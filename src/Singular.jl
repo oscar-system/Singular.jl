@@ -1,5 +1,6 @@
 module Singular
 
-# package code goes here
+using Nemo
+using Cxx
 
 end # module
