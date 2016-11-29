@@ -8,3 +8,7 @@
 
 Julia package for using the [Singular](https://www.singular.uni-kl.de/) library for commutative and
 non-commutative algebra, algebraic geometry, and singularity theory.
+
+Currently this requires the latest Julia sources to be built, with a Make.user
+file as specified in the Cxx package [README](https://github.com/Keno/Cxx.jl).
+
