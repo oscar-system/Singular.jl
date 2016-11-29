@@ -6,5 +6,5 @@
 
 [![codecov.io](http://codecov.io/github/wbhart/Singular.jl/coverage.svg?branch=master)](http://codecov.io/github/wbhart/Singular.jl?branch=master)
 
-Julia package for using the [Singular]: https://www.singular.uni-kl.de/ library for commutative and
+Julia package for using the [Singular](https://www.singular.uni-kl.de/) library for commutative and
 non-commutative algebra, algebraic geometry, and singularity theory.
