@@ -3,12 +3,14 @@ module Singular
 using Nemo
 using Cxx
 
-import Base: div, gcd, inv, isequal, isless, lcm, one, show, zero,
+import Base: deepcopy, div, divrem, gcd, inv, isequal, isless, lcm, one,
+             rem, show, zero,
              +, -, *, ==, ^, &, |, $, <<, >>, ~, <=, >=, <, >, //,
              /, !=
 
-import Nemo: addeq!, divexact, elem_type, is_negative, isone, iszero, mul!,
-             needs_parentheses, parent_type, parent, show_minus_one 
+import Nemo: add!, addeq!, divexact, elem_type, is_negative, isone, iszero,
+             mul!, needs_parentheses, parent_type, parent, show_minus_one,
+             zero! 
 
 export SingularQQ
 
@@ -70,6 +72,7 @@ function __init__()
    # done in __init__ since headers must be included first
 
    global SingularQQ = SingularRationalField()
+   global SingularZZ = SingularIntegerRing()
 end
 
 ###############################################################################

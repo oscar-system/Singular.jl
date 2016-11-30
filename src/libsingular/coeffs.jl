@@ -8,9 +8,24 @@ function nKillChar(cf::coeffs)
    icxx"""nKillChar($cf);"""
 end
 
-# initialise a number
-function n_Init(i::Int64, cf::coeffs) 
+function nCoeff_has_simple_Alloc(cf::coeffs)
+   icxx"""nCoeff_has_simple_Alloc($cf);""" > 0
+end
+
+# initialise a number from an Int
+function n_Init(i::Int, cf::coeffs) 
    icxx"""n_Init($i, $cf);"""
+end
+
+# initialise a number from an Int
+function n_Copy(n::number, cf::coeffs) 
+   icxx"""n_Copy($n, $cf);"""
+end
+
+# initialise a number from an mpz
+function n_InitMPZ(b::BigInt, cf::coeffs)
+    bb = __mpz_struct(pointer_from_objref(b))
+    icxx"""n_InitMPZ($bb, $cf);"""
 end
 
 # delete a number
@@ -82,6 +97,24 @@ end
 
 function n_InpAdd(a::number_ref, b::number, cf::coeffs)
    icxx"""n_InpAdd($a, $b, $cf);"""
+end
+
+function n_InpMult(a::number_ref, b::number, cf::coeffs)
+   icxx"""n_InpMult($a, $b, $cf);"""
+end
+
+function n_QuotRem(a::number, b::number, cf::coeffs)
+   q = n_Init(0, cf)
+   r = n_Init(0, cf)
+   icxx"""number qq = n_Init(0, $cf); $r = n_QuotRem($a, $b, &qq, $cf); $q = qq;"""
+   return q[], r[]
+end
+
+function n_Rem(a::number, b::number, cf::coeffs)
+   q = n_Init(0, cf)
+   r = n_Init(0, cf)
+   icxx"""number qq = n_Init(0, $cf); $r = n_QuotRem($a, $b, &qq, $cf); $q = qq;"""
+   return r[]
 end
 
 # create a Singular string environment

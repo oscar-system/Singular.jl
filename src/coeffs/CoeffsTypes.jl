@@ -81,14 +81,58 @@ type SingularQQElem <: Nemo.FieldElem
     end
 end
 
+ checkit = Dict{Int, Int}()
+
 function _SingularQQElem_clear_fn(n::SingularQQElem)
-   c = parent(n)
-   cf = c.ptr
-   p = n.ptr
+   libSingular.n_Delete(n.ptr, parent(n).ptr)
+   nothing
+end
 
-   # if libSingular.nCoeff_has_simple_Alloc(cf) || (p == number(0))
-   #    nothing
-   # end
+###############################################################################
+#
+#   SingularIntegerRing/SingularZZElem
+#
+###############################################################################
 
-   libSingular.n_Delete(p, cf)
+type SingularIntegerRing <: Nemo.Ring
+   ptr::libSingular.coeffs
+
+   function SingularIntegerRing() 
+      n_Z = @cxx n_Z
+      d = new(libSingular.nInitChar(n_Z, Ptr{Void}(0)))
+      finalizer(d, _SingularIntegerRing_clear_fn)
+      return d
+   end
+end
+
+function _SingularIntegerRing_clear_fn(cf::SingularIntegerRing)
+   libSingular.nKillChar(cf.ptr)
+end
+
+type SingularZZElem <: Nemo.RingElem
+    ptr::libSingular.number
+
+    function SingularZZElem()
+    	const c = SingularZZ.ptr
+        z = new(libSingular.n_Init(0, c))
+        finalizer(z, _SingularZZElem_clear_fn)
+        return z
+    end
+
+    function SingularZZElem(n::Int)
+    	const c = SingularZZ.ptr
+        z = new(libSingular.n_Init(n, c))
+        finalizer(z, _SingularZZElem_clear_fn)
+        return z
+    end
+
+    function SingularZZElem(n::libSingular.number)
+    	z = new(n)
+        finalizer(z, _SingularZZElem_clear_fn)
+        return z
+    end
+end
+
+function _SingularZZElem_clear_fn(n::SingularZZElem)
+   libSingular.n_Delete(n.ptr, parent(n).ptr)
 end

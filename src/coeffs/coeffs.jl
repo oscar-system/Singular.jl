@@ -16,6 +16,10 @@ function check_parent(a::SingularQQElem, b::SingularQQElem)
    parent(a) != parent(b) && error("Elements have different parents")
 end
 
+function deepcopy(a::SingularQQElem)
+   return parent(a)(libSingular.n_Copy(a.ptr, parent(a).ptr))
+end
+
 ###############################################################################
 #
 #   Basic manipulation
@@ -208,12 +212,31 @@ end
 
 ###############################################################################
 #
+#   Euclidean division
+#
+###############################################################################
+
+function divrem(x::SingularQQElem, y::SingularQQElem)
+   check_parent(x, y)
+   return div(x, y), zero(parent(x)) 
+end
+
+function rem(x::SingularQQElem, y::SingularQQElem)
+   check_parent(x, y)
+   return zero(parent(x))
+end
+
+###############################################################################
+#
 #   GCD and LCM
 #
 ###############################################################################
 
 function gcd(x::SingularQQElem, y::SingularQQElem)
    check_parent(x, y)
+   if x == 0 && y == 0
+      return zero(parent(x))
+   end
    c = parent(x)
    p = libSingular.n_Gcd(x.ptr, y.ptr, c.ptr)
    return c(p)
@@ -221,6 +244,9 @@ end
 
 function lcm(x::SingularQQElem, y::SingularQQElem)
    check_parent(x, y)
+   if x == 0 && y == 0
+      return zero(parent(x))
+   end
    c = parent(x)
    p = libSingular.n_Lcm(x.ptr, y.ptr, c.ptr)
    return c(p)
@@ -240,10 +266,24 @@ function addeq!(x::SingularQQElem, y::SingularQQElem)
 end
 
 function mul!(x::SingularQQElem, y::SingularQQElem, z::SingularQQElem)
-    ptr = libSingular.n_Mult(y.ptr, z.ptr, parent(x).ptr)
-    libSingular.n_Delete(x.ptr, parent(x).ptr)
-    x.ptr = ptr
-    nothing
+   ptr = libSingular.n_Mult(y.ptr, z.ptr, parent(x).ptr)
+   libSingular.n_Delete(x.ptr, parent(x).ptr)
+   x.ptr = ptr
+   nothing
+end
+
+function add!(x::SingularQQElem, y::SingularQQElem, z::SingularQQElem)
+   ptr = libSingular.n_Add(y.ptr, z.ptr, parent(x).ptr)
+   libSingular.n_Delete(x.ptr, parent(x).ptr)
+   x.ptr = ptr
+   nothing
+end
+
+function zero!(x::SingularQQElem)
+   ptr = libSingular.n_Init(0, parent(x).ptr)
+   libSingular.n_Delete(x.ptr, parent(x).ptr)
+   x.ptr = ptr
+   nothing
 end
 
 ###############################################################################
@@ -258,4 +298,10 @@ end
 
 (::SingularRationalField)(n::libSingular.number) = SingularQQElem(n) 
 
+function (R::SingularRationalField)(x::Nemo.fmpz)
+   a = BigInt()
+   ccall((:flint_mpz_init_set_readonly, :libflint), Void,
+         (Ptr{BigInt}, Ptr{fmpz}), &a, &x)
+   return R(libSingular.n_InitMPZ(a, R.ptr))   
+end
 
