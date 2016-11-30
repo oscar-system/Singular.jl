@@ -17,7 +17,7 @@ end
 
 const tmp = mktempdir(wdir)
 
-# http://www.shoup.net/ntl/WinNTL-9_3_0.zip # under Windows?
+# http://www.shoup.net/ntl/WinNTL-9_3_0.zip
 cd(tmp)
 run(`tar -C "$tmp" -xkvf "$wdir/$ntl.tar.gz"`)
 cd(joinpath(tmp, ntl, "src"))
