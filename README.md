@@ -12,3 +12,12 @@ non-commutative algebra, algebraic geometry, and singularity theory.
 Currently this requires the latest Julia sources to be built, with a Make.user
 file as specified in the Cxx package [README](https://github.com/Keno/Cxx.jl).
 
+To build Singular.jl, start julia and then type:
+
+julia> Pkg.clone("https://github.com/wbhart/Singular.jl")
+julia> Pkg.build("Singular")
+
+To use Singular.jl, start julia and then type:
+
+julia> using Singular
+
