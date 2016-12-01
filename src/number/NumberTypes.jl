@@ -38,59 +38,7 @@ end
 
 ###############################################################################
 #
-#   SingularRationalField/SingularQQElem
-#
-###############################################################################
-
-type SingularRationalField <: Nemo.Field
-   ptr::libSingular.coeffs
-
-   function SingularRationalField() 
-      n_Q = @cxx n_Q
-      d = new(libSingular.nInitChar(n_Q, Ptr{Void}(0)))
-      finalizer(d, _SingularRationalField_clear_fn)
-      return d
-   end
-end
-
-function _SingularRationalField_clear_fn(cf::SingularRationalField)
-   libSingular.nKillChar(cf.ptr)
-end
-
-type SingularQQElem <: Nemo.FieldElem
-    ptr::libSingular.number
-
-    function SingularQQElem()
-    	const c = SingularQQ.ptr
-        z = new(libSingular.n_Init(0, c))
-        finalizer(z, _SingularQQElem_clear_fn)
-        return z
-    end
-
-    function SingularQQElem(n::Int)
-    	const c = SingularQQ.ptr
-        z = new(libSingular.n_Init(n, c))
-        finalizer(z, _SingularQQElem_clear_fn)
-        return z
-    end
-
-    function SingularQQElem(n::libSingular.number)
-    	z = new(n)
-        finalizer(z, _SingularQQElem_clear_fn)
-        return z
-    end
-end
-
- checkit = Dict{Int, Int}()
-
-function _SingularQQElem_clear_fn(n::SingularQQElem)
-   libSingular.n_Delete(n.ptr, parent(n).ptr)
-   nothing
-end
-
-###############################################################################
-#
-#   SingularIntegerRing/SingularZZElem
+#   SingularIntegerRing/n_Z
 #
 ###############################################################################
 
@@ -109,30 +57,86 @@ function _SingularIntegerRing_clear_fn(cf::SingularIntegerRing)
    libSingular.nKillChar(cf.ptr)
 end
 
-type SingularZZElem <: Nemo.RingElem
+type n_Z <: Nemo.RingElem
     ptr::libSingular.number
 
-    function SingularZZElem()
+    function n_Z()
     	const c = SingularZZ.ptr
         z = new(libSingular.n_Init(0, c))
-        finalizer(z, _SingularZZElem_clear_fn)
+        finalizer(z, _n_Z_clear_fn)
         return z
     end
 
-    function SingularZZElem(n::Int)
+    function n_Z(n::Int)
     	const c = SingularZZ.ptr
         z = new(libSingular.n_Init(n, c))
-        finalizer(z, _SingularZZElem_clear_fn)
+        finalizer(z, _n_Z_clear_fn)
         return z
     end
 
-    function SingularZZElem(n::libSingular.number)
+    function n_Z(n::libSingular.number)
     	z = new(n)
-        finalizer(z, _SingularZZElem_clear_fn)
+        finalizer(z, _n_Z_clear_fn)
         return z
     end
 end
 
-function _SingularZZElem_clear_fn(n::SingularZZElem)
+function _n_Z_clear_fn(n::n_Z)
    libSingular.n_Delete(n.ptr, parent(n).ptr)
+end
+
+###############################################################################
+#
+#   SingularRationalField/n_Q
+#
+###############################################################################
+
+type SingularRationalField <: Nemo.Field
+   ptr::libSingular.coeffs
+
+   function SingularRationalField() 
+      n_Q = @cxx n_Q
+      d = new(libSingular.nInitChar(n_Q, Ptr{Void}(0)))
+      finalizer(d, _SingularRationalField_clear_fn)
+      return d
+   end
+end
+
+function _SingularRationalField_clear_fn(cf::SingularRationalField)
+   libSingular.nKillChar(cf.ptr)
+end
+
+type n_Q <: Nemo.FieldElem
+    ptr::libSingular.number
+
+    function n_Q()
+    	const c = SingularQQ.ptr
+        z = new(libSingular.n_Init(0, c))
+        finalizer(z, _n_Q_clear_fn)
+        return z
+    end
+
+    function n_Q(n::Int)
+    	const c = SingularQQ.ptr
+        z = new(libSingular.n_Init(n, c))
+        finalizer(z, _n_Q_clear_fn)
+        return z
+    end
+
+    function n_Q(n::n_Z)
+    	z = new(libSingular.nApplyMapFunc(n_Z_2_n_Q, p, SingularZZ.ptr, SingularQQ.ptr))
+        finalizer(z, _n_Q_clear_fn)
+        return z
+    end
+
+    function n_Q(n::libSingular.number)
+    	z = new(n)
+        finalizer(z, _n_Q_clear_fn)
+        return z
+    end
+end
+
+function _n_Q_clear_fn(n::n_Q)
+   libSingular.n_Delete(n.ptr, parent(n).ptr)
+   nothing
 end

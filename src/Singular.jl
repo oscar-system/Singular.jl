@@ -3,14 +3,14 @@ module Singular
 using Nemo
 using Cxx
 
-import Base: deepcopy, div, divrem, gcd, inv, isequal, isless, lcm, one,
-             rem, show, zero,
+import Base: abs, deepcopy, den, div, divrem, gcd, gcdx, inv, isequal, isless,
+             lcm, num, one, rem, show, zero,
              +, -, *, ==, ^, &, |, $, <<, >>, ~, <=, >=, <, >, //,
              /, !=
 
-import Nemo: add!, addeq!, divexact, elem_type, is_negative, isone, iszero,
-             mul!, needs_parentheses, parent_type, parent, show_minus_one,
-             zero! 
+import Nemo: add!, addeq!, divexact, elem_type, gcdinv, is_negative, isone,
+             iszero, isunit, mul!, needs_parentheses, parent_type, parent,
+             reconstruct, show_minus_one, zero! 
 
 export SingularQQ
 
@@ -73,6 +73,9 @@ function __init__()
 
    global SingularQQ = SingularRationalField()
    global SingularZZ = SingularIntegerRing()
+
+   global n_Z_2_n_Q = libSingular.n_SetMap(SingularZZ.ptr, SingularQQ.ptr)
+   global n_Q_2_n_Z = libSingular.n_SetMap(SingularQQ.ptr, SingularZZ.ptr)
 end
 
 ###############################################################################
@@ -85,6 +88,6 @@ include("AbstractTypes.jl")
 
 include("LibSingular.jl")
 
-include("Coeffs.jl")
+include("Number.jl")
 
 end # module

@@ -8,6 +8,15 @@ function nKillChar(cf::coeffs)
    icxx"""nKillChar($cf);"""
 end
 
+# return a function to convert between rings
+function n_SetMap(src::coeffs, dst::coeffs)
+   icxx"""n_SetMap($src, $dst);"""
+end
+
+function nApplyMapFunc(f::Cxx.CppFptr, n::number, src::coeffs, dst::coeffs)
+   icxx"""$f($n, $src, $dst);"""
+end
+
 function nCoeff_has_simple_Alloc(cf::coeffs)
    icxx"""nCoeff_has_simple_Alloc($cf);""" > 0
 end
@@ -67,6 +76,14 @@ function n_Div(a::number, b::number, cf::coeffs)
    icxx"""number z = n_Div($a, $b, $cf); n_Normalize(z, $cf); z;"""
 end
 
+function n_GetNumerator(a::number_ref, cf::coeffs)
+   icxx"""return n_GetNumerator($a, $cf);"""
+end
+
+function n_GetDenom(a::number_ref, cf::coeffs)
+   icxx"""return n_GetDenom($a, $cf);"""
+end
+
 function n_Power(a::number, b::Int, cf::coeffs)
    icxx"""number res; n_Power($a, $b, &res, $cf); res;"""
 end
@@ -75,8 +92,20 @@ function n_Gcd(a::number, b::number, cf::coeffs)
    icxx"""n_Gcd($a, $b, $cf);"""
 end
 
+function n_SubringGcd(a::number, b::number, cf::coeffs)
+   icxx"""n_SubringGcd($a, $b, $cf);"""
+end
+
 function n_Lcm(a::number, b::number, cf::coeffs)
    icxx"""n_Lcm($a, $b, $cf);"""
+end
+
+function n_ExtGcd(a::number, b::number, cf:: coeffs)
+   s = n_Init(0, cf)
+   t = n_Init(0, cf)
+   g = n_Init(0, cf)
+   icxx"""number ss, tt; $g = n_ExtGcd($a, $b, &ss, &tt, $cf); $s = ss; $t = tt;"""
+   g, s, t
 end
 
 function n_IsZero(a::number, cf::coeffs)
@@ -89,6 +118,10 @@ end
 
 function n_Greater(a::number, b::number, cf::coeffs)
    icxx"""n_Greater($a, $b, $cf);""" > 0
+end
+
+function n_GreaterZero(a::number, cf::coeffs)
+   icxx"""n_GreaterZero($a, $cf);""" > 0
 end
 
 function n_Equal(a::number, b::number, cf::coeffs)
@@ -106,15 +139,19 @@ end
 function n_QuotRem(a::number, b::number, cf::coeffs)
    q = n_Init(0, cf)
    r = n_Init(0, cf)
-   icxx"""number qq = n_Init(0, $cf); $r = n_QuotRem($a, $b, &qq, $cf); $q = qq;"""
+   icxx"""number qq; $r = n_QuotRem($a, $b, &qq, $cf); $q = qq;"""
    return q[], r[]
 end
 
 function n_Rem(a::number, b::number, cf::coeffs)
    q = n_Init(0, cf)
    r = n_Init(0, cf)
-   icxx"""number qq = n_Init(0, $cf); $r = n_QuotRem($a, $b, &qq, $cf); $q = qq;"""
+   icxx"""number qq; $r = n_QuotRem($a, $b, &qq, $cf); $q = qq;"""
    return r[]
+end
+
+function n_Farey(a::number, b::number, cf::coeffs)
+   icxx"""n_Farey($a, $b, $cf);"""
 end
 
 # create a Singular string environment
