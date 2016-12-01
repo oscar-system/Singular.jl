@@ -282,6 +282,10 @@ function reconstruct(x::n_Z, y::n_Z)
    return SingularQQ(p)
 end
 
+reconstruct(x::n_Z, y::Integer) = reconstruct(x, SingularZZ(y))
+
+reconstruct(x::Integer, y::n_Z) = reconstruct(SingularZZ(x), y)
+
 ###############################################################################
 #
 #   Unsafe functions
