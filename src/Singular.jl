@@ -4,15 +4,15 @@ using Nemo
 using Cxx
 
 import Base: abs, deepcopy, den, div, divrem, gcd, gcdx, inv, isequal, isless,
-             lcm, num, one, rem, show, zero,
+             lcm, mod, num, one, rem, show, zero,
              +, -, *, ==, ^, &, |, $, <<, >>, ~, <=, >=, <, >, //,
              /, !=
 
-import Nemo: add!, addeq!, divexact, elem_type, gcdinv, is_negative, isone,
-             iszero, isunit, mul!, needs_parentheses, parent_type, parent,
-             reconstruct, show_minus_one, zero! 
+import Nemo: add!, addeq!, crt, divexact, elem_type, gcdinv, is_negative,
+             isone, iszero, isunit, mul!, needs_parentheses, parent_type,
+             parent, reconstruct, show_minus_one, zero! 
 
-export SingularQQ
+export SingularQQ, SingularZZ
 
 ###############################################################################
 #

@@ -35,17 +35,21 @@ try
 catch
   cd(srcs)
   run(`git pull --rebase`)
-  cd(joinpath(tmp, ntl, "src"))
+  cd(wdir)
 end  
 
 run(`$srcs/autogen.sh`)
 
 # out of source-tree building:
-cd(mktempdir(tmp))
+try 
+   mkdir(joinpath(wdir, "Singular_build"))
+catch
+end
+
+cd(joinpath(wdir, "Singular_build"))
 run(`$srcs/configure --prefix=$vdir --disable-static --disable-p-procs-static --enable-p-procs-dynamic --enable-shared --with-gmp=$vdir --with-flint=$vdir --with-ntl=$vdir --without-python --with-readline=no --disable-gfanlib --with-debug --enable-debug --disable-optimizationflags`)
 run(`make -j4`)
 run(`make install`)
-run(`rm -Rf $tmp`)
 
 cd(wdir)
 

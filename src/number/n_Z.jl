@@ -1,4 +1,4 @@
-export reconstruct, isone, iszero, isunit, divexact
+export crt
 
 ###############################################################################
 #
@@ -6,17 +6,17 @@ export reconstruct, isone, iszero, isunit, divexact
 #
 ###############################################################################
 
-elem_type(::SingularRationalField) = n_Q
+elem_type(::SingularIntegerRing) = n_Z
 
-parent(a::n_Q) = SingularQQ
+parent(a::n_Z) = SingularZZ
 
-parent_type(::Type{n_Q}) = SingularRationalField
+parent_type(::Type{n_Z}) = SingularIntegerRing
 
-base_ring(a::n_Q) = SingularZZ
+base_ring(a::n_Z) = SingularZZ
 
-base_ring(a::SingularRationalField) = SingularZZ
+base_ring(a::SingularIntegerRing) = SingularZZ
 
-function deepcopy(a::n_Q)
+function deepcopy(a::n_Z)
    return parent(a)(libSingular.n_Copy(a.ptr, parent(a).ptr))
 end
 
@@ -26,39 +26,33 @@ end
 #
 ###############################################################################
 
-one(::SingularRationalField) = SingularQQ(1)
+one(::SingularIntegerRing) = SingularZZ(1)
 
-zero(::SingularRationalField) = SingularQQ(0)
+zero(::SingularIntegerRing) = SingularZZ(0)
 
-function isone(n::n_Q)
+function isone(n::n_Z)
    c = parent(n)
    return libSingular.n_IsOne(n.ptr, c.ptr)
 end
 
-function iszero(n::n_Q)
+function iszero(n::n_Z)
    c = parent(n)
    return libSingular.n_IsZero(n.ptr, c.ptr)
 end
 
-isunit(n::n_Q) = !iszero(n)
+isunit(n::n_Z) = !iszero(n)
 
-function num(n::n_Q)
-   nn = libSingular.number_ref(n.ptr);
-   p = libSingular.n_GetNumerator(nn, parent(n).ptr)
-   pp = libSingular.nApplyMapFunc(n_Q_2_n_Z, p, SingularQQ.ptr, SingularZZ.ptr)
-   libSingular.n_Delete(p, SingularQQ.ptr)
-   return SingularZZ(pp)
+function num(n::n_Z)
+   par = parent(n)
+   r = libSingular.n_Copy(n.ptr, par.ptr)
+   return par(r)
 end
 
-function den(n::n_Q)
-   nn = libSingular.number_ref(n.ptr);
-   p = libSingular.n_GetDenom(nn, parent(n).ptr)
-   pp = libSingular.nApplyMapFunc(n_Q_2_n_Z, p, SingularQQ.ptr, SingularZZ.ptr)
-   libSingular.n_Delete(p, SingularQQ.ptr)
-   return SingularZZ(pp)
+function den(n::n_Z)
+   return one(parent(n))
 end
 
-function abs(n::n_Q)
+function abs(n::n_Z)
    if libSingular.n_GreaterZero(n.ptr, parent(n).ptr) || iszero(n)
       return deepcopy(n)
    else
@@ -72,7 +66,7 @@ end
 #
 ###############################################################################
 
-canonical_unit(x::n_Q) = x
+canonical_unit(x::n_Z) = isnegative(x) ? -one(parent(x)) : one(parent(x))
 
 ###############################################################################
 #
@@ -80,11 +74,11 @@ canonical_unit(x::n_Q) = x
 #
 ###############################################################################
 
-function show(io::IO, c::SingularRationalField)
-   print(io, "Rational Field")
+function show(io::IO, c::SingularIntegerRing)
+   print(io, "Integer Ring")
 end
 
-function show(io::IO, n::n_Q)
+function show(io::IO, n::n_Z)
    libSingular.StringSetS("")
 
    nn = libSingular.number_ref(n.ptr)	
@@ -98,12 +92,12 @@ function show(io::IO, n::n_Q)
    print(io, s)
 end
 
-needs_parentheses(x::n_Q) = false
+needs_parentheses(x::n_Z) = false
 
-is_negative(x::n_Q) = !libSingular.n_GreaterZero(x.ptr, parent(x).ptr) &&
+is_negative(x::n_Z) = !libSingular.n_GreaterZero(x.ptr, parent(x).ptr) &&
                       !iszero(x)
 
-show_minus_one(::Type{n_Q}) = false
+show_minus_one(::Type{n_Z}) = false
 
 ###############################################################################
 #
@@ -111,7 +105,7 @@ show_minus_one(::Type{n_Q}) = false
 #
 ###############################################################################
 
-function -(x::n_Q) 
+function -(x::n_Z) 
     C = parent(x)
     ptr = libSingular.n_Neg(x.ptr, C.ptr)
     return C(ptr) 
@@ -123,19 +117,19 @@ end
 #
 ###############################################################################
 
-function +(x::n_Q, y::n_Q)
+function +(x::n_Z, y::n_Z)
    c = parent(x)
    p = libSingular.n_Add(x.ptr, y.ptr, c.ptr)
    return c(p)
 end
 
-function -(x::n_Q, y::n_Q)
+function -(x::n_Z, y::n_Z)
    c = parent(x)
    p = libSingular.n_Sub(x.ptr, y.ptr, c.ptr)
    return c(p)
 end
 
-function *(x::n_Q, y::n_Q)
+function *(x::n_Z, y::n_Z)
    c = parent(x)
    p = libSingular.n_Mult(x.ptr, y.ptr, c.ptr)
    return c(p)
@@ -147,17 +141,17 @@ end
 #
 ###############################################################################
 
-+(x::n_Q, y::Integer) = x + parent(x)(y)
++(x::n_Z, y::Integer) = x + parent(x)(y)
 
-+(x::Integer, y::n_Q) = parent(y)(x) + y
++(x::Integer, y::n_Z) = parent(y)(x) + y
 
--(x::n_Q, y::Integer) = x - parent(x)(y)
+-(x::n_Z, y::Integer) = x - parent(x)(y)
 
--(x::Integer, y::n_Q) = parent(y)(x) - y
+-(x::Integer, y::n_Z) = parent(y)(x) - y
 
-*(x::n_Q, y::Integer) = x*parent(x)(y)
+*(x::n_Z, y::Integer) = x*parent(x)(y)
 
-*(x::Integer, y::n_Q) = parent(y)(x)*y
+*(x::Integer, y::n_Z) = parent(y)(x)*y
 
 ###############################################################################
 #
@@ -165,15 +159,15 @@ end
 #
 ###############################################################################
 
-function isless(x::n_Q, y::n_Q)
+function isless(x::n_Z, y::n_Z)
     libSingular.n_Greater(y.ptr, x.ptr, parent(x).ptr)
 end
 
-function ==(x::n_Q, y::n_Q)
+function ==(x::n_Z, y::n_Z)
     return libSingular.n_Equal(x.ptr, y.ptr, parent(x).ptr)
 end
 
-isequal(x::n_Q, y::n_Q) = (x == y)
+isequal(x::n_Z, y::n_Z) = (x == y)
 
 ###############################################################################
 #
@@ -181,17 +175,17 @@ isequal(x::n_Q, y::n_Q) = (x == y)
 #
 ###############################################################################
 
-==(x::n_Q, y::Integer) = (x ==  parent(x)(y))
+==(x::n_Z, y::Integer) = (x ==  parent(x)(y))
 
-==(x::Integer, y::n_Q) = (parent(y)(x) == y)
+==(x::Integer, y::n_Z) = (parent(y)(x) == y)
 
-isequal(x::n_Q, y::Integer) = (x == y)
+isequal(x::n_Z, y::Integer) = (x == y)
 
-isequal(x::Integer, y::n_Q) = (x == y)
+isequal(x::Integer, y::n_Z) = (x == y)
 
-isless(x::n_Q, y::Integer) = isless(x, parent(x)(y))
+isless(x::n_Z, y::Integer) = isless(x, parent(x)(y))
 
-isless(x::Integer, y::n_Q) = isless(parent(y)(x), y)
+isless(x::Integer, y::n_Z) = isless(parent(y)(x), y)
 
 ###############################################################################
 #
@@ -199,10 +193,9 @@ isless(x::Integer, y::n_Q) = isless(parent(y)(x), y)
 #
 ###############################################################################
 
-function ^(x::n_Q, y::Int)
-    if y < 0
-       return div(parent(x)(1), x^(-y))
-    elseif isone(x)
+function ^(x::n_Z, y::Int)
+    y < 0 && throw(DomainError())
+    if isone(x)
        return x
     elseif y == 0
        return one(parent(x))
@@ -220,21 +213,15 @@ end
 #
 ###############################################################################
 
-function inv(x::n_Q)
-   c = parent(x)
-   p = libSingular.n_Invers(x.ptr, c.ptr)
-   return c(p)
-end
-
-function div(x::n_Q, y::n_Q)
+function div(x::n_Z, y::n_Z)
    c = parent(x)
    p = libSingular.n_Div(x.ptr, y.ptr, c.ptr)
    return c(p)
 end
 
-function divexact(x::n_Q, y::n_Q)
+function divexact(x::n_Z, y::n_Z)
    c = parent(x)
-   p = libSingular.n_Div(x.ptr, y.ptr, c.ptr)
+   p = libSingular.n_ExactDiv(x.ptr, y.ptr, c.ptr)
    return c(p)
 end
 
@@ -244,13 +231,19 @@ end
 #
 ###############################################################################
 
-function divrem(x::n_Q, y::n_Q)
-   return div(x, y), zero(parent(x)) 
+function divrem(x::n_Z, y::n_Z)
+   par = parent(x)
+   q, r = libSingular.n_QuotRem(x.ptr, y.ptr, par.ptr)
+   return par(q), par(r)
 end
 
-function rem(x::n_Q, y::n_Q)
-   return zero(parent(x))
+function rem(x::n_Z, y::n_Z)
+   par = parent(x)
+   r = libSingular.n_IntMod(x.ptr, y.ptr, par.ptr)
+   return par(r)
 end
+
+mod(x::n_Z, y::n_Z) = rem(x, y)
 
 ###############################################################################
 #
@@ -258,13 +251,13 @@ end
 #
 ###############################################################################
 
-function gcd(x::n_Q, y::n_Q)
+function gcd(x::n_Z, y::n_Z)
    par = parent(x)
-   p = libSingular.n_SubringGcd(x.ptr, y.ptr, par.ptr)
+   p = libSingular.n_Gcd(x.ptr, y.ptr, par.ptr)
    return par(p)
 end
 
-function lcm(x::n_Q, y::n_Q)
+function lcm(x::n_Z, y::n_Z)
    if x == 0 && y == 0
       return zero(parent(x))
    end
@@ -273,18 +266,29 @@ end
 
 ###############################################################################
 #
-#   Rational reconstruction
+#   Extended GCD
 #
 ###############################################################################
 
-function reconstruct(x::n_Z, y::n_Z)
-   p = libSingular.n_Farey(x.ptr, y.ptr, SingularQQ.ptr)
-   return SingularQQ(p)
+function gcdx(x::n_Z, y::n_Z)
+   par = parent(x)
+   g, s, t = libSingular.n_ExtGcd(x.ptr, y.ptr, par.ptr)
+   return par(g), par(s), par(t)
 end
 
-reconstruct(x::n_Z, y::Integer) = reconstruct(x, SingularZZ(y))
+###############################################################################
+#
+#   Chinese remainder
+#
+###############################################################################
 
-reconstruct(x::Integer, y::n_Z) = reconstruct(SingularZZ(x), y)
+function crt(r1::n_Z, m1::n_Z, r2::n_Z, m2::n_Z, signed=false)
+   par = parent(r1)
+   r = [r1.ptr, r2.ptr]
+   m = [m1.ptr, m2.ptr]
+   a = libSingular.n_ChineseRemainderSym(r, m, Cint(2), Cint(signed), par.ptr)
+   return par(a)
+end
 
 ###############################################################################
 #
@@ -292,28 +296,28 @@ reconstruct(x::Integer, y::n_Z) = reconstruct(SingularZZ(x), y)
 #
 ###############################################################################
 
-function addeq!(x::n_Q, y::n_Q)
+function addeq!(x::n_Z, y::n_Z)
     xx = libSingular.number_ref(x.ptr)
     libSingular.n_InpAdd(xx, y.ptr, parent(x).ptr)
     x.ptr = xx[]
     nothing
 end
 
-function mul!(x::n_Q, y::n_Q, z::n_Q)
+function mul!(x::n_Z, y::n_Z, z::n_Z)
    ptr = libSingular.n_Mult(y.ptr, z.ptr, parent(x).ptr)
    libSingular.n_Delete(x.ptr, parent(x).ptr)
    x.ptr = ptr
    nothing
 end
 
-function add!(x::n_Q, y::n_Q, z::n_Q)
+function add!(x::n_Z, y::n_Z, z::n_Z)
    ptr = libSingular.n_Add(y.ptr, z.ptr, parent(x).ptr)
    libSingular.n_Delete(x.ptr, parent(x).ptr)
    x.ptr = ptr
    nothing
 end
 
-function zero!(x::n_Q)
+function zero!(x::n_Z)
    ptr = libSingular.n_Init(0, parent(x).ptr)
    libSingular.n_Delete(x.ptr, parent(x).ptr)
    x.ptr = ptr
@@ -326,11 +330,7 @@ end
 #
 ###############################################################################
 
-Base.promote_rule{T <: Integer}(C::Type{n_Q}, ::Type{T}) = n_Q
-
-Base.promote_rule(C::Type{n_Q}, ::Type{Nemo.fmpz}) = n_Q
-
-Base.promote_rule(C::Type{n_Q}, ::Type{n_Q}) = n_Z
+Base.promote_rule{T <: Integer}(C::Type{n_Z}, ::Type{T}) = n_Z
 
 ###############################################################################
 #
@@ -338,19 +338,17 @@ Base.promote_rule(C::Type{n_Q}, ::Type{n_Q}) = n_Z
 #
 ###############################################################################
 
-(::SingularRationalField)() = n_Q()
+(::SingularIntegerRing)() = n_Z()
 
-(::SingularRationalField)(n::Int) = n_Q(n)
+(R::SingularIntegerRing)(x::Integer) = R(libSingular.n_InitMPZ(BigInt(x), R.ptr)) 
 
-(R::SingularRationalField)(x::Integer) = R(libSingular.n_InitMPZ(BigInt(x), R.ptr)) 
+(::SingularIntegerRing)(n::Int) = n_Z(n)
 
-(::SingularRationalField)(n::n_Z) = n_Q(n)
+(::SingularIntegerRing)(n::n_Z) = n
 
-(::SingularIntegerRing)(n::n_Q) = n
+(::SingularIntegerRing)(n::libSingular.number) = n_Z(n) 
 
-(::SingularRationalField)(n::libSingular.number) = n_Q(n) 
-
-function (R::SingularRationalField)(x::Nemo.fmpz)
+function (R::SingularIntegerRing)(x::Nemo.fmpz)
    a = BigInt()
    ccall((:flint_mpz_init_set_readonly, :libflint), Void,
          (Ptr{BigInt}, Ptr{fmpz}), &a, &x)

@@ -101,11 +101,11 @@ function n_Lcm(a::number, b::number, cf::coeffs)
 end
 
 function n_ExtGcd(a::number, b::number, cf:: coeffs)
-   s = n_Init(0, cf)
-   t = n_Init(0, cf)
-   g = n_Init(0, cf)
-   icxx"""number ss, tt; $g = n_ExtGcd($a, $b, &ss, &tt, $cf); $s = ss; $t = tt;"""
-   g, s, t
+   s = [n_Init(0, cf)]
+   t = [n_Init(0, cf)]
+   p1 = pointer(s)
+   p2 = pointer(t)
+   icxx"""number gg, ss, tt; n_ExtGcd($a, $b, $p1, $p2, $cf);""", s[1], t[1]
 end
 
 function n_IsZero(a::number, cf::coeffs)
@@ -137,21 +137,28 @@ function n_InpMult(a::number_ref, b::number, cf::coeffs)
 end
 
 function n_QuotRem(a::number, b::number, cf::coeffs)
-   q = n_Init(0, cf)
-   r = n_Init(0, cf)
-   icxx"""number qq; $r = n_QuotRem($a, $b, &qq, $cf); $q = qq;"""
-   return q[], r[]
+   r = [n_Init(0, cf)]
+   p = pointer(r)
+   q = icxx"""n_QuotRem($a, $b, $p, $cf);"""
+   return q, r[1]
 end
 
 function n_Rem(a::number, b::number, cf::coeffs)
-   q = n_Init(0, cf)
-   r = n_Init(0, cf)
-   icxx"""number qq; $r = n_QuotRem($a, $b, &qq, $cf); $q = qq;"""
-   return r[]
+   icxx"""number qq; n_QuotRem($a, $b, &qq, $cf);"""
+end
+
+function n_IntMod(a::number, b::number, cf::coeffs)
+   icxx"""n_IntMod($a, $b, $cf);"""
 end
 
 function n_Farey(a::number, b::number, cf::coeffs)
    icxx"""n_Farey($a, $b, $cf);"""
+end
+
+function n_ChineseRemainderSym(a::Array{number, 1}, b::Array{number, 1}, n::Cint, signed::Cint, cf::coeffs)
+   p1 = pointer(a)
+   p2 = pointer(b)
+   icxx"""CFArray inv_cache($n); n_ChineseRemainderSym($p1, $p2, $n, $signed, inv_cache, $cf);"""
 end
 
 # create a Singular string environment

@@ -10,14 +10,5 @@ typealias __mpz_struct pcpp"__mpz_struct"
 
 typealias mpz_t pcpp"mpz_t"
 
-typealias nMapFunc Cxx.CppFptr{Cxx.CppFunc{Cxx.CppPtr{Cxx.CxxQualType{Cxx.CppBaseType{:snumber},
-          (false,false,false)},(false,false,false)},
-          Tuple{Cxx.CppPtr{Cxx.CxxQualType{Cxx.CppBaseType{:snumber},
-          (false,false,false)},(false,false,false)},
-          Cxx.CppPtr{Cxx.CxxQualType{Cxx.CppBaseType{:n_Procs_s},
-          (false,false,false)},(false,false,false)},
-          Cxx.CppPtr{Cxx.CxxQualType{Cxx.CppBaseType{:n_Procs_s},
-          (false,false,false)},(false,false,false)}}}}
-        
 
 
