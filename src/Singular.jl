@@ -10,7 +10,7 @@ import Base: abs, deepcopy, den, div, divrem, gcd, gcdx, inv, isequal, isless,
 
 import Nemo: add!, addeq!, crt, divexact, elem_type, gcdinv, is_negative,
              isone, iszero, isunit, mul!, needs_parentheses, parent_type,
-             parent, reconstruct, show_minus_one, zero! 
+             parent, reconstruct, show_minus_one, zero!, ResidueRing
 
 export SingularQQ, SingularZZ
 
@@ -42,6 +42,7 @@ function __init__()
    cxxinclude(joinpath("coeffs", "coeffs.h"), isAngled = false)
    cxxinclude(joinpath("polys", "clapsing.h"), isAngled = false)
    cxxinclude(joinpath("coeffs", "bigintmat.h"), isAngled = false)
+   cxxinclude(joinpath("coeffs", "rmodulon.h"), isAngled = false)
    cxxinclude(joinpath("polys", "monomials", "ring.h"), isAngled = false)
    cxxinclude(joinpath("polys", "monomials", "p_polys.h"), isAngled = false)
    cxxinclude(joinpath("polys", "simpleideals.h"), isAngled = false)

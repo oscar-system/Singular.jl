@@ -3,6 +3,11 @@ function nInitChar(n::n_coeffType, p::Ptr{Void})
    return icxx"""nInitChar($n, $p);"""
 end
 
+# get the characteristic of a coefficient domain
+function n_GetChar(n::coeffs)
+   return icxx"""n_GetChar($n);"""
+end
+
 # kill a coefficient ring
 function nKillChar(cf::coeffs)
    icxx"""nKillChar($cf);"""
