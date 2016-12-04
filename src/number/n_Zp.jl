@@ -1,4 +1,4 @@
-export SingularFiniteField
+export SingularFp
 
 ###############################################################################
 #
@@ -362,7 +362,7 @@ end
 #
 ###############################################################################
 
-function SingularFiniteField(a::Int; cached=true)
+function SingularFp(a::Int; cached=true)
    a == 0 && throw(DivideError())
    a < 0 && throw(DomainError())
    !Nemo.is_prime(UInt(a)) && throw(DomainError())
