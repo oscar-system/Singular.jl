@@ -166,6 +166,11 @@ function n_ChineseRemainderSym(a::Array{number, 1}, b::Array{number, 1}, n::Cint
    icxx"""CFArray inv_cache($n); n_ChineseRemainderSym($p1, $p2, $n, $signed, inv_cache, $cf);"""
 end
 
+function n_Param(a::Cint, cf::coeffs)
+   icxx"""n_Param($a, $cf);"""
+end
+
+
 # create a Singular string environment
 function StringSetS(m) 
    @cxx StringSetS(pointer(m))

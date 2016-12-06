@@ -250,3 +250,62 @@ function _n_Zp_clear_fn(n::n_Zp)
    libSingular.n_Delete(n.ptr, parent(n).ptr)
 end
 
+###############################################################################
+#
+#   SingularFiniteField/n_GF
+#
+###############################################################################
+
+type GFInfo
+   p::Cint
+   n::Cint
+   s::Ptr{UInt8}
+end
+
+type SingularN_GFField <: Nemo.Field
+   ptr::libSingular.coeffs
+   deg::Int
+   from_n_Z::Cxx.CppFptr
+   to_n_Z::Cxx.CppFptr
+
+   function SingularN_GFField(p::Int, n::Int, S::Symbol) 
+      n_GF = @cxx n_GF
+      ptr = libSingular.nInitChar(n_GF, pointer_from_objref(GFInfo(Cint(p), Cint(n), pointer(ascii(string(S)*"\0").data))))
+      d = new(ptr, n, libSingular.n_SetMap(SingularZZ.ptr, ptr), 
+              libSingular.n_SetMap(ptr, SingularZZ.ptr))
+      finalizer(d, _SingularN_GFField_clear_fn)
+      return d
+   end
+end
+
+function _SingularN_GFField_clear_fn(cf::SingularN_GFField)
+   libSingular.nKillChar(cf.ptr)
+end
+
+type n_GF <: Nemo.FieldElem
+    ptr::libSingular.number
+    parent::SingularN_GFField
+
+    function n_GF(c::SingularN_GFField)
+    	z = new(libSingular.n_Init(0, c.ptr))
+        finalizer(z, _n_GF_clear_fn)
+        return z
+    end
+
+    function n_GF(c::SingularN_GFField, n::Int)
+    	z = new(libSingular.n_Init(n, c.ptr))
+        finalizer(z, _n_GF_clear_fn)
+        return z
+    end
+
+    function n_GF(c::SingularN_GFField, n::libSingular.number)
+    	z = new(n)
+        finalizer(z, _n_GF_clear_fn)
+        return z
+    end
+end
+
+function _n_GF_clear_fn(n::n_GF)
+   libSingular.n_Delete(n.ptr, parent(n).ptr)
+end
+
