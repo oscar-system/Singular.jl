@@ -4,13 +4,14 @@ using Nemo
 using Cxx
 
 import Base: abs, deepcopy, den, div, divrem, gcd, gcdx, inv, isequal, isless,
-             lcm, mod, num, one, rem, show, zero,
+             lcm, length, mod, num, one, rem, show, zero,
              +, -, *, ==, ^, &, |, $, <<, >>, ~, <=, >=, <, >, //,
              /, !=
 
-import Nemo: add!, addeq!, crt, divexact, elem_type, gcdinv, is_negative,
-             isone, iszero, isunit, mul!, needs_parentheses, parent_type,
-             parent, reconstruct, show_minus_one, zero!, ResidueRing
+import Nemo: add!, addeq!, coeff, crt, divexact, elem_type, gcdinv,
+             is_negative, isone, iszero, isunit, mul!, needs_parentheses,
+             parent_type, parent, reconstruct, show_minus_one, zero!,
+             ResidueRing
 
 export SingularQQ, SingularZZ
 
