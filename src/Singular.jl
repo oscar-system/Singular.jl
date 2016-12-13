@@ -72,11 +72,36 @@ function __init__()
    # set up Singular parents
    # done in __init__ since headers must be included first
 
-   global SingularQQ = SingularRationalField()
-   global SingularZZ = SingularIntegerRing()
+   global const SingularQQ = SingularRationalField()
+   global const SingularZZ = SingularIntegerRing()
 
-   global n_Z_2_n_Q = libSingular.n_SetMap(SingularZZ.ptr, SingularQQ.ptr)
-   global n_Q_2_n_Z = libSingular.n_SetMap(SingularQQ.ptr, SingularZZ.ptr)
+   global const n_Z_2_n_Q = libSingular.n_SetMap(SingularZZ.ptr, SingularQQ.ptr)
+   global const n_Q_2_n_Z = libSingular.n_SetMap(SingularQQ.ptr, SingularZZ.ptr)
+
+   global const ringorder_no = @cxx ringorder_no
+   global const ringorder_lp = @cxx ringorder_lp
+   global const ringorder_rp = @cxx ringorder_rp
+   global const ringorder_dp = @cxx ringorder_dp
+   global const ringorder_Dp = @cxx ringorder_Dp
+   global const ringorder_ls = @cxx ringorder_ls
+   global const ringorder_rs = @cxx ringorder_rs
+   global const ringorder_ds = @cxx ringorder_ds
+   global const ringorder_Ds = @cxx ringorder_Ds
+   global const ringorder_c  = @cxx ringorder_c
+   global const ringorder_C  = @cxx ringorder_C
+
+   global const sym2ringorder = Dict{Symbol, Cxx.CppEnum}(
+   	  :lex => ringorder_lp,
+      :revlex => ringorder_rp, 
+   	  :neglex => ringorder_ls,
+      :negrevlex => ringorder_rs, 
+	  :degrevlex => ringorder_dp,
+      :deglex => ringorder_Dp,
+	  :negdegrevlex => ringorder_ds,
+      :negdeglex => ringorder_Ds,
+	  :comp1max => ringorder_c,
+      :comp1min => ringorder_C
+   )
 end
 
 ###############################################################################
@@ -90,5 +115,7 @@ include("AbstractTypes.jl")
 include("LibSingular.jl")
 
 include("Number.jl")
+
+include("Poly.jl")
 
 end # module
