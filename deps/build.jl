@@ -2,6 +2,8 @@ const oldwdir = pwd()
 const pkgdir = Pkg.dir("Singular") 
 const nemodir = Pkg.dir("Nemo")
 
+const debug_build = false # N.B: debug builds are up to 50 times slower at runtime!
+
 wdir = "$pkgdir/deps"
 vdir = "$pkgdir/local"
 nemovdir = "$nemodir/local"
@@ -53,7 +55,11 @@ catch
 end
 
 cd(joinpath(wdir, "Singular_build"))
-run(`$srcs/configure --prefix=$vdir --disable-static --disable-p-procs-static --enable-p-procs-dynamic --enable-shared --with-gmp=$nemovdir --with-flint=$nemovdir --with-ntl=$vdir --without-python --with-readline=no --disable-gfanlib --with-debug --enable-debug --disable-optimizationflags`)
+if debug_build
+   run(`$srcs/configure --prefix=$vdir --disable-static --disable-p-procs-static --enable-p-procs-dynamic --enable-shared --with-gmp=$nemovdir --with-flint=$nemovdir --with-ntl=$vdir --without-python --with-readline=no --disable-gfanlib`)
+else
+   run(`$srcs/configure --prefix=$vdir --disable-static --disable-p-procs-static --enable-p-procs-dynamic --enable-shared --with-gmp=$nemovdir --with-flint=$nemovdir --with-ntl=$vdir --without-python --with-readline=no --disable-gfanlib --with-debug --enable-debug --disable-optimizationflags`)
+end
 run(`make -j4`)
 run(`make install`)
 
