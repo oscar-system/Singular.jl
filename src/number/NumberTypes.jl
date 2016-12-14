@@ -165,21 +165,21 @@ type n_Zn <: Nemo.RingElem
 
     function n_Zn(c::SingularN_ZnRing)
     	z = new(libSingular.n_Init(0, c.ptr))
-        z.parent.refcount += 1
+        c.refcount += 1
         finalizer(z, _n_Zn_clear_fn)
         return z
     end
 
     function n_Zn(c::SingularN_ZnRing, n::Int)
     	z = new(libSingular.n_Init(n, c.ptr))
-        z.parent.refcount += 1
+        c.refcount += 1
         finalizer(z, _n_Zn_clear_fn)
         return z
     end
 
     function n_Zn(c::SingularN_ZnRing, n::libSingular.number)
     	z = new(n)
-        z.parent.refcount += 1
+        c.refcount += 1
         finalizer(z, _n_Zn_clear_fn)
         return z
     end
@@ -219,7 +219,7 @@ function _SingularN_ZpField_clear_fn(cf::SingularN_ZpField)
    if cf.refcount == 0
       libSingular.nKillChar(cf.ptr)
    end
-   nothign
+   nothing
 end
 
 type n_Zp <: Nemo.FieldElem
@@ -228,21 +228,21 @@ type n_Zp <: Nemo.FieldElem
 
     function n_Zp(c::SingularN_ZpField)
     	z = new(libSingular.n_Init(0, c.ptr))
-        z.parent.refcount += 1
+        c.refcount += 1
         finalizer(z, _n_Zp_clear_fn)
         return z
     end
 
     function n_Zp(c::SingularN_ZpField, n::Int)
     	z = new(libSingular.n_Init(n, c.ptr))
-        z.parent.refcount += 1
+        c.refcount += 1
         finalizer(z, _n_Zp_clear_fn)
         return z
     end
 
     function n_Zp(c::SingularN_ZpField, n::libSingular.number)
     	z = new(n)
-        z.parent.refcount += 1
+        c.refcount += 1
         finalizer(z, _n_Zp_clear_fn)
         return z
     end
@@ -251,7 +251,7 @@ end
 function _n_Zp_clear_fn(n::n_Zp)
    R = parent(n)
    libSingular.n_Delete(n.ptr, parent(n).ptr)
-   _SingularN_ZpRing_clear_fn(R)
+   _SingularN_ZpField_clear_fn(R)
    nothing
 end
 
@@ -298,21 +298,21 @@ type n_GF <: Nemo.FieldElem
 
     function n_GF(c::SingularN_GFField)
     	z = new(libSingular.n_Init(0, c.ptr))
-        z.parent.refcount += 1
+        c.refcount += 1
         finalizer(z, _n_GF_clear_fn)
         return z
     end
 
     function n_GF(c::SingularN_GFField, n::Int)
     	z = new(libSingular.n_Init(n, c.ptr))
-        z.parent.refcount += 1
+        c.refcount += 1
         finalizer(z, _n_GF_clear_fn)
         return z
     end
 
     function n_GF(c::SingularN_GFField, n::libSingular.number)
     	z = new(n)
-        z.parent.refcount += 1
+        c.refcount += 1
         finalizer(z, _n_GF_clear_fn)
         return z
     end

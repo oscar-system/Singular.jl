@@ -226,7 +226,8 @@ end
 
 function divrem(x::n_Zn, y::n_Zn)
    par = parent(x)
-   q, r = libSingular.n_QuotRem(x.ptr, y.ptr, par.ptr)
+   r = [libSingular.n_Init(0, par.ptr)]
+   q = libSingular.n_QuotRem(x.ptr, y.ptr, pointer(r), par.ptr)
    return par(q), par(r)
 end
 
@@ -265,8 +266,10 @@ end
 
 function gcdx(x::n_Zn, y::n_Zn)
    par = parent(x)
-   g, s, t = libSingular.n_ExtGcd(x.ptr, y.ptr, par.ptr)
-   return par(g), par(s), par(t)
+   s = [libSingular.n_Init(0, par.ptr)]
+   t = [libSingular.n_Init(0, par.ptr)]
+   g = libSingular.n_ExtGcd(x.ptr, y.ptr, pointer(s), pointer(t), par.ptr)
+   return par(g), par(s[]), par(t[])
 end
 
 ###############################################################################

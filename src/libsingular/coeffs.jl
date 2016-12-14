@@ -8,6 +8,11 @@ function n_GetChar(n::coeffs)
    return icxx"""n_GetChar($n);"""
 end
 
+# make a copy of a coefficient domain (actually just increments a reference count)
+function nCopyCoeff(n::coeffs)
+   return icxx"""nCopyCoeff($n);"""
+end
+
 # kill a coefficient ring
 function nKillChar(cf::coeffs)
    icxx"""nKillChar($cf);"""
@@ -105,12 +110,8 @@ function n_Lcm(a::number, b::number, cf::coeffs)
    icxx"""n_Lcm($a, $b, $cf);"""
 end
 
-function n_ExtGcd(a::number, b::number, cf:: coeffs)
-   s = [n_Init(0, cf)]
-   t = [n_Init(0, cf)]
-   p1 = pointer(s)
-   p2 = pointer(t)
-   icxx"""number gg, ss, tt; n_ExtGcd($a, $b, $p1, $p2, $cf);""", s[1], t[1]
+function n_ExtGcd(a::number, b::number, s::Ptr{number}, t::Ptr{number}, cf:: coeffs)
+   icxx"""n_ExtGcd($a, $b, $s, $t, $cf);"""
 end
 
 function n_IsZero(a::number, cf::coeffs)
@@ -141,11 +142,8 @@ function n_InpMult(a::number_ref, b::number, cf::coeffs)
    icxx"""n_InpMult($a, $b, $cf);"""
 end
 
-function n_QuotRem(a::number, b::number, cf::coeffs)
-   r = [n_Init(0, cf)]
-   p = pointer(r)
-   q = icxx"""n_QuotRem($a, $b, $p, $cf);"""
-   return q, r[1]
+function n_QuotRem(a::number, b::number, p::Ptr{number}, cf::coeffs)
+   icxx"""n_QuotRem($a, $b, $p, $cf);"""
 end
 
 function n_Rem(a::number, b::number, cf::coeffs)
@@ -169,7 +167,6 @@ end
 function n_Param(a::Cint, cf::coeffs)
    icxx"""n_Param($a, $cf);"""
 end
-
 
 # create a Singular string environment
 function StringSetS(m) 

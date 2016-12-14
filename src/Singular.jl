@@ -8,10 +8,10 @@ import Base: abs, deepcopy, den, div, divrem, gcd, gcdx, inv, isequal, isless,
              +, -, *, ==, ^, &, |, $, <<, >>, ~, <=, >=, <, >, //,
              /, !=
 
-import Nemo: add!, addeq!, coeff, crt, divexact, elem_type, gcdinv,
-             is_negative, isone, iszero, isunit, mul!, needs_parentheses,
-             parent_type, parent, reconstruct, show_minus_one, zero!,
-             ResidueRing
+import Nemo: add!, addeq!, coeff, content, crt, divexact, elem_type, gcdinv,
+             is_negative, isone, isgen, iszero, isunit, mul!,
+             needs_parentheses, parent_type, parent, primpart, reconstruct,
+             show_minus_one, zero!, ResidueRing
 
 export SingularQQ, SingularZZ
 

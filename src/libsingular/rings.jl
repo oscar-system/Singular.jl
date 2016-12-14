@@ -38,6 +38,14 @@ function p_IsOne(p::poly, r::ring)
    icxx"""p_IsOne($p, $r);"""
 end
 
+function p_IsUnit(p::poly, r::ring)
+   icxx"""p_IsUnit($p, $r);"""
+end
+
+function p_GetExp(p::poly, i::Cint, r::ring)
+   icxx"""p_GetExp($p, $i, $r);"""
+end
+
 function p_String(p::poly, r::ring)
    icxx"""p_String($p, $r);"""
 end
@@ -80,4 +88,24 @@ end
 
 function p_Power(a::poly, n::Cint, r::ring)
    icxx"""p_Power($a, $n, $r);"""
+end
+
+function p_EqualPolys(a::poly, b::poly, r::ring)
+   icxx"""p_EqualPolys($a, $b, $r);"""
+end
+
+function singclap_pdivide(a::poly, b::poly, r::ring)
+   icxx"""singclap_pdivide($a, $b, $r);"""
+end
+
+function singclap_gcd(a::poly, b::poly, r::ring)
+   icxx"""singclap_gcd($a, $b, $r);"""
+end
+
+function singclap_extgcd(a::poly, b::poly, res::poly_ref, s::poly_ref, t::poly_ref, r::ring)
+   icxx"""singclap_extgcd($a, $b, $res, $s, $t, $r);"""
+end
+
+function p_Content(a::poly, r::ring)
+   icxx"""p_Content($a, $r);"""
 end

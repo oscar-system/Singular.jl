@@ -232,14 +232,13 @@ divexact(x::n_GF, y::n_GF) = div(x, y)
 
 function divrem(x::n_GF, y::n_GF)
    par = parent(x)
-   q, r = libSingular.n_QuotRem(x.ptr, y.ptr, par.ptr)
-   return par(q), par(r)
+   r = [libSingular.n_Init(0, par.ptr)]
+   q = libSingular.n_QuotRem(x.ptr, y.ptr, pointer(r), par.ptr)
+   return par(q), par(r[])
 end
 
 function rem(x::n_GF, y::n_GF)
-   par = parent(x)
-   q, r = libSingular.n_QuotRem(x.ptr, y.ptr, par.ptr)
-   return par(r)
+   return parent(x)()
 end
 
 mod(x::n_GF, y::n_GF) = rem(x, y)

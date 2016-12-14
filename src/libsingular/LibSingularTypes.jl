@@ -26,6 +26,8 @@ typealias ring pcpp"ip_sring"
 
 typealias poly pcpp"spolyrec"
 
+typealias poly_ref Ref{poly}
+
 typealias vector pcpp"spolyrec"
 
 typealias rRingOrder_t Cxx.CppEnum{:rRingOrder_t, Cuint}
