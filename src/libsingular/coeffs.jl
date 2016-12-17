@@ -178,6 +178,10 @@ function StringEndS()
    icxx"""StringEndS();"""
 end
 
+function omAlloc0(size :: Csize_t)
+   icxx"""(void*) omAlloc0($size);"""
+end
+
 # omalloc free
 function omFree{T}(m :: Ptr{T})
    icxx"""omFree((void*) $m);"""

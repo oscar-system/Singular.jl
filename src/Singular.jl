@@ -3,8 +3,9 @@ module Singular
 using Nemo
 using Cxx
 
-import Base: abs, deepcopy, den, div, divrem, gcd, gcdx, inv, isequal, isless,
-             lcm, length, mod, num, one, rem, show, zero,
+import Base: abs, checkbounds, deepcopy, den, div, divrem, gcd, gcdx,
+             getindex, indices, inv, isequal, isless, lcm, length, mod, num,
+             one, rem, setindex!, show, std, zero,
              +, -, *, ==, ^, &, |, $, <<, >>, ~, <=, >=, <, >, //,
              /, !=
 
@@ -118,5 +119,9 @@ include("LibSingular.jl")
 include("Number.jl")
 
 include("Poly.jl")
+
+include("Module.jl")
+
+include("Ideal.jl")
 
 end # module

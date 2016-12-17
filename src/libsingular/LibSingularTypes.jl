@@ -40,3 +40,12 @@ typealias rRingOrder_t Cxx.CppEnum{:rRingOrder_t, Cuint}
 
 typealias ideal pcpp"sip_sideal"
 
+typealias ideal_ref Ref{ideal}
+
+###############################################################################
+#
+#   Matrices
+#
+###############################################################################
+
+typealias matrix pcpp"ip_smatrix"
