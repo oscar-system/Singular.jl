@@ -87,6 +87,12 @@ function -{T <: Nemo.RingElem}(a::svector{T}, b::svector{T})
    return SingularVector(R, a.rank, s) 
 end
 
+###############################################################################
+#
+#   Ad hoc arithmetic functions
+#
+###############################################################################
+
 function *{T <: Nemo.RingElem}(a::svector{spoly{T}}, b::spoly{T})
    check_parent(a, b)
    R = base_ring(a)
