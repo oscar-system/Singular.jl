@@ -19,7 +19,7 @@ function checkbounds(I::sideal, i::Int)
    (i > ngens(I) || i < 1) && throw(BoundsError(I, i))
 end   
 
-function setindex!(I::sideal, p::spoly, i::Int)
+function setindex!{T <: Nemo.RingElem}(I::sideal{spoly{T}}, p::spoly{T}, i::Int)
    checkbounds(I, i)
    R = base_ring(I)
    p0 = libSingular.getindex(I.ptr, Cint(i - 1))
@@ -55,7 +55,7 @@ function deepcopy(I::sideal)
    return SingularIdeal(R, ptr)
 end
 
-function check_parent(I::sideal, J::sideal)
+function check_parent{T <: Nemo.RingElem}(I::sideal{T}, J::sideal{T})
    base_ring(I) != base_ring(J) && error("Incompatible ideals")
 end
 
@@ -90,14 +90,14 @@ end
 #
 ###############################################################################
 
-function +(I::sideal, J::sideal)
+function +{T <: Nemo.RingElem}(I::sideal{T}, J::sideal{T})
    check_parent(I, J)
    R = base_ring(I)
    ptr = libSingular.id_Add(I.ptr, J.ptr, R.ptr)
    return SingularIdeal(R, ptr)
 end
 
-function *(I::sideal, J::sideal)
+function *{T <: Nemo.RingElem}(I::sideal{T}, J::sideal{T})
    check_parent(I, J)
    R = base_ring(I)
    ptr = libSingular.id_Mult(I.ptr, J.ptr, R.ptr)

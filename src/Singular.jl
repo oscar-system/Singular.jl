@@ -126,4 +126,6 @@ include("Ideal.jl")
 
 include("Matrix.jl")
 
+include("Vector.jl")
+
 end # module

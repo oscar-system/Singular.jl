@@ -14,27 +14,18 @@ base_ring(I::smodule) = I.base_ring
 
 ngens(I::smodule) = Int(libSingular.ngens(I.ptr))
 
+#rank of the ambient space
+rank(I::smodule) = Int(libSingular.rank(I.ptr))
+
 function checkbounds(I::smodule, i::Int)
    (i > ngens(I) || i < 1) && throw(BoundsError(I, i))
-end   
-
-function setindex!(I::smodule, p::spoly, i::Int)
-   checkbounds(I, i)
-   R = base_ring(I)
-   p0 = libSingular.getindex(I.ptr, Cint(i - 1))
-   if p0 != C_NULL
-      libSingular.p_Delete(p0, R.ptr)
-   end
-   p1 = libSingular.p_Copy(p.ptr, R.ptr)
-   libSingular.setindex!(I.ptr, p1, Cint(i - 1))
-   nothing
 end
 
 function getindex(I::smodule, i::Int)
    checkbounds(I, i)
    R = base_ring(I)
    p = libSingular.getindex(I.ptr, Cint(i - 1))
-   return R(libSingular.p_Copy(p, R.ptr))
+   return SingularVector(R, rank(I), libSingular.p_Copy(p, R.ptr))
 end
 
 iszero(p::smodule) = Bool(libSingular.idIs0(p.ptr))

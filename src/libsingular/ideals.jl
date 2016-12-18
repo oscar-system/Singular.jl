@@ -70,6 +70,10 @@ function ngens(I::ideal)
    icxx"""(int) IDELEMS($I);"""
 end
 
+function rank(I::ideal) 
+   icxx"""(int) $I->rank;"""
+end
+
 function id_Std(I:: ideal, R::ring)
    icxx"""ideal id = NULL;
           if (!idIs0($I))

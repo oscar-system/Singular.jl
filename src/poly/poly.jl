@@ -12,7 +12,7 @@ base_ring(R::SingularPolyRing) = R.base_ring
 
 base_ring(p::spoly) = base_ring(parent(p))
 
-elem_type{T <: Nemo.RingElem}(::SingularPolyRing{T}) = T
+elem_type{T <: Nemo.RingElem}(::SingularPolyRing{T}) = spoly{T}
 
 parent_type{T <: Nemo.RingElem}(a::spoly{T}) = SingularPolyRing{T}
 
@@ -340,29 +340,29 @@ Base.promote_rule{T <: Nemo.RingElem}(::Type{spoly{T}}, ::Type{T}) = spoly{T}
 ###############################################################################
 
 function (R::SingularPolyRing)()
-   T = elem_type(R)
+   T = elem_type(base_ring(R))
    return spoly{T}(R)
 end
 
 function (R::SingularPolyRing)(n::Int)
-   T = elem_type(R)
+   T = elem_type(base_ring(R))
    return spoly{T}(R, n)
 end
 
 function (R::SingularPolyRing)(n::Integer)
-   T = elem_type(R)
+   T = elem_type(base_ring(R))
    return spoly{T}(R, BigInt(n))
 end
 
 function (R::SingularPolyRing)(n::n_Z)
    n = base_ring(R)(n)
    ptr = libSingular.n_Copy(n.ptr, parent(n).ptr)
-   T = elem_type(R)
+   T = elem_type(base_ring(R))
    return spoly{T}(R, ptr)
 end
 
 function (R::SingularPolyRing)(n::libSingular.poly)
-   T = elem_type(R)
+   T = elem_type(base_ring(R))
    return spoly{T}(R, n)
 end
 
