@@ -22,6 +22,14 @@ function idIs0(I::ideal)
    icxx"""idIs0($I);"""
 end
 
+function id_IsConstant(I::ideal, R::ring)
+   icxx"""id_IsConstant($I, $R);"""
+end
+
+function id_IsZeroDim(I::ideal, R::ring)
+   icxx"""id_IsZeroDim($I, $R);"""
+end
+
 function idElem(I::ideal)
    icxx"""idElem($I);"""
 end
@@ -30,36 +38,36 @@ function id_Normalize(I::ideal, R::ring)
    icxx"""id_Normalize($I, $R);"""
 end
 
+function id_Head(I::ideal, R::ring)
+   icxx"""id_Head($I, $R);"""
+end
+
+function id_MaxIdeal(d::Cint, R::ring)
+   icxx"""id_MaxIdeal($d, $R);"""
+end
+
+function id_Add(I::ideal, J::ideal, R::ring)
+   icxx"""id_Add($I, $J, $R);"""
+end
+
+function id_Mult(I::ideal, J::ideal, R::ring)
+   icxx"""id_Mult($I, $J, $R);"""
+end
+
+function id_Power(I::ideal, n::Cint, R::ring)
+   icxx"""id_Power($I, $n, $R);"""
+end
+
+function id_FreeModule(n::Cint, R::ring)
+   icxx"""id_FreeModule($n, $R);"""
+end
+
 function idSkipZeroes(I::ideal)
    icxx"""idSkipZeroes($I);"""
 end
 
 function ngens(I::ideal) 
    icxx"""(int) IDELEMS($I);"""
-end
-
-function ncols(I::matrix) 
-  icxx"""(int) MATCOLS($I);"""
-end
-
-function nrows(I::matrix) 
-  icxx"""(int) MATROWS($I);"""
-end
-
-function id_Module2Matrix(I::ideal, R::ring)
-   icxx"""id_Module2Matrix($I, $R);"""
-end
-
-function getindex(M::matrix, i::Cint, j::Cint) 
-  icxx"""(poly) MATELEM($M, $i, $j);"""
-end
-
-function mp_Delete(M::matrix, R::ring)
-   icxx"""mp_Delete(&$M, $R);"""
-end
-
-function iiStringMatrix(I::matrix, d::Cint, R::ring)
-   icxx"""iiStringMatrix($I, $d, $R);"""
 end
 
 function id_Std(I:: ideal, R::ring)

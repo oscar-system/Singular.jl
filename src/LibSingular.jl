@@ -10,4 +10,6 @@ include("libsingular/rings.jl")
 
 include("libsingular/ideals.jl")
 
+include("libsingular/matrix.jl")
+
 end # module

@@ -1,4 +1,4 @@
-export SingularModuleClass, SingularModule
+export SingularModuleClass, SingularModule, SingularFreeModule
 
 ###############################################################################
 #
@@ -57,28 +57,16 @@ function show(io::IO, S::SingularModuleClass)
 end
 
 function show(io::IO, I::smodule)
-   R = base_ring(I)
-   ptr = libSingular.id_Copy(I.ptr, R.ptr)
-   ptr = libSingular.id_Module2Matrix(ptr, R.ptr)
    print(io, "Singular Module over ")
-   show(io, R)
-   println(":")
-   print(io, "[")
-   m = libSingular.nrows(ptr)
-   n = libSingular.ncols(ptr)
-   for i = 1:m
-      for j = 1:n
-         p = libSingular.p_Copy(libSingular.getindex(ptr, Cint(i), Cint(j)), R.ptr)
-         show(io, R(p))
-         if j != n
-            print(io, ", ")
-         elseif i != m
-            println(io, "")
-         end
+   show(io, base_ring(I))
+   println(", with Generators:")
+   n = ngens(I)
+   for i = 1:n
+      show(io, I[i])
+      if i != n
+         println(io, "")
       end
    end
-   print(io, "]")
-   libSingular.mp_Delete(ptr, R.ptr)
 end
 
 ###############################################################################
@@ -90,4 +78,12 @@ end
 function SingularModule{T <: Nemo.RingElem}(R::SingularPolyRing{T}, id::libSingular.ideal)
    S = elem_type(R)
    return smodule{S}(R, id)
+end
+
+# free module of rank n
+function SingularFreeModule{T <: Nemo.RingElem}(R::SingularPolyRing{T}, n::Int)
+   (n > typemax(Cint) || n < 0) && throw(DomainError())
+   ptr = libSingular.id_FreeModule(Cint(n), R.ptr)
+   S = elem_type(R)
+   return smodule{S}(R, ptr)
 end

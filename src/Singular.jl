@@ -4,13 +4,13 @@ using Nemo
 using Cxx
 
 import Base: abs, checkbounds, deepcopy, den, div, divrem, gcd, gcdx,
-             getindex, indices, inv, isequal, isless, lcm, length, mod, num,
-             one, rem, setindex!, show, std, zero,
+             getindex, indices, inv, isequal, isless, lcm, length, mod, 
+             normalize!, num, one, rem, setindex!, show, std, zero,
              +, -, *, ==, ^, &, |, $, <<, >>, ~, <=, >=, <, >, //,
              /, !=
 
 import Nemo: add!, addeq!, coeff, content, crt, divexact, elem_type, gcdinv,
-             is_negative, isone, isgen, iszero, isunit, mul!,
+             is_negative, isone, isgen, iszero, isunit, lead, mul!,
              needs_parentheses, parent_type, parent, primpart, reconstruct,
              show_minus_one, zero!, ResidueRing
 
@@ -123,5 +123,7 @@ include("Poly.jl")
 include("Module.jl")
 
 include("Ideal.jl")
+
+include("Matrix.jl")
 
 end # module

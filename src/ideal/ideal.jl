@@ -1,4 +1,5 @@
-export SingularIdealSet, SingularIdeal, syz
+export SingularIdealSet, SingularIdeal, SingularMaximalIdeal, syz, lead,
+       normalize!, isconstant, iszerodim
 
 ###############################################################################
 #
@@ -37,12 +38,25 @@ function getindex(I::sideal, i::Int)
    return R(libSingular.p_Copy(p, R.ptr))
 end
 
-iszero(p::sideal) = Bool(libSingular.idIs0(p.ptr))
+iszero(I::sideal) = Bool(libSingular.idIs0(I.ptr))
+
+iszerodim(I::sideal) = Bool(libSingular.id_IsZeroDim(I.ptr, base_ring(I).ptr))
+
+isconstant(I::sideal) = Bool(libSingular.id_IsConstant(I.ptr, base_ring(I).ptr))
+
+function normalize!(I::sideal)
+   libSingular.id_Normalize(I.ptr, base_ring(I).ptr)
+   nothing
+end
 
 function deepcopy(I::sideal)
    R = base_ring(I)
    ptr = libSingular.id_Copy(I.ptr, R.ptr)
    return SingularIdeal(R, ptr)
+end
+
+function check_parent(I::sideal, J::sideal)
+   base_ring(I) != base_ring(J) && error("Incompatible ideals")
 end
 
 ###############################################################################
@@ -68,6 +82,52 @@ function show(io::IO, I::sideal)
       end
    end
    print(io, ")")
+end
+
+###############################################################################
+#
+#   Arithmetic functions
+#
+###############################################################################
+
+function +(I::sideal, J::sideal)
+   check_parent(I, J)
+   R = base_ring(I)
+   ptr = libSingular.id_Add(I.ptr, J.ptr, R.ptr)
+   return SingularIdeal(R, ptr)
+end
+
+function *(I::sideal, J::sideal)
+   check_parent(I, J)
+   R = base_ring(I)
+   ptr = libSingular.id_Mult(I.ptr, J.ptr, R.ptr)
+   return SingularIdeal(R, ptr)
+end
+
+###############################################################################
+#
+#   Powering
+#
+###############################################################################
+
+function ^(I::sideal, n::Int)
+   (n > typemax(Cint) || n < 0) && throw(DomainError())
+   R = base_ring(I)
+   ptr = libSingular.id_Power(I.ptr, Cint(n), R.ptr)
+   return SingularIdeal(R, ptr)
+end
+
+###############################################################################
+#
+#   Leading terms
+#
+###############################################################################
+
+# ideal of leading terms
+function lead(I::sideal)
+   R = base_ring(I)
+   ptr = libSingular.id_Head(I.ptr, R.ptr)
+   return SingularIdeal(R, ptr)
 end
 
 ###############################################################################
@@ -112,5 +172,10 @@ function SingularIdeal{T <: Nemo.RingElem}(R::SingularPolyRing{T}, id::libSingul
    return sideal{S}(R, id)
 end
 
-
-
+# maximal ideal in degree d
+function SingularMaximalIdeal{T <: Nemo.RingElem}(R::SingularPolyRing{T}, d::Int)
+   (d > typemax(Cint) || d < 0) && throw(DomainError())
+   S = elem_type(R)
+   ptr = libSingular.id_MaxIdeal(Cint(d), R.ptr)
+   return sideal{S}(R, ptr)
+end
