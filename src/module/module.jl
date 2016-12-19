@@ -12,7 +12,7 @@ base_ring(S::SingularModuleClass) = S.base_ring
 
 base_ring(I::smodule) = I.base_ring
 
-ngens(I::smodule) = Int(libSingular.ngens(I.ptr))
+ngens(I::smodule) = I.ptr == C_NULL ? 0 : Int(libSingular.ngens(I.ptr))
 
 #rank of the ambient space
 rank(I::smodule) = Int(libSingular.rank(I.ptr))
@@ -58,6 +58,55 @@ function show(io::IO, I::smodule)
          println(io, "")
       end
    end
+end
+
+###############################################################################
+#
+#   Groebner basis
+#
+###############################################################################
+
+function std(I::smodule) 
+   R = base_ring(I)
+   ptr = libSingular.id_Std(I.ptr, R.ptr)
+   libSingular.idSkipZeroes(ptr)
+   z = SingularModule(R, ptr)
+   z.isGB = true
+   return z
+end
+
+###############################################################################
+#
+#   Resolutions
+#
+###############################################################################
+
+function sres{T <: Nemo.RingElem}(I::smodule{T}, n::Int)
+   I.isGB == false && error("Not a Groebner basis ideal")
+   R = base_ring(I)
+   len = [Cint(0)]
+   r = libSingular.id_sres(I.ptr, Cint(n), pointer(len), R.ptr)
+   for i = 1:n
+      id = libSingular.getindex(r, Cint(i - 1))
+      if id != C_NULL
+         libSingular.idSkipZeroes(id)
+      end
+   end
+   return sresolution{T}(R, n, r)
+end
+
+function lres{T <: Nemo.RingElem}(I::smodule{T}, n::Int)
+   I.isGB == false && error("Not a Groebner basis ideal")
+   R = base_ring(I)
+   len = [Cint(n)]
+   r = libSingular.id_lres(I.ptr, pointer(len), R.ptr)
+   for i = 1:n
+      id = libSingular.getindex(r, Cint(i - 1))
+      if id != C_NULL
+         libSingular.idSkipZeroes(id)
+      end
+   end
+   return sresolution{T}(R, n, r)
 end
 
 ###############################################################################

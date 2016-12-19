@@ -105,3 +105,22 @@ function id_Syzygies(I:: ideal, R::ring)
           id;
        """
 end
+
+function id_sres(I:: ideal, n::Cint, len::Ptr{Cint}, R::ring)
+   icxx"""const ring origin = currRing;
+          rChangeCurrRing($R);
+          resolvente r = sySchreyerResolvente($I, $n, $len);
+          rChangeCurrRing(origin);
+          (resolvente) r;
+       """
+end
+
+function id_lres(I:: ideal, len::Ptr{Cint}, R::ring)
+   icxx"""const ring origin = currRing;
+          rChangeCurrRing($R);
+          resolvente r = syLaScala1($I, $len);
+          rChangeCurrRing(origin);
+          (resolvente) r;
+       """
+end
+

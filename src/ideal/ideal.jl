@@ -1,5 +1,5 @@
 export SingularIdealSet, SingularIdeal, SingularMaximalIdeal, syz, lead,
-       normalize!, isconstant, iszerodim
+       normalize!, isconstant, iszerodim, sres, lres
 
 ###############################################################################
 #
@@ -140,12 +140,14 @@ function std(I::sideal)
    R = base_ring(I)
    ptr = libSingular.id_Std(I.ptr, R.ptr)
    libSingular.idSkipZeroes(ptr)
-   return SingularIdeal(R, ptr)
+   z = SingularIdeal(R, ptr)
+   z.isGB = true
+   return z
 end
 
 ###############################################################################
 #
-#   Groebner basis
+#   Syzygies
 #
 ###############################################################################
 
@@ -154,6 +156,40 @@ function syz(I::sideal)
    ptr = libSingular.id_Syzygies(I.ptr, R.ptr)
    libSingular.idSkipZeroes(ptr)
    return SingularModule(R, ptr)
+end
+
+###############################################################################
+#
+#   Resolutions
+#
+###############################################################################
+
+function sres{T <: Nemo.RingElem}(I::sideal{T}, n::Int)
+   I.isGB == false && error("Not a Groebner basis ideal")
+   R = base_ring(I)
+   len = [Cint(0)]
+   r = libSingular.id_sres(I.ptr, Cint(n), pointer(len), R.ptr)
+   for i = 1:n
+      id = libSingular.getindex(r, Cint(i - 1))
+      if id != C_NULL
+         libSingular.idSkipZeroes(id)
+      end
+   end
+   return sresolution{T}(R, n, r)
+end
+
+function lres{T <: Nemo.RingElem}(I::sideal{T}, n::Int)
+   I.isGB == false && error("Not a Groebner basis ideal")
+   R = base_ring(I)
+   len = [Cint(n)]
+   r = libSingular.id_lres(I.ptr, pointer(len), R.ptr)
+   for i = 1:n
+      id = libSingular.getindex(r, Cint(i - 1))
+      if id != C_NULL
+         libSingular.idSkipZeroes(id)
+      end
+   end
+   return sresolution{T}(R, n, r)
 end
 
 ###############################################################################

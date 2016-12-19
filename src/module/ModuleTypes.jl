@@ -21,9 +21,10 @@ end
 type smodule{T <: Nemo.RingElem} <: Nemo.Module{T}
    ptr::libSingular.ideal # ideal and module types are the same in Singular
    base_ring::SingularPolyRing
+   isGB::Bool
 
    function smodule(R::SingularPolyRing, m::libSingular.ideal)
-      z = new(m, R)
+      z = new(m, R, false)
       finalizer(z, _smodule_clear_fn)
       return z
    end

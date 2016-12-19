@@ -128,4 +128,6 @@ include("Matrix.jl")
 
 include("Vector.jl")
 
+include("Resolution.jl")
+
 end # module
