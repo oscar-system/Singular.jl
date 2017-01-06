@@ -28,6 +28,7 @@ cd(joinpath(tmp, ntl, "src"))
 run(`./configure DEF_PREFIX="$vdir" SHARED=on NTL_THREADS=off NTL_EXCEPTIONS=off NTL_GMP_LIP=on CXXFLAGS="-I$nemovdir/include" LDFLAGS="-L$nemovdir/lib -Wl,-rpath,$nemovdir/lib"`)
 run(`make -j4`)
 run(`make install`)
+cd(wdir)
 rm(tmp; recursive=true)
 
 # Install Singular
