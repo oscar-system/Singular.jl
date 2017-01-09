@@ -14,6 +14,8 @@ file as specified in the Cxx package [README](https://github.com/Keno/Cxx.jl).
 
 To build Singular.jl, start julia and then type:
 
+julia> Pkg.add("Nemo")
+julia> Pkg.checkout("Nemo")
 julia> Pkg.clone("https://github.com/wbhart/Singular.jl")</br>
 julia> Pkg.build("Singular")
 
