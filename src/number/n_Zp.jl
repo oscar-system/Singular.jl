@@ -80,7 +80,7 @@ end
 
 needs_parentheses(x::n_Zp) = false
 
-function is_negative(x::n_Zp)
+function isnegative(x::n_Zp)
    return x > parent(x)(div(characteristic(parent(x)), SingularZZ(2)))
 end
 
@@ -364,7 +364,7 @@ end
 function SingularFp(a::Int; cached=true)
    a == 0 && throw(DivideError())
    a < 0 && throw(DomainError())
-   !Nemo.is_prime(UInt(a)) && throw(DomainError())
+   !Nemo.isprime(UInt(a)) && throw(DomainError())
 
    return SingularN_ZpField(a)
 end

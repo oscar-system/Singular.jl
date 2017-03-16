@@ -94,7 +94,7 @@ end
 
 needs_parentheses(x::n_Z) = false
 
-is_negative(x::n_Z) = !libSingular.n_GreaterZero(x.ptr, parent(x).ptr) &&
+isnegative(x::n_Z) = !libSingular.n_GreaterZero(x.ptr, parent(x).ptr) &&
                       !iszero(x)
 
 show_minus_one(::Type{n_Z}) = false

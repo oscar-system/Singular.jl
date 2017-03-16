@@ -80,7 +80,7 @@ end
 
 needs_parentheses(x::n_Zn) = false
 
-is_negative(x::n_Zn) = false
+isnegative(x::n_Zn) = false
 
 show_minus_one(::Type{n_Zn}) = true
 

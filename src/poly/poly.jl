@@ -128,7 +128,7 @@ show_minus_one{T <: Nemo.RingElem}(::Type{spoly{T}}) = show_minus_one(T)
 
 needs_parentheses(x::spoly) = length(x) > 1
 
-is_negative(x::spoly) = isconstant(x) && !iszero(x) && is_negative(coeff(x, 0))
+isnegative(x::spoly) = isconstant(x) && !iszero(x) && isnegative(coeff(x, 0))
 
 ###############################################################################
 #
