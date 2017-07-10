@@ -8,6 +8,8 @@ wdir = "$pkgdir/deps"
 vdir = "$pkgdir/local"
 nemovdir = "$nemodir/local"
 
+LDFLAGS = "-rpath $vdir/lib -R$vdir/lib -R$nemovdir/lib -R\$\$ORIGIN/../share/julia/site/v$(VERSION.major).$(VERSION.minor)/Singular/local/lib"
+
 cd(wdir)
 
 # INSTALL NTL
@@ -25,11 +27,37 @@ const tmp = mktempdir(wdir)
 cd(tmp)
 run(`tar -C "$tmp" -xkvf "$wdir/$ntl.tar.gz"`)
 cd(joinpath(tmp, ntl, "src"))
-run(`./configure DEF_PREFIX="$vdir" SHARED=on NTL_THREADS=off NTL_EXCEPTIONS=off NTL_GMP_LIP=on CXXFLAGS="-I$nemovdir/include" LDFLAGS="-L$nemovdir/lib -Wl,-rpath,$nemovdir/lib"`)
+run(`./configure DEF_PREFIX=$vdir SHARED=on NTL_THREADS=off NTL_EXCEPTIONS=off NTL_GMP_LIP=on CXXFLAGS="-I$nemovdir/include" LDFLAGS="-L$nemovdir/lib -Wl,-rpath,$nemovdir/lib"`)
 run(`make -j4`)
 run(`make install`)
 cd(wdir)
 rm(tmp; recursive=true)
+
+# Install cddlib
+
+# Currently cddlib appears to have no way to specify what GMP is used
+# thus --enable-gfanlib is not possible below, since it relies on cddlib
+# being installed
+
+# const cddlib="cddlib-094h"
+
+# try
+#   run(`wget -q -nc -c -O $wdir/$cddlib.tar.gz ftp://ftp.math.ethz.ch/users/fukudak/cdd/$cddlib.tar.gz`)
+# catch
+# end
+
+# const tmp2 = mktempdir(wdir)
+
+# cd(tmp2)
+# run(`tar -C $tmp2 -xkvf $wdir/$cddlib.tar.gz`)
+# cd(joinpath(tmp2, cddlib))
+# withenv("CPP_FLAGS"=>"-I$vdir/include", "LD_LIBRARY_PATH"=>"$vdir/lib:$nemodir/lib", "LDFLAGS"=>LDFLAGS) do
+#    run(`./configure --prefix=$vdir --with-gmp=$nemovdir`)
+#    run(`make -j4`)
+#    run(`make install`)
+# end
+# cd(wdir)
+# rm(tmp2; recursive=true)
 
 # Install Singular
 
@@ -56,13 +84,17 @@ catch
 end
 
 cd(joinpath(wdir, "Singular_build"))
-if !debug_build
-   run(`$srcs/configure --prefix=$vdir --disable-static --disable-p-procs-static --enable-p-procs-dynamic --enable-shared --with-gmp=$nemovdir --with-flint=$nemovdir --with-ntl=$vdir --without-python --with-readline=no --disable-gfanlib`)
-else
-   run(`$srcs/configure --prefix=$vdir --disable-static --disable-p-procs-static --enable-p-procs-dynamic --enable-shared --with-gmp=$nemovdir --with-flint=$nemovdir --with-ntl=$vdir --without-python --with-readline=no --disable-gfanlib --with-debug --enable-debug --disable-optimizationflags`)
+withenv("CPP_FLAGS"=>"-I$vdir/include", "LD_LIBRARY_PATH"=>"$vdir/lib:$nemodir/lib") do
+   if !debug_build
+      run(`$srcs/configure --prefix=$vdir --disable-static --disable-p-procs-static --disable-gfanlib --enable-p-procs-dynamic --enable-shared --with-gmp=$nemovdir --with-flint=$nemovdir --with-ntl=$vdir --without-python --with-readline=no`)
+   else
+      run(`$srcs/configure --prefix=$vdir --disable-static --disable-p-procs-static --disable-gfanlib --enable-p-procs-dynamic --enable-shared --with-gmp=$nemovdir --with-flint=$nemovdir --with-ntl=$vdir --without-python --with-readline=no --with-debug --enable-debug --disable-optimizationflags`)
+   end
+   withenv("LDFLAGS"=>LDFLAGS) do
+      run(`make -j4`)
+      run(`make install`)
+   end
 end
-run(`make -j4`)
-run(`make install`)
 
 cd(wdir)
 

@@ -276,7 +276,7 @@ type SingularN_GFField <: Nemo.Field
 
    function SingularN_GFField(p::Int, n::Int, S::Symbol) 
       n_GF = @cxx n_GF
-      ptr = libSingular.nInitChar(n_GF, pointer_from_objref(GFInfo(Cint(p), Cint(n), pointer(ascii(string(S)*"\0").data))))
+      ptr = libSingular.nInitChar(n_GF, pointer_from_objref(GFInfo(Cint(p), Cint(n), pointer(Vector{UInt8}(string(S)*"\0")))))
       d = new(ptr, n, libSingular.n_SetMap(SingularZZ.ptr, ptr), 
               libSingular.n_SetMap(ptr, SingularZZ.ptr), 1)
       finalizer(d, _SingularN_GFField_clear_fn)

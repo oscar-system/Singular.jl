@@ -26,9 +26,12 @@ const pkgdir = realpath(joinpath(dirname(@__FILE__), ".."))
 const libsingular = joinpath(pkgdir, "local", "lib", "libSingular")
 
 prefix = joinpath(Pkg.dir("Singular"), "local");
+nemoinc = joinpath(Pkg.dir("Nemo"), "local");
 
-addHeaderDir(joinpath(prefix, "include"), kind = C_System)
-addHeaderDir(joinpath(prefix, "include", "singular"), kind = C_System)
+addHeaderDir(joinpath(prefix, "include"), kind = C_User)
+addHeaderDir(joinpath(prefix, "include", "singular"), kind = C_User)
+addHeaderDir(joinpath(prefix, "include", "resources"), kind = C_User)
+addHeaderDir(joinpath(nemoinc, "include"), kind = C_User)
 
 function __init__()
    Libdl.dlopen(libsingular, Libdl.RTLD_GLOBAL)
@@ -40,7 +43,7 @@ function __init__()
    cxxinclude(joinpath("misc", "intvec.h"), isAngled = false)
    cxxinclude(joinpath("misc", "auxiliary.h"), isAngled = false)
    cxxinclude(joinpath("reporter", "reporter.h"), isAngled = false)
-   cxxinclude(joinpath("resources", "feFopen.h"), isAngled = false)
+   cxxinclude(joinpath("feFopen.h"), isAngled = false)
    cxxinclude(joinpath("coeffs", "coeffs.h"), isAngled = false)
    cxxinclude(joinpath("polys", "clapsing.h"), isAngled = false)
    cxxinclude(joinpath("coeffs", "bigintmat.h"), isAngled = false)

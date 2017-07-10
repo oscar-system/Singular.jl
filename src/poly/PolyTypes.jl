@@ -16,7 +16,7 @@ type SingularPolyRing{T <: Nemo.RingElem} <: Nemo.Ring
       if haskey(SingularPolyRingID, (R, s, ordering))
          return SingularPolyRingID[R, s, ordering]::SingularPolyRing{T}
       else
-         v = [pointer(ascii(string(str)*"\0").data) for str in s]
+         v = [pointer(Vector{UInt8}(string(str)*"\0")) for str in s]
          r = libSingular.nCopyCoeff(R.ptr)
          
          ord  = unsafe_wrap(Array, 
