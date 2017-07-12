@@ -7,7 +7,7 @@ function rDefault(cf::coeffs, vars::Array{Ptr{UInt8}, 1}, ord::rRingOrder_t)
 end
 
 function rDefault{T}(cf::coeffs, vars::Array{T,1}, ord::Array{rRingOrder_t, 1}, 
-    blk0::Array{Cint, 1}, blk1::Array{Cint, 1})
+   blk0::Array{Cint, 1}, blk1::Array{Cint, 1})
    wvhdl = Ptr{Ptr{Cint}}(C_NULL)
    len = length(vars)
    ptr = Ptr{Ptr{Cuchar}}(pointer(vars))
@@ -122,4 +122,22 @@ end
 
 function p_Content(a::poly, r::ring)
    icxx"""p_Content($a, $r);"""
+end
+
+function p_Reduce(p::poly, G::ideal, R::ring)
+   icxx"""const ring origin = currRing;
+          rChangeCurrRing($R);
+          poly res = kNF($G, $R->qideal, $p);
+          rChangeCurrRing(origin);
+          res;
+       """
+end
+
+function p_Reduce(p::ideal, G::ideal, R::ring)
+   icxx"""const ring origin = currRing;
+          rChangeCurrRing($R);
+          ideal res = kNF($G, $R->qideal, $p);
+          rChangeCurrRing(origin);
+          res;
+       """
 end

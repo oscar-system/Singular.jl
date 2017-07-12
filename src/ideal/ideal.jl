@@ -1,5 +1,6 @@
 export SingularIdealSet, SingularIdeal, SingularMaximalIdeal, syz, lead,
-       normalize!, isconstant, iszerodim, sres, lres
+       normalize!, isconstant, iszerodim, sres, lres, intersection,
+       quotient, reduce, eliminate
 
 ###############################################################################
 #
@@ -132,6 +133,32 @@ end
 
 ###############################################################################
 #
+#   Intersection
+#
+###############################################################################
+
+function intersection{T <: Nemo.RingElem}(I::sideal{T}, J::sideal{T})
+   check_parent(I, J)
+   R = base_ring(I)
+   ptr = libSingular.id_Intersection(I.ptr, J.ptr, R.ptr)
+   return SingularIdeal(R, ptr)
+end
+
+###############################################################################
+#
+#   Quotient
+#
+###############################################################################
+
+function quotient{T <: Nemo.RingElem}(I::sideal{T}, J::sideal{T})
+   check_parent(I, J)
+   R = base_ring(I)
+   ptr = libSingular.id_Quotient(I.ptr, J.ptr, R.ptr)
+   return SingularIdeal(R, ptr)
+end
+
+###############################################################################
+#
 #   Groebner basis
 #
 ###############################################################################
@@ -143,6 +170,42 @@ function std(I::sideal)
    z = SingularIdeal(R, ptr)
    z.isGB = true
    return z
+end
+
+###############################################################################
+#
+#   Reduction
+#
+###############################################################################
+
+function reduce(I::sideal, G::sideal)
+   check_parent(I, G)
+   R = base_ring(I)
+   !G.isGB && error("Not a Groebner basis")
+   ptr = libSingular.p_Reduce(I.ptr, G.ptr, R.ptr)
+   return SingularIdeal(R, ptr)
+end
+
+function reduce(p::spoly, G::sideal)
+   R = base_ring(G)
+   par = parent(p)
+   R != par && error("Incompatible base rings")
+   !G.isGB && error("Not a Groebner basis")
+   ptr = libSingular.p_Reduce(p.ptr, G.ptr, R.ptr)
+   return par(ptr)
+end
+
+###############################################################################
+#
+#   Eliminate
+#
+###############################################################################
+
+function eliminate(I::sideal, p::spoly)
+   R = base_ring(I)
+   base_ring(p) != R && error("Incompatible base rings")
+   ptr = libSingular.id_Eliminate(I.ptr, p.ptr, R.ptr)
+   return R(ptr)
 end
 
 ###############################################################################
