@@ -4,9 +4,9 @@ using Nemo
 using Cxx
 
 import Base: abs, checkbounds, deepcopy, den, div, divrem, gcd, gcdx,
-             getindex, indices, inv, isequal, isless, lcm, length, mod, 
-             normalize!, num, one, reduce, rem, setindex!, show, std, zero,
-             +, -, *, ==, ^, &, |, $, <<, >>, ~, <=, >=, <, >, //,
+             getindex, indices, inv, isequal, isless, lcm, length,
+             mod, normalize!, num, one, reduce, rem, setindex!, show, std,
+             zero, +, -, *, ==, ^, &, |, $, <<, >>, ~, <=, >=, <, >, //,
              /, !=
 
 import Nemo: add!, addeq!, coeff, content, crt, divexact, elem_type, gcdinv,

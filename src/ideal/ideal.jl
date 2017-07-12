@@ -203,9 +203,9 @@ end
 
 function eliminate(I::sideal, p::spoly)
    R = base_ring(I)
-   base_ring(p) != R && error("Incompatible base rings")
+   parent(p) != R && error("Incompatible base rings")
    ptr = libSingular.id_Eliminate(I.ptr, p.ptr, R.ptr)
-   return R(ptr)
+   return SingularIdeal(R, ptr)
 end
 
 ###############################################################################
