@@ -10,8 +10,13 @@ end
    
 function fmpzDelete(ptr::Ptr{number}, cf::coeffs)
    n = unsafe_load(ptr)
-   #pop!(nemoNumberID, n)
+   pop!(nemoNumberID, n)
    nothing
+end
+
+function fmpzCopy(a::number, cf::coeffs)
+   n = julia(a)::Nemo.fmpz
+   return number(deepcopy(n))
 end
 
 ###############################################################################
@@ -51,7 +56,7 @@ function fmpzNeg(a::number, cf::coeffs)
 end
 
 function fmpzInpNeg(a::number, cf::coeffs)
-   n = nemoNumberID[a] # pop!(nemoNumberID, a)::Nemo.fmpz
+   n = pop!(nemoNumberID, a)::Nemo.fmpz
    return number(-n)
 end
 
@@ -129,6 +134,15 @@ function fmpzInt(ptr::Ptr{number}, cf::coeffs)
    return Clong(n)
 end
 
+function fmpzMPZ(b::BigInt, ptr::Ptr{number}, cf::coeffs)
+   n = julia(unsafe_load(ptr))::fmpz
+   z = convert(BigInt, n)
+   bptr = pointer_from_objref(b)
+   zptr = pointer_from_objref(z)
+   icxx"""mpz_init_set((__mpz_struct *) $bptr, (mpz_ptr) $zptr);"""
+   nothing
+end
+
 ###############################################################################
 #
 #   InitChar
@@ -139,7 +153,9 @@ function fmpzInitChar(cf::coeffs, p::Ptr{Void})
         
     pInit = cfunction(fmpzInit, number, (Clong, coeffs))
     pInt = cfunction(fmpzInt, Clong, (Ptr{number}, coeffs))
+    pMPZ = cfunction(fmpzMPZ, Void, (BigInt, Ptr{number}, coeffs))
     pInpNeg = cfunction(fmpzInpNeg, number, (number, coeffs))
+    pCopy = cfunction(fmpzCopy, number, (number, coeffs))
     pDelete = cfunction(fmpzDelete, Void, (Ptr{number}, coeffs))
     pAdd = cfunction(fmpzAdd, number, (number, number, coeffs))
     pSub = cfunction(fmpzSub, number, (number, number, coeffs))
@@ -164,7 +180,9 @@ function fmpzInitChar(cf::coeffs, p::Ptr{Void})
       cf->ch = 0;
       cf->cfInit = (number (*)(long, const coeffs)) $pInit;
       cf->cfInt = (long (*)(number &, const coeffs)) $pInt;
+      cf->cfMPZ = (void (*)(__mpz_struct *, number &, const coeffs)) $pMPZ;
       cf->cfInpNeg = (number (*)(number, const coeffs)) $pInpNeg;
+      cf->cfCopy = (number (*)(number, const coeffs)) $pCopy;
       cf->cfDelete = (void (*)(number *, const coeffs)) $pDelete;
       cf->cfAdd = (numberfunc) $pAdd;
       cf->cfSub = (numberfunc) $pSub;
