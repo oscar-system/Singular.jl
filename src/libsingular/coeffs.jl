@@ -186,3 +186,33 @@ end
 function omFree{T}(m :: Ptr{T})
    icxx"""omFree((void*) $m);"""
 end
+
+###############################################################################
+#
+#   Conversion between numbers that wrap jl_value_t's and julia values
+#
+###############################################################################
+
+function nRegister(t::n_coeffType, f::Ptr{Void})
+   return icxx"""return nRegister($t, (cfInitCharProc)$f);"""
+end
+
+const nemoNumberID = Base.Dict{number, RingElem}()
+
+function julia(cf::coeffs)
+   ptr = @cxx cf->data
+   return unsafe_pointer_to_objref(ptr)
+end
+
+function julia(p::number)
+    ptr = icxx"""return (void*)$p;"""
+    return unsafe_pointer_to_objref(ptr)
+end
+
+function number{T <: RingElem}(j::T)
+    n = number(pointer_from_objref(j))
+    nemoNumberID[n] = j # keep j alive
+    return n
+end
+
+include("flint/fmpz.jl")

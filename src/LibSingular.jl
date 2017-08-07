@@ -2,6 +2,10 @@ module libSingular
 
 using Cxx
 
+using Nemo
+
+import Base:setindex!
+
 include("libsingular/LibSingularTypes.jl")
 
 include("libsingular/coeffs.jl")

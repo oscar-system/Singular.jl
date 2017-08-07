@@ -324,3 +324,22 @@ function _n_GF_clear_fn(n::n_GF)
    _SingularN_GFField_clear_fn(R)
    nothing
 end
+
+###############################################################################
+#
+#   SingularCoefficientRing/n_unknown
+#
+###############################################################################
+
+type CoefficientRing <: Nemo.Ring
+   ptr::libSingular.coeffs
+
+   function CoefficientRing(R::Nemo.Ring)
+      c = libSingular.register(R)
+      return new(libSingular.nInitChar(c, C_NULL))
+   end
+end
+
+type n_unknown <: Nemo.RingElem
+end
+

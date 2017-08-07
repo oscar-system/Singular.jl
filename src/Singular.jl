@@ -14,7 +14,7 @@ import Nemo: add!, addeq!, coeff, content, crt, divexact, elem_type, gcdinv,
              needs_parentheses, parent_type, parent, primpart, reconstruct,
              show_minus_one, zero!, ResidueRing
 
-export SingularQQ, SingularZZ
+export SingularQQ, SingularZZ, CoefficientRing
 
 ###############################################################################
 #
