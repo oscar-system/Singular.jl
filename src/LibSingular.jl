@@ -4,7 +4,7 @@ using Cxx
 
 using Nemo
 
-import Base:setindex!
+import Base:setindex!, getindex
 
 include("libsingular/LibSingularTypes.jl")
 

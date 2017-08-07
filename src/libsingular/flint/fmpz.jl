@@ -50,6 +50,11 @@ function fmpzNeg(a::number, cf::coeffs)
    return number(-n)
 end
 
+function fmpzInpNeg(a::number, cf::coeffs)
+   n = nemoNumberID[a] # pop!(nemoNumberID, a)::Nemo.fmpz
+   return number(-n)
+end
+
 function fmpzInvers(a::number, cf::coeffs)
    n = julia(a)::Nemo.fmpz
    return number(divexact(1, n))
@@ -134,6 +139,7 @@ function fmpzInitChar(cf::coeffs, p::Ptr{Void})
         
     pInit = cfunction(fmpzInit, number, (Clong, coeffs))
     pInt = cfunction(fmpzInt, Clong, (Ptr{number}, coeffs))
+    pInpNeg = cfunction(fmpzInpNeg, number, (number, coeffs))
     pDelete = cfunction(fmpzDelete, Void, (Ptr{number}, coeffs))
     pAdd = cfunction(fmpzAdd, number, (number, number, coeffs))
     pSub = cfunction(fmpzSub, number, (number, number, coeffs))
@@ -158,6 +164,7 @@ function fmpzInitChar(cf::coeffs, p::Ptr{Void})
       cf->ch = 0;
       cf->cfInit = (number (*)(long, const coeffs)) $pInit;
       cf->cfInt = (long (*)(number &, const coeffs)) $pInt;
+      cf->cfInpNeg = (number (*)(number, const coeffs)) $pInpNeg;
       cf->cfDelete = (void (*)(number *, const coeffs)) $pDelete;
       cf->cfAdd = (numberfunc) $pAdd;
       cf->cfSub = (numberfunc) $pSub;
