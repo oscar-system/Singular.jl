@@ -331,15 +331,18 @@ end
 #
 ###############################################################################
 
-type CoefficientRing <: Nemo.Ring
+type CoefficientRing{T <: Nemo.RingElem} <: Nemo.Ring
    ptr::libSingular.coeffs
+   base_ring::Nemo.Ring
 
    function CoefficientRing(R::Nemo.Ring)
       c = libSingular.register(R)
-      return new(libSingular.nInitChar(c, C_NULL))
+      return new(libSingular.nInitChar(c, C_NULL), R)
    end
 end
 
-type n_unknown <: Nemo.RingElem
+type n_unknown{T <: Nemo.RingElem} <: Nemo.RingElem
+   ptr::libSingular.number
+   parent::CoefficientRing{T}
 end
 

@@ -327,11 +327,11 @@ end
 #
 ###############################################################################
 
-Base.promote_rule{U <: Integer, T <: Nemo.RingElem}(::Type{spoly{T}}, ::Type{U}) = spoly{T}
+Nemo.promote_rule{U <: Integer, T <: Nemo.RingElem}(::Type{spoly{T}}, ::Type{U}) = spoly{T}
 
-Base.promote_rule{T <: Nemo.RingElem}(::Type{spoly{T}}, ::Type{n_Z}) = spoly{T}
+Nemo.promote_rule{T <: Nemo.RingElem}(::Type{spoly{T}}, ::Type{n_Z}) = spoly{T}
 
-Base.promote_rule{T <: Nemo.RingElem}(::Type{spoly{T}}, ::Type{T}) = spoly{T}
+Nemo.promote_rule{T <: Nemo.RingElem}(::Type{spoly{T}}, ::Type{T}) = spoly{T}
 
 ###############################################################################
 #
@@ -366,9 +366,13 @@ function (R::SingularPolyRing)(n::libSingular.poly)
    return spoly{T}(R, n)
 end
 
-function (R::SingularPolyRing){T <: Nemo.RingElem}(n::T)
+function (R::SingularPolyRing{T}){T <: Nemo.RingElem}(n::T)
    parent(n) != base_ring(R) && error("Unable to coerce into polynomial ring")
    return spoly{T}(R, n.ptr)
+end
+
+function (R::SingularPolyRing{S}){S <: Nemo.RingElem, T <: Nemo.RingElem}(n::T)
+   return R(base_ring(R)(n))
 end
 
 function (R::SingularPolyRing)(p::spoly)
