@@ -56,8 +56,9 @@ function fmpzNeg(a::number, cf::coeffs)
 end
 
 function fmpzInpNeg(a::number, cf::coeffs)
-   n = pop!(nemoNumberID, a)::Nemo.fmpz
-   return number(-n)
+   n = julia(a)::Nemo.fmpz
+   ccall((:fmpz_neg, :libflint), Void, (Ptr{Nemo.fmpz}, Ptr{Nemo.fmpz}), &n, &n)
+   return number(n, false)
 end
 
 function fmpzInvers(a::number, cf::coeffs)
@@ -71,10 +72,28 @@ function fmpzMult(a::number, b::number, cf::coeffs)
    return number(n1*n2)
 end
 
+function fmpzInpMult(a::Ptr{number}, b::number, cf::coeffs)
+   r = unsafe_load(a)
+   aa = julia(r)::Nemo.fmpz
+   bb = julia(b)::Nemo.fmpz
+   aa = mul!(aa, aa, bb)
+   n = number(aa, false)
+   nothing
+end
+
 function fmpzAdd(a::number, b::number, cf::coeffs)
    n1 = julia(a)::Nemo.fmpz
    n2 = julia(b)::Nemo.fmpz
    return number(n1 + n2)
+end
+
+function fmpzInpAdd(a::Ptr{number}, b::number, cf::coeffs)
+   r = unsafe_load(a)
+   aa = julia(r)::Nemo.fmpz
+   bb = julia(b)::Nemo.fmpz
+   aa = addeq!(aa, bb)
+   n = number(aa, false)
+   nothing
 end
 
 function fmpzSub(a::number, b::number, cf::coeffs)
@@ -158,8 +177,10 @@ function fmpzInitChar(cf::coeffs, p::Ptr{Void})
     pCopy = cfunction(fmpzCopy, number, (number, coeffs))
     pDelete = cfunction(fmpzDelete, Void, (Ptr{number}, coeffs))
     pAdd = cfunction(fmpzAdd, number, (number, number, coeffs))
+    pInpAdd = cfunction(fmpzInpAdd, Void, (Ptr{number}, number, coeffs))
     pSub = cfunction(fmpzSub, number, (number, number, coeffs))
     pMult = cfunction(fmpzMult, number, (number, number, coeffs))
+    pInpMult = cfunction(fmpzInpMult, Void, (Ptr{number}, number, coeffs))
     pDiv = cfunction(fmpzDiv, number, (number, number, coeffs))
     pInvers = cfunction(fmpzInvers, number, (number, coeffs))
     pGreater = cfunction(fmpzGreater, Cint, (number, number, coeffs))
@@ -185,8 +206,10 @@ function fmpzInitChar(cf::coeffs, p::Ptr{Void})
       cf->cfCopy = (number (*)(number, const coeffs)) $pCopy;
       cf->cfDelete = (void (*)(number *, const coeffs)) $pDelete;
       cf->cfAdd = (numberfunc) $pAdd;
+      cf->cfInpAdd = (void (*)(number &, number, const coeffs)) $pInpAdd;
       cf->cfSub = (numberfunc) $pSub;
       cf->cfMult = (numberfunc) $pMult;
+      cf->cfInpMult = (void (*)(number &, number, const coeffs)) $pInpMult;
       cf->cfDiv = (numberfunc) $pDiv;
       cf->cfInvers = (number (*)(number, const coeffs)) $pInvers;
       cf->cfGreater = (BOOLEAN (*)(number, number, const coeffs)) $pGreater;

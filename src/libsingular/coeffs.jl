@@ -209,9 +209,11 @@ function julia(p::number)
     return unsafe_pointer_to_objref(ptr)
 end
 
-function number{T <: RingElem}(j::T)
+function number{T <: RingElem}(j::T, cache::Bool=true)
     n = number(pointer_from_objref(j))
-    nemoNumberID[n] = j # keep j alive
+    if cache
+       nemoNumberID[n] = j # keep j alive
+    end
     return n
 end
 
