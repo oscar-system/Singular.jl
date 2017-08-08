@@ -193,11 +193,16 @@ end
 #
 ###############################################################################
 
+type live_cache
+   num::Int
+   A::Array{Nemo.RingElem, 1}
+end
+
 function nRegister(t::n_coeffType, f::Ptr{Void})
    return icxx"""return nRegister($t, (cfInitCharProc)$f);"""
 end
 
-const nemoNumberID = Base.Dict{number, RingElem}()
+const nemoNumberID = Base.Dict{UInt, live_cache}()
 
 function julia(cf::coeffs)
    ptr = @cxx cf->data
@@ -209,10 +214,26 @@ function julia(p::number)
     return unsafe_pointer_to_objref(ptr)
 end
 
+function number_pop!(D::Base.Dict{UInt, live_cache}, ptr::Ptr{Void})
+   iptr = reinterpret(UInt, ptr) >> 24
+   val = D[iptr]
+   val.num -= 1
+   if val.num == 0
+      pop!(D, iptr)
+   end
+end
+
 function number{T <: RingElem}(j::T, cache::Bool=true)
-    n = number(pointer_from_objref(j))
+    ptr = pointer_from_objref(j)
+    n = number(ptr)
     if cache
-       nemoNumberID[n] = j # keep j alive
+       iptr = reinterpret(UInt, ptr) >> 24
+       if !haskey(nemoNumberID, iptr)
+          nemoNumberID[iptr] = live_cache(0, Array{Nemo.RingElem}(64))
+       end
+       val = nemoNumberID[iptr]
+       val.num += 1
+       push!(val.A, j)
     end
     return n
 end

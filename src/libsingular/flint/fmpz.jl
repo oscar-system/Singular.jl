@@ -10,7 +10,7 @@ end
    
 function fmpzDelete(ptr::Ptr{number}, cf::coeffs)
    n = unsafe_load(ptr)
-   pop!(nemoNumberID, n)
+   number_pop!(nemoNumberID, Ptr{Void}(n))
    nothing
 end
 
@@ -148,8 +148,7 @@ end
 ###############################################################################
 
 function fmpzInt(ptr::Ptr{number}, cf::coeffs)
-   nptr = icxx"""number* n = $ptr; return ((number)(*n));"""
-   n = julia(nptr)
+   n = julia(unsafe_load(ptr))::fmpz
    return Clong(n)
 end
 

@@ -5,14 +5,14 @@
 ###############################################################################
 
 function nf_elemInit(i::Clong, cf::coeffs)
-   R = julia(cf)
+   R = julia(cf)::Nemo.AnticNumberField
    return number(R(Int(i)))
 end
    
 function nf_elemDelete(ptr::Ptr{number}, cf::coeffs)
    n = unsafe_load(ptr)
    if n != C_NULL
-      pop!(nemoNumberID, n)
+      number_pop!(nemoNumberID, Ptr{Void}(n))
    end
    nothing
 end
@@ -58,7 +58,7 @@ function nf_elemNeg(a::number, cf::coeffs)
 end
 
 function nf_elemInpNeg(a::number, cf::coeffs)
-   R = julia(cf)
+   R = julia(cf)::Nemo.AnticNumberField
    n = julia(a)::Nemo.nf_elem
    ccall((:nf_elem_neg, :libflint), Void, (Ptr{Nemo.nf_elem}, Ptr{Nemo.nf_elem}, Ptr{AnticNumberField}), &n, &n, &R)
    return number(n, false)
