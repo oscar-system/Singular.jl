@@ -337,7 +337,8 @@ type CoefficientRing{T <: Nemo.RingElem} <: Nemo.Ring
 
    function CoefficientRing(R::Nemo.Ring)
       c = libSingular.register(R)
-      return new(libSingular.nInitChar(c, C_NULL), R)
+      ptr = pointer_from_objref(R)
+      return new(libSingular.nInitChar(c, ptr), R)
    end
 end
 
