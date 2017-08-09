@@ -25,6 +25,7 @@ type smodule{T <: Nemo.RingElem} <: Nemo.Module{T}
 
    function smodule(R::SingularPolyRing, m::libSingular.ideal)
       z = new(m, R, false)
+      R.refcount += 1
       finalizer(z, _smodule_clear_fn)
       return z
    end
@@ -32,6 +33,7 @@ end
 
 function _smodule_clear_fn(I::smodule)
    libSingular.id_Delete(I.ptr, I.base_ring.ptr)
+   _SingularPolyRing_clear_fn(R)
 end
 
 ###############################################################################

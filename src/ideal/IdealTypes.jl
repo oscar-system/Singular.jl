@@ -27,6 +27,7 @@ type sideal{T <: Nemo.RingElem} <: Nemo.Module{T}
       n = length(ids)
       id = libSingular.idInit(Cint(n))
       z = new(id, R, false)
+      R.refcount += 1
       finalizer(z, _sideal_clear_fn)
       for i = 1:n
          p = libSingular.p_Copy(ids[i].ptr, R.ptr)
@@ -37,11 +38,14 @@ type sideal{T <: Nemo.RingElem} <: Nemo.Module{T}
 
    function sideal(R::SingularPolyRing, id::libSingular.ideal)
       z = new(id, R, false)
+      R.refcount += 1
       finalizer(z, _sideal_clear_fn)
       return z
    end
 end
 
 function _sideal_clear_fn(I::sideal)
-   libSingular.id_Delete(I.ptr, I.base_ring.ptr)
+   R = I.base_ring
+   libSingular.id_Delete(I.ptr, R.ptr)
+   _SingularPolyRing_clear_fn
 end
