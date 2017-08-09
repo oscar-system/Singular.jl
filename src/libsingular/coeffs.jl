@@ -239,5 +239,6 @@ function number{T <: RingElem}(j::T, cache::Bool=true)
 end
 
 include("flint/fmpz.jl")
+include("flint/fmpq.jl")
 include("antic/nf_elem.jl")
 
