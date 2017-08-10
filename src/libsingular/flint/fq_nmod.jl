@@ -156,9 +156,7 @@ end
 
 function fq_nmodMPZ(b::BigInt, ptr::Ptr{number}, cf::coeffs)
    bptr = pointer_from_objref(b)
-   icxx"""mpz_init((__mpz_struct *) $bptr);
-          mpz_set_ui((__mpz_struct *) $bptr, 0);
-   """
+   icxx"""mpz_init_set_si((__mpz_struct *) $bptr, 0);"""
    nothing
 end
 
