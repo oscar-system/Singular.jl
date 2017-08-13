@@ -312,9 +312,9 @@ end
 #
 ###############################################################################
 
-Base.promote_rule{T <: Integer}(C::Type{n_Zn}, ::Type{T}) = n_Zn
+promote_rule{T <: Integer}(C::Type{n_Zn}, ::Type{T}) = n_Zn
 
-Base.promote_rule(C::Type{n_Zn}, ::Type{n_Z}) = n_Zn
+promote_rule(C::Type{n_Zn}, ::Type{n_Z}) = n_Zn
 
 ###############################################################################
 #

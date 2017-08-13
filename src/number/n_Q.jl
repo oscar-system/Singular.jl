@@ -329,11 +329,11 @@ end
 #
 ###############################################################################
 
-Base.promote_rule{T <: Integer}(C::Type{n_Q}, ::Type{T}) = n_Q
+promote_rule{T <: Integer}(C::Type{n_Q}, ::Type{T}) = n_Q
 
-Base.promote_rule(C::Type{n_Q}, ::Type{Nemo.fmpz}) = n_Q
+promote_rule(C::Type{n_Q}, ::Type{Nemo.fmpz}) = n_Q
 
-Base.promote_rule(C::Type{n_Q}, ::Type{n_Q}) = n_Z
+promote_rule(C::Type{n_Q}, ::Type{n_Q}) = n_Z
 
 ###############################################################################
 #

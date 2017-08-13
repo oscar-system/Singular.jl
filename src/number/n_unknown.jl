@@ -14,6 +14,122 @@ base_ring(R::CoefficientRing) = R.base_ring
 
 base_ring(a::n_unknown) = base_ring(parent(a))
 
+function check_parent(a::n_unknown, b::n_unknown)
+   parent(a) != parent(b) && error("Incompatible parents")
+end
+
+###############################################################################
+#
+#   String I/O
+#
+###############################################################################
+
+function show(io::IO, R::CoefficientRing)
+   print(io, "Singular coefficient ring over ")
+   show(io, R.base_ring)
+end
+
+function show(io::IO, a::n_unknown)
+   libSingular.StringSetS("")
+
+   nn = libSingular.number_ref(a.ptr)	
+   libSingular.n_Write(nn, parent(a).ptr, false)
+
+   m = libSingular.StringEndS()
+   s = unsafe_string(m) 
+   libSingular.omFree(Ptr{Void}(m))
+
+   print(io, s)
+end
+
+###############################################################################
+#
+#   Unary operators
+#
+###############################################################################
+
+function -(a::n_unknown)
+   R = parent(a)
+   n = libSingular.n_Neg(a.ptr, R.ptr)
+   return R(n)
+end
+
+###############################################################################
+#
+#   Binary operators
+#
+###############################################################################
+
+function +{T <: Nemo.RingElem}(a::n_unknown{T}, b::n_unknown{T})
+   check_parent(a, b)
+   R = parent(a)
+   n = libSingular.n_Add(a.ptr, b.ptr, R.ptr)
+   return R(n)
+end
+
+function -{T <: Nemo.RingElem}(a::n_unknown{T}, b::n_unknown{T})
+   check_parent(a, b)
+   R = parent(a)
+   n = libSingular.n_Sub(a.ptr, b.ptr, R.ptr)
+   return R(n)
+end
+
+function *{T <: Nemo.RingElem}(a::n_unknown{T}, b::n_unknown{T})
+   check_parent(a, b)
+   R = parent(a)
+   n = libSingular.n_Mult(a.ptr, b.ptr, R.ptr)
+   return R(n)
+end
+
+###############################################################################
+#
+#   Inversion
+#
+###############################################################################
+
+function inv{T <: Nemo.FieldElem}(a::n_unknown{T})
+   R = parent(a)
+   n = libSingular.n_Invers(a.ptr, R.ptr)
+   return R(n)
+end
+
+###############################################################################
+#
+#   Exact division
+#
+###############################################################################
+
+function divexact{T <: Nemo.RingElem}(a::n_unknown{T}, b::n_unknown{T})
+   check_parent(a, b)
+   R = parent(a)
+   n = libSingular.n_ExactDiv(a.ptr, b.ptr, R.ptr)
+   return R(n)
+end
+
+###############################################################################
+#
+#   Conversions and promotions
+#
+###############################################################################
+
+promote_rule{S <: Nemo.RingElem, T <: Integer}(C::Type{n_unknown{S}}, ::Type{T}) = n_unknown{S}
+
+promote_rule{T <: Nemo.RingElem}(::Type{n_unknown{T}}, ::Type{T}) = n_unknown{T}
+
+promote_rule1{T <: Nemo.RingElem, U <: Nemo.RingElem}(::Type{U}, ::Type{n_unknown{T}}) = promote_rule(U, n_unknown{T})
+
+function promote_rule1{T <: Nemo.RingElem, U <: Nemo.RingElem}(::Type{n_unknown{T}}, ::Type{n_unknown{U}})
+   promote_rule(T, n_unknown{U}) == T ? n_unknown{T} : Union{}
+end
+
+function promote_rule{T <: Nemo.RingElem, U <: Nemo.RingElem}(::Type{n_unknown{T}}, ::Type{U})
+   promote_rule(T, U) == T ? n_unknown{T} : promote_rule1(U, n_unknown{T})
+end
+
+promote_rule{S <: Nemo.RingElem}(::Type{n_unknown{S}}, ::Type{Nemo.fmpz}) = n_unknown{S}
+
+promote_rule{S <: Nemo.FieldElem}(::Type{n_unknown{S}}, ::Type{Nemo.fmpq}) = n_unknown{S}
+
 ###############################################################################
 #
 #   Parent call overloads
@@ -33,9 +149,12 @@ function (R::CoefficientRing{T}){T <: Nemo.RingElem}(a::n_unknown{T})
    return a
 end
 
+function (R::CoefficientRing{T}){T <: Nemo.RingElem}(ptr::libSingular.number)
+   return n_unknown{T}(ptr, R)
+end
+
 function (R::CoefficientRing{T}){T <: Nemo.RingElem, S <: Nemo.RingElem}(a::S)
    U = base_ring(R)
-   parent(a) != U && error("Unable to coerce element")
    return R(U(a))
 end
 

@@ -303,9 +303,9 @@ end
 #
 ###############################################################################
 
-Base.promote_rule{T <: Integer}(C::Type{n_Zp}, ::Type{T}) = n_Zp
+promote_rule{T <: Integer}(C::Type{n_Zp}, ::Type{T}) = n_Zp
 
-Base.promote_rule(C::Type{n_Zp}, ::Type{n_Z}) = n_Zp
+promote_rule(C::Type{n_Zp}, ::Type{n_Z}) = n_Zp
 
 ###############################################################################
 #

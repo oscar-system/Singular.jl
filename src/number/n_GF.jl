@@ -168,6 +168,7 @@ function ==(x::n_GF, y::n_GF)
     return libSingular.n_Equal(x.ptr, y.ptr, parent(x).ptr)
 end
 
+
 isequal(x::n_GF, y::n_GF) = (x == y)
 
 ###############################################################################
@@ -305,9 +306,9 @@ end
 #
 ###############################################################################
 
-Base.promote_rule{T <: Integer}(C::Type{n_GF}, ::Type{T}) = n_GF
+promote_rule{T <: Integer}(C::Type{n_GF}, ::Type{T}) = n_GF
 
-Base.promote_rule(C::Type{n_GF}, ::Type{n_Z}) = n_GF
+promote_rule(C::Type{n_GF}, ::Type{n_Z}) = n_GF
 
 ###############################################################################
 #
