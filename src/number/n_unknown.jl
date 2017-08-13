@@ -18,6 +18,26 @@ function check_parent(a::n_unknown, b::n_unknown)
    parent(a) != parent(b) && error("Incompatible parents")
 end
 
+function canonical_unit(a::n_unknown)
+   R = parent(a)
+   n = libSingular.julia(a.ptr)
+   return R(libSingular.number(canonical_unit(n)))
+end
+
+function deepcopy(a::n_unknown)
+   R = parent(a)
+   n = libSingular.julia(a.ptr)
+   return R(libSingular.number(deepcopy(n)))
+end
+
+function one(R::CoefficientRing)
+   return R(libSingular.n_Init(1, R.ptr))
+end
+
+function zero(R::CoefficientRing)
+   return R(libSingular.n_Init(0, R.ptr))
+end
+
 ###############################################################################
 #
 #   String I/O
@@ -79,6 +99,18 @@ function *{T <: Nemo.RingElem}(a::n_unknown{T}, b::n_unknown{T})
    R = parent(a)
    n = libSingular.n_Mult(a.ptr, b.ptr, R.ptr)
    return R(n)
+end
+
+###############################################################################
+#
+#   Comparison
+#
+###############################################################################
+
+function =={T <: Nemo.RingElem}(a::n_unknown{T}, b::n_unknown{T})
+   check_parent(a, b)
+   R = parent(a)
+   return libSingular.n_Equal(a.ptr, b.ptr, R.ptr)
 end
 
 ###############################################################################

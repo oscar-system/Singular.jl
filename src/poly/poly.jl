@@ -14,7 +14,7 @@ base_ring(p::spoly) = base_ring(parent(p))
 
 elem_type{T <: Nemo.RingElem}(::SingularPolyRing{T}) = spoly{T}
 
-parent_type{T <: Nemo.RingElem}(a::spoly{T}) = SingularPolyRing{T}
+parent_type{T <: Nemo.RingElem}(::Type{spoly{T}}) = SingularPolyRing{T}
 
 ngens(R::SingularPolyRing) = Int(libSingular.rVar(R.ptr))
 
@@ -104,6 +104,10 @@ function check_parent{T <: Nemo.RingElem}(a::spoly{T}, b::spoly{T})
    parent(a) != parent(b) && error("Incompatible parent objects")
 end
 
+function canonical_unit{T <: Nemo.RingElem}(a::spoly{T})
+  return a == 0 ? one(base_ring(a)) : canonical_unit(coeff(a, 0))
+end
+   
 ###############################################################################
 #
 #   String I/O
