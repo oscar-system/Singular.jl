@@ -150,6 +150,18 @@ end
 
 ###############################################################################
 #
+#   GCD
+#
+###############################################################################
+
+function fqGcd(a::number, b::number, cf::coeffs)
+   n1 = julia(a)::Nemo.fq
+   n2 = julia(b)::Nemo.fq
+   return number(gcd(n1, n2))
+end
+
+###############################################################################
+#
 #   Conversion
 #
 ###############################################################################
@@ -185,6 +197,7 @@ function fqInitChar(cf::coeffs, p::Ptr{Void})
     pInpMult = cfunction(fqInpMult, Void, (Ptr{number}, number, coeffs))
     pDiv = cfunction(fqDiv, number, (number, number, coeffs))
     pInvers = cfunction(fqInvers, number, (number, coeffs))
+    pGcd = cfunction(fqGcd, number, (number, number, coeffs))
     pGreater = cfunction(fqGreater, Cint, (number, number, coeffs))
     pEqual = cfunction(fqEqual, Cint, (number, number, coeffs))
     pIsZero = cfunction(fqIsZero, Cint, (number, coeffs))
@@ -215,6 +228,7 @@ function fqInitChar(cf::coeffs, p::Ptr{Void})
       cf->cfInpMult = (void (*)(number &, number, const coeffs)) $pInpMult;
       cf->cfDiv = (numberfunc) $pDiv;
       cf->cfInvers = (number (*)(number, const coeffs)) $pInvers;
+      cf->cfGcd = (numberfunc) $pGcd;
       cf->cfGreater = (BOOLEAN (*)(number, number, const coeffs)) $pGreater;
       cf->cfEqual = (BOOLEAN (*)(number, number, const coeffs)) $pEqual;
       cf->cfIsZero = (BOOLEAN (*)(number, const coeffs)) $pIsZero;

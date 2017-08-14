@@ -151,6 +151,18 @@ end
 
 ###############################################################################
 #
+#   GCD
+#
+###############################################################################
+
+function nemoRingGcd(a::number, b::number, cf::coeffs)
+   n1 = julia(a)
+   n2 = julia(b)
+   return number(gcd(n1, n2))
+end
+
+###############################################################################
+#
 #   Conversion
 #
 ###############################################################################
@@ -186,6 +198,7 @@ function nemoRingInitChar(cf::coeffs, p::Ptr{Void})
     pInpMult = cfunction(nemoRingInpMult, Void, (Ptr{number}, number, coeffs))
     pDiv = cfunction(nemoRingDiv, number, (number, number, coeffs))
     pInvers = cfunction(nemoRingInvers, number, (number, coeffs))
+    pGcd = cfunction(nemoRingGcd, number, (number, number, coeffs))
     pGreater = cfunction(nemoRingGreater, Cint, (number, number, coeffs))
     pEqual = cfunction(nemoRingEqual, Cint, (number, number, coeffs))
     pIsZero = cfunction(nemoRingIsZero, Cint, (number, coeffs))
@@ -216,6 +229,7 @@ function nemoRingInitChar(cf::coeffs, p::Ptr{Void})
       cf->cfInpMult = (void (*)(number &, number, const coeffs)) $pInpMult;
       cf->cfDiv = (numberfunc) $pDiv;
       cf->cfInvers = (number (*)(number, const coeffs)) $pInvers;
+      cf->cfGcd = (numberfunc) $pGcd;
       cf->cfGreater = (BOOLEAN (*)(number, number, const coeffs)) $pGreater;
       cf->cfEqual = (BOOLEAN (*)(number, number, const coeffs)) $pEqual;
       cf->cfIsZero = (BOOLEAN (*)(number, const coeffs)) $pIsZero;
