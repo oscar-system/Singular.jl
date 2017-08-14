@@ -331,14 +331,24 @@ end
 #
 ###############################################################################
 
+const CoeffRingID = Dict{Nemo.Ring, Nemo.Ring}()
+
 type CoefficientRing{T <: Nemo.RingElem} <: Nemo.Ring
    ptr::libSingular.coeffs
    base_ring::Nemo.Ring
 
-   function CoefficientRing(R::Nemo.Ring)
-      c = libSingular.register(R)
-      ptr = pointer_from_objref(R)
-      return new(libSingular.nInitChar(c, ptr), R)
+   function CoefficientRing(R::Nemo.Ring, cached::Bool=true)
+      if haskey(CoeffRingID, R)
+         return CoeffRingID[R]::CoefficientRing{T}
+      else 
+         c = libSingular.register(R)
+         ptr = pointer_from_objref(R)
+         z = new(libSingular.nInitChar(c, ptr), R)
+         if cached
+           CoeffRingID[R] = z
+         end
+         return z
+      end
    end
 end
 
