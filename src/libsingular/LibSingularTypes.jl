@@ -4,17 +4,17 @@
 #
 ###############################################################################
 
-typealias coeffs pcpp"n_Procs_s"
+const coeffs = @pcpp_str "n_Procs_s"
 
-typealias n_coeffType Cxx.CppEnum{:n_coeffType}
+const n_coeffType = Cxx.CppEnum{:n_coeffType}
 
-typealias number pcpp"snumber"
+const number = @pcpp_str "snumber"
 
-typealias number_ref Ref{number}
+const number_ref = Ref{number}
 
-typealias __mpz_struct pcpp"__mpz_struct"
+const __mpz_struct = @pcpp_str "__mpz_struct"
 
-typealias mpz_t pcpp"mpz_t"
+const mpz_t = @pcpp_str "mpz_t"
 
 ###############################################################################
 #
@@ -22,15 +22,15 @@ typealias mpz_t pcpp"mpz_t"
 #
 ###############################################################################
 
-typealias ring pcpp"ip_sring"
+const ring = @pcpp_str "ip_sring"
 
-typealias poly pcpp"spolyrec"
+const poly = @pcpp_str "spolyrec"
 
-typealias poly_ref Ref{poly}
+const poly_ref = Ref{poly}
 
-typealias vector pcpp"spolyrec"
+const vector = @pcpp_str "spolyrec"
 
-typealias rRingOrder_t Cxx.CppEnum{:rRingOrder_t, Cuint}
+const rRingOrder_t = Cxx.CppEnum{:rRingOrder_t, Cuint}
 
 ###############################################################################
 #
@@ -38,9 +38,9 @@ typealias rRingOrder_t Cxx.CppEnum{:rRingOrder_t, Cuint}
 #
 ###############################################################################
 
-typealias ideal pcpp"sip_sideal"
+const ideal = @pcpp_str "sip_sideal"
 
-typealias ideal_ref Ref{ideal}
+const ideal_ref = Ref{ideal}
 
 ###############################################################################
 #
@@ -48,7 +48,7 @@ typealias ideal_ref Ref{ideal}
 #
 ###############################################################################
 
-typealias matrix pcpp"ip_smatrix"
+const matrix = @pcpp_str "ip_smatrix"
 
 ###############################################################################
 #
@@ -56,7 +56,7 @@ typealias matrix pcpp"ip_smatrix"
 #
 ###############################################################################
 
-typealias resolvente Cxx.CppPtr{pcpp"sip_sideal", (false, false, false)}
+const resolvente = Cxx.CppPtr{@pcpp_str "sip_sideal", (false, false, false)}
 
 ###############################################################################
 #
@@ -64,4 +64,4 @@ typealias resolvente Cxx.CppPtr{pcpp"sip_sideal", (false, false, false)}
 #
 ###############################################################################
 
-typealias syStrategy pcpp"ssyStrategy" 
+const syStrategy = @pcpp_str "ssyStrategy" 
