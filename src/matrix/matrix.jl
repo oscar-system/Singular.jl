@@ -1,5 +1,3 @@
-export SingularMatrix
-
 ###############################################################################
 #
 #   Basic manipulation
@@ -58,10 +56,10 @@ end
 
 ###############################################################################
 #
-#   SingularMatrix constructors
+#   Matrix constructors
 #
 ###############################################################################
 
-function SingularMatrix{T <: Nemo.RingElem}(I::smodule{T})
+function Matrix{T <: Nemo.RingElem}(I::smodule{T})
    return smatrix{T}(base_ring(I), I.ptr)
 end

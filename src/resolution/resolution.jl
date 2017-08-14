@@ -19,7 +19,7 @@ function getindex(r::sresolution, i::Int)
    if ptr != C_NULL
       ptr = libSingular.id_Copy(ptr, R.ptr)
    end
-   return SingularModule(R, ptr)
+   return Module(R, ptr)
 end
 
 ###############################################################################

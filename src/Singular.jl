@@ -12,10 +12,9 @@ import Base: abs, checkbounds, deepcopy, den, div, divrem, gcd, gcdx,
 import Nemo: add!, addeq!, canonical_unit, check_parent, coeff, content, crt,
              divexact, elem_type, gcdinv, isnegative, isone, isgen, iszero,
              isunit, lead, mul!, needs_parentheses, parent_type, parent,
-             primpart, promote_rule, reconstruct, show_minus_one, zero!,
-             ResidueRing
+             primpart, promote_rule, reconstruct, show_minus_one, zero!
 
-export SingularQQ, SingularZZ, CoefficientRing
+export CoefficientRing, SingularQQ, SingularZZ
 
 ###############################################################################
 #

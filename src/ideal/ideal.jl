@@ -1,4 +1,4 @@
-export SingularIdealSet, SingularIdeal, SingularMaximalIdeal, syz, lead,
+export syz, lead,
        normalize!, isconstant, iszerodim, sres, lres, intersection,
        quotient, reduce, eliminate
 
@@ -53,7 +53,7 @@ end
 function deepcopy(I::sideal)
    R = base_ring(I)
    ptr = libSingular.id_Copy(I.ptr, R.ptr)
-   return SingularIdeal(R, ptr)
+   return Ideal(R, ptr)
 end
 
 function check_parent{T <: Nemo.RingElem}(I::sideal{T}, J::sideal{T})
@@ -95,14 +95,14 @@ function +{T <: Nemo.RingElem}(I::sideal{T}, J::sideal{T})
    check_parent(I, J)
    R = base_ring(I)
    ptr = libSingular.id_Add(I.ptr, J.ptr, R.ptr)
-   return SingularIdeal(R, ptr)
+   return Ideal(R, ptr)
 end
 
 function *{T <: Nemo.RingElem}(I::sideal{T}, J::sideal{T})
    check_parent(I, J)
    R = base_ring(I)
    ptr = libSingular.id_Mult(I.ptr, J.ptr, R.ptr)
-   return SingularIdeal(R, ptr)
+   return Ideal(R, ptr)
 end
 
 ###############################################################################
@@ -115,7 +115,7 @@ function ^(I::sideal, n::Int)
    (n > typemax(Cint) || n < 0) && throw(DomainError())
    R = base_ring(I)
    ptr = libSingular.id_Power(I.ptr, Cint(n), R.ptr)
-   return SingularIdeal(R, ptr)
+   return Ideal(R, ptr)
 end
 
 ###############################################################################
@@ -128,7 +128,7 @@ end
 function lead(I::sideal)
    R = base_ring(I)
    ptr = libSingular.id_Head(I.ptr, R.ptr)
-   return SingularIdeal(R, ptr)
+   return Ideal(R, ptr)
 end
 
 ###############################################################################
@@ -141,7 +141,7 @@ function intersection{T <: Nemo.RingElem}(I::sideal{T}, J::sideal{T})
    check_parent(I, J)
    R = base_ring(I)
    ptr = libSingular.id_Intersection(I.ptr, J.ptr, R.ptr)
-   return SingularIdeal(R, ptr)
+   return Ideal(R, ptr)
 end
 
 ###############################################################################
@@ -154,7 +154,7 @@ function quotient{T <: Nemo.RingElem}(I::sideal{T}, J::sideal{T})
    check_parent(I, J)
    R = base_ring(I)
    ptr = libSingular.id_Quotient(I.ptr, J.ptr, R.ptr)
-   return SingularIdeal(R, ptr)
+   return Ideal(R, ptr)
 end
 
 ###############################################################################
@@ -167,7 +167,7 @@ function std(I::sideal)
    R = base_ring(I)
    ptr = libSingular.id_Std(I.ptr, R.ptr)
    libSingular.idSkipZeroes(ptr)
-   z = SingularIdeal(R, ptr)
+   z = Ideal(R, ptr)
    z.isGB = true
    return z
 end
@@ -183,7 +183,7 @@ function reduce(I::sideal, G::sideal)
    R = base_ring(I)
    !G.isGB && error("Not a Groebner basis")
    ptr = libSingular.p_Reduce(I.ptr, G.ptr, R.ptr)
-   return SingularIdeal(R, ptr)
+   return Ideal(R, ptr)
 end
 
 function reduce(p::spoly, G::sideal)
@@ -205,7 +205,7 @@ function eliminate(I::sideal, p::spoly)
    R = base_ring(I)
    parent(p) != R && error("Incompatible base rings")
    ptr = libSingular.id_Eliminate(I.ptr, p.ptr, R.ptr)
-   return SingularIdeal(R, ptr)
+   return Ideal(R, ptr)
 end
 
 ###############################################################################
@@ -218,7 +218,7 @@ function syz(I::sideal)
    R = base_ring(I)
    ptr = libSingular.id_Syzygies(I.ptr, R.ptr)
    libSingular.idSkipZeroes(ptr)
-   return SingularModule(R, ptr)
+   return Module(R, ptr)
 end
 
 ###############################################################################
@@ -257,22 +257,22 @@ end
 
 ###############################################################################
 #
-#   SingularIdeal constructors
+#   Ideal constructors
 #
 ###############################################################################
 
-function SingularIdeal{T <: Nemo.RingElem}(R::SingularPolyRing{T}, ids::spoly{T}...)
+function Ideal{T <: Nemo.RingElem}(R::SingularPolyRing{T}, ids::spoly{T}...)
    S = elem_type(R)
    return sideal{S}(R, ids...)
 end
 
-function SingularIdeal{T <: Nemo.RingElem}(R::SingularPolyRing{T}, id::libSingular.ideal)
+function Ideal{T <: Nemo.RingElem}(R::SingularPolyRing{T}, id::libSingular.ideal)
    S = elem_type(R)
    return sideal{S}(R, id)
 end
 
 # maximal ideal in degree d
-function SingularMaximalIdeal{T <: Nemo.RingElem}(R::SingularPolyRing{T}, d::Int)
+function MaximalIdeal{T <: Nemo.RingElem}(R::SingularPolyRing{T}, d::Int)
    (d > typemax(Cint) || d < 0) && throw(DomainError())
    S = elem_type(R)
    ptr = libSingular.id_MaxIdeal(Cint(d), R.ptr)

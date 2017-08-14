@@ -1,5 +1,3 @@
-export SingularModuleClass, SingularModule, SingularFreeModule
-
 ###############################################################################
 #
 #   Basic manipulation 
@@ -70,7 +68,7 @@ function std(I::smodule)
    R = base_ring(I)
    ptr = libSingular.id_Std(I.ptr, R.ptr)
    libSingular.idSkipZeroes(ptr)
-   z = SingularModule(R, ptr)
+   z = Module(R, ptr)
    z.isGB = true
    return z
 end
@@ -111,17 +109,17 @@ end
 
 ###############################################################################
 #
-#   SingularModule constructors
+#   Module constructors
 #
 ###############################################################################
 
-function SingularModule{T <: Nemo.RingElem}(R::SingularPolyRing{T}, id::libSingular.ideal)
+function Module{T <: Nemo.RingElem}(R::SingularPolyRing{T}, id::libSingular.ideal)
    S = elem_type(R)
    return smodule{S}(R, id)
 end
 
 # free module of rank n
-function SingularFreeModule{T <: Nemo.RingElem}(R::SingularPolyRing{T}, n::Int)
+function FreeModule{T <: Nemo.RingElem}(R::SingularPolyRing{T}, n::Int)
    (n > typemax(Cint) || n < 0) && throw(DomainError())
    ptr = libSingular.id_FreeModule(Cint(n), R.ptr)
    S = elem_type(R)

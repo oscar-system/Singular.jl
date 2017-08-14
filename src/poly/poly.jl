@@ -1,4 +1,4 @@
-export SingularPolynomialRing, ngens, coeff, isgen, content, primpart
+export ngens, coeff, isgen, content, primpart
 
 ###############################################################################
 #
@@ -394,11 +394,11 @@ end
 
 ###############################################################################
 #
-#   SingularPolynomialRing constructor
+#   PolynomialRing constructor
 #
 ###############################################################################
 
-function SingularPolynomialRing(R::Nemo.Ring, s::Array{String, 1}; cached::Bool = true, ordering::Symbol = :degrevlex)
+function PolynomialRing(R::Nemo.Ring, s::Array{String, 1}; cached::Bool = true, ordering::Symbol = :degrevlex)
    U = [Symbol(v) for v in s]
    T = elem_type(R)
    parent_obj = SingularPolyRing{T}(R, U, cached, sym2ringorder[ordering])
