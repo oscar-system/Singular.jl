@@ -402,6 +402,6 @@ function SingularPolynomialRing(R::Nemo.Ring, s::Array{String, 1}; cached::Bool 
    U = [Symbol(v) for v in s]
    T = elem_type(R)
    parent_obj = SingularPolyRing{T}(R, U, cached, sym2ringorder[ordering])
-   return tuple(parent_obj, gens(parent_obj)...)
+   return tuple(parent_obj, gens(parent_obj))
 end
 
