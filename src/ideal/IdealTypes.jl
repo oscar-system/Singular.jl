@@ -9,7 +9,7 @@ const SingularIdealSetID = ObjectIdDict()
 type SingularIdealSet{T <: Nemo.RingElem} <: Nemo.Set
    base_ring::SingularPolyRing
 
-   function SingularIdealSet(R::SingularPolyRing)
+   function SingularIdealSet{T}(R::SingularPolyRing) where T
       if haskey(SingularIdealSetID, R)
          return SingularIdealSetID[R]
       else
@@ -23,7 +23,7 @@ type sideal{T <: Nemo.RingElem} <: Nemo.Module{T}
    base_ring::SingularPolyRing
    isGB::Bool
 
-   function sideal(R::SingularPolyRing, ids::spoly...)
+   function sideal{T}(R::SingularPolyRing, ids::spoly...) where T
       n = length(ids)
       id = libSingular.idInit(Cint(n))
       z = new(id, R, false)
@@ -36,7 +36,7 @@ type sideal{T <: Nemo.RingElem} <: Nemo.Module{T}
       return z
    end
 
-   function sideal(R::SingularPolyRing, id::libSingular.ideal)
+   function sideal{T}(R::SingularPolyRing, id::libSingular.ideal) where T
       z = new(id, R, false)
       R.refcount += 1
       finalizer(z, _sideal_clear_fn)

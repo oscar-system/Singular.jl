@@ -7,7 +7,7 @@
 type SingularResolutionSet{T <: Nemo.RingElem} <: Nemo.Set
    base_ring::SingularPolyRing
 
-   function SingularResolutionSet(R::SingularPolyRing)
+   function SingularResolutionSet{T}(R::SingularPolyRing) where T
       return new(R)
    end
 end
@@ -18,7 +18,7 @@ type sresolution{T <: Nemo.RingElem} <: Nemo.SetElem
    base_ring::SingularPolyRing
 
    # really takes a Singular module, which has type ideal
-   function sresolution(R::SingularPolyRing, n::Int, ptr::libSingular.resolvente)
+   function sresolution{T}(R::SingularPolyRing, n::Int, ptr::libSingular.resolvente) where T
       z = new(ptr, n, R)
       finalizer(z, _sresolution_clear_fn)
       return z

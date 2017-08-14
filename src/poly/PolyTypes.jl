@@ -11,8 +11,8 @@ type SingularPolyRing{T <: Nemo.RingElem} <: Nemo.Ring
    base_ring::Nemo.Ring
    refcount::Int
 
-   function SingularPolyRing(R::Nemo.Ring, s::Array{Symbol, 1}, cached::Bool = true, 
-                            ordering::libSingular.rRingOrder_t = ringorder_dp)
+   function SingularPolyRing{T}(R::Nemo.Ring, s::Array{Symbol, 1}, cached::Bool = true, 
+                            ordering::libSingular.rRingOrder_t = ringorder_dp) where T
       if haskey(SingularPolyRingID, (R, s, ordering))
          return SingularPolyRingID[R, s, ordering]::SingularPolyRing{T}
       else
@@ -48,7 +48,7 @@ type spoly{T <: Nemo.RingElem} <: Nemo.RingElem
    ptr::libSingular.poly
    parent::SingularPolyRing{T}
 
-   function spoly(R::SingularPolyRing{T})
+   function spoly{T}(R::SingularPolyRing{T}) where T
       p = libSingular.p_ISet(0, R.ptr)
 	  z = new(p, R)
       R.refcount += 1
@@ -56,14 +56,14 @@ type spoly{T <: Nemo.RingElem} <: Nemo.RingElem
       return z
    end
     
-   function spoly(R::SingularPolyRing{T}, p::libSingular.poly)
+   function spoly{T}(R::SingularPolyRing{T}, p::libSingular.poly) where T
       z = new(p, R)
       R.refcount += 1
       finalizer(z, _spoly_clear_fn)
       return z
    end
     
-   function spoly(R::SingularPolyRing{T}, p::T)
+   function spoly{T}(R::SingularPolyRing{T}, p::T) where T
       n = libSingular.n_Copy(p.ptr, parent(p).ptr)
 	  r = libSingular.p_NSet(n, R.ptr)
       z = new(r, R)
@@ -72,7 +72,7 @@ type spoly{T <: Nemo.RingElem} <: Nemo.RingElem
       return z
    end
     
-   function spoly(R::SingularPolyRing{T}, n::libSingular.number) 
+   function spoly{T}(R::SingularPolyRing{T}, n::libSingular.number) where T
       p = libSingular.p_NSet(n, R.ptr)
 	  z = new(p, R)
       R.refcount += 1
@@ -80,7 +80,7 @@ type spoly{T <: Nemo.RingElem} <: Nemo.RingElem
       return z
    end 
 
-   function spoly(R::SingularPolyRing{T}, b::Int)
+   function spoly{T}(R::SingularPolyRing{T}, b::Int) where T
       p = libSingular.p_ISet(b, R.ptr)
 	  z = new(p, R)
       R.refcount += 1
@@ -88,7 +88,7 @@ type spoly{T <: Nemo.RingElem} <: Nemo.RingElem
       return z
    end
 
-   function spoly(R::SingularPolyRing{T}, b::BigInt)
+   function spoly{T}(R::SingularPolyRing{T}, b::BigInt) where T
       n = libSingular.n_InitMPZ(b, R.base_ring.ptr)
 	  p = libSingular.p_NSet(n, R.ptr)
 	  z = new(p, R)

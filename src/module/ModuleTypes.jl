@@ -9,7 +9,7 @@ const SingularModuleClassID = ObjectIdDict()
 type SingularModuleClass{T <: Nemo.RingElem} <: Nemo.Set
    base_ring::SingularPolyRing
 
-   function SingularModuleClass(R::SingularPolyRing)
+   function SingularModuleClass{T}(R::SingularPolyRing) where T
       if haskey(SingularModuleClassID, R)
          return SingularModuleClassID[R]
       else
@@ -23,7 +23,7 @@ type smodule{T <: Nemo.RingElem} <: Nemo.Module{T}
    base_ring::SingularPolyRing
    isGB::Bool
 
-   function smodule(R::SingularPolyRing, m::libSingular.ideal)
+   function smodule{T}(R::SingularPolyRing, m::libSingular.ideal) where T
       z = new(m, R, false)
       R.refcount += 1
       finalizer(z, _smodule_clear_fn)
@@ -32,7 +32,8 @@ type smodule{T <: Nemo.RingElem} <: Nemo.Module{T}
 end
 
 function _smodule_clear_fn(I::smodule)
-   libSingular.id_Delete(I.ptr, I.base_ring.ptr)
+   R = I.base_ring
+   libSingular.id_Delete(I.ptr, R.ptr)
    _SingularPolyRing_clear_fn(R)
 end
 
@@ -48,7 +49,7 @@ type SingularFreeMod{T <: Nemo.RingElem} <: Nemo.Module{T}
    base_ring::SingularPolyRing
    rank::Int
 
-   function SingularFreeMod(R::SingularPolyRing, r::Int)
+   function SingularFreeMod{T}(R::SingularPolyRing, r::Int) where T
       if haskey(SingularFreeModID, (R, r))
          return SingularFreeModID[R, r]::SingularFreeMod{T}
       else
@@ -62,7 +63,7 @@ type svector{T <: Nemo.RingElem} <: Nemo.ModuleElem{T}
    rank::Int
    base_ring::SingularPolyRing
 
-   function svector(R::SingularPolyRing, r::Int, p::libSingular.poly)
+   function svector{T}(R::SingularPolyRing, r::Int, p::libSingular.poly) where T
       z = new(p, r, R)
       R.refcount += 1
       finalizer(z, _svector_clear_fn)

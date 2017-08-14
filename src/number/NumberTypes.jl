@@ -337,7 +337,7 @@ type CoefficientRing{T <: Nemo.RingElem} <: Nemo.Ring
    ptr::libSingular.coeffs
    base_ring::Nemo.Ring
 
-   function CoefficientRing(R::Nemo.Ring, cached::Bool=true)
+   function CoefficientRing{T}(R::Nemo.Ring, cached::Bool=true) where T
       if haskey(CoeffRingID, R)
          return CoeffRingID[R]::CoefficientRing{T}
       else 

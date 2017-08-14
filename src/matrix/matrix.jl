@@ -62,6 +62,6 @@ end
 #
 ###############################################################################
 
-function SingularMatrix(I::smodule)
-   return smatrix(base_ring(I), I.ptr)
+function SingularMatrix{T <: Nemo.RingElem}(I::smodule{T})
+   return smatrix{T}(base_ring(I), I.ptr)
 end
