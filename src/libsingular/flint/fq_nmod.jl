@@ -41,7 +41,11 @@ end
 
 function fq_nmodWrite(a::number, cf::coeffs)
    n = julia(a)::Nemo.fq_nmod
-   str = "("*string(n)*")"
+   if needs_parentheses(n)
+      str = "("*string(n)*")"
+   else
+      str = string(n)
+   end
    icxx"""StringAppendS($str);"""
    nothing
 end

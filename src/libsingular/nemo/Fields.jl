@@ -41,7 +41,11 @@ end
 
 function nemoFieldWrite(a::number, cf::coeffs)
    n = julia(a)
-   str = string(n)
+   if needs_parentheses(n)
+      str = "("*string(n)*")"
+   else
+      str = string(n)
+   end
    icxx"""StringAppendS($str);"""
    nothing
 end
