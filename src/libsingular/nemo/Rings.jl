@@ -163,6 +163,29 @@ end
 
 ###############################################################################
 #
+#   Extended GCD
+#
+###############################################################################
+
+function nemoRingExtGcd(a::number, b::number, s::Ptr{number}, t::Ptr{number}, cf::coeffs)
+   n1 = julia(a)
+   n2 = julia(b)
+   s1 = unsafe_load(s)
+   if s1 != C_NULL
+      number_pop!(nemoNumberID, Ptr{Void}(s1))
+   end
+   t1 = unsafe_load(t)
+   if t1 != C_NULL
+      number_pop!(nemoNumberID, Ptr{Void}(t1))
+   end
+   g1, s1, t1 = gcdx(n1, n2)
+   libSingular.setindex!(s, number(s1))
+   libSingular.setindex!(t, number(t1))
+   return number(g1)
+end
+
+###############################################################################
+#
 #   Conversion
 #
 ###############################################################################
@@ -199,6 +222,7 @@ function nemoRingInitChar(cf::coeffs, p::Ptr{Void})
     pDiv = cfunction(nemoRingDiv, number, (number, number, coeffs))
     pInvers = cfunction(nemoRingInvers, number, (number, coeffs))
     pGcd = cfunction(nemoRingGcd, number, (number, number, coeffs))
+    pExtGcd = cfunction(nemoFieldExtGcd, number, (number, number, Ptr{number}, Ptr{number}, coeffs))
     pGreater = cfunction(nemoRingGreater, Cint, (number, number, coeffs))
     pEqual = cfunction(nemoRingEqual, Cint, (number, number, coeffs))
     pIsZero = cfunction(nemoRingIsZero, Cint, (number, coeffs))
@@ -230,6 +254,7 @@ function nemoRingInitChar(cf::coeffs, p::Ptr{Void})
       cf->cfDiv = (numberfunc) $pDiv;
       cf->cfInvers = (number (*)(number, const coeffs)) $pInvers;
       cf->cfGcd = (numberfunc) $pGcd;
+      cf->cfExtGcd = (number (*)(number, number, number *, number *, const coeffs)) $pExtGcd;
       cf->cfGreater = (BOOLEAN (*)(number, number, const coeffs)) $pGreater;
       cf->cfEqual = (BOOLEAN (*)(number, number, const coeffs)) $pEqual;
       cf->cfIsZero = (BOOLEAN (*)(number, const coeffs)) $pIsZero;

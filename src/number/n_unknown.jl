@@ -140,7 +140,7 @@ end
 
 ###############################################################################
 #
-#   Gcd
+#   GCD
 #
 ###############################################################################
 
@@ -149,6 +149,21 @@ function gcd{T <: Nemo.RingElem}(a::n_unknown{T}, b::n_unknown{T})
    R = parent(a)
    n = libSingular.n_Gcd(a.ptr, b.ptr, R.ptr)
    return R(n)
+end
+
+###############################################################################
+#
+#   Extended GCD
+#
+###############################################################################
+
+function gcdx{T <: Nemo.RingElem}(a::n_unknown{T}, b::n_unknown{T})
+   check_parent(a, b)
+   R = parent(a)
+   s = [libSingular.n_Init(0, R.ptr)]
+   t = [libSingular.n_Init(0, R.ptr)]
+   n = libSingular.n_ExtGcd(a.ptr, b.ptr, pointer(s), pointer(t), R.ptr)
+   return R(n), R(s[]), R(t[])
 end
 
 ###############################################################################

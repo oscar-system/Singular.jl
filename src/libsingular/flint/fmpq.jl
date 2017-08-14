@@ -161,6 +161,18 @@ end
 
 ###############################################################################
 #
+#   Subring GCD
+#
+###############################################################################
+
+function fmpqSubringGcd(a::number, b::number, cf::coeffs)
+   n1 = num(julia(a)::fmpq)
+   n2 = num(julia(b)::fmpq)
+   return number(fmpq(gcd(n1, n2)))
+end
+
+###############################################################################
+#
 #   Conversion
 #
 ###############################################################################
@@ -201,6 +213,7 @@ function fmpqInitChar(cf::coeffs, p::Ptr{Void})
     pDiv = cfunction(fmpqDiv, number, (number, number, coeffs))
     pInvers = cfunction(fmpqInvers, number, (number, coeffs))
     pGcd = cfunction(fmpqGcd, number, (number, number, coeffs))
+    pSubringGcd = cfunction(fmpqSubringGcd, number, (number, number, coeffs))
     pGreater = cfunction(fmpqGreater, Cint, (number, number, coeffs))
     pEqual = cfunction(fmpqEqual, Cint, (number, number, coeffs))
     pIsZero = cfunction(fmpqIsZero, Cint, (number, coeffs))
@@ -232,6 +245,7 @@ function fmpqInitChar(cf::coeffs, p::Ptr{Void})
       cf->cfDiv = (numberfunc) $pDiv;
       cf->cfInvers = (number (*)(number, const coeffs)) $pInvers;
       cf->cfGcd = (numberfunc) $pGcd;
+      cf->cfSubringGcd = (numberfunc) $pSubringGcd;
       cf->cfGreater = (BOOLEAN (*)(number, number, const coeffs)) $pGreater;
       cf->cfEqual = (BOOLEAN (*)(number, number, const coeffs)) $pEqual;
       cf->cfIsZero = (BOOLEAN (*)(number, const coeffs)) $pIsZero;

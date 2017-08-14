@@ -163,6 +163,20 @@ end
 
 ###############################################################################
 #
+#   Subring GCD
+#
+###############################################################################
+
+function nemoFieldSubringGcd(a::number, b::number, cf::coeffs)
+   R = julia(cf)
+   !isa(R, FracField) && error("Not a fraction field in SubringGcd")
+   n1 = num(julia(a))
+   n2 = num(julia(b))
+   return number(R(gcd(n1, n2)))
+end
+
+###############################################################################
+#
 #   Conversion
 #
 ###############################################################################
@@ -199,6 +213,7 @@ function nemoFieldInitChar(cf::coeffs, p::Ptr{Void})
     pDiv = cfunction(nemoFieldDiv, number, (number, number, coeffs))
     pInvers = cfunction(nemoFieldInvers, number, (number, coeffs))
     pGcd = cfunction(nemoFieldGcd, number, (number, number, coeffs))
+    pSubringGcd = cfunction(nemoFieldSubringGcd, number, (number, number, coeffs))
     pGreater = cfunction(nemoFieldGreater, Cint, (number, number, coeffs))
     pEqual = cfunction(nemoFieldEqual, Cint, (number, number, coeffs))
     pIsZero = cfunction(nemoFieldIsZero, Cint, (number, coeffs))
@@ -230,6 +245,7 @@ function nemoFieldInitChar(cf::coeffs, p::Ptr{Void})
       cf->cfDiv = (numberfunc) $pDiv;
       cf->cfInvers = (number (*)(number, const coeffs)) $pInvers;
       cf->cfGcd = (numberfunc) $pGcd;
+      cf->cfSubringGcd = (numberfunc) $pSubringGcd;
       cf->cfGreater = (BOOLEAN (*)(number, number, const coeffs)) $pGreater;
       cf->cfEqual = (BOOLEAN (*)(number, number, const coeffs)) $pEqual;
       cf->cfIsZero = (BOOLEAN (*)(number, const coeffs)) $pIsZero;
