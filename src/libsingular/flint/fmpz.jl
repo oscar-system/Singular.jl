@@ -200,6 +200,7 @@ function fmpzInitChar(cf::coeffs, p::Ptr{Void})
       cf->is_field  = FALSE;
       cf->is_domain = TRUE;
       cf->ch = 0;
+      cf->data = $p;
       cf->cfInit = (number (*)(long, const coeffs)) $pInit;
       cf->cfInt = (long (*)(number &, const coeffs)) $pInt;
       cf->cfMPZ = (void (*)(__mpz_struct *, number &, const coeffs)) $pMPZ;
