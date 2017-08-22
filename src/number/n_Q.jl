@@ -8,13 +8,13 @@ export reconstruct, isone, iszero, isunit, divexact
 
 elem_type(::SingularRationalField) = n_Q
 
-parent(a::n_Q) = SingularQQ
+parent(a::n_Q) = QQ
 
 parent_type(::Type{n_Q}) = SingularRationalField
 
-base_ring(a::n_Q) = SingularZZ
+base_ring(a::n_Q) = ZZ
 
-base_ring(a::SingularRationalField) = SingularZZ
+base_ring(a::SingularRationalField) = ZZ
 
 function deepcopy(a::n_Q)
    return parent(a)(libSingular.n_Copy(a.ptr, parent(a).ptr))
@@ -26,9 +26,9 @@ end
 #
 ###############################################################################
 
-one(::SingularRationalField) = SingularQQ(1)
+one(::SingularRationalField) = QQ(1)
 
-zero(::SingularRationalField) = SingularQQ(0)
+zero(::SingularRationalField) = QQ(0)
 
 function isone(n::n_Q)
    c = parent(n)
@@ -45,17 +45,17 @@ isunit(n::n_Q) = !iszero(n)
 function num(n::n_Q)
    nn = libSingular.number_ref(n.ptr);
    p = libSingular.n_GetNumerator(nn, parent(n).ptr)
-   pp = libSingular.nApplyMapFunc(n_Q_2_n_Z, p, SingularQQ.ptr, SingularZZ.ptr)
-   libSingular.n_Delete(p, SingularQQ.ptr)
-   return SingularZZ(pp)
+   pp = libSingular.nApplyMapFunc(n_Q_2_n_Z, p, QQ.ptr, ZZ.ptr)
+   libSingular.n_Delete(p, QQ.ptr)
+   return ZZ(pp)
 end
 
 function den(n::n_Q)
    nn = libSingular.number_ref(n.ptr);
    p = libSingular.n_GetDenom(nn, parent(n).ptr)
-   pp = libSingular.nApplyMapFunc(n_Q_2_n_Z, p, SingularQQ.ptr, SingularZZ.ptr)
-   libSingular.n_Delete(p, SingularQQ.ptr)
-   return SingularZZ(pp)
+   pp = libSingular.nApplyMapFunc(n_Q_2_n_Z, p, QQ.ptr, ZZ.ptr)
+   libSingular.n_Delete(p, QQ.ptr)
+   return ZZ(pp)
 end
 
 function abs(n::n_Q)
@@ -281,13 +281,13 @@ end
 ###############################################################################
 
 function reconstruct(x::n_Z, y::n_Z)
-   p = libSingular.n_Farey(x.ptr, y.ptr, SingularQQ.ptr)
-   return SingularQQ(p)
+   p = libSingular.n_Farey(x.ptr, y.ptr, QQ.ptr)
+   return QQ(p)
 end
 
-reconstruct(x::n_Z, y::Integer) = reconstruct(x, SingularZZ(y))
+reconstruct(x::n_Z, y::Integer) = reconstruct(x, ZZ(y))
 
-reconstruct(x::Integer, y::n_Z) = reconstruct(SingularZZ(x), y)
+reconstruct(x::Integer, y::n_Z) = reconstruct(ZZ(x), y)
 
 ###############################################################################
 #

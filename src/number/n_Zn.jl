@@ -12,12 +12,12 @@ parent(a::n_Zn) = a.parent
 
 parent_type(::Type{n_Zn}) = SingularN_ZnRing
 
-base_ring(a::n_Zn) = SingularZZ
+base_ring(a::n_Zn) = ZZ
 
-base_ring(a::SingularN_ZnRing) = SingularZZ
+base_ring(a::SingularN_ZnRing) = ZZ
 
 function characteristic(R::SingularN_ZnRing)
-   return SingularZZ(libSingular.n_GetChar(R.ptr))
+   return ZZ(libSingular.n_GetChar(R.ptr))
 end
 
 function deepcopy(a::n_Zn)

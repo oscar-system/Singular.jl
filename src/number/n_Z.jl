@@ -8,13 +8,13 @@ export crt
 
 elem_type(::SingularIntegerRing) = n_Z
 
-parent(a::n_Z) = SingularZZ
+parent(a::n_Z) = ZZ
 
 parent_type(::Type{n_Z}) = SingularIntegerRing
 
-base_ring(a::n_Z) = SingularZZ
+base_ring(a::n_Z) = ZZ
 
-base_ring(a::SingularIntegerRing) = SingularZZ
+base_ring(a::SingularIntegerRing) = ZZ
 
 function deepcopy(a::n_Z)
    return parent(a)(libSingular.n_Copy(a.ptr, parent(a).ptr))
@@ -26,9 +26,9 @@ end
 #
 ###############################################################################
 
-one(::SingularIntegerRing) = SingularZZ(1)
+one(::SingularIntegerRing) = ZZ(1)
 
-zero(::SingularIntegerRing) = SingularZZ(0)
+zero(::SingularIntegerRing) = ZZ(0)
 
 function isone(n::n_Z)
    c = parent(n)

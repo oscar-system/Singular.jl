@@ -27,7 +27,7 @@ type n_Z <: Nemo.RingElem
     ptr::libSingular.number
 
     function n_Z()
-    	const c = SingularZZ.ptr
+    	const c = ZZ.ptr
         z = new(libSingular.n_Init(0, c))
         parent(z).refcount += 1
         finalizer(z, _n_Z_clear_fn)
@@ -35,7 +35,7 @@ type n_Z <: Nemo.RingElem
     end
 
     function n_Z(n::Int)
-    	const c = SingularZZ.ptr
+    	const c = ZZ.ptr
         z = new(libSingular.n_Init(n, c))
         parent(z).refcount += 1
         finalizer(z, _n_Z_clear_fn)
@@ -87,7 +87,7 @@ type n_Q <: Nemo.FieldElem
     ptr::libSingular.number
 
     function n_Q()
-    	const c = SingularQQ.ptr
+    	const c = QQ.ptr
         z = new(libSingular.n_Init(0, c))
         parent(z).refcount += 1
         finalizer(z, _n_Q_clear_fn)
@@ -95,7 +95,7 @@ type n_Q <: Nemo.FieldElem
     end
 
     function n_Q(n::Int)
-    	const c = SingularQQ.ptr
+    	const c = QQ.ptr
         z = new(libSingular.n_Init(n, c))
         parent(z).refcount += 1
         finalizer(z, _n_Q_clear_fn)
@@ -103,7 +103,7 @@ type n_Q <: Nemo.FieldElem
     end
 
     function n_Q(n::n_Z)
-    	z = new(libSingular.nApplyMapFunc(n_Z_2_n_Q, n.ptr, SingularZZ.ptr, SingularQQ.ptr))
+    	z = new(libSingular.nApplyMapFunc(n_Z_2_n_Q, n.ptr, ZZ.ptr, QQ.ptr))
         parent(z).refcount += 1
         finalizer(z, _n_Q_clear_fn)
         return z
@@ -144,8 +144,8 @@ type SingularN_ZnRing <: Nemo.Ring
    function SingularN_ZnRing(n::Int) 
       n_Zn = @cxx n_Zn
       ptr = libSingular.nInitChar(n_Zn, pointer_from_objref(ZnmInfo(BigInt(n), UInt(1))))
-      d = new(ptr, libSingular.n_SetMap(SingularZZ.ptr, ptr), 
-              libSingular.n_SetMap(ptr, SingularZZ.ptr), 1)
+      d = new(ptr, libSingular.n_SetMap(ZZ.ptr, ptr), 
+              libSingular.n_SetMap(ptr, ZZ.ptr), 1)
       finalizer(d, _SingularN_ZnRing_clear_fn)
       return d
    end
@@ -207,8 +207,8 @@ type SingularN_ZpField <: Nemo.Field
    function SingularN_ZpField(n::Int) 
       n_Zp = @cxx n_Zp
       ptr = libSingular.nInitChar(n_Zp, Ptr{Void}(n))
-      d = new(ptr, libSingular.n_SetMap(SingularZZ.ptr, ptr), 
-              libSingular.n_SetMap(ptr, SingularZZ.ptr), 1)
+      d = new(ptr, libSingular.n_SetMap(ZZ.ptr, ptr), 
+              libSingular.n_SetMap(ptr, ZZ.ptr), 1)
       finalizer(d, _SingularN_ZpField_clear_fn)
       return d
    end
@@ -277,8 +277,8 @@ type SingularN_GFField <: Nemo.Field
    function SingularN_GFField(p::Int, n::Int, S::Symbol) 
       n_GF = @cxx n_GF
       ptr = libSingular.nInitChar(n_GF, pointer_from_objref(GFInfo(Cint(p), Cint(n), pointer(Vector{UInt8}(string(S)*"\0")))))
-      d = new(ptr, n, libSingular.n_SetMap(SingularZZ.ptr, ptr), 
-              libSingular.n_SetMap(ptr, SingularZZ.ptr), 1)
+      d = new(ptr, n, libSingular.n_SetMap(ZZ.ptr, ptr), 
+              libSingular.n_SetMap(ptr, ZZ.ptr), 1)
       finalizer(d, _SingularN_GFField_clear_fn)
       return d
    end

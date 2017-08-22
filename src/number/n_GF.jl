@@ -1,5 +1,3 @@
-export SingularFiniteField
-
 ###############################################################################
 #
 #   Data type and parent methods
@@ -17,7 +15,7 @@ base_ring(a::n_GF) = Union{}
 base_ring(a::SingularN_GFField) = Union{}
 
 function characteristic(R::SingularN_GFField)
-   return SingularZZ(libSingular.n_GetChar(R.ptr))
+   return ZZ(libSingular.n_GetChar(R.ptr))
 end
 
 function degree(R::SingularN_GFField)
@@ -364,7 +362,7 @@ end
 #
 ###############################################################################
 
-function SingularFiniteField(p::Int, n::Int, S::String; cached=true)
+function FiniteField(p::Int, n::Int, S::String; cached=true)
    n >= 16 || p >= 2^16 && throw(DomainError())
    !Nemo.isprime(UInt(p)) && throw(DomainError())
    n*log(p) >= 20*log(2) && throw(DomainError())

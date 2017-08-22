@@ -1,5 +1,3 @@
-export SingularFp
-
 ###############################################################################
 #
 #   Data type and parent methods
@@ -17,7 +15,7 @@ base_ring(a::n_Zp) = Union{}
 base_ring(a::SingularN_ZpField) = Union{}
 
 function characteristic(R::SingularN_ZpField)
-   return SingularZZ(libSingular.n_GetChar(R.ptr))
+   return ZZ(libSingular.n_GetChar(R.ptr))
 end
 
 function deepcopy(a::n_Zp)
@@ -81,7 +79,7 @@ end
 needs_parentheses(x::n_Zp) = false
 
 function isnegative(x::n_Zp)
-   return x > parent(x)(div(characteristic(parent(x)), SingularZZ(2)))
+   return x > parent(x)(div(characteristic(parent(x)), ZZ(2)))
 end
 
 show_minus_one(::Type{n_Zp}) = false
@@ -361,7 +359,7 @@ end
 #
 ###############################################################################
 
-function SingularFp(a::Int; cached=true)
+function Fp(a::Int; cached=true)
    a == 0 && throw(DivideError())
    a < 0 && throw(DomainError())
    !Nemo.isprime(UInt(a)) && throw(DomainError())

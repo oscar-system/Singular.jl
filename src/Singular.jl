@@ -14,8 +14,6 @@ import Nemo: add!, addeq!, canonical_unit, check_parent, coeff, content, crt,
              isunit, lead, mul!, needs_parentheses, parent_type, parent,
              primpart, promote_rule, reconstruct, show_minus_one, zero!
 
-export CoefficientRing, SingularQQ, SingularZZ
-
 ###############################################################################
 #
 #   Set up environment / load libraries
@@ -77,11 +75,11 @@ function __init__()
    # set up Singular parents
    # done in __init__ since headers must be included first
 
-   global const SingularQQ = SingularRationalField()
-   global const SingularZZ = SingularIntegerRing()
+   global const QQ = SingularRationalField()
+   global const ZZ = SingularIntegerRing()
 
-   global const n_Z_2_n_Q = libSingular.n_SetMap(SingularZZ.ptr, SingularQQ.ptr)
-   global const n_Q_2_n_Z = libSingular.n_SetMap(SingularQQ.ptr, SingularZZ.ptr)
+   global const n_Z_2_n_Q = libSingular.n_SetMap(ZZ.ptr, QQ.ptr)
+   global const n_Q_2_n_Z = libSingular.n_SetMap(QQ.ptr, ZZ.ptr)
 
    global const ringorder_no = @cxx ringorder_no
    global const ringorder_lp = @cxx ringorder_lp
