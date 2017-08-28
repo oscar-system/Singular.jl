@@ -169,10 +169,13 @@ end
 
 function nemoFieldSubringGcd(a::number, b::number, cf::coeffs)
    R = julia(cf)
-   !isa(R, FracField) && error("Not a fraction field in SubringGcd")
-   n1 = num(julia(a))
-   n2 = num(julia(b))
-   return number(R(gcd(n1, n2)))
+   if isa(R, FracField)
+      n1 = num(julia(a))
+      n2 = num(julia(b))
+      return number(R(gcd(n1, n2)))
+   else
+      return number(deepcopy(julia(a)))
+   end
 end
 
 ###############################################################################
