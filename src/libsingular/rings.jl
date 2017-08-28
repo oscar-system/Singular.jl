@@ -108,8 +108,8 @@ function p_EqualPolys(a::poly, b::poly, r::ring)
    icxx"""p_EqualPolys($a, $b, $r);"""
 end
 
-function singclap_pdivide(a::poly, b::poly, r::ring)
-   icxx"""singclap_pdivide($a, $b, $r);"""
+function p_Divide(a::poly, b::poly, r::ring)
+   icxx"""p_Divide($a, $b, $r);"""
 end
 
 function singclap_gcd(a::poly, b::poly, r::ring)

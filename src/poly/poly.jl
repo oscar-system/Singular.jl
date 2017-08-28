@@ -219,7 +219,7 @@ function divexact(x::spoly, y::spoly)
    R = parent(x)
    x1 = libSingular.p_Copy(x.ptr, R.ptr)
    y1 = libSingular.p_Copy(y.ptr, R.ptr)
-   p = libSingular.singclap_pdivide(x1, y1, R.ptr)
+   p = libSingular.p_Divide(x1, y1, R.ptr)
    return R(p)
 end
 
