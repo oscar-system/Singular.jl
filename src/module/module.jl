@@ -23,7 +23,7 @@ function getindex(I::smodule, i::Int)
    checkbounds(I, i)
    R = base_ring(I)
    p = libSingular.getindex(I.ptr, Cint(i - 1))
-   return SingularVector(R, rank(I), libSingular.p_Copy(p, R.ptr))
+   return Singular.Vector(R, rank(I), libSingular.p_Copy(p, R.ptr))
 end
 
 iszero(p::smodule) = Bool(libSingular.idIs0(p.ptr))

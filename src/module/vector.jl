@@ -20,7 +20,7 @@ rank(R::SingularFreeMod) = R.rank
 
 function deepcopy(p::svector)
    p2 = libSingular.p_Copy(p.ptr, parent(p).ptr)
-   return SingularVector(p.base_ring, p.rank, p2)
+   return Singular.Vector(p.base_ring, p.rank, p2)
 end
 
 function check_parent{T <: Nemo.RingElem}(a::svector{T}, b::svector{T})
@@ -60,7 +60,7 @@ function -(a::svector)
    R = base_ring(a)
    a1 = libSingular.p_Copy(a.ptr, R.ptr)
    s = libSingular.p_Neg(a1, R.ptr)
-   return SingularVector(R, a.rank, s) 
+   return Singular.Vector(R, a.rank, s) 
 end
 
 ###############################################################################
@@ -75,7 +75,7 @@ function +{T <: Nemo.RingElem}(a::svector{T}, b::svector{T})
    a1 = libSingular.p_Copy(a.ptr, R.ptr)
    b1 = libSingular.p_Copy(b.ptr, R.ptr)
    s = libSingular.p_Add_q(a1, b1, R.ptr)
-   return SingularVector(R, a.rank, s) 
+   return Singular.Vector(R, a.rank, s) 
 end
 
 function -{T <: Nemo.RingElem}(a::svector{T}, b::svector{T})
@@ -84,7 +84,7 @@ function -{T <: Nemo.RingElem}(a::svector{T}, b::svector{T})
    a1 = libSingular.p_Copy(a.ptr, R.ptr)
    b1 = libSingular.p_Copy(b.ptr, R.ptr)
    s = libSingular.p_Sub(a1, b1, R.ptr)
-   return SingularVector(R, a.rank, s) 
+   return Singular.Vector(R, a.rank, s) 
 end
 
 ###############################################################################
@@ -99,7 +99,7 @@ function *{T <: Nemo.RingElem}(a::svector{spoly{T}}, b::spoly{T})
    a1 = libSingular.p_Copy(a.ptr, R.ptr)
    b1 = libSingular.p_Copy(b.ptr, R.ptr)
    s = libSingular.p_Mult_q(a1, b1, R.ptr)
-   return SingularVector(R, a.rank, s)
+   return Singular.Vector(R, a.rank, s)
 end
 
 *{T <: Nemo.RingElem}(a::spoly{T}, b::svector{spoly{T}}) = b*a
@@ -125,10 +125,10 @@ end
 
 ###############################################################################
 #
-#   SingularVector Constructors
+#   Vector Constructors
 #
 ###############################################################################
 
-function SingularVector{T <: Nemo.RingElem}(R::SingularPolyRing{T}, r::Int, p::libSingular.poly)
+function Vector{T <: Nemo.RingElem}(R::SingularPolyRing{T}, r::Int, p::libSingular.poly)
    return svector{spoly{T}}(R, r, p)
 end

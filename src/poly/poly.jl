@@ -331,18 +331,10 @@ end
 #
 ###############################################################################
 
-promote_rule{U <: Integer, T <: Nemo.RingElem}(::Type{spoly{T}}, ::Type{U}) = spoly{T}
+promote_rule(::Type{spoly{T}}, ::Type{spoly{T}}) where T <: Nemo.RingElem = spoly{T}
 
-promote_rule{T <: Nemo.RingElem}(::Type{spoly{T}}, ::Type{n_Z}) = spoly{T}
-
-promote_rule{T <: Nemo.RingElem}(::Type{spoly{T}}, ::Type{T}) = spoly{T}
-
-function promote_rule1{T <: Nemo.RingElem, U <: Nemo.RingElem}(::Type{spoly{T}}, ::Type{spoly{U}})
-   promote_rule(T, spoly{U}) == T ? spoly{T} : Union{}
-end
-
-function promote_rule{T <: Nemo.RingElem, U <: Nemo.RingElem}(::Type{spoly{T}}, ::Type{U})
-   promote_rule(T, U) == T ? spoly{T} : promote_rule1(U, spoly{T})
+function promote_rule(::Type{spoly{T}}, ::Type{U}) where {T <: Nemo.RingElem, U <: Nemo.RingElem}
+   promote_rule(T, U) == T ? spoly{T} : Union{}
 end
 
 ###############################################################################

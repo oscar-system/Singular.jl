@@ -14,6 +14,11 @@ import Nemo: add!, addeq!, canonical_unit, check_parent, coeff, content, crt,
              isunit, lead, mul!, needs_parentheses, parent_type, parent,
              primpart, promote_rule, reconstruct, show_minus_one, zero!
 
+export ResidueRing, PolynomialRing, Ideal, MaximalIdeal, Module, FreeModule,
+       Vector, Matrix
+
+export ZZ, QQ, FiniteField, CoefficientRing, Fp
+
 ###############################################################################
 #
 #   Set up environment / load libraries
@@ -72,11 +77,15 @@ function __init__()
 
    @cxx siInit(pointer(binSingular))
 
-   # set up Singular parents
-   # done in __init__ since headers must be included first
+   # set up Singular parents (we cannot do this before Singular is initialised)
 
-   global const QQ = SingularRationalField()
-   global const ZZ = SingularIntegerRing()
+   ZZ.ptr = get_n_Z()
+   ZZ.refcount = 1
+
+   QQ.ptr = get_n_Q()
+   QQ.refcount = 1
+
+   # done in __init__ since headers must be included first
 
    global const n_Z_2_n_Q = libSingular.n_SetMap(ZZ.ptr, QQ.ptr)
    global const n_Q_2_n_Z = libSingular.n_SetMap(QQ.ptr, ZZ.ptr)
@@ -130,5 +139,14 @@ include("Matrix.jl")
 include("Vector.jl")
 
 include("Resolution.jl")
+
+###############################################################################
+#
+#   Set Singlular ZZ and QQ
+#
+###############################################################################
+
+QQ = SingularRationalField()
+ZZ = SingularIntegerRing()
 
 end # module

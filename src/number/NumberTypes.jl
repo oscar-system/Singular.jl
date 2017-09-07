@@ -4,13 +4,17 @@
 #
 ###############################################################################
 
+function get_n_Z()
+   n_Z = @cxx n_Z
+   d = libSingular.nInitChar(n_Z, Ptr{Void}(0))
+end
+
 type SingularIntegerRing <: Nemo.Ring
    ptr::libSingular.coeffs
    refcount::Int
 
    function SingularIntegerRing() 
-      n_Z = @cxx n_Z
-      d = new(libSingular.nInitChar(n_Z, Ptr{Void}(0)), 1)
+      d = new()
       finalizer(d, _SingularIntegerRing_clear_fn)
       return d
    end
@@ -63,13 +67,17 @@ end
 #
 ###############################################################################
 
+function get_n_Q()
+   n_Q = @cxx n_Q
+   d = libSingular.nInitChar(n_Q, Ptr{Void}(0))
+end
+
 type SingularRationalField <: Nemo.Field
    ptr::libSingular.coeffs
    refcount::Int
 
    function SingularRationalField() 
-      n_Q = @cxx n_Q
-      d = new(libSingular.nInitChar(n_Q, Ptr{Void}(0)), 1)
+      d = new()
       finalizer(d, _SingularRationalField_clear_fn)
       return d
    end
@@ -276,7 +284,7 @@ type SingularN_GFField <: Nemo.Field
 
    function SingularN_GFField(p::Int, n::Int, S::Symbol) 
       n_GF = @cxx n_GF
-      ptr = libSingular.nInitChar(n_GF, pointer_from_objref(GFInfo(Cint(p), Cint(n), pointer(Vector{UInt8}(string(S)*"\0")))))
+      ptr = libSingular.nInitChar(n_GF, pointer_from_objref(GFInfo(Cint(p), Cint(n), pointer(Base.Vector{UInt8}(string(S)*"\0")))))
       d = new(ptr, n, libSingular.n_SetMap(ZZ.ptr, ptr), 
               libSingular.n_SetMap(ptr, ZZ.ptr), 1)
       finalizer(d, _SingularN_GFField_clear_fn)
