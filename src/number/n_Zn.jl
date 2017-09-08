@@ -6,17 +6,17 @@ export characteristic
 #
 ###############################################################################
 
-elem_type(::SingularN_ZnRing) = n_Zn
+elem_type(::N_ZnRing) = n_Zn
 
 parent(a::n_Zn) = a.parent
 
-parent_type(::Type{n_Zn}) = SingularN_ZnRing
+parent_type(::Type{n_Zn}) = N_ZnRing
 
 base_ring(a::n_Zn) = ZZ
 
-base_ring(a::SingularN_ZnRing) = ZZ
+base_ring(a::N_ZnRing) = ZZ
 
-function characteristic(R::SingularN_ZnRing)
+function characteristic(R::N_ZnRing)
    return ZZ(libSingular.n_GetChar(R.ptr))
 end
 
@@ -30,9 +30,9 @@ end
 #
 ###############################################################################
 
-one(R::SingularN_ZnRing) = R(1)
+one(R::N_ZnRing) = R(1)
 
-zero(R::SingularN_ZnRing) = R(0)
+zero(R::N_ZnRing) = R(0)
 
 function isone(n::n_Zn)
    c = parent(n)
@@ -60,7 +60,7 @@ canonical_unit(x::n_Zn) = x
 #
 ###############################################################################
 
-function show(io::IO, c::SingularN_ZnRing)
+function show(io::IO, c::N_ZnRing)
    print(io, "Residue Ring of Integer Ring modulo ", characteristic(c))
 end
 
@@ -282,28 +282,28 @@ function addeq!(x::n_Zn, y::n_Zn)
     xx = libSingular.number_ref(x.ptr)
     libSingular.n_InpAdd(xx, y.ptr, parent(x).ptr)
     x.ptr = xx[]
-    nothing
+    return x
 end
 
 function mul!(x::n_Zn, y::n_Zn, z::n_Zn)
    ptr = libSingular.n_Mult(y.ptr, z.ptr, parent(x).ptr)
    libSingular.n_Delete(x.ptr, parent(x).ptr)
    x.ptr = ptr
-   nothing
+   return x
 end
 
 function add!(x::n_Zn, y::n_Zn, z::n_Zn)
    ptr = libSingular.n_Add(y.ptr, z.ptr, parent(x).ptr)
    libSingular.n_Delete(x.ptr, parent(x).ptr)
    x.ptr = ptr
-   nothing
+   return x
 end
 
 function zero!(x::n_Zn)
    ptr = libSingular.n_Init(0, parent(x).ptr)
    libSingular.n_Delete(x.ptr, parent(x).ptr)
    x.ptr = ptr
-   nothing
+   return x
 end
 
 ###############################################################################
@@ -322,40 +322,40 @@ promote_rule(C::Type{n_Zn}, ::Type{n_Z}) = n_Zn
 #
 ###############################################################################
 
-function (R::SingularN_ZnRing)()
+function (R::N_ZnRing)()
    z = n_Zn(R)
    z.parent = R
    return z
 end
 
-function (R::SingularN_ZnRing)(x::Integer)
+function (R::N_ZnRing)(x::Integer)
    z = R(libSingular.n_InitMPZ(BigInt(x), R.ptr)) 
    z.parent = R
    return z
 end
 
-function (R::SingularN_ZnRing)(n::Int)
+function (R::N_ZnRing)(n::Int)
    z = n_Zn(R, n)
    z.parent = R
    return z
 end
 
-function (R::SingularN_ZnRing)(n::n_Z)
+function (R::N_ZnRing)(n::n_Z)
    m = libSingular.nApplyMapFunc(R.from_n_Z, n.ptr, parent(n).ptr, R.ptr)
    z = n_Zn(R, m)
    z.parent = R
    return z
 end
 
-(R::SingularN_ZnRing)(n::n_Zn) = n
+(R::N_ZnRing)(n::n_Zn) = n
 
-function (R::SingularN_ZnRing)(n::libSingular.number)
+function (R::N_ZnRing)(n::libSingular.number)
    z = n_Zn(R, n) 
    z.parent = R
    return z
 end
 
-function (R::SingularN_ZnRing)(x::Nemo.fmpz)
+function (R::N_ZnRing)(x::Nemo.fmpz)
    a = BigInt()
    ccall((:flint_mpz_init_set_readonly, :libflint), Void,
          (Ptr{BigInt}, Ptr{fmpz}), &a, &x)
@@ -370,9 +370,9 @@ end
 #
 ###############################################################################
 
-function ResidueRing(R::SingularIntegerRing, a::Int; cached=true)
+function ResidueRing(R::IntegerRing, a::Int; cached=true)
    a == 0 && throw(DivideError())
    a < 0 && throw(DomainError())
 
-   return SingularN_ZnRing(a)
+   return N_ZnRing(a)
 end

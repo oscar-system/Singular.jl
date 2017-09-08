@@ -6,15 +6,15 @@ export reconstruct, isone, iszero, isunit, divexact
 #
 ###############################################################################
 
-elem_type(::SingularRationalField) = n_Q
+elem_type(::RationalField) = n_Q
 
 parent(a::n_Q) = QQ
 
-parent_type(::Type{n_Q}) = SingularRationalField
+parent_type(::Type{n_Q}) = RationalField
 
 base_ring(a::n_Q) = ZZ
 
-base_ring(a::SingularRationalField) = ZZ
+base_ring(a::RationalField) = ZZ
 
 function deepcopy(a::n_Q)
    return parent(a)(libSingular.n_Copy(a.ptr, parent(a).ptr))
@@ -26,9 +26,9 @@ end
 #
 ###############################################################################
 
-one(::SingularRationalField) = QQ(1)
+one(::RationalField) = QQ(1)
 
-zero(::SingularRationalField) = QQ(0)
+zero(::RationalField) = QQ(0)
 
 function isone(n::n_Q)
    c = parent(n)
@@ -80,7 +80,7 @@ canonical_unit(x::n_Q) = x
 #
 ###############################################################################
 
-function show(io::IO, c::SingularRationalField)
+function show(io::IO, c::RationalField)
    print(io, "Rational Field")
 end
 
@@ -299,28 +299,28 @@ function addeq!(x::n_Q, y::n_Q)
     xx = libSingular.number_ref(x.ptr)
     libSingular.n_InpAdd(xx, y.ptr, parent(x).ptr)
     x.ptr = xx[]
-    nothing
+    return x
 end
 
 function mul!(x::n_Q, y::n_Q, z::n_Q)
    ptr = libSingular.n_Mult(y.ptr, z.ptr, parent(x).ptr)
    libSingular.n_Delete(x.ptr, parent(x).ptr)
    x.ptr = ptr
-   nothing
+   return x
 end
 
 function add!(x::n_Q, y::n_Q, z::n_Q)
    ptr = libSingular.n_Add(y.ptr, z.ptr, parent(x).ptr)
    libSingular.n_Delete(x.ptr, parent(x).ptr)
    x.ptr = ptr
-   nothing
+   return x
 end
 
 function zero!(x::n_Q)
    ptr = libSingular.n_Init(0, parent(x).ptr)
    libSingular.n_Delete(x.ptr, parent(x).ptr)
    x.ptr = ptr
-   nothing
+   return x
 end
 
 ###############################################################################
@@ -341,19 +341,19 @@ promote_rule(C::Type{n_Q}, ::Type{n_Q}) = n_Z
 #
 ###############################################################################
 
-(::SingularRationalField)() = n_Q()
+(::RationalField)() = n_Q()
 
-(::SingularRationalField)(n::Int) = n_Q(n)
+(::RationalField)(n::Int) = n_Q(n)
 
-(R::SingularRationalField)(x::Integer) = R(libSingular.n_InitMPZ(BigInt(x), R.ptr)) 
+(R::RationalField)(x::Integer) = R(libSingular.n_InitMPZ(BigInt(x), R.ptr)) 
 
-(::SingularRationalField)(n::n_Z) = n_Q(n)
+(::RationalField)(n::n_Z) = n_Q(n)
 
-(::SingularIntegerRing)(n::n_Q) = n
+(::IntegerRing)(n::n_Q) = n
 
-(::SingularRationalField)(n::libSingular.number) = n_Q(n) 
+(::RationalField)(n::libSingular.number) = n_Q(n) 
 
-function (R::SingularRationalField)(x::Nemo.fmpz)
+function (R::RationalField)(x::Nemo.fmpz)
    a = BigInt()
    ccall((:flint_mpz_init_set_readonly, :libflint), Void,
          (Ptr{BigInt}, Ptr{fmpz}), &a, &x)

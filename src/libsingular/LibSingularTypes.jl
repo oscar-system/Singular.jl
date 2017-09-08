@@ -56,7 +56,7 @@ const matrix = @pcpp_str "ip_smatrix"
 #
 ###############################################################################
 
-const resolvente = Cxx.CppPtr{@pcpp_str "sip_sideal", (false, false, false)}
+const resolvente = Cxx.CppPtr{ideal, (false, false, false)}
 
 ###############################################################################
 #

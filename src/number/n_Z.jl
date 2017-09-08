@@ -6,15 +6,15 @@ export crt
 #
 ###############################################################################
 
-elem_type(::SingularIntegerRing) = n_Z
+elem_type(::IntegerRing) = n_Z
 
 parent(a::n_Z) = ZZ
 
-parent_type(::Type{n_Z}) = SingularIntegerRing
+parent_type(::Type{n_Z}) = IntegerRing
 
 base_ring(a::n_Z) = ZZ
 
-base_ring(a::SingularIntegerRing) = ZZ
+base_ring(a::IntegerRing) = ZZ
 
 function deepcopy(a::n_Z)
    return parent(a)(libSingular.n_Copy(a.ptr, parent(a).ptr))
@@ -26,9 +26,9 @@ end
 #
 ###############################################################################
 
-one(::SingularIntegerRing) = ZZ(1)
+one(::IntegerRing) = ZZ(1)
 
-zero(::SingularIntegerRing) = ZZ(0)
+zero(::IntegerRing) = ZZ(0)
 
 function isone(n::n_Z)
    c = parent(n)
@@ -74,7 +74,7 @@ canonical_unit(x::n_Z) = isnegative(x) ? -one(parent(x)) : one(parent(x))
 #
 ###############################################################################
 
-function show(io::IO, c::SingularIntegerRing)
+function show(io::IO, c::IntegerRing)
    print(io, "Integer Ring")
 end
 
@@ -303,28 +303,28 @@ function addeq!(x::n_Z, y::n_Z)
     xx = libSingular.number_ref(x.ptr)
     libSingular.n_InpAdd(xx, y.ptr, parent(x).ptr)
     x.ptr = xx[]
-    nothing
+    return x
 end
 
 function mul!(x::n_Z, y::n_Z, z::n_Z)
    ptr = libSingular.n_Mult(y.ptr, z.ptr, parent(x).ptr)
    libSingular.n_Delete(x.ptr, parent(x).ptr)
    x.ptr = ptr
-   nothing
+   return x
 end
 
 function add!(x::n_Z, y::n_Z, z::n_Z)
    ptr = libSingular.n_Add(y.ptr, z.ptr, parent(x).ptr)
    libSingular.n_Delete(x.ptr, parent(x).ptr)
    x.ptr = ptr
-   nothing
+   return x
 end
 
 function zero!(x::n_Z)
    ptr = libSingular.n_Init(0, parent(x).ptr)
    libSingular.n_Delete(x.ptr, parent(x).ptr)
    x.ptr = ptr
-   nothing
+   return x
 end
 
 ###############################################################################
@@ -341,17 +341,17 @@ promote_rule{T <: Integer}(C::Type{n_Z}, ::Type{T}) = n_Z
 #
 ###############################################################################
 
-(::SingularIntegerRing)() = n_Z()
+(::IntegerRing)() = n_Z()
 
-(R::SingularIntegerRing)(x::Integer) = R(libSingular.n_InitMPZ(BigInt(x), R.ptr)) 
+(R::IntegerRing)(x::Integer) = R(libSingular.n_InitMPZ(BigInt(x), R.ptr)) 
 
-(::SingularIntegerRing)(n::Int) = n_Z(n)
+(::IntegerRing)(n::Int) = n_Z(n)
 
-(::SingularIntegerRing)(n::n_Z) = n
+(::IntegerRing)(n::n_Z) = n
 
-(::SingularIntegerRing)(n::libSingular.number) = n_Z(n) 
+(::IntegerRing)(n::libSingular.number) = n_Z(n) 
 
-function (R::SingularIntegerRing)(x::Nemo.fmpz)
+function (R::IntegerRing)(x::Nemo.fmpz)
    a = BigInt()
    ccall((:flint_mpz_init_set_readonly, :libflint), Void,
          (Ptr{BigInt}, Ptr{fmpz}), &a, &x)

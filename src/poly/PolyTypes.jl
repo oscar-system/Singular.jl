@@ -1,20 +1,20 @@
 ###############################################################################
 #
-#   SingularPolyRing/spoly 
+#   PolyRing/spoly 
 #
 ###############################################################################
 
-const SingularPolyRingID = Dict{Tuple{Nemo.Ring, Array{Symbol, 1}, libSingular.rRingOrder_t}, Nemo.Ring}()
+const PolyRingID = Dict{Tuple{Nemo.Ring, Array{Symbol, 1}, libSingular.rRingOrder_t}, Nemo.Ring}()
 
-type SingularPolyRing{T <: Nemo.RingElem} <: Nemo.Ring
+type PolyRing{T <: Nemo.RingElem} <: Nemo.Ring
    ptr::libSingular.ring
    base_ring::Nemo.Ring
    refcount::Int
 
-   function SingularPolyRing{T}(R::Nemo.Ring, s::Array{Symbol, 1}, cached::Bool = true, 
+   function PolyRing{T}(R::Nemo.Ring, s::Array{Symbol, 1}, cached::Bool = true, 
                             ordering::libSingular.rRingOrder_t = ringorder_dp) where T
-      if haskey(SingularPolyRingID, (R, s, ordering))
-         return SingularPolyRingID[R, s, ordering]::SingularPolyRing{T}
+      if haskey(PolyRingID, (R, s, ordering))
+         return PolyRingID[R, s, ordering]::PolyRing{T}
       else
          v = [pointer(Base.Vector{UInt8}(string(str)*"\0")) for str in s]
          r = libSingular.nCopyCoeff(R.ptr)
@@ -30,14 +30,14 @@ type SingularPolyRing{T <: Nemo.RingElem} <: Nemo.Ring
          ord[2] = ringorder_C
          ord[3] = ringorder_no
          ptr = libSingular.rDefault(r, v, ord, blk0, blk1)
-         d = SingularPolyRingID[R, s, ordering] = new(ptr, R, 1)
-         finalizer(d, _SingularPolyRing_clear_fn)
+         d = PolyRingID[R, s, ordering] = new(ptr, R, 1)
+         finalizer(d, _PolyRing_clear_fn)
          return d
       end
    end
 end
 
-function _SingularPolyRing_clear_fn(R::SingularPolyRing)
+function _PolyRing_clear_fn(R::PolyRing)
    R.refcount -= 1
    if R.refcount == 0
       libSingular.rDelete(R.ptr)
@@ -46,9 +46,9 @@ end
 
 type spoly{T <: Nemo.RingElement} <: Nemo.RingElem
    ptr::libSingular.poly
-   parent::SingularPolyRing{T}
+   parent::PolyRing{T}
 
-   function spoly{T}(R::SingularPolyRing{T}) where T <: Nemo.RingElement
+   function spoly{T}(R::PolyRing{T}) where T <: Nemo.RingElement
       p = libSingular.p_ISet(0, R.ptr)
 	  z = new(p, R)
       R.refcount += 1
@@ -56,14 +56,14 @@ type spoly{T <: Nemo.RingElement} <: Nemo.RingElem
       return z
    end
     
-   function spoly{T}(R::SingularPolyRing{T}, p::libSingular.poly) where T <: Nemo.RingElement
+   function spoly{T}(R::PolyRing{T}, p::libSingular.poly) where T <: Nemo.RingElement
       z = new(p, R)
       R.refcount += 1
       finalizer(z, _spoly_clear_fn)
       return z
    end
     
-   function spoly{T}(R::SingularPolyRing{T}, p::T) where T <: Nemo.RingElement
+   function spoly{T}(R::PolyRing{T}, p::T) where T <: Nemo.RingElement
       n = libSingular.n_Copy(p.ptr, parent(p).ptr)
       r = libSingular.p_NSet(n, R.ptr)
       z = new(r, R)
@@ -72,7 +72,7 @@ type spoly{T <: Nemo.RingElement} <: Nemo.RingElem
       return z
    end
     
-   function spoly{T}(R::SingularPolyRing{T}, n::libSingular.number) where T <: Nemo.RingElement
+   function spoly{T}(R::PolyRing{T}, n::libSingular.number) where T <: Nemo.RingElement
       p = libSingular.p_NSet(n, R.ptr)
       z = new(p, R)
       R.refcount += 1
@@ -80,7 +80,7 @@ type spoly{T <: Nemo.RingElement} <: Nemo.RingElem
       return z
    end 
 
-   function spoly{T}(R::SingularPolyRing{T}, b::Int) where T <: Nemo.RingElement
+   function spoly{T}(R::PolyRing{T}, b::Int) where T <: Nemo.RingElement
       p = libSingular.p_ISet(b, R.ptr)
       z = new(p, R)
       R.refcount += 1
@@ -88,7 +88,7 @@ type spoly{T <: Nemo.RingElement} <: Nemo.RingElem
       return z
    end
 
-   function spoly{T}(R::SingularPolyRing{T}, b::BigInt) where T <: Nemo.RingElement
+   function spoly{T}(R::PolyRing{T}, b::BigInt) where T <: Nemo.RingElement
       n = libSingular.n_InitMPZ(b, R.base_ring.ptr)
       p = libSingular.p_NSet(n, R.ptr)
       z = new(p, R)
@@ -101,5 +101,5 @@ end
 function _spoly_clear_fn(p::spoly)
    R = parent(p)
    libSingular.p_Delete(p.ptr, R.ptr)
-   _SingularPolyRing_clear_fn(R)
+   _PolyRing_clear_fn(R)
 end

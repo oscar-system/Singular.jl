@@ -1,5 +1,4 @@
-export syz, lead,
-       normalize!, isconstant, iszerodim, sres, lres, intersection,
+export syz, lead, normalize!, isconstant, iszerodim, sres, lres, intersection,
        quotient, reduce, eliminate
 
 ###############################################################################
@@ -8,9 +7,9 @@ export syz, lead,
 #
 ###############################################################################
 
-parent{T <: Nemo.RingElem}(a::sideal{T}) = SingularIdealSet{T}(a.base_ring)
+parent{T <: Nemo.RingElem}(a::sideal{T}) = IdealSet{T}(a.base_ring)
 
-base_ring(S::SingularIdealSet) = S.base_ring
+base_ring(S::IdealSet) = S.base_ring
 
 base_ring(I::sideal) = I.base_ring
 
@@ -66,7 +65,7 @@ end
 #
 ###############################################################################
 
-function show(io::IO, S::SingularIdealSet)
+function show(io::IO, S::IdealSet)
    print(io, "Set of Singular Ideals over ")
    show(io, base_ring(S))
 end
@@ -261,18 +260,18 @@ end
 #
 ###############################################################################
 
-function Ideal{T <: Nemo.RingElem}(R::SingularPolyRing{T}, ids::spoly{T}...)
+function Ideal{T <: Nemo.RingElem}(R::PolyRing{T}, ids::spoly{T}...)
    S = elem_type(R)
    return sideal{S}(R, ids...)
 end
 
-function Ideal{T <: Nemo.RingElem}(R::SingularPolyRing{T}, id::libSingular.ideal)
+function Ideal{T <: Nemo.RingElem}(R::PolyRing{T}, id::libSingular.ideal)
    S = elem_type(R)
    return sideal{S}(R, id)
 end
 
 # maximal ideal in degree d
-function MaximalIdeal{T <: Nemo.RingElem}(R::SingularPolyRing{T}, d::Int)
+function MaximalIdeal{T <: Nemo.RingElem}(R::PolyRing{T}, d::Int)
    (d > typemax(Cint) || d < 0) && throw(DomainError())
    S = elem_type(R)
    ptr = libSingular.id_MaxIdeal(Cint(d), R.ptr)

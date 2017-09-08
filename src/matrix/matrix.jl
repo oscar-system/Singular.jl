@@ -9,16 +9,16 @@ nrows(M::smatrix) = Int(libSingular.nrows(M.ptr))
 ncols(M::smatrix) = Int(libSingular.nrows(M.ptr))
 
 function parent(M::smatrix)
-   return SingularMatrixSpace(M.base_ring, nrows(M), ncols(M))
+   return MatrixSpace(M.base_ring, nrows(M), ncols(M))
 end
 
-base_ring(S::SingularMatrixSpace) = S.base_ring
+base_ring(S::MatrixSpace) = S.base_ring
 
 base_ring(M::smatrix) = M.base_ring
 
-elem_type(S::SingularMatrixSpace) = smatrix
+elem_type(S::MatrixSpace) = smatrix
 
-parent_type(M::smatrix) = SingularMatrixSpace
+parent_type(M::smatrix) = MatrixSpace
 
 function getindex(M::smatrix, i::Int, j::Int)
    R = base_ring(M)
@@ -32,7 +32,7 @@ end
 #
 ###############################################################################
 
-function show(io::IO, S::SingularMatrixSpace)
+function show(io::IO, S::MatrixSpace)
    print(io, "Space of ", S.nrows, "x", S.ncols, " Singular Matrices over ")
    show(io, base_ring(S))
 end

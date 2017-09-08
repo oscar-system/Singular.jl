@@ -146,7 +146,7 @@ include("Resolution.jl")
 #
 ###############################################################################
 
-QQ = SingularRationalField()
-ZZ = SingularIntegerRing()
+QQ = RationalField()
+ZZ = IntegerRing()
 
 end # module

@@ -1,22 +1,20 @@
-export SingularFreeMod
-
 ###############################################################################
 #
 #   Basic manipulation
 #
 ###############################################################################
 
-parent{T <: Nemo.RingElem}(v::svector{T}) = SingularFreeMod{T}(v.base_ring, v.rank)
+parent{T <: Nemo.RingElem}(v::svector{T}) = FreeMod{T}(v.base_ring, v.rank)
 
-base_ring(R::SingularFreeMod) = R.base_ring
+base_ring(R::FreeMod) = R.base_ring
 
 base_ring(v::svector) = v.base_ring
 
-elem_type{T <: Nemo.RingElem}(::SingularFreeMod{T}) = T
+elem_type{T <: Nemo.RingElem}(::FreeMod{T}) = T
 
-parent_type{T <: Nemo.RingElem}(v::svector{T}) = SingularFreeMod{T}
+parent_type{T <: Nemo.RingElem}(v::svector{T}) = FreeMod{T}
 
-rank(R::SingularFreeMod) = R.rank
+rank(R::FreeMod) = R.rank
 
 function deepcopy(p::svector)
    p2 = libSingular.p_Copy(p.ptr, parent(p).ptr)
@@ -38,7 +36,7 @@ end
 #
 ###############################################################################
 
-function show(io::IO, R::SingularFreeMod)
+function show(io::IO, R::FreeMod)
    print(io, "Free Module of rank ", R.rank, " over ")
    show(io, R.base_ring)
 end
@@ -129,6 +127,6 @@ end
 #
 ###############################################################################
 
-function Vector{T <: Nemo.RingElem}(R::SingularPolyRing{T}, r::Int, p::libSingular.poly)
+function Vector{T <: Nemo.RingElem}(R::PolyRing{T}, r::Int, p::libSingular.poly)
    return svector{spoly{T}}(R, r, p)
 end

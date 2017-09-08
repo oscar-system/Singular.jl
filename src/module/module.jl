@@ -4,9 +4,9 @@
 #
 ###############################################################################
 
-parent{T <: Nemo.RingElem}(a::smodule{T}) = SingularModuleClass{T}(a.base_ring)
+parent{T <: Nemo.RingElem}(a::smodule{T}) = ModuleClass{T}(a.base_ring)
 
-base_ring(S::SingularModuleClass) = S.base_ring
+base_ring(S::ModuleClass) = S.base_ring
 
 base_ring(I::smodule) = I.base_ring
 
@@ -40,7 +40,7 @@ end
 #
 ###############################################################################
 
-function show(io::IO, S::SingularModuleClass)
+function show(io::IO, S::ModuleClass)
    print(io, "Class of Singular Modules over ")
    show(io, base_ring(S))
 end
@@ -113,13 +113,13 @@ end
 #
 ###############################################################################
 
-function Module{T <: Nemo.RingElem}(R::SingularPolyRing{T}, id::libSingular.ideal)
+function Module{T <: Nemo.RingElem}(R::PolyRing{T}, id::libSingular.ideal)
    S = elem_type(R)
    return smodule{S}(R, id)
 end
 
 # free module of rank n
-function FreeModule{T <: Nemo.RingElem}(R::SingularPolyRing{T}, n::Int)
+function FreeModule{T <: Nemo.RingElem}(R::PolyRing{T}, n::Int)
    (n > typemax(Cint) || n < 0) && throw(DomainError())
    ptr = libSingular.id_FreeModule(Cint(n), R.ptr)
    S = elem_type(R)

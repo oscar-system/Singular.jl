@@ -6,7 +6,7 @@
 
 base_ring(r::sresolution) = r.base_ring
 
-parent(r::sresolution) = SingularResolutionSet(r.base_ring)
+parent(r::sresolution) = ResolutionSet(r.base_ring)
 
 function checkbounds(r::sresolution, i::Int)
    (i < 1 || i > r.len) && throw(BoundsError(I, i))
@@ -28,7 +28,7 @@ end
 #
 ###############################################################################
 
-function show(io::IO, R::SingularResolutionSet)
+function show(io::IO, R::ResolutionSet)
    print(io, "Set of Singular Resolutions over ")
    show(io, R.base_ring)
 end

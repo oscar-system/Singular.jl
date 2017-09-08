@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   SingularIntegerRing/n_Z
+#   IntegerRing/n_Z
 #
 ###############################################################################
 
@@ -9,18 +9,18 @@ function get_n_Z()
    d = libSingular.nInitChar(n_Z, Ptr{Void}(0))
 end
 
-type SingularIntegerRing <: Nemo.Ring
+type IntegerRing <: Nemo.Ring
    ptr::libSingular.coeffs
    refcount::Int
 
-   function SingularIntegerRing() 
+   function IntegerRing() 
       d = new()
-      finalizer(d, _SingularIntegerRing_clear_fn)
+      finalizer(d, _IntegerRing_clear_fn)
       return d
    end
 end
 
-function _SingularIntegerRing_clear_fn(cf::SingularIntegerRing)
+function _IntegerRing_clear_fn(cf::IntegerRing)
    cf.refcount -= 1
    if cf.refcount == 0
       libSingular.nKillChar(cf.ptr)
@@ -57,13 +57,13 @@ end
 function _n_Z_clear_fn(n::n_Z)
    R = parent(n)
    libSingular.n_Delete(n.ptr, parent(n).ptr)
-   _SingularIntegerRing_clear_fn(R)
+   _IntegerRing_clear_fn(R)
    nothing
 end
 
 ###############################################################################
 #
-#   SingularRationalField/n_Q
+#   RationalField/n_Q
 #
 ###############################################################################
 
@@ -72,18 +72,18 @@ function get_n_Q()
    d = libSingular.nInitChar(n_Q, Ptr{Void}(0))
 end
 
-type SingularRationalField <: Nemo.Field
+type RationalField <: Nemo.Field
    ptr::libSingular.coeffs
    refcount::Int
 
-   function SingularRationalField() 
+   function RationalField() 
       d = new()
-      finalizer(d, _SingularRationalField_clear_fn)
+      finalizer(d, _RationalField_clear_fn)
       return d
    end
 end
 
-function _SingularRationalField_clear_fn(cf::SingularRationalField)
+function _RationalField_clear_fn(cf::RationalField)
    cf.refcount -= 1
    if cf.refcount == 0
       libSingular.nKillChar(cf.ptr)
@@ -128,13 +128,13 @@ end
 function _n_Q_clear_fn(n::n_Q)
    R = parent(n)
    libSingular.n_Delete(n.ptr, parent(n).ptr)
-   _SingularRationalField_clear_fn(R)
+   _RationalField_clear_fn(R)
    nothing
 end
 
 ###############################################################################
 #
-#   SingularN_ZnRing/n_Zn
+#   N_ZnRing/n_Zn
 #
 ###############################################################################
 
@@ -143,23 +143,23 @@ type ZnmInfo
    exp::UInt
 end
 
-type SingularN_ZnRing <: Nemo.Ring
+type N_ZnRing <: Nemo.Ring
    ptr::libSingular.coeffs
    from_n_Z::Cxx.CppFptr
    to_n_Z::Cxx.CppFptr
    refcount::Int
 
-   function SingularN_ZnRing(n::Int) 
+   function N_ZnRing(n::Int) 
       n_Zn = @cxx n_Zn
       ptr = libSingular.nInitChar(n_Zn, pointer_from_objref(ZnmInfo(BigInt(n), UInt(1))))
       d = new(ptr, libSingular.n_SetMap(ZZ.ptr, ptr), 
               libSingular.n_SetMap(ptr, ZZ.ptr), 1)
-      finalizer(d, _SingularN_ZnRing_clear_fn)
+      finalizer(d, _N_ZnRing_clear_fn)
       return d
    end
 end
 
-function _SingularN_ZnRing_clear_fn(cf::SingularN_ZnRing)
+function _N_ZnRing_clear_fn(cf::N_ZnRing)
    cf.refcount -= 1
    if cf.refcount == 0
       libSingular.nKillChar(cf.ptr)
@@ -169,23 +169,23 @@ end
 
 type n_Zn <: Nemo.RingElem
     ptr::libSingular.number
-    parent::SingularN_ZnRing
+    parent::N_ZnRing
 
-    function n_Zn(c::SingularN_ZnRing)
+    function n_Zn(c::N_ZnRing)
     	z = new(libSingular.n_Init(0, c.ptr))
         c.refcount += 1
         finalizer(z, _n_Zn_clear_fn)
         return z
     end
 
-    function n_Zn(c::SingularN_ZnRing, n::Int)
+    function n_Zn(c::N_ZnRing, n::Int)
     	z = new(libSingular.n_Init(n, c.ptr))
         c.refcount += 1
         finalizer(z, _n_Zn_clear_fn)
         return z
     end
 
-    function n_Zn(c::SingularN_ZnRing, n::libSingular.number)
+    function n_Zn(c::N_ZnRing, n::libSingular.number)
     	z = new(n)
         c.refcount += 1
         finalizer(z, _n_Zn_clear_fn)
@@ -196,33 +196,33 @@ end
 function _n_Zn_clear_fn(n::n_Zn)
    R = parent(n)
    libSingular.n_Delete(n.ptr, parent(n).ptr)
-   _SingularN_ZnRing_clear_fn(R)
+   _N_ZnRing_clear_fn(R)
    nothing
 end
 
 ###############################################################################
 #
-#   SingularN_ZpField/n_Zp
+#   N_ZpField/n_Zp
 #
 ###############################################################################
 
-type SingularN_ZpField <: Nemo.Field
+type N_ZpField <: Nemo.Field
    ptr::libSingular.coeffs
    from_n_Z::Cxx.CppFptr
    to_n_Z::Cxx.CppFptr
    refcount::Int
 
-   function SingularN_ZpField(n::Int) 
+   function N_ZpField(n::Int) 
       n_Zp = @cxx n_Zp
       ptr = libSingular.nInitChar(n_Zp, Ptr{Void}(n))
       d = new(ptr, libSingular.n_SetMap(ZZ.ptr, ptr), 
               libSingular.n_SetMap(ptr, ZZ.ptr), 1)
-      finalizer(d, _SingularN_ZpField_clear_fn)
+      finalizer(d, _N_ZpField_clear_fn)
       return d
    end
 end
 
-function _SingularN_ZpField_clear_fn(cf::SingularN_ZpField)
+function _N_ZpField_clear_fn(cf::N_ZpField)
    cf.refcount -= 1
    if cf.refcount == 0
       libSingular.nKillChar(cf.ptr)
@@ -232,23 +232,23 @@ end
 
 type n_Zp <: Nemo.FieldElem
     ptr::libSingular.number
-    parent::SingularN_ZpField
+    parent::N_ZpField
 
-    function n_Zp(c::SingularN_ZpField)
+    function n_Zp(c::N_ZpField)
     	z = new(libSingular.n_Init(0, c.ptr))
         c.refcount += 1
         finalizer(z, _n_Zp_clear_fn)
         return z
     end
 
-    function n_Zp(c::SingularN_ZpField, n::Int)
+    function n_Zp(c::N_ZpField, n::Int)
     	z = new(libSingular.n_Init(n, c.ptr))
         c.refcount += 1
         finalizer(z, _n_Zp_clear_fn)
         return z
     end
 
-    function n_Zp(c::SingularN_ZpField, n::libSingular.number)
+    function n_Zp(c::N_ZpField, n::libSingular.number)
     	z = new(n)
         c.refcount += 1
         finalizer(z, _n_Zp_clear_fn)
@@ -259,7 +259,7 @@ end
 function _n_Zp_clear_fn(n::n_Zp)
    R = parent(n)
    libSingular.n_Delete(n.ptr, parent(n).ptr)
-   _SingularN_ZpField_clear_fn(R)
+   _N_ZpField_clear_fn(R)
    nothing
 end
 
@@ -275,24 +275,24 @@ type GFInfo
    s::Ptr{UInt8}
 end
 
-type SingularN_GFField <: Nemo.Field
+type N_GField <: Nemo.Field
    ptr::libSingular.coeffs
    deg::Int
    from_n_Z::Cxx.CppFptr
    to_n_Z::Cxx.CppFptr
    refcount::Int
 
-   function SingularN_GFField(p::Int, n::Int, S::Symbol) 
+   function N_GField(p::Int, n::Int, S::Symbol) 
       n_GF = @cxx n_GF
       ptr = libSingular.nInitChar(n_GF, pointer_from_objref(GFInfo(Cint(p), Cint(n), pointer(Base.Vector{UInt8}(string(S)*"\0")))))
       d = new(ptr, n, libSingular.n_SetMap(ZZ.ptr, ptr), 
               libSingular.n_SetMap(ptr, ZZ.ptr), 1)
-      finalizer(d, _SingularN_GFField_clear_fn)
+      finalizer(d, _N_GField_clear_fn)
       return d
    end
 end
 
-function _SingularN_GFField_clear_fn(cf::SingularN_GFField)
+function _N_GField_clear_fn(cf::N_GField)
    cf.refcount -= 1
    if cf.refcount == 0
       libSingular.nKillChar(cf.ptr)
@@ -302,23 +302,23 @@ end
 
 type n_GF <: Nemo.FieldElem
     ptr::libSingular.number
-    parent::SingularN_GFField
+    parent::N_GField
 
-    function n_GF(c::SingularN_GFField)
+    function n_GF(c::N_GField)
     	z = new(libSingular.n_Init(0, c.ptr))
         c.refcount += 1
         finalizer(z, _n_GF_clear_fn)
         return z
     end
 
-    function n_GF(c::SingularN_GFField, n::Int)
+    function n_GF(c::N_GField, n::Int)
     	z = new(libSingular.n_Init(n, c.ptr))
         c.refcount += 1
         finalizer(z, _n_GF_clear_fn)
         return z
     end
 
-    function n_GF(c::SingularN_GFField, n::libSingular.number)
+    function n_GF(c::N_GField, n::libSingular.number)
     	z = new(n)
         c.refcount += 1
         finalizer(z, _n_GF_clear_fn)
@@ -329,7 +329,7 @@ end
 function _n_GF_clear_fn(n::n_GF)
    R = parent(n)
    libSingular.n_Delete(n.ptr, parent(n).ptr)
-   _SingularN_GFField_clear_fn(R)
+   _N_GField_clear_fn(R)
    nothing
 end
 

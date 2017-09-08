@@ -1,31 +1,31 @@
 ###############################################################################
 #
-#   SingularMatrixSpace/smatrix 
+#   MatrixSpace/smatrix 
 #
 ###############################################################################
 
-const SingularMatrixSpaceID = ObjectIdDict()
+const MatrixSpaceID = ObjectIdDict()
 
-type SingularMatrixSpace{T <: Nemo.RingElem} <: Nemo.Set
-   base_ring::SingularPolyRing
+type MatrixSpace{T <: Nemo.RingElem} <: Nemo.Set
+   base_ring::PolyRing
    nrows::Int
    ncols::Int
 
-   function SingularMatrixSpace{T}(R::SingularPolyRing, r::Int, c::Int) where T
-      if haskey(SingularMatrixSpaceID, (R, r, c))
-         return SingularMatrixSpaceID[R, r, c]
+   function MatrixSpace{T}(R::PolyRing, r::Int, c::Int) where T
+      if haskey(MatrixSpaceID, (R, r, c))
+         return MatrixSpaceID[R, r, c]
       else
-         return SingularMatrixSpaceID[R, r, c] = new(R, r, c)
+         return MatrixSpaceID[R, r, c] = new(R, r, c)
       end
    end
 end
 
 type smatrix{T <: Nemo.RingElem} <: Nemo.SetElem
    ptr::libSingular.matrix
-   base_ring::SingularPolyRing
+   base_ring::PolyRing
 
    # really takes a Singular module, which has type ideal
-   function smatrix{T}(R::SingularPolyRing, m::libSingular.ideal) where T
+   function smatrix{T}(R::PolyRing, m::libSingular.ideal) where T
       ptr = libSingular.id_Copy(m, R.ptr)
       ptr = libSingular.id_Module2Matrix(ptr, R.ptr)
       z = new(ptr, R)

@@ -4,17 +4,17 @@
 #
 ###############################################################################
 
-elem_type(::SingularN_ZpField) = n_Zp
+elem_type(::N_ZpField) = n_Zp
 
 parent(a::n_Zp) = a.parent
 
-parent_type(::Type{n_Zp}) = SingularN_ZpField
+parent_type(::Type{n_Zp}) = N_ZpField
 
 base_ring(a::n_Zp) = Union{}
 
-base_ring(a::SingularN_ZpField) = Union{}
+base_ring(a::N_ZpField) = Union{}
 
-function characteristic(R::SingularN_ZpField)
+function characteristic(R::N_ZpField)
    return ZZ(libSingular.n_GetChar(R.ptr))
 end
 
@@ -28,9 +28,9 @@ end
 #
 ###############################################################################
 
-one(R::SingularN_ZpField) = R(1)
+one(R::N_ZpField) = R(1)
 
-zero(R::SingularN_ZpField) = R(0)
+zero(R::N_ZpField) = R(0)
 
 function isone(n::n_Zp)
    c = parent(n)
@@ -58,7 +58,7 @@ canonical_unit(x::n_Zp) = x
 #
 ###############################################################################
 
-function show(io::IO, c::SingularN_ZpField)
+function show(io::IO, c::N_ZpField)
    print(io, "Finite Field of Characteristic ", characteristic(c))
 end
 
@@ -271,28 +271,28 @@ function addeq!(x::n_Zp, y::n_Zp)
     xx = libSingular.number_ref(x.ptr)
     libSingular.n_InpAdd(xx, y.ptr, parent(x).ptr)
     x.ptr = xx[]
-    nothing
+    return x
 end
 
 function mul!(x::n_Zp, y::n_Zp, z::n_Zp)
    ptr = libSingular.n_Mult(y.ptr, z.ptr, parent(x).ptr)
    libSingular.n_Delete(x.ptr, parent(x).ptr)
    x.ptr = ptr
-   nothing
+   return x
 end
 
 function add!(x::n_Zp, y::n_Zp, z::n_Zp)
    ptr = libSingular.n_Add(y.ptr, z.ptr, parent(x).ptr)
    libSingular.n_Delete(x.ptr, parent(x).ptr)
    x.ptr = ptr
-   nothing
+   return x
 end
 
 function zero!(x::n_Zp)
    ptr = libSingular.n_Init(0, parent(x).ptr)
    libSingular.n_Delete(x.ptr, parent(x).ptr)
    x.ptr = ptr
-   nothing
+   return x
 end
 
 ###############################################################################
@@ -311,40 +311,40 @@ promote_rule(C::Type{n_Zp}, ::Type{n_Z}) = n_Zp
 #
 ###############################################################################
 
-function (R::SingularN_ZpField)()
+function (R::N_ZpField)()
    z = n_Zp(R)
    z.parent = R
    return z
 end
 
-function (R::SingularN_ZpField)(x::Integer)
+function (R::N_ZpField)(x::Integer)
    z = R(libSingular.n_InitMPZ(BigInt(x), R.ptr)) 
    z.parent = R
    return z
 end
 
-function (R::SingularN_ZpField)(n::Int)
+function (R::N_ZpField)(n::Int)
    z = n_Zp(R, n)
    z.parent = R
    return z
 end
 
-function (R::SingularN_ZpField)(n::n_Z)
+function (R::N_ZpField)(n::n_Z)
    m = libSingular.nApplyMapFunc(R.from_n_Z, n.ptr, parent(n).ptr, R.ptr)
    z = n_Zp(R, m)
    z.parent = R
    return z
 end
 
-(R::SingularN_ZpField)(n::n_Zp) = n
+(R::N_ZpField)(n::n_Zp) = n
 
-function (R::SingularN_ZpField)(n::libSingular.number)
+function (R::N_ZpField)(n::libSingular.number)
    z = n_Zp(R, n) 
    z.parent = R
    return z
 end
 
-function (R::SingularN_ZpField)(x::Nemo.fmpz)
+function (R::N_ZpField)(x::Nemo.fmpz)
    a = BigInt()
    ccall((:flint_mpz_init_set_readonly, :libflint), Void,
          (Ptr{BigInt}, Ptr{fmpz}), &a, &x)
@@ -364,5 +364,5 @@ function Fp(a::Int; cached=true)
    a < 0 && throw(DomainError())
    !Nemo.isprime(UInt(a)) && throw(DomainError())
 
-   return SingularN_ZpField(a)
+   return N_ZpField(a)
 end

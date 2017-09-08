@@ -8,26 +8,26 @@ export ngens, coeff, isgen, content, primpart
 
 parent(p::spoly) = p.parent
 
-base_ring(R::SingularPolyRing) = R.base_ring
+base_ring(R::PolyRing) = R.base_ring
 
 base_ring(p::spoly) = base_ring(parent(p))
 
-elem_type{T <: Nemo.RingElem}(::SingularPolyRing{T}) = spoly{T}
+elem_type{T <: Nemo.RingElem}(::PolyRing{T}) = spoly{T}
 
-parent_type{T <: Nemo.RingElem}(::Type{spoly{T}}) = SingularPolyRing{T}
+parent_type{T <: Nemo.RingElem}(::Type{spoly{T}}) = PolyRing{T}
 
-ngens(R::SingularPolyRing) = Int(libSingular.rVar(R.ptr))
+ngens(R::PolyRing) = Int(libSingular.rVar(R.ptr))
 
-characteristic(R::SingularPolyRing) = Int(libSingular.rChar(R.ptr))
+characteristic(R::PolyRing) = Int(libSingular.rChar(R.ptr))
 
-function gens(R::SingularPolyRing)
+function gens(R::PolyRing)
    n = ngens(R)
    return [R(libSingular.rGetVar(Cint(i), R.ptr)) for i = 1:n]
 end
 
-zero(R::SingularPolyRing) = R()
+zero(R::PolyRing) = R()
 
-one(R::SingularPolyRing) = R(1)
+one(R::PolyRing) = R(1)
 
 iszero(p::spoly) = p.ptr == C_NULL
 
@@ -114,7 +114,7 @@ end
 #
 ###############################################################################
 
-function show(io::IO, R::SingularPolyRing)
+function show(io::IO, R::PolyRing)
    m = libSingular.rString(R.ptr)
    s = unsafe_string(m)
    libSingular.omFree(Ptr{Void}(m))
@@ -219,7 +219,7 @@ function divexact(x::spoly, y::spoly)
    R = parent(x)
    x1 = libSingular.p_Copy(x.ptr, R.ptr)
    y1 = libSingular.p_Copy(y.ptr, R.ptr)
-   p = libSingular.p_Divide(x1, y1, R.ptr)
+   p = libSingular.singclap_pdivide(x1, y1, R.ptr)
    return R(p)
 end
 
@@ -343,43 +343,43 @@ end
 #
 ###############################################################################
 
-function (R::SingularPolyRing)()
+function (R::PolyRing)()
    T = elem_type(base_ring(R))
    return spoly{T}(R)
 end
 
-function (R::SingularPolyRing)(n::Int)
+function (R::PolyRing)(n::Int)
    T = elem_type(base_ring(R))
    return spoly{T}(R, n)
 end
 
-function (R::SingularPolyRing)(n::Integer)
+function (R::PolyRing)(n::Integer)
    T = elem_type(base_ring(R))
    return spoly{T}(R, BigInt(n))
 end
 
-function (R::SingularPolyRing)(n::n_Z)
+function (R::PolyRing)(n::n_Z)
    n = base_ring(R)(n)
    ptr = libSingular.n_Copy(n.ptr, parent(n).ptr)
    T = elem_type(base_ring(R))
    return spoly{T}(R, ptr)
 end
 
-function (R::SingularPolyRing)(n::libSingular.poly)
+function (R::PolyRing)(n::libSingular.poly)
    T = elem_type(base_ring(R))
    return spoly{T}(R, n)
 end
 
-function (R::SingularPolyRing{T}){T <: Nemo.RingElem}(n::T)
+function (R::PolyRing{T}){T <: Nemo.RingElem}(n::T)
    parent(n) != base_ring(R) && error("Unable to coerce into polynomial ring")
    return spoly{T}(R, n.ptr)
 end
 
-function (R::SingularPolyRing{S}){S <: Nemo.RingElem, T <: Nemo.RingElem}(n::T)
+function (R::PolyRing{S}){S <: Nemo.RingElem, T <: Nemo.RingElem}(n::T)
    return R(base_ring(R)(n))
 end
 
-function (R::SingularPolyRing)(p::spoly)
+function (R::PolyRing)(p::spoly)
    parent(p) != R && error("Unable to coerce polynomial")
    return p
 end
@@ -393,7 +393,7 @@ end
 function PolynomialRing(R::Nemo.Ring, s::Array{String, 1}; cached::Bool = true, ordering::Symbol = :degrevlex)
    U = [Symbol(v) for v in s]
    T = elem_type(R)
-   parent_obj = SingularPolyRing{T}(R, U, cached, sym2ringorder[ordering])
+   parent_obj = PolyRing{T}(R, U, cached, sym2ringorder[ordering])
    return tuple(parent_obj, gens(parent_obj))
 end
 

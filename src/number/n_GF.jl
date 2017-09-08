@@ -4,21 +4,21 @@
 #
 ###############################################################################
 
-elem_type(::SingularN_GFField) = n_GF
+elem_type(::N_GField) = n_GF
 
 parent(a::n_GF) = a.parent
 
-parent_type(::Type{n_GF}) = SingularN_GFField
+parent_type(::Type{n_GF}) = N_GField
 
 base_ring(a::n_GF) = Union{}
 
-base_ring(a::SingularN_GFField) = Union{}
+base_ring(a::N_GField) = Union{}
 
-function characteristic(R::SingularN_GFField)
+function characteristic(R::N_GField)
    return ZZ(libSingular.n_GetChar(R.ptr))
 end
 
-function degree(R::SingularN_GFField)
+function degree(R::N_GField)
    return R.deg
 end
 
@@ -32,9 +32,9 @@ end
 #
 ###############################################################################
 
-one(R::SingularN_GFField) = R(1)
+one(R::N_GField) = R(1)
 
-zero(R::SingularN_GFField) = R(0)
+zero(R::N_GField) = R(0)
 
 function isone(n::n_GF)
    c = parent(n)
@@ -62,7 +62,7 @@ canonical_unit(x::n_GF) = x
 #
 ###############################################################################
 
-function show(io::IO, c::SingularN_GFField)
+function show(io::IO, c::N_GField)
    print(io, "Finite Field of Characteristic ", characteristic(c), " and degree ", degree(c))
 end
 
@@ -274,28 +274,28 @@ function addeq!(x::n_GF, y::n_GF)
     xx = libSingular.number_ref(x.ptr)
     libSingular.n_InpAdd(xx, y.ptr, parent(x).ptr)
     x.ptr = xx[]
-    nothing
+    return x
 end
 
 function mul!(x::n_GF, y::n_GF, z::n_GF)
    ptr = libSingular.n_Mult(y.ptr, z.ptr, parent(x).ptr)
    libSingular.n_Delete(x.ptr, parent(x).ptr)
    x.ptr = ptr
-   nothing
+   return x
 end
 
 function add!(x::n_GF, y::n_GF, z::n_GF)
    ptr = libSingular.n_Add(y.ptr, z.ptr, parent(x).ptr)
    libSingular.n_Delete(x.ptr, parent(x).ptr)
    x.ptr = ptr
-   nothing
+   return x
 end
 
 function zero!(x::n_GF)
    ptr = libSingular.n_Init(0, parent(x).ptr)
    libSingular.n_Delete(x.ptr, parent(x).ptr)
    x.ptr = ptr
-   nothing
+   return x
 end
 
 ###############################################################################
@@ -314,40 +314,40 @@ promote_rule(C::Type{n_GF}, ::Type{n_Z}) = n_GF
 #
 ###############################################################################
 
-function (R::SingularN_GFField)()
+function (R::N_GField)()
    z = n_GF(R)
    z.parent = R
    return z
 end
 
-function (R::SingularN_GFField)(x::Integer)
+function (R::N_GField)(x::Integer)
    z = R(libSingular.n_InitMPZ(BigInt(x), R.ptr)) 
    z.parent = R
    return z
 end
 
-function (R::SingularN_GFField)(n::Int)
+function (R::N_GField)(n::Int)
    z = n_GF(R, n)
    z.parent = R
    return z
 end
 
-function (R::SingularN_GFField)(n::n_Z)
+function (R::N_GField)(n::n_Z)
    m = libSingular.nApplyMapFunc(R.from_n_Z, n.ptr, parent(n).ptr, R.ptr)
    z = n_GF(R, m)
    z.parent = R
    return z
 end
 
-(R::SingularN_GFField)(n::n_GF) = n
+(R::N_GField)(n::n_GF) = n
 
-function (R::SingularN_GFField)(n::libSingular.number)
+function (R::N_GField)(n::libSingular.number)
    z = n_GF(R, n) 
    z.parent = R
    return z
 end
 
-function (R::SingularN_GFField)(x::Nemo.fmpz)
+function (R::N_GField)(x::Nemo.fmpz)
    a = BigInt()
    ccall((:flint_mpz_init_set_readonly, :libflint), Void,
          (Ptr{BigInt}, Ptr{fmpz}), &a, &x)
@@ -368,6 +368,6 @@ function FiniteField(p::Int, n::Int, S::String; cached=true)
    n*log(p) >= 20*log(2) && throw(DomainError())
    p^n >= 2^16 && throw(DomainError())
    n == 1 && error("Degree one finite fields not supported. Please use SingularFp")
-   par = SingularN_GFField(p, n, symbol(S))
+   par = N_GField(p, n, symbol(S))
    return par, par(libSingular.n_Param(Cint(1), par.ptr))
 end

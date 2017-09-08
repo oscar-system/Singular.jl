@@ -1,29 +1,29 @@
 ###############################################################################
 #
-#   SingularIdealSet/sideal 
+#   IdealSet/sideal 
 #
 ###############################################################################
 
-const SingularIdealSetID = ObjectIdDict()
+const IdealSetID = ObjectIdDict()
 
-type SingularIdealSet{T <: Nemo.RingElem} <: Nemo.Set
-   base_ring::SingularPolyRing
+type IdealSet{T <: Nemo.RingElem} <: Nemo.Set
+   base_ring::PolyRing
 
-   function SingularIdealSet{T}(R::SingularPolyRing) where T
-      if haskey(SingularIdealSetID, R)
-         return SingularIdealSetID[R]
+   function IdealSet{T}(R::PolyRing) where T
+      if haskey(IdealSetID, R)
+         return IdealSetID[R]
       else
-         return SingularIdealSetID[R] = new(R)
+         return IdealSetID[R] = new(R)
       end
    end
 end
 
 type sideal{T <: Nemo.RingElem} <: Nemo.Module{T}
    ptr::libSingular.ideal
-   base_ring::SingularPolyRing
+   base_ring::PolyRing
    isGB::Bool
 
-   function sideal{T}(R::SingularPolyRing, ids::spoly...) where T
+   function sideal{T}(R::PolyRing, ids::spoly...) where T
       n = length(ids)
       id = libSingular.idInit(Cint(n))
       z = new(id, R, false)
@@ -36,7 +36,7 @@ type sideal{T <: Nemo.RingElem} <: Nemo.Module{T}
       return z
    end
 
-   function sideal{T}(R::SingularPolyRing, id::libSingular.ideal) where T
+   function sideal{T}(R::PolyRing, id::libSingular.ideal) where T
       z = new(id, R, false)
       R.refcount += 1
       finalizer(z, _sideal_clear_fn)
@@ -47,5 +47,5 @@ end
 function _sideal_clear_fn(I::sideal)
    R = I.base_ring
    libSingular.id_Delete(I.ptr, R.ptr)
-   _SingularPolyRing_clear_fn
+   _PolyRing_clear_fn
 end
