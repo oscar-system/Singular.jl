@@ -6,7 +6,7 @@
 
 const ModuleClassID = ObjectIdDict()
 
-type ModuleClass{T <: Nemo.RingElem} <: Nemo.Set
+type ModuleClass{T <: Nemo.RingElem} <: Set
    base_ring::PolyRing
 
    function ModuleClass{T}(R::PolyRing) where T
@@ -18,7 +18,7 @@ type ModuleClass{T <: Nemo.RingElem} <: Nemo.Set
    end
 end
 
-type smodule{T <: Nemo.RingElem} <: Nemo.Module{T}
+type smodule{T <: Nemo.RingElem} <: Module{T}
    ptr::libSingular.ideal # ideal and module types are the same in Singular
    base_ring::PolyRing
    isGB::Bool
@@ -45,7 +45,7 @@ end
 
 const FreeModID = ObjectIdDict()
 
-type FreeMod{T <: Nemo.RingElem} <: Nemo.Module{T}
+type FreeMod{T <: Nemo.RingElem} <: Module{T}
    base_ring::PolyRing
    rank::Int
 

@@ -9,7 +9,7 @@ function get_n_Z()
    d = libSingular.nInitChar(n_Z, Ptr{Void}(0))
 end
 
-type IntegerRing <: Nemo.Ring
+type IntegerRing <: Ring
    ptr::libSingular.coeffs
    refcount::Int
 
@@ -72,7 +72,7 @@ function get_n_Q()
    d = libSingular.nInitChar(n_Q, Ptr{Void}(0))
 end
 
-type RationalField <: Nemo.Field
+type RationalField <: Field
    ptr::libSingular.coeffs
    refcount::Int
 
@@ -143,7 +143,7 @@ type ZnmInfo
    exp::UInt
 end
 
-type N_ZnRing <: Nemo.Ring
+type N_ZnRing <: Ring
    ptr::libSingular.coeffs
    from_n_Z::Cxx.CppFptr
    to_n_Z::Cxx.CppFptr
@@ -206,7 +206,7 @@ end
 #
 ###############################################################################
 
-type N_ZpField <: Nemo.Field
+type N_ZpField <: Field
    ptr::libSingular.coeffs
    from_n_Z::Cxx.CppFptr
    to_n_Z::Cxx.CppFptr
@@ -275,7 +275,7 @@ type GFInfo
    s::Ptr{UInt8}
 end
 
-type N_GField <: Nemo.Field
+type N_GField <: Field
    ptr::libSingular.coeffs
    deg::Int
    from_n_Z::Cxx.CppFptr
@@ -341,7 +341,7 @@ end
 
 const CoeffRingID = Dict{Nemo.Ring, Nemo.Ring}()
 
-type CoefficientRing{T <: Nemo.RingElem} <: Nemo.Ring
+type CoefficientRing{T <: Nemo.RingElem} <: Ring
    ptr::libSingular.coeffs
    base_ring::Nemo.Ring
 

@@ -6,7 +6,7 @@
 
 const IdealSetID = ObjectIdDict()
 
-type IdealSet{T <: Nemo.RingElem} <: Nemo.Set
+type IdealSet{T <: Nemo.RingElem} <: Set
    base_ring::PolyRing
 
    function IdealSet{T}(R::PolyRing) where T
@@ -18,7 +18,7 @@ type IdealSet{T <: Nemo.RingElem} <: Nemo.Set
    end
 end
 
-type sideal{T <: Nemo.RingElem} <: Nemo.Module{T}
+type sideal{T <: Nemo.RingElem} <: Module{T}
    ptr::libSingular.ideal
    base_ring::PolyRing
    isGB::Bool

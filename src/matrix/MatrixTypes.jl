@@ -6,7 +6,7 @@
 
 const MatrixSpaceID = ObjectIdDict()
 
-type MatrixSpace{T <: Nemo.RingElem} <: Nemo.Set
+type MatrixSpace{T <: Nemo.RingElem} <: Set
    base_ring::PolyRing
    nrows::Int
    ncols::Int
