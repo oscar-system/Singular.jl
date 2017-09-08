@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-const IdealSetID = ObjectIdDict()
+const IdealSetID = Dict{Ring, Set}()
 
 type IdealSet{T <: Nemo.RingElem} <: Set
    base_ring::PolyRing

@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-const ModuleClassID = ObjectIdDict()
+const ModuleClassID = Dict{Ring, Set}()
 
 type ModuleClass{T <: Nemo.RingElem} <: Set
    base_ring::PolyRing
@@ -43,7 +43,7 @@ end
 #
 ###############################################################################
 
-const FreeModID = ObjectIdDict()
+const FreeModID = Dict{Ring, Module}()
 
 type FreeMod{T <: Nemo.RingElem} <: Module{T}
    base_ring::PolyRing

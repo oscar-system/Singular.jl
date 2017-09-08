@@ -4,11 +4,17 @@
 #
 ###############################################################################
 
-type ResolutionSet{T <: Nemo.RingElem} <: Nemo.Set
+const ResolutionSetID = Dict{Ring, Set}()
+
+type ResolutionSet{T <: Nemo.RingElem} <: Set
    base_ring::PolyRing
 
    function ResolutionSet{T}(R::PolyRing) where T
-      return new(R)
+      if haskey(ResolutionSetID, R)
+         return ResolutionSetID[R]
+      else
+         return ResolutionSetID[R] = new(R)
+      end
    end
 end
 

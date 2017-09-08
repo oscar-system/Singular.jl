@@ -4,14 +4,14 @@
 #
 ###############################################################################
 
-const PolyRingID = Dict{Tuple{Nemo.Ring, Array{Symbol, 1}, libSingular.rRingOrder_t}, Nemo.Ring}()
+const PolyRingID = Dict{Tuple{Union{Ring, Field}, Array{Symbol, 1}, libSingular.rRingOrder_t}, Ring}()
 
-type PolyRing{T <: Nemo.RingElem} <: Nemo.Ring
+type PolyRing{T <: Nemo.RingElem} <: Ring
    ptr::libSingular.ring
-   base_ring::Nemo.Ring
+   base_ring::Union{Ring, Field}
    refcount::Int
 
-   function PolyRing{T}(R::Nemo.Ring, s::Array{Symbol, 1}, cached::Bool = true, 
+   function PolyRing{T}(R::Union{Ring, Field}, s::Array{Symbol, 1}, cached::Bool = true, 
                             ordering::libSingular.rRingOrder_t = ringorder_dp) where T
       if haskey(PolyRingID, (R, s, ordering))
          return PolyRingID[R, s, ordering]::PolyRing{T}

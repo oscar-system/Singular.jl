@@ -9,13 +9,20 @@ function get_n_Z()
    d = libSingular.nInitChar(n_Z, Ptr{Void}(0))
 end
 
+const IntegersID = Dict{Symbol, Ring}()
+
 type Integers <: Ring
    ptr::libSingular.coeffs
    refcount::Int
 
    function Integers() 
-      d = new()
-      finalizer(d, _Integers_clear_fn)
+      if haskey(IntegersID, :ZZ)
+         d = IntegersID[:ZZ]::Integers
+      else
+         d = new()
+         IntegersID[:ZZ] = d
+         finalizer(d, _Integers_clear_fn)
+      end
       return d
    end
 end
@@ -72,13 +79,20 @@ function get_n_Q()
    d = libSingular.nInitChar(n_Q, Ptr{Void}(0))
 end
 
+const RationalsID = Dict{Symbol, Field}()
+
 type RationalField <: Field
    ptr::libSingular.coeffs
    refcount::Int
 
    function RationalField() 
-      d = new()
-      finalizer(d, _RationalField_clear_fn)
+      if haskey(RationalsID, :ZZ)
+         d = RationalsID[:ZZ]::Rationals
+      else
+         d = new()
+         RationalsID[:QQ] = d
+         finalizer(d, _RationalField_clear_fn)
+      end
       return d
    end
 end
@@ -143,6 +157,8 @@ type ZnmInfo
    exp::UInt
 end
 
+const N_ZnRingID = Dict{Int, Ring}()
+
 type N_ZnRing <: Ring
    ptr::libSingular.coeffs
    from_n_Z::Cxx.CppFptr
@@ -150,11 +166,16 @@ type N_ZnRing <: Ring
    refcount::Int
 
    function N_ZnRing(n::Int) 
-      n_Zn = @cxx n_Zn
-      ptr = libSingular.nInitChar(n_Zn, pointer_from_objref(ZnmInfo(BigInt(n), UInt(1))))
-      d = new(ptr, libSingular.n_SetMap(ZZ.ptr, ptr), 
+      if haskey(N_ZnRingID, n)
+         d = N_ZnRingID[n]::N_ZnRing
+      else
+         n_Zn = @cxx n_Zn
+         ptr = libSingular.nInitChar(n_Zn, pointer_from_objref(ZnmInfo(BigInt(n), UInt(1))))
+         d = new(ptr, libSingular.n_SetMap(ZZ.ptr, ptr), 
               libSingular.n_SetMap(ptr, ZZ.ptr), 1)
-      finalizer(d, _N_ZnRing_clear_fn)
+         N_ZnRingID[n] = d
+         finalizer(d, _N_ZnRing_clear_fn)
+      end
       return d
    end
 end
@@ -206,6 +227,8 @@ end
 #
 ###############################################################################
 
+const N_ZpFieldID = Dict{Int, Field}()
+
 type N_ZpField <: Field
    ptr::libSingular.coeffs
    from_n_Z::Cxx.CppFptr
@@ -213,11 +236,16 @@ type N_ZpField <: Field
    refcount::Int
 
    function N_ZpField(n::Int) 
-      n_Zp = @cxx n_Zp
-      ptr = libSingular.nInitChar(n_Zp, Ptr{Void}(n))
-      d = new(ptr, libSingular.n_SetMap(ZZ.ptr, ptr), 
+      if haskey(NZ_ZpFieldID, n)
+         d = N_ZpFieldID[n]::N_ZpField
+      else
+         n_Zp = @cxx n_Zp
+         ptr = libSingular.nInitChar(n_Zp, Ptr{Void}(n))
+         d = new(ptr, libSingular.n_SetMap(ZZ.ptr, ptr), 
               libSingular.n_SetMap(ptr, ZZ.ptr), 1)
-      finalizer(d, _N_ZpField_clear_fn)
+         N_ZpFieldID[n] = d
+         finalizer(d, _N_ZpField_clear_fn)
+      end
       return d
    end
 end
@@ -275,6 +303,8 @@ type GFInfo
    s::Ptr{UInt8}
 end
 
+const N_GFieldID = Dict{Tuple{Int, Int, Symbol}, Field}()
+
 type N_GField <: Field
    ptr::libSingular.coeffs
    deg::Int
@@ -283,11 +313,16 @@ type N_GField <: Field
    refcount::Int
 
    function N_GField(p::Int, n::Int, S::Symbol) 
-      n_GF = @cxx n_GF
-      ptr = libSingular.nInitChar(n_GF, pointer_from_objref(GFInfo(Cint(p), Cint(n), pointer(Base.Vector{UInt8}(string(S)*"\0")))))
-      d = new(ptr, n, libSingular.n_SetMap(ZZ.ptr, ptr), 
+      if haskey(N_GFieldID, (p, n, S))
+         d = N_GFieldID[p, n, S]::N_GField
+      else
+         n_GF = @cxx n_GF
+         ptr = libSingular.nInitChar(n_GF, pointer_from_objref(GFInfo(Cint(p), Cint(n), pointer(Base.Vector{UInt8}(string(S)*"\0")))))
+         d = new(ptr, n, libSingular.n_SetMap(ZZ.ptr, ptr), 
               libSingular.n_SetMap(ptr, ZZ.ptr), 1)
-      finalizer(d, _N_GField_clear_fn)
+         N_GFieldID[p, n, S] = d
+         finalizer(d, _N_GField_clear_fn)
+      end
       return d
    end
 end
@@ -339,7 +374,7 @@ end
 #
 ###############################################################################
 
-const CoeffRingID = Dict{Nemo.Ring, Nemo.Ring}()
+const CoeffRingID = Dict{Nemo.Ring, Ring}()
 
 type CoefficientRing{T <: Nemo.RingElem} <: Ring
    ptr::libSingular.coeffs

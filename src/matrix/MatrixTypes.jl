@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-const MatrixSpaceID = ObjectIdDict()
+const MatrixSpaceID = Dict{Ring, Set}()
 
 type MatrixSpace{T <: Nemo.RingElem} <: Set
    base_ring::PolyRing
