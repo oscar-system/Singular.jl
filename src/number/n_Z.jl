@@ -6,15 +6,15 @@ export crt
 #
 ###############################################################################
 
-elem_type(::IntegerRing) = n_Z
+elem_type(::Integers) = n_Z
 
 parent(a::n_Z) = ZZ
 
-parent_type(::Type{n_Z}) = IntegerRing
+parent_type(::Type{n_Z}) = Integers
 
 base_ring(a::n_Z) = ZZ
 
-base_ring(a::IntegerRing) = ZZ
+base_ring(a::Integers) = ZZ
 
 function deepcopy(a::n_Z)
    return parent(a)(libSingular.n_Copy(a.ptr, parent(a).ptr))
@@ -26,9 +26,9 @@ end
 #
 ###############################################################################
 
-one(::IntegerRing) = ZZ(1)
+one(::Integers) = ZZ(1)
 
-zero(::IntegerRing) = ZZ(0)
+zero(::Integers) = ZZ(0)
 
 function isone(n::n_Z)
    c = parent(n)
@@ -74,7 +74,7 @@ canonical_unit(x::n_Z) = isnegative(x) ? -one(parent(x)) : one(parent(x))
 #
 ###############################################################################
 
-function show(io::IO, c::IntegerRing)
+function show(io::IO, c::Integers)
    print(io, "Integer Ring")
 end
 
@@ -341,17 +341,17 @@ promote_rule{T <: Integer}(C::Type{n_Z}, ::Type{T}) = n_Z
 #
 ###############################################################################
 
-(::IntegerRing)() = n_Z()
+(::Integers)() = n_Z()
 
-(R::IntegerRing)(x::Integer) = R(libSingular.n_InitMPZ(BigInt(x), R.ptr)) 
+(R::Integers)(x::Integer) = R(libSingular.n_InitMPZ(BigInt(x), R.ptr)) 
 
-(::IntegerRing)(n::Int) = n_Z(n)
+(::Integers)(n::Int) = n_Z(n)
 
-(::IntegerRing)(n::n_Z) = n
+(::Integers)(n::n_Z) = n
 
-(::IntegerRing)(n::libSingular.number) = n_Z(n) 
+(::Integers)(n::libSingular.number) = n_Z(n) 
 
-function (R::IntegerRing)(x::Nemo.fmpz)
+function (R::Integers)(x::Nemo.fmpz)
    a = BigInt()
    ccall((:flint_mpz_init_set_readonly, :libflint), Void,
          (Ptr{BigInt}, Ptr{fmpz}), &a, &x)

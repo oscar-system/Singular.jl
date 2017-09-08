@@ -370,7 +370,7 @@ end
 #
 ###############################################################################
 
-function ResidueRing(R::IntegerRing, a::Int; cached=true)
+function ResidueRing(R::Integers, a::Int; cached=true)
    a == 0 && throw(DivideError())
    a < 0 && throw(DomainError())
 

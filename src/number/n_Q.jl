@@ -349,7 +349,7 @@ promote_rule(C::Type{n_Q}, ::Type{n_Q}) = n_Z
 
 (::RationalField)(n::n_Z) = n_Q(n)
 
-(::IntegerRing)(n::n_Q) = n
+(::Integers)(n::n_Q) = n
 
 (::RationalField)(n::libSingular.number) = n_Q(n) 
 

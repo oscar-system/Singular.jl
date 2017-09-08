@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   IntegerRing/n_Z
+#   Integers/n_Z
 #
 ###############################################################################
 
@@ -9,18 +9,18 @@ function get_n_Z()
    d = libSingular.nInitChar(n_Z, Ptr{Void}(0))
 end
 
-type IntegerRing <: Ring
+type Integers <: Ring
    ptr::libSingular.coeffs
    refcount::Int
 
-   function IntegerRing() 
+   function Integers() 
       d = new()
-      finalizer(d, _IntegerRing_clear_fn)
+      finalizer(d, _Integers_clear_fn)
       return d
    end
 end
 
-function _IntegerRing_clear_fn(cf::IntegerRing)
+function _Integers_clear_fn(cf::Integers)
    cf.refcount -= 1
    if cf.refcount == 0
       libSingular.nKillChar(cf.ptr)
@@ -57,7 +57,7 @@ end
 function _n_Z_clear_fn(n::n_Z)
    R = parent(n)
    libSingular.n_Delete(n.ptr, parent(n).ptr)
-   _IntegerRing_clear_fn(R)
+   _Integers_clear_fn(R)
    nothing
 end
 
