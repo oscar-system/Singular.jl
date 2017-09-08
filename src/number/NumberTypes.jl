@@ -70,7 +70,7 @@ end
 
 ###############################################################################
 #
-#   RationalField/n_Q
+#   Rationals/n_Q
 #
 ###############################################################################
 
@@ -81,23 +81,23 @@ end
 
 const RationalsID = Dict{Symbol, Field}()
 
-type RationalField <: Field
+type Rationals <: Field
    ptr::libSingular.coeffs
    refcount::Int
 
-   function RationalField() 
+   function Rationals() 
       if haskey(RationalsID, :ZZ)
          d = RationalsID[:ZZ]::Rationals
       else
          d = new()
          RationalsID[:QQ] = d
-         finalizer(d, _RationalField_clear_fn)
+         finalizer(d, _Rationals_clear_fn)
       end
       return d
    end
 end
 
-function _RationalField_clear_fn(cf::RationalField)
+function _Rationals_clear_fn(cf::Rationals)
    cf.refcount -= 1
    if cf.refcount == 0
       libSingular.nKillChar(cf.ptr)
@@ -142,7 +142,7 @@ end
 function _n_Q_clear_fn(n::n_Q)
    R = parent(n)
    libSingular.n_Delete(n.ptr, parent(n).ptr)
-   _RationalField_clear_fn(R)
+   _Rationals_clear_fn(R)
    nothing
 end
 

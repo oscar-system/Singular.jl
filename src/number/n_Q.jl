@@ -6,15 +6,15 @@ export reconstruct, isone, iszero, isunit, divexact
 #
 ###############################################################################
 
-elem_type(::RationalField) = n_Q
+elem_type(::Rationals) = n_Q
 
 parent(a::n_Q) = QQ
 
-parent_type(::Type{n_Q}) = RationalField
+parent_type(::Type{n_Q}) = Rationals
 
 base_ring(a::n_Q) = ZZ
 
-base_ring(a::RationalField) = ZZ
+base_ring(a::Rationals) = ZZ
 
 function deepcopy(a::n_Q)
    return parent(a)(libSingular.n_Copy(a.ptr, parent(a).ptr))
@@ -26,9 +26,9 @@ end
 #
 ###############################################################################
 
-one(::RationalField) = QQ(1)
+one(::Rationals) = QQ(1)
 
-zero(::RationalField) = QQ(0)
+zero(::Rationals) = QQ(0)
 
 function isone(n::n_Q)
    c = parent(n)
@@ -80,7 +80,7 @@ canonical_unit(x::n_Q) = x
 #
 ###############################################################################
 
-function show(io::IO, c::RationalField)
+function show(io::IO, c::Rationals)
    print(io, "Rational Field")
 end
 
@@ -341,19 +341,19 @@ promote_rule(C::Type{n_Q}, ::Type{n_Q}) = n_Z
 #
 ###############################################################################
 
-(::RationalField)() = n_Q()
+(::Rationals)() = n_Q()
 
-(::RationalField)(n::Int) = n_Q(n)
+(::Rationals)(n::Int) = n_Q(n)
 
-(R::RationalField)(x::Integer) = R(libSingular.n_InitMPZ(BigInt(x), R.ptr)) 
+(R::Rationals)(x::Integer) = R(libSingular.n_InitMPZ(BigInt(x), R.ptr)) 
 
-(::RationalField)(n::n_Z) = n_Q(n)
+(::Rationals)(n::n_Z) = n_Q(n)
 
 (::Integers)(n::n_Q) = n
 
-(::RationalField)(n::libSingular.number) = n_Q(n) 
+(::Rationals)(n::libSingular.number) = n_Q(n) 
 
-function (R::RationalField)(x::Nemo.fmpz)
+function (R::Rationals)(x::Nemo.fmpz)
    a = BigInt()
    ccall((:flint_mpz_init_set_readonly, :libflint), Void,
          (Ptr{BigInt}, Ptr{fmpz}), &a, &x)
