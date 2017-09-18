@@ -124,6 +124,11 @@ function p_Content(a::poly, r::ring)
    icxx"""p_Content($a, $r);"""
 end
 
+function p_GetExpVL(p::poly, ev::Array{Int, 1}, r::ring)
+   ptr = pointer(ev)
+   icxx"""p_GetExpVL($p, $ptr, $r);"""
+end
+
 function p_Reduce(p::poly, G::ideal, R::ring)
    icxx"""const ring origin = currRing;
           rChangeCurrRing($R);

@@ -1,4 +1,4 @@
-export ngens, coeff, isgen, content, primpart
+export ngens, coeff, isgen, content, primpart, lead_exponent
 
 ###############################################################################
 #
@@ -93,6 +93,14 @@ function coeff(p::spoly, i::Int)
       end
    end
    return R(libSingular.n_Copy(libSingular.pGetCoeff(ptr), R.ptr))
+end
+
+function lead_exponent(p::spoly)
+   R = parent(p)
+   n = ngens(R)
+   A = Array{Int}(n)
+   libSingular.p_GetExpVL(p.ptr, A, R.ptr)
+   return A
 end
 
 function deepcopy(p::spoly)
@@ -219,7 +227,7 @@ function divexact(x::spoly, y::spoly)
    R = parent(x)
    x1 = libSingular.p_Copy(x.ptr, R.ptr)
    y1 = libSingular.p_Copy(y.ptr, R.ptr)
-   p = libSingular.singclap_pdivide(x1, y1, R.ptr)
+   p = libSingular.p_Divide(x1, y1, R.ptr)
    return R(p)
 end
 
