@@ -162,9 +162,9 @@ end
 #
 ###############################################################################
 
-function std(I::sideal) 
+function std(I::sideal; complete_reduction::Bool=false) 
    R = base_ring(I)
-   ptr = libSingular.id_Std(I.ptr, R.ptr)
+   ptr = libSingular.id_Std(I.ptr, R.ptr; complete_reduction=complete_reduction)
    libSingular.idSkipZeroes(ptr)
    z = Ideal(R, ptr)
    z.isGB = true

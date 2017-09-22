@@ -64,9 +64,9 @@ end
 #
 ###############################################################################
 
-function std(I::smodule) 
+function std(I::smodule; complete_reduction::Bool=false) 
    R = base_ring(I)
-   ptr = libSingular.id_Std(I.ptr, R.ptr)
+   ptr = libSingular.id_Std(I.ptr, R.ptr; complete_reduction=complete_reduction)
    libSingular.idSkipZeroes(ptr)
    z = Module(R, ptr)
    z.isGB = true
