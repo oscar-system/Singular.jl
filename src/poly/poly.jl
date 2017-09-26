@@ -298,7 +298,7 @@ function addeq!(x::spoly, y::spoly)
     else
        x.ptr = libSingular.p_Add_q(x.ptr, libSingular.p_Copy(y.ptr, R.ptr), R.ptr)
     end
-    nothing
+    return x
 end
 
 function mul!(c::spoly, x::spoly, y::spoly) 
@@ -310,7 +310,7 @@ function mul!(c::spoly, x::spoly, y::spoly)
       libSingular.p_Delete(c.ptr, R.ptr)
    end
    c.ptr = ptr
-   nothing
+   return c
 end
 
 function add!(c::spoly, x::spoly, y::spoly) 
@@ -322,7 +322,7 @@ function add!(c::spoly, x::spoly, y::spoly)
       libSingular.p_Delete(c.ptr, R.ptr)
    end
    c.ptr = ptr
-   nothing
+   return c
 end
 
 function zero!(x::spoly)
@@ -330,7 +330,7 @@ function zero!(x::spoly)
       libSingular.p_Delete(x.ptr, parent(x).ptr)
       x.ptr = libSingular.p_ISet(0, parent(x).ptr)
    end
-   nothing
+   return x
 end
 
 ###############################################################################

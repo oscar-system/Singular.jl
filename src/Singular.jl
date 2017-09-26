@@ -9,10 +9,10 @@ import Base: abs, checkbounds, deepcopy, den, div, divrem, gcd, gcdx,
              zero, +, -, *, ==, ^, &, |, $, <<, >>, ~, <=, >=, <, >, //,
              /, !=
 
-import Nemo: add!, addeq!, canonical_unit, check_parent, coeff, content, crt,
-             divexact, elem_type, gcdinv, isnegative, isone, isgen, iszero,
-             isunit, lead, mul!, needs_parentheses, parent_type, parent,
-             primpart, promote_rule, reconstruct, show_minus_one, zero!
+import Nemo: add!, addeq!, base_ring, canonical_unit, check_parent, coeff,
+             content, crt, divexact, elem_type, gcdinv, isnegative, isone,
+             isgen, iszero, isunit, lead, mul!, needs_parentheses, parent_type,
+             parent, primpart, promote_rule, reconstruct, show_minus_one, zero!
 
 export ResidueRing, PolynomialRing, Ideal, MaximalIdeal, Module, FreeModule,
        Vector, Matrix
