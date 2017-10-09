@@ -171,6 +171,16 @@ function std(I::sideal; complete_reduction::Bool=false)
    return z
 end
 
+function satstd(I::sideal, J::sideal)
+   check_parent(I, J)
+   R = base_ring(I)
+   ptr = libSingular.id_Satstd(I.ptr, J.ptr, R.ptr)
+   libSingular.idSkipZeroes(ptr)
+   z = Ideal(R, ptr)
+   z.isGB = true
+   return z
+end
+
 ###############################################################################
 #
 #   Reduction
