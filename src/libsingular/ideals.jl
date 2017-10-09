@@ -158,3 +158,8 @@ function id_Eliminate(I::ideal, v::poly, R::ring)
           res;
        """
 end
+
+function id_Satstd(I::ideal, J::ideal, R::ring)
+   icxx"""id_Satstd($I, $J, $R);
+       """
+end
