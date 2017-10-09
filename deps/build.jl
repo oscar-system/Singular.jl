@@ -27,9 +27,11 @@ const tmp = mktempdir(wdir)
 cd(tmp)
 run(`tar -C "$tmp" -xkvf "$wdir/$ntl.tar.gz"`)
 cd(joinpath(tmp, ntl, "src"))
-run(`./configure PREFIX=$vdir DEF_PREFIX=$vdir SHARED=on NTL_THREADS=off NTL_EXCEPTIONS=off NTL_GMP_LIP=on CXXFLAGS="-I$nemovdir/include" LDFLAGS="-L$nemovdir/lib -Wl,-rpath,$nemovdir/lib"`)
-run(`make -j4`)
-run(`make install`)
+withenv("CPP_FLAGS"=>"-I$vdir/include", "LD_LIBRARY_PATH"=>"$vdir/lib:$nemovdir/lib", "LDFLAGS"=>LDFLAGS) do
+   run(`./configure PREFIX=$vdir DEF_PREFIX=$nemovdir SHARED=on NTL_THREADS=off NTL_EXCEPTIONS=off NTL_GMP_LIP=on CXXFLAGS="-I$nemovdir/include"`)
+   run(`make -j4`)
+   run(`make install`)
+end
 cd(wdir)
 rm(tmp; recursive=true)
 
@@ -51,7 +53,7 @@ rm(tmp; recursive=true)
 # cd(tmp2)
 # run(`tar -C $tmp2 -xkvf $wdir/$cddlib.tar.gz`)
 # cd(joinpath(tmp2, cddlib))
-# withenv("CPP_FLAGS"=>"-I$vdir/include", "LD_LIBRARY_PATH"=>"$vdir/lib:$nemodir/lib", "LDFLAGS"=>LDFLAGS) do
+# withenv("CPP_FLAGS"=>"-I$vdir/include", "LD_LIBRARY_PATH"=>"$vdir/lib:$nemovdir/lib", "LDFLAGS"=>LDFLAGS) do
 #    run(`./configure --prefix=$vdir --with-gmp=$nemovdir`)
 #    run(`make -j4`)
 #    run(`make install`)
@@ -75,7 +77,12 @@ catch
   cd(wdir)
 end  
 
-run(`$srcs/autogen.sh`)
+cd(srcs)
+run(`libtoolize --force`)
+run(`autoreconf -i`)
+run(`aclocal`)
+run(`autoconf`)
+cd(wdir)
 
 # out of source-tree building:
 try 
