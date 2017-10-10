@@ -78,10 +78,7 @@ catch
 end  
 
 cd(srcs)
-run(`libtoolize --force`)
-run(`autoreconf -i`)
-run(`aclocal`)
-run(`autoconf`)
+run(`./autogen.sh`)
 cd(wdir)
 
 # out of source-tree building:
