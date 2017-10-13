@@ -86,6 +86,7 @@ function nemoFieldInpMult(a::Ptr{number}, b::number, cf::coeffs)
    bb = julia(b)
    aa = mul!(aa, aa, bb)
    n = number(aa, false)
+   unsafe_store!(a, n, 1)
    nothing
 end
 
@@ -101,6 +102,7 @@ function nemoFieldInpAdd(a::Ptr{number}, b::number, cf::coeffs)
    bb = julia(b)
    aa = addeq!(aa, bb)
    n = number(aa, false)
+   unsafe_store!(a, n, 1)
    nothing
 end
 

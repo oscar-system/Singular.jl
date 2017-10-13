@@ -84,6 +84,7 @@ function fmpzInpMult(a::Ptr{number}, b::number, cf::coeffs)
    bb = julia(b)::Nemo.fmpz
    aa = mul!(aa, aa, bb)
    n = number(aa, false)
+   unsafe_store!(a, n, 1)
    nothing
 end
 
@@ -99,6 +100,7 @@ function fmpzInpAdd(a::Ptr{number}, b::number, cf::coeffs)
    bb = julia(b)::Nemo.fmpz
    aa = addeq!(aa, bb)
    n = number(aa, false)
+   unsafe_store!(a, n, 1)
    nothing
 end
 

@@ -85,6 +85,7 @@ function nf_elemInpMult(a::Ptr{number}, b::number, cf::coeffs)
    bb = julia(b)::Nemo.nf_elem
    aa = mul!(aa, aa, bb)
    n = number(aa, false)
+   unsafe_store!(a, n, 1)
    nothing
 end
 
@@ -100,6 +101,7 @@ function nf_elemInpAdd(a::Ptr{number}, b::number, cf::coeffs)
    bb = julia(b)::Nemo.nf_elem
    aa = addeq!(aa, bb)
    n = number(aa, false)
+   unsafe_store!(a, n, 1)
    nothing
 end
 

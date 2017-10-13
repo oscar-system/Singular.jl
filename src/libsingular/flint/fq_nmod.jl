@@ -85,6 +85,7 @@ function fq_nmodInpMult(a::Ptr{number}, b::number, cf::coeffs)
    bb = julia(b)::Nemo.fq_nmod
    aa = mul!(aa, aa, bb)
    n = number(aa, false)
+   unsafe_store!(a, n, 1)
    nothing
 end
 
@@ -100,6 +101,7 @@ function fq_nmodInpAdd(a::Ptr{number}, b::number, cf::coeffs)
    bb = julia(b)::Nemo.fq_nmod
    aa = addeq!(aa, bb)
    n = number(aa, false)
+   unsafe_store!(a, n, 1)
    nothing
 end
 
