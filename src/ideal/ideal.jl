@@ -152,7 +152,7 @@ end
 function quotient{T <: Nemo.RingElem}(I::sideal{T}, J::sideal{T})
    check_parent(I, J)
    R = base_ring(I)
-   ptr = libSingular.id_Quotient(I.ptr, J.ptr, R.ptr)
+   ptr = libSingular.id_Quotient(I.ptr, J.ptr, I.isGB, R.ptr)
    return Ideal(R, ptr)
 end
 

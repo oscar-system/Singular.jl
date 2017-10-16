@@ -74,10 +74,10 @@ function rank(I::ideal)
    icxx"""(int) $I->rank;"""
 end
 
-function id_Quotient(A::ideal, B::ideal, R::ring)
+function id_Quotient(A::ideal, B::ideal, AisGB::Bool, R::ring)
    icxx"""const ring origin = currRing;
           rChangeCurrRing($R);
-          ideal id = idQuot($A, $B, FALSE, TRUE);
+          ideal id = idQuot($A, $B, $AisGB, TRUE);
           rChangeCurrRing(origin);
           id;
        """
