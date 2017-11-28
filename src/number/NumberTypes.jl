@@ -236,7 +236,7 @@ type N_ZpField <: Field
    refcount::Int
 
    function N_ZpField(n::Int) 
-      if haskey(NZ_ZpFieldID, n)
+      if haskey(N_ZpFieldID, n)
          d = N_ZpFieldID[n]::N_ZpField
       else
          n_Zp = @cxx n_Zp
