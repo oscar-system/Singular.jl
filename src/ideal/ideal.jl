@@ -275,6 +275,12 @@ function Ideal{T <: Nemo.RingElem}(R::PolyRing{T}, ids::spoly{T}...)
    return sideal{S}(R, ids...)
 end
 
+function Ideal{T <: Nemo.RingElem}(R::PolyRing{T}, ids::Array{spoly{T}, 1})
+   S = elem_type(R)
+   return sideal{S}(R, ids...)
+end
+
+
 function Ideal{T <: Nemo.RingElem}(R::PolyRing{T}, id::libSingular.ideal)
    S = elem_type(R)
    return sideal{S}(R, id)
