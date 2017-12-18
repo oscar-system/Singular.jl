@@ -44,11 +44,11 @@ function _PolyRing_clear_fn(R::PolyRing)
    end
 end
 
-type spoly{T <: Nemo.RingElement} <: Nemo.RingElem
+type spoly{T <: Nemo.RingElem} <: Nemo.RingElem
    ptr::libSingular.poly
    parent::PolyRing{T}
 
-   function spoly{T}(R::PolyRing{T}) where T <: Nemo.RingElement
+   function spoly{T}(R::PolyRing{T}) where T <: Nemo.RingElem
       p = libSingular.p_ISet(0, R.ptr)
 	  z = new(p, R)
       R.refcount += 1
@@ -56,14 +56,14 @@ type spoly{T <: Nemo.RingElement} <: Nemo.RingElem
       return z
    end
     
-   function spoly{T}(R::PolyRing{T}, p::libSingular.poly) where T <: Nemo.RingElement
+   function spoly{T}(R::PolyRing{T}, p::libSingular.poly) where T <: Nemo.RingElem
       z = new(p, R)
       R.refcount += 1
       finalizer(z, _spoly_clear_fn)
       return z
    end
     
-   function spoly{T}(R::PolyRing{T}, p::T) where T <: Nemo.RingElement
+   function spoly{T}(R::PolyRing{T}, p::T) where T <: Nemo.RingElem
       n = libSingular.n_Copy(p.ptr, parent(p).ptr)
       r = libSingular.p_NSet(n, R.ptr)
       z = new(r, R)
@@ -72,7 +72,7 @@ type spoly{T <: Nemo.RingElement} <: Nemo.RingElem
       return z
    end
     
-   function spoly{T}(R::PolyRing{T}, n::libSingular.number) where T <: Nemo.RingElement
+   function spoly{T}(R::PolyRing{T}, n::libSingular.number) where T <: Nemo.RingElem
       p = libSingular.p_NSet(n, R.ptr)
       z = new(p, R)
       R.refcount += 1
@@ -80,7 +80,7 @@ type spoly{T <: Nemo.RingElement} <: Nemo.RingElem
       return z
    end 
 
-   function spoly{T}(R::PolyRing{T}, b::Int) where T <: Nemo.RingElement
+   function spoly{T}(R::PolyRing{T}, b::Int) where T <: Nemo.RingElem
       p = libSingular.p_ISet(b, R.ptr)
       z = new(p, R)
       R.refcount += 1
@@ -88,7 +88,7 @@ type spoly{T <: Nemo.RingElement} <: Nemo.RingElem
       return z
    end
 
-   function spoly{T}(R::PolyRing{T}, b::BigInt) where T <: Nemo.RingElement
+   function spoly{T}(R::PolyRing{T}, b::BigInt) where T <: Nemo.RingElem
       n = libSingular.n_InitMPZ(b, R.base_ring.ptr)
       p = libSingular.p_NSet(n, R.ptr)
       z = new(p, R)

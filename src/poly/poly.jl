@@ -95,6 +95,91 @@ function coeff(p::spoly, i::Int)
    return R(libSingular.n_Copy(libSingular.pGetCoeff(ptr), R.ptr))
 end
 
+function exponent(p::spoly, i::Int)
+   i = length(p) - i - 1
+   R = parent(p)
+   n = ngens(R)
+   if i < 0 || iszero(p)
+      return zeros(Int, n)
+   end
+   ptr = p.ptr
+   for i = 1:i
+      ptr = libSingular.pNext(ptr)
+      if ptr == C_NULL
+         return zeros(Int, n)
+      end
+   end
+   A = Array{Int}(n)
+   libSingular.p_GetExpVL(ptr, A, R.ptr)
+   return A
+end
+
+function exponent!(A::Array{Int, 1}, p::spoly, i::Int)
+   i = length(p) - i - 1
+   R = parent(p)
+   n = ngens(R)
+   @assert length(A) == n
+   if i < 0 || iszero(p)
+      for i=1:n
+        A[i] = 0
+      end
+      return A
+   end
+   ptr = p.ptr
+   for i = 1:i
+      ptr = libSingular.pNext(ptr)
+      if ptr == C_NULL
+        for i=1:n
+          A[i] = 0
+        end
+      end
+   end
+   libSingular.p_GetExpVL(ptr, A, R.ptr)
+   return A
+end
+
+mutable struct coeffs_expos
+  E::Array{Int, 1}
+  c::Nemo.RingElem
+  R::Nemo.Ring
+  Rx::Nemo.Ring
+  a::spoly
+  function coeffs_expos(p::spoly)
+    r = new()
+    Rx = parent(p)
+    n = ngens(Rx)
+    r.E = zeros(Int, n)
+    r.Rx = Rx
+    r.R = base_ring(p)
+    r.c = r.R(0)
+    r.a = p
+    return r
+  end
+end
+
+function show(io::IO, sp::coeffs_expos)
+  println(io, "Coefficients and exponent iterator for $(sp.a)")
+end
+
+function Base.start(sp::coeffs_expos)
+  return sp.a.ptr
+end
+
+function Base.next(sp::coeffs_expos, p)
+  if p == C_NULL
+    return (sp.c, sp.E), p
+  end
+
+  libSingular.p_GetExpVL(p, sp.E, sp.Rx.ptr)
+  sp.c = sp.R(libSingular.n_Copy(libSingular.pGetCoeff(p), sp.R.ptr))
+
+  return (sp.c, sp.E), libSingular.pNext(p) 
+end
+
+function Base.done(sp::coeffs_expos, p)
+  return p == C_NULL
+end
+
 function lead_exponent(p::spoly)
    R = parent(p)
    n = ngens(R)

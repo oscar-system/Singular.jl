@@ -52,6 +52,14 @@ function p_IsOne(p::poly, r::ring)
    icxx"""p_IsOne($p, $r);"""
 end
 
+function p_One(r::ring)
+   icxx"""p_One($r);"""
+end
+
+function p_Init(r::ring)  #empty poly, no coeff, no exp
+   icxx"""p_Init($r);"""
+end
+
 function p_IsUnit(p::poly, r::ring)
    icxx"""p_IsUnit($p, $r);"""
 end
@@ -86,6 +94,14 @@ end
 
 function pGetCoeff(a::poly)
    icxx"""number p = pGetCoeff($a); p;"""
+end
+
+function pSetCoeff(a::poly, c::Clong, r::ring)
+   icxx"""number n = n_Init($c,$r); p_SetCoeff($a,n,$r);"""
+end
+
+function pSetCoeff0(a::poly, c::Clong, r::ring)
+   icxx"""number n = n_Init($c,$r); p_SetCoeff0($a,n,$r);"""
 end
 
 function p_Add_q(a::poly, b::poly, r::ring)
@@ -124,9 +140,15 @@ function p_Content(a::poly, r::ring)
    icxx"""p_Content($a, $r);"""
 end
 
-function p_GetExpVL(p::poly, ev::Array{Int, 1}, r::ring)
+function p_GetExpVL(p::poly, ev::Array{Clong, 1}, r::ring)
    ptr = pointer(ev)
    icxx"""p_GetExpVL($p, $ptr, $r);"""
+end
+
+function p_SetExpV(p::poly, ev::Array{Cint, 1}, r::ring)
+   @assert ev[1] == 0
+   ptr = pointer(ev)
+   icxx"""p_SetExpV($p, $ptr, $r);"""
 end
 
 function p_Reduce(p::poly, G::ideal, R::ring)

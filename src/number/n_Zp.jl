@@ -366,3 +366,7 @@ function Fp(a::Int; cached=true)
 
    return N_ZpField(a)
 end
+
+function Base.Int(a::n_Zp)
+  return reinterpret(Int, a.ptr)
+end
