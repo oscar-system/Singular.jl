@@ -132,6 +132,15 @@ function id_Syzygies(I:: ideal, R::ring)
        """
 end
 
+function id_fres(I::ideal, n::Cint, method::String, R::ring)
+   icxx"""const ring origin = currRing;
+          rChangeCurrRing($R);
+          resolvente r = syFrank($I, $n, $method)->fullres;
+          rChangeCurrRing(origin);
+          (resolvente) r;
+       """
+end
+
 function id_sres(I:: ideal, n::Cint, len::Ptr{Cint}, R::ring)
    icxx"""const ring origin = currRing;
           rChangeCurrRing($R);
