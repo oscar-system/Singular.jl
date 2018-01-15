@@ -112,6 +112,15 @@ function pSetCoeff0(a::poly, c::Clong, r::ring)
    icxx"""number n = n_Init($c,$r); p_SetCoeff0($a,n,$r);"""
 end
 
+function pLDeg(a::poly, r::ring)
+   icxx"""long res;
+          int dummy;
+          if ($a != NULL) res = $r->pLDeg($a, &dummy, $r);
+          else res = -1;
+          res;
+       """
+end
+
 function p_Add_q(a::poly, b::poly, r::ring)
    icxx"""p_Add_q($a, $b, $r);"""
 end

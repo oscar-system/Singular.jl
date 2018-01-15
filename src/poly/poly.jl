@@ -1,4 +1,4 @@
-export ngens, coeff, isgen, content, primpart, lead_exponent, option!
+export ngens, coeff, isgen, content, primpart, lead_exponent, option!, degree
 
 ###############################################################################
 #
@@ -147,6 +147,11 @@ function exponent!(A::Array{Int, 1}, p::spoly, i::Int)
    end
    libSingular.p_GetExpVL(ptr, A, R.ptr)
    return A
+end
+
+function degree(p::spoly)
+   R = parent(p)
+   libSingular.pLDeg(p.ptr, R.ptr)
 end
 
 mutable struct coeffs_expos
