@@ -1,4 +1,4 @@
-export ngens, coeff, isgen, content, primpart, lead_exponent, option!, deg
+export ngens, coeff, isgen, content, primpart, lead_exponent, option!, degree
 
 ###############################################################################
 #
@@ -149,7 +149,7 @@ function exponent!(A::Array{Int, 1}, p::spoly, i::Int)
    return A
 end
 
-function deg(p::spoly)
+function degree(p::spoly)
    R = parent(p)
    libSingular.pLDeg(p.ptr, R.ptr)
 end
