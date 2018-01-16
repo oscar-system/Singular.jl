@@ -58,6 +58,8 @@ function test_n_Z_manipulation()
    @test abs(ZZ(2)) == 2
    @test abs(ZZ()) == 0
 
+   @test deepcopy(ZZ(2)) == ZZ(2)
+
    println("PASS")
 end
 
@@ -96,6 +98,38 @@ function test_n_Z_adhoc_binary()
    println("PASS")
 end
 
+function test_n_Z_comparison()
+   print("n_Z.comparison...")
+
+   @test ZZ(2) < ZZ(3)
+   @test ZZ(2) <= ZZ(3)
+   @test ZZ(3) > ZZ(2)
+   @test ZZ(3) >= ZZ(3)
+   @test ZZ(2) == ZZ(2)
+   @test isequal(ZZ(2), ZZ(2))
+
+   println("PASS")
+end
+
+function test_n_Z_adhoc_comparison()
+   print("n_Z.ad_hoc_comparison...")
+
+   @test ZZ(2) < 3
+   @test ZZ(2) <= 3
+   @test 2 < ZZ(3)
+   @test 2 <= ZZ(3)
+   @test ZZ(3) > 2
+   @test ZZ(3) >= 3
+   @test 3 > ZZ(2)
+   @test 3 >= ZZ(3)
+   @test ZZ(2) == 2
+   @test 2 == ZZ(2)
+   @test isequal(ZZ(2), 2)
+   @test isequal(2, ZZ(2))
+
+   println("PASS")
+end
+
 function test_n_Z()
    test_n_Z_constructors()
    test_n_Z_printing()
@@ -103,6 +137,8 @@ function test_n_Z()
    test_n_Z_unary_ops()
    test_n_Z_binary_ops()
    test_n_Z_adhoc_binary()
+   test_n_Z_comparison()
+   test_n_Z_adhoc_comparison()
 
    println("")
 end
