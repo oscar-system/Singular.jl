@@ -41,11 +41,19 @@ function  rVar(r::ring)
 end
 
 function rSetOption_redSB(r::ring)
-   icxx"""$r->options |= Sy_bit(OPT_REDSB);"""
+   icxx"""const ring origin = currRing;
+          rChangeCurrRing($r);
+          si_opt_1 |= Sy_bit(OPT_REDSB);
+          rChangeCurrRing(origin);
+       """
 end
 
 function rSetOption_redTail(r::ring)
-   icxx"""$r->options |= Sy_bit(OPT_REDTAIL);"""
+   icxx"""const ring origin = currRing;
+          rChangeCurrRing($r);
+          si_opt_1 |= Sy_bit(OPT_REDTAIL);
+          rChangeCurrRing(origin);
+       """
 end
 
 function p_Delete(p::poly, r::ring)
