@@ -1,5 +1,5 @@
-export syz, lead, normalize!, isconstant, iszerodim, fres, sres, lres,
-       intersection, quotient, reduce, eliminate
+export sideal, IdealSet, syz, lead, normalize!, isconstant, iszerodim, fres,
+       sres, lres, intersection, quotient, reduce, eliminate
 
 ###############################################################################
 #
