@@ -61,10 +61,34 @@ function test_n_Z_manipulation()
    println("PASS")
 end
 
+function test_n_Z_unary_ops()
+   print("n_Z.unary_ops...")
+
+   @test -ZZ(123) == -123
+   @test -ZZ() == 0
+
+   println("PASS")
+end
+
+function test_n_Z_binary_ops()
+   print("n_Z.binary_ops...")
+
+   a = ZZ(2)
+   b = ZZ(3)
+
+   @test a + b == 5
+   @test a - b == -1
+   @test a*b == 6
+
+   println("PASS")
+end
+
 function test_n_Z()
    test_n_Z_constructors()
    test_n_Z_printing()
    test_n_Z_manipulation()
+   test_n_Z_unary_ops()
+   test_n_Z_binary_ops()
 
    println("")
 end
