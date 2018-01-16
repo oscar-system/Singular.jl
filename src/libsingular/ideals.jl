@@ -135,9 +135,7 @@ end
 function id_fres(I::ideal, n::Cint, method::String, R::ring)
    s = icxx"""const ring origin = currRing;
          rChangeCurrRing($R);
-         printf("n before syFrank: %d\n", $n);
          syStrategy s = syFrank($I, $n, $method);
-         printf("from syFrank: %d\n", s->length);
          rChangeCurrRing(origin);
          s;
       """
