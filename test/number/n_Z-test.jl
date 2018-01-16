@@ -83,12 +83,26 @@ function test_n_Z_binary_ops()
    println("PASS")
 end
 
+function test_n_Z_adhoc_binary()
+   print("n_Z.adhoc_binary...")
+
+   @test ZZ(2) + 3 == 5
+   @test 2 + ZZ(3) == 5
+   @test ZZ(2) - 3 == -1
+   @test 2 - ZZ(3) == -1
+   @test 2*ZZ(3) == 6
+   @test ZZ(2)*3 == 6
+
+   println("PASS")
+end
+
 function test_n_Z()
    test_n_Z_constructors()
    test_n_Z_printing()
    test_n_Z_manipulation()
    test_n_Z_unary_ops()
    test_n_Z_binary_ops()
+   test_n_Z_adhoc_binary()
 
    println("")
 end
