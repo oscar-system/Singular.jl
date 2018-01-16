@@ -14,6 +14,8 @@ import Nemo: add!, addeq!, base_ring, canonical_unit, check_parent, coeff,
              isgen, iszero, isunit, lead, mul!, needs_parentheses, parent_type,
              parent, primpart, promote_rule, reconstruct, show_minus_one, zero!
 
+export base_ring, elem_type, parent_type, parent
+
 export ResidueRing, PolynomialRing, Ideal, MaximalIdeal, Module, FreeModule,
        Vector, Matrix
 

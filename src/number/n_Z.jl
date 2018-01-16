@@ -1,4 +1,4 @@
-export crt
+export n_Z, Integers, crt
 
 ###############################################################################
 #
@@ -6,15 +6,15 @@ export crt
 #
 ###############################################################################
 
-elem_type(::Integers) = n_Z
+elem_type(::Type{Integers}) = n_Z
 
 parent(a::n_Z) = ZZ
 
 parent_type(::Type{n_Z}) = Integers
 
-base_ring(a::n_Z) = ZZ
+base_ring(a::n_Z) = Union{}
 
-base_ring(a::Integers) = ZZ
+base_ring(a::Integers) = Union{}
 
 function deepcopy(a::n_Z)
    return parent(a)(libSingular.n_Copy(a.ptr, parent(a).ptr))
