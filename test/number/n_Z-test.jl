@@ -34,8 +34,37 @@ function test_n_Z_constructors()
    println("PASS")
 end
 
+function test_n_Z_printing()
+   print("n_Z.printing...")
+
+   @test string(ZZ(123)) == "123"
+
+   println("PASS")
+end
+
+function test_n_Z_manipulation()
+   print("n_Z.manipulation...")
+
+   @test isone(one(ZZ))
+   @test iszero(zero(ZZ))
+   @test isunit(ZZ(1)) && isunit(ZZ(1))
+   @test !isunit(ZZ(2)) && !isunit(ZZ(0)) 
+
+   @test numerator(ZZ(2)) == 2
+   @test denominator(ZZ(2)) == 1
+   @test denominator(ZZ()) == 1
+
+   @test abs(ZZ(-2)) == 2
+   @test abs(ZZ(2)) == 2
+   @test abs(ZZ()) == 0
+
+   println("PASS")
+end
+
 function test_n_Z()
    test_n_Z_constructors()
+   test_n_Z_printing()
+   test_n_Z_manipulation()
 
    println("")
 end

@@ -3,9 +3,9 @@ module Singular
 using Nemo
 using Cxx
 
-import Base: abs, checkbounds, deepcopy, den, div, divrem, gcd, gcdx,
+import Base: abs, checkbounds, deepcopy, denominator, div, divrem, gcd, gcdx,
              getindex, indices, inv, isequal, isless, lcm, length,
-             mod, normalize!, num, one, reduce, rem, setindex!, show, std,
+             mod, normalize!, numerator, one, reduce, rem, setindex!, show, std,
              zero, +, -, *, ==, ^, &, |, $, <<, >>, ~, <=, >=, <, >, //,
              /, !=
 

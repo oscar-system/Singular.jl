@@ -42,7 +42,7 @@ end
 
 isunit(n::n_Q) = !iszero(n)
 
-function num(n::n_Q)
+function numerator(n::n_Q)
    nn = libSingular.number_ref(n.ptr);
    p = libSingular.n_GetNumerator(nn, parent(n).ptr)
    pp = libSingular.nApplyMapFunc(n_Q_2_n_Z, p, QQ.ptr, ZZ.ptr)
@@ -50,7 +50,7 @@ function num(n::n_Q)
    return ZZ(pp)
 end
 
-function den(n::n_Q)
+function denominator(n::n_Q)
    nn = libSingular.number_ref(n.ptr);
    p = libSingular.n_GetDenom(nn, parent(n).ptr)
    pp = libSingular.nApplyMapFunc(n_Q_2_n_Z, p, QQ.ptr, ZZ.ptr)

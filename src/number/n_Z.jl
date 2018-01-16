@@ -40,15 +40,15 @@ function iszero(n::n_Z)
    return libSingular.n_IsZero(n.ptr, c.ptr)
 end
 
-isunit(n::n_Z) = !iszero(n)
+isunit(n::n_Z) = n == 1 || n == -1
 
-function num(n::n_Z)
+function numerator(n::n_Z)
    par = parent(n)
    r = libSingular.n_Copy(n.ptr, par.ptr)
    return par(r)
 end
 
-function den(n::n_Z)
+function denominator(n::n_Z)
    return one(parent(n))
 end
 
