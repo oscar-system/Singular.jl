@@ -133,12 +133,17 @@ function id_Syzygies(I:: ideal, R::ring)
 end
 
 function id_fres(I::ideal, n::Cint, method::String, R::ring)
-   icxx"""const ring origin = currRing;
-          rChangeCurrRing($R);
-          resolvente r = syFrank($I, $n, $method)->fullres;
-          rChangeCurrRing(origin);
-          (resolvente) r;
-       """
+   s = icxx"""const ring origin = currRing;
+         rChangeCurrRing($R);
+         printf("n before syFrank: %d\n", $n);
+         syStrategy s = syFrank($I, $n, $method);
+         printf("from syFrank: %d\n", s->length);
+         rChangeCurrRing(origin);
+         s;
+      """
+   r = icxx"""$s->fullres;"""
+   length = icxx"""$s->length;"""
+   r, Int(length)
 end
 
 function id_sres(I:: ideal, n::Cint, len::Ptr{Cint}, R::ring)
