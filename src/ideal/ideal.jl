@@ -250,8 +250,8 @@ function fres{T <: Nemo.RingElem}(id::sideal{T}, max_length::Int,
          && method != "extended frame")
       error("wrong optional argument for fres")
    end
-   r = libSingular.id_fres(id.ptr, Cint(max_length), method, R.ptr)
-   return sresolution{T}(R, max_length, r)
+   r, length = libSingular.id_fres(id.ptr, Cint(max_length), method, R.ptr)
+   return sresolution{T}(R, length, r)
 end
 
 function sres{T <: Nemo.RingElem}(I::sideal{T}, n::Int)

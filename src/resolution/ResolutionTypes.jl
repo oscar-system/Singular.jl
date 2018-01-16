@@ -33,6 +33,6 @@ end
 
 function _sresolution_clear_fn(r::sresolution)
    for i = 1:r.len
-      libSingular.sy_Delete(r.ptr, Cint(i), r.base_ring.ptr)
+      libSingular.sy_Delete(r.ptr, Cint(i-1), r.base_ring.ptr)
    end
 end
