@@ -1,10 +1,12 @@
+export n_GF, N_GField
+
 ###############################################################################
 #
 #   Data type and parent methods
 #
 ###############################################################################
 
-elem_type(::N_GField) = n_GF
+elem_type(::Type{N_GField}) = n_GF
 
 parent(a::n_GF) = a.parent
 
@@ -158,10 +160,6 @@ end
 #
 ###############################################################################
 
-function isless(x::n_GF, y::n_GF)
-    libSingular.n_Greater(y.ptr, x.ptr, parent(x).ptr)
-end
-
 function ==(x::n_GF, y::n_GF)
     return libSingular.n_Equal(x.ptr, y.ptr, parent(x).ptr)
 end
@@ -215,32 +213,11 @@ function inv(x::n_GF)
    return c(p)
 end
 
-function div(x::n_GF, y::n_GF)
+function divexact(x::n_GF, y::n_GF)
    c = parent(x)
    p = libSingular.n_Div(x.ptr, y.ptr, c.ptr)
    return c(p)
 end
-
-divexact(x::n_GF, y::n_GF) = div(x, y)
-
-###############################################################################
-#
-#   Euclidean division
-#
-###############################################################################
-
-function divrem(x::n_GF, y::n_GF)
-   par = parent(x)
-   r = [libSingular.n_Init(0, par.ptr)]
-   q = libSingular.n_QuotRem(x.ptr, y.ptr, pointer(r), par.ptr)
-   return par(q), par(r[])
-end
-
-function rem(x::n_GF, y::n_GF)
-   return parent(x)()
-end
-
-mod(x::n_GF, y::n_GF) = rem(x, y)
 
 ###############################################################################
 #
@@ -255,13 +232,6 @@ function gcd(x::n_GF, y::n_GF)
    par = parent(x)
    p = libSingular.n_Gcd(x.ptr, y.ptr, par.ptr)
    return par(p)
-end
-
-function lcm(x::n_GF, y::n_GF)
-   if x == 0 && y == 0
-      return zero(parent(x))
-   end
-   return div(x*y, gcd(x, y))
 end
 
 ###############################################################################
@@ -368,6 +338,6 @@ function FiniteField(p::Int, n::Int, S::String; cached=true)
    n*log(p) >= 20*log(2) && throw(DomainError())
    p^n >= 2^16 && throw(DomainError())
    n == 1 && error("Degree one finite fields not supported. Please use SingularFp")
-   par = N_GField(p, n, symbol(S))
+   par = N_GField(p, n, Symbol(S))
    return par, par(libSingular.n_Param(Cint(1), par.ptr))
 end
