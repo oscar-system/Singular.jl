@@ -43,7 +43,9 @@ end
 function test_n_Zp_printing()
    print("n_Zp.printing...")
 
-   @test string(ZZ(123)) == "123"
+   R = Fp(5)
+
+   @test string(R(3)) == "-2"
 
    println("PASS")
 end
@@ -51,20 +53,16 @@ end
 function test_n_Zp_manipulation()
    print("n_Zp.manipulation...")
 
-   @test isone(one(ZZ))
-   @test iszero(zero(ZZ))
-   @test isunit(ZZ(1)) && isunit(ZZ(1))
-   @test !isunit(ZZ(2)) && !isunit(ZZ(0)) 
+   R = Fp(5)
 
-   @test numerator(ZZ(2)) == 2
-   @test denominator(ZZ(2)) == 1
-   @test denominator(ZZ()) == 1
+   @test isone(one(R))
+   @test iszero(zero(R))
+   @test isunit(R(1)) && isunit(R(2))
+   @test !isunit(R(0)) 
 
-   @test abs(ZZ(-2)) == 2
-   @test abs(ZZ(2)) == 2
-   @test abs(ZZ()) == 0
+   @test characteristic(R) == 5
 
-   @test deepcopy(ZZ(2)) == ZZ(2)
+   @test deepcopy(R(2)) == R(2)
 
    println("PASS")
 end
