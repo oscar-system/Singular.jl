@@ -47,7 +47,7 @@ function test_n_Z_manipulation()
 
    @test isone(one(ZZ))
    @test iszero(zero(ZZ))
-   @test isunit(ZZ(1)) && isunit(ZZ(1))
+   @test isunit(ZZ(1)) && isunit(ZZ(-1))
    @test !isunit(ZZ(2)) && !isunit(ZZ(0)) 
 
    @test numerator(ZZ(2)) == 2
