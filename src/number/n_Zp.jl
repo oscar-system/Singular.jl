@@ -1,10 +1,12 @@
+export n_Zp, N_ZpField
+
 ###############################################################################
 #
 #   Data type and parent methods
 #
 ###############################################################################
 
-elem_type(::N_ZpField) = n_Zp
+elem_type(::Type{N_ZpField}) = n_Zp
 
 parent(a::n_Zp) = a.parent
 
