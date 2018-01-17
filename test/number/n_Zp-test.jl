@@ -111,12 +111,10 @@ end
 function test_n_Zp_comparison()
    print("n_Zp.comparison...")
 
-   @test ZZ(2) < ZZ(3)
-   @test ZZ(2) <= ZZ(3)
-   @test ZZ(3) > ZZ(2)
-   @test ZZ(3) >= ZZ(3)
-   @test ZZ(2) == ZZ(2)
-   @test isequal(ZZ(2), ZZ(2))
+   R = Fp(5)
+
+   @test R(2) == R(2)
+   @test isequal(R(2), R(2))
 
    println("PASS")
 end
@@ -124,18 +122,12 @@ end
 function test_n_Zp_adhoc_comparison()
    print("n_Zp.ad_hoc_comparison...")
 
-   @test ZZ(2) < 3
-   @test ZZ(2) <= 3
-   @test 2 < ZZ(3)
-   @test 2 <= ZZ(3)
-   @test ZZ(3) > 2
-   @test ZZ(3) >= 3
-   @test 3 > ZZ(2)
-   @test 3 >= ZZ(3)
-   @test ZZ(2) == 2
-   @test 2 == ZZ(2)
-   @test isequal(ZZ(2), 2)
-   @test isequal(2, ZZ(2))
+   R = Fp(5)
+
+   @test R(2) == 2
+   @test 2 == R(2)
+   @test isequal(R(2), 2)
+   @test isequal(2, R(2))
 
    println("PASS")
 end
