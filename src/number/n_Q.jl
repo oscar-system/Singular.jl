@@ -1,4 +1,4 @@
-export reconstruct, isone, iszero, isunit, divexact
+export n_Q, Rationals, reconstruct, isone, iszero, isunit, divexact
 
 ###############################################################################
 #
@@ -6,7 +6,7 @@ export reconstruct, isone, iszero, isunit, divexact
 #
 ###############################################################################
 
-elem_type(::Rationals) = n_Q
+elem_type(::Type{Rationals}) = n_Q
 
 parent(a::n_Q) = QQ
 
@@ -226,30 +226,10 @@ function inv(x::n_Q)
    return c(p)
 end
 
-function div(x::n_Q, y::n_Q)
-   c = parent(x)
-   p = libSingular.n_Div(x.ptr, y.ptr, c.ptr)
-   return c(p)
-end
-
 function divexact(x::n_Q, y::n_Q)
    c = parent(x)
    p = libSingular.n_Div(x.ptr, y.ptr, c.ptr)
    return c(p)
-end
-
-###############################################################################
-#
-#   Euclidean division
-#
-###############################################################################
-
-function divrem(x::n_Q, y::n_Q)
-   return div(x, y), zero(parent(x)) 
-end
-
-function rem(x::n_Q, y::n_Q)
-   return zero(parent(x))
 end
 
 ###############################################################################
@@ -263,7 +243,7 @@ function gcd(x::n_Q, y::n_Q)
       return zero(parent(x))
    end
    par = parent(x)
-   p = libSingular.n_SubringGcd(x.ptr, y.ptr, par.ptr)
+   p = libSingular.n_Gcd(x.ptr, y.ptr, par.ptr)
    return par(p)
 end
 
@@ -271,7 +251,7 @@ function lcm(x::n_Q, y::n_Q)
    if x == 0 && y == 0
       return zero(parent(x))
    end
-   return div(x*y, gcd(x, y))
+   return divexact(x*y, gcd(x, y))
 end
 
 ###############################################################################
@@ -349,7 +329,7 @@ promote_rule(C::Type{n_Q}, ::Type{n_Q}) = n_Z
 
 (::Rationals)(n::n_Z) = n_Q(n)
 
-(::Integers)(n::n_Q) = n
+(::Rationals)(n::n_Q) = n
 
 (::Rationals)(n::libSingular.number) = n_Q(n) 
 

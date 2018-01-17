@@ -302,12 +302,13 @@ function (R::N_GField)(n::Int)
    return z
 end
 
-function (R::N_GField)(n::n_Z)
-   m = libSingular.nApplyMapFunc(R.from_n_Z, n.ptr, parent(n).ptr, R.ptr)
-   z = n_GF(R, m)
-   z.parent = R
-   return z
-end
+# not currently implemented
+# function (R::N_GField)(n::n_Z)
+#    m = libSingular.nApplyMapFunc(R.from_n_Z, n.ptr, parent(n).ptr, R.ptr)
+#    z = n_GF(R, m)
+#    z.parent = R
+#    return z
+# end
 
 (R::N_GField)(n::n_GF) = n
 

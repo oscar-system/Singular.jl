@@ -64,6 +64,8 @@ function test_n_Zp_manipulation()
 
    @test deepcopy(R(2)) == R(2)
 
+   @test Int(R(2)) == 2
+
    println("PASS")
 end
 
