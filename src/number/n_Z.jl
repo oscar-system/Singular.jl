@@ -244,7 +244,10 @@ function rem(x::n_Z, y::n_Z)
    return par(r)
 end
 
-mod(x::n_Z, y::n_Z) = rem(x, y)
+function mod(x::n_Z, y::n_Z)
+   d = rem(x, y)
+   return d < 0 ? d + abs(y) : d
+end
 
 ###############################################################################
 #

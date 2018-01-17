@@ -130,6 +130,84 @@ function test_n_Z_adhoc_comparison()
    println("PASS")
 end
 
+function test_n_Z_powering()
+   print("n_Z.powering...")
+
+   @test ZZ(2)^10 == 1024
+
+   println("PASS")
+end
+
+function test_n_Z_exact_division()
+   print("n_Z.exact_division...")
+
+   @test divexact(ZZ(12), ZZ(2)) == 6
+
+   println("PASS")
+end
+
+function test_n_Z_euclidean_division()
+   print("n_Z.euclidean_division...")
+
+   @test div(ZZ(7), ZZ(3)) == 2
+   @test rem(ZZ(4), ZZ(3)) == 1
+   @test mod(ZZ(7), ZZ(3)) == 1
+   @test rem(ZZ(-2), ZZ(3)) == -2
+   @test rem(ZZ(2), ZZ(-3)) == 2
+   @test rem(ZZ(-2), ZZ(-3)) == -2
+   @test mod(ZZ(-2), ZZ(3)) == 1
+   @test mod(ZZ(2), ZZ(-3)) == 2
+   @test mod(ZZ(-2), ZZ(-3)) == 1
+
+   println("PASS")
+end
+
+function test_n_Z_gcd_lcm()
+   print("n_Z.gcd_lcm...")
+
+   @test gcd(ZZ(6), ZZ(12)) == 6
+   @test gcd(ZZ(-6), ZZ(12)) == 6
+   @test gcd(ZZ(6), ZZ(-12)) == 6
+   @test gcd(ZZ(-6), ZZ(-12)) == 6
+
+   @test lcm(ZZ(4), ZZ(6)) == 12
+
+   println("PASS")
+end
+
+function test_n_Z_extended_gcd()
+   print("n_Z.extended_gcd...")
+
+   g, s, t = gcdx(ZZ(4), ZZ(6))
+
+   @test s*ZZ(4) + t*ZZ(6) == g
+
+   println("PASS")
+end
+
+function test_n_Z_chinese_remainder()
+   print("n_Z.chinese_remainder...")
+
+   # @test crt(ZZ(2), ZZ(3), ZZ(3), ZZ(7), true) == -4
+   # @test crt(ZZ(2), ZZ(3), ZZ(3), ZZ(7), false) == 17
+
+   println("PASS")
+end
+
+function test_n_Z_Polynomials()
+   print("n_Z.Polynomials...")
+
+   R, x = Nemo.PolynomialRing(ZZ, "x")
+
+   f = 1 + 2x + 3x^2
+
+   g = f^2
+
+   @test g == 9*x^4+12*x^3+10*x^2+4*x+1
+
+   println("PASS")
+end
+
 function test_n_Z()
    test_n_Z_constructors()
    test_n_Z_printing()
@@ -139,6 +217,13 @@ function test_n_Z()
    test_n_Z_adhoc_binary()
    test_n_Z_comparison()
    test_n_Z_adhoc_comparison()
+   test_n_Z_powering()
+   test_n_Z_exact_division()
+   test_n_Z_euclidean_division()
+   test_n_Z_gcd_lcm()
+   test_n_Z_extended_gcd()
+   test_n_Z_chinese_remainder()
+   test_n_Z_Polynomials()
 
    println("")
 end
