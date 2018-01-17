@@ -70,8 +70,10 @@ end
 function test_n_Zp_unary_ops()
    print("n_Zp.unary_ops...")
 
-   @test -ZZ(123) == -123
-   @test -ZZ() == 0
+   R = Fp(5)
+
+   @test -R(3) == R(2)
+   @test -R() == R()
 
    println("PASS")
 end
@@ -79,12 +81,14 @@ end
 function test_n_Zp_binary_ops()
    print("n_Zp.binary_ops...")
 
-   a = ZZ(2)
-   b = ZZ(3)
+   R = Fp(5)
 
-   @test a + b == 5
-   @test a - b == -1
-   @test a*b == 6
+   a = R(2)
+   b = R(3)
+
+   @test a + b == R(0)
+   @test a - b == R(4)
+   @test a*b == R(1)
 
    println("PASS")
 end
@@ -92,12 +96,14 @@ end
 function test_n_Zp_adhoc_binary()
    print("n_Zp.adhoc_binary...")
 
-   @test ZZ(2) + 3 == 5
-   @test 2 + ZZ(3) == 5
-   @test ZZ(2) - 3 == -1
-   @test 2 - ZZ(3) == -1
-   @test 2*ZZ(3) == 6
-   @test ZZ(2)*3 == 6
+   R = Fp(5)
+
+   @test R(2) + 3 == R(0)
+   @test 2 + R(3) == R(0)
+   @test R(2) - 3 == R(4)
+   @test 2 - R(3) == R(4)
+   @test 2*R(3) == R(1)
+   @test R(2)*3 == R(1)
 
    println("PASS")
 end
