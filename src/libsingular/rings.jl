@@ -40,6 +40,22 @@ function  rVar(r::ring)
    icxx"""rVar($r);"""
 end
 
+function rSetOption_redSB(r::ring)
+   icxx"""const ring origin = currRing;
+          rChangeCurrRing($r);
+          si_opt_1 |= Sy_bit(OPT_REDSB);
+          rChangeCurrRing(origin);
+       """
+end
+
+function rSetOption_redTail(r::ring)
+   icxx"""const ring origin = currRing;
+          rChangeCurrRing($r);
+          si_opt_1 |= Sy_bit(OPT_REDTAIL);
+          rChangeCurrRing(origin);
+       """
+end
+
 function p_Delete(p::poly, r::ring)
    icxx"""p_Delete(&$p, $r);"""
 end
@@ -102,6 +118,15 @@ end
 
 function pSetCoeff0(a::poly, c::Clong, r::ring)
    icxx"""number n = n_Init($c,$r); p_SetCoeff0($a,n,$r);"""
+end
+
+function pLDeg(a::poly, r::ring)
+   icxx"""long res;
+          int dummy;
+          if ($a != NULL) res = $r->pLDeg($a, &dummy, $r);
+          else res = -1;
+          res;
+       """
 end
 
 function p_Add_q(a::poly, b::poly, r::ring)

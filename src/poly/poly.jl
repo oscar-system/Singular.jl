@@ -1,4 +1,4 @@
-export ngens, coeff, isgen, content, primpart, lead_exponent
+export ngens, coeff, isgen, content, primpart, lead_exponent, option!, degree
 
 ###############################################################################
 #
@@ -23,6 +23,17 @@ characteristic(R::PolyRing) = Int(libSingular.rChar(R.ptr))
 function gens(R::PolyRing)
    n = ngens(R)
    return [R(libSingular.rGetVar(Cint(i), R.ptr)) for i = 1:n]
+end
+
+function option!(r::PolyRing, opt::Symbol)
+   if opt == :redSB
+      libSingular.rSetOption_redSB(r.ptr)
+   elseif opt == :redTail
+      libSingular.rSetOption_redTail(r.ptr)
+   else
+      error("option " * string(opt) * " not recognized")
+   end
+   r
 end
 
 zero(R::PolyRing) = R()
@@ -136,6 +147,11 @@ function exponent!(A::Array{Int, 1}, p::spoly, i::Int)
    end
    libSingular.p_GetExpVL(ptr, A, R.ptr)
    return A
+end
+
+function degree(p::spoly)
+   R = parent(p)
+   libSingular.pLDeg(p.ptr, R.ptr)
 end
 
 mutable struct coeffs_expos

@@ -1,5 +1,5 @@
-export syz, lead, normalize!, isconstant, iszerodim, sres, lres, intersection,
-       quotient, reduce, eliminate
+export sideal, IdealSet, syz, lead, normalize!, isconstant, iszerodim, fres,
+       sres, lres, intersection, quotient, reduce, eliminate
 
 ###############################################################################
 #
@@ -235,6 +235,24 @@ end
 #   Resolutions
 #
 ###############################################################################
+
+function fres{T <: Nemo.RingElem}(id::sideal{T}, max_length::Int,
+      method::String="complete")
+   id.isGB == false && error("ideal is not a standard basis")
+   max_length < 0 && error("length for fres must not be negative")
+   R = base_ring(id)
+   if max_length == 0
+        max_length = ngens(R)+1
+        # TODO: consider qrings
+   end
+   if (method != "complete"
+         && method != "frame"
+         && method != "extended frame")
+      error("wrong optional argument for fres")
+   end
+   r, length = libSingular.id_fres(id.ptr, Cint(max_length), method, R.ptr)
+   return sresolution{T}(R, length, r)
+end
 
 function sres{T <: Nemo.RingElem}(I::sideal{T}, n::Int)
    I.isGB == false && error("Not a Groebner basis ideal")

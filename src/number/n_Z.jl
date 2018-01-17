@@ -1,4 +1,4 @@
-export crt
+export n_Z, Integers, crt
 
 ###############################################################################
 #
@@ -6,15 +6,15 @@ export crt
 #
 ###############################################################################
 
-elem_type(::Integers) = n_Z
+elem_type(::Type{Integers}) = n_Z
 
 parent(a::n_Z) = ZZ
 
 parent_type(::Type{n_Z}) = Integers
 
-base_ring(a::n_Z) = ZZ
+base_ring(a::n_Z) = Union{}
 
-base_ring(a::Integers) = ZZ
+base_ring(a::Integers) = Union{}
 
 function deepcopy(a::n_Z)
    return parent(a)(libSingular.n_Copy(a.ptr, parent(a).ptr))
@@ -40,15 +40,15 @@ function iszero(n::n_Z)
    return libSingular.n_IsZero(n.ptr, c.ptr)
 end
 
-isunit(n::n_Z) = !iszero(n)
+isunit(n::n_Z) = n == 1 || n == -1
 
-function num(n::n_Z)
+function numerator(n::n_Z)
    par = parent(n)
    r = libSingular.n_Copy(n.ptr, par.ptr)
    return par(r)
 end
 
-function den(n::n_Z)
+function denominator(n::n_Z)
    return one(parent(n))
 end
 
@@ -244,7 +244,10 @@ function rem(x::n_Z, y::n_Z)
    return par(r)
 end
 
-mod(x::n_Z, y::n_Z) = rem(x, y)
+function mod(x::n_Z, y::n_Z)
+   d = rem(x, y)
+   return d < 0 ? d + abs(y) : d
+end
 
 ###############################################################################
 #

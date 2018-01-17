@@ -362,7 +362,7 @@ end
 function Fp(a::Int; cached=true)
    a == 0 && throw(DivideError())
    a < 0 && throw(DomainError())
-   !Nemo.isprime(UInt(a)) && throw(DomainError())
+   !Nemo.isprime(Nemo.fmpz(a)) && throw(DomainError())
 
    return N_ZpField(a)
 end
