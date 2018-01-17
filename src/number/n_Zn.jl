@@ -1,4 +1,4 @@
-export characteristic
+export n_Zn, N_ZnRing, characteristic
 
 ###############################################################################
 #
@@ -6,7 +6,7 @@ export characteristic
 #
 ###############################################################################
 
-elem_type(::N_ZnRing) = n_Zn
+elem_type(::Type{N_ZnRing}) = n_Zn
 
 parent(a::n_Zn) = a.parent
 
@@ -156,10 +156,6 @@ end
 #
 ###############################################################################
 
-function isless(x::n_Zn, y::n_Zn)
-    libSingular.n_Greater(y.ptr, x.ptr, parent(x).ptr)
-end
-
 function ==(x::n_Zn, y::n_Zn)
     return libSingular.n_Equal(x.ptr, y.ptr, parent(x).ptr)
 end
@@ -206,38 +202,11 @@ end
 #
 ###############################################################################
 
-function div(x::n_Zn, y::n_Zn)
-   c = parent(x)
-   p = libSingular.n_Div(x.ptr, y.ptr, c.ptr)
-   return c(p)
-end
-
 function divexact(x::n_Zn, y::n_Zn)
    c = parent(x)
    p = libSingular.n_ExactDiv(x.ptr, y.ptr, c.ptr)
    return c(p)
 end
-
-###############################################################################
-#
-#   Euclidean division
-#
-###############################################################################
-
-function divrem(x::n_Zn, y::n_Zn)
-   par = parent(x)
-   r = [libSingular.n_Init(0, par.ptr)]
-   q = libSingular.n_QuotRem(x.ptr, y.ptr, pointer(r), par.ptr)
-   return par(q), par(r)
-end
-
-function rem(x::n_Zn, y::n_Zn)
-   par = parent(x)
-   r = libSingular.n_IntMod(x.ptr, y.ptr, par.ptr)
-   return par(r)
-end
-
-mod(x::n_Zn, y::n_Zn) = rem(x, y)
 
 ###############################################################################
 #
@@ -249,13 +218,6 @@ function gcd(x::n_Zn, y::n_Zn)
    par = parent(x)
    p = libSingular.n_Gcd(x.ptr, y.ptr, par.ptr)
    return par(p)
-end
-
-function lcm(x::n_Zn, y::n_Zn)
-   if x == 0 && y == 0
-      return zero(parent(x))
-   end
-   return div(x*y, gcd(x, y))
 end
 
 ###############################################################################
