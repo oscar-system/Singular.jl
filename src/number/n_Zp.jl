@@ -158,10 +158,6 @@ end
 #
 ###############################################################################
 
-function isless(x::n_Zp, y::n_Zp)
-    libSingular.n_Greater(y.ptr, x.ptr, parent(x).ptr)
-end
-
 function ==(x::n_Zp, y::n_Zp)
     return libSingular.n_Equal(x.ptr, y.ptr, parent(x).ptr)
 end
@@ -214,32 +210,11 @@ function inv(x::n_Zp)
    return c(p)
 end
 
-function div(x::n_Zp, y::n_Zp)
+function divexact(x::n_Zp, y::n_Zp)
    c = parent(x)
    p = libSingular.n_Div(x.ptr, y.ptr, c.ptr)
    return c(p)
 end
-
-divexact(x::n_Zp, y::n_Zp) = div(x, y)
-
-###############################################################################
-#
-#   Euclidean division
-#
-###############################################################################
-
-function divrem(x::n_Zp, y::n_Zp)
-   par = parent(x)
-   r = [libSingular.n_Init(0, par.ptr)]
-   q = libSingular.n_QuotRem(x.ptr, y.ptr, pointer(r), par.ptr)
-   return par(q), par(r[])
-end
-
-function rem(x::n_Zp, y::n_Zp)
-   return parent(x)()
-end
-
-mod(x::n_Zp, y::n_Zp) = rem(x, y)
 
 ###############################################################################
 #
@@ -254,13 +229,6 @@ function gcd(x::n_Zp, y::n_Zp)
    par = parent(x)
    p = libSingular.n_Gcd(x.ptr, y.ptr, par.ptr)
    return par(p)
-end
-
-function lcm(x::n_Zp, y::n_Zp)
-   if x == 0 && y == 0
-      return zero(parent(x))
-   end
-   return div(x*y, gcd(x, y))
 end
 
 ###############################################################################

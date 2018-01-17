@@ -135,7 +135,9 @@ end
 function test_n_Zp_powering()
    print("n_Zp.powering...")
 
-   @test ZZ(2)^10 == 1024
+   R = Fp(5)
+
+   @test R(2)^10 == R(4)
 
    println("PASS")
 end
@@ -143,23 +145,10 @@ end
 function test_n_Zp_exact_division()
    print("n_Zp.exact_division...")
 
-   @test divexact(ZZ(12), ZZ(2)) == 6
+   R = Fp(5)
 
-   println("PASS")
-end
-
-function test_n_Zp_euclidean_division()
-   print("n_Zp.euclidean_division...")
-
-   @test div(ZZ(7), ZZ(3)) == 2
-   @test rem(ZZ(4), ZZ(3)) == 1
-   @test mod(ZZ(7), ZZ(3)) == 1
-   @test rem(ZZ(-2), ZZ(3)) == -2
-   @test rem(ZZ(2), ZZ(-3)) == 2
-   @test rem(ZZ(-2), ZZ(-3)) == -2
-   @test mod(ZZ(-2), ZZ(3)) == 1
-   @test mod(ZZ(2), ZZ(-3)) == 2
-   @test mod(ZZ(-2), ZZ(-3)) == 1
+   @test inv(R(2)) == R(3)
+   @test divexact(R(2), R(3)) == R(4)
 
    println("PASS")
 end
@@ -167,31 +156,10 @@ end
 function test_n_Zp_gcd_lcm()
    print("n_Zp.gcd_lcm...")
 
-   @test gcd(ZZ(6), ZZ(12)) == 6
-   @test gcd(ZZ(-6), ZZ(12)) == 6
-   @test gcd(ZZ(6), ZZ(-12)) == 6
-   @test gcd(ZZ(-6), ZZ(-12)) == 6
+   R = Fp(5)
 
-   @test lcm(ZZ(4), ZZ(6)) == 12
-
-   println("PASS")
-end
-
-function test_n_Zp_extended_gcd()
-   print("n_Zp.extended_gcd...")
-
-   g, s, t = gcdx(ZZ(4), ZZ(6))
-
-   @test s*ZZ(4) + t*ZZ(6) == g
-
-   println("PASS")
-end
-
-function test_n_Zp_chinese_remainder()
-   print("n_Zp.chinese_remainder...")
-
-   # @test crt(ZZ(2), ZZ(3), ZZ(3), ZZ(7), true) == -4
-   # @test crt(ZZ(2), ZZ(3), ZZ(3), ZZ(7), false) == 17
+   @test gcd(R(2), R(3)) == R(1)
+   @test gcd(R(0), R(0)) == R(0)
 
    println("PASS")
 end
@@ -199,13 +167,14 @@ end
 function test_n_Zp_Polynomials()
    print("n_Zp.Polynomials...")
 
-   R, x = Nemo.PolynomialRing(ZZ, "x")
+   R = Fp(5)
+   S, x = Nemo.PolynomialRing(R, "x")
 
    f = 1 + 2x + 3x^2
 
    g = f^2
 
-   @test g == 9*x^4+12*x^3+10*x^2+4*x+1
+   @test g == -x^4+2*x^3-x+1
 
    println("PASS")
 end
@@ -221,10 +190,7 @@ function test_n_Zp()
    test_n_Zp_adhoc_comparison()
    test_n_Zp_powering()
    test_n_Zp_exact_division()
-   test_n_Zp_euclidean_division()
    test_n_Zp_gcd_lcm()
-   test_n_Zp_extended_gcd()
-   test_n_Zp_chinese_remainder()
    test_n_Zp_Polynomials()
 
    println("")
