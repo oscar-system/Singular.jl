@@ -1,4 +1,5 @@
-export ngens, coeff, isgen, content, primpart, lead_exponent, option!, degree
+export spoly, PolyRing, coeff, coeffs_expos, degree, exponent!, isgen, content,
+       exponent, lead_exponent, ngens, option!, primpart
 
 ###############################################################################
 #
@@ -8,13 +9,13 @@ export ngens, coeff, isgen, content, primpart, lead_exponent, option!, degree
 
 parent(p::spoly) = p.parent
 
-base_ring(R::PolyRing) = R.base_ring
+base_ring(R::PolyRing{T}) where T <: Nemo.RingElem = R.base_ring
 
 base_ring(p::spoly) = base_ring(parent(p))
 
-elem_type{T <: Nemo.RingElem}(::PolyRing{T}) = spoly{T}
+elem_type(::Type{PolyRing{T}}) where T <: Nemo.RingElem = spoly{T}
 
-parent_type{T <: Nemo.RingElem}(::Type{spoly{T}}) = PolyRing{T}
+parent_type(::Type{spoly{T}}) where T <: Nemo.RingElem = PolyRing{T}
 
 ngens(R::PolyRing) = Int(libSingular.rVar(R.ptr))
 
@@ -55,7 +56,7 @@ function isgen(p::spoly)
    n = 0
    for i = 1:ngens(R)
       d = libSingular.p_GetExp(p.ptr, Cint(i), R.ptr)
-      if d > 1
+      if d > 1 || d == 0
          return false
       elseif d == 1
          if n == 1
