@@ -16,17 +16,13 @@ function syBetti(res::resolvente, length::Cint, R::ring)
       """
    nrows = icxx"""$iv->rows();"""
    ncols = icxx"""$iv->cols();"""
-   betti = icxx"""int **betti = (int **)malloc($ncols*sizeof(int *));
-         betti[0] = (int *)malloc($ncols*$nrows*sizeof(int));
-         for (int i = 0; i < $ncols; i++) {
-            betti[i] = (*betti + $nrows*i);
-         }
+   betti = icxx"""int *betti = (int *)malloc($ncols*$nrows*sizeof(int));
          for (int i = 0; i < $ncols; i++) {
             for (int j = 0; j < $nrows; j++) {
-               betti[i][j] = IMATELEM(*$iv, j+1, i+1);
+               betti[i*$nrows+j] = IMATELEM(*$iv, j+1, i+1);
             }
          }
-         return &betti[0][0];
+         return &betti[0];
       """
    unsafe_wrap(Array, betti, (nrows, ncols), true)
 end
