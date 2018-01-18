@@ -1,3 +1,5 @@
+export betti
+
 ###############################################################################
 #
 #   Basic manipulation
@@ -20,6 +22,10 @@ function getindex(r::sresolution, i::Int)
       ptr = libSingular.id_Copy(ptr, R.ptr)
    end
    return Module(R, ptr)
+end
+
+function betti(r::sresolution)
+   libSingular.syBetti(r.ptr, Cint(r.len), r.base_ring.ptr)
 end
 
 ###############################################################################
