@@ -84,6 +84,10 @@ function p_GetExp(p::poly, i::Cint, r::ring)
    icxx"""p_GetExp($p, $i, $r);"""
 end
 
+function p_GetComp(p::poly, r::ring)
+   icxx"""p_GetComp($p, $r);"""
+end
+
 function p_String(p::poly, r::ring)
    icxx"""p_String($p, $r);"""
 end
