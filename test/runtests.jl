@@ -7,7 +7,9 @@ else
 end
 
 include("../test/number-test.jl")
+include("../test/poly-test.jl")
 
 test_number()
+test_poly()
 
 
