@@ -22,6 +22,7 @@ function syBetti(res::resolvente, length::Cint, R::ring)
                betti[i*$nrows+j] = IMATELEM(*$iv, j+1, i+1);
             }
          }
+         delete($iv);
          return &betti[0];
       """
    unsafe_wrap(Array, betti, (nrows, ncols), true)
