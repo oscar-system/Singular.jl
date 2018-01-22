@@ -42,13 +42,14 @@ end
 function show(io::IO, r::sresolution)
    println(io, "Singular Resolution:")
    if r.len > 0
-      print(io, "R^", rank(r[1]))
+      ptr = libSingular.getindex(r.ptr, Cint(0))
+      print(io, "R^", libSingular.rank(ptr))
    end
    for i = 2:r.len
-      m = r[i]
-      if m.ptr == C_NULL
+      ptr = libSingular.getindex(r.ptr, Cint(i-1))
+      if ptr == C_NULL
          break
       end
-      print(io, " <- R^", rank(m))
+      print(io, " <- R^", libSingular.rank(ptr))
    end
 end
