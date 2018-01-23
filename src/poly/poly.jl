@@ -1,5 +1,5 @@
 export spoly, PolyRing, coeff, coeffs_expos, degree, exponent!, isgen, content,
-       exponent, lead_exponent, ngens, option!, primpart
+       exponent, lead_exponent, ngens, option!, primpart, @PolynomialRing
 
 ###############################################################################
 #
@@ -515,3 +515,27 @@ function PolynomialRing(R::Nemo.Ring, s::Array{String, 1}; cached::Bool = true, 
    return tuple(parent_obj, gens(parent_obj))
 end
 
+macro PolynomialRing(R, s, n, o)
+   v = [s*string(i) for i in 1:n]
+   w = [Symbol(str) for str in v]
+   sym = eval(o)
+   R1 = eval(R)
+   S, y = PolynomialRing(R1, v; ordering=sym)
+   for i = 1:n
+      eval(:(global $(w[i]) = $(y[i])))
+      eval(:(export $(w[i])))
+   end
+   return S
+end
+
+macro PolynomialRing(R, s, n)
+   v = [s*string(i) for i in 1:n]
+   w = [Symbol(str) for str in v]
+   R1 = eval(R)
+   S, y = PolynomialRing(R1, v)
+   for i = 1:n
+      eval(:(global $(w[i]) = $(y[i])))
+      eval(:(export $(w[i])))
+   end
+   return S
+end
