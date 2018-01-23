@@ -516,26 +516,20 @@ function PolynomialRing(R::Nemo.Ring, s::Array{String, 1}; cached::Bool = true, 
 end
 
 macro PolynomialRing(R, s, n, o)
-   v = [s*string(i) for i in 1:n]
-   w = [Symbol(str) for str in v]
-   sym = eval(o)
-   R1 = eval(R)
-   S, y = PolynomialRing(R1, v; ordering=sym)
-   for i = 1:n
-      eval(:(global $(w[i]) = $(y[i])))
-      eval(:(export $(w[i])))
-   end
-   return S
+   S = gensym()
+   v0 = [s*string(i) for i in 1:n]
+   exp1 = :(($S, y) = PolynomialRing($R, $v0; ordering=$o))
+   v = [:($(Symbol(s, i)) = y[$i]) for i in 1:n]
+   v1 = Expr(:block, exp1, v..., S)
+   return esc(v1)
 end
 
 macro PolynomialRing(R, s, n)
-   v = [s*string(i) for i in 1:n]
-   w = [Symbol(str) for str in v]
-   R1 = eval(R)
-   S, y = PolynomialRing(R1, v)
-   for i = 1:n
-      eval(:(global $(w[i]) = $(y[i])))
-      eval(:(export $(w[i])))
-   end
-   return S
+   S = gensym()
+   v0 = [s*string(i) for i in 1:n]
+   exp1 = :(($S, y) = PolynomialRing($R, $v0))
+   v = [:($(Symbol(s, i)) = y[$i]) for i in 1:n]
+   v1 = Expr(:block, exp1, v..., S)
+   return esc(v1)
 end
+
