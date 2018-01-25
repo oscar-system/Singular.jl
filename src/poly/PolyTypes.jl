@@ -4,17 +4,22 @@
 #
 ###############################################################################
 
-const PolyRingID = Dict{Tuple{Union{Ring, Field}, Array{Symbol, 1}, libSingular.rRingOrder_t}, Ring}()
+const PolyRingID = Dict{Tuple{Union{Ring, Field}, Array{Symbol, 1}, libSingular.rRingOrder_t, Int}, Ring}()
 
 type PolyRing{T <: Nemo.RingElem} <: Ring
    ptr::libSingular.ring
    base_ring::Union{Ring, Field}
    refcount::Int
 
-   function PolyRing{T}(R::Union{Ring, Field}, s::Array{Symbol, 1}, cached::Bool = true, 
-                            ordering::libSingular.rRingOrder_t = ringorder_dp) where T
-      if haskey(PolyRingID, (R, s, ordering))
-         return PolyRingID[R, s, ordering]::PolyRing{T}
+   function PolyRing{T}(R::Union{Ring, Field}, s::Array{Symbol, 1},
+         cached::Bool = true,
+         ordering::libSingular.rRingOrder_t = ringorder_dp,
+         degree_bound::Int = 0) where T
+      bitmask = Culong(degree_bound)
+      # internally in libSingular, degree_bound is set to
+      degree_bound_adjusted = libSingular.rGetExpSize(bitmask, Cint(length(s)))
+      if haskey(PolyRingID, (R, s, ordering, degree_bound_adjusted))
+         return PolyRingID[R, s, ordering, degree_bound_adjusted]::PolyRing{T}
       else
          v = [pointer(Base.Vector{UInt8}(string(str)*"\0")) for str in s]
          r = libSingular.nCopyCoeff(R.ptr)
@@ -29,8 +34,9 @@ type PolyRing{T <: Nemo.RingElem} <: Ring
          ord[1] = ordering
          ord[2] = ringorder_C
          ord[3] = ringorder_no
-         ptr = libSingular.rDefault(r, v, ord, blk0, blk1)
-         d = PolyRingID[R, s, ordering] = new(ptr, R, 1)
+         ptr = libSingular.rDefault(r, v, ord, blk0, blk1, bitmask)
+         @assert degree_bound_adjusted == libSingular.rBitmask(ptr)
+         d = PolyRingID[R, s, ordering, degree_bound_adjusted] = new(ptr, R, 1)
          finalizer(d, _PolyRing_clear_fn)
          return d
       end
