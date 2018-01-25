@@ -517,18 +517,20 @@ end
 
 macro PolynomialRing(R, s, n, o)
    S = gensym()
+   y = gensym()
    v0 = [s*string(i) for i in 1:n]
-   exp1 = :(($S, y) = PolynomialRing($R, $v0; ordering=$o))
-   v = [:($(Symbol(s, i)) = y[$i]) for i in 1:n]
+   exp1 = :(($S, $y) = PolynomialRing($R, $v0; ordering=$o))
+   v = [:($(Symbol(s, i)) = $y[$i]) for i in 1:n]
    v1 = Expr(:block, exp1, v..., S)
    return esc(v1)
 end
 
 macro PolynomialRing(R, s, n)
    S = gensym()
+   y = gensym()
    v0 = [s*string(i) for i in 1:n]
-   exp1 = :(($S, y) = PolynomialRing($R, $v0))
-   v = [:($(Symbol(s, i)) = y[$i]) for i in 1:n]
+   exp1 = :(($S, $y) = PolynomialRing($R, $v0))
+   v = [:($(Symbol(s, i)) = $y[$i]) for i in 1:n]
    v1 = Expr(:block, exp1, v..., S)
    return esc(v1)
 end
