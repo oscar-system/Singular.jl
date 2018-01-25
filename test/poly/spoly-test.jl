@@ -49,6 +49,14 @@ function test_spoly_constructors()
 
    @test isa(k, spoly)
 
+   S = @PolynomialRing(ZZ, "x", 50)
+
+   @test isa(x17, spoly)
+
+   T = @PolynomialRing(ZZ, "y", 50, :lex)
+
+   @test isa(y7, spoly)
+
    println("PASS")
 end
 
