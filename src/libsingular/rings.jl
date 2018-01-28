@@ -42,12 +42,14 @@ end
 
 function rGetExpSize(bitmask::Culong, N::Cint)
    icxx"""int bits;
-          rGetExpSize($bitmask, bits, $N);
+          // cast to unsigned int for 32 bit compatibility in Cxx package
+          (unsigned int)rGetExpSize($bitmask, bits, $N);
        """
 end
 
 function rBitmask(r::ring)
-   icxx"""$r->bitmask;"""
+   # cast to unsigned int for 32 bit compatibility in Cxx package
+   icxx"""(unsigned int)$r->bitmask;"""
 end
 
 function rSetOption_redSB(r::ring)

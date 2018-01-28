@@ -16,8 +16,9 @@ type PolyRing{T <: Nemo.RingElem} <: Ring
          ordering::libSingular.rRingOrder_t = ringorder_dp,
          degree_bound::Int = 0) where T
       bitmask = Culong(degree_bound)
+      n_vars = Cint(length(s));
       # internally in libSingular, degree_bound is set to
-      degree_bound_adjusted = libSingular.rGetExpSize(bitmask, Cint(length(s)))
+      degree_bound_adjusted = Int(libSingular.rGetExpSize(bitmask, n_vars))
       if haskey(PolyRingID, (R, s, ordering, degree_bound_adjusted))
          return PolyRingID[R, s, ordering, degree_bound_adjusted]::PolyRing{T}
       else
@@ -35,7 +36,7 @@ type PolyRing{T <: Nemo.RingElem} <: Ring
          ord[2] = ringorder_C
          ord[3] = ringorder_no
          ptr = libSingular.rDefault(r, v, ord, blk0, blk1, bitmask)
-         @assert degree_bound_adjusted == libSingular.rBitmask(ptr)
+         @assert degree_bound_adjusted == Int(libSingular.rBitmask(ptr))
          d = PolyRingID[R, s, ordering, degree_bound_adjusted] = new(ptr, R, 1)
          finalizer(d, _PolyRing_clear_fn)
          return d
