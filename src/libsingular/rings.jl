@@ -7,7 +7,7 @@ function rDefault(cf::coeffs, vars::Array{Ptr{UInt8}, 1}, ord::rRingOrder_t)
 end
 
 function rDefault{T}(cf::coeffs, vars::Array{T,1}, ord::Array{rRingOrder_t, 1}, 
-   blk0::Array{Cint, 1}, blk1::Array{Cint, 1})
+   blk0::Array{Cint, 1}, blk1::Array{Cint, 1}, bitmask::Culong)
    wvhdl = Ptr{Ptr{Cint}}(C_NULL)
    len = length(vars)
    ptr = Ptr{Ptr{Cuchar}}(pointer(vars))
@@ -15,7 +15,7 @@ function rDefault{T}(cf::coeffs, vars::Array{T,1}, ord::Array{rRingOrder_t, 1},
    ordptr =  pointer(ord)
    blk0ptr = pointer(blk0)
    blk1ptr = pointer(blk1)
-   r = icxx"""rDefault($cf, $len, $ptr, $ordlen, $ordptr, $blk0ptr, $blk1ptr, $wvhdl);"""
+   r = icxx"""rDefault($cf, $len, $ptr, $ordlen, $ordptr, $blk0ptr, $blk1ptr, $wvhdl, $bitmask);"""
    icxx"""$r->ShortOut = 0;"""
    return r
 end
@@ -38,6 +38,18 @@ end
 
 function  rVar(r::ring)
    icxx"""rVar($r);"""
+end
+
+function rGetExpSize(bitmask::Culong, N::Cint)
+   icxx"""int bits;
+          // cast to unsigned int for 32 bit compatibility in Cxx package
+          (unsigned int)rGetExpSize($bitmask, bits, $N);
+       """
+end
+
+function rBitmask(r::ring)
+   # cast to unsigned int for 32 bit compatibility in Cxx package
+   icxx"""(unsigned int)$r->bitmask;"""
 end
 
 function rSetOption_redSB(r::ring)

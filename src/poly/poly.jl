@@ -1,5 +1,6 @@
 export spoly, PolyRing, coeff, coeffs_expos, degree, exponent!, isgen, content,
-       exponent, lead_exponent, ngens, option!, primpart, @PolynomialRing
+       exponent, lead_exponent, ngens, degree_bound, option!, primpart,
+       @PolynomialRing
 
 ###############################################################################
 #
@@ -24,6 +25,10 @@ characteristic(R::PolyRing) = Int(libSingular.rChar(R.ptr))
 function gens(R::PolyRing)
    n = ngens(R)
    return [R(libSingular.rGetVar(Cint(i), R.ptr)) for i = 1:n]
+end
+
+function degree_bound(R::PolyRing)
+   return Int(libSingular.rBitmask(R.ptr))
 end
 
 function option!(r::PolyRing, opt::Symbol)
@@ -500,18 +505,23 @@ end
 #
 ###############################################################################
 
-function PolynomialRing(R::Union{Ring, Field}, s::Array{String, 1}; cached::Bool = true, ordering::Symbol = :degrevlex)
+function PolynomialRing(R::Union{Ring, Field}, s::Array{String, 1};
+      cached::Bool = true, ordering::Symbol = :degrevlex,
+      degree_bound::Int = 0)
    U = [Symbol(v) for v in s]
    T = elem_type(R)
-   parent_obj = PolyRing{T}(R, U, cached, sym2ringorder[ordering])
+   parent_obj = PolyRing{T}(R, U, cached, sym2ringorder[ordering],
+         degree_bound)
    return tuple(parent_obj, gens(parent_obj))
 end
 
-function PolynomialRing(R::Nemo.Ring, s::Array{String, 1}; cached::Bool = true, ordering::Symbol = :degrevlex)
+function PolynomialRing(R::Nemo.Ring, s::Array{String, 1}; cached::Bool = true,
+      ordering::Symbol = :degrevlex, degree_bound::Int = 0)
    S = CoefficientRing(R)
    U = [Symbol(v) for v in s]
    T = elem_type(S)
-   parent_obj = PolyRing{T}(S, U, cached, sym2ringorder[ordering])
+   parent_obj = PolyRing{T}(S, U, cached, sym2ringorder[ordering],
+         degree_bound)
    return tuple(parent_obj, gens(parent_obj))
 end
 
