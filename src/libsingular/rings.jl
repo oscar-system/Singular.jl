@@ -53,19 +53,11 @@ function rBitmask(r::ring)
 end
 
 function rSetOption_redSB(r::ring)
-   icxx"""const ring origin = currRing;
-          rChangeCurrRing($r);
-          si_opt_1 |= Sy_bit(OPT_REDSB);
-          rChangeCurrRing(origin);
-       """
+   icxx"""$r->options |= Sy_bit(OPT_REDSB);"""
 end
 
 function rSetOption_redTail(r::ring)
-   icxx"""const ring origin = currRing;
-          rChangeCurrRing($r);
-          si_opt_1 |= Sy_bit(OPT_REDTAIL);
-          rChangeCurrRing(origin);
-       """
+   icxx"""$r->options |= Sy_bit(OPT_REDTAIL);"""
 end
 
 function p_Delete(p::poly, r::ring)
