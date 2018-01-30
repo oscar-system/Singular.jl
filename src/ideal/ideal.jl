@@ -247,7 +247,8 @@ function fres{T <: Nemo.RingElem}(id::sideal{T}, max_length::Int,
    end
    if (method != "complete"
          && method != "frame"
-         && method != "extended frame")
+         && method != "extended frame"
+         && method != "single module")
       error("wrong optional argument for fres")
    end
    r, length = libSingular.id_fres(id.ptr, Cint(max_length), method, R.ptr)
