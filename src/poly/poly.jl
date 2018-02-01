@@ -1,6 +1,5 @@
 export spoly, PolyRing, coeff, coeffs_expos, degree, exponent!, isgen, content,
-       exponent, lead_exponent, ngens, degree_bound, option!, primpart,
-       @PolynomialRing
+       exponent, lead_exponent, ngens, degree_bound, primpart, @PolynomialRing
 
 ###############################################################################
 #
@@ -29,17 +28,6 @@ end
 
 function degree_bound(R::PolyRing)
    return Int(libSingular.rBitmask(R.ptr))
-end
-
-function option!(r::PolyRing, opt::Symbol)
-   if opt == :redSB
-      libSingular.rSetOption_redSB(r.ptr)
-   elseif opt == :redTail
-      libSingular.rSetOption_redTail(r.ptr)
-   else
-      error("option " * string(opt) * " not recognized")
-   end
-   r
 end
 
 zero(R::PolyRing) = R()

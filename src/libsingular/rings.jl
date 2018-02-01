@@ -52,22 +52,6 @@ function rBitmask(r::ring)
    icxx"""(unsigned int)$r->bitmask;"""
 end
 
-function rSetOption_redSB(r::ring)
-   icxx"""const ring origin = currRing;
-          rChangeCurrRing($r);
-          si_opt_1 |= Sy_bit(OPT_REDSB);
-          rChangeCurrRing(origin);
-       """
-end
-
-function rSetOption_redTail(r::ring)
-   icxx"""const ring origin = currRing;
-          rChangeCurrRing($r);
-          si_opt_1 |= Sy_bit(OPT_REDTAIL);
-          rChangeCurrRing(origin);
-       """
-end
-
 function p_Delete(p::poly, r::ring)
    icxx"""p_Delete(&$p, $r);"""
 end
