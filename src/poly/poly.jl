@@ -495,21 +495,22 @@ end
 
 function PolynomialRing(R::Union{Ring, Field}, s::Array{String, 1};
       cached::Bool = true, ordering::Symbol = :degrevlex,
-      degree_bound::Int = 0)
+      ordering2::Symbol = :comp1min, degree_bound::Int = 0)
    U = [Symbol(v) for v in s]
    T = elem_type(R)
    parent_obj = PolyRing{T}(R, U, cached, sym2ringorder[ordering],
-         degree_bound)
+         sym2ringorder[ordering2], degree_bound)
    return tuple(parent_obj, gens(parent_obj))
 end
 
 function PolynomialRing(R::Nemo.Ring, s::Array{String, 1}; cached::Bool = true,
-      ordering::Symbol = :degrevlex, degree_bound::Int = 0)
+      ordering::Symbol = :degrevlex, ordering2::Symbol = :comp1min,
+      degree_bound::Int = 0)
    S = CoefficientRing(R)
    U = [Symbol(v) for v in s]
    T = elem_type(S)
    parent_obj = PolyRing{T}(S, U, cached, sym2ringorder[ordering],
-         degree_bound)
+         sym2ringorder[ordering2], degree_bound)
    return tuple(parent_obj, gens(parent_obj))
 end
 
