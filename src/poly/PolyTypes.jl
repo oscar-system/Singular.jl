@@ -17,6 +17,13 @@ type PolyRing{T <: Nemo.RingElem} <: Ring
          ordering::libSingular.rRingOrder_t = ringorder_dp,
          ordering2::libSingular.rRingOrder_t = ringorder_C,
          degree_bound::Int = 0) where T
+      # check ordering: accept exactly one of ringorder_c, ringorder_C
+      if (((ordering == ringorder_c || ordering == ringorder_C)
+               && (ordering2 == ringorder_c || ordering2 == ringorder_C))
+            || ((ordering != ringorder_c && ordering != ringorder_C)
+               && (ordering2 != ringorder_c && ordering2 != ringorder_C)))
+         error("wrong ordering")
+      end
       bitmask = Culong(degree_bound)
       n_vars = Cint(length(s));
       # internally in libSingular, degree_bound is set to
@@ -33,8 +40,17 @@ type PolyRing{T <: Nemo.RingElem} <: Ring
       	       (Cint(3),), false)
          blk0 = unsafe_wrap(Array, Ptr{Cint}(libSingular.omAlloc0(Csize_t(3*sizeof(Cint)))), (Cint(3),), false)
          blk1 = unsafe_wrap(Array, Ptr{Cint}(libSingular.omAlloc0(Csize_t(3*sizeof(Cint)))), (Cint(3),), false)
-         blk0[1] = 1
-         blk1[1] = length(v)
+         if (ordering == ringorder_c || ordering == ringorder_C)
+            blk0[1] = 0
+            blk1[1] = 0
+            blk0[2] = 1
+            blk1[2] = length(v)
+         else
+            blk0[1] = 1
+            blk1[1] = length(v)
+            blk0[2] = 0
+            blk1[2] = 0
+         end
          ord[1] = ordering
          ord[2] = ordering2
          ord[3] = ringorder_no
