@@ -30,8 +30,45 @@ function test_PolyRing_degree_bound()
    println("PASS")
 end
 
+function test_PolyRing_ordering()
+   print("PolyRing.ordering...")
+
+   R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"])
+   I = Ideal(R, x+z, y+z)
+   I.isGB = true
+   S = fres(I, 0)
+   M = S[2]
+   @test string(M[1]) == "x*gen(2)-y*gen(1)+z*gen(2)-z*gen(1)"
+
+   R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"], ordering2 = :comp1max)
+   I = Ideal(R, x+z, y+z)
+   I.isGB = true
+   S = fres(I, 0)
+   M = S[2]
+   @test string(M[1]) == "x*gen(2)-y*gen(1)-z*gen(1)+z*gen(2)"
+
+   R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"], ordering = :comp1min,
+         ordering2 = :degrevlex)
+   I = Ideal(R, x+z, y+z)
+   I.isGB = true
+   S = fres(I, 0)
+   M = S[2]
+   @test string(M[1]) == "x*gen(2)+z*gen(2)-y*gen(1)-z*gen(1)"
+
+   R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"], ordering = :comp1max,
+         ordering2 = :degrevlex)
+   I = Ideal(R, x+z, y+z)
+   I.isGB = true
+   S = fres(I, 0)
+   M = S[2]
+   @test string(M[1]) == "[-y-z,x+z]"
+
+   println("PASS")
+end
+
 function test_PolyRing()
    test_PolyRing_degree_bound()
+   test_PolyRing_ordering()
 
    println("")
 end
