@@ -45,11 +45,11 @@ function show(io::IO, r::sresolution)
       ptr = libSingular.getindex(r.ptr, Cint(0))
       print(io, "R^", libSingular.rank(ptr))
    end
-   for i = 2:r.len
+   for i = 1:r.len
       ptr = libSingular.getindex(r.ptr, Cint(i-1))
       if ptr == C_NULL
          break
       end
-      print(io, " <- R^", libSingular.rank(ptr))
+      print(io, " <- R^", libSingular.ngens(ptr))
    end
 end
