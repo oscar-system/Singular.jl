@@ -1,7 +1,7 @@
-abstract type Set <: Nemo.Set end
+abstract type Set <: AbstractAlgebra.Set end
 
-abstract type Ring <: Nemo.Ring end
+abstract type Ring <: AbstractAlgebra.Ring end
 
-abstract type Field <: Nemo.Field end
+abstract type Field <: AbstractAlgebra.Field end
 
-abstract type Module{T <: Nemo.RingElem} <: Nemo.Module{T} end
+abstract type Module{T <: AbstractAlgebra.RingElem} <: AbstractAlgebra.Module{T} end
