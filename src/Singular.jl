@@ -1,6 +1,8 @@
 module Singular
 
+import AbstractAlgebra
 using Nemo
+
 using Cxx
 
 import Base: abs, checkbounds, deepcopy, denominator, div, divrem, exponent,
@@ -12,12 +14,14 @@ import Base: abs, checkbounds, deepcopy, denominator, div, divrem, exponent,
 import Nemo: add!, addeq!, base_ring, canonical_unit, check_parent, coeff,
              content, crt, divexact, elem_type, gcdinv, isnegative, isone,
              isgen, iszero, isunit, lead, mul!, needs_parentheses, parent_type,
-             parent, primpart, promote_rule, reconstruct, show_minus_one, zero!
+             parent, primpart, promote_rule, reconstruct, show_minus_one, zero!,
+             FiniteField, IdealSet, PolyRing, PolynomialRing, ResidueRing, 
+             characteristic, degree, intersection, isconstant, ngens, intersection,
+             IdealSet
 
 export base_ring, elem_type, parent_type, parent
 
-export ResidueRing, PolynomialRing, Ideal, MaximalIdeal, Module, FreeModule,
-       Vector, Matrix
+export ResidueRing, PolynomialRing, Ideal, MaximalIdeal, FreeModule
 
 export ZZ, QQ, FiniteField, CoefficientRing, Fp
 
