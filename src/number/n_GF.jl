@@ -334,11 +334,10 @@ end
 ###############################################################################
 
 function SingularFiniteField(p::Int, n::Int, S::String; cached=true)
-   n >= 16 || p >= 2^16 && throw(DomainError())
+   n >= 16 || p >= 2^8 && throw(DomainError())
    !Nemo.isprime(Nemo.fmpz(p)) && throw(DomainError())
    n*log(p) >= 20*log(2) && throw(DomainError())
    p^n >= 2^16 && throw(DomainError())
-   n == 1 && error("Degree one finite fields not supported. Please use SingularFp")
    par = N_GField(p, n, Symbol(S))
    return par, par(libSingular.n_Param(Cint(1), par.ptr))
 end
