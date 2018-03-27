@@ -82,8 +82,10 @@ function fmpqInpMult(a::Ptr{number}, b::number, cf::coeffs)
    r = unsafe_load(a)
    aa = julia(r)::Nemo.fmpq
    bb = julia(b)::Nemo.fmpq
+   ptr1 = pointer_from_objref(aa)
    aa = mul!(aa, aa, bb)
-   n = number(aa, false)
+   ptr2 = pointer_from_objref(aa)
+   n = number(aa, ptr1 != ptr2)
    unsafe_store!(a, n, 1)
    nothing
 end
@@ -98,8 +100,10 @@ function fmpqInpAdd(a::Ptr{number}, b::number, cf::coeffs)
    r = unsafe_load(a)
    aa = julia(r)::Nemo.fmpq
    bb = julia(b)::Nemo.fmpq
+   ptr1 = pointer_from_objref(aa)
    aa = addeq!(aa, bb)
-   n = number(aa, false)
+   ptr2 = pointer_from_objref(aa)
+   n = number(aa, ptr1 != ptr2)
    unsafe_store!(a, n, 1)
    nothing
 end
