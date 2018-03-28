@@ -83,8 +83,8 @@ function fqInpMult(a::Ptr{number}, b::number, cf::coeffs)
    r = unsafe_load(a)
    aa = julia(r)::Nemo.fq
    bb = julia(b)::Nemo.fq
-   aa = mul!(aa, aa, bb)
-   n = number(aa, false)
+   cc = mul!(aa, aa, bb)
+   n = number(cc, aa)
    unsafe_store!(a, n, 1)
    nothing
 end
@@ -99,8 +99,8 @@ function fqInpAdd(a::Ptr{number}, b::number, cf::coeffs)
    r = unsafe_load(a)
    aa = julia(r)::Nemo.fq
    bb = julia(b)::Nemo.fq
-   aa = addeq!(aa, bb)
-   n = number(aa, false)
+   cc = addeq!(aa, bb)
+   n = number(cc, aa)
    unsafe_store!(a, n, 1)
    nothing
 end

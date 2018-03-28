@@ -65,8 +65,8 @@ function nemoFieldInpNeg(a::number, cf::coeffs)
    R = julia(cf)
    n = julia(a)
    mone = R(-1)
-   mul!(n, n, mone)
-   return number(n, false)
+   n_new = mul!(n, n, mone)
+   return number(n_new, n)
 end
 
 function nemoFieldInvers(a::number, cf::coeffs)
@@ -84,8 +84,8 @@ function nemoFieldInpMult(a::Ptr{number}, b::number, cf::coeffs)
    r = unsafe_load(a)
    aa = julia(r)
    bb = julia(b)
-   aa = mul!(aa, aa, bb)
-   n = number(aa, false)
+   cc = mul!(aa, aa, bb)
+   n = number(cc, aa)
    unsafe_store!(a, n, 1)
    nothing
 end
@@ -100,8 +100,8 @@ function nemoFieldInpAdd(a::Ptr{number}, b::number, cf::coeffs)
    r = unsafe_load(a)
    aa = julia(r)
    bb = julia(b)
-   aa = addeq!(aa, bb)
-   n = number(aa, false)
+   cc = addeq!(aa, bb)
+   n = number(cc, aa)
    unsafe_store!(a, n, 1)
    nothing
 end
