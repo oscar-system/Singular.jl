@@ -249,6 +249,15 @@ function number{T <: RingElem}(j::T, cache::Bool=true)
     return n
 end
 
+function number{T <: RingElem}(j::T, j_old::T)
+    if j == j_old   # for inplace operations
+        return number(j, false)
+    else
+        number_pop!(nemoNumberID, j_old)
+        return number(j)
+    end
+end
+
 include("flint/fmpz.jl")
 include("flint/fmpq.jl")
 include("flint/fq.jl")

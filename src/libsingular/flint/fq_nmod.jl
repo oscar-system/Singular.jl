@@ -83,10 +83,8 @@ function fq_nmodInpMult(a::Ptr{number}, b::number, cf::coeffs)
    r = unsafe_load(a)
    aa = julia(r)::Nemo.fq_nmod
    bb = julia(b)::Nemo.fq_nmod
-   ptr1 = pointer_from_objref(aa)
-   aa = mul!(aa, aa, bb)
-   ptr2 = pointer_from_objref(aa)
-   n = number(aa, ptr1 != ptr2)
+   cc = mul!(aa, aa, bb)
+   n = number(cc, aa)
    unsafe_store!(a, n, 1)
    nothing
 end
@@ -101,10 +99,8 @@ function fq_nmodInpAdd(a::Ptr{number}, b::number, cf::coeffs)
    r = unsafe_load(a)
    aa = julia(r)::Nemo.fq_nmod
    bb = julia(b)::Nemo.fq_nmod
-   ptr1 = pointer_from_objref(aa)
-   aa = addeq!(aa, bb)
-   ptr2 = pointer_from_objref(aa)
-   n = number(aa, ptr1 != ptr2)
+   cc = addeq!(aa, bb)
+   n = number(cc, aa)
    unsafe_store!(a, n, 1)
    nothing
 end
