@@ -253,7 +253,7 @@ function number{T <: RingElem}(j::T, j_old::T)
     if j == j_old   # for inplace operations
         return number(j, false)
     else
-        number_pop!(nemoNumberID, j_old)
+        number_pop!(nemoNumberID, pointer_from_objref(j_old))
         return number(j)
     end
 end
