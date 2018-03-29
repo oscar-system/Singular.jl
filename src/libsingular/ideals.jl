@@ -174,3 +174,13 @@ end
 function id_Satstd(I::ideal, J::ideal, R::ring)
    icxx"""id_Satstd($I, $J, $R);"""
 end
+
+function id_Array2Vector(m::Array{poly,1},n::Int, R::ring)
+   p=pointer(m)
+   icxx"""id_Array2Vector($p, $n, $R);"""
+end
+
+function p_Vector2Array(v::poly, m::Array{poly,1}, n::Int, R::ring)
+   p=pointer(m)
+   icxx"""p_Vec2Array($v, $p, $n, $R);"""
+end

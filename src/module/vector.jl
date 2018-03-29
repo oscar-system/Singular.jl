@@ -48,6 +48,7 @@ function show(io::IO, a::svector)
    print(io, s)
 end
 
+
 ###############################################################################
 #
 #   Unary functions
@@ -129,4 +130,26 @@ end
 
 function Vector{T <: Nemo.RingElem}(R::PolyRing{T}, r::Int, p::libSingular.poly)
    return svector{spoly{T}}(R, r, p)
+end
+
+function Array{T <: Nemo.RingElem}(v::svector{T})
+   n = v.rank
+   a=Array{spoly, 1}(n)
+   aa=Array{libSingular.poly, 1}(n)
+   R=v.base_ring
+   libSingular.p_Vector2Array(v.ptr, aa, n, R.ptr)
+   for i in 1:n
+     a[i]=spoly{T}(R, aa[i])
+   end
+   return a
+end
+
+function svector{T <: Nemo.RingElem}(a::Array{spoly{T}, 1})
+  n = size(a)[1]
+  aa=Array{libSingular.poly, 1}(n)
+  for i in 1:n
+    aa[i]=a[i].ptr
+  end
+  v=libSingular.id_Array2Vector(aa,n,parent(a[1]).ptr)
+  return svector{T}(parent(a[1]), n, v)
 end
