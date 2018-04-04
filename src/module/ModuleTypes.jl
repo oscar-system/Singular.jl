@@ -1,45 +1,6 @@
 ###############################################################################
 #
-#   ModuleClass/smodule 
-#
-###############################################################################
-
-const ModuleClassID = Dict{Ring, Set}()
-
-type ModuleClass{T <: Nemo.RingElem} <: Set
-   base_ring::PolyRing
-
-   function ModuleClass{T}(R::PolyRing) where T
-      if haskey(ModuleClassID, R)
-         return ModuleClassID[R]
-      else
-         return ModuleClassID[R] = new(R)
-      end
-   end
-end
-
-type smodule{T <: Nemo.RingElem} <: Module{T}
-   ptr::libSingular.ideal # ideal and module types are the same in Singular
-   base_ring::PolyRing
-   isGB::Bool
-
-   function smodule{T}(R::PolyRing, m::libSingular.ideal) where T
-      z = new(m, R, false)
-      R.refcount += 1
-      finalizer(z, _smodule_clear_fn)
-      return z
-   end
-end
-
-function _smodule_clear_fn(I::smodule)
-   R = I.base_ring
-   libSingular.id_Delete(I.ptr, R.ptr)
-   _PolyRing_clear_fn(R)
-end
-
-###############################################################################
-#
-#   FreeMod/svector 
+#   FreeMod/svector
 #
 ###############################################################################
 
@@ -74,5 +35,44 @@ end
 function _svector_clear_fn(p::svector)
    R = p.base_ring
    libSingular.p_Delete(p.ptr, R.ptr)
+   _PolyRing_clear_fn(R)
+end
+
+###############################################################################
+#
+#   ModuleClass/smodule
+#
+###############################################################################
+
+const ModuleClassID = Dict{Ring, Set}()
+
+type ModuleClass{T <: Nemo.RingElem} <: Set
+   base_ring::PolyRing
+
+   function ModuleClass{T}(R::PolyRing) where T
+      if haskey(ModuleClassID, R)
+         return ModuleClassID[R]
+      else
+         return ModuleClassID[R] = new(R)
+      end
+   end
+end
+
+type smodule{T <: Nemo.RingElem} <: Module{T}
+   ptr::libSingular.ideal # ideal and module types are the same in Singular
+   base_ring::PolyRing
+   isGB::Bool
+
+   function smodule{T}(R::PolyRing, m::libSingular.ideal) where T
+      z = new(m, R, false)
+      R.refcount += 1
+      finalizer(z, _smodule_clear_fn)
+      return z
+   end
+end
+
+function _smodule_clear_fn(I::smodule)
+   R = I.base_ring
+   libSingular.id_Delete(I.ptr, R.ptr)
    _PolyRing_clear_fn(R)
 end
