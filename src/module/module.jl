@@ -75,6 +75,19 @@ end
 
 ###############################################################################
 #
+#   Syzygies
+#
+###############################################################################
+
+function syz(M::smodule)
+   R = base_ring(M)
+   ptr = libSingular.id_Syzygies(M.ptr, R.ptr)
+   libSingular.idSkipZeroes(ptr)
+   return Module(R, ptr)
+end
+
+###############################################################################
+#
 #   Resolutions
 #
 ###############################################################################
@@ -112,6 +125,11 @@ end
 #   Module constructors
 #
 ###############################################################################
+
+function Module{T <: Nemo.RingElem}(R::PolyRing{T}, vecs::svector{T}...)
+   S = elem_type(R)
+   return smodule{S}(R, vecs...)
+end
 
 function Module{T <: Nemo.RingElem}(R::PolyRing{T}, id::libSingular.ideal)
    S = elem_type(R)
