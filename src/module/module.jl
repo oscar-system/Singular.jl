@@ -113,6 +113,11 @@ end
 #
 ###############################################################################
 
+function Module{T <: Nemo.RingElem}(R::PolyRing{T}, vecs::svector{T}...)
+   S = elem_type(R)
+   return smodule{S}(R, vecs...)
+end
+
 function Module{T <: Nemo.RingElem}(R::PolyRing{T}, id::libSingular.ideal)
    S = elem_type(R)
    return smodule{S}(R, id)
