@@ -129,7 +129,7 @@ end
 ###############################################################################
 
 function Vector{T <: Nemo.RingElem}(R::PolyRing{T}, r::Int, p::libSingular.poly)
-   return svector{spoly{T}}(R, r, p)
+   return svector{T}(R, r, p)
 end
 
 function Array{T <: Nemo.RingElem}(v::svector{T})
