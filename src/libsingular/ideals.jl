@@ -184,3 +184,11 @@ function p_Vector2Array(v::poly, m::Array{poly,1}, n::Int, R::ring)
    p=pointer(m)
    icxx"""p_Vec2Array($v, $p, $n, $R);"""
 end
+
+function maGetPreimage(target::ring, map::ideal, id::ideal, source::ring)
+   preimage_ptr = icxx"""
+      sip_smap sing_map = { $map->m, (char *)"julia_ring", 1, $map->ncols };
+      return maGetPreimage($target, &sing_map, $id, $source);
+   """
+   return preimage_ptr;
+end

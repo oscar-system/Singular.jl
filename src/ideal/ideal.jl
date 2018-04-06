@@ -1,5 +1,5 @@
 export sideal, IdealSet, syz, lead, normalize!, isconstant, iszerodim, fres,
-       sres, lres, intersection, quotient, reduce, eliminate
+       sres, lres, intersection, quotient, reduce, eliminate, kernel
 
 ###############################################################################
 #
@@ -215,6 +215,22 @@ function eliminate(I::sideal, p::spoly)
    parent(p) != R && error("Incompatible base rings")
    ptr = libSingular.id_Eliminate(I.ptr, p.ptr, R.ptr)
    return Ideal(R, ptr)
+end
+
+#=
+The kernel of the map \phi defined as follows:
+Let v_1, ..., v_s be the variables in the polynomial ring 'source'. Then
+\phi(v_i) := map[i].
+This is internally computed via elimination.
+=#
+function kernel(source::PolyRing, map::sideal)
+   # TODO: check for quotient rings and/or local (or mixed) orderings, see
+   #       jjPREIMAGE() in the Singular interpreter
+   target = base_ring(map)
+   zero_ideal = Ideal(target, )
+   ptr = libSingular.maGetPreimage(target.ptr, map.ptr, zero_ideal.ptr,
+         source.ptr)
+   return Ideal(source, ptr)
 end
 
 ###############################################################################
