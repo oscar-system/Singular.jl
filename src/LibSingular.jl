@@ -4,6 +4,8 @@ using Cxx
 
 using Nemo
 
+using Hecke
+
 import Base:setindex!, getindex
 
 include("libsingular/LibSingularTypes.jl")
