@@ -48,7 +48,7 @@ end
 function show(io::IO, I::smodule)
    print(io, "Singular Module over ")
    show(io, base_ring(I))
-   println(", with Generators:")
+   println(io, ", with Generators:")
    n = ngens(I)
    for i = 1:n
       show(io, I[i])
