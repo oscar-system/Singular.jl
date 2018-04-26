@@ -58,6 +58,10 @@ function id_Power(I::ideal, n::Cint, R::ring)
    icxx"""id_Power($I, $n, $R);"""
 end
 
+function id_IsEqual(I1::ideal, I2::ideal, R::ring)
+   icxx"""mp_Equal((ip_smatrix *) $I1, (ip_smatrix *) $I2, $R);"""
+end
+
 function id_FreeModule(n::Cint, R::ring)
    icxx"""id_FreeModule($n, $R);"""
 end

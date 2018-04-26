@@ -13,6 +13,12 @@ base_ring(S::IdealSet) = S.base_ring
 
 base_ring(I::sideal) = I.base_ring
 
+elem_type(::Type{IdealSet{spoly{T}}}) where T <: Nemo.RingElem = sideal{spoly{T}}
+
+elem_type(::IdealSet{spoly{T}}) where T <: Nemo.RingElem = sideal{spoly{T}}
+
+parent_type(::Type{sideal{spoly{T}}}) where T <: Nemo.RingElem = IdealSet{spoly{T}}
+
 ngens(I::sideal) = Int(libSingular.ngens(I.ptr))
 
 function checkbounds(I::sideal, i::Int)
@@ -115,6 +121,26 @@ function ^(I::sideal, n::Int)
    R = base_ring(I)
    ptr = libSingular.id_Power(I.ptr, Cint(n), R.ptr)
    return Ideal(R, ptr)
+end
+
+###############################################################################
+#
+#   Comparison
+#
+###############################################################################
+
+doc"""
+    isequal{T <: AbstractAlgebra.RingElem}(I1::sideal{T}, I2::sideal{T})
+> Return `true` if the given ideals have the same generators in the same order. Note
+> that two arithmetically equal ideals with different generators will return `false`.
+"""
+function isequal(I1::sideal{T}, I2::sideal{T}) where T <: AbstractAlgebra.RingElem
+   check_parent(I1, I2)
+   if ngens(I1) != ngens(I2)
+      return false
+   end
+   R = base_ring(I1)
+   return Bool(libSingular.id_IsEqual(I1.ptr, I2.ptr, R.ptr))
 end
 
 ###############################################################################
