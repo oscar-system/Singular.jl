@@ -12,7 +12,7 @@ import Base: abs, checkbounds, deepcopy, denominator, div, divrem, exponent,
              /, !=
 
 import Nemo: add!, addeq!, base_ring, canonical_unit, check_parent, coeff,
-             content, crt, divexact, elem_type, gcdinv, isnegative, isone,
+             contains, content, crt, divexact, elem_type, gcdinv, isnegative, isone,
              isgen, iszero, isunit, lead, mul!, needs_parentheses, parent_type,
              parent, primpart, promote_rule, reconstruct, show_minus_one, zero!,
              IdealSet, ResidueRing, 
