@@ -107,6 +107,19 @@ function test_sideal_containment()
    println("PASS")
 end
 
+function test_sideal_comparison()
+   print("sideal.comparison...")
+
+   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+
+   @test equal(Ideal(R, x, y, x - y), Ideal(R, x, y, x + y))
+   @test !equal(Ideal(R, x), Ideal(R, x, y))
+   @test !isequal(Ideal(R, x, y, x - y), Ideal(R, x, y, x + y))
+   @test isequal(Ideal(R, x, y), Ideal(R, x, y))
+
+   println("PASS")
+end
+
 function test_sideal_kernel()
    print("sideal.kernel...")
 
@@ -125,8 +138,9 @@ function test_sideal()
    test_sideal_manipulation()
    test_sideal_binary_ops()
    test_sideal_powering()
-   test_sideal_kernel()
    test_sideal_containment()
+   test_sideal_comparison()
+   test_sideal_kernel()
 
    println("")
 end
