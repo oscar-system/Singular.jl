@@ -1,5 +1,5 @@
 export sideal, IdealSet, syz, lead, normalize!, isconstant, iszerodim, fres,
-       sres, lres, intersection, quotient, reduce, eliminate, kernel
+       sres, lres, intersection, quotient, reduce, eliminate, kernel, equal
 
 ###############################################################################
 #
@@ -125,6 +125,25 @@ end
 
 ###############################################################################
 #
+#   Containment
+#
+###############################################################################
+
+doc"""
+    contains{T <: AbstractAlgebra.RingElem}(I::sideal, J::sideal)
+> Returns `true` if the ideal $I$ contains the ideal $J$. This will be
+> expensive if $I$ is not a Groebner ideal, since its standard form must be
+> computed.
+"""
+function contains(I::sideal{T}, J::sideal{T}) where T <: AbstractAlgebra.RingElem
+   if !I.isGB
+      I = std(I)
+   end
+   return iszero(reduce(J, I))
+end
+
+###############################################################################
+#
 #   Comparison
 #
 ###############################################################################
@@ -141,6 +160,18 @@ function isequal(I1::sideal{T}, I2::sideal{T}) where T <: AbstractAlgebra.RingEl
    end
    R = base_ring(I1)
    return Bool(libSingular.id_IsEqual(I1.ptr, I2.ptr, R.ptr))
+end
+
+doc"""
+    equal(I1::sideal{T}, I2::sideal{T}) where T <: AbstractAlgebra.RingElem
+> Return `true` if the two ideals are contained in each other, i.e. are the same
+> ideal mathematically. This function should be called only as a last
+> resort; it is exceptionally expensive to test equality of ideals! Do not
+> define `==` as an alias for this function!
+"""
+function equal(I1::sideal{T}, I2::sideal{T}) where T <: AbstractAlgebra.RingElem
+   check_parent(I1, I2)
+   return contains(I1, I2) && contains(I2, I1)
 end
 
 ###############################################################################

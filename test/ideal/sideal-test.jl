@@ -69,9 +69,10 @@ function test_sideal_binary_ops()
    I1 = Ideal(R, x)
    I2 = Ideal(R, y)
    I3 = Ideal(R, x, y)
+   I4 = Ideal(R, x*y)
 
-   @test iszero(reduce(I3, std(I1 + I2)))
-   @test iszero(reduce(I1 + I2, std(I3)))
+   @test equal(I1 + I2, I3)
+   @test equal(I1*I2, I4)
    
    println("PASS")
 end
