@@ -58,6 +58,12 @@ function test_sideal_manipulation()
 
    @test isconstant(Ideal(R, R(1), R(2)))
 
+   @test isvar_generated(Ideal(R, x))
+   @test isvar_generated(Ideal(R, y))
+   @test isvar_generated(Ideal(R, x, y))
+   @test !isvar_generated(Ideal(R, R(1)))
+   @test !isvar_generated(Ideal(R, x + y))
+
    println("PASS")
 end
 
