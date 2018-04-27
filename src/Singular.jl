@@ -11,8 +11,6 @@ import Base: abs, checkbounds, deepcopy, denominator, div, divrem, exponent,
              std, zero, +, -, *, ==, ^, &, |, $, <<, >>, ~, <=, >=, <, >, //,
              /, !=
 
-import AbstractAlgebra: ngens
-
 import Nemo: add!, addeq!, base_ring, canonical_unit, check_parent, coeff,
              content, crt, divexact, elem_type, gcdinv, isnegative, isone,
              isgen, iszero, isunit, lead, mul!, needs_parentheses, parent_type,
