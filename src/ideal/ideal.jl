@@ -287,6 +287,12 @@ end
 #
 ###############################################################################
 
+doc"""
+   reduce(I::sideal, G::sideal)
+> Return an ideal whose generators are the generators of $I$ reduced by the
+> ideal $G$. The ideal $G$ is required to be a Groebner basis. The returned
+> ideal will have the same number of generators as $I$, even if they are zero.
+"""
 function reduce(I::sideal, G::sideal)
    check_parent(I, G)
    R = base_ring(I)
@@ -295,6 +301,11 @@ function reduce(I::sideal, G::sideal)
    return Ideal(R, ptr)
 end
 
+doc"""
+    reduce(p::spoly, G::sideal)
+> Return the polynomial which is $p$ reduced by the polynomials generating $G$.
+> It is assumed that $G$ is a Groebner basis.
+"""
 function reduce(p::spoly, G::sideal)
    R = base_ring(G)
    par = parent(p)

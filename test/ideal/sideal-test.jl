@@ -210,6 +210,26 @@ function test_sideal_std()
    println("PASS")
 end
 
+function test_sideal_reduction()
+   print("sideal.reduction...")
+
+   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+
+   f = x^2*y + 2y + 1
+   g = y^2 + 1
+
+   I = Ideal(R, (x^2 + 1)*f + (x + y)*g + x + 1, (2y^2 + x)*f + y)
+   J = std(Ideal(R, f, g))
+
+   @test isequal(reduce(I, J), Ideal(R, x + 1, y))
+
+   h = (x^2 + 1)*f + (x + y)*g + x + 1
+
+   @test reduce(h, J) == x + 1
+
+   println("PASS")
+end
+
 function test_sideal_kernel()
    print("sideal.kernel...")
 
@@ -235,6 +255,7 @@ function test_sideal()
    test_sideal_quotient()
    test_sideal_saturation()
    test_sideal_std()
+   test_sideal_reduction()
    test_sideal_kernel()
 
    println("")
