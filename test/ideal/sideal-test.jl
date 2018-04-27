@@ -179,6 +179,11 @@ function test_sideal_saturation()
 
    @test equal(saturation(I, J), Ideal(R, 2y^2 + 3, x^2 + x*y + 1))
 
+   I = Ideal(R, (x*y + 1)*(2x^2*y^2 + x*y - 2) + 2x*y^2 + x, 2x*y + 1)
+   J = Ideal(R, x)
+
+   @test equal(satstd(I, J), std(saturation(I, J)))
+
    println("PASS")
 end
 
