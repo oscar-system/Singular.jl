@@ -1,6 +1,6 @@
 export sideal, IdealSet, syz, lead, normalize!, isconstant, iszerodim, fres,
        sres, lres, intersection, quotient, reduce, eliminate, kernel, equal,
-       contains, isvar_generated
+       contains, isvar_generated, saturation
 
 ###############################################################################
 #
@@ -226,6 +226,25 @@ function quotient{T <: Nemo.RingElem}(I::sideal{T}, J::sideal{T})
    R = base_ring(I)
    ptr = libSingular.id_Quotient(I.ptr, J.ptr, I.isGB, R.ptr)
    return Ideal(R, ptr)
+end
+
+###############################################################################
+#
+#   Saturation
+#
+###############################################################################
+
+function saturation{T <: Nemo.RingElem}(I::sideal{T}, J::sideal{T})
+   check_parent(I, J)
+   R = base_ring(I)
+   !has_global_ordering(R) && error("Must be over a ring with global ordering")
+   Q = quotient(I, J)
+   # we already have contains(Q, I) automatically
+   while !contains(I, Q)
+      I = Q
+      Q = quotient(I, J)
+   end
+   return I
 end
 
 ###############################################################################
