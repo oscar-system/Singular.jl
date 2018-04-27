@@ -77,6 +77,25 @@ function test_sideal_binary_ops()
    println("PASS")
 end
 
+function test_sideal_powering()
+   print("sideal.powering...")
+
+   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+
+   I = Ideal(R, x^2, x*y + 1)
+
+   @test equal(I^0, Ideal(R, R(1)))
+
+   S = I
+
+   for i = 1:5
+      @test equal(S, I^i)
+      S *= I
+   end
+
+   println("PASS")
+end
+
 function test_sideal_kernel()
    print("sideal.kernel...")
 
@@ -94,6 +113,7 @@ function test_sideal()
    test_sideal_constructors()
    test_sideal_manipulation()
    test_sideal_binary_ops()
+   test_sideal_powering()
    test_sideal_kernel()
 
    println("")
