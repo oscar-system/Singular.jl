@@ -51,6 +51,15 @@ iszerodim(I::sideal) = Bool(libSingular.id_IsZeroDim(I.ptr, base_ring(I).ptr))
 
 isconstant(I::sideal) = Bool(libSingular.id_IsConstant(I.ptr, base_ring(I).ptr))
 
+function isvar_generated(I::sideal)
+   for i = 1:length(I)
+      if !isgen(I[i])
+         return false
+      end
+   end
+   return true
+end
+
 function normalize!(I::sideal)
    libSingular.id_Normalize(I.ptr, base_ring(I).ptr)
    nothing

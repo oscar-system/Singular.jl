@@ -120,6 +120,72 @@ function test_sideal_comparison()
    println("PASS")
 end
 
+function test_sideal_leading_terms()
+   print("sideal.leading_terms...")
+
+   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+
+   @test equal(lead(Ideal(R, x^2 + x*y + 1, 2y^2 + 3, R(7))), Ideal(R, x^2, 2y^2, R(7)))
+
+   println("PASS")
+end
+
+function test_sideal_intersection()
+   print("sideal.intersection...")
+
+   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+
+   I1 = Ideal(R, x^2 + x*y + 1, 2y^2 + 3, R(7))
+   I2 = Ideal(R, x*y^2 + x + 1, 2x*y + 1, 7x + 1)
+
+   I = intersection(I1, I2)
+
+   @test contains(I1, I)
+   @test contains(I2, I)
+
+   println("PASS")
+end
+
+function test_sideal_quotient()
+   print("sideal.quotient...")
+
+   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+
+   I = Ideal(R, x^2 + x*y + 1, 2y^2 + 3)
+   J = Ideal(R, x*y^2 + x + 1, 2x*y + 1)
+   K = Ideal(R, x*y + 1)
+
+   A = quotient(I, J + K)
+   B = intersection(quotient(I, J), quotient(I, K))
+
+   @test equal(A, B)
+
+   println("PASS")
+end
+
+function test_sideal_std()
+   print("sideal.std...")
+
+   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+
+   I = Ideal(R, x^2 + x*y + 1, 2y^2 + 3)
+   J = Ideal(R, 2*y^2 + 3, x^2 + x*y + 1)
+
+   A = std(I)
+
+   @test isequal(lead(A), Ideal(R, 2y^2, x^2)) ||
+         isequal(lead(A), Ideal(R, x^2, 2*y^2))
+   @test A.isGB == true
+   
+   B = std(I, complete_reduction=true)
+
+   @test isequal(B, Ideal(R, 2y^2 + 3, x^2 + x*y + 1)) ||
+         isequal(B, Ideal(x^2 + x*y + 1, 2y^2 + 3))
+   @test B.isGB == true
+
+   println("PASS")
+end
+
 function test_sideal_kernel()
    print("sideal.kernel...")
 
@@ -140,6 +206,10 @@ function test_sideal()
    test_sideal_powering()
    test_sideal_containment()
    test_sideal_comparison()
+   test_sideal_leading_terms()
+   test_sideal_intersection()
+   test_sideal_quotient()
+   test_sideal_std()
    test_sideal_kernel()
 
    println("")
