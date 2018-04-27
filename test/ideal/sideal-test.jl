@@ -169,6 +169,19 @@ function test_sideal_quotient()
    println("PASS")
 end
 
+function test_sideal_saturation()
+   print("sideal.saturation...")
+
+   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+
+   I = Ideal(R, (x^2 + x*y + 1)*(2y^2+1)^3, (2y^2 + 3)*(2y^2+1)^2)
+   J = Ideal(R, 2y^2 + 1)
+
+   @test equal(saturation(I, J), Ideal(R, 2y^2 + 3, x^2 + x*y + 1))
+
+   println("PASS")
+end
+
 function test_sideal_std()
    print("sideal.std...")
 
@@ -215,6 +228,7 @@ function test_sideal()
    test_sideal_leading_terms()
    test_sideal_intersection()
    test_sideal_quotient()
+   test_sideal_saturation()
    test_sideal_std()
    test_sideal_kernel()
 
