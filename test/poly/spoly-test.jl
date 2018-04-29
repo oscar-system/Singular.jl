@@ -57,6 +57,16 @@ function test_spoly_constructors()
 
    @test isa(y7, spoly)
 
+   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+
+   @test isgen(x)
+   @test isgen(y)
+   @test !isgen(R(1))
+   @test !isgen(R(0))
+   @test !isgen(2x)
+   @test !isgen(x + y)
+   @test !isgen(x^2)
+
    println("PASS")
 end
 

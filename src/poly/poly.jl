@@ -49,7 +49,7 @@ function isgen(p::spoly)
    n = 0
    for i = 1:ngens(R)
       d = libSingular.p_GetExp(p.ptr, Cint(i), R.ptr)
-      if d > 1 || d == 0
+      if d > 1
          return false
       elseif d == 1
          if n == 1
@@ -58,7 +58,7 @@ function isgen(p::spoly)
          n = 1
       end
    end
-   return true   
+   return n == 1   
 end
 
 function isconstant(p::spoly)
