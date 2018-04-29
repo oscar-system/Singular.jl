@@ -86,8 +86,8 @@ type Rationals <: Field
    refcount::Int
 
    function Rationals() 
-      if haskey(RationalsID, :ZZ)
-         d = RationalsID[:ZZ]::Rationals
+      if haskey(RationalsID, :QQ)
+         d = RationalsID[:QQ]::Rationals
       else
          d = new()
          RationalsID[:QQ] = d
