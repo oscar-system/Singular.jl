@@ -283,6 +283,7 @@ function test_sideal()
    test_sideal_saturation()
    test_sideal_std()
    test_sideal_reduction()
+   test_sideal_free_resolution()
    test_sideal_kernel()
 
    println("")
