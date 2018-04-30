@@ -1,3 +1,5 @@
+export nrows, ncols
+
 ###############################################################################
 #
 #   Basic manipulation
@@ -6,7 +8,7 @@
 
 nrows(M::smatrix) = Int(libSingular.nrows(M.ptr))
 
-ncols(M::smatrix) = Int(libSingular.nrows(M.ptr))
+ncols(M::smatrix) = Int(libSingular.ncols(M.ptr))
 
 function parent(M::smatrix)
    return MatrixSpace(M.base_ring, nrows(M), ncols(M))
@@ -24,6 +26,17 @@ function getindex(M::smatrix, i::Int, j::Int)
    R = base_ring(M)
    ptr = libSingular.getindex(M.ptr, Cint(i), Cint(j))
    return R(libSingular.p_Copy(ptr, R.ptr))
+end
+
+function iszero(M::smatrix)
+   for i = 1:nrows(M)
+      for j = 1:ncols(M)
+         if !iszero(M[i, j])
+            return false
+         end
+      end
+   end
+   return true
 end
 
 ###############################################################################
@@ -56,6 +69,38 @@ end
 
 ###############################################################################
 #
+#   Binary operations
+#
+###############################################################################
+
+function +(M::smatrix{T}, N::smatrix{T}) where T <: AbstractAlgebra.RingElem
+   R = base_ring(M)
+   R != base_ring(N) && error("Matrices are not over the same ring")
+   (nrows(M) != nrows(N)) && error("Incompatible dimensions")
+   (ncols(M) != ncols(N)) && error("Incompatible dimensions")
+   ptr = libSingular.mp_Add(M.ptr, N.ptr, R.ptr)
+   return smatrix{T}(R, ptr)
+end
+
+function -(M::smatrix{T}, N::smatrix{T}) where T <: AbstractAlgebra.RingElem
+   R = base_ring(M)
+   R != base_ring(N) && error("Matrices are not over the same ring")
+   (nrows(M) != nrows(N)) && error("Incompatible dimensions")
+   (ncols(M) != ncols(N)) && error("Incompatible dimensions")
+   ptr = libSingular.mp_Sub(M.ptr, N.ptr, R.ptr)
+   return smatrix{T}(R, ptr)
+end
+
+function *(M::smatrix{T}, N::smatrix{T}) where T <: AbstractAlgebra.RingElem
+   R = base_ring(M)
+   R != base_ring(N) && error("Matrices are not over the same ring")
+   (ncols(M) != nrows(N)) && error("Incompatible dimensions")
+   ptr = libSingular.mp_Mult(M.ptr, N.ptr, R.ptr)
+   return smatrix{T}(R, ptr)
+end
+
+###############################################################################
+#
 #   Matrix constructors
 #
 ###############################################################################
@@ -63,3 +108,4 @@ end
 function Matrix{T <: Nemo.RingElem}(I::smodule{T})
    return smatrix{T}(base_ring(I), I.ptr)
 end
+
