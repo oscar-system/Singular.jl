@@ -148,22 +148,16 @@ function id_fres(I::ideal, n::Cint, method::String, R::ring)
    r, Int(length)
 end
 
-function id_sres(I:: ideal, n::Cint, len::Ptr{Cint}, R::ring)
-   icxx"""const ring origin = currRing;
-          rChangeCurrRing($R);
-          resolvente r = sySchreyerResolvente($I, $n, $len);
-          rChangeCurrRing(origin);
-          (resolvente) r;
-       """
-end
-
-function id_lres(I:: ideal, len::Ptr{Cint}, R::ring)
-   icxx"""const ring origin = currRing;
-          rChangeCurrRing($R);
-          resolvente r = syLaScala1($I, $len);
-          rChangeCurrRing(origin);
-          (resolvente) r;
-       """
+function id_sres(I::ideal, n::Cint, R::ring)
+   s = icxx"""const ring origin = currRing;
+         rChangeCurrRing($R);
+         syStrategy s = sySchreyer($I, $n);
+         rChangeCurrRing(origin);
+         s;
+      """
+   r = icxx"""$s->fullres;"""
+   length = icxx"""$s->length;"""
+   r, Int(length)
 end
 
 function id_Eliminate(I::ideal, v::poly, R::ring)

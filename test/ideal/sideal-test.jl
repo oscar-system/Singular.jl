@@ -230,6 +230,33 @@ function test_sideal_reduction()
    println("PASS")
 end
 
+function test_sideal_free_resolution()
+   print("sideal.free_resolution...")
+
+   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+
+   I = Ideal(R, x^2*y + 2y + 1, y^2 + 1)
+
+   F1 = fres(std(I), 5)
+   F2 = sres(std(I), 5)
+
+   # check resolution is of the correct length
+   @test length(F1) == 2
+   @test length(F2) == 2
+
+   M1 = Singular.Matrix(F1[1])
+   N1 = Singular.Matrix(F1[2])
+
+   M2 = Singular.Matrix(F2[1])
+   N2 = Singular.Matrix(F2[2])
+
+   # check we have a complex
+   @test iszero(M1*N1)
+   @test iszero(M2*N2)
+
+   println("PASS")
+end
+
 function test_sideal_kernel()
    print("sideal.kernel...")
 

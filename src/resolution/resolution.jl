@@ -24,6 +24,8 @@ function getindex(r::sresolution, i::Int)
    return Module(R, ptr)
 end
 
+length(r::sresolution) = r.len - 1
+
 function betti(r::sresolution)
    libSingular.syBetti(r.ptr, Cint(r.len), r.base_ring.ptr)
 end

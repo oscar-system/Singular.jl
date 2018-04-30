@@ -363,6 +363,16 @@ end
 #
 ###############################################################################
 
+doc"""
+     fres{T <: Nemo.RingElem}(id::sideal{T}, max_length::Int,
+      method::String="complete")
+> Compute a free resolution of the given ideal up to the maximum given length.
+> The ideal must be over a polynomial ring over a field, and a Groebner basis.
+> The possible methods are "comple", "frame", "extended frame" and
+> "single module". The result is given as a resolution, whose i-th entry is
+> the syzygy module of the previous module, starting with the given ideal.
+> The `max_length` can be set to $0$ if the full free resolution is required.
+"""
 function fres{T <: Nemo.RingElem}(id::sideal{T}, max_length::Int,
       method::String="complete")
    id.isGB == false && error("ideal is not a standard basis")
@@ -382,32 +392,31 @@ function fres{T <: Nemo.RingElem}(id::sideal{T}, max_length::Int,
    return sresolution{T}(R, length, r)
 end
 
-function sres{T <: Nemo.RingElem}(I::sideal{T}, n::Int)
+doc"""
+     sres{T <: Nemo.RingElem}(id::sideal{T}, max_length::Int)
+> Compute a (free) Schreyer resolution of the given ideal up to the maximum
+> given length. The ideal must be over a polynomial ring over a field, and a
+> Groebner basis. The result is given as a resolution, whose i-th entry is
+> the syzygy module of the previous module, starting with the given ideal.
+> The `max_length` can be set to $0$ if the full free resolution is required.
+"""
+function sres{T <: Nemo.RingElem}(I::sideal{T}, max_length::Int)
    I.isGB == false && error("Not a Groebner basis ideal")
    R = base_ring(I)
-   len = [Cint(0)]
-   r = libSingular.id_sres(I.ptr, Cint(n), pointer(len), R.ptr)
-   for i = 1:n
-      id = libSingular.getindex(r, Cint(i - 1))
-      if id != C_NULL
-         libSingular.idSkipZeroes(id)
-      end
+   if max_length == 0
+        max_length = ngens(R)+1
+        # TODO: consider qrings
    end
-   return sresolution{T}(R, n, r)
-end
-
-function lres{T <: Nemo.RingElem}(I::sideal{T}, n::Int)
-   I.isGB == false && error("Not a Groebner basis ideal")
-   R = base_ring(I)
-   len = [Cint(n)]
-   r = libSingular.id_lres(I.ptr, pointer(len), R.ptr)
-   for i = 1:n
-      id = libSingular.getindex(r, Cint(i - 1))
-      if id != C_NULL
-         libSingular.idSkipZeroes(id)
+   r, length = libSingular.id_sres(I.ptr, Cint(max_length), R.ptr)
+   for i = 1:length
+      ptr = libSingular.getindex(r, Cint(i - 1))
+      if ptr == C_NULL
+         length = i - 1
+         break
       end
+     libSingular.idSkipZeroes(ptr)
    end
-   return sresolution{T}(R, n, r)
+   return sresolution{T}(R, length, r)
 end
 
 ###############################################################################
