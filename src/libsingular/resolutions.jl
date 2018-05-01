@@ -20,6 +20,8 @@ function syMinimize(r::resolvente, length::Cint, R::ring)
           temp->length = $length;
           syMinimize(temp);
           result = temp->minres;
+          temp->minres = NULL;
+          syKillComputation(temp, $R);
           omFreeSize((ADDRESS) temp, sizeof(ssyStrategy));
           rChangeCurrRing(origin);
           result;
