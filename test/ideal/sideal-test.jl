@@ -288,6 +288,20 @@ function test_sideal_kernel()
    println("PASS")
 end
 
+function test_sideal_eliminate()
+   print("sideal.eliminate...")
+
+   R, (x, y, t) = PolynomialRing(QQ, ["x", "y", "t"])
+
+   I = Ideal(R, x - t^2, y - t^3)
+
+   J = eliminate(I, t)
+
+   @test equal(J, Ideal(R, x^3 - y^2))
+
+   println("PASS")
+end
+
 function test_sideal()
    test_sideal_constructors()
    test_sideal_manipulation()
@@ -303,6 +317,7 @@ function test_sideal()
    test_sideal_reduction()
    test_sideal_free_resolution()
    test_sideal_syzygy()
+   test_sideal_eliminate()
    test_sideal_kernel()
 
    println("")

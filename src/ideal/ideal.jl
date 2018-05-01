@@ -323,6 +323,7 @@ end
 
 function eliminate(I::sideal, p::spoly)
    R = base_ring(I)
+   !isgen(p) && error("Not a variable")
    parent(p) != R && error("Incompatible base rings")
    ptr = libSingular.id_Eliminate(I.ptr, p.ptr, R.ptr)
    return Ideal(R, ptr)
