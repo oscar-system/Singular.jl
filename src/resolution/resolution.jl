@@ -1,4 +1,4 @@
-export betti
+export betti, minres
 
 ###############################################################################
 #
@@ -28,6 +28,21 @@ length(r::sresolution) = r.len - 1
 
 function betti(r::sresolution)
    libSingular.syBetti(r.ptr, Cint(r.len), r.base_ring.ptr)
+end
+
+###############################################################################
+#
+#   Minimal resolution
+#
+###############################################################################
+
+function minres(r::sresolution{T}) where T <: AbstractAlgebra.RingElem
+   if r.minimal
+      return r
+   end
+   R = base_ring(r)
+   ptr = libSingular.syMinimize(r.ptr, Cint(r.len), R.ptr)
+   return sresolution{T}(R, r.len, ptr, true)
 end
 
 ###############################################################################

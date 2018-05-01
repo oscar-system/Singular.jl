@@ -21,11 +21,12 @@ end
 type sresolution{T <: Nemo.RingElem} <: Nemo.SetElem
    ptr::libSingular.resolvente
    len::Int
+   minimal::Bool
    base_ring::PolyRing
 
    # really takes a Singular module, which has type ideal
-   function sresolution{T}(R::PolyRing, n::Int, ptr::libSingular.resolvente) where T
-      z = new(ptr, n, R)
+   function sresolution{T}(R::PolyRing, n::Int, ptr::libSingular.resolvente, minimal::Bool=false) where T
+      z = new(ptr, n, minimal, R)
       finalizer(z, _sresolution_clear_fn)
       return z
    end

@@ -388,8 +388,8 @@ function fres{T <: Nemo.RingElem}(id::sideal{T}, max_length::Int,
          && method != "single module")
       error("wrong optional argument for fres")
    end
-   r, length = libSingular.id_fres(id.ptr, Cint(max_length), method, R.ptr)
-   return sresolution{T}(R, length, r)
+   r, length, minimal = libSingular.id_fres(id.ptr, Cint(max_length), method, R.ptr)
+   return sresolution{T}(R, length, r, minimal)
 end
 
 doc"""
@@ -407,7 +407,7 @@ function sres{T <: Nemo.RingElem}(I::sideal{T}, max_length::Int)
         max_length = ngens(R)+1
         # TODO: consider qrings
    end
-   r, length = libSingular.id_sres(I.ptr, Cint(max_length), R.ptr)
+   r, length, minimal = libSingular.id_sres(I.ptr, Cint(max_length), R.ptr)
    for i = 1:length
       ptr = libSingular.getindex(r, Cint(i - 1))
       if ptr == C_NULL
@@ -416,7 +416,7 @@ function sres{T <: Nemo.RingElem}(I::sideal{T}, max_length::Int)
       end
      libSingular.idSkipZeroes(ptr)
    end
-   return sresolution{T}(R, length, r)
+   return sresolution{T}(R, length, r, minimal)
 end
 
 ###############################################################################

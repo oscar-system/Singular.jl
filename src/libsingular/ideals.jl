@@ -143,9 +143,14 @@ function id_fres(I::ideal, n::Cint, method::String, R::ring)
          rChangeCurrRing(origin);
          s;
       """
-   r = icxx"""$s->fullres;"""
+   r = icxx"""$s->minres;"""
+   minimal = true
+   if r == C_NULL
+      r = icxx"""$s->fullres;"""
+      minimal = false
+   end
    length = icxx"""$s->length;"""
-   r, Int(length)
+   r, Int(length), minimal
 end
 
 function id_sres(I::ideal, n::Cint, R::ring)
@@ -155,9 +160,14 @@ function id_sres(I::ideal, n::Cint, R::ring)
          rChangeCurrRing(origin);
          s;
       """
-   r = icxx"""$s->fullres;"""
+   r = icxx"""$s->minres;"""
+   minimal = true
+   if r == C_NULL
+      r = icxx"""$s->fullres;"""
+      minimal = false
+   end
    length = icxx"""$s->length;"""
-   r, Int(length)
+   r, Int(length), minimal
 end
 
 function id_Eliminate(I::ideal, v::poly, R::ring)
