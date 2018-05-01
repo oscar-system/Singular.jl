@@ -109,3 +109,6 @@ function Matrix{T <: Nemo.RingElem}(I::smodule{T})
    return smatrix{T}(base_ring(I), I.ptr)
 end
 
+function Matrix{T <: Nemo.RingElem}(I::sideal{T})
+   return smatrix{T}(base_ring(I), I.ptr)
+end

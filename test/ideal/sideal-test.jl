@@ -257,6 +257,24 @@ function test_sideal_free_resolution()
    println("PASS")
 end
 
+function test_sideal_syzygy()
+   print("sideal.syzygy...")
+
+   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+
+   I = Ideal(R, x^2*y + 2y + 1, y^2 + 1)
+
+   F = syz(I)
+
+   M = Singular.Matrix(I)
+   N = Singular.Matrix(F)
+
+   # check they are actually syzygies
+   @test iszero(M*N)
+
+   println("PASS")
+end
+
 function test_sideal_kernel()
    print("sideal.kernel...")
 
@@ -284,6 +302,7 @@ function test_sideal()
    test_sideal_std()
    test_sideal_reduction()
    test_sideal_free_resolution()
+   test_sideal_syzygy()
    test_sideal_kernel()
 
    println("")
