@@ -151,6 +151,7 @@ doc"""
 > computed.
 """
 function contains(I::sideal{T}, J::sideal{T}) where T <: AbstractAlgebra.RingElem
+   check_parent(I, J)
    if !I.isGB
       I = std(I)
    end
@@ -166,7 +167,7 @@ end
 doc"""
     isequal{T <: AbstractAlgebra.RingElem}(I1::sideal{T}, I2::sideal{T})
 > Return `true` if the given ideals have the same generators in the same order. Note
-> that two arithmetically equal ideals with different generators will return `false`.
+> that two algebraically equal ideals with different generators will return `false`.
 """
 function isequal(I1::sideal{T}, I2::sideal{T}) where T <: AbstractAlgebra.RingElem
    check_parent(I1, I2)
@@ -321,10 +322,20 @@ end
 #
 ###############################################################################
 
-function eliminate(I::sideal, p::spoly)
+doc"""
+    eliminate(I::sideal, polys::spoly...)
+> Given a list of polynomials which are variables, construct the ideal
+> corresponding geometrically to the projection of the variety given by the
+> ideal $I$ where those variables have been eliminated.
+"""
+function eliminate(I::sideal, polys::spoly...)
    R = base_ring(I)
-   !isgen(p) && error("Not a variable")
-   parent(p) != R && error("Incompatible base rings")
+   p = one(R)
+   for i = 1:length(polys)
+      !isgen(polys[i]) && error("Not a variable")
+      parent(polys[i]) != R && error("Incompatible base rings")
+      p *= polys[i]
+   end
    ptr = libSingular.id_Eliminate(I.ptr, p.ptr, R.ptr)
    return Ideal(R, ptr)
 end
@@ -369,7 +380,7 @@ doc"""
       method::String="complete")
 > Compute a free resolution of the given ideal up to the maximum given length.
 > The ideal must be over a polynomial ring over a field, and a Groebner basis.
-> The possible methods are "comple", "frame", "extended frame" and
+> The possible methods are "complete", "frame", "extended frame" and
 > "single module". The result is given as a resolution, whose i-th entry is
 > the syzygy module of the previous module, starting with the given ideal.
 > The `max_length` can be set to $0$ if the full free resolution is required.

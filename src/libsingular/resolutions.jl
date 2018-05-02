@@ -1,5 +1,8 @@
-function sy_Delete(r::resolvente, i::Cint, R::ring)
-   icxx"""id_Delete($r + $i, $R);"""
+function res_Delete(r::resolvente, length::Cint, R::ring)
+   icxx"""for (int i = 0; i < $length; i++)
+          id_Delete($r + i, $R);
+          omFreeSize((ADDRESS) $r, ($length + 1)*sizeof(ideal));
+       """
 end
 
 function getindex(r::resolvente, i::Cint)
@@ -21,8 +24,9 @@ function syMinimize(r::resolvente, length::Cint, R::ring)
           syMinimize(temp);
           result = temp->minres;
           temp->minres = NULL;
+          /* syMinimize increments this as it returns a value we ignore */
+          temp->references--;
           syKillComputation(temp, $R);
-          omFreeSize((ADDRESS) temp, sizeof(ssyStrategy));
           rChangeCurrRing(origin);
           result;
        """

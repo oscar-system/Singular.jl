@@ -299,6 +299,10 @@ function test_sideal_eliminate()
 
    @test equal(J, Ideal(R, x^3 - y^2))
 
+   K = eliminate(I, t, x)
+
+   @test equal(K, Ideal(R))
+
    println("PASS")
 end
 
