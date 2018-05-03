@@ -32,6 +32,12 @@ type smatrix{T <: Nemo.RingElem} <: Nemo.SetElem
       finalizer(z, _smatrix_clear_fn)
       return z
    end
+
+   function smatrix{T}(R::PolyRing, ptr::libSingular.matrix) where {T}
+      z = new(ptr, R)
+      finalizer(z, _smatrix_clear_fn)
+      return z
+   end
 end
 
 function _smatrix_clear_fn(I::smatrix)

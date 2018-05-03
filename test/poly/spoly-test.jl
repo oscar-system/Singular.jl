@@ -67,6 +67,8 @@ function test_spoly_constructors()
    @test !isgen(x + y)
    @test !isgen(x^2)
 
+   @test has_global_ordering(R)
+
    println("PASS")
 end
 

@@ -1,9 +1,35 @@
-function sy_Delete(r::resolvente, i::Cint, R::ring)
-   icxx"""id_Delete($r + $i, $R);"""
+function res_Delete(r::resolvente, length::Cint, R::ring)
+   icxx"""for (int i = 0; i < $length; i++)
+          id_Delete($r + i, $R);
+          omFreeSize((ADDRESS) $r, ($length + 1)*sizeof(ideal));
+       """
 end
 
 function getindex(r::resolvente, i::Cint)
    icxx"""(ideal) $r[$i];"""
+end
+
+function syMinimize(r::resolvente, length::Cint, R::ring)
+   icxx"""const ring origin = currRing;
+          syStrategy temp = (syStrategy) omAlloc0(sizeof(ssyStrategy));
+          resolvente result;
+          rChangeCurrRing($R);
+          temp->fullres = (resolvente) omAlloc0(($length + 1)*sizeof(ideal));
+          for (int i = $length - 1; i >= 0; i--)
+          {
+             if ($r[i] != NULL)
+                temp->fullres[i] = idCopy($r[i]);
+          }
+          temp->length = $length;
+          syMinimize(temp);
+          result = temp->minres;
+          temp->minres = NULL;
+          /* syMinimize increments this as it returns a value we ignore */
+          temp->references--;
+          syKillComputation(temp, $R);
+          rChangeCurrRing(origin);
+          result;
+       """
 end
 
 function syBetti(res::resolvente, length::Cint, R::ring)

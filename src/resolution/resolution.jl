@@ -1,4 +1,4 @@
-export betti
+export betti, minres
 
 ###############################################################################
 #
@@ -24,8 +24,25 @@ function getindex(r::sresolution, i::Int)
    return Module(R, ptr)
 end
 
+length(r::sresolution) = r.len - 1
+
 function betti(r::sresolution)
    libSingular.syBetti(r.ptr, Cint(r.len), r.base_ring.ptr)
+end
+
+###############################################################################
+#
+#   Minimal resolution
+#
+###############################################################################
+
+function minres(r::sresolution{T}) where T <: AbstractAlgebra.RingElem
+   if r.minimal
+      return r
+   end
+   R = base_ring(r)
+   ptr = libSingular.syMinimize(r.ptr, Cint(r.len), R.ptr)
+   return sresolution{T}(R, r.len, ptr, true)
 end
 
 ###############################################################################
@@ -45,7 +62,7 @@ function show(io::IO, r::sresolution)
       ptr = libSingular.getindex(r.ptr, Cint(0))
       print(io, "R^", libSingular.rank(ptr))
    end
-   for i = 1:r.len
+   for i = 1:r.len - 1
       ptr = libSingular.getindex(r.ptr, Cint(i-1))
       if ptr == C_NULL
          break

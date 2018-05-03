@@ -58,6 +58,10 @@ function id_Power(I::ideal, n::Cint, R::ring)
    icxx"""id_Power($I, $n, $R);"""
 end
 
+function id_IsEqual(I1::ideal, I2::ideal, R::ring)
+   icxx"""mp_Equal((ip_smatrix *) $I1, (ip_smatrix *) $I2, $R);"""
+end
+
 function id_FreeModule(n::Cint, R::ring)
    icxx"""id_FreeModule($n, $R);"""
 end
@@ -139,27 +143,31 @@ function id_fres(I::ideal, n::Cint, method::String, R::ring)
          rChangeCurrRing(origin);
          s;
       """
-   r = icxx"""$s->fullres;"""
+   r = icxx"""$s->minres;"""
+   minimal = true
+   if r == C_NULL
+      r = icxx"""$s->fullres;"""
+      minimal = false
+   end
    length = icxx"""$s->length;"""
-   r, Int(length)
+   r, Int(length), minimal
 end
 
-function id_sres(I:: ideal, n::Cint, len::Ptr{Cint}, R::ring)
-   icxx"""const ring origin = currRing;
-          rChangeCurrRing($R);
-          resolvente r = sySchreyerResolvente($I, $n, $len);
-          rChangeCurrRing(origin);
-          (resolvente) r;
-       """
-end
-
-function id_lres(I:: ideal, len::Ptr{Cint}, R::ring)
-   icxx"""const ring origin = currRing;
-          rChangeCurrRing($R);
-          resolvente r = syLaScala1($I, $len);
-          rChangeCurrRing(origin);
-          (resolvente) r;
-       """
+function id_sres(I::ideal, n::Cint, R::ring)
+   s = icxx"""const ring origin = currRing;
+         rChangeCurrRing($R);
+         syStrategy s = sySchreyer($I, $n);
+         rChangeCurrRing(origin);
+         s;
+      """
+   r = icxx"""$s->minres;"""
+   minimal = true
+   if r == C_NULL
+      r = icxx"""$s->fullres;"""
+      minimal = false
+   end
+   length = icxx"""$s->length;"""
+   r, Int(length), minimal
 end
 
 function id_Eliminate(I::ideal, v::poly, R::ring)

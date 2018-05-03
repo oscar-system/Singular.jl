@@ -1,5 +1,6 @@
 export spoly, PolyRing, coeff, coeffs_expos, degree, exponent!, isgen, content,
-       exponent, lead_exponent, ngens, degree_bound, primpart, @PolynomialRing
+       exponent, lead_exponent, ngens, degree_bound, primpart, @PolynomialRing,
+       has_global_ordering
 
 ###############################################################################
 #
@@ -18,6 +19,8 @@ elem_type(::Type{PolyRing{T}}) where T <: Nemo.RingElem = spoly{T}
 parent_type(::Type{spoly{T}}) where T <: Nemo.RingElem = PolyRing{T}
 
 ngens(R::PolyRing) = Int(libSingular.rVar(R.ptr))
+
+has_global_ordering(R::PolyRing) = Bool(libSingular.rHasGlobalOrdering(R.ptr))
 
 characteristic(R::PolyRing) = Int(libSingular.rChar(R.ptr))
 

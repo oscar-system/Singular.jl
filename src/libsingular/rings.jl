@@ -47,6 +47,10 @@ function rGetExpSize(bitmask::Culong, N::Cint)
        """
 end
 
+function rHasGlobalOrdering(r::ring)
+   icxx"""rHasGlobalOrdering($r);"""
+end
+
 function rBitmask(r::ring)
    # cast to unsigned int for 32 bit compatibility in Cxx package
    icxx"""(unsigned int)$r->bitmask;"""
