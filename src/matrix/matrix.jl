@@ -41,6 +41,12 @@ function iszero(M::smatrix)
    return true
 end
 
+function deepcopy(M::smatrix)
+   R = base_ring(M)
+   ptr = libSingular.mp_Copy(M.ptr, R.ptr)
+   return parent(M)(ptr)
+end
+
 ###############################################################################
 #
 #   String I/O 
@@ -99,6 +105,30 @@ function *(M::smatrix{T}, N::smatrix{T}) where T <: AbstractAlgebra.RingElem
    (ncols(M) != nrows(N)) && error("Incompatible dimensions")
    ptr = libSingular.mp_Mult(M.ptr, N.ptr, R.ptr)
    return smatrix{T}(R, ptr)
+end
+
+###############################################################################
+#
+#   Comparison
+#
+###############################################################################
+
+function ==(M::smatrix{T}, N::smatrix{T}) where T <: AbstractAlgebra.RingElem
+   R = base_ring(M)
+   R != base_ring(N) && error("Matrices are not over the same ring")
+   (nrows(M) != nrows(N)) && error("Incompatible dimensions")
+   (ncols(M) != ncols(N)) && error("Incompatible dimensions")
+   return Bool(libSingular.mp_Equal(M.ptr, N.ptr, R.ptr))
+end
+
+###############################################################################
+#
+#   Parent object call
+#
+###############################################################################
+
+function (S::MatrixSpace{T})(ptr::libSingular.matrix) where T <: AbstractAlgebra.RingElem
+   return smatrix{T}(base_ring(S), ptr)
 end
 
 ###############################################################################

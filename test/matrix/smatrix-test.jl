@@ -43,12 +43,54 @@ function test_smatrix_manipulation()
    @test !iszero(M)
    @test iszero(M - M)
 
+   @test deepcopy(M) == M
+
+   println("PASS")
+end
+
+function test_smatrix_binary_ops()
+   print("smatrix.binary_ops...")
+
+   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+
+   I1 = Ideal(R, x, y)
+   I2 = Ideal(R, x*y + 1, x^2 + 1)
+   I3 = Ideal(R, x^2*y^2 + x + 1)
+
+   M1 = Singular.Matrix(I1)
+   M2 = Singular.Matrix(I2)
+   M3 = Singular.Matrix(I3)
+
+   @test M1 + M2 == M2 + M1
+   @test (M1 + M2) - M2 == M1
+   @test M3*(M1 + M2) == M3*M1 + M3*M2
+
+   println("PASS")
+end
+
+function test_smatrix_comparison()
+   print("smatrix.comparison...")
+
+   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+
+   I1 = Ideal(R, x, y)
+   I2 = Ideal(R, x*y + 1, x^2 + 1)
+
+   M1 = Singular.Matrix(I1)
+   M2 = Singular.Matrix(I2)
+
+   @test M1 != M2
+   @test M1 == M1
+   @test M1 == deepcopy(M1)
+
    println("PASS")
 end
 
 function test_smatrix()
    test_smatrix_constructors()
    test_smatrix_manipulation()
+   test_smatrix_binary_ops()
+   test_smatrix_comparison()
 
    println("")
 end
