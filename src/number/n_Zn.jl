@@ -20,7 +20,7 @@ function characteristic(R::N_ZnRing)
    return ZZ(libSingular.n_GetChar(R.ptr))
 end
 
-function deepcopy(a::n_Zn)
+function deepcopy_internal(a::n_Zn, dict::ObjectIdDict)
    return parent(a)(libSingular.n_Copy(a.ptr, parent(a).ptr))
 end
 

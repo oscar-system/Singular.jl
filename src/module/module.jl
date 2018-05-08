@@ -30,7 +30,7 @@ end
 
 iszero(p::smodule) = Bool(libSingular.idIs0(p.ptr))
 
-function deepcopy(I::smodule)
+function deepcopy_internal(I::smodule, dict::ObjectIdDict)
    R = base_ring(I)
    ptr = libSingular.id_Copy(I.ptr, R.ptr)
    return SingularIdeal(R, ptr)
