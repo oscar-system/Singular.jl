@@ -26,8 +26,29 @@ function test_smatrix_constructors()
    println("PASS")
 end
 
+function test_smatrix_manipulation()
+   print("smatrix.manipulation...")
+
+   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+
+   I = Ideal(R, x, y)
+   M = Singular.Matrix(I)
+
+   @test nrows(M) == 1
+   @test ncols(M) == 2
+
+   @test M[1, 1] == x
+   @test M[1, 2] == y
+
+   @test !iszero(M)
+   @test iszero(M - M)
+
+   println("PASS")
+end
+
 function test_smatrix()
    test_smatrix_constructors()
+   test_smatrix_manipulation()
 
    println("")
 end
