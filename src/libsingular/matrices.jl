@@ -14,6 +14,10 @@ function getindex(M::matrix, i::Cint, j::Cint)
   icxx"""(poly) MATELEM($M, $i, $j);"""
 end
 
+function mp_Copy(M::matrix, R::ring)
+   icxx"""mp_Copy($M, $R);"""
+end
+
 function mp_Delete(M::matrix, R::ring)
    icxx"""mp_Delete(&$M, $R);"""
 end
@@ -28,6 +32,10 @@ end
 
 function mp_Mult(M::matrix, N::matrix, R::ring)
    icxx"""mp_Mult($M, $N, $R);"""
+end
+
+function mp_Equal(M::matrix, N::matrix, R::ring)
+   icxx"""mp_Equal($M, $N, $R);"""
 end
 
 function iiStringMatrix(I::matrix, d::Cint, R::ring)
