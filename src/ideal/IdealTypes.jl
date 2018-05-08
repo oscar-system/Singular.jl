@@ -47,5 +47,5 @@ end
 function _sideal_clear_fn(I::sideal)
    R = I.base_ring
    libSingular.id_Delete(I.ptr, R.ptr)
-   _PolyRing_clear_fn
+   _PolyRing_clear_fn(R)
 end
