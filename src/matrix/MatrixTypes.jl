@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-const MatrixSpaceID = Dict{Ring, Set}()
+const MatrixSpaceID = Dict{Tuple{Ring, Int, Int}, Set}()
 
 type MatrixSpace{T <: Nemo.RingElem} <: Set
    base_ring::PolyRing
@@ -15,7 +15,7 @@ type MatrixSpace{T <: Nemo.RingElem} <: Set
       if haskey(MatrixSpaceID, (R, r, c))
          return MatrixSpaceID[R, r, c]
       else
-         return MatrixSpaceID[R, r, c] = new(R, r, c)
+         return MatrixSpaceID[R, r, c] = new{T}(R, r, c)
       end
    end
 end

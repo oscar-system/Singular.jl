@@ -1,4 +1,4 @@
-export nrows, ncols
+export MatrixSpace, smatrix, nrows, ncols
 
 ###############################################################################
 #
@@ -10,17 +10,19 @@ nrows(M::smatrix) = Int(libSingular.nrows(M.ptr))
 
 ncols(M::smatrix) = Int(libSingular.ncols(M.ptr))
 
-function parent(M::smatrix)
-   return MatrixSpace(M.base_ring, nrows(M), ncols(M))
+function parent(M::smatrix{T}) where T <: AbstractAlgebra.RingElem
+   return MatrixSpace{T}(M.base_ring, nrows(M), ncols(M))
 end
 
 base_ring(S::MatrixSpace) = S.base_ring
 
 base_ring(M::smatrix) = M.base_ring
 
-elem_type(S::MatrixSpace) = smatrix
+elem_type(::Type{MatrixSpace{T}}) where T <: AbstractAlgebra.RingElem = smatrix{T}
 
-parent_type(M::smatrix) = MatrixSpace
+elem_type(::MatrixSpace{T}) where T <: AbstractAlgebra.RingElem = smatrix{T}
+
+parent_type(::Type{smatrix{T}}) where T <: AbstractAlgebra.RingElem = MatrixSpace{T}
 
 function getindex(M::smatrix, i::Int, j::Int)
    R = base_ring(M)

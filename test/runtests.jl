@@ -9,9 +9,11 @@ end
 include("../test/number-test.jl")
 include("../test/poly-test.jl")
 include("../test/ideal-test.jl")
+include("../test/matrix-test.jl")
 
 test_number()
 test_poly()
 test_ideal()
+test_matrix()
 
 
