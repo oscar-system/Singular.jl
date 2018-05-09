@@ -5,6 +5,18 @@ function res_Delete(r::resolvente, length::Cint, R::ring)
        """
 end
 
+function res_Copy(r::resolvente, length::Cint, R::ring)
+   icxx"""resolvente res = (resolvente) omAlloc0(($length + 1)*sizeof(ideal));
+          rChangeCurrRing($R);
+          for (int i = $length - 1; i >= 0; i--)
+          {
+             if ($r[i] != NULL)
+                res[i] = id_Copy($r[i], $R);
+          }
+          res;
+       """
+end
+
 function getindex(r::resolvente, i::Cint)
    icxx"""(ideal) $r[$i];"""
 end

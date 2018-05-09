@@ -38,9 +38,15 @@ length(r::sresolution) = r.len - 1
 
 function deepcopy_internal(r::sresolution, dict::ObjectIdDict)
    R = base_ring(r)
-   ptr = libSingular.res_Copy(r.ptr, r.len, R.ptr)
+   ptr = libSingular.res_Copy(r.ptr, Cint(r.len), R.ptr)
    return parent(r)(ptr, r.len)
 end
+
+###############################################################################
+#
+#   Betti numbers
+#
+###############################################################################
 
 function betti(r::sresolution)
    libSingular.syBetti(r.ptr, Cint(r.len), r.base_ring.ptr)
@@ -94,7 +100,7 @@ end
 ###############################################################################
 
 function (S::ResolutionSet{T})(ptr::libSingular.resolvente, len::Int) where T <: AbstractAlgebra.RingElem
-   R = base_ring(R)
+   R = base_ring(S)
    return sresolution{T}(R, len, ptr)
 end
 
