@@ -1,4 +1,4 @@
-export betti, minres
+export ResolutionSet, sresolution, betti, minres
 
 ###############################################################################
 #
@@ -10,7 +10,9 @@ base_ring(r::sresolution) = r.base_ring
 
 base_ring(R::ResolutionSet) = R.base_ring
 
-parent(r::sresolution) = ResolutionSet(r.base_ring)
+function parent(r::sresolution{T}) where T <: AbstractAlgebra.RingElem
+   return ResolutionSet{T}(r.base_ring)
+end
 
 elem_type(::Type{ResolutionSet{T}}) where T <: AbstractAlgebra.RingElem = sresolution{T}
 
