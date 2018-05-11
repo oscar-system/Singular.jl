@@ -94,32 +94,23 @@ end
 #
 ###############################################################################
 
-function sres{T <: Nemo.RingElem}(I::smodule{T}, n::Int)
+function sres{T <: Nemo.RingElem}(I::smodule{T}, max_length::Int)
    I.isGB == false && error("Not a Groebner basis ideal")
    R = base_ring(I)
-   len = [Cint(0)]
-   r = libSingular.id_sres(I.ptr, Cint(n), pointer(len), R.ptr)
-   for i = 1:n
-      id = libSingular.getindex(r, Cint(i - 1))
-      if id != C_NULL
-         libSingular.idSkipZeroes(id)
-      end
+   if max_length == 0
+        max_length = ngens(R)
+        # TODO: consider qrings
    end
-   return sresolution{T}(R, n, r)
-end
-
-function lres{T <: Nemo.RingElem}(I::smodule{T}, n::Int)
-   I.isGB == false && error("Not a Groebner basis ideal")
-   R = base_ring(I)
-   len = [Cint(n)]
-   r = libSingular.id_lres(I.ptr, pointer(len), R.ptr)
-   for i = 1:n
-      id = libSingular.getindex(r, Cint(i - 1))
-      if id != C_NULL
-         libSingular.idSkipZeroes(id)
+   r, length, minimal = libSingular.id_sres(I.ptr, Cint(max_length + 1), R.ptr)
+   for i = 1:length
+      ptr = libSingular.getindex(r, Cint(i - 1))
+      if ptr == C_NULL
+         length = i - 1
+         break
       end
+     libSingular.idSkipZeroes(ptr)
    end
-   return sresolution{T}(R, n, r)
+   return sresolution{T}(R, length, r, minimal)
 end
 
 ###############################################################################

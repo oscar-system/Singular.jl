@@ -391,7 +391,7 @@ function fres{T <: Nemo.RingElem}(id::sideal{T}, max_length::Int,
    max_length < 0 && error("length for fres must not be negative")
    R = base_ring(id)
    if max_length == 0
-        max_length = ngens(R)+1
+        max_length = ngens(R)
         # TODO: consider qrings
    end
    if (method != "complete"
@@ -400,7 +400,7 @@ function fres{T <: Nemo.RingElem}(id::sideal{T}, max_length::Int,
          && method != "single module")
       error("wrong optional argument for fres")
    end
-   r, length, minimal = libSingular.id_fres(id.ptr, Cint(max_length), method, R.ptr)
+   r, length, minimal = libSingular.id_fres(id.ptr, Cint(max_length + 1), method, R.ptr)
    return sresolution{T}(R, length, r, minimal)
 end
 
@@ -416,10 +416,10 @@ function sres{T <: Nemo.RingElem}(I::sideal{T}, max_length::Int)
    I.isGB == false && error("Not a Groebner basis ideal")
    R = base_ring(I)
    if max_length == 0
-        max_length = ngens(R)+1
+        max_length = ngens(R)
         # TODO: consider qrings
    end
-   r, length, minimal = libSingular.id_sres(I.ptr, Cint(max_length), R.ptr)
+   r, length, minimal = libSingular.id_sres(I.ptr, Cint(max_length + 1), R.ptr)
    for i = 1:length
       ptr = libSingular.getindex(r, Cint(i - 1))
       if ptr == C_NULL

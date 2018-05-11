@@ -28,6 +28,18 @@ function test_sresolution_manipulation()
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    I = Ideal(R, x*y + 1, x^2 + 1)
+   F = fres(std(I), 1)
+
+   @test length(F) == 1
+
+   F = fres(std(I), 0)
+
+   @test length(F) == 2
+
+   F = fres(std(I), 2)
+
+   @test length(F) == 2
+
    F = fres(std(I), 3)
 
    @test length(F) == 2

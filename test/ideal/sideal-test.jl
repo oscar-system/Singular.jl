@@ -237,8 +237,8 @@ function test_sideal_free_resolution()
 
    I = Ideal(R, x^2*y + 2y + 1, y^2 + 1)
 
-   F1 = fres(std(I), 5)
-   F2 = sres(std(I), 5)
+   F1 = fres(std(I), 4)
+   F2 = sres(std(I), 4)
 
    # check resolution is of the correct length
    @test length(F1) == 2
