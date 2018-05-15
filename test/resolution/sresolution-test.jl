@@ -46,7 +46,7 @@ function test_sresolution_manipulation()
 
    @test isa(F[1], smodule)
    @test isa(F[2], smodule)
-   @test isa(F[2], smodule)
+   @test isa(F[3], smodule)
 
    G = deepcopy(F)
 
