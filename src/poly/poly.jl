@@ -201,7 +201,7 @@ function lead_exponent(p::spoly)
    return A
 end
 
-function deepcopy(p::spoly)
+function deepcopy_internal(p::spoly, dict::ObjectIdDict)
    p2 = libSingular.p_Copy(p.ptr, parent(p).ptr)
    return parent(p)(p2)
 end
@@ -451,34 +451,46 @@ end
 
 function (R::PolyRing)()
    T = elem_type(base_ring(R))
-   return spoly{T}(R)
+   z = spoly{T}(R)
+   z.parent = R
+   return z
 end
 
 function (R::PolyRing)(n::Int)
    T = elem_type(base_ring(R))
-   return spoly{T}(R, n)
+   z = spoly{T}(R, n)
+   z.parent = R
+   return z
 end
 
 function (R::PolyRing)(n::Integer)
    T = elem_type(base_ring(R))
-   return spoly{T}(R, BigInt(n))
+   z = spoly{T}(R, BigInt(n))
+   z.parent = R
+   return z
 end
 
 function (R::PolyRing)(n::n_Z)
    n = base_ring(R)(n)
    ptr = libSingular.n_Copy(n.ptr, parent(n).ptr)
    T = elem_type(base_ring(R))
-   return spoly{T}(R, ptr)
+   z = spoly{T}(R, ptr)
+   z.parent = R
+   return z
 end
 
 function (R::PolyRing)(n::libSingular.poly)
    T = elem_type(base_ring(R))
-   return spoly{T}(R, n)
+   z = spoly{T}(R, n)
+   z.parent = R
+   return z
 end
 
 function (R::PolyRing{T}){T <: Nemo.RingElem}(n::T)
    parent(n) != base_ring(R) && error("Unable to coerce into polynomial ring")
-   return spoly{T}(R, n.ptr)
+   z = spoly{T}(R, n.ptr)
+   z.parent = R
+   return z
 end
 
 function (R::PolyRing{S}){S <: Nemo.RingElem, T <: Nemo.RingElem}(n::T)

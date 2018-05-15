@@ -1,4 +1,4 @@
-export betti, minres
+export ResolutionSet, sresolution, betti, minres
 
 ###############################################################################
 #
@@ -8,7 +8,17 @@ export betti, minres
 
 base_ring(r::sresolution) = r.base_ring
 
-parent(r::sresolution) = ResolutionSet(r.base_ring)
+base_ring(R::ResolutionSet) = R.base_ring
+
+function parent(r::sresolution{T}) where T <: AbstractAlgebra.RingElem
+   return ResolutionSet{T}(r.base_ring)
+end
+
+elem_type(::Type{ResolutionSet{T}}) where T <: AbstractAlgebra.RingElem = sresolution{T}
+
+elem_type(::ResolutionSet{T}) where T <: AbstractAlgebra.RingElem = sresolution{T}
+
+parent_type(::Type{sresolution{T}}) where T <: AbstractAlgebra.RingElem = ResolutionSet{T}
 
 function checkbounds(r::sresolution, i::Int)
    (i < 1 || i > r.len) && throw(BoundsError(I, i))
@@ -25,6 +35,18 @@ function getindex(r::sresolution, i::Int)
 end
 
 length(r::sresolution) = r.len - 1
+
+function deepcopy_internal(r::sresolution, dict::ObjectIdDict)
+   R = base_ring(r)
+   ptr = libSingular.res_Copy(r.ptr, Cint(r.len), R.ptr)
+   return parent(r)(ptr, r.len)
+end
+
+###############################################################################
+#
+#   Betti numbers
+#
+###############################################################################
 
 function betti(r::sresolution)
    libSingular.syBetti(r.ptr, Cint(r.len), r.base_ring.ptr)
@@ -70,3 +92,15 @@ function show(io::IO, r::sresolution)
       print(io, " <- R^", libSingular.ngens(ptr))
    end
 end
+
+###############################################################################
+#
+#   Parent object call overload
+#
+###############################################################################
+
+function (S::ResolutionSet{T})(ptr::libSingular.resolvente, len::Int) where T <: AbstractAlgebra.RingElem
+   R = base_ring(S)
+   return sresolution{T}(R, len, ptr)
+end
+

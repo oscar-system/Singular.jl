@@ -16,7 +16,7 @@ base_ring(a::n_Q) = ZZ
 
 base_ring(a::Rationals) = ZZ
 
-function deepcopy(a::n_Q)
+function deepcopy_internal(a::n_Q, dict::ObjectIdDict)
    return parent(a)(libSingular.n_Copy(a.ptr, parent(a).ptr))
 end
 

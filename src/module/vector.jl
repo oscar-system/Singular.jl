@@ -1,3 +1,5 @@
+export FreeMod, svector
+
 ###############################################################################
 #
 #   Basic manipulation
@@ -16,7 +18,7 @@ parent_type{T <: Nemo.RingElem}(v::svector{T}) = FreeMod{T}
 
 rank(R::FreeMod) = R.rank
 
-function deepcopy(p::svector)
+function deepcopy_internal(p::svector, dict::ObjectIdDict)
    p2 = libSingular.p_Copy(p.ptr, parent(p).ptr)
    return Singular.Vector(p.base_ring, p.rank, p2)
 end
