@@ -48,10 +48,37 @@ function test_svector_manipulation()
    println("PASS")
 end
 
+function test_svector_unary_ops()
+   print("svector.unary_ops...")
+
+   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+
+   v = vector(R, x, y, R(2))
+
+   @test -(-v) == v
+
+   println("PASS")
+end
+
+function test_svector_binary_ops()
+   print("svector.binary_ops...")
+
+   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+
+   v1 = vector(R, x, y, R(2))
+   v2 = vector(R, x^2 + 1, x*y, y + 1)
+
+   @test v1 + v2 == v2 + v1
+   @test v1 + v2 - v2 == v1
+
+   println("PASS")
+end
+
 function test_svector()
    test_svector_constructors()
    test_svector_manipulation()
+   test_svector_unary_ops()
+   test_svector_binary_ops()
 
    println("")
 end
-
