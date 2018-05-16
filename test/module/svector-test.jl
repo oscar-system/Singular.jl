@@ -74,11 +74,42 @@ function test_svector_binary_ops()
    println("PASS")
 end
 
+function test_svector_adhoc_binary()
+   print("svector.adhoc_binary...")
+
+   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+
+   v1 = vector(R, x, y, R(2))
+   v2 = vector(R, x^2 + 1, x*y, y + 1)
+
+   @test 2*(v1 + v2) == v1*2 + v2*2
+   @test QQ(2)*(v1 + v2) == v1*QQ(2) + v2*QQ(2)
+   @test x*(v1 + v2) == v1*x + v2*x
+   
+   println("PASS")
+end
+
+function test_svector_comparison()
+   print("svector.comparison...")
+
+   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+
+   v1 = vector(R, x, y, R(2))
+   v2 = vector(R, x^2 + 1, x*y, y + 1)
+
+   @test v1 != v2
+   @test v1 == deepcopy(v1)
+
+   println("PASS")
+end
+
 function test_svector()
    test_svector_constructors()
    test_svector_manipulation()
    test_svector_unary_ops()
    test_svector_binary_ops()
+   test_svector_adhoc_binary()
+   test_svector_comparison()
 
    println("")
 end
