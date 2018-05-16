@@ -1,4 +1,4 @@
-export FreeMod, svector, gens, vector
+export FreeMod, svector, gens, rank, vector
 
 ###############################################################################
 #
@@ -26,18 +26,14 @@ function gens(M::FreeMod{T}) where T <: AbstractAlgebra.RingElem
    return [svector{T}(R, M.rank, libSingular.getindex(ptr, Cint(i - 1))) for i in 1:M.rank]
 end
 
-function deepcopy_internal(p::svector, dict::ObjectIdDict)
-   p2 = libSingular.p_Copy(p.ptr, parent(p).ptr)
-   return Singular.Vector(p.base_ring, p.rank, p2)
+function deepcopy_internal(p::svector{T}, dict::ObjectIdDict) where T <: AbstractAlgebra.RingElem
+   p2 = libSingular.p_Copy(p.ptr, base_ring(p).ptr)
+   return svector{T}(p.base_ring, p.rank, p2)
 end
 
 function check_parent{T <: Nemo.RingElem}(a::svector{T}, b::svector{T})
    base_ring(a) != base_ring(b) && error("Incompatible base rings")
    a.rank != b.rank && error("Vectors of incompatible rank")
-end
-
-function check_parent{T <: Nemo.RingElem}(a::svector{spoly{T}}, b::spoly{T})
-   base_ring(a) != parent(b) && error("Incompatible base rings")
 end
 
 ###############################################################################
@@ -103,7 +99,7 @@ end
 ###############################################################################
 
 function *(a::svector{spoly{T}}, b::spoly{T}) where T <: AbstractAlgebra.RingElem
-   check_parent(a, b)
+   base_ring(a) != parent(b) && error("Incompatible base rings")
    R = base_ring(a)
    a1 = libSingular.p_Copy(a.ptr, R.ptr)
    b1 = libSingular.p_Copy(b.ptr, R.ptr)

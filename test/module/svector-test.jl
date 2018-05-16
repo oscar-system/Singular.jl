@@ -31,6 +31,20 @@ function test_svector_manipulation()
 
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
+   M = FreeModule(R, 3)
+
+   v = vector(R, x, y, R(2))
+
+   @test rank(M) == 3
+
+   g = gens(M)
+
+   @test length(g) == 3
+
+   @test g[1]*x + g[2]*y + g[3]*2 == v
+
+   @test deepcopy(v) == v
+
    println("PASS")
 end
 

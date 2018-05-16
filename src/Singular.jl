@@ -8,7 +8,7 @@ using Cxx
 import Base: abs, checkbounds, deepcopy, deepcopy_internal,
              denominator, div, divrem, exponent,
              gcd, gcdx, getindex, indices, inv, isequal, isless, lcm, length,
-             mod, normalize!, numerator, one, reduce, rem, setindex!, show,
+             mod, normalize!, numerator, one, rank, reduce, rem, setindex!, show,
              std, zero, +, -, *, ==, ^, &, |, $, <<, >>, ~, <=, >=, <, >, //,
              /, !=
 
