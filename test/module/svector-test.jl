@@ -103,6 +103,18 @@ function test_svector_comparison()
    println("PASS")
 end
 
+function test_svector_conversion()
+   print("svector.conversion...")
+
+   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+
+   v1 = vector(R, x, y, R(2))
+
+   @test Array(v1) == [x, y, R(2)]
+
+   println("PASS")
+end
+
 function test_svector()
    test_svector_constructors()
    test_svector_manipulation()
@@ -110,6 +122,7 @@ function test_svector()
    test_svector_binary_ops()
    test_svector_adhoc_binary()
    test_svector_comparison()
+   test_svector_conversion()
 
    println("")
 end
