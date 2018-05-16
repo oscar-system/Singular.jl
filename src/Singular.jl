@@ -13,7 +13,8 @@ import Base: abs, checkbounds, deepcopy, deepcopy_internal,
              /, !=
 
 import Nemo: add!, addeq!, base_ring, canonical_unit, check_parent, coeff,
-             contains, content, crt, divexact, elem_type, gcdinv, isnegative, isone,
+             contains, content, crt, divexact,
+             elem_type, gcdinv, gens, isnegative, isone,
              isgen, iszero, isunit, lead, mul!, needs_parentheses, parent_type,
              parent, primpart, promote_rule, reconstruct, show_minus_one, zero!,
              ResidueRing, characteristic, degree, intersect, isconstant

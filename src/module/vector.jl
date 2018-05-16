@@ -1,4 +1,4 @@
-export FreeMod, svector
+export FreeMod, svector, gens, vector
 
 ###############################################################################
 #
@@ -12,11 +12,19 @@ base_ring(R::FreeMod) = R.base_ring
 
 base_ring(v::svector) = v.base_ring
 
-elem_type{T <: Nemo.RingElem}(::FreeMod{T}) = T
+elem_type{T <: Nemo.RingElem}(::FreeMod{T}) = svector{T}
 
-parent_type{T <: Nemo.RingElem}(v::svector{T}) = FreeMod{T}
+elem_type{T <: Nemo.RingElem}(::Type{FreeMod{T}}) = svector{T}
+
+parent_type{T <: Nemo.RingElem}(::Type{svector{T}}) = FreeMod{T}
 
 rank(R::FreeMod) = R.rank
+
+function gens(M::FreeMod{T}) where T <: AbstractAlgebra.RingElem
+   R = base_ring(M)
+   ptr = libSingular.id_FreeModule(Cint(M.rank), R.ptr)
+   return [svector{T}(R, M.rank, libSingular.getindex(ptr, Cint(i - 1))) for i in 1:M.rank]
+end
 
 function deepcopy_internal(p::svector, dict::ObjectIdDict)
    p2 = libSingular.p_Copy(p.ptr, parent(p).ptr)
@@ -57,11 +65,11 @@ end
 #
 ###############################################################################
 
-function -(a::svector)
+function -(a::svector{T}) where T <: AbstractAlgebra.RingElem
    R = base_ring(a)
    a1 = libSingular.p_Copy(a.ptr, R.ptr)
    s = libSingular.p_Neg(a1, R.ptr)
-   return Singular.Vector(R, a.rank, s) 
+   return svector{T}(R, a.rank, s) 
 end
 
 ###############################################################################
@@ -70,22 +78,22 @@ end
 #
 ###############################################################################
 
-function +{T <: Nemo.RingElem}(a::svector{T}, b::svector{T})
+function +(a::svector{T}, b::svector{T}) where T <: AbstractAlgebra.RingElem
    check_parent(a, b)
    R = base_ring(a)
    a1 = libSingular.p_Copy(a.ptr, R.ptr)
    b1 = libSingular.p_Copy(b.ptr, R.ptr)
    s = libSingular.p_Add_q(a1, b1, R.ptr)
-   return Singular.Vector(R, a.rank, s) 
+   return svector{T}(R, a.rank, s) 
 end
 
-function -{T <: Nemo.RingElem}(a::svector{T}, b::svector{T})
+function -(a::svector{T}, b::svector{T}) where T <: AbstractAlgebra.RingElem
    check_parent(a, b)
    R = base_ring(a)
    a1 = libSingular.p_Copy(a.ptr, R.ptr)
    b1 = libSingular.p_Copy(b.ptr, R.ptr)
    s = libSingular.p_Sub(a1, b1, R.ptr)
-   return Singular.Vector(R, a.rank, s) 
+   return svector{T}(R, a.rank, s) 
 end
 
 ###############################################################################
@@ -94,13 +102,13 @@ end
 #
 ###############################################################################
 
-function *{T <: Nemo.RingElem}(a::svector{spoly{T}}, b::spoly{T})
+function *(a::svector{spoly{T}}, b::spoly{T}) where T <: AbstractAlgebra.RingElem
    check_parent(a, b)
    R = base_ring(a)
    a1 = libSingular.p_Copy(a.ptr, R.ptr)
    b1 = libSingular.p_Copy(b.ptr, R.ptr)
    s = libSingular.p_Mult_q(a1, b1, R.ptr)
-   return Singular.Vector(R, a.rank, s)
+   return svector{spoly{T}}(R, a.rank, s)
 end
 
 *{T <: Nemo.RingElem}(a::spoly{T}, b::svector{spoly{T}}) = b*a
@@ -120,38 +128,61 @@ end
 ###############################################################################
 
 function =={T <: Nemo.RingElem}(x::svector{T}, y::svector{T})
-    check_parent(x, y)
-    return Bool(libSingular.p_EqualPolys(x.ptr, y.ptr, base_ring(x).ptr))
+   check_parent(x, y)
+   return Bool(libSingular.p_EqualPolys(x.ptr, y.ptr, base_ring(x).ptr))
 end
 
 ###############################################################################
 #
-#   Vector Constructors
+#   Parent object call overload
 #
 ###############################################################################
 
-function Vector{T <: Nemo.RingElem}(R::PolyRing{T}, r::Int, p::libSingular.poly)
-   return svector{T}(R, r, p)
+function (S::FreeMod{T})(a::Array{T, 1}) where T <: AbstractAlgebra.RingElem
+   R = base_ring(S) # polynomial ring
+   n = size(a)[1]
+   aa = [p.ptr for p in a]
+   v = libSingular.id_Array2Vector(aa, n, base_ring(S).ptr)
+   return svector{T}(R, n, v)
 end
 
-function Array{T <: Nemo.RingElem}(v::svector{T})
+###############################################################################
+#
+#   Conversions
+#
+###############################################################################
+
+function Array{T <: Nemo.RingElem}(v::svector{spoly{T}})
    n = v.rank
-   a=Array{spoly, 1}(n)
-   aa=Array{libSingular.poly, 1}(n)
-   R=v.base_ring
+   aa = Array{libSingular.poly, 1}(n)
+   R = base_ring(v)
    libSingular.p_Vector2Array(v.ptr, aa, n, R.ptr)
-   for i in 1:n
-     a[i]=spoly{T}(R, aa[i])
-   end
-   return a
+   return [spoly{T}(R, p) for p in aa]
 end
 
-function svector{T <: Nemo.RingElem}(a::Array{spoly{T}, 1})
-  n = size(a)[1]
-  aa=Array{libSingular.poly, 1}(n)
-  for i in 1:n
-    aa[i]=a[i].ptr
-  end
-  v=libSingular.id_Array2Vector(aa,n,parent(a[1]).ptr)
-  return svector{T}(parent(a[1]), n, v)
+###############################################################################
+#
+#   Vector constructors
+#
+###############################################################################
+
+function vector(R::PolyRing{T}, coords::spoly{T}...) where T <: AbstractAlgebra.RingElem
+   n = length(coords)
+   aa = [p.ptr for p in coords]
+   v = libSingular.id_Array2Vector(aa, n, R.ptr)
+   return svector{spoly{T}}(R, n, v)
 end
+
+###############################################################################
+#
+#   Free module constructors
+#
+###############################################################################
+
+# free module of rank n
+function FreeModule{T <: Nemo.RingElem}(R::PolyRing{T}, n::Int)
+   (n > typemax(Cint) || n < 0) && throw(DomainError())
+   S = elem_type(R)
+   return FreeMod{S}(R, n)
+end
+
