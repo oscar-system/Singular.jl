@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-const FreeModID = Dict{Ring, Module}()
+const FreeModID = Dict{Tuple{Ring, Int}, Module}()
 
 type FreeMod{T <: Nemo.RingElem} <: Module{T}
    base_ring::PolyRing
