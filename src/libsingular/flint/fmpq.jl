@@ -168,8 +168,8 @@ end
 ###############################################################################
 
 function fmpqSubringGcd(a::number, b::number, cf::coeffs)
-   n1 = num(julia(a)::fmpq)
-   n2 = num(julia(b)::fmpq)
+   n1 = numerator(julia(a)::fmpq)
+   n2 = numerator(julia(b)::fmpq)
    return number(fmpq(gcd(n1, n2)))
 end
 

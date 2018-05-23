@@ -172,8 +172,8 @@ end
 function nemoFieldSubringGcd(a::number, b::number, cf::coeffs)
    R = julia(cf)
    if isa(R, FracField)
-      n1 = num(julia(a))
-      n2 = num(julia(b))
+      n1 = numerator(julia(a))
+      n2 = numerator(julia(b))
       return number(R(gcd(n1, n2)))
    else
       return number(deepcopy(julia(a)))
