@@ -64,7 +64,7 @@ end
 function nf_elemInpNeg(a::number, cf::coeffs)
    R = julia(cf)::Nemo.AnticNumberField
    n = julia(a)::Nemo.nf_elem
-   ccall((:nf_elem_neg, :libflint), Void, (Ptr{Nemo.nf_elem}, Ptr{Nemo.nf_elem}, Ptr{AnticNumberField}), &n, &n, &R)
+   sub!(n, 0, n)
    return number(n, false)
 end
 
