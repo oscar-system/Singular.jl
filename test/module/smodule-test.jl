@@ -71,12 +71,31 @@ function test_smodule_std()
    @test G[2] == vector(R, x + 1, x*y + 1, y)
    @test G[3] == vector(R, x^2 + 1, 2*x + 3*y, x)
 
-   @test G.is_GB == true
+   @test G.isGB == true
 
    # Simply test the interfacing works in this case
    G2 = std(M)
 
-   @test G2.is_GB == true
+   @test G2.isGB == true
+
+   println("PASS")
+end
+
+function test_smodule_syz()
+   print("smodule.syz...")
+
+   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+
+   v1 = vector(R, (x + 1)*y, (x*y + 1)*y, y)
+   v2 = vector(R, (x + 1)*x, (x*y + 1)*x, x)
+
+   M = Singular.Module(R, v1, v2)
+
+   Z = syz(M)
+
+   @test ngens(Z) == 1
+
+   @test Z[1] == vector(R, x, -y)
 
    println("PASS")
 end
@@ -84,6 +103,8 @@ end
 function test_smodule()
    test_smodule_constructors()
    test_smodule_manipulation()
+   test_smodule_std()
+   test_smodule_syz()
 
    println("")
 end
