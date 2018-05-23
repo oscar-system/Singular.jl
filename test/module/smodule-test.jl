@@ -100,11 +100,52 @@ function test_smodule_syz()
    println("PASS")
 end
 
+function test_smodule_sres()
+   print("smodule.sres...")
+
+   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+
+   v1 = vector(R, x + 1, x*y + 1, y)
+   v2 = vector(R, x^2 + 1, 2x + 3y, x)
+
+   M = std(Singular.Module(R, v1, v2))
+
+   F = sres(M, 0)
+
+   @test length(F) == 1
+
+   M1 = Singular.Matrix(M)
+   M2 = Singular.Matrix(F[2])
+
+   @test iszero(M1*M2)
+
+   F = sres(M, 1)
+
+   @test length(F) == 1
+
+   M1 = Singular.Matrix(M)
+   M2 = Singular.Matrix(F[2])
+
+   @test iszero(M1*M2)
+
+   F = sres(M, 3)
+
+   @test length(F) == 1
+
+   M1 = Singular.Matrix(M)
+   M2 = Singular.Matrix(F[2])
+
+   @test iszero(M1*M2)
+
+   println("PASS")
+end
+
 function test_smodule()
    test_smodule_constructors()
    test_smodule_manipulation()
    test_smodule_std()
    test_smodule_syz()
+   test_smodule_sres()
 
    println("")
 end
