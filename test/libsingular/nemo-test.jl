@@ -80,9 +80,107 @@ function test_nemo_fmpz()
    println("PASS")
 end
 
+function test_nemo_fq_nmod()
+   print("Nemo.fq_nmod...")
+
+   F, a = Nemo.FiniteField(7, 2, "a")
+
+   R, (x, y) = PolynomialRing(F, ["x", "y"])
+
+   f1 = 3x*y + x^2 + 2y
+   f2 = y^2 + 1
+   f3 = x^2 + 2x + 1
+
+   @test isa(coeff(f1, 1), Singular.n_unknown{Nemo.fq_nmod})
+
+   @test f1 + 2 == 2 + f1
+   @test f1 - 2 == -(2 - f1)
+   @test 2*f1 == f1*2
+
+   @test f1 + F(2) == F(2) + f1
+   @test f1 - F(2) == -(F(2) - f1)
+   @test F(2)*f1 == f1*F(2)
+
+   @test f1*x == x*f1
+
+   @test f1 + a == a + f1
+   @test f1 - a == -(a - f1)
+   @test a*f1 == f1*a
+
+   @test deepcopy(f1) == f1
+
+   @test f1*f2 == f2*f1
+
+   @test divexact(f1*f2, f1) == f2
+
+   @test f1^3*f1^3 == f1^6
+
+   @test inv(coeff(f1, 1)) == F(5)
+
+   @test gcd(coeff(f1, 1), coeff(f1, 2)) == F(1)
+
+   @test divexact(coeff(f1, 1), coeff(f1, 2)) == F(3)
+
+   @test coeff(f1, 1) - coeff(f1, 2) == F(2)
+
+   @test coeff(f1, 1) + coeff(f1, 2) == F(4)
+
+   println("PASS")
+end
+
+function test_nemo_fq()
+   print("Nemo.fq...")
+
+   F, a = Nemo.FiniteField(Nemo.ZZ(7), 2, "a")
+
+   R, (x, y) = PolynomialRing(F, ["x", "y"])
+
+   f1 = 3x*y + x^2 + 2y
+   f2 = y^2 + 1
+   f3 = x^2 + 2x + 1
+
+   @test isa(coeff(f1, 1), Singular.n_unknown{Nemo.fq})
+
+   @test f1 + 2 == 2 + f1
+   @test f1 - 2 == -(2 - f1)
+   @test 2*f1 == f1*2
+
+   @test f1 + F(2) == F(2) + f1
+   @test f1 - F(2) == -(F(2) - f1)
+   @test F(2)*f1 == f1*F(2)
+
+   @test f1*x == x*f1
+
+   @test f1 + a == a + f1
+   @test f1 - a == -(a - f1)
+   @test a*f1 == f1*a
+
+   @test deepcopy(f1) == f1
+
+   @test f1*f2 == f2*f1
+
+   @test divexact(f1*f2, f1) == f2
+
+   @test f1^3*f1^3 == f1^6
+
+   @test inv(coeff(f1, 1)) == F(5)
+
+   @test gcd(coeff(f1, 1), coeff(f1, 2)) == F(1)
+
+   @test divexact(coeff(f1, 1), coeff(f1, 2)) == F(3)
+
+   @test coeff(f1, 1) - coeff(f1, 2) == F(2)
+
+   @test coeff(f1, 1) + coeff(f1, 2) == F(4)
+
+   println("PASS")
+end
+
 function test_nemo()
    test_nemo_fmpq()
    test_nemo_fmpz()
+   test_nemo_fq_nmod()
+   test_nemo_fq()
 
    println("")
 end
