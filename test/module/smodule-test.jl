@@ -71,6 +71,13 @@ function test_smodule_std()
    @test G[2] == vector(R, x + 1, x*y + 1, y)
    @test G[3] == vector(R, x^2 + 1, 2*x + 3*y, x)
 
+   @test G.is_GB == true
+
+   # Simply test the interfacing works in this case
+   G2 = std(M)
+
+   @test G2.is_GB == true
+
    println("PASS")
 end
 
