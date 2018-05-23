@@ -40,8 +40,49 @@ function test_nemo_fmpq()
    println("PASS")
 end
 
+function test_nemo_fmpz()
+   print("Nemo.fmpz...")
+
+   R, (x, y) = PolynomialRing(Nemo.ZZ, ["x", "y"])
+
+   f1 = 3x*y + x^2 + 2y
+   f2 = y^2 + 1
+   f3 = x^2 + 2x + 1
+
+   @test isa(coeff(f1, 1), Singular.n_unknown{Nemo.fmpz})
+
+   @test f1 + 2 == 2 + f1
+   @test f1 - 2 == -(2 - f1)
+   @test 2*f1 == f1*2
+
+   @test f1 + Nemo.ZZ(2) == Nemo.ZZ(2) + f1
+   @test f1 - Nemo.ZZ(2) == -(Nemo.ZZ(2) - f1)
+   @test Nemo.ZZ(2)*f1 == f1*Nemo.ZZ(2)
+
+   @test f1*x == x*f1
+
+   @test deepcopy(f1) == f1
+
+   @test f1*f2 == f2*f1
+
+   @test divexact(f1*f2, f1) == f2
+
+   @test f1^3*f1^3 == f1^6
+
+   @test gcd(coeff(f1, 1), coeff(f1, 2)) == Nemo.ZZ(1)
+
+   @test divexact(coeff(f1, 1), coeff(f1, 2)) == Nemo.ZZ(3)
+
+   @test coeff(f1, 1) - coeff(f1, 2) == Nemo.ZZ(2)
+
+   @test coeff(f1, 1) + coeff(f1, 2) == Nemo.ZZ(4)
+
+   println("PASS")
+end
+
 function test_nemo()
    test_nemo_fmpq()
+   test_nemo_fmpz()
 
    println("")
 end
