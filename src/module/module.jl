@@ -12,6 +12,12 @@ base_ring(S::ModuleClass) = S.base_ring
 
 base_ring(I::smodule) = I.base_ring
 
+elem_type(::ModuleClass{T}) where T <: AbstractAlgebra.RingElem = smodule{T}
+
+elem_type(::Type{ModuleClass{T}}) where T <: AbstractAlgebra.RingElem = smodule{T}
+
+parent_type(::Type{smodule{T}}) where T <: AbstractAlgebra.RingElem = ModuleClass{T}
+
 ngens(I::smodule) = I.ptr == C_NULL ? 0 : Int(libSingular.ngens(I.ptr))
 
 #rank of the ambient space
@@ -119,7 +125,7 @@ end
 #
 ###############################################################################
 
-function Module{T <: Nemo.RingElem}(R::PolyRing{T}, vecs::svector{T}...)
+function Module{T <: Nemo.RingElem}(R::PolyRing{T}, vecs::svector{spoly{T}}...)
    S = elem_type(R)
    return smodule{S}(R, vecs...)
 end
