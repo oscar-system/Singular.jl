@@ -225,12 +225,100 @@ function test_nemo_nf_elem()
    println("PASS")
 end
 
+function test_nemo_field()
+   print("Nemo.NemoField...")
+
+   U = Nemo.Generic.FractionField(Nemo.ZZ)
+
+   R, (x, y) = PolynomialRing(U, ["x", "y"])
+
+   f1 = 3x*y + x^2 + 2y
+   f2 = y^2 + 1
+   f3 = x^2 + 2x + 1
+
+   @test isa(coeff(f1, 1), Singular.n_unknown{AbstractAlgebra.Generic.Frac{Nemo.fmpz}})
+
+   @test f1 + 2 == 2 + f1
+   @test f1 - 2 == -(2 - f1)
+   @test 2*f1 == f1*2
+
+   @test f1 + U(2) == U(2) + f1
+   @test f1 - U(2) == -(U(2) - f1)
+   @test U(2)*f1 == f1*U(2)
+
+   @test f1*x == x*f1
+
+   @test deepcopy(f1) == f1
+
+   @test f1*f2 == f2*f1
+
+   @test divexact(f1*f2, f1) == f2
+
+   @test f1^3*f1^3 == f1^6
+
+   @test inv(coeff(f1, 1)) == U(1, 3)
+
+   @test gcd(coeff(f1, 1), coeff(f1, 2)) == U(1)
+
+   @test divexact(coeff(f1, 1), coeff(f1, 2)) == U(3)
+
+   @test coeff(f1, 1) - coeff(f1, 2) == U(2)
+
+   @test coeff(f1, 1) + coeff(f1, 2) == U(4)
+
+   println("PASS")
+end
+
+function test_nemo_ring()
+   print("Nemo.NemoRing...")
+
+   U, z = Nemo.PolynomialRing(Nemo.ZZ, "z")
+
+   R, (x, y) = PolynomialRing(U, ["x", "y"])
+
+   f1 = 3x*y + x^2 + 2y
+   f2 = y^2 + 1
+   f3 = x^2 + 2x + 1
+
+   @test isa(coeff(f1, 1), Singular.n_unknown{Nemo.fmpz_poly})
+
+   @test f1 + 2 == 2 + f1
+   @test f1 - 2 == -(2 - f1)
+   @test 2*f1 == f1*2
+
+   @test f1 + U(2) == U(2) + f1
+   @test f1 - U(2) == -(U(2) - f1)
+   @test U(2)*f1 == f1*U(2)
+
+   @test f1*x == x*f1
+
+   @test deepcopy(f1) == f1
+
+   @test f1*f2 == f2*f1
+
+   @test divexact(f1*f2, f1) == f2
+
+   @test f1^3*f1^3 == f1^6
+
+   @test gcd(coeff(f1, 1), coeff(f1, 2)) == U(1)
+
+   @test divexact(coeff(f1, 1), coeff(f1, 2)) == U(3)
+
+   @test coeff(f1, 1) - coeff(f1, 2) == U(2)
+
+   @test coeff(f1, 1) + coeff(f1, 2) == U(4)
+
+   println("PASS")
+end
+
 function test_nemo()
    test_nemo_fmpq()
    test_nemo_fmpz()
    test_nemo_fq_nmod()
    test_nemo_fq()
    test_nemo_nf_elem()
+   test_nemo_field()
+   test_nemo_ring()
 
    println("")
 end
