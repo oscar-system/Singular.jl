@@ -222,7 +222,7 @@ function test_n_Z()
    test_n_Z_euclidean_division()
    test_n_Z_gcd_lcm()
    test_n_Z_extended_gcd()
-   test_n_Z_chinese_remainder()
+   # test_n_Z_chinese_remainder()
    test_n_Z_Polynomials()
 
    println("")

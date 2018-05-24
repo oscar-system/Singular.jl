@@ -40,18 +40,34 @@ function iszero(n::n_Z)
    return libSingular.n_IsZero(n.ptr, c.ptr)
 end
 
+doc"""
+    isunit(n::n_Z)
+> Return `true` if $n$ is $\pm 1$.
+"""
 isunit(n::n_Z) = n == 1 || n == -1
 
+doc"""
+    numerator(n::n_Z)
+> Return the numerator of $n$ (which is $n$ itself).
+"""
 function numerator(n::n_Z)
    par = parent(n)
    r = libSingular.n_Copy(n.ptr, par.ptr)
    return par(r)
 end
 
+doc"""
+    denominator(n::n_Z)
+> Return the denominator of $n$ (which will always be $1$).
+"""
 function denominator(n::n_Z)
    return one(parent(n))
 end
 
+doc"""
+    abs(n::n_Z)
+> Return the absolute value of $n$.
+"""
 function abs(n::n_Z)
    if libSingular.n_GreaterZero(n.ptr, parent(n).ptr) || iszero(n)
       return deepcopy(n)
