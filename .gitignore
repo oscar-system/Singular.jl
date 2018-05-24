@@ -1,5 +1,6 @@
 deps/*
 local/*
+docs/build
 *.jl.cov
 *.jl.*.cov
 *.jl.mem
