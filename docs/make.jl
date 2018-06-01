@@ -7,7 +7,8 @@ makedocs(
              "index.md",
              "Coefficient rings" => [
                   "integer.md",
-                  "rational.md"
+                  "rational.md",
+                  "modn.md"
              ]
          ]
 )
