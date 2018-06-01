@@ -6,7 +6,8 @@ makedocs(
          pages    = [
              "index.md",
              "Coefficient rings" => [
-                  "integer.md"
+                  "integer.md",
+                  "rational.md"
              ]
          ]
 )
