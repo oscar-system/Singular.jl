@@ -340,6 +340,7 @@ end
 function Fp(a::Int; cached=true)
    a == 0 && throw(DivideError())
    a < 0 && throw(DomainError())
+   a > 2^28 && throw(DomainError())
    !Nemo.isprime(Nemo.fmpz(a)) && throw(DomainError())
 
    return N_ZpField(a)

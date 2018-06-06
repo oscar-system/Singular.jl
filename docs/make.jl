@@ -9,7 +9,8 @@ makedocs(
                   "integer.md",
                   "rational.md",
                   "modn.md",
-                  "modp.md"
+                  "modp.md",
+                  "GF.md"
              ]
          ]
 )
