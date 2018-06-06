@@ -333,7 +333,7 @@ end
 #
 ###############################################################################
 
-function SingularFiniteField(p::Int, n::Int, S::String; cached=true)
+function FiniteField(p::Int, n::Int, S::String; cached=true)
    n >= 16 || p >= 2^8 && throw(DomainError())
    !Nemo.isprime(Nemo.fmpz(p)) && throw(DomainError())
    n*log(p) >= 20*log(2) && throw(DomainError())
@@ -342,6 +342,3 @@ function SingularFiniteField(p::Int, n::Int, S::String; cached=true)
    return par, par(libSingular.n_Param(Cint(1), par.ptr))
 end
 
-#in sync with the other packages, there should be FiniteField=SingularFiniteField
-#in Singular.jl
-FiniteField = SingularFiniteField
