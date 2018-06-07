@@ -18,10 +18,25 @@ elem_type(::Type{PolyRing{T}}) where T <: Nemo.RingElem = spoly{T}
 
 parent_type(::Type{spoly{T}}) where T <: Nemo.RingElem = PolyRing{T}
 
+doc"""
+    ngens(R::PolyRing)
+> Return the number of variables in the given polynomial ring.
+"""
 ngens(R::PolyRing) = Int(libSingular.rVar(R.ptr))
 
+doc"""
+    has_global_ordering(R::PolyRing)
+> Return `true` if the given polynomial has a global ordering, i.e. if $1 < x$ for
+> each variable $x$ in the ring. This include `:lex`, `:deglex` and `:degrevlex`
+> orderings..
+"""
 has_global_ordering(R::PolyRing) = Bool(libSingular.rHasGlobalOrdering(R.ptr))
 
+doc"""
+    characteristic(R::PolyRing)
+> Return the characteristic of the polynomial ring, i.e. the characteristic of the
+> coefficient ring.
+"""
 characteristic(R::PolyRing) = Int(libSingular.rChar(R.ptr))
 
 function gens(R::PolyRing)
@@ -29,6 +44,13 @@ function gens(R::PolyRing)
    return [R(libSingular.rGetVar(Cint(i), R.ptr)) for i = 1:n]
 end
 
+doc"""
+    degree_bound(R::PolyRing)
+> Return the internal degree bound in each variable, enforced by Singular. This is the
+> largest positive value any degree can have before an overflow will occur. This
+> internal bound may be higher than the bound requested by the user via the 
+> `degree_bound` parameter of the `PolynomialRing` constructor.
+"""
 function degree_bound(R::PolyRing)
    return Int(libSingular.rBitmask(R.ptr))
 end
@@ -193,6 +215,12 @@ function Base.done(sp::coeffs_expos, p)
   return p == C_NULL
 end
 
+doc"""
+    lead_exponent(p::spoly)
+> Return the exponent vector of the leading term of the given polynomial. The return
+> value is a Julia 1-dimensional array giving the exponent for each variable of the
+> leading term.
+"""
 function lead_exponent(p::spoly)
    R = parent(p)
    n = ngens(R)
@@ -363,6 +391,11 @@ function lcm{T <: Nemo.RingElem}(x::spoly{T}, y::spoly{T})
    return divexact(x*y, gcd(x, y))
 end
 
+doc"""
+    primpart(x::spoly)
+> Return the primitive part of the polynomial, i.e. the polynomial divided by the GCD
+> of its coefficients.
+"""
 function primpart(x::spoly)
    R = parent(x)
    p = deepcopy(x)
@@ -370,6 +403,10 @@ function primpart(x::spoly)
    return p
 end
 
+doc"""
+    content(x::spoly)
+> Return the content of the polynomial, i.e. the GCD of its coefficients.
+"""
 function content(x::spoly)
    R = base_ring(x)
    d = R()

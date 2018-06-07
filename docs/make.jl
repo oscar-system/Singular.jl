@@ -10,8 +10,10 @@ makedocs(
                   "rational.md",
                   "modn.md",
                   "modp.md",
-                  "GF.md"
-             ]
+                  "GF.md",
+                  "nemo.md"
+             ],
+            "polynomial.md"
          ]
 )
 
