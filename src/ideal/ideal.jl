@@ -1,6 +1,6 @@
 export sideal, IdealSet, syz, lead, normalize!, isconstant, iszerodim, fres,
        sres, lres, intersection, quotient, reduce, eliminate, kernel, equal,
-       contains, isvar_generated, saturation, satstd
+       contains, isvar_generated, saturation, satstd, slimgb
 
 ###############################################################################
 #
@@ -298,6 +298,15 @@ end
 #   Groebner basis
 #
 ###############################################################################
+
+function slimgb(I::sideal; complete_reduction::Bool=false)
+   R = base_ring(I)
+   ptr = libSingular.id_Slimgb(I.ptr, R.ptr; complete_reduction=complete_reduction)
+   libSingular.idSkipZeroes(ptr)
+   z = Ideal(R, ptr)
+   z.isGB = true
+   return z
+end
 
 doc"""
     std(I::sideal; complete_reduction::Bool=false)
