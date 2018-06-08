@@ -13,7 +13,8 @@ makedocs(
                   "GF.md",
                   "nemo.md"
              ],
-            "polynomial.md"
+            "polynomial.md",
+            "ideal.md"
          ]
 )
 
