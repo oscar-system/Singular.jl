@@ -18,7 +18,9 @@ makedocs(
             "Modules" => [
                   "module.md",
                   "vector.md"
-            ]
+            ],
+            "resolution.md",
+            "matrix.md"
          ]
 )
 

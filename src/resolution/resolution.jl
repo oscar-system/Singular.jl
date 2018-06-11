@@ -34,6 +34,12 @@ function getindex(r::sresolution, i::Int)
    return Module(R, ptr)
 end
 
+doc"""
+    length(r::sresolution)
+> Return the length of the resolution. This is what is mathematically meant by the
+> length of a resolution. Over a field, this should be at most the number of variables
+> in the polynomial ring.
+"""
 length(r::sresolution) = r.len - 1
 
 function deepcopy_internal(r::sresolution, dict::ObjectIdDict)
@@ -48,6 +54,11 @@ end
 #
 ###############################################################################
 
+doc"""
+    betti(r::sresolution)
+> Return the Betti numbers, i.e. the ranks of the free modules in the given
+> free resolution. These are returned as a Julia array of `Int`s.
+"""
 function betti(r::sresolution)
    libSingular.syBetti(r.ptr, Cint(r.len), r.base_ring.ptr)
 end
@@ -58,6 +69,11 @@ end
 #
 ###############################################################################
 
+doc"""
+    minres{T <: AbstractAlgebra.RingElem}(r::sresolution{T})
+> Return a minimal free resolution, given any free resolution. If the supplied
+> resolution is already minimal, it may be returned without making a copy.
+"""
 function minres(r::sresolution{T}) where T <: AbstractAlgebra.RingElem
    if r.minimal
       return r
