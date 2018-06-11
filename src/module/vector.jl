@@ -18,8 +18,16 @@ elem_type{T <: Nemo.RingElem}(::Type{FreeMod{T}}) = svector{T}
 
 parent_type{T <: Nemo.RingElem}(::Type{svector{T}}) = FreeMod{T}
 
-rank(R::FreeMod) = R.rank
+doc"""
+    rank(M::FreeMod)
+> Return the rank of the given free module.
+"""
+rank(M::FreeMod) = M.rank
 
+doc"""
+    gens{T <: AbstractAlgebra.RingElem}(M::FreeMod{T})
+> Return a Julia array whose entries are the generators of the given free module.
+"""
 function gens(M::FreeMod{T}) where T <: AbstractAlgebra.RingElem
    R = base_ring(M)
    ptr = libSingular.id_FreeModule(Cint(M.rank), R.ptr)

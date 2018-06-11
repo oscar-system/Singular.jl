@@ -16,7 +16,8 @@ makedocs(
             "polynomial.md",
             "ideal.md",
             "Modules" => [
-                  "module.md"
+                  "module.md",
+                  "vector.md"
             ]
          ]
 )
