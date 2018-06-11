@@ -14,7 +14,10 @@ makedocs(
                   "nemo.md"
              ],
             "polynomial.md",
-            "ideal.md"
+            "ideal.md",
+            "Modules" => [
+                  "module.md"
+            ]
          ]
 )
 

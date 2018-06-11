@@ -20,8 +20,8 @@ according to the library provding them.
 ----------------|---------------|-----------------------
 Singular        | `sideal{T}`    | `Singular.IdealSet{T}`
 
-These types are parameterised by the type of elements in the coefficient ring of the
-polynomials that generate the ideals.
+These types are parameterised by the type of elements of the polynomial ring over which
+the ideals are defined.
 
 All ideal types belong directly to the abstract type `Module{T}` and
 all the ideal set parent object types belong to the abstract type `Set`.
