@@ -11,8 +11,6 @@ non-commutative algebra, algebraic geometry, and singularity theory.
 
 To build Singular.jl, start julia and then type:
 ```julia
-julia> Pkg.add("Nemo")
-julia> Pkg.checkout("Nemo")
 julia> Pkg.clone("https://github.com/oscar-system/Singular.jl")
 julia> Pkg.build("Singular")
 ```
