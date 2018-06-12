@@ -1,25 +1,42 @@
-# Documentation: http://docs.travis-ci.com/user/languages/julia/
-language: julia
+sudo: false
+addons:
+    apt:
+        sources:
+           - ubuntu-toolchain-r-test
+           - george-edison55-precise-backports
+        packages:
+           - cmake
+           - cmake-data
+           - gcc-6
+           - g++-6
+           - binutils
+           - gfortran
+           - libblas-dev
+           - liblapack-dev
+           - libgmp-dev
+           - libmpfr-dev
+
 matrix:
-  include:
-    - os: linux
-      compiler: "g++-4.9"
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-            - george-edison55-precise-backports # cmake 3.2.3 / doxygen 1.8.3
-          packages:
-            - g++-4.9
-            - cmake
-            - cmake-data
-      env:
-        - CC=gcc-4.9
-        - CXX=g++-4.9
-      julia: 0.6
-    - os: osx
-      compiler: "clang"
-      julia: 0.6
+    include:
+       - language: julia
+         julia: 0.6
+         os: linux
+       - language: julia
+         julia: 0.6
+         os: osx
+cache:
+    directories:
+        - $(julia -e 'println(Pkg.dir())')/Cxx/deps/src
+        - $(julia -e 'println(Pkg.dir())')/Cxx/deps/build
+        - ~/usr
+before_cache:
+    - rm ~/.julia/0.5/Cxx/deps/build/bootstrap.o
+    - rm -rf ~/.julia/0.5/deps/usr
+install:
+    - if [ "$TRAVIS_OS_NAME" = "linux" ]; then export CXX="g++-6" CC="gcc-6"; fi
+    - if [ "$TRAVIS_OS_NAME" = "osx" ]; then export CXX="clang++" CC="clang"; fi
+    - if [ "$TRAVIS_OS_NAME" = "linux" ]; then export PATH="$HOME/usr/bin:$PATH"; fi
+    - export THE_PKG_DIR=`julia -e 'println(Pkg.dir())'`
 
 notifications:
   email: false
