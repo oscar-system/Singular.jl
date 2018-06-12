@@ -24,14 +24,6 @@ matrix:
        - language: julia
          julia: 0.6
          os: osx
-cache:
-    directories:
-        - $(julia -e 'println(Pkg.dir())')/Cxx/deps/src
-        - $(julia -e 'println(Pkg.dir())')/Cxx/deps/build
-        - ~/usr
-before_cache:
-    - rm ~/.julia/0.5/Cxx/deps/build/bootstrap.o
-    - rm -rf ~/.julia/0.5/deps/usr
 install:
     - if [ "$TRAVIS_OS_NAME" = "linux" ]; then export CXX="g++-6" CC="gcc-6"; fi
     - if [ "$TRAVIS_OS_NAME" = "osx" ]; then export CXX="clang++" CC="clang"; fi
