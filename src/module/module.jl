@@ -18,9 +18,17 @@ elem_type(::Type{ModuleClass{T}}) where T <: AbstractAlgebra.RingElem = smodule{
 
 parent_type(::Type{smodule{T}}) where T <: AbstractAlgebra.RingElem = ModuleClass{T}
 
+doc"""
+    ngens(I::smodule)
+> Return the number of generators in the current representation of the module (as a list
+> of vectors).
+"""
 ngens(I::smodule) = I.ptr == C_NULL ? 0 : Int(libSingular.ngens(I.ptr))
 
-#rank of the ambient space
+doc"""
+    rank(I::smodule)
+> Return the rank $n$ of the ambient space $R^n$ of which this module is a submodule.
+"""
 rank(I::smodule) = Int(libSingular.rank(I.ptr))
 
 function checkbounds(I::smodule, i::Int)
@@ -34,6 +42,10 @@ function getindex(I::smodule{T}, i::Int) where T <: AbstractAlgebra.RingElem
    return svector{T}(R, rank(I), libSingular.p_Copy(p, R.ptr))
 end
 
+doc"""
+    iszero(p::smodule)
+> Return `true` if this is algebraically the zero module.
+"""
 iszero(p::smodule) = Bool(libSingular.idIs0(p.ptr))
 
 function deepcopy_internal(I::smodule, dict::ObjectIdDict)
@@ -72,6 +84,15 @@ end
 #
 ###############################################################################
 
+doc"""
+    std(I::smodule; complete_reduction::Bool=false)
+> Compute the Groebner basis of the module $I$. If `complete_reduction` is
+> set to `true`, the result is unique, up to permutation of the generators
+> and multiplication by constants. If not, only the leading terms are unique
+> (up to permutation of the generators and multiplication by constants, of
+> course). Presently the polynomial ring used must be over a field or over
+> the Singular integers.
+"""
 function std(I::smodule; complete_reduction::Bool=false) 
    R = base_ring(I)
    ptr = libSingular.id_Std(I.ptr, R.ptr; complete_reduction=complete_reduction)
@@ -87,6 +108,12 @@ end
 #
 ###############################################################################
 
+doc"""
+    syz(M::smodule)
+> Compute the module of syzygies of the given module. This will be given as
+> a set of generators in an ambient space $R^n$, where $n$ is the number of
+> generators in $M$.
+"""
 function syz(M::smodule)
    R = base_ring(M)
    ptr = libSingular.id_Syzygies(M.ptr, R.ptr)
@@ -100,6 +127,12 @@ end
 #
 ###############################################################################
 
+doc"""
+    sres{T <: Nemo.RingElem}(I::smodule{T}, max_length::Int)
+> Compute a free resolution of the given module $I$ of length up to the given
+> maximum length. If `max_length` is set to zero, a full length free
+> resolution is computed. Each element of the resolution is itself a module.
+"""
 function sres{T <: Nemo.RingElem}(I::smodule{T}, max_length::Int)
    I.isGB == false && error("Not a Groebner basis ideal")
    R = base_ring(I)

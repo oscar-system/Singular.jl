@@ -16,6 +16,10 @@ base_ring(a::n_Zn) = ZZ
 
 base_ring(a::N_ZnRing) = ZZ
 
+doc"""
+    characteristic(R::N_ZnRing)
+> Return the characteristic $n$ of the ring.
+"""
 function characteristic(R::N_ZnRing)
    return ZZ(libSingular.n_GetChar(R.ptr))
 end
@@ -44,6 +48,10 @@ function iszero(n::n_Zn)
    return libSingular.n_IsZero(n.ptr, c.ptr)
 end
 
+doc"""
+    isunit(n::n_Zn)
+> Return `true` if the given value is a unit in the integers modulo $n$.
+"""
 isunit(n::n_Zn) = gcd(n, parent(n)(characteristic(parent(n)))) == 1
 
 ###############################################################################

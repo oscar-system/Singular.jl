@@ -42,6 +42,10 @@ end
 
 isunit(n::n_Q) = !iszero(n)
 
+doc"""
+    numerator(n::n_Q)
+> Return the numerator of the given fraction.
+"""
 function numerator(n::n_Q)
    nn = libSingular.number_ref(n.ptr);
    p = libSingular.n_GetNumerator(nn, parent(n).ptr)
@@ -50,6 +54,10 @@ function numerator(n::n_Q)
    return ZZ(pp)
 end
 
+doc"""
+    denominator(n::n_Q)
+> Return the denominator of the given fraction.
+"""
 function denominator(n::n_Q)
    nn = libSingular.number_ref(n.ptr);
    p = libSingular.n_GetDenom(nn, parent(n).ptr)
@@ -58,6 +66,10 @@ function denominator(n::n_Q)
    return ZZ(pp)
 end
 
+doc"""
+    abs(n::n_Q)
+> Return the absolute value of the given fraction.
+"""
 function abs(n::n_Q)
    if libSingular.n_GreaterZero(n.ptr, parent(n).ptr) || iszero(n)
       return deepcopy(n)
@@ -260,6 +272,11 @@ end
 #
 ###############################################################################
 
+doc"""
+    reconstruct(x::n_Z, y::n_Z)
+> Given $x$ modulo $y$, find $r/s$ such that $x \equiv r/s \pmod{y}$ for values
+> $r$ and $s$ satisfying the bound $y > 2(|r| + 1)(s + 1)$.
+"""
 function reconstruct(x::n_Z, y::n_Z)
    p = libSingular.n_Farey(x.ptr, y.ptr, QQ.ptr)
    return QQ(p)
