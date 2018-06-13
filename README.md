@@ -10,11 +10,13 @@ Julia package for using the [Singular](https://www.singular.uni-kl.de/) library 
 non-commutative algebra, algebraic geometry, and singularity theory.
 
 To build Singular.jl, start julia and then type:
+
 ```julia
 julia> Pkg.clone("https://github.com/oscar-system/Singular.jl")
 julia> Pkg.build("Singular")
 ```
 To use Singular.jl, start julia and then type:
+
 ```julia
 julia> using Singular
 ```
