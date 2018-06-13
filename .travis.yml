@@ -15,7 +15,7 @@ addons:
            - liblapack-dev
            - libgmp-dev
            - libmpfr-dev
-
+ 
 matrix:
     include:
        - language: julia
@@ -29,6 +29,18 @@ install:
     - if [ "$TRAVIS_OS_NAME" = "osx" ]; then export CXX="clang++" CC="clang"; fi
     - if [ "$TRAVIS_OS_NAME" = "linux" ]; then export PATH="$HOME/usr/bin:$PATH"; fi
     - export THE_PKG_DIR=`julia -e 'println(Pkg.dir())'`
+
+script:
+    - if [ "$TRAVIS_OS_NAME" = "linux" ] && [ ! -f $HOME/usr/bin/ld ]; then
+         wget https://ftp.gnu.org/gnu/binutils/binutils-2.27.tar.gz;
+         tar xzf binutils-2.27.tar.gz;
+         (cd binutils-2.27 && ./configure --prefix=$HOME/usr && make && make install);
+      fi;
+    - if [ ! -f $HOME/early_abort ]; then julia -e 'Pkg.clone("https://github.com/Keno/Cxx.jl")' || false; fi
+    - if [ ! -f $HOME/early_abort ]; then PREBUILT_CI_BINARIES=1 julia -e 'Pkg.build("Cxx")' || false; fi
+    - if [ ! -f $HOME/early_abort ]; then julia -e 'Pkg.clone("https://github.com/wbhart/Singular.jl")' || false; fi
+    - if [ ! -f $HOME/early_abort ]; then julia -e 'Pkg.build("Singular")' || false; fi
+    - if [ ! -f $HOME/early_abort ]; then julia -e 'Pkg.test("Singular"; coverage=true)' || false; fi
 
 notifications:
   email: false
