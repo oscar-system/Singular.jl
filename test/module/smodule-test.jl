@@ -52,6 +52,35 @@ function test_smodule_manipulation()
    println("PASS")
 end
 
+function test_smodule_slimgb()
+   print("smodule.slimgb...")
+
+   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+
+   v1 = vector(R, x + 1, x*y + 1, y)
+   v2 = vector(R, x^2 + 1, 2x + 3y, x)
+   v3 = x*v1 + y*v2 + vector(R, x, y + 1, y^2)
+
+   M = Singular.Module(R, v1, v2, v3)
+
+   G = slimgb(M; complete_reduction=true)
+
+   @test ngens(G) == 3
+
+   @test G[1] == vector(R, x, y + 1, y^2)
+   @test G[2] == vector(R, x + 1, x*y + 1, y)
+   @test G[3] == vector(R, x^2 + 1, 2*x + 3*y, x)
+
+   @test G.isGB == true
+
+   # Simply test the interfacing works in this case
+   G2 = slimgb(M)
+
+   @test G2.isGB == true
+
+   println("PASS")
+end
+
 function test_smodule_std()
    print("smodule.std...")
 
@@ -143,6 +172,7 @@ end
 function test_smodule()
    test_smodule_constructors()
    test_smodule_manipulation()
+   test_smodule_slimgb()
    test_smodule_std()
    test_smodule_syz()
    test_smodule_sres()

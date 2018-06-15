@@ -187,6 +187,29 @@ function test_sideal_saturation()
    println("PASS")
 end
 
+function test_sideal_slimgb()
+   print("sideal.slimgb...")
+
+   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+
+   I = Ideal(R, x^2 + x*y + 1, 2y^2 + 3)
+   J = Ideal(R, 2*y^2 + 3, x^2 + x*y + 1)
+
+   A = slimgb(I)
+
+   @test isequal(lead(A), Ideal(R, 2y^2, x^2)) ||
+         isequal(lead(A), Ideal(R, x^2, 2*y^2))
+   @test A.isGB == true
+
+   B = slimgb(I, complete_reduction=true)
+
+   @test isequal(B, Ideal(R, 2y^2 + 3, x^2 + x*y + 1)) ||
+         isequal(B, Ideal(x^2 + x*y + 1, 2y^2 + 3))
+   @test B.isGB == true
+
+   println("PASS")
+end
+
 function test_sideal_std()
    print("sideal.std...")
 
@@ -317,6 +340,7 @@ function test_sideal()
    test_sideal_intersection()
    test_sideal_quotient()
    test_sideal_saturation()
+   test_sideal_slimgb()
    test_sideal_std()
    test_sideal_reduction()
    test_sideal_free_resolution()

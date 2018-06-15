@@ -1,4 +1,4 @@
-export smodule, ModuleClass, rank
+export smodule, ModuleClass, rank, slimgb
 
 ###############################################################################
 #
@@ -96,6 +96,24 @@ doc"""
 function std(I::smodule; complete_reduction::Bool=false) 
    R = base_ring(I)
    ptr = libSingular.id_Std(I.ptr, R.ptr; complete_reduction=complete_reduction)
+   libSingular.idSkipZeroes(ptr)
+   z = Module(R, ptr)
+   z.isGB = true
+   return z
+end
+
+doc"""
+   slimgb(I::smodule; complete_reduction::Bool=false)
+> Given a module $I$ this function computes a Groebner basis for it.
+> Compared to `std`, `slimgb` uses different strategies for choosing
+> a reducer.
+>
+> If the optional parameter `complete_reduction` is set to `true` the
+> function computes a reduced Gröbner basis for $I$.
+"""
+function slimgb(I::smodule; complete_reduction::Bool=false)
+   R = base_ring(I)
+   ptr = libSingular.id_Slimgb(I.ptr, R.ptr; complete_reduction=complete_reduction)
    libSingular.idSkipZeroes(ptr)
    z = Module(R, ptr)
    z.isGB = true

@@ -96,7 +96,33 @@ function id_Intersection(A::ideal, B::ideal, R::ring)
        """
 end
 
-function id_Std(I:: ideal, R::ring; complete_reduction::Bool=false)
+function id_Slimgb(I::ideal, R::ring; complete_reduction::Bool=false)
+   if complete_reduction
+      crbit = icxx"""Sy_bit(OPT_REDSB);"""
+   else
+      crbit = Cuint(0);
+   end
+   icxx"""ideal id = NULL;
+          if (!idIs0($I))
+          {
+             intvec * n = NULL;
+             tHomog h = testHomog;
+             const ring origin = currRing;
+             unsigned int save_opt = si_opt_1;
+             si_opt_1 |= $crbit;
+             rChangeCurrRing($R);
+             id = t_rep_gb($R, $I, $I->rank);
+             si_opt_1 = save_opt;
+             rChangeCurrRing(origin);
+             if (n != NULL)
+                delete n;
+          } else
+             id = idInit(0, $I->rank);
+          id;
+       """
+end
+
+function id_Std(I::ideal, R::ring; complete_reduction::Bool=false)
    if complete_reduction
       crbit = icxx"""Sy_bit(OPT_REDSB);"""
    else
