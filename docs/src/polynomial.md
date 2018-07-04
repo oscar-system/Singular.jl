@@ -94,6 +94,13 @@ T, x = PolynomialRing(ZZ, ["x$i" for i in 1:5];
 
 See also the convenience macros below for simple use cases.
 
+The following function allows creating a Singular polynomial ring from a given
+polynomial ring of type AbstractAlgebra.Generic.MPolyRing:
+
+```@docs
+PolynomialRing(R::AbstractAlgebra.Generic.MPolyRing{T}; cached::Bool = true, ordering::Symbol = :degrevlex, ordering2::Symbol = :comp1min, degree_bound::Int = 0)  where {T <: RingElement}
+```
+
 ### Polynomial ring macros
 
 For convenience, we provide some macros for constructing polynomial rings and injecting

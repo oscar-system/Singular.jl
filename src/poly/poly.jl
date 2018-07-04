@@ -566,6 +566,12 @@ function PolynomialRing(R::Nemo.Ring, s::Array{String, 1}; cached::Bool = true,
    return tuple(parent_obj, gens(parent_obj))
 end
 
+function PolynomialRing(R::AbstractAlgebra.Generic.MPolyRing{T}; cached::Bool = true,
+      ordering::Symbol = :degrevlex, ordering2::Symbol = :comp1min,
+      degree_bound::Int = 0)  where {T <: RingElement}
+   return PolynomialRing(AbstractAlgebra.Generic.base_ring(R), [string(v) for v in vars(R)], cached=cached, ordering=ordering, ordering2=ordering2, degree_bound=degree_bound)
+end
+
 macro PolynomialRing(R, s, n, o)
    S = gensym()
    y = gensym()
@@ -586,3 +592,38 @@ macro PolynomialRing(R, s, n)
    return esc(v1)
 end
 
+doc"""
+    convert_MPoly_to_SingularPoly(p::AbstractAlgebra.Generic.MPoly{T}, S::Singular.spoly{Singular.n_unknown{T}, vars_S::Array{Singular.spoly{Singular.n_unknown{T}},1}) where {T <: RingElement}
+> Construct a Singular polynomial in a given Singular polynomial ring
+> from a given polynomial of type AbstractAlgebra.Generic.MPoly{T}.
+"""
+function convert_MPoly_to_SingularPoly(p::AbstractAlgebra.Generic.MPoly{T}, S, vars_S) where {T <: RingElement}
+   parent_ring = parent(p)
+   n = nvars(parent_ring)
+   exps = p.exps
+
+   size_exps = size(p.exps)
+   if parent_ring.ord != :lex
+      exps = exps[2:size_exps[1],:]
+   end
+   if parent_ring.ord == :degrevlex
+      exps = exps[end:-1:1,:]
+   end
+
+   new_p = zero(S)
+
+   for i=1:length(p)
+      prod = p.coeffs[i]
+      for j=1:n
+         prod = prod * vars_S[j]^Int(exps[j,i])
+      end
+      new_p = new_p + prod
+   end
+   return(new_p)
+end
+
+function Base.convert(::Type{Singular.spoly{Singular.n_unknown{T}}}, p::AbstractAlgebra.Generic.MPoly{T}) where {T <: RingElement}
+   parent_ring = parent(p)
+   SingularPolyRing,vars_SPR = PolynomialRing(parent_ring)
+   return convert_MPoly_to_SingularPoly(p, SingularPolyRing, vars_SPR)
+end
