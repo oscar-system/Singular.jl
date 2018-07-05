@@ -68,6 +68,9 @@ function test_spoly_constructors()
    @test !isgen(x^2)
 
    @test has_global_ordering(R)
+   
+   @test length(symbols(R)) == 2
+   @test symbols(R) == [:x, :y]
 
    println("PASS")
 end

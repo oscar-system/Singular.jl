@@ -135,6 +135,10 @@ ngens(::PolyRing)
 ```
 
 ```@docs
+symbols(::PolyRing)
+```
+
+```@docs
 has_global_ordering(R::PolyRing)
 ```
 

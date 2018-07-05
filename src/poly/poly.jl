@@ -1,6 +1,6 @@
 export spoly, PolyRing, coeff, coeffs_expos, degree, exponent!, isgen, content,
        exponent, lead_exponent, ngens, degree_bound, primpart, @PolynomialRing,
-       has_global_ordering
+       has_global_ordering, symbols
 
 ###############################################################################
 #
@@ -43,6 +43,21 @@ function gens(R::PolyRing)
    n = ngens(R)
    return [R(libSingular.rGetVar(Cint(i), R.ptr)) for i = 1:n]
 end
+
+doc"""
+    symbols(R::PolyRing)
+> Return symbols for the generators of the polynomial ring $R$.
+"""
+function symbols(R::PolyRing)
+   io = IOBuffer();
+   symbols = Array{Symbol,1}(0)
+   for g in gens(R)
+      show(io,g)
+      push!(symbols, Symbol(String(take!(io))))
+   end
+   return symbols
+end
+
 
 doc"""
     degree_bound(R::PolyRing)
