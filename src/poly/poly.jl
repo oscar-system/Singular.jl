@@ -593,11 +593,10 @@ macro PolynomialRing(R, s, n)
 end
 
 doc"""
-    convert_MPoly_to_SingularPoly(p::AbstractAlgebra.Generic.MPoly{T}, S::Singular.spoly{Singular.n_unknown{T}, vars_S::Array{Singular.spoly{Singular.n_unknown{T}},1}) where {T <: RingElement}
-> Construct a Singular polynomial in a given Singular polynomial ring
-> from a given polynomial of type AbstractAlgebra.Generic.MPoly{T}.
+   (R::PolyRing){T <: Nemo.RingElem}(p::AbstractAlgebra.Generic.MPoly{T})
+> Return a Singular polynomial in $R$ with the same coefficients and exponents as $p$.
 """
-function convert_MPoly_to_SingularPoly(p::AbstractAlgebra.Generic.MPoly{T}, S, vars_S) where {T <: RingElement}
+function (R::PolyRing){T <: Nemo.RingElem}(p::AbstractAlgebra.Generic.MPoly{T})
    parent_ring = parent(p)
    n = nvars(parent_ring)
    exps = p.exps
@@ -610,20 +609,14 @@ function convert_MPoly_to_SingularPoly(p::AbstractAlgebra.Generic.MPoly{T}, S, v
       exps = exps[end:-1:1,:]
    end
 
-   new_p = zero(S)
+   new_p = zero(R)
 
    for i=1:length(p)
       prod = p.coeffs[i]
       for j=1:n
-         prod = prod * vars_S[j]^Int(exps[j,i])
+         prod = prod * gens(R)[j]^Int(exps[j,i])
       end
       new_p = new_p + prod
    end
    return(new_p)
-end
-
-function Base.convert(::Type{Singular.spoly{Singular.n_unknown{T}}}, p::AbstractAlgebra.Generic.MPoly{T}) where {T <: RingElement}
-   parent_ring = parent(p)
-   SingularPolyRing,vars_SPR = PolynomialRing(parent_ring)
-   return convert_MPoly_to_SingularPoly(p, SingularPolyRing, vars_SPR)
 end

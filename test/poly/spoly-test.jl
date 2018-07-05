@@ -263,8 +263,9 @@ function test_convert_MPoly_to_SingularPoly()
       for iter in 1:10
          f = AbstractAlgebra.Generic.rand(R, 5:10, 1:10, -100:100)
          g = AbstractAlgebra.Generic.rand(R, 5:10, 1:10, -100:100)
-         @test Singular.convert_MPoly_to_SingularPoly(f * g, Rsing, vars_Rsing) == Singular.convert_MPoly_to_SingularPoly(f, Rsing, vars_Rsing) * Singular.convert_MPoly_to_SingularPoly(g, Rsing, vars_Rsing)
-         @test Singular.convert_MPoly_to_SingularPoly(f + g, Rsing, vars_Rsing) == Singular.convert_MPoly_to_SingularPoly(f, Rsing, vars_Rsing) + Singular.convert_MPoly_to_SingularPoly(g, Rsing, vars_Rsing)
+         @test Rsing(f * g) == Rsing(f) * Rsing(g)
+         @test Rsing(f + g) == Rsing(f) + Rsing(g)
+         @test Rsing(f - g) == Rsing(f) - Rsing(g)
       end
    end
 end
