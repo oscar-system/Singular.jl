@@ -581,12 +581,6 @@ function PolynomialRing(R::Nemo.Ring, s::Array{String, 1}; cached::Bool = true,
    return tuple(parent_obj, gens(parent_obj))
 end
 
-function PolynomialRing(R::AbstractAlgebra.Generic.MPolyRing{T}; cached::Bool = true,
-      ordering::Symbol = :degrevlex, ordering2::Symbol = :comp1min,
-      degree_bound::Int = 0)  where {T <: RingElement}
-   return PolynomialRing(AbstractAlgebra.Generic.base_ring(R), [string(v) for v in vars(R)], cached=cached, ordering=ordering, ordering2=ordering2, degree_bound=degree_bound)
-end
-
 macro PolynomialRing(R, s, n, o)
    S = gensym()
    y = gensym()
@@ -606,6 +600,23 @@ macro PolynomialRing(R, s, n)
    v1 = Expr(:block, exp1, v..., S)
    return esc(v1)
 end
+
+###############################################################################
+#
+#   Conversion functions
+#
+###############################################################################
+
+function AsEquivalentSingularPolynomialRing(R::AbstractAlgebra.Generic.MPolyRing{T}; cached::Bool = true,
+      ordering::Symbol = :degrevlex, ordering2::Symbol = :comp1min,
+      degree_bound::Int = 0)  where {T <: RingElement}
+   return PolynomialRing(AbstractAlgebra.Generic.base_ring(R), [string(v) for v in vars(R)], cached=cached, ordering=ordering, ordering2=ordering2, degree_bound=degree_bound)
+end
+
+function AsEquivalentAbstractAlgebraPolynomialRing(R::Singular.PolyRing{Singular.n_unknown{T}}; ordering::Symbol = :degrevlex)  where {T <: Nemo.RingElem}
+   return AbstractAlgebra.Generic.PolynomialRing(base_ring(R).base_ring, Base.convert( Array{String,1}, symbols(R)), ordering=ordering)
+end
+
 
 doc"""
    (R::PolyRing){T <: Nemo.RingElem}(p::AbstractAlgebra.Generic.MPoly{T})
@@ -632,6 +643,24 @@ function (R::PolyRing){T <: Nemo.RingElem}(p::AbstractAlgebra.Generic.MPoly{T})
          prod = prod * gens(R)[j]^Int(exps[j,i])
       end
       new_p = new_p + prod
+   end
+   return(new_p)
+end
+
+doc"""
+   (R::AbstractAlgebra.Generic.MPolyRing{T}){T <: Nemo.RingElem}(p::Singular.spoly{Singular.n_unknown{T}})
+> Return a AbstractAlgebra polynomial in R with the same coefficients and exponents as $p$.
+"""
+function (R::AbstractAlgebra.Generic.MPolyRing{T}){T <: Nemo.RingElem}(p::Singular.spoly{Singular.n_unknown{T}})
+   parent_ring = parent(p)
+   n = ngens(parent_ring)
+   new_p = zero(R)
+   gens = AbstractAlgebra.Generic.gens(R)
+   iterator = coeffs_expos(p)
+   t = start(iterator)
+   while !done(iterator,t)
+      (coeff,exps),t = next(iterator,t)
+      new_p = new_p + convert(T,coeff) * prod(gens.^exps)
    end
    return(new_p)
 end
