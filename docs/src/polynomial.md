@@ -52,7 +52,7 @@ PolynomialRing(R::Union{Ring, Field}, s::Array{String, 1};
       ordering2::Symbol = :comp1min, degree_bound::Int = 0)
 ```
 
-Returns a tuple, $S, x$ consisting of a multivariate polynomial ring $S$ and an array
+Returns a tuple, $S, x$ consisting of a multivariate polynomial ring $S$ and an array $x$
 of variables (from which polynomials can be constructed). The ring $R$ must be a valid
 Singular coefficient ring, or any Nemo/AbstractAlgebra coefficient ring. The array $s$
 must be a list of strings corresponding to how the variables will be printed. By default,
