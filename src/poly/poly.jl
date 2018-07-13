@@ -566,6 +566,12 @@ function PolynomialRing(R::Nemo.Ring, s::Array{String, 1}; cached::Bool = true,
    return tuple(parent_obj, gens(parent_obj))
 end
 
+function PolynomialRing(R::AbstractAlgebra.Generic.MPolyRing{T}; cached::Bool = true,
+      ordering::Symbol = :degrevlex, ordering2::Symbol = :comp1min,
+      degree_bound::Int = 0)  where {T <: RingElement}
+   return PolynomialRing(AbstractAlgebra.Generic.base_ring(R), [string(v) for v in vars(R)], cached=cached, ordering=ordering, ordering2=ordering2, degree_bound=degree_bound)
+end
+
 macro PolynomialRing(R, s, n, o)
    S = gensym()
    y = gensym()
@@ -586,3 +592,31 @@ macro PolynomialRing(R, s, n)
    return esc(v1)
 end
 
+doc"""
+   (R::PolyRing){T <: Nemo.RingElem}(p::AbstractAlgebra.Generic.MPoly{T})
+> Return a Singular polynomial in $R$ with the same coefficients and exponents as $p$.
+"""
+function (R::PolyRing){T <: Nemo.RingElem}(p::AbstractAlgebra.Generic.MPoly{T})
+   parent_ring = parent(p)
+   n = nvars(parent_ring)
+   exps = p.exps
+
+   size_exps = size(p.exps)
+   if parent_ring.ord != :lex
+      exps = exps[2:size_exps[1],:]
+   end
+   if parent_ring.ord == :degrevlex
+      exps = exps[end:-1:1,:]
+   end
+
+   new_p = zero(R)
+
+   for i=1:length(p)
+      prod = p.coeffs[i]
+      for j=1:n
+         prod = prod * gens(R)[j]^Int(exps[j,i])
+      end
+      new_p = new_p + prod
+   end
+   return(new_p)
+end

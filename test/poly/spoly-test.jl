@@ -252,6 +252,24 @@ function test_spoly_Polynomials()
    println("PASS")
 end
 
+function test_convert_MPoly_to_SingularPoly()
+   print("spoly.test_convert_MPoly_to_SingularPoly...")
+   for num_vars=1:10
+      var_names = ["x$j" for j in 1:num_vars]
+      ord = AbstractAlgebra.rand_ordering()
+
+      R, vars_R = AbstractAlgebra.Generic.PolynomialRing(Nemo.ZZ, var_names; ordering=ord)
+      Rsing, vars_Rsing = Singular.PolynomialRing(R)
+      for iter in 1:10
+         f = AbstractAlgebra.Generic.rand(R, 5:10, 1:10, -100:100)
+         g = AbstractAlgebra.Generic.rand(R, 5:10, 1:10, -100:100)
+         @test Rsing(f * g) == Rsing(f) * Rsing(g)
+         @test Rsing(f + g) == Rsing(f) + Rsing(g)
+         @test Rsing(f - g) == Rsing(f) - Rsing(g)
+      end
+   end
+end
+
 function test_spoly()
    test_spoly_constructors()
    test_spoly_printing()
@@ -264,6 +282,7 @@ function test_spoly()
    test_spoly_gcd_lcm()
    test_spoly_extended_gcd()
    test_spoly_Polynomials()
+   test_convert_MPoly_to_SingularPoly()
 
    println("")
 end
