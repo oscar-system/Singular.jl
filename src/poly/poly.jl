@@ -610,7 +610,7 @@ end
 function AsEquivalentSingularPolynomialRing(R::AbstractAlgebra.Generic.MPolyRing{T}; cached::Bool = true,
       ordering::Symbol = :degrevlex, ordering2::Symbol = :comp1min,
       degree_bound::Int = 0)  where {T <: RingElement}
-   return PolynomialRing(AbstractAlgebra.Generic.base_ring(R), [string(v) for v in vars(R)], cached=cached, ordering=ordering, ordering2=ordering2, degree_bound=degree_bound)
+   return PolynomialRing(AbstractAlgebra.Generic.base_ring(R), [string(v) for v in AbstractAlgebra.Generic.symbols(R)], cached=cached, ordering=ordering, ordering2=ordering2, degree_bound=degree_bound)
 end
 
 function AsEquivalentAbstractAlgebraPolynomialRing(R::Singular.PolyRing{Singular.n_unknown{T}}; ordering::Symbol = :degrevlex)  where {T <: Nemo.RingElem}
