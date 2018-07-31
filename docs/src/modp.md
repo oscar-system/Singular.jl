@@ -5,7 +5,7 @@ CurrentModule = Singular
 # Integers mod p
 
 Integers mod a prime $p$ are implemented via the Singular `n_Zp` type for any positive
-prime modulus less than $2^{28}$.
+prime modulus less than $2^{29}$.
 
 The associated field of integers mod $p$ is represented by a parent object which can
 be constructed by a call to the `Fp` constructor.
@@ -44,7 +44,7 @@ Fp(p::Int; cached=true)
 Construct the field of integers modulo $p$. By default, the field is cached, so that
 all fields of integers modulo $p$ have the same parent object. If this is not the
 desired behaviour, the `cached` paramater can be set to `false`. If $p$ is not a prime
-or $p$ is not in the range $(0, 2^{28})$, an exception is raised.
+or $p$ is not in the range $(0, 2^{29})$, an exception is raised.
 
 Given a field $R$ of integers modulo $p$, we also have the following coercions in
 addition to the standard ones expected.
