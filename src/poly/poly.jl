@@ -607,19 +607,29 @@ end
 #
 ###############################################################################
 
+doc"""
+    AsEquivalentSingularPolynomialRing(R::AbstractAlgebra.Generic.MPolyRing{T}; cached::Bool = true,
+      ordering::Symbol = :degrevlex, ordering2::Symbol = :comp1min,
+      degree_bound::Int = 0)  where {T <: RingElem}
+> Return a Singular (multivariate) polynomial ring over the base ring of $R$ in variables having the same names as those of R.
+"""
 function AsEquivalentSingularPolynomialRing(R::AbstractAlgebra.Generic.MPolyRing{T}; cached::Bool = true,
       ordering::Symbol = :degrevlex, ordering2::Symbol = :comp1min,
-      degree_bound::Int = 0)  where {T <: RingElement}
+      degree_bound::Int = 0)  where {T <: RingElem}
    return PolynomialRing(AbstractAlgebra.Generic.base_ring(R), [string(v) for v in AbstractAlgebra.Generic.symbols(R)], cached=cached, ordering=ordering, ordering2=ordering2, degree_bound=degree_bound)
 end
 
-function AsEquivalentAbstractAlgebraPolynomialRing(R::Singular.PolyRing{Singular.n_unknown{T}}; ordering::Symbol = :degrevlex)  where {T <: Nemo.RingElem}
+doc"""
+    AsEquivalentAbstractAlgebraPolynomialRing(R::Singular.PolyRing{Singular.n_unknown{T}}; ordering::Symbol = :degrevlex)  where {T <: RingElem}
+> Return an AbstractAlgebra (multivariate) polynomial ring over the base ring of $R$ in variables having the same names as those of R.
+"""
+function AsEquivalentAbstractAlgebraPolynomialRing(R::Singular.PolyRing{Singular.n_unknown{T}}; ordering::Symbol = :degrevlex)  where {T <: RingElem}
    return AbstractAlgebra.Generic.PolynomialRing(base_ring(R).base_ring, Base.convert( Array{String,1}, symbols(R)), ordering=ordering)
 end
 
 
 doc"""
-   (R::PolyRing){T <: Nemo.RingElem}(p::AbstractAlgebra.Generic.MPoly{T})
+    (R::PolyRing){T <: RingElem}(p::AbstractAlgebra.Generic.MPoly{T})
 > Return a Singular polynomial in $R$ with the same coefficients and exponents as $p$.
 """
 function (R::PolyRing){T <: Nemo.RingElem}(p::AbstractAlgebra.Generic.MPoly{T})

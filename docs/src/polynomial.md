@@ -197,5 +197,37 @@ p = primpart(f)
 c = content(f)
 ```
 
+### Conversion between Singular.jl polynomials and MPoly polynomials
 
+There are conversion functions between the polynomial ring implementation
+from Singular.jl and the generic MPoly implementation from AbstractAlgebra.jl.
 
+```@docs
+AsEquivalentSingularPolynomialRing(R::AbstractAlgebra.Generic.MPolyRing{T}; cached::Bool = true,
+      ordering::Symbol = :degrevlex, ordering2::Symbol = :comp1min,
+      degree_bound::Int = 0)  where {T <: RingElem}
+```
+
+```@docs
+AsEquivalentAbstractAlgebraPolynomialRing(R::Singular.PolyRing{Singular.n_unknown{T}}; ordering::Symbol = :degrevlex)  where {T <: Nemo.RingElem}
+```
+
+**Examples**
+
+Conversion of generic AbstractAlgebra polynomials to Singular.jl polynomials:
+
+```
+K = Nemo.ZZ
+R,(x,y) = AbstractAlgebra.Generic.PolynomialRing(K, ["x","y"]);
+Rsing,vars_Rsing = Singular.AsEquivalentSingularPolynomialRing(R);
+Rsing(x+y) == Rsing(x) + Rsing(y)
+```
+
+Conversion of Singular.jl polynomials to generic AbstractAlgebra polynomials:
+
+```
+K = Nemo.ZZ
+S,(u,v) = Singular.PolynomialRing(K, ["u","v"])
+Saa,(uu,vv) = Singular.AsEquivalentAbstractAlgebraPolynomialRing(S)
+Saa(u) + Saa(v) == Saa(u) + Saa(v)
+```
