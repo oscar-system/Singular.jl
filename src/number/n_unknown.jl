@@ -190,10 +190,6 @@ promote_rule{S <: Nemo.RingElem}(::Type{n_unknown{S}}, ::Type{Nemo.fmpz}) = n_un
 
 promote_rule{S <: Nemo.FieldElem}(::Type{n_unknown{S}}, ::Type{Nemo.fmpq}) = n_unknown{S}
 
-function convert( ::Type{T}, a::Singular.n_unknown{T} ) where {T <: Nemo.RingElem}
-   return unsafe_load( reinterpret( Ptr{elem_type(parent(a).base_ring )}, a.ptr ) )
-end
-
 ###############################################################################
 #
 #   Parent call overloads

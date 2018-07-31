@@ -660,7 +660,7 @@ function (R::AbstractAlgebra.Generic.MPolyRing{T}){T <: Nemo.RingElem}(p::Singul
    t = start(iterator)
    while !done(iterator,t)
       (coeff,exps),t = next(iterator,t)
-      new_p = new_p + convert(T,coeff) * prod(gens.^exps)
+      new_p = new_p + libSingular.julia(coeff.ptr) * prod(gens.^exps)
    end
    return(new_p)
 end
