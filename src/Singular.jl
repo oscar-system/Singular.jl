@@ -84,8 +84,7 @@ function __init__()
    # Initialise Singular
    binSingular = joinpath(prefix, "bin", "Singular")
    ENV["SINGULAR_EXECUTABLE"] = binSingular
-   libSingular.si_init(binSingular)
-#   @cxx siInit(pointer(binSingular))
+   libSingular.siInit(binSingular)
 
    # set up Singular parents (we cannot do this before Singular is initialised)
 
