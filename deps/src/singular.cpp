@@ -16,7 +16,7 @@ const char* test_versionString(){
 }
 
 JULIA_CPP_MODULE_BEGIN(registry)
-  jlcxx::Module& Singular = registry.create_module("Singular");
+  jlcxx::Module& Singular = registry.create_module("libSingular");
   Singular.method("si_init",&test_init);
   Singular.method("versionString",&test_versionString);
 

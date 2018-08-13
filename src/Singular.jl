@@ -1,3 +1,5 @@
+__precompile__()
+
 module Singular
 
 import AbstractAlgebra
@@ -42,9 +44,11 @@ nemoinc = joinpath(Pkg.dir("Nemo"), "local");
 # addHeaderDir(joinpath(prefix, "include", "resources"), kind = C_User)
 # addHeaderDir(joinpath(nemoinc, "include"), kind = C_User)
 
-function __init__()
-   Libdl.dlopen(libsingular, Libdl.RTLD_GLOBAL)
+function init_wrap()
+    wrap_module(Pkg.dir("Singular","local","lib","libsingularwrap.so"),libSingular)
+end
 
+function __init__()
    # include Singular header files
 
 #   cxxinclude(joinpath("gmp.h"), isAngled = false)
@@ -78,10 +82,9 @@ function __init__()
 #   cxxinclude(joinpath("Singular", "fehelp.h"), isAngled = false)
 
    # Initialise Singular
-   
    binSingular = joinpath(prefix, "bin", "Singular")
    ENV["SINGULAR_EXECUTABLE"] = binSingular
-
+   libSingular.si_init(binSingular)
 #   @cxx siInit(pointer(binSingular))
 
    # set up Singular parents (we cannot do this before Singular is initialised)
@@ -122,6 +125,16 @@ function __init__()
 #      :comp1min => ringorder_C
 #   )
 end
+
+module libSingular
+    using CxxWrap
+    import Singular: init_wrap
+    function __init__()
+        init_wrap()
+    end
+end
+
+import .libSingular
 
 ###############################################################################
 #
