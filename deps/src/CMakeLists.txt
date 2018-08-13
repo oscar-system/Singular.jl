@@ -7,7 +7,9 @@ find_package(JlCxx REQUIRED)
 include_directories(${JlCxx_DIR}/../../../include/)
 include_directories(${JuliaIncludeDir})
 include_directories(${singular_includes})
+include_directories(${singular_includes}/singular)
 
+SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14" )
 SET( CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -L${JULIA_LIB_DIR} -Wl,-rpath,${JULIA_LIB_DIR} -L${singular_libdir} -Wl,-rpath,${singular_libdir}" )
 
 add_library(singular SHARED singular.cpp)
