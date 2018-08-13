@@ -45,11 +45,11 @@ nemoinc = joinpath(Pkg.dir("Nemo"), "local");
 # addHeaderDir(joinpath(nemoinc, "include"), kind = C_User)
 
 function init_wrap()
-    wrap_module(Pkg.dir("Singular","local","lib","libsingularwrap.so"),libSingular)
+    wrap_module(Pkg.dir("Singular", "local", "lib", "libsingularwrap.so"), libSingular)
 end
 
 function __init__()
-   # include Singular header files
+# include Singular header files
 
 #   cxxinclude(joinpath("gmp.h"), isAngled = false)
 #   cxxinclude(joinpath("omalloc", "omalloc.h"), isAngled = false)
@@ -81,7 +81,7 @@ function __init__()
 #   cxxinclude(joinpath("Singular", "links", "silink.h"), isAngled = false)
 #   cxxinclude(joinpath("Singular", "fehelp.h"), isAngled = false)
 
-   # Initialise Singular
+# Initialise Singular
    binSingular = joinpath(prefix, "bin", "Singular")
    ENV["SINGULAR_EXECUTABLE"] = binSingular
    libSingular.siInit(binSingular)
@@ -125,16 +125,6 @@ function __init__()
 #   )
 end
 
-module libSingular
-    using CxxWrap
-    import Singular: init_wrap
-    function __init__()
-        init_wrap()
-    end
-end
-
-import .libSingular
-
 ###############################################################################
 #
 #   Load Singular Rings/Fields/etc
@@ -143,7 +133,7 @@ import .libSingular
 
 include("AbstractTypes.jl")
 
-# include("LibSingular.jl")
+include("LibSingular.jl")
 
 # include("Number.jl")
 
