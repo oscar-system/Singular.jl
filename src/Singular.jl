@@ -135,7 +135,7 @@ include("AbstractTypes.jl")
 
 include("LibSingular.jl")
 
-# include("Number.jl")
+include("Number.jl")
 
 # include("Poly.jl")
 
@@ -156,6 +156,6 @@ include("LibSingular.jl")
 ###############################################################################
 
 # QQ = Rationals()
-# ZZ = Integers()
+ZZ = Integers()
 
 end # module
