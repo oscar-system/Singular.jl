@@ -7,17 +7,12 @@
 #include <Singular/cntrlc.h>
 
 
-void test_init(const char* test){
-    siInit(const_cast<char*>(test));
-}
-
-const char* test_versionString(){
-    return versionString();
-}
-
 JULIA_CPP_MODULE_BEGIN(registry)
   jlcxx::Module& Singular = registry.create_module("libSingular");
-  Singular.method("si_init",&test_init);
-  Singular.method("versionString",&test_versionString);
 
+  Singular.method("siInit",[](const char* path){ siInit(const_cast<char*>(path)); });
+  Singular.method("versionString",[](){ return const_cast<const char*>(versionString()); });
+
+  Singular.add_type<n_Procs_s>("coeffs");
+//   Singular.add_type<snumber>("number");
 JULIA_CPP_MODULE_END
