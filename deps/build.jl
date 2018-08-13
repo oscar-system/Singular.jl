@@ -116,5 +116,8 @@ cmake_build_path = Pkg.dir("Singular","deps","src")
 
 cd(cmake_build_path)
 
-run(`cmake Julia_EXECUTABLE=$julia_exec -DJlCxx_DIR=$jlcxx_cmake_dir -DJuliaIncludeDir=$julia_include -DJULIA_LIB_DIR=$julia_lib -Dsingular_includes=$vdir/include -Dsingular_libdir=$vdir/lib -DCMAKE_INSTALL_LIBDIR=lib .`)
+run(`cmake -DJulia_EXECUTABLE=$julia_exec -DJlCxx_DIR=$jlcxx_cmake_dir -DJuliaIncludeDir=$julia_include -DJULIA_LIB_DIR=$julia_lib -Dsingular_includes=$vdir/include -Dsingular_libdir=$vdir/lib -DCMAKE_INSTALL_LIBDIR=$vdir/lib .`)
+
 run(`make`)
+run(`make install`)
+
