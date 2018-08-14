@@ -6,6 +6,7 @@ find_package(JlCxx REQUIRED)
 
 include_directories(${JlCxx_DIR}/../../../include/)
 include_directories(${JuliaIncludeDir})
+include_directories(${nemo_includes})
 include_directories(${singular_includes})
 include_directories(${singular_includes}/singular)
 
