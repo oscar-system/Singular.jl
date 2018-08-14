@@ -24,7 +24,9 @@ function n_Lcm(a::number, b::number, cf::coeffs)
 end
 
 function n_ExtGcd(a::number, b::number, s::Ptr{number}, t::Ptr{number}, cf:: coeffs)
-   icxx"""n_ExtGcd($a, $b, $s, $t, $cf);"""
+   sp = reinterpret(Ptr{Void},s)
+   tp = reinterpret(Ptr{Void},tp)
+   return n_ExtGcd_internal(a, b, sp, tp, cf);
 end
 
 function n_IsZero(a::number, cf::coeffs)

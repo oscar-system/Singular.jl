@@ -120,8 +120,10 @@ JULIA_CPP_MODULE_BEGIN(registry)
 
   Singular.method("n_Lcm",[]( snumber* a, snumber* b, coeffs c ){ return n_Lcm(a,b,c); });
 
-  // Singular.method("n_ExtGcd",[]( snumber* a, snumber* b, snumber** s, snumber** t, coeffs c ){
-  //                                return n_ExtGcd(a,b,s,t,c); });
+  Singular.method("n_ExtGcd_internal",[]( snumber* a, snumber* b, void* s, void* t, coeffs c ){
+                                 return n_ExtGcd(a,b,
+                                          reinterpret_cast<snumber**>(s),
+                                          reinterpret_cast<snumber**>(t),c); });
 
   Singular.method("n_IsZero",[]( snumber* x, const coeffs n ){ return n_IsZero( x,n ) > 0; });
 
