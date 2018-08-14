@@ -29,7 +29,7 @@ end
 
 # create a Singular string environment
 function StringSetS(m) 
-   StringSetS_internal(pointer(m))
+   StringSetS_internal(m)
 end
 
 # omalloc free

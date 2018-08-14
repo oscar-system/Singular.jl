@@ -6,7 +6,7 @@ wrap_module(Pkg.dir("Singular", "local", "lib", "libsingularwrap.so"), libSingul
 
 include("libsingular/LibSingularTypes.jl")
 
-# include("libsingular/coeffs.jl")
+include("libsingular/coeffs.jl")
 
 # include("libsingular/rings.jl")
 

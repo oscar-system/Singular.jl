@@ -151,7 +151,7 @@ JULIA_CPP_MODULE_BEGIN(registry)
 
   Singular.method("StringSetS_internal",[]( std::string m ){ return StringSetS(m.c_str()); });
 
-  Singular.method("StringEndS",[](){ return std::string(StringEndS()); });
+  Singular.method("StringEndS",[](){ char* m = StringEndS(); std::string s(m); omFree(m); return s; });
 
   Singular.method("omAlloc0",[]( size_t siz ){ return (void*) omAlloc0(siz); });
 

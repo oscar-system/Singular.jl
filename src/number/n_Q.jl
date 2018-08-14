@@ -97,17 +97,16 @@ function show(io::IO, c::Rationals)
 end
 
 function show(io::IO, n::n_Q)
-   libSingular.StringSetS("")
+    libSingular.StringSetS("")
 
-   nn = libSingular.number_ref(n.ptr)	
-   libSingular.n_Write(nn, parent(n).ptr, false)
-   n.ptr = nn[]
-
-   m = libSingular.StringEndS()
-   s = unsafe_string(m) 
-   libSingular.omFree(Ptr{Void}(m))
-
-   print(io, s)
+    nn = libSingular.number_ref(n.ptr)	
+    libSingular.n_Write(nn, parent(n).ptr, false)
+    ## What is this doing?
+    ## n.ptr = nn[]
+ 
+    m = libSingular.StringEndS()
+ 
+    print(io,m)
 end
 
 needs_parentheses(x::n_Q) = false
