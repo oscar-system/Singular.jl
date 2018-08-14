@@ -1,12 +1,3 @@
-# return a function to convert between rings
-function n_SetMap(src::coeffs, dst::coeffs)
-   icxx"""n_SetMap($src, $dst);"""
-end
-
-function nApplyMapFunc(f::Cxx.CppFptr, n::number, src::coeffs, dst::coeffs)
-   icxx"""$f($n, $src, $dst);"""
-end
-
 # initialise a number from an mpz
 function n_InitMPZ(b::BigInt, cf::coeffs)
     bb = __mpz_struct(pointer_from_objref(b))
@@ -19,58 +10,15 @@ function n_Write(n::numberRef, cf::coeffs, bShortOut::Bool = false)
    n_Write_internal(n, cf, d);
 end
 
-function n_Lcm(a::number, b::number, cf::coeffs)
-   icxx"""n_Lcm($a, $b, $cf);"""
-end
-
 function n_ExtGcd(a::number, b::number, s::Ptr{number}, t::Ptr{number}, cf:: coeffs)
    sp = reinterpret(Ptr{Void},s)
    tp = reinterpret(Ptr{Void},tp)
    return n_ExtGcd_internal(a, b, sp, tp, cf);
 end
 
-function n_IsZero(a::number, cf::coeffs)
-   icxx"""n_IsZero($a, $cf);""" > 0
-end
-
-function n_IsOne(a::number, cf::coeffs)
-   icxx"""n_IsOne($a, $cf);""" > 0
-end
-
-function n_Greater(a::number, b::number, cf::coeffs)
-   icxx"""n_Greater($a, $b, $cf);""" > 0
-end
-
-function n_GreaterZero(a::number, cf::coeffs)
-   icxx"""n_GreaterZero($a, $cf);""" > 0
-end
-
-function n_Equal(a::number, b::number, cf::coeffs)
-   icxx"""n_Equal($a, $b, $cf);""" > 0
-end
-
-function n_InpAdd(a::number_ref, b::number, cf::coeffs)
-   icxx"""n_InpAdd($a, $b, $cf);"""
-end
-
-function n_InpMult(a::number_ref, b::number, cf::coeffs)
-   icxx"""n_InpMult($a, $b, $cf);"""
-end
-
 function n_QuotRem(a::number, b::number, p::Ptr{number}, cf::coeffs)
-   icxx"""n_QuotRem($a, $b, $p, $cf);"""
-end
-
-function n_Rem(a::number, b::number, cf::coeffs)
-   icxx"""number qq; n_QuotRem($a, $b, &qq, $cf);"""
-end
-
-function n_IntMod(a::number, b::number, cf::coeffs)
-   icxx"""n_IntMod($a, $b, $cf);"""
-end
-
-function n_Farey(a::number, b::number, cf::coeffs)
-   icxx"""n_Farey($a, $b, $cf);"""
+   pp = reinterpret(Ptr{Void}, p)
+   n_QuotRem_internal(a, b, pp, cf)
 end
 
 function n_ChineseRemainderSym(a::Array{number, 1}, b::Array{number, 1}, n::Cint, signed::Cint, cf::coeffs)
@@ -79,27 +27,15 @@ function n_ChineseRemainderSym(a::Array{number, 1}, b::Array{number, 1}, n::Cint
    icxx"""CFArray inv_cache($n); n_ChineseRemainderSym($p1, $p2, $n, $signed, inv_cache, $cf);"""
 end
 
-function n_Param(a::Cint, cf::coeffs)
-   icxx"""n_Param($a, $cf);"""
-end
-
 # create a Singular string environment
 function StringSetS(m) 
-   @cxx StringSetS(pointer(m))
-end
-
-# end a Singular string environment
-function StringEndS() 
-   icxx"""StringEndS();"""
-end
-
-function omAlloc0(size :: Csize_t)
-   icxx"""(void*) omAlloc0($size);"""
+   StringSetS_internal(pointer(m))
 end
 
 # omalloc free
 function omFree{T}(m :: Ptr{T})
-   icxx"""omFree((void*) $m);"""
+   mp = reinterpret(Ptr{Void}, m)
+   omFree_internal(m)
 end
 
 ###############################################################################
@@ -109,8 +45,8 @@ end
 ###############################################################################
 
 function setindex!(ptr::Ptr{number}, n::number)
-   icxx"""*$ptr = $n;"""
-   nothing
+   pp = reinterpret(Ptr{Void}, ptr)
+   setindex_internal(pp, n)
 end
 
 ###############################################################################
@@ -118,6 +54,8 @@ end
 #   Conversion between numbers that wrap jl_value_t's and julia values
 #
 ###############################################################################
+
+#=
 
 type live_cache
    num::Int
@@ -173,6 +111,9 @@ function number{T <: RingElem}(j::T, j_old::T)
     end
 end
 
+=#
+
+#=
 include("flint/fmpz.jl")
 include("flint/fmpq.jl")
 include("flint/fq.jl")
@@ -180,4 +121,4 @@ include("flint/fq_nmod.jl")
 include("antic/nf_elem.jl")
 include("nemo/Rings.jl")
 include("nemo/Fields.jl")
-
+=#
