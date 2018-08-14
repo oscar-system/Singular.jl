@@ -7,73 +7,16 @@ function nApplyMapFunc(f::Cxx.CppFptr, n::number, src::coeffs, dst::coeffs)
    icxx"""$f($n, $src, $dst);"""
 end
 
-function nCoeff_has_simple_Alloc(cf::coeffs)
-   icxx"""nCoeff_has_simple_Alloc($cf);""" > 0
-end
-
 # initialise a number from an mpz
 function n_InitMPZ(b::BigInt, cf::coeffs)
     bb = __mpz_struct(pointer_from_objref(b))
     return n_InitMPZ_internal(bb,cf)
 end
 
-# delete a number
-function n_Delete(n::number, cf::coeffs) 
-   icxx"""number t = $n; if (t != NULL) n_Delete(&t, $cf);"""
-end
-
 # write a number to a Singular string
-function n_Write(n::number_ref, cf::coeffs, bShortOut::Bool = false)
+function n_Write(n::numberRef, cf::coeffs, bShortOut::Bool = false)
    d = Int(bShortOut)
-   icxx"""n_Write($n, $cf, $d);"""
-end
-
-function n_Add(a::number, b::number, cf::coeffs)
-   icxx"""n_Add($a, $b, $cf);"""
-end
-
-function n_Sub(a::number, b::number, cf::coeffs)
-   icxx"""n_Sub($a, $b, $cf);"""
-end
-
-function n_Mult(a::number, b::number, cf::coeffs)
-   icxx"""n_Mult($a, $b, $cf);"""
-end
-
-function n_Neg(n::number, cf::coeffs)
-   icxx"""number nn = n_Copy($n, $cf); nn = n_InpNeg(nn, $cf); nn;"""
-end
-
-function n_Invers(a::number, cf::coeffs)
-   icxx"""n_Invers($a, $cf);"""
-end
-
-function n_ExactDiv(a::number, b::number, cf::coeffs)
-   icxx"""n_ExactDiv($a, $b, $cf);"""
-end
-
-function n_Div(a::number, b::number, cf::coeffs)
-   icxx"""number z = n_Div($a, $b, $cf); n_Normalize(z, $cf); z;"""
-end
-
-function n_GetNumerator(a::number_ref, cf::coeffs)
-   icxx"""return n_GetNumerator($a, $cf);"""
-end
-
-function n_GetDenom(a::number_ref, cf::coeffs)
-   icxx"""return n_GetDenom($a, $cf);"""
-end
-
-function n_Power(a::number, b::Int, cf::coeffs)
-   icxx"""number res; n_Power($a, $b, &res, $cf); res;"""
-end
-
-function n_Gcd(a::number, b::number, cf::coeffs)
-   icxx"""n_Gcd($a, $b, $cf);"""
-end
-
-function n_SubringGcd(a::number, b::number, cf::coeffs)
-   icxx"""n_SubringGcd($a, $b, $cf);"""
+   n_Write_internal(n, cf, d);
 end
 
 function n_Lcm(a::number, b::number, cf::coeffs)
