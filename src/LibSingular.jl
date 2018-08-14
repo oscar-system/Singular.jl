@@ -2,17 +2,9 @@ module libSingular
 
 using CxxWrap
 
-using Nemo
+wrap_module(Pkg.dir("Singular", "local", "lib", "libsingularwrap.so"),libSingular)
 
-import Base:setindex!, getindex
-
-import Singular: init_wrap
-    
-function __init__()
-   init_wrap()
-end
-
-# include("libsingular/LibSingularTypes.jl")
+include("libsingular/LibSingularTypes.jl")
 
 # include("libsingular/coeffs.jl")
 

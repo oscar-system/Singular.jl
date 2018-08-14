@@ -1,4 +1,4 @@
-__precompile__()
+# __precompile__()
 
 module Singular
 
@@ -44,9 +44,6 @@ nemoinc = joinpath(Pkg.dir("Nemo"), "local");
 # addHeaderDir(joinpath(prefix, "include", "resources"), kind = C_User)
 # addHeaderDir(joinpath(nemoinc, "include"), kind = C_User)
 
-function init_wrap()
-    wrap_module(Pkg.dir("Singular", "local", "lib", "libsingularwrap.so"), libSingular)
-end
 
 function __init__()
 # include Singular header files
@@ -85,10 +82,9 @@ function __init__()
    binSingular = joinpath(prefix, "bin", "Singular")
    ENV["SINGULAR_EXECUTABLE"] = binSingular
    libSingular.siInit(binSingular)
-
    # set up Singular parents (we cannot do this before Singular is initialised)
 
-#  ZZ.ptr = get_n_Z()
+   ZZ.ptr = get_n_Z()
 #   ZZ.refcount = 1
 
 #   QQ.ptr = get_n_Q()
@@ -155,7 +151,8 @@ include("Number.jl")
 #
 ###############################################################################
 
-# QQ = Rationals()
 ZZ = Integers()
+
+# QQ = Rationals()
 
 end # module
