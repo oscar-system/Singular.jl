@@ -115,6 +115,6 @@ include("Number.jl")
 
 ZZ = Integers()
 
-# QQ = Rationals()
+QQ = Rationals()
 
 end # module
