@@ -1,23 +1,3 @@
-# initialise a coefficient ring
-function nInitChar(n::n_coeffType, p::Ptr{Void})
-   return icxx"""nInitChar($n, $p);"""
-end
-
-# get the characteristic of a coefficient domain
-function n_GetChar(n::coeffs)
-   return icxx"""n_GetChar($n);"""
-end
-
-# make a copy of a coefficient domain (actually just increments a reference count)
-function nCopyCoeff(n::coeffs)
-   return icxx"""nCopyCoeff($n);"""
-end
-
-# kill a coefficient ring
-function nKillChar(cf::coeffs)
-   icxx"""nKillChar($cf);"""
-end
-
 # return a function to convert between rings
 function n_SetMap(src::coeffs, dst::coeffs)
    icxx"""n_SetMap($src, $dst);"""
@@ -31,20 +11,10 @@ function nCoeff_has_simple_Alloc(cf::coeffs)
    icxx"""nCoeff_has_simple_Alloc($cf);""" > 0
 end
 
-# initialise a number from an Int
-function n_Init(i::Int, cf::coeffs) 
-   icxx"""n_Init($i, $cf);"""
-end
-
-# initialise a number from an Int
-function n_Copy(n::number, cf::coeffs) 
-   icxx"""n_Copy($n, $cf);"""
-end
-
 # initialise a number from an mpz
 function n_InitMPZ(b::BigInt, cf::coeffs)
     bb = __mpz_struct(pointer_from_objref(b))
-    icxx"""n_InitMPZ($bb, $cf);"""
+    return n_InitMPZ_internal(bb,cf)
 end
 
 # delete a number

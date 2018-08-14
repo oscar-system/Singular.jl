@@ -58,14 +58,43 @@ JULIA_CPP_MODULE_BEGIN(registry)
   Singular.method("siInit",[](const char* path){ siInit(const_cast<char*>(path)); });
   Singular.method("versionString",[](){ return const_cast<const char*>(versionString()); });
 
-  // from coeffs.jl
-  Singular.method("nInitChar",&nInitChar);
-  Singular.method("n_GetChar",[]( const coeffs n ){ return n_GetChar(n);});
-  Singular.method("nCopyCoeff",&nCopyCoeff);
-  Singular.method("nKillChar",&nKillChar);
-  // Singular.method("nApplyMapFunc",[]())
-  // Singular.method("n_Init",[](long x, coeffs n){ n_Init);
+  /****************************
+   ** from coeffs.jl
+   ***************************/
 
+  /* initialise a coefficient ring */
+  Singular.method("nInitChar",&nInitChar);
+
+  /* get the characteristic of a coefficient domain */
+  Singular.method("n_GetChar",[]( coeffs n ){ return n_GetChar(n);});
+
+  /* make a copy of a coefficient domain (actually just increments a reference count) */
+  Singular.method("nCopyCoeff",&nCopyCoeff);
+
+  /* kill a coefficient ring */
+  Singular.method("nKillChar",&nKillChar);
+
+  /* return a function to convert between rings */
+  // Singular.method("n_SetMap",[]( const coeffs x, const coeffs y){ return n_SetMap(x,y); });
+
+  // Singular.method("nApplyMapFunc",[]())
+
+  Singular.method("n_Init",[]( long x, coeffs n){ return n_Init(x,n); });
+
+  Singular.method("n_Copy",[]( snumber* x, const coeffs n){ return n_Copy(x,n); });
+
+  Singular.method("nCoeff_has_simple_Alloc",[]( coeffs x ){ return nCoeff_has_simple_Alloc( x ) > 0; });
+
+  Singular.method("n_InitMPZ_internal",&n_InitMPZ);
+
+
+
+
+/******************
+ * **
+ * ** Start with n_ExtGcd
+ * **
+ * ****************/
 
 
 JULIA_CPP_MODULE_END
