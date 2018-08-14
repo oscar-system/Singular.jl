@@ -2,7 +2,7 @@ module libSingular
 
 using CxxWrap
 
-wrap_module(Pkg.dir("Singular", "local", "lib", "libsingularwrap.so"),libSingular)
+wrap_module(Pkg.dir("Singular", "local", "lib", "libsingularwrap.so"), libSingular)
 
 include("libsingular/LibSingularTypes.jl")
 

@@ -1,5 +1,3 @@
-# __precompile__()
-
 module Singular
 
 import AbstractAlgebra
@@ -39,46 +37,10 @@ const libsingular = joinpath(pkgdir, "local", "lib", "libSingular")
 prefix = joinpath(Pkg.dir("Singular"), "local");
 nemoinc = joinpath(Pkg.dir("Nemo"), "local");
 
-# addHeaderDir(joinpath(prefix, "include"), kind = C_User)
-# addHeaderDir(joinpath(prefix, "include", "singular"), kind = C_User)
-# addHeaderDir(joinpath(prefix, "include", "resources"), kind = C_User)
-# addHeaderDir(joinpath(nemoinc, "include"), kind = C_User)
-
-
 function __init__()
-# include Singular header files
 
-#   cxxinclude(joinpath("gmp.h"), isAngled = false)
-#   cxxinclude(joinpath("omalloc", "omalloc.h"), isAngled = false)
-#   cxxinclude(joinpath("misc", "intvec.h"), isAngled = false)
-#   cxxinclude(joinpath("misc", "auxiliary.h"), isAngled = false)
-#   cxxinclude(joinpath("reporter", "reporter.h"), isAngled = false)
-#   cxxinclude(joinpath("feFopen.h"), isAngled = false)
-#   cxxinclude(joinpath("coeffs", "coeffs.h"), isAngled = false)
-#   cxxinclude(joinpath("polys", "clapsing.h"), isAngled = false)
-#   cxxinclude(joinpath("coeffs", "bigintmat.h"), isAngled = false)
-#   cxxinclude(joinpath("coeffs", "rmodulon.h"), isAngled = false)
-#   cxxinclude(joinpath("polys", "monomials", "ring.h"), isAngled = false)
-#   cxxinclude(joinpath("polys", "monomials", "p_polys.h"), isAngled = false)
-#   cxxinclude(joinpath("polys", "simpleideals.h"), isAngled = false)
-#   cxxinclude(joinpath("kernel", "GBEngine", "kstd1.h"), isAngled = false) 
-#   cxxinclude(joinpath("kernel", "GBEngine", "syz.h"), isAngled = false)
-#   cxxinclude(joinpath("kernel", "GBEngine", "tgb.h"), isAngled = false)
-#   cxxinclude(joinpath("kernel", "ideals.h"), isAngled = false)
-#   cxxinclude(joinpath("kernel", "polys.h"), isAngled = false)
-#   cxxinclude(joinpath("Singular", "grammar.h"), isAngled = false) 
-#   cxxinclude(joinpath("Singular", "libsingular.h"), isAngled = false)
-#   cxxinclude(joinpath("Singular", "fevoices.h"), isAngled = false)
-#   cxxinclude(joinpath("Singular", "ipshell.h"), isAngled = false)
-#   cxxinclude(joinpath("Singular", "ipid.h"), isAngled = false)
-#   cxxinclude(joinpath("Singular", "subexpr.h"), isAngled = false)
-#   cxxinclude(joinpath("Singular", "lists.h"), isAngled = false)
-#   cxxinclude(joinpath("Singular", "idrec.h"), isAngled = false)
-#   cxxinclude(joinpath("Singular", "tok.h"), isAngled = false)
-#   cxxinclude(joinpath("Singular", "links", "silink.h"), isAngled = false)
-#   cxxinclude(joinpath("Singular", "fehelp.h"), isAngled = false)
-
-# Initialise Singular
+   # Initialise Singular
+   
    binSingular = joinpath(prefix, "bin", "Singular")
    ENV["SINGULAR_EXECUTABLE"] = binSingular
    libSingular.siInit(binSingular)
