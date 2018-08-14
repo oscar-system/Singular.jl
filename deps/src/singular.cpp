@@ -123,10 +123,34 @@ JULIA_CPP_MODULE_BEGIN(registry)
   // Singular.method("n_ExtGcd",[]( snumber* a, snumber* b, snumber** s, snumber** t, coeffs c ){
   //                                return n_ExtGcd(a,b,s,t,c); });
 
-/******************
- * **
- * ** Start with n_ExtGcd
- * **
- * ****************/
+  Singular.method("n_IsZero",[]( snumber* x, const coeffs n ){ return n_IsZero( x,n ) > 0; });
+
+  Singular.method("n_IsOne",[]( snumber* x, const coeffs n ){ return n_IsOne( x,n ) > 0; });
+
+  Singular.method("n_Greater",[]( snumber* x, snumber* y, const coeffs n ){ return n_Greater( x,y,n ) > 0; });
+
+  Singular.method("n_Equal",[]( snumber* x, snumber* y, const coeffs n ){ return n_Equal( x,y,n ) > 0; });
+
+  Singular.method("n_InpAdd",[]( snumber* x, snumber* y, const coeffs n ){ return n_InpAdd( x,y,n ); });
+
+  Singular.method("n_InpMult",[]( snumber* x, snumber* y, const coeffs n ){ return n_InpMult( x,y,n ); });
+
+  /* Singular.method("n_QuotRem",[]( snumber* x, snumber* y, snumber** p, const coeffs n ){ return n_QuotRem( x,y,p,n ); }); */
+
+  Singular.method("n_Rem",[]( snumber* x, snumber* y, const coeffs n ){ number qq; return n_QuotRem( x,y, &qq, n ); });
+
+  Singular.method("n_IntMod",&n_IntMod);
+
+  Singular.method("n_Farey",&n_Farey);
+
+  /* Singular.method("n_ChineseRemainderSym_internal",[]( snumber** x, snumber** y, int m, int sign_flag, const coeffs n ){ return n_ChineseRemainderSym( x,y,m,sign_flag,n ); }); */
+
+  Singular.method("n_Param",[]( int x, const coeffs n ){ return n_Param(x,n); });
+
+  Singular.method("StringSetS_internal",[]( std::string m ){ return StringSetS(m.c_str()); });
+
+  Singular.method("omAlloc0",[]( size_t siz ){ return (void*) omAlloc0(siz); });
+
+  Singular.method("omFree_internal",[]( void* m ){ omFree(m); });
 
 JULIA_CPP_MODULE_END
