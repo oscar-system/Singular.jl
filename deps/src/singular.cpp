@@ -153,4 +153,8 @@ JULIA_CPP_MODULE_BEGIN(registry)
 
   Singular.method("omFree_internal",[]( void* m ){ omFree(m); });
 
+  /* Setting a Ptr{number} to a number */
+
+  /* Singular.method("setindex!",[]( snumber** x, snumber* y ){ *x = y; return; }); */
+
 JULIA_CPP_MODULE_END
