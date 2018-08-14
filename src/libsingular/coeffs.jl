@@ -22,9 +22,9 @@ function n_QuotRem(a::number, b::number, p::Ptr{number}, cf::coeffs)
 end
 
 function n_ChineseRemainderSym(a::Array{number, 1}, b::Array{number, 1}, n::Cint, signed::Cint, cf::coeffs)
-   p1 = pointer(a)
-   p2 = pointer(b)
-   icxx"""CFArray inv_cache($n); n_ChineseRemainderSym($p1, $p2, $n, $signed, inv_cache, $cf);"""
+   p1 = reinterpret(Ptr{Void},pointer(a))
+   p2 = reinterpret(Ptr{Void},pointer(b))
+   return n_ChineseRemainderSym_internal(p1, p2, n, signed, cf)
 end
 
 # create a Singular string environment

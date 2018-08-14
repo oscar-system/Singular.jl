@@ -137,7 +137,7 @@ JULIA_CPP_MODULE_BEGIN(registry)
 
   Singular.method("n_InpMult",[]( snumber* x, snumber* y, const coeffs n ){ return n_InpMult( x,y,n ); });
 
-  /* Singular.method("n_QuotRem",[]( snumber* x, snumber* y, snumber** p, const coeffs n ){ return n_QuotRem( x,y,p,n ); }); */
+  Singular.method("n_QuotRem_internal",[]( snumber* x, snumber* y, void* p, const coeffs n ){ return n_QuotRem( x,y,reinterpret_cast<snumber**>(p),n ); });
 
   Singular.method("n_Rem",[]( snumber* x, snumber* y, const coeffs n ){ number qq; return n_QuotRem( x,y, &qq, n ); });
 
@@ -145,11 +145,13 @@ JULIA_CPP_MODULE_BEGIN(registry)
 
   Singular.method("n_Farey",&n_Farey);
 
-  /* Singular.method("n_ChineseRemainderSym_internal",[]( snumber** x, snumber** y, int m, int sign_flag, const coeffs n ){ return n_ChineseRemainderSym( x,y,m,sign_flag,n ); }); */
+  Singular.method("n_ChineseRemainderSym_internal",[]( void* x, void* y, int n, int sign_flag, coeffs c ){ CFArray inv_cache(n); return n_ChineseRemainderSym( reinterpret_cast<snumber**>(x),reinterpret_cast<snumber**>(y),n,sign_flag,inv_cache,c ); });
 
   Singular.method("n_Param",[]( int x, const coeffs n ){ return n_Param(x,n); });
 
   Singular.method("StringSetS_internal",[]( std::string m ){ return StringSetS(m.c_str()); });
+
+  Singular.method("StringEndS",[](){ return std::string(StringEndS()); });
 
   Singular.method("omAlloc0",[]( size_t siz ){ return (void*) omAlloc0(siz); });
 
@@ -157,6 +159,6 @@ JULIA_CPP_MODULE_BEGIN(registry)
 
   /* Setting a Ptr{number} to a number */
 
-  /* Singular.method("setindex!",[]( snumber** x, snumber* y ){ *x = y; return; }); */
+  Singular.method("setindex_internal",[]( void* x, snumber* y ){ *reinterpret_cast<snumber**>(x) = y; });
 
 JULIA_CPP_MODULE_END
