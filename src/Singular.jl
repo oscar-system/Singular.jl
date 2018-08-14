@@ -47,10 +47,10 @@ function __init__()
    # set up Singular parents (we cannot do this before Singular is initialised)
 
    ZZ.ptr = get_n_Z()
-#   ZZ.refcount = 1
+   ZZ.refcount = 1
 
-#   QQ.ptr = get_n_Q()
-#   QQ.refcount = 1
+   QQ.ptr = get_n_Q()
+   QQ.refcount = 1
 
    # done in __init__ since headers must be included first
 
