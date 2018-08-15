@@ -1,4 +1,5 @@
 #include <string>
+#include <cstring>
 #include <iostream>
 #include <tuple>
 
@@ -54,6 +55,19 @@ auto id_fres_helper(sip_sideal* I, int n, std::string method, ring R){
     return std::make_tuple(reinterpret_cast<void*>(r),s->length,minimal);
 }
 
+auto rDefault_helper(coeffs cf, jlcxx::ArrayRef<std::string> vars, rRingOrder_t ord){
+    auto len = vars.size();
+    char** vars_ptr  = new char*[len];
+    for(int i = 0;i<len; i++){
+        vars_ptr[i] = new char[vars[i].length()+1];
+        std::strcpy(vars_ptr[i],vars[i].c_str());
+    }
+    auto r = rDefault(cf,len,vars_ptr,ord);
+    delete[] vars_ptr;
+    r->ShortOut = 0;
+    return r;
+}
+
 // typedef snumber* snumberptr;
 
 JULIA_CPP_MODULE_BEGIN(registry)
@@ -73,7 +87,7 @@ JULIA_CPP_MODULE_BEGIN(registry)
   Singular.add_type<spolyrec>("poly");
   // Singular.add_type<nMapFunc>("nMapFunc");
   // Singular.add_type<spolyrec>("vector");
-  Singular.add_bits<rRingOrder_t>("r_RingOrder_t");
+  Singular.add_bits<rRingOrder_t>("rRingOrder_t");
   Singular.add_type<sip_sideal>("ideal");
   Singular.add_type<ip_smatrix>("ip_smatrix");
   Singular.add_type<ssyStrategy>("syStrategy");
@@ -197,5 +211,18 @@ JULIA_CPP_MODULE_BEGIN(registry)
   Singular.method("setindex_internal",[]( void* x, snumber* y ){ *reinterpret_cast<snumber**>(x) = y; });
 
   Singular.method("id_fres",&id_fres_helper);
+  
+  /****************************
+   ** from coeffs.jl
+   ***************************/
+  Singular.method("rDefault",&rDefault_helper);
+  Singular.method("rDelete",&rDelete);
+  Singular.method("rString",[](ip_sring* r){auto s = rString(r); return std::string(s);});
+  Singular.method("rChar",&rChar);
+  Singular.method("rGetVar",&rGetVar);
+  Singular.method("rVar",&rVar);
+  Singular.method("rGetExpSize",[]( unsigned long bitmask, int N){ int bits; return static_cast<unsigned int>(rGetExpSize(bitmask,bits,N));});
+  Singular.method("rHasGlobalOrdering",&rHasGlobalOrdering);
+
 
 JULIA_CPP_MODULE_END

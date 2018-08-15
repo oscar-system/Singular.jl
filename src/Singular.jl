@@ -69,7 +69,7 @@ function __init__()
   global const ringorder_c  = libSingular.ringorder_c
   global const ringorder_C  = libSingular.ringorder_C
 
- global const sym2ringorder = Dict{Symbol, libSingular.r_RingOrder_t}(
+ global const sym2ringorder = Dict{Symbol, libSingular.rRingOrder_t}(
   	  :lex => ringorder_lp,
      :revlex => ringorder_rp, 
   	  :neglex => ringorder_ls,
