@@ -268,6 +268,80 @@ JULIA_CPP_MODULE_BEGIN(registry)
 
   Singular.method("rank",[](ideal m ) { (int) m->rank; });
 
+  Singular.method("id_Quotient",[](ideal a, ideal b, bool c, ring d) { 
+    const ring origin = currRing;
+          rChangeCurrRing(d);
+          ideal id = idQuot(a, b, c, TRUE);
+          rChangeCurrRing(origin);
+          id; });
 
+  Singular.method("id_Intersection",[](ideal a, ideal b, ring c) { 
+    const ring origin = currRing;
+          rChangeCurrRing(c);
+          ideal id = idSect(a, b);
+          rChangeCurrRing(origin);
+          id; });
+
+ /* Singular.method("id_Slimgb",[](ideal a, ring b, bool c= false) {
+    if (c)
+      crbit = Sy_bit(OPT_REDSB);
+   else
+      crbit = unsigned int(0);
+   ideal id = NULL;
+          if (!idIs0(a))
+          {
+             intvec * n = NULL;
+             tHomog h = testHomog;
+             const ring origin = currRing;
+             unsigned int save_opt = si_opt_1;
+             si_opt_1 |= crbit;
+             rChangeCurrRing(b);
+             id = t_rep_gb(b, a, a->rank);
+             si_opt_1 = save_opt;
+             rChangeCurrRing(origin);
+             if (n != NULL)
+                delete n;
+          } else
+             id = idInit(0, a->rank);
+          id;
+       }); 
+*/
+
+  Singular.method("id_Syzygies",[](ideal m, ring o) { 
+          ideal id = NULL;
+          intvec * n = NULL;
+          tHomog h = testHomog;
+          const ring origin = currRing;
+          rChangeCurrRing(o);
+          id = idSyzygies(m, h, &n);
+          rChangeCurrRing(origin);
+          if (n != NULL)
+             delete n;
+          id; });
+/*
+  Singular.method("id_sres",[](ideal m, int n, String s, ring o) {
+                s = const ring origin = currRing;
+         rChangeCurrRing(o);
+         syStrategy s = sySchreyer(m, n);
+         rChangeCurrRing(origin);
+         s;
+   r = s->minres;
+   minimal = true
+   if r == C_NULL
+      r = s->fullres;
+      minimal = false
+   end
+   length = s->length;
+   return r, Int(length), minimal;
+
+});
+*/
+
+  Singular.method("id_Eliminate",[](ideal m, poly p, ring o) {
+          const ring origin = currRing;
+          rChangeCurrRing(o);
+          ideal res = idElimination(m, p);
+          rChangeCurrRing(origin);
+          res; });
 
 JULIA_CPP_MODULE_END
