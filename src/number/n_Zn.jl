@@ -79,7 +79,7 @@ function show(io::IO, n::n_Zn)
    libSingular.n_Write(nn, parent(n).ptr, false)
 
    m = libSingular.StringEndS()
-   print(io, s)
+   print(io, m)
 end
 
 needs_parentheses(x::n_Zn) = false

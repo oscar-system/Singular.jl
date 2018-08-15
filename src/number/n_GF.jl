@@ -88,7 +88,7 @@ function show(io::IO, n::n_GF)
 
    m = libSingular.StringEndS()
    
-   print(io, s)
+   print(io, m)
 end
 
 needs_parentheses(x::n_GF) = false
