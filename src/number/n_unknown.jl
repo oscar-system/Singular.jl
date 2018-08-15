@@ -56,10 +56,8 @@ function show(io::IO, a::n_unknown)
    libSingular.n_Write(nn, parent(a).ptr, false)
 
    m = libSingular.StringEndS()
-   s = unsafe_string(m) 
-   libSingular.omFree(Ptr{Void}(m))
 
-   print(io, s)
+   print(io, m)
 end
 
 ###############################################################################

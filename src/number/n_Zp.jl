@@ -77,12 +77,7 @@ function show(io::IO, n::n_Zp)
 
    nn = libSingular.number_ref(n.ptr)	
    libSingular.n_Write(nn, parent(n).ptr, false)
-   n.ptr = nn[]
-
    m = libSingular.StringEndS()
-   s = unsafe_string(m) 
-   libSingular.omFree(Ptr{Void}(m))
-
    print(io, s)
 end
 
