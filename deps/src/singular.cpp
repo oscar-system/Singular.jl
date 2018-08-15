@@ -224,5 +224,22 @@ JULIA_CPP_MODULE_BEGIN(registry)
   Singular.method("rGetExpSize",[]( unsigned long bitmask, int N){ int bits; return static_cast<unsigned int>(rGetExpSize(bitmask,bits,N));});
   Singular.method("rHasGlobalOrdering",&rHasGlobalOrdering);
 
+  /****************************
+   ** from ideals.jl
+   ***************************/
+
+  Singular.method("id_Delete",[]( ideal m, ring n ) { return id_Delete(&m,n); });
+
+  Singular.method("id_Copy",&id_Copy);
+
+  Singular.method("idInit",&idInit);
+
+  Singular.method("setindex!",[]( ideal r, poly n, int o) { r->m[o] = n; });
+
+  Singular.method("getindex",[]( ideal r, int o) { (poly) (r->m[o]); });
+  
+  Singular.method("idIs0",&idIs0);
+
+  Singular.method("id_IsConstant",&id_IsConstant);
 
 JULIA_CPP_MODULE_END

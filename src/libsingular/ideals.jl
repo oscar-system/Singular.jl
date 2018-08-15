@@ -1,30 +1,3 @@
-function id_Delete(I::ideal, R::ring)
-   icxx"""id_Delete(&$I, $R);"""
-end
-
-function id_Copy(I::ideal, R::ring)
-   icxx"""id_Copy($I, $R);"""
-end
-
-function idInit(size::Cint, rank = Cint(1))
-   icxx"""idInit($size, $rank);"""
-end
-
-function setindex!(I::ideal, x::poly, j::Cint) 
-   icxx"""$I->m[$j] = $x;"""
-end
-
-function getindex(I::ideal, j::Cint) 
-   icxx"""(poly) ($I->m[$j]);"""
-end
-
-function idIs0(I::ideal)
-   icxx"""idIs0($I);"""
-end
-
-function id_IsConstant(I::ideal, R::ring)
-   icxx"""id_IsConstant($I, $R);"""
-end
 
 function id_IsZeroDim(I::ideal, R::ring)
    icxx"""id_IsZeroDim($I, $R);"""
