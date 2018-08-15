@@ -94,7 +94,9 @@ JULIA_CPP_MODULE_BEGIN(registry)
 
   Singular.method("n_InitMPZ_internal",&n_InitMPZ);
 
-  Singular.method("n_Delete",[]( snumber n, coeffs cf) { number t = &n; if (t != NULL) n_Delete(&t, cf); });
+  Singular.method("n_Delete",[]( snumber* n, coeffs cf) { number* t = &n; if( n != NULL ){ n_Delete(t, cf); } });
+
+  Singular.method("n_Delete_Q",[]( void* n, coeffs cf ) { number tt = reinterpret_cast<number>(n); number* t = &tt; if( n != NULL ){ n_Delete(t, cf); } });
 
   Singular.method("n_Write_internal",[]( snumber* x, coeffs cf, const int d ){ return n_Write(x,cf,d); });
 

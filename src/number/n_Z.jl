@@ -99,8 +99,7 @@ function show(io::IO, n::n_Z)
 
    nn = libSingular.number_ref(n.ptr)	
    libSingular.n_Write(nn, parent(n).ptr, false)
-   ## What is this doing?
-   ## n.ptr = nn[]
+   n.ptr = nn
 
    m = libSingular.StringEndS()
 
