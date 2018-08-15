@@ -118,6 +118,12 @@ function nemoRingDiv(a::number, b::number, cf::coeffs)
    return number(divexact(n1, n2))
 end
 
+function nemoRingDivBy(a::number, b::number, cf::coeffs)
+   n1 = julia(a)
+   n2 = julia(b)
+   return Cint(divides(n1, n2)[1])
+end
+
 ###############################################################################
 #
 #   Comparison
@@ -214,6 +220,7 @@ function nemoRingInitChar(cf::coeffs, p::Ptr{Void})
     pMult = cfunction(nemoRingMult, number, (number, number, coeffs))
     pInpMult = cfunction(nemoRingInpMult, Void, (Ptr{number}, number, coeffs))
     pDiv = cfunction(nemoRingDiv, number, (number, number, coeffs))
+    pDivBy = cfunction(nemoRingDivBy, Cint, (number, number, coeffs))
     pInvers = cfunction(nemoRingInvers, number, (number, coeffs))
     pGcd = cfunction(nemoRingGcd, number, (number, number, coeffs))
     pExtGcd = cfunction(nemoRingExtGcd, number, (number, number, Ptr{number}, Ptr{number}, coeffs))
@@ -246,6 +253,7 @@ function nemoRingInitChar(cf::coeffs, p::Ptr{Void})
       cf->cfMult = (numberfunc) $pMult;
       cf->cfInpMult = (void (*)(number &, number, const coeffs)) $pInpMult;
       cf->cfDiv = (numberfunc) $pDiv;
+      cf->cfDivBy = (BOOLEAN (*)(number, number, const coeffs)) $pDivBy;
       cf->cfInvers = (number (*)(number, const coeffs)) $pInvers;
       cf->cfGcd = (numberfunc) $pGcd;
       cf->cfExtGcd = (number (*)(number, number, number *, number *, const coeffs)) $pExtGcd;
