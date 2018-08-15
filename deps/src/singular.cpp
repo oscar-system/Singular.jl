@@ -70,6 +70,21 @@ auto rDefault_helper(coeffs cf, jlcxx::ArrayRef<std::string> vars, rRingOrder_t 
 
 // typedef snumber* snumberptr;
 
+ideal id_Syzygies_internal(ideal m, ring o) 
+{ 
+  ideal id = NULL;
+          intvec * n = NULL;
+          tHomog h = testHomog;
+          const ring origin = currRing;
+          rChangeCurrRing(o);
+          id = idSyzygies(m, h, &n);
+          rChangeCurrRing(origin);
+          if (n != NULL)
+             delete n;
+          return id; 
+}
+
+
 JULIA_CPP_MODULE_BEGIN(registry)
   jlcxx::Module& Singular = registry.create_module("libSingular");
 
@@ -307,17 +322,11 @@ JULIA_CPP_MODULE_BEGIN(registry)
        }); 
 */
 
-  Singular.method("id_Syzygies",[](ideal m, ring o) { 
-          ideal id = NULL;
-          intvec * n = NULL;
-          tHomog h = testHomog;
-          const ring origin = currRing;
-          rChangeCurrRing(o);
-          id = idSyzygies(m, h, &n);
-          rChangeCurrRing(origin);
-          if (n != NULL)
-             delete n;
-          id; });
+
+  Singular.method("id_Syzygies",&id_Syzygies_internal);
+
+
+
 /*
   Singular.method("id_sres",[](ideal m, int n, String s, ring o) {
                 s = const ring origin = currRing;
@@ -343,5 +352,15 @@ JULIA_CPP_MODULE_BEGIN(registry)
           ideal res = idElimination(m, p);
           rChangeCurrRing(origin);
           res; });
+
+  Singular.method("id_Satstd",&id_Satstd);
+
+  Singular.method("id_Array2Vector",[](void* p, int a, ring o) { return id_Array2Vector(reinterpret_cast<spolyrec**>(p), a, o); });
+
+  Singular.method("p_Vector2Array",[](poly p, void* a, int b, ring o) { return p_Vec2Array(p, reinterpret_cast<spolyrec**>(a), b, o); });
+
+//  Singular.method("maGetPreimage",&maGetPreimage);
+
+
 
 JULIA_CPP_MODULE_END
