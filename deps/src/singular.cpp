@@ -56,6 +56,7 @@ JULIA_CPP_MODULE_BEGIN(registry)
   Singular.add_type<__mpz_struct>("__mpz_struct");
   Singular.add_type<ip_sring>("ring");
   Singular.add_type<spolyrec>("poly");
+  // Singular.add_type<nMapFunc>("nMapFunc");
   // Singular.add_type<spolyrec>("vector");
   Singular.add_bits<rRingOrder_t>("r_RingOrder_t");
   Singular.add_type<sip_sideal>("ideal");
@@ -82,9 +83,9 @@ JULIA_CPP_MODULE_BEGIN(registry)
   Singular.method("nKillChar",&nKillChar);
 
   /* return a function to convert between rings */
-  // Singular.method("n_SetMap",[]( const coeffs x, const coeffs y){ return n_SetMap(x,y); });
+  Singular.method("n_SetMap",[]( const coeffs x, const coeffs y){ return reinterpret_cast<void*>(n_SetMap(x,y)); });
 
-  // Singular.method("nApplyMapFunc",[]())
+  Singular.method("nApplyMapFunc",[]( void* map, snumber* x, coeffs a, coeffs b ){ return reinterpret_cast<nMapFunc>(map)(x,a,b); });
 
   Singular.method("n_Init",[]( long x, coeffs n){ return n_Init(x,n); });
 
