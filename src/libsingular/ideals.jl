@@ -1,36 +1,4 @@
 
-function id_IsZeroDim(I::ideal, R::ring)
-   icxx"""id_IsZeroDim($I, $R);"""
-end
-
-function idElem(I::ideal)
-   icxx"""idElem($I);"""
-end
-
-function id_Normalize(I::ideal, R::ring)
-   icxx"""id_Normalize($I, $R);"""
-end
-
-function id_Head(I::ideal, R::ring)
-   icxx"""id_Head($I, $R);"""
-end
-
-function id_MaxIdeal(d::Cint, R::ring)
-   icxx"""id_MaxIdeal($d, $R);"""
-end
-
-function id_Add(I::ideal, J::ideal, R::ring)
-   icxx"""id_Add($I, $J, $R);"""
-end
-
-function id_Mult(I::ideal, J::ideal, R::ring)
-   icxx"""id_Mult($I, $J, $R);"""
-end
-
-function id_Power(I::ideal, n::Cint, R::ring)
-   icxx"""id_Power($I, $n, $R);"""
-end
-
 function id_IsEqual(I1::ideal, I2::ideal, R::ring)
    icxx"""mp_Equal((ip_smatrix *) $I1, (ip_smatrix *) $I2, $R);"""
 end

@@ -242,4 +242,21 @@ JULIA_CPP_MODULE_BEGIN(registry)
 
   Singular.method("id_IsConstant",&id_IsConstant);
 
+  Singular.method("id_IsZeroDim",&id_IsZeroDim);
+
+  Singular.method("idElem",&idElem);
+
+  Singular.method("id_Normalize",&id_Normalize);
+
+  Singular.method("id_Head",&id_Head);
+
+  Singular.method("id_MaxIdeal",[](int m, ring n) { return id_MaxIdeal(m,n); });
+
+  Singular.method("id_Add",&id_Add);
+
+  Singular.method("id_Mult",&id_Mult);
+
+  Singular.method("id_Power",&id_Power);
+
+
 JULIA_CPP_MODULE_END
