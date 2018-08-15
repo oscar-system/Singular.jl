@@ -48,6 +48,10 @@ JULIA_CPP_MODULE_BEGIN(registry)
   Singular.add_bits<n_coeffType>("n_coeffType");
   Singular.set_const("n_Z",n_Z);
   Singular.set_const("n_Q",n_Q);
+  Singular.set_const("n_Zn",n_Zn);
+  Singular.set_const("n_Zp",n_Zp);
+  Singular.set_const("n_GF",n_GF);
+  Singular.set_const("n_unknown",n_unknown);
   Singular.add_type<snumber>("number");
   Singular.add_type<__mpz_struct>("__mpz_struct");
   Singular.add_type<ip_sring>("ring");

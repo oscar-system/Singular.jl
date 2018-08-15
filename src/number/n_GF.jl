@@ -85,13 +85,10 @@ function show(io::IO, n::n_GF)
 
    nn = libSingular.number_ref(n.ptr)	
    libSingular.n_Write(nn, parent(n).ptr, false)
-   n.ptr = nn[]
 
    m = libSingular.StringEndS()
-   s = unsafe_string(m) 
-   libSingular.omFree(Ptr{Void}(m))
-
-   print(io, s)
+   
+   print(io, m)
 end
 
 needs_parentheses(x::n_GF) = false
