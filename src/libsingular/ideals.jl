@@ -1,24 +1,4 @@
 
-function id_IsEqual(I1::ideal, I2::ideal, R::ring)
-   icxx"""mp_Equal((ip_smatrix *) $I1, (ip_smatrix *) $I2, $R);"""
-end
-
-function id_FreeModule(n::Cint, R::ring)
-   icxx"""id_FreeModule($n, $R);"""
-end
-
-function idSkipZeroes(I::ideal)
-   icxx"""idSkipZeroes($I);"""
-end
-
-function ngens(I::ideal) 
-   icxx"""(int) IDELEMS($I);"""
-end
-
-function rank(I::ideal) 
-   icxx"""(int) $I->rank;"""
-end
-
 function id_Quotient(A::ideal, B::ideal, AisGB::Bool, R::ring)
    icxx"""const ring origin = currRing;
           rChangeCurrRing($R);

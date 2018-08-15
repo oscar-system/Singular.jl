@@ -258,5 +258,16 @@ JULIA_CPP_MODULE_BEGIN(registry)
 
   Singular.method("id_Power",&id_Power);
 
+  Singular.method("id_IsEqual",[](ideal m, ideal n, ring o) { mp_Equal((ip_smatrix *) m, (ip_smatrix *) n, o); });
+
+  Singular.method("id_FreeModule",&id_FreeModule);
+
+  Singular.method("idSkipZeroes",&idSkipZeroes);
+
+  Singular.method("ngens",[](ideal m) { (int) IDELEMS(m); });
+
+  Singular.method("rank",[](ideal m ) { (int) m->rank; });
+
+
 
 JULIA_CPP_MODULE_END
