@@ -225,18 +225,24 @@ JULIA_CPP_MODULE_BEGIN(registry)
 
   Singular.method("setindex_internal",[]( void* x, snumber* y ){ *reinterpret_cast<snumber**>(x) = y; });
 
-  Singular.method("id_fres",&id_fres_helper);
-  
   /****************************
    ** from coeffs.jl
    ***************************/
+
   Singular.method("rDefault",&rDefault_helper);
+
   Singular.method("rDelete",&rDelete);
+
   Singular.method("rString",[](ip_sring* r){auto s = rString(r); return std::string(s);});
+
   Singular.method("rChar",&rChar);
+
   Singular.method("rGetVar",&rGetVar);
+
   Singular.method("rVar",&rVar);
+
   Singular.method("rGetExpSize",[]( unsigned long bitmask, int N){ int bits; return static_cast<unsigned int>(rGetExpSize(bitmask,bits,N));});
+
   Singular.method("rHasGlobalOrdering",&rHasGlobalOrdering);
 
   /****************************
@@ -325,7 +331,7 @@ JULIA_CPP_MODULE_BEGIN(registry)
 
   Singular.method("id_Syzygies",&id_Syzygies_internal);
 
-
+  Singular.method("id_fres",&id_fres_helper);
 
 /*
   Singular.method("id_sres",[](ideal m, int n, String s, ring o) {
