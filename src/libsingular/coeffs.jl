@@ -12,7 +12,7 @@ end
 
 function n_ExtGcd(a::number, b::number, s::Ptr{number}, t::Ptr{number}, cf:: coeffs)
    sp = reinterpret(Ptr{Void},s)
-   tp = reinterpret(Ptr{Void},tp)
+   tp = reinterpret(Ptr{Void},t)
    return n_ExtGcd_internal(a, b, sp, tp, cf);
 end
 
