@@ -55,6 +55,23 @@ auto id_fres_helper(sip_sideal* I, int n, std::string method, ring R){
     return std::make_tuple(reinterpret_cast<void*>(r),s->length,minimal);
 }
 
+
+
+auto id_sres_helper(sip_sideal* m, int n, ring R) {
+  auto origin = currRing;
+  rChangeCurrRing(R);
+  syStrategy s = sySchreyer(m, n);
+  rChangeCurrRing(origin);
+  auto r = s->minres;
+  bool minimal = true;
+  if (r == NULL){
+	r = s->fullres;
+        minimal = false;
+  }
+  return std::make_tuple(reinterpret_cast<void*>(r),s->length,minimal);
+
+}
+
 auto rDefault_helper(coeffs cf, jlcxx::ArrayRef<std::string> vars, rRingOrder_t ord){
     auto len = vars.size();
     char** vars_ptr  = new char*[len];
@@ -73,16 +90,69 @@ auto rDefault_helper(coeffs cf, jlcxx::ArrayRef<std::string> vars, rRingOrder_t 
 ideal id_Syzygies_internal(ideal m, ring o) 
 { 
   ideal id = NULL;
-          intvec * n = NULL;
-          tHomog h = testHomog;
-          const ring origin = currRing;
-          rChangeCurrRing(o);
-          id = idSyzygies(m, h, &n);
-          rChangeCurrRing(origin);
-          if (n != NULL)
-             delete n;
-          return id; 
+  intvec * n = NULL;
+  tHomog h = testHomog;
+  const ring origin = currRing;
+  rChangeCurrRing(o);
+  id = idSyzygies(m, h, &n);
+  rChangeCurrRing(origin);
+  if (n != NULL)
+     delete n;
+  return id; 
 }
+
+auto id_Slimgb_helper(ideal a, ring b) {
+  bool complete_reduction= false;
+  unsigned int crbit;
+  if (complete_reduction == false)
+	auto crbit = Sy_bit(OPT_REDSB);
+  else
+	crbit = 0;
+   	ideal id = NULL;
+          if (!idIs0(a))
+          {
+             intvec * n = NULL;
+             tHomog h = testHomog;
+             const ring origin = currRing;
+             unsigned int save_opt = si_opt_1;
+             si_opt_1 |= crbit;
+             rChangeCurrRing(b);
+             id = t_rep_gb(b, a, a->rank);
+             si_opt_1 = save_opt;
+             rChangeCurrRing(origin);
+             if (n != NULL)
+                delete n;
+          } else
+             id = idInit(0, a->rank);
+          return id;
+} 
+
+auto id_Std_helper(ideal a, ring b) {
+  bool complete_reduction= false;
+  unsigned int crbit;
+  if (complete_reduction == false)
+      crbit = Sy_bit(OPT_REDSB);
+  else
+	crbit = 0;
+   	ideal id = NULL;
+          if (!idIs0(a))
+          {
+             intvec * n = NULL;
+             tHomog h = testHomog;
+             const ring origin = currRing;
+             unsigned int save_opt = si_opt_1;
+             si_opt_1 |= crbit;
+             rChangeCurrRing(b);
+             id = kStd(a, b->qideal, h, &n);
+             si_opt_1 = save_opt;
+             rChangeCurrRing(origin);
+             if (n != NULL)
+                delete n;
+          } else
+             id = idInit(0, a->rank);
+          return id;
+}
+
 
 
 JULIA_CPP_MODULE_BEGIN(registry)
@@ -303,54 +373,15 @@ JULIA_CPP_MODULE_BEGIN(registry)
           rChangeCurrRing(origin);
           id; });
 
- /* Singular.method("id_Slimgb",[](ideal a, ring b, bool c= false) {
-    if (c)
-      crbit = Sy_bit(OPT_REDSB);
-   else
-      crbit = unsigned int(0);
-   ideal id = NULL;
-          if (!idIs0(a))
-          {
-             intvec * n = NULL;
-             tHomog h = testHomog;
-             const ring origin = currRing;
-             unsigned int save_opt = si_opt_1;
-             si_opt_1 |= crbit;
-             rChangeCurrRing(b);
-             id = t_rep_gb(b, a, a->rank);
-             si_opt_1 = save_opt;
-             rChangeCurrRing(origin);
-             if (n != NULL)
-                delete n;
-          } else
-             id = idInit(0, a->rank);
-          id;
-       }); 
-*/
-
-
   Singular.method("id_Syzygies",&id_Syzygies_internal);
 
   Singular.method("id_fres",&id_fres_helper);
 
-/*
-  Singular.method("id_sres",[](ideal m, int n, String s, ring o) {
-                s = const ring origin = currRing;
-         rChangeCurrRing(o);
-         syStrategy s = sySchreyer(m, n);
-         rChangeCurrRing(origin);
-         s;
-   r = s->minres;
-   minimal = true
-   if r == C_NULL
-      r = s->fullres;
-      minimal = false
-   end
-   length = s->length;
-   return r, Int(length), minimal;
+  Singular.method("id_sres",&id_sres_helper);
 
-});
-*/
+  Singular.method("id_Slimgb",&id_Slimgb_helper);
+
+  Singular.method("id_Std",&id_Std_helper);
 
   Singular.method("id_Eliminate",[](ideal m, poly p, ring o) {
           const ring origin = currRing;
@@ -365,7 +396,10 @@ JULIA_CPP_MODULE_BEGIN(registry)
 
   Singular.method("p_Vector2Array",[](poly p, void* a, int b, ring o) { return p_Vec2Array(p, reinterpret_cast<spolyrec**>(a), b, o); });
 
-//  Singular.method("maGetPreimage",&maGetPreimage);
+
+
+//  Singular.method("id_fres",&id_fres);
+
 
 
 
