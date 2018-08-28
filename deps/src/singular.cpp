@@ -2,11 +2,6 @@
 #include "coeffs.h"
 #include "rings.h"
 
-namespace jlcxx {
-    template<> struct IsBits<n_coeffType> : std::true_type {};
-    template<> struct IsBits<rRingOrder_t> : std::true_type {};
-}
-
 // typedef snumber* snumberptr;
 
 JULIA_CPP_MODULE_BEGIN(registry)

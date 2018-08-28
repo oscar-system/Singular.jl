@@ -39,4 +39,9 @@
 #include <Singular/links/silink.h>
 #include <Singular/fehelp.h>
 
+namespace jlcxx {
+    template<> struct IsBits<n_coeffType> : std::true_type {};
+    template<> struct IsBits<rRingOrder_t> : std::true_type {};
+}
+
 #endif
