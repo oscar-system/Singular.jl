@@ -101,8 +101,8 @@ ideal id_Syzygies_internal(ideal m, ring o)
   return id; 
 }
 
-auto id_Slimgb_helper(ideal a, ring b) {
-  bool complete_reduction= false;
+auto id_Slimgb_helper(ideal a, ring b,bool complete_reduction) {
+//  bool complete_reduction= false;
   unsigned int crbit;
   if (complete_reduction == false)
 	auto crbit = Sy_bit(OPT_REDSB);
@@ -379,7 +379,7 @@ JULIA_CPP_MODULE_BEGIN(registry)
 
   Singular.method("id_sres",&id_sres_helper);
 
-  Singular.method("id_Slimgb",&id_Slimgb_helper);
+  Singular.method("id_Slimgb_helper",&id_Slimgb_helper);
 
   Singular.method("id_Std",&id_Std_helper);
 
@@ -398,9 +398,107 @@ JULIA_CPP_MODULE_BEGIN(registry)
 
 
 
-//  Singular.method("id_fres",&id_fres);
 
 
 
 
+  /****************************
+   ** from matrices.jl
+   ***************************/
+
+  Singular.method("ncols",[](matrix I){ return (int) MATCOLS(I);});
+
+  Singular.method("nrows",[](matrix I){ return (int) MATROWS(I); });
+
+  Singular.method("id_Module2Matrix",&id_Module2Matrix);
+
+  Singular.method("getindex",[](matrix M, int i, int j){ return (poly) MATELEM(M, i, j); });
+
+  Singular.method("mp_Copy",[](matrix M, ring R){ return mp_Copy(M, R);});
+
+  Singular.method("mp_Delete",[](matrix M, ring R){ return mp_Delete(&M, R);});
+
+  Singular.method("mp_Add",&mp_Add);
+
+  Singular.method("mp_Sub",&mp_Sub);
+
+  Singular.method("mp_Mult",&mp_Mult);
+
+  Singular.method("mp_Equal",&mp_Equal);
+
+ //Singular.method("iiStringMatrix",[](matrix I, int d, ring o){ return iiStringMatrix(I, d, o); });
+
+
+
+  /****************************
+   ** from resolutions.jl
+   ***************************/
+
+/*Singular.method("res_Delete",[](resolvente ra, int len, ring o){ 
+	for (int i = 0; i < len; i++) {
+          id_Delete(ra + i, o);
+          omFreeSize((ADDRESS) ra, (len + 1)*sizeof(ideal));}});
+
+*/
+
+/*  Singular.method("res_Copy",[](resolvente ra, int len, ring o){ 
+  resolvente res = (resolvente) omAlloc0((len + 1)*sizeof(ideal));
+          rChangeCurrRing(o);
+          for (int i = len - 1; i >= 0; i--)
+          {
+             if (ra[i] != NULL)
+                res[i] = id_Copy(ra[i], o);
+          }
+          return res; });
+*/
+
+
+//  Singular.method("getindex",[](resolvente ra, int k){ return (ideal) ra[i];});
+
+/*  Singular.method("syMinimize",[](resolvente ra, int len, ring o){
+	  const ring origin = currRing;
+          syStrategy temp = (syStrategy) omAlloc0(sizeof(ssyStrategy));
+          resolvente result;
+          rChangeCurrRing(o);
+          temp->fullres = (resolvente) omAlloc0((len + 1)*sizeof(ideal));
+          for (int i = len - 1; i >= 0; i--)
+          {
+             if (ra[i] != NULL)
+                temp->fullres[i] = idCopy(ra[i]);
+          }
+          temp->length = len;
+          syMinimize(temp);
+          result = temp->minres;
+          temp->minres = NULL;
+          // syMinimize increments this as it returns a value we ignore 
+          temp->references--;
+          syKillComputation(temp, o);
+          rChangeCurrRing(origin);
+          return result;});
+
+
+
+*/
+
+/*
+  Singular.method("syBetti",[](resolvente rs,int len, ring o){
+   const ring origin = currRing;
+   rChangeCurrRing(o);
+   int dummy;
+   intvec *iv = syBetti(rs, len, &dummy, NULL, FALSE, NULL);
+   rChangeCurrRing(origin);
+   return iv;
+   int nrows = iv->rows();
+   int ncols = iv->cols();
+   auto betti = (int *)malloc(ncols*nrows*sizeof(int));
+   	for (int i = 0; i < ncols; i++) {
+            for (int j = 0; j < nrows; j++) {
+               betti[i*nrows+j] = IMATELEM(*iv, j+1, i+1);
+            }
+         }
+    delete(iv);
+    return &betti[0];
+  
+   unsafe_wrap(Array, betti, (nrows, ncols), true);});
+*/
 JULIA_CPP_MODULE_END
