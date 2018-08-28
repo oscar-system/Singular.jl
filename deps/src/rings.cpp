@@ -13,6 +13,25 @@ auto rDefault_helper(coeffs cf, jlcxx::ArrayRef<std::string> vars, rRingOrder_t 
     return r;
 }
 
+auto rDefault_long_helper(coeffs cf, jlcxx::ArrayRef<uint8_t*> vars, jlcxx::ArrayRef<rRingOrder_t> ord, int* blk0, int* blk1, unsigned long bitmask){
+    auto len = vars.size();
+    char** vars_ptr  = new char*[len];
+    for(int i = 0;i<len; i++){
+        vars_ptr[i] = reinterpret_cast<char*>(vars[i]);
+        // std::strcpy(vars_ptr[i],vars[i].c_str());
+    }
+    auto len_ord = ord.size();
+    rRingOrder_t* ord_ptr = new rRingOrder_t[len_ord];
+    for(int i = 0;i<len_ord; i++){
+        ord_ptr[i] = ord[i];
+    }
+    int** wvhdl = NULL;
+    auto r = rDefault(cf,len,vars_ptr,len_ord,ord_ptr,blk0,blk1,wvhdl,bitmask);
+    delete[] vars_ptr;
+    r->ShortOut = 0;
+    return r;
+}
+
 void singular_define_rings(jlcxx::Module& Singular){
   Singular.method("rDefault",&rDefault_helper);
   Singular.method("rDelete",&rDelete);
@@ -70,5 +89,7 @@ void singular_define_rings(jlcxx::Module& Singular){
           rChangeCurrRing(origin);
           return res;
   });
+//   Singular.method("rDefault_long_helper",[](coeffs cf, jlcxx::ArrayRef<std::string> vars, jlcxx::ArrayRef<rRingOrder_t> ord, int* blk0, int* blk1, unsigned long bitmask){ return rDefault_long_helper(cf,vars,ord,blk0,blk1,bitmask); });
+  Singular.method("rDefault_long_helper",&rDefault_long_helper);
 
 }
