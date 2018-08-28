@@ -249,16 +249,16 @@ end
 ###############################################################################
 
 function show(io::IO, R::PolyRing)
-   m = libSingular.rString(R.ptr)
-   s = unsafe_string(m)
-   libSingular.omFree(Ptr{Void}(m))
+   s = libSingular.rString(R.ptr)
+  #  s = unsafe_string(m)
+  #  libSingular.omFree(Ptr{Void}(m))
    print(io, "Singular Polynomial Ring ", s)
 end
 
 function show(io::IO, a::spoly)
-   m = libSingular.p_String(a.ptr, parent(a).ptr)
-   s = unsafe_string(m)
-   libSingular.omFree(Ptr{Void}(m))
+   s = libSingular.p_String(a.ptr, parent(a).ptr)
+  #  s = unsafe_string(m)
+  #  libSingular.omFree(Ptr{Void}(m))
    print(io, s)
 end
 

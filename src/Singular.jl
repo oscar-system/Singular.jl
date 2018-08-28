@@ -95,7 +95,7 @@ include("LibSingular.jl")
 
 include("Number.jl")
 
-# include("Poly.jl")
+include("Poly.jl")
 
 # include("Module.jl")
 
