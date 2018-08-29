@@ -53,12 +53,11 @@ JULIA_CPP_MODULE_BEGIN(registry)
    ** from resolutions.jl
    ***************************/
 
-/*Singular.method("res_Delete",[](resolvente ra, int len, ring o){ 
-	for (int i = 0; i < len; i++) {
+Singular.method("res_Delete_helper",[](void* ra_void, int len, ring o){ 
+	auto ra = reinterpret_cast<resolvente>(ra_void);
+  for (int i = 0; i < len; i++) {
           id_Delete(ra + i, o);
           omFreeSize((ADDRESS) ra, (len + 1)*sizeof(ideal));}});
-
-*/
 
 /*  Singular.method("res_Copy",[](resolvente ra, int len, ring o){ 
   resolvente res = (resolvente) omAlloc0((len + 1)*sizeof(ideal));

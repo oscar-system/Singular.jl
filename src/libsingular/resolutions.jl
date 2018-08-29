@@ -1,8 +1,6 @@
 function res_Delete(r::resolvente, length::Cint, R::ring)
-   icxx"""for (int i = 0; i < $length; i++)
-          id_Delete($r + i, $R);
-          omFreeSize((ADDRESS) $r, ($length + 1)*sizeof(ideal));
-       """
+    r_ptr = reinterpret(Ptr{Void},r)
+    return res_Delete_helper(r_ptr,length,R)
 end
 
 function res_Copy(r::resolvente, length::Cint, R::ring)
