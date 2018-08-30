@@ -54,14 +54,15 @@ JULIA_CPP_MODULE_BEGIN(registry)
    ** from resolutions.jl
    ***************************/
 
-Singular.method("res_Delete_helper",[](void* ra_void, int len, ring o){ 
-	auto ra = reinterpret_cast<resolvente>(ra_void);
-  for (int i = 0; i < len; i++) {
+  Singular.method("res_Delete_helper",[](void* ra_void, int len, ring o){ 
+    auto ra = reinterpret_cast<resolvente>(ra_void);
+    for (int i = 0; i < len; i++) {
           id_Delete(ra + i, o);
           omFreeSize((ADDRESS) ra, (len + 1)*sizeof(ideal));}});
 
-/*  Singular.method("res_Copy",[](resolvente ra, int len, ring o){ 
-  resolvente res = (resolvente) omAlloc0((len + 1)*sizeof(ideal));
+  Singular.method("res_Copy",[](void* ra_void, int len, ring o){ 
+    auto ra = reinterpret_cast<resolvente>(ra_void);  
+    resolvente res = (resolvente) omAlloc0((len + 1)*sizeof(ideal));
           rChangeCurrRing(o);
           for (int i = len - 1; i >= 0; i--)
           {
@@ -69,55 +70,56 @@ Singular.method("res_Delete_helper",[](void* ra_void, int len, ring o){
                 res[i] = id_Copy(ra[i], o);
           }
           return res; });
-*/
-
-
-//  Singular.method("getindex",[](resolvente ra, int k){ return (ideal) ra[i];});
-
-/*  Singular.method("syMinimize",[](resolvente ra, int len, ring o){
-	  const ring origin = currRing;
-          syStrategy temp = (syStrategy) omAlloc0(sizeof(ssyStrategy));
-          resolvente result;
-          rChangeCurrRing(o);
-          temp->fullres = (resolvente) omAlloc0((len + 1)*sizeof(ideal));
-          for (int i = len - 1; i >= 0; i--)
-          {
-             if (ra[i] != NULL)
-                temp->fullres[i] = idCopy(ra[i]);
-          }
-          temp->length = len;
-          syMinimize(temp);
-          result = temp->minres;
-          temp->minres = NULL;
-          // syMinimize increments this as it returns a value we ignore 
-          temp->references--;
-          syKillComputation(temp, o);
-          rChangeCurrRing(origin);
-          return result;});
 
 
 
-*/
+  Singular.method("getindex",[](void* ra_void, int k){ 
+    auto ra = reinterpret_cast<resolvente>(ra_void);
+    return (ideal) ra[k];});
 
-/*
-  Singular.method("syBetti",[](resolvente rs,int len, ring o){
-   const ring origin = currRing;
-   rChangeCurrRing(o);
-   int dummy;
-   intvec *iv = syBetti(rs, len, &dummy, NULL, FALSE, NULL);
-   rChangeCurrRing(origin);
-   return iv;
-   int nrows = iv->rows();
-   int ncols = iv->cols();
-   auto betti = (int *)malloc(ncols*nrows*sizeof(int));
+  Singular.method("syMinimize",[](void* ra_void, int len, ring o){
+    auto ra = reinterpret_cast<resolvente>(ra_void); 
+    const ring origin = currRing;
+    syStrategy temp = (syStrategy) omAlloc0(sizeof(ssyStrategy));
+    resolvente result;
+    rChangeCurrRing(o);
+    temp->fullres = (resolvente) omAlloc0((len + 1)*sizeof(ideal));
+    for (int i = len - 1; i >= 0; i--)
+     {
+       if (ra[i] != NULL)
+       temp->fullres[i] = idCopy(ra[i]);
+     }
+    temp->length = len;
+    syMinimize(temp);
+    result = temp->minres;
+    temp->minres = NULL;
+    // syMinimize increments this as it returns a value we ignore 
+    temp->references--;
+    syKillComputation(temp, o);
+    rChangeCurrRing(origin);
+    return result;});
+
+
+
+  Singular.method("syBetti",[](void* ra_void, int len, ring o){
+    auto ra = reinterpret_cast<resolvente>(ra_void); 
+    const ring origin = currRing;
+    rChangeCurrRing(o);
+    int dummy;
+    intvec *iv = syBetti(ra, len, &dummy, NULL, FALSE, NULL);
+    rChangeCurrRing(origin);
+    return iv;
+    int nrows = iv->rows();
+    int ncols = iv->cols();
+    auto betti = (int *)malloc(ncols*nrows*sizeof(int));
    	for (int i = 0; i < ncols; i++) {
             for (int j = 0; j < nrows; j++) {
                betti[i*nrows+j] = IMATELEM(*iv, j+1, i+1);
             }
          }
     delete(iv);
-    return &betti[0];
-  
-   unsafe_wrap(Array, betti, (nrows, ncols), true);});
-*/
+    return betti[0];
+    unsafe_wrap(Array, betti, (nrows, ncols), true);});
+
+
 JULIA_CPP_MODULE_END
