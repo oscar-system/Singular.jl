@@ -157,4 +157,11 @@ void singular_define_ideals(jlcxx::Module& Singular){
 
   Singular.method("p_Vector2Array",[](poly p, void* a, int b, ring o) { return p_Vec2Array(p, reinterpret_cast<spolyrec**>(a), b, o); });
 
+  Singular.method("maGetPreimage",[](ring trgt, ideal a, ideal b, ring src){  
+    sip_smap sing_map = { a->m, (char *)"julia_ring", 1, a->ncols  };
+    auto preimage_ptr = sing_map;
+    return std::make_tuple(maGetPreimage(trgt, &sing_map, b, src),preimage_ptr);
+
+   });
+
 }
