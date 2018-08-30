@@ -27,6 +27,7 @@ JULIA_CPP_MODULE_BEGIN(registry)
   Singular.add_type<sip_sideal>("ideal");
   Singular.add_type<ip_smatrix>("ip_smatrix");
   Singular.add_type<ssyStrategy>("syStrategy");
+  Singular.add_type<sip_smap>("sip_smap");
 
   /* monomial orderings */
   Singular.set_const("ringorder_no", ringorder_no);
