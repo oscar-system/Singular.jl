@@ -7,6 +7,8 @@
 #include <tuple>
 
 #include "jlcxx/jlcxx.hpp"
+#include "jlcxx/const_array.hpp"
+#include "jlcxx/array.hpp"
 
 #include <gmp.h>
 #include <omalloc/omalloc.h>

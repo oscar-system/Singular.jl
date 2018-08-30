@@ -108,7 +108,6 @@ JULIA_CPP_MODULE_BEGIN(registry)
     int dummy;
     intvec *iv = syBetti(ra, len, &dummy, NULL, FALSE, NULL);
     rChangeCurrRing(origin);
-    return iv;
     int nrows = iv->rows();
     int ncols = iv->cols();
     auto betti = (int *)malloc(ncols*nrows*sizeof(int));
@@ -118,8 +117,7 @@ JULIA_CPP_MODULE_BEGIN(registry)
             }
          }
     delete(iv);
-    return betti[0];
-    unsafe_wrap(Array, betti, (nrows, ncols), true);});
+    return jlcxx::make_const_array(const_cast<const int*>(betti),nrows,ncols);});
 
 
 JULIA_CPP_MODULE_END
