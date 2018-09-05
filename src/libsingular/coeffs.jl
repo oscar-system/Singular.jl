@@ -1,6 +1,6 @@
 # initialise a number from an mpz
 function n_InitMPZ(b::BigInt, cf::coeffs)
-    bb = __mpz_struct(pointer_from_objref(b))
+    bb = pointer_from_objref(b)
     return n_InitMPZ_internal(bb, cf)
 end
 
