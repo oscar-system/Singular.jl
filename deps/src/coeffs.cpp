@@ -88,7 +88,7 @@ void singular_define_coeffs(jlcxx::Module& Singular)
 
   Singular.method("n_Equal",[]( snumber* x, snumber* y, const coeffs n ){ return n_Equal( x,y,n ) > 0; });
 
-  Singular.method("n_InpAdd",[]( snumber* x, snumber* y, const coeffs n ){ return n_InpAdd( x,y,n ); });
+  Singular.method("n_InpAdd",[]( snumber* x, snumber* y, const coeffs n ){ snumber* xx = x; n_InpAdd( xx,y,n ); return xx; });
 
   Singular.method("n_InpMult",[]( snumber* x, snumber* y, const coeffs n ){ return n_InpMult( x,y,n ); });
 

@@ -318,9 +318,7 @@ end
 ###############################################################################
 
 function addeq!(x::n_Z, y::n_Z)
-    xx = libSingular.number_ref(x.ptr)
-    libSingular.n_InpAdd(xx, y.ptr, parent(x).ptr)
-    x.ptr = xx[]
+    x.ptr = libSingular.n_InpAdd(x.ptr, y.ptr, parent(x).ptr)
     return x
 end
 
