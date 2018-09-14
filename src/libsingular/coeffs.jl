@@ -10,7 +10,7 @@ function n_Write(n::numberRef, cf::coeffs, bShortOut::Bool = false)
    n_Write_internal(n, cf, d);
 end
 
-function n_ExtGcd(a::number, b::number, s::Ptr{number}, t::Ptr{number}, cf:: coeffs)
+function n_ExtGcd(a::number, b::number, s::Ptr{numberRef}, t::Ptr{numberRef}, cf:: coeffs)
    sp = reinterpret(Ptr{Void},s)
    tp = reinterpret(Ptr{Void},t)
    return n_ExtGcd_internal(a, b, sp, tp, cf);
