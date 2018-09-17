@@ -291,10 +291,8 @@ reconstruct(x::Integer, y::n_Z) = reconstruct(ZZ(x), y)
 ###############################################################################
 
 function addeq!(x::n_Q, y::n_Q)
-    xx = libSingular.number_ref(x.ptr)
-    libSingular.n_InpAdd(xx, y.ptr, parent(x).ptr)
-    x.ptr = xx[]
-    return x
+   x.ptr = libSingular.n_InpAdd(x.ptr, y.ptr, parent(x).ptr)
+   return x
 end
 
 function mul!(x::n_Q, y::n_Q, z::n_Q)

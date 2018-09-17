@@ -54,8 +54,8 @@ function __init__()
 
    # done in __init__ since headers must be included first
 
-#   global const n_Z_2_n_Q = libSingular.n_SetMap(ZZ.ptr, QQ.ptr)
-#   global const n_Q_2_n_Z = libSingular.n_SetMap(QQ.ptr, ZZ.ptr)
+  global const n_Z_2_n_Q = libSingular.n_SetMap(ZZ.ptr, QQ.ptr)
+  global const n_Q_2_n_Z = libSingular.n_SetMap(QQ.ptr, ZZ.ptr)
 
   global const ringorder_no = libSingular.ringorder_no
   global const ringorder_lp = libSingular.ringorder_lp

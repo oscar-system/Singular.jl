@@ -144,7 +144,7 @@ function _n_Q_clear_fn(n::n_Q)
    nothing
 end
 
-#=
+
 ###############################################################################
 #
 #   N_ZnRing/n_Zn
@@ -160,8 +160,8 @@ const N_ZnRingID = Dict{Int, Ring}()
 
 type N_ZnRing <: Ring
    ptr::libSingular.coeffs
-   from_n_Z::Cxx.CppFptr
-   to_n_Z::Cxx.CppFptr
+   from_n_Z::Ptr{Void}
+   to_n_Z::Ptr{Void}
    refcount::Int
 
    function N_ZnRing(n::Int) 
@@ -219,9 +219,9 @@ function _n_Zn_clear_fn(n::n_Zn)
    nothing
 end
 
-=#
 
-#=
+
+
 ###############################################################################
 #
 #   N_ZpField/n_Zp
@@ -232,8 +232,8 @@ const N_ZpFieldID = Dict{Int, Field}()
 
 type N_ZpField <: Field
    ptr::libSingular.coeffs
-   from_n_Z::Cxx.CppFptr
-   to_n_Z::Cxx.CppFptr
+   from_n_Z::Ptr{Void}
+   to_n_Z::Ptr{Void}
    refcount::Int
 
    function N_ZpField(n::Int) 
@@ -291,14 +291,14 @@ function _n_Zp_clear_fn(n::n_Zp)
    nothing
 end
 
-=#
+
 
 ###############################################################################
 #
 #   SingularFiniteField/n_GF
 #
 ###############################################################################
-#=
+
 type GFInfo
    p::Cint
    n::Cint
@@ -310,8 +310,8 @@ const N_GFieldID = Dict{Tuple{Int, Int, Symbol}, Field}()
 type N_GField <: Field
    ptr::libSingular.coeffs
    deg::Int
-   from_n_Z::Cxx.CppFptr
-   to_n_Z::Cxx.CppFptr
+   from_n_Z::Ptr{Void}
+   to_n_Z::Ptr{Void}
    refcount::Int
 
    function N_GField(p::Int, n::Int, S::Symbol) 
@@ -368,7 +368,7 @@ function _n_GF_clear_fn(n::n_GF)
    _N_GField_clear_fn(R)
    nothing
 end
-=#
+
 ###############################################################################
 #
 #   SingularCoefficientRing/n_unknown

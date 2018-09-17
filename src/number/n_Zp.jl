@@ -241,10 +241,8 @@ end
 ###############################################################################
 
 function addeq!(x::n_Zp, y::n_Zp)
-    xx = libSingular.number_ref(x.ptr)
-    libSingular.n_InpAdd(xx, y.ptr, parent(x).ptr)
-    x.ptr = xx[]
-    return x
+   x.ptr = libSingular.n_InpAdd(x.ptr, y.ptr, parent(x).ptr)
+   return x
 end
 
 function mul!(x::n_Zp, y::n_Zp, z::n_Zp)
@@ -342,5 +340,5 @@ function Fp(a::Int; cached=true)
 end
 
 function Base.Int(a::n_Zp)
-  return reinterpret(Int, a.ptr)
+  return reinterpret(Int, a.ptr.cpp_object)
 end
