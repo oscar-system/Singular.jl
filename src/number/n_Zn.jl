@@ -245,10 +245,8 @@ end
 ###############################################################################
 
 function addeq!(x::n_Zn, y::n_Zn)
-    xx = libSingular.number_ref(x.ptr)
-    libSingular.n_InpAdd(xx, y.ptr, parent(x).ptr)
-    x.ptr = xx[]
-    return x
+   x.ptr = libSingular.n_InpAdd(x.ptr, y.ptr, parent(x).ptr)
+   return x
 end
 
 function mul!(x::n_Zn, y::n_Zn, z::n_Zn)
