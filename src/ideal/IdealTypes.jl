@@ -25,13 +25,13 @@ type sideal{T <: Nemo.RingElem} <: Module{T}
 
    function sideal{T}(R::PolyRing, ids::spoly...) where T
       n = length(ids)
-      id = libSingular.idInit(Cint(n))
+      id = libSingular.idInit(Cint(n),1)
       z = new(id, R, false)
       R.refcount += 1
       finalizer(z, _sideal_clear_fn)
       for i = 1:n
          p = libSingular.p_Copy(ids[i].ptr, R.ptr)
-         libSingular.setindex!(id, p, Cint(i - 1))
+         libSingular.setindex_internal(id, p, Cint(i - 1))
       end
       return z
    end

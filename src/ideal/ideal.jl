@@ -38,7 +38,7 @@ function setindex!{T <: Nemo.RingElem}(I::sideal{spoly{T}}, p::spoly{T}, i::Int)
       libSingular.p_Delete(p0, R.ptr)
    end
    p1 = libSingular.p_Copy(p.ptr, R.ptr)
-   libSingular.setindex!(I.ptr, p1, Cint(i - 1))
+   libSingular.setindex_internal(I.ptr, p1, Cint(i - 1))
    nothing
 end
 
