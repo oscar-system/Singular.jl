@@ -59,7 +59,7 @@ zero(R::PolyRing) = R()
 
 one(R::PolyRing) = R(1)
 
-iszero(p::spoly) = p.ptr == C_NULL
+iszero(p::spoly) = p.ptr.cpp_object == C_NULL
 
 function isone(p::spoly)
    return Bool(libSingular.p_IsOne(p.ptr, parent(p).ptr))
@@ -67,11 +67,11 @@ end
 
 function isgen(p::spoly)
    R = parent(p)
-   if p.ptr == C_NULL || libSingular.pNext(p.ptr) != C_NULL || 
+   if p.ptr.cpp_object == C_NULL || libSingular.pNext(p.ptr).cpp_object != C_NULL || 
      !Bool(libSingular.n_IsOne(libSingular.pGetCoeff(p.ptr), base_ring(p).ptr))
       return false
    end
-   n = 0
+    n = 0
    for i = 1:ngens(R)
       d = libSingular.p_GetExp(p.ptr, Cint(i), R.ptr)
       if d > 1
@@ -83,15 +83,15 @@ function isgen(p::spoly)
          n = 1
       end
    end
-   return n == 1   
+   return n == 1    
 end
 
 function isconstant(p::spoly)
    R = parent(p)
-   if p.ptr == C_NULL
+   if p.ptr.cpp_object == C_NULL
       return true
    end
-   if libSingular.pNext(p.ptr) != C_NULL
+   if libSingular.pNext(p.ptr).cpp_object != C_NULL
       return false
    end
    for i = 1:ngens(R)
@@ -103,7 +103,7 @@ function isconstant(p::spoly)
 end
 
 function isunit(p::spoly)
-   return p.ptr != C_NULL && libSingular.pNext(p.ptr) == C_NULL &&
+   return p.ptr.cpp_object != C_NULL && libSingular.pNext(p.ptr).cpp_object == C_NULL &&
           Bool(libSingular.p_IsUnit(p.ptr, parent(p).ptr))
 end
 
@@ -118,7 +118,7 @@ function coeff(p::spoly, i::Int)
    ptr = p.ptr
    for i = 1:i
       ptr = libSingular.pNext(ptr)
-      if ptr == C_NULL
+      if ptr.cpp_object == C_NULL
          return R()
       end
    end
@@ -135,7 +135,7 @@ function exponent(p::spoly, i::Int)
    ptr = p.ptr
    for i = 1:i
       ptr = libSingular.pNext(ptr)
-      if ptr == C_NULL
+      if ptr.cpp_object == C_NULL
          return zeros(Int, n)
       end
    end
@@ -158,7 +158,7 @@ function exponent!(A::Array{Int, 1}, p::spoly, i::Int)
    ptr = p.ptr
    for i = 1:i
       ptr = libSingular.pNext(ptr)
-      if ptr == C_NULL
+      if ptr.cpp_object == C_NULL
         for i=1:n
           A[i] = 0
         end
@@ -201,10 +201,6 @@ function Base.start(sp::coeffs_expos)
 end
 
 function Base.next(sp::coeffs_expos, p)
-  if p == C_NULL
-    return (sp.c, sp.E), p
-  end
-
   libSingular.p_GetExpVL(p, sp.E, sp.Rx.ptr)
   sp.c = sp.R(libSingular.n_Copy(libSingular.pGetCoeff(p), sp.R.ptr))
 
@@ -212,7 +208,7 @@ function Base.next(sp::coeffs_expos, p)
 end
 
 function Base.done(sp::coeffs_expos, p)
-  return p == C_NULL
+  return p.cpp_object == C_NULL
 end
 
 doc"""
@@ -365,8 +361,8 @@ end
 
 function gcd{T <: Nemo.RingElem}(x::spoly{T}, y::spoly{T})
    check_parent(x, y)
-   R = parent(x)
-   x1 = libSingular.p_Copy(x.ptr, R.ptr)
+   R = parent(x)   
+   x1 = libSingular.p_Copy(x.ptr, R.ptr)   
    y1 = libSingular.p_Copy(y.ptr, R.ptr)
    p = libSingular.singclap_gcd(x1, y1, R.ptr)
    return R(p)
@@ -377,10 +373,10 @@ function gcdx{T <: Nemo.FieldElem}(x::spoly{T}, y::spoly{T})
    R = parent(x)
    x1 = libSingular.p_Copy(x.ptr, R.ptr)
    y1 = libSingular.p_Copy(y.ptr, R.ptr)
-   s = libSingular.poly_ref(libSingular.poly(C_NULL))
-   t = libSingular.poly_ref(libSingular.poly(C_NULL))
-   p = libSingular.poly_ref(libSingular.poly(C_NULL))
-   libSingular.singclap_extgcd(x1, y1, p, s, t, R.ptr)
+   s = [libSingular.p_ISet(0,R.ptr)]
+   t = [libSingular.p_ISet(0,R.ptr)]
+   p = [libSingular.p_ISet(0,R.ptr)]
+   libSingular.p_ExtGcd(x1, y1, pointer(p), pointer(s), pointer(t), R.ptr)
    return R(p[]), R(s[]), R(t[])
 end
 

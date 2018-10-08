@@ -54,12 +54,12 @@ void singular_define_rings(jlcxx::Module& Singular){
   Singular.method("p_ISet",[](long i, ip_sring* r){ return p_ISet(i,r);});
   Singular.method("p_NSet",[](snumber* p, ip_sring* r){ return p_NSet(p,r);});
   Singular.method("pLength",[](spolyrec* p){ return pLength(p);});
-  Singular.method("pNext",[](spolyrec* p){ return pNext(p);});
+  Singular.method("pNext",[](spolyrec* a){ poly p = pNext(a); return p;  });
   Singular.method("p_Neg",[](spolyrec* p, ip_sring* r){ return p_Neg(p,r); });
   Singular.method("pGetCoeff",[](spolyrec* p){ return pGetCoeff(p);});
   Singular.method("pSetCoeff",[](spolyrec* p, long c, ip_sring* r){ number n = n_Init(c,r); return p_SetCoeff(p,n,r); });
   Singular.method("pSetCoeff0",[](spolyrec* p, long c, ip_sring* r){ number n = n_Init(c,r); return p_SetCoeff0(p,n,r); });
-  Singular.method("pLDeg",[](spolyrec* a, ip_sring* r){ long res; int dummy; if(a==NULL){ res = r->pLDeg(a,&dummy,r);}else{ res = -1;} return res; });
+  Singular.method("pLDeg",[](spolyrec* a, ip_sring* r){ long res; int dummy; if(a!=NULL){ res = r->pLDeg(a,&dummy,r);}else{ res = -1;} return res; });
   Singular.method("p_Add_q",[](spolyrec* p, spolyrec* q, ip_sring* r){ return p_Add_q(p,q,r); });
   Singular.method("p_Sub",[](spolyrec* p, spolyrec* q, ip_sring* r){ return p_Sub(p,q,r); });
   Singular.method("p_Mult_q",[](spolyrec* p, spolyrec* q, ip_sring* r){ return p_Mult_q(p,q,r); });
@@ -67,11 +67,10 @@ void singular_define_rings(jlcxx::Module& Singular){
   Singular.method("p_EqualPolys",[](spolyrec* p, spolyrec* q, ip_sring* r){ return p_EqualPolys(p,q,r); });
   Singular.method("p_Divide",[](spolyrec* p, spolyrec* q, ip_sring* r){ return p_Divide(p,q,r); });
   Singular.method("singclap_gcd",[](spolyrec* p, spolyrec* q, ip_sring* r){ return singclap_gcd(p,q,r); });
-  Singular.method("singclap_extgcd",[]( spolyrec* a, spolyrec* b, spolyrec* res, spolyrec* s, spolyrec* t, ip_sring* r ){
-                                 return singclap_extgcd(a,b,
-                                          res,
-                                          s,
-                                          t,r); });
+  Singular.method("p_ExtGcd_internal",[]( spolyrec* a, spolyrec* b, void* res, void* s, void* t, ip_sring* r ){ return singclap_extgcd(a,b,
+                                          reinterpret_cast<spolyrec*&>(res), 
+                                          reinterpret_cast<spolyrec*&>(s),
+                                          reinterpret_cast<spolyrec*&>(t),r); });
   Singular.method("p_Content",[](spolyrec* p, ip_sring* r){ return p_Content(p,r); });
   Singular.method("p_GetExpVL_internal",[](spolyrec* p, long* ev, ip_sring* r){return p_GetExpVL(p,ev,r);});
   Singular.method("p_SetExpV_internal",[](spolyrec* p, int* ev, ip_sring* r){return p_SetExpV(p,ev,r);});

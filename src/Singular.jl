@@ -99,13 +99,13 @@ include("Poly.jl")
 
 # include("Module.jl")
 
-# include("Ideal.jl")
+include("Ideal.jl")
 
 # include("Matrix.jl")
 
 # include("Vector.jl")
 
-# include("Resolution.jl")
+ include("Resolution.jl")
 
 ###############################################################################
 #

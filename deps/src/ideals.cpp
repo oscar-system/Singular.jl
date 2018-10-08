@@ -88,7 +88,7 @@ void singular_define_ideals(jlcxx::Module& Singular){
 
   Singular.method("idInit",&idInit);
 
-  Singular.method("setindex!",[]( ideal r, poly n, int o) { r->m[o] = n; });
+  Singular.method("setindex_internal",[]( ideal r, poly n, int o) { r->m[o] = n; });
 
   Singular.method("getindex",[]( ideal r, int o) { (poly) (r->m[o]); });
   
