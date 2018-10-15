@@ -56,7 +56,7 @@ function test_sresolution_manipulation()
    println("PASS")
 end
 
-#= function test_sresolution_betti()
+function test_sresolution_betti()
    print("sresolution.betti...")
 
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
@@ -73,7 +73,7 @@ end
    @test B[2, 1] == 0 && B[2, 2] == 1 && B[2, 3] == 1
 
    println("PASS")
-end =#
+end
 
 function test_sresolution_minres()
    print("sresolution.minres...")
@@ -99,7 +99,7 @@ end
 function test_sresolution()
    test_sresolution_constructors()
    test_sresolution_manipulation()
-#    test_sresolution_betti()
+   test_sresolution_betti()
    test_sresolution_minres()
 
    println("")
