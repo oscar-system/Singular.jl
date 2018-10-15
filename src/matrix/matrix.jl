@@ -127,7 +127,7 @@ end
 #
 ###############################################################################
 
-function (S::MatrixSpace{T})(ptr::libSingular.matrix) where T <: AbstractAlgebra.RingElem
+function (S::MatrixSpace{T})(ptr::libSingular.matrix_ref) where T <: AbstractAlgebra.RingElem
    return smatrix{T}(base_ring(S), ptr)
 end
 

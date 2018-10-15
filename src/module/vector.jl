@@ -179,6 +179,7 @@ end
 
 function vector(R::PolyRing{T}, coords::spoly{T}...) where T <: AbstractAlgebra.RingElem
    n = length(coords)
+   println("type of coords", typeof(coords))
    aa = [p.ptr for p in coords]
    v = libSingular.id_Array2Vector(aa, n, R.ptr)
    return svector{spoly{T}}(R, n, v)
