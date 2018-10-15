@@ -203,7 +203,6 @@ end
 function Base.next(sp::coeffs_expos, p)
   libSingular.p_GetExpVL(p, sp.E, sp.Rx.ptr)
   sp.c = sp.R(libSingular.n_Copy(libSingular.pGetCoeff(p), sp.R.ptr))
-
   return (sp.c, sp.E), libSingular.pNext(p) 
 end
 

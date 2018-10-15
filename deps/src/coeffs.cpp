@@ -1,19 +1,5 @@
 #include "coeffs.h"
 
-auto id_fres_helper(sip_sideal* I, int n, std::string method, ring R){
-    auto origin = currRing;
-    rChangeCurrRing(R);
-    syStrategy s = syFrank(I, n, method.c_str());
-    rChangeCurrRing(origin);
-    auto r = s->minres;
-    bool minimal = true;
-    if(r==NULL){
-        r = s->fullres;
-        minimal = false;
-    }
-    return std::make_tuple(reinterpret_cast<void*>(r),s->length,minimal);
-}
-
 void singular_define_coeffs(jlcxx::Module& Singular)
 {
   /* initialise a coefficient ring */
@@ -116,5 +102,5 @@ void singular_define_coeffs(jlcxx::Module& Singular)
 
   Singular.method("setindex_internal",[]( void* x, snumber* y ){ *reinterpret_cast<snumber**>(x) = y; });
 
-  Singular.method("id_fres",&id_fres_helper);
+
 }

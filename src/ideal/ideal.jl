@@ -310,7 +310,7 @@ doc"""
 """
 function slimgb(I::sideal; complete_reduction::Bool=false)
    R = base_ring(I)
-   ptr = libSingular.id_Slimgb(I.ptr, R.ptr; complete_reduction=complete_reduction)
+   ptr = libSingular.id_Slimgb(I.ptr, R.ptr,complete_reduction)
    libSingular.idSkipZeroes(ptr)
    z = Ideal(R, ptr)
    z.isGB = true
@@ -327,7 +327,7 @@ doc"""
 """
 function std(I::sideal; complete_reduction::Bool=false) 
    R = base_ring(I)
-   ptr = libSingular.id_Std(I.ptr, R.ptr; complete_reduction=complete_reduction)
+   ptr = libSingular.id_Std(I.ptr, R.ptr, complete_reduction)
    libSingular.idSkipZeroes(ptr)
    z = Ideal(R, ptr)
    z.isGB = true
@@ -422,8 +422,7 @@ function kernel(source::PolyRing, map::sideal)
    #       jjPREIMAGE() in the Singular interpreter
    target = base_ring(map)
    zero_ideal = Ideal(target, )
-   ptr = libSingular.maGetPreimage(target.ptr, map.ptr, zero_ideal.ptr,
-         source.ptr)
+   ptr = libSingular.maGetPreimage(target.ptr, map.ptr, zero_ideal.ptr, source.ptr)
    return Ideal(source, ptr)
 end
 
@@ -476,7 +475,7 @@ function fres{T <: Nemo.RingElem}(id::sideal{T}, max_length::Int,
       error("wrong optional argument for fres")
    end
    r, length, minimal = libSingular.id_fres(id.ptr, Cint(max_length + 1), method, R.ptr)
-   return sresolution{T}(R, length, r, minimal)
+   return sresolution{T}(R, Int(length), r, minimal)
 end
 
 doc"""
@@ -497,7 +496,7 @@ function sres{T <: Nemo.RingElem}(I::sideal{T}, max_length::Int)
    r, length, minimal = libSingular.id_sres(I.ptr, Cint(max_length + 1), R.ptr)
    for i = 1:length
       ptr = libSingular.getindex(r, Cint(i - 1))
-      if ptr == C_NULL
+      if ptr.cpp_object == C_NULL
          length = i - 1
          break
       end

@@ -69,7 +69,7 @@ JULIA_CPP_MODULE_BEGIN(registry)
              if (ra[i] != NULL)
                 res[i] = id_Copy(ra[i], o);
           }
-          return res; });
+          return reinterpret_cast<void*>(res); });
 
 
 
@@ -97,10 +97,10 @@ JULIA_CPP_MODULE_BEGIN(registry)
     temp->references--;
     syKillComputation(temp, o);
     rChangeCurrRing(origin);
-    return result;});
+    return reinterpret_cast<void*>(result);});
 
 
-
+ 
   Singular.method("syBetti",[](void* ra_void, int len, ring o){
     auto ra = reinterpret_cast<resolvente>(ra_void); 
     const ring origin = currRing;

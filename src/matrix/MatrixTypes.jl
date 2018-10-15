@@ -21,7 +21,7 @@ type MatrixSpace{T <: Nemo.RingElem} <: Set
 end
 
 type smatrix{T <: Nemo.RingElem} <: Nemo.SetElem
-   ptr::libSingular.matrix
+   ptr::libSingular.matrix_ref
    base_ring::PolyRing
 
    # really takes a Singular module, which has type ideal
@@ -33,7 +33,7 @@ type smatrix{T <: Nemo.RingElem} <: Nemo.SetElem
       return z
    end
 
-   function smatrix{T}(R::PolyRing, ptr::libSingular.matrix) where {T}
+   function smatrix{T}(R::PolyRing, ptr::libSingular.matrix_ref) where {T}
       z = new(ptr, R)
       finalizer(z, _smatrix_clear_fn)
       return z

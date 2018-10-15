@@ -15,6 +15,22 @@ auto id_sres_helper(sip_sideal* m, int n, ring R) {
 
 }
 
+
+auto id_fres_helper(sip_sideal* I, int n, std::string method, ring R){
+    auto origin = currRing;
+    rChangeCurrRing(R);
+    syStrategy s = syFrank(I, n, method.c_str());
+    rChangeCurrRing(origin);
+    auto r = s->minres;
+    bool minimal = true;
+    if(r==NULL){
+        r = s->fullres;
+        minimal = false;
+    }
+    return std::make_tuple(reinterpret_cast<void*>(r),s->length,minimal);
+}
+
+
 ideal id_Syzygies_internal(ideal m, ring o) 
 { 
   ideal id = NULL;
@@ -29,7 +45,7 @@ ideal id_Syzygies_internal(ideal m, ring o)
   return id; 
 }
 
-auto id_Slimgb_helper(ideal a, ring b,bool complete_reduction) {
+auto id_Slimgb_helper(ideal a, ring b,bool complete_reduction=false) {
 //  bool complete_reduction= false;
   unsigned int crbit;
   if (complete_reduction == false)
@@ -55,8 +71,8 @@ auto id_Slimgb_helper(ideal a, ring b,bool complete_reduction) {
           return id;
 } 
 
-auto id_Std_helper(ideal a, ring b) {
-  bool complete_reduction= false;
+auto id_Std_helper(ideal a, ring b, bool complete_reduction=false) {
+  //bool complete_reduction= false;
   unsigned int crbit;
   if (complete_reduction == false)
       crbit = Sy_bit(OPT_REDSB);
@@ -90,7 +106,7 @@ void singular_define_ideals(jlcxx::Module& Singular){
 
   Singular.method("setindex_internal",[]( ideal r, poly n, int o) { r->m[o] = n; });
 
-  Singular.method("getindex",[]( ideal r, int o) { (poly) (r->m[o]); });
+  Singular.method("getindex",[]( ideal r, int o) { return (poly) (r->m[o]); });
   
   Singular.method("idIs0",&idIs0);
 
@@ -112,35 +128,39 @@ void singular_define_ideals(jlcxx::Module& Singular){
 
   Singular.method("id_Power",&id_Power);
 
-  Singular.method("id_IsEqual",[](ideal m, ideal n, ring o) { mp_Equal((ip_smatrix *) m, (ip_smatrix *) n, o); });
+  Singular.method("id_IsEqual",[](ideal m, ideal n, ring o) { return mp_Equal((ip_smatrix *) m, (ip_smatrix *) n, o); });
 
   Singular.method("id_FreeModule",&id_FreeModule);
 
   Singular.method("idSkipZeroes",&idSkipZeroes);
 
-  Singular.method("ngens",[](ideal m) { (int) IDELEMS(m); });
+  Singular.method("ngens",[](ideal m) { return (int) IDELEMS(m); });
 
   Singular.method("rank",[](ideal m ) { (int) m->rank; });
+
+ // Singular.method("p_Copy",[](void o, ring r){ return p_Copy(o,r);});
 
   Singular.method("id_Quotient",[](ideal a, ideal b, bool c, ring d) { 
     const ring origin = currRing;
           rChangeCurrRing(d);
           ideal id = idQuot(a, b, c, TRUE);
           rChangeCurrRing(origin);
-          id; });
+          return id; });
 
   Singular.method("id_Intersection",[](ideal a, ideal b, ring c) { 
     const ring origin = currRing;
           rChangeCurrRing(c);
           ideal id = idSect(a, b);
           rChangeCurrRing(origin);
-          id; });
+          return id; });
 
   Singular.method("id_Syzygies",&id_Syzygies_internal);
 
   Singular.method("id_sres",&id_sres_helper);
 
-  Singular.method("id_Slimgb_helper",&id_Slimgb_helper);
+  Singular.method("id_fres",&id_fres_helper);
+
+  Singular.method("id_Slimgb",&id_Slimgb_helper);
 
   Singular.method("id_Std",&id_Std_helper);
 
@@ -149,18 +169,17 @@ void singular_define_ideals(jlcxx::Module& Singular){
           rChangeCurrRing(o);
           ideal res = idElimination(m, p);
           rChangeCurrRing(origin);
-          res; });
+          return res; });
 
   Singular.method("id_Satstd",&id_Satstd);
 
-  Singular.method("id_Array2Vector",[](void* p, int a, ring o) { return id_Array2Vector(reinterpret_cast<spolyrec**>(p), a, o); });
+  Singular.method("id_Array2Vector",[](int* p[], int a, ring o) { return id_Array2Vector(reinterpret_cast<spolyrec**>(p), a, o); });
 
   Singular.method("p_Vector2Array",[](poly p, void* a, int b, ring o) { return p_Vec2Array(p, reinterpret_cast<spolyrec**>(a), b, o); });
 
   Singular.method("maGetPreimage",[](ring trgt, ideal a, ideal b, ring src){  
     sip_smap sing_map = { a->m, (char *)"julia_ring", 1, a->ncols  };
-    auto preimage_ptr = sing_map;
-    return std::make_tuple(maGetPreimage(trgt, &sing_map, b, src),preimage_ptr);
+    return maGetPreimage(trgt, &sing_map, b, src);
 
    });
 

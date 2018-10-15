@@ -1,4 +1,4 @@
-function res_Delete(r::resolvente, length::Cint, R::ring)
+#= function res_Delete(r::resolvente, length::Cint, R::ring)
     r_ptr = reinterpret(Ptr{Void},r)
     return res_Delete_helper(r_ptr,length,R)
 end
@@ -63,3 +63,4 @@ function syBetti(res::resolvente, length::Cint, R::ring)
       """
    unsafe_wrap(Array, betti, (nrows, ncols), true)
 end
+ =#

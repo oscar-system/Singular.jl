@@ -30,7 +30,7 @@ function test_PolyRing_degree_bound()
    println("PASS")
 end
 
-#= function test_PolyRing_ordering()
+ #= function test_PolyRing_ordering()
    print("PolyRing.ordering...")
 
    R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"])
@@ -64,11 +64,11 @@ end
    @test string(M[1]) == "[-y-z,x+z]"
 
    println("PASS")
-end
- =# 
+end =#
+
 function test_PolyRing()
    test_PolyRing_degree_bound()
-#    test_PolyRing_ordering()
+#     test_PolyRing_ordering()
 
    println("")
 end
