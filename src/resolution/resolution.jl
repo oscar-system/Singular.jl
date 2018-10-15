@@ -61,7 +61,8 @@ doc"""
 > free resolution. These are returned as a Julia array of `Int`s.
 """
 function betti(r::sresolution)
-   libSingular.syBetti(r.ptr, Cint(r.len), r.base_ring.ptr)
+   array = libSingular.syBetti(r.ptr, Cint(r.len), r.base_ring.ptr)
+   return unsafe_wrap(Array, array[1], array[2:3],true)
 end
 
 ###############################################################################
