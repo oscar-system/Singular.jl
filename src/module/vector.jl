@@ -152,8 +152,8 @@ end
 function (S::FreeMod{T})(a::Array{T, 1}) where T <: AbstractAlgebra.RingElem
    R = base_ring(S) # polynomial ring
    n = size(a)[1]
-   aa = [p.ptr for p in a]
-   v = libSingular.id_Array2Vector(aa, n, base_ring(S).ptr)
+   aa = [p.ptr.cpp_object for p in a]
+   v = libSingular.id_Array2Vector(pointer(aa), n, base_ring(S).ptr)
    return svector{T}(R, n, v)
 end
 
@@ -165,7 +165,11 @@ end
 
 function Array{T <: Nemo.RingElem}(v::svector{spoly{T}})
    n = v.rank
+   println(n)
    aa = Array{libSingular.poly, 1}(n)
+   println("printing aa",aa)
+   
+   println("type of aa in Array", typeof(aa))
    R = base_ring(v)
    libSingular.p_Vector2Array(v.ptr, aa, n, R.ptr)
    return [spoly{T}(R, p) for p in aa]
@@ -179,9 +183,12 @@ end
 
 function vector(R::PolyRing{T}, coords::spoly{T}...) where T <: AbstractAlgebra.RingElem
    n = length(coords)
+   println("type of n", typeof(n))
    println("type of coords", typeof(coords))
-   aa = [p.ptr for p in coords]
-   v = libSingular.id_Array2Vector(aa, n, R.ptr)
+   aa = [p.ptr.cpp_object for p in coords]
+   
+   println("type of aa", typeof(aa))
+   v = libSingular.id_Array2Vector(pointer(aa), n, R.ptr)
    return svector{spoly{T}}(R, n, v)
 end
 
