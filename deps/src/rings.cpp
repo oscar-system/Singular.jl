@@ -91,4 +91,12 @@ void singular_define_rings(jlcxx::Module& Singular){
 //   Singular.method("rDefault_long_helper",[](coeffs cf, jlcxx::ArrayRef<std::string> vars, jlcxx::ArrayRef<rRingOrder_t> ord, int* blk0, int* blk1, unsigned long bitmask){ return rDefault_long_helper(cf,vars,ord,blk0,blk1,bitmask); });
   Singular.method("rDefault_long_helper",&rDefault_long_helper);
 
+  Singular.method("letterplace_ring_helper",[](ip_sring* r, long block_size){
+          rUnComplete(r);
+          r->isLPring = block_size;
+          r->ShortOut = FALSE;
+          r->CanShortOut = FALSE;
+          rComplete(r);
+  });
+
 }
