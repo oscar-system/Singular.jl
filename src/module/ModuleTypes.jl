@@ -70,12 +70,14 @@ type smodule{T <: Nemo.RingElem} <: Module{T}
          @assert vecs[i].rank == r
       end
       m = libSingular.idInit(Cint(n), Cint(r))
+      println("Type of m in smodule", typeof(m))
       z = new(m, R, false)
       R.refcount += 1
       finalizer(z, _smodule_clear_fn)
       for i = 1:n
          v = libSingular.p_Copy(vecs[i].ptr, R.ptr)
-         libSingular.setindex!(m, v, Cint(i - 1))
+         println("Type of v in smodule", typeof(v))
+         libSingular.setindex_internal(m, v, Cint(i - 1))
       end
       return z
    end
