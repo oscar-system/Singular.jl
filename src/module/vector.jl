@@ -153,7 +153,7 @@ function (S::FreeMod{T})(a::Array{T, 1}) where T <: AbstractAlgebra.RingElem
    R = base_ring(S) # polynomial ring
    n = size(a)[1]
    aa = [p.ptr.cpp_object for p in a]
-   v = libSingular.id_Array2Vector(pointer(aa), n, base_ring(S).ptr)
+   v = libSingular.id_Array2Vector(reinterpret(Ptr{Void},pointer(aa)), n, base_ring(S).ptr)
    return svector{T}(R, n, v)
 end
 
