@@ -165,13 +165,10 @@ end
 
 function Array{T <: Nemo.RingElem}(v::svector{spoly{T}})
    n = v.rank
-   println(n)
-   aa = Array{libSingular.poly, 1}(n)
-   println("printing aa",aa)
-   
-   println("type of aa in Array", typeof(aa))
+   aa_val = Array{Ptr{Void},1}(n)
    R = base_ring(v)
-   libSingular.p_Vector2Array(v.ptr, aa, n, R.ptr)
+   libSingular.p_Vector2Array(v.ptr, reinterpret(Ptr{Void},pointer(aa_val)), n, R.ptr)
+   aa = [libSingular.internal_void_to_poly_helper(p) for p in aa_val]
    return [spoly{T}(R, p) for p in aa]
 end
 
@@ -183,12 +180,8 @@ end
 
 function vector(R::PolyRing{T}, coords::spoly{T}...) where T <: AbstractAlgebra.RingElem
    n = length(coords)
-   println("type of n", typeof(n))
-   println("type of coords", typeof(coords))
    aa = [p.ptr.cpp_object for p in coords]
-   
-   println("type of aa", typeof(aa))
-   v = libSingular.id_Array2Vector(pointer(aa), n, R.ptr)
+   v = libSingular.id_Array2Vector(reinterpret(Ptr{Void},pointer(aa)), n, R.ptr)
    return svector{spoly{T}}(R, n, v)
 end
 

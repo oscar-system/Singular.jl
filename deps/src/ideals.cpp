@@ -173,13 +173,12 @@ void singular_define_ideals(jlcxx::Module& Singular){
 
   Singular.method("id_Satstd",&id_Satstd);
 
-  Singular.method("id_Array2Vector",[]( void** p, int a, ring o) { 
-//          auto len = p.size();
-  //        spolyrec** vars_ptr  = new spolyrec*[len];
-    //      for (int i = 0; i < len; i++) { vars_ptr[i] = reinterpret_cast<spolyrec*>(p[i]); }
-          return id_Array2Vector(reinterpret_cast<spolyrec**>(p), a, o);} );
+  Singular.method("id_Array2Vector",[]( void* p, int a, ring o) {
+          return id_Array2Vector( reinterpret_cast<poly*>(p), a, o);} );
 
-  Singular.method("p_Vector2Array",[](spolyrec* p, void* a, int b, ring o) { return p_Vec2Array(p, reinterpret_cast<spolyrec**>(a), b, o); });
+  Singular.method("p_Vector2Array",[](poly p, void* a, int b, ring o) { p_Vec2Array(p, reinterpret_cast<poly*>(a), b, o); });
+
+  Singular.method("internal_void_to_poly_helper",[](void* p){ return reinterpret_cast<poly*>(p);});
 
   Singular.method("maGetPreimage",[](ring trgt, ideal a, ideal b, ring src){  
     sip_smap sing_map = { a->m, (char *)"julia_ring", 1, a->ncols  };
