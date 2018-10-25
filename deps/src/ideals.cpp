@@ -136,7 +136,7 @@ void singular_define_ideals(jlcxx::Module& Singular){
 
   Singular.method("ngens",[](ideal m) { return (int) IDELEMS(m); });
 
-  Singular.method("rank",[](ideal m ) { (int) m->rank; });
+  Singular.method("rank",[](ideal m ) { return (int) m->rank; });
 
  // Singular.method("p_Copy",[](void o, ring r){ return p_Copy(o,r);});
 

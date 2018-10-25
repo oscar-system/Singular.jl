@@ -18,6 +18,7 @@ elem_type(::Type{ModuleClass{T}}) where T <: AbstractAlgebra.RingElem = smodule{
 
 parent_type(::Type{smodule{T}}) where T <: AbstractAlgebra.RingElem = ModuleClass{T}
 
+
 doc"""
     ngens(I::smodule)
 > Return the number of generators in the current representation of the module (as a list
@@ -29,6 +30,7 @@ doc"""
     rank(I::smodule)
 > Return the rank $n$ of the ambient space $R^n$ of which this module is a submodule.
 """
+
 rank(I::smodule) = Int(libSingular.rank(I.ptr))
 
 function checkbounds(I::smodule, i::Int)
@@ -95,7 +97,7 @@ doc"""
 """
 function std(I::smodule; complete_reduction::Bool=false) 
    R = base_ring(I)
-   ptr = libSingular.id_Std(I.ptr, R.ptr; complete_reduction=complete_reduction)
+   ptr = libSingular.id_Std(I.ptr, R.ptr, complete_reduction)
    libSingular.idSkipZeroes(ptr)
    z = Module(R, ptr)
    z.isGB = true
@@ -113,7 +115,7 @@ doc"""
 """
 function slimgb(I::smodule; complete_reduction::Bool=false)
    R = base_ring(I)
-   ptr = libSingular.id_Slimgb(I.ptr, R.ptr; complete_reduction=complete_reduction)
+   ptr = libSingular.id_Slimgb(I.ptr, R.ptr, complete_reduction)
    libSingular.idSkipZeroes(ptr)
    z = Module(R, ptr)
    z.isGB = true
@@ -161,7 +163,7 @@ function sres{T <: Nemo.RingElem}(I::smodule{T}, max_length::Int)
    r, length, minimal = libSingular.id_sres(I.ptr, Cint(max_length + 1), R.ptr)
    for i = 1:length
       ptr = libSingular.getindex(r, Cint(i - 1))
-      if ptr == C_NULL
+      if ptr.cpp_object == C_NULL
          length = i - 1
          break
       end

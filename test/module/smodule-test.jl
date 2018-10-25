@@ -52,7 +52,7 @@ function test_smodule_manipulation()
    println("PASS")
 end
 
-function test_smodule_slimgb()
+#= function test_smodule_slimgb()
    print("smodule.slimgb...")
 
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
@@ -79,9 +79,9 @@ function test_smodule_slimgb()
    @test G2.isGB == true
 
    println("PASS")
-end
+end =#
 
-function test_smodule_std()
+#= function test_smodule_std()
    print("smodule.std...")
 
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
@@ -108,7 +108,7 @@ function test_smodule_std()
    @test G2.isGB == true
 
    println("PASS")
-end
+end =#
 
 function test_smodule_syz()
    print("smodule.syz...")
@@ -138,7 +138,7 @@ function test_smodule_sres()
    v2 = vector(R, x^2 + 1, 2x + 3y, x)
 
    M = std(Singular.Module(R, v1, v2))
-
+   
    F = sres(M, 0)
 
    @test length(F) == 1
@@ -172,8 +172,8 @@ end
 function test_smodule()
    test_smodule_constructors()
    test_smodule_manipulation()
-   test_smodule_slimgb()
-   test_smodule_std()
+#    test_smodule_slimgb()
+#    test_smodule_std()
    test_smodule_syz()
    test_smodule_sres()
 
