@@ -81,7 +81,7 @@ end
    println("PASS")
 end =#
 
-#= function test_smodule_std()
+function test_smodule_std()
    print("smodule.std...")
 
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
@@ -108,7 +108,7 @@ end =#
    @test G2.isGB == true
 
    println("PASS")
-end =#
+end
 
 function test_smodule_syz()
    print("smodule.syz...")
@@ -173,7 +173,7 @@ function test_smodule()
    test_smodule_constructors()
    test_smodule_manipulation()
 #    test_smodule_slimgb()
-#    test_smodule_std()
+   test_smodule_std()
    test_smodule_syz()
    test_smodule_sres()
 

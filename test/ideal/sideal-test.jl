@@ -17,7 +17,6 @@ function test_sideal_constructors()
    @test typeof(I) <: AbstractAlgebra.Module
 
    I1 = Ideal(R)
-#    println(I1)
    I2 = Ideal(R, x + y)
    I3 = Ideal(R, x + y, y^2 + 2)
    I4 = Ideal(R, [x + y, y^2 + 2])
@@ -59,11 +58,11 @@ function test_sideal_manipulation()
 
    @test isconstant(Ideal(R, R(1), R(2)))
 
-    @test isvar_generated(Ideal(R, x))
-    @test isvar_generated(Ideal(R, y))
-    @test isvar_generated(Ideal(R, x, y))
-    @test !isvar_generated(Ideal(R, R(1)))
-    @test !isvar_generated(Ideal(R, x + y))
+   @test isvar_generated(Ideal(R, x))
+   @test isvar_generated(Ideal(R, y))
+   @test isvar_generated(Ideal(R, x, y))
+   @test !isvar_generated(Ideal(R, R(1)))
+   @test !isvar_generated(Ideal(R, x + y))
 
    println("PASS")
 end
