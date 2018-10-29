@@ -35,6 +35,6 @@ end
 
 function _sresolution_clear_fn(r::sresolution)
    R = base_ring(r)
-   libSingular.res_Delete(r.ptr, Cint(r.len), R.ptr)
+   libSingular.res_Delete_helper(r.ptr, Cint(r.len), R.ptr)
     _PolyRing_clear_fn(R)
 end
