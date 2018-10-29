@@ -108,9 +108,9 @@ cd(oldwdir)
 
 jlcxx_cmake_dir = Pkg.dir("CxxWrap", "deps", "usr", "lib", "cmake", "JlCxx")
 
-julia_include = Pkg.dir(JULIA_HOME,"..","include/julia")
-julia_lib = Pkg.dir(JULIA_HOME,"..","lib")
-julia_exec = JULIA_HOME*"/julia"
+julia_include = abspath(joinpath(Sys.BINDIR, "..", "include", "julia"))
+julia_lib = abspath(joinpath(Sys.BINDIR, "..", "lib"))
+julia_exec = abspath(joinpath(Sys.BINDIR, "julia"))
 
 cmake_build_path = Pkg.dir("Singular","deps","src")
 

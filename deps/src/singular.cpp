@@ -1,3 +1,4 @@
+#include "jlcxx/jlcxx.hpp"
 #include "includes.h"
 #include "coeffs.h"
 #include "rings.h"
@@ -6,9 +7,8 @@
 
 
 
-JULIA_CPP_MODULE_BEGIN(registry)
-  jlcxx::Module& Singular = registry.create_module("libSingular");
-
+JLCXX_MODULE define_julia_module(jlcxx::Module& Singular)
+{
   Singular.add_type<n_Procs_s>("coeffs");
   Singular.add_bits<n_coeffType>("n_coeffType");
   Singular.set_const("n_Z",n_Z);
@@ -119,6 +119,4 @@ JULIA_CPP_MODULE_BEGIN(registry)
          }
     delete(iv);
     return std::make_tuple(betti,nrows,ncols);});
-
-
-JULIA_CPP_MODULE_END
+}
