@@ -57,9 +57,9 @@ end
 
 function show(io::IO, a::svector)
    m = libSingular.p_String(a.ptr, base_ring(a).ptr)
-   s = unsafe_string(m)
-   libSingular.omFree(Ptr{Void}(m))
-   print(io, s)
+#   s = unsafe_string(m)
+#   libSingular.omFree(Ptr{Void}(m))
+   print(io, m)
 end
 
 
@@ -182,6 +182,7 @@ function vector(R::PolyRing{T}, coords::spoly{T}...) where T <: AbstractAlgebra.
    n = length(coords)
    aa = [p.ptr.cpp_object for p in coords]
    v = libSingular.id_Array2Vector(reinterpret(Ptr{Void},pointer(aa)), n, R.ptr)
+   
    return svector{spoly{T}}(R, n, v)
 end
 

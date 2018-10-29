@@ -75,7 +75,7 @@ type smodule{T <: Nemo.RingElem} <: Module{T}
       finalizer(z, _smodule_clear_fn)
       for i = 1:n
          v = libSingular.p_Copy(vecs[i].ptr, R.ptr)
-         libSingular.setindex!(m, v, Cint(i - 1))
+         libSingular.setindex_internal(m, v, Cint(i - 1))
       end
       return z
    end

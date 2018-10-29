@@ -117,7 +117,7 @@ JULIA_CPP_MODULE_BEGIN(registry)
             }
          }
     delete(iv);
-    return jlcxx::make_const_array(const_cast<const int*>(betti),nrows,ncols);});
+    return std::make_tuple(betti,nrows,ncols);});
 
 
 JULIA_CPP_MODULE_END

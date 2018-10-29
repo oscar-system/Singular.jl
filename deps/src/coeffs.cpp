@@ -86,7 +86,8 @@ void singular_define_coeffs(jlcxx::Module& Singular)
 
   Singular.method("n_Farey",&n_Farey);
 
-  Singular.method("n_ChineseRemainderSym_internal",[]( void* x, void* y, int n, int sign_flag, coeffs c ){ CFArray inv_cache(n); return n_ChineseRemainderSym( reinterpret_cast<snumber**>(x),reinterpret_cast<snumber**>(y),n,sign_flag,inv_cache,c ); });
+  Singular.method("n_ChineseRemainderSym",[]( void* x, void* y, int n, int sign_flag, coeffs c ){ CFArray inv_cache(n); 
+  return n_ChineseRemainderSym( reinterpret_cast<snumber**>(x),reinterpret_cast<snumber**>(y), n, sign_flag, inv_cache, c ); });
 
   Singular.method("n_Param",[]( int x, const coeffs n ){ return n_Param(x,n); });
 

@@ -307,7 +307,11 @@ function crt(r1::n_Z, m1::n_Z, r2::n_Z, m2::n_Z, signed=false)
    par = parent(r1)
    r = [r1.ptr, r2.ptr]
    m = [m1.ptr, m2.ptr]
-   a = libSingular.n_ChineseRemainderSym(r, m, Cint(2), Cint(signed), par.ptr)
+   println("type par",typeof(par.ptr))
+   println("type r",typeof(r))
+   println("type m",typeof(m))
+   a = libSingular.n_ChineseRemainderSym(reinterpret(Ptr{Void},pointer(r)), reinterpret(Ptr{Void},pointer(m)), Cint(2), Cint(signed), par.ptr)
+   println("Got through")
    return par(a)
 end
 
