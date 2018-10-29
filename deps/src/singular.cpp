@@ -58,7 +58,8 @@ JULIA_CPP_MODULE_BEGIN(registry)
     auto ra = reinterpret_cast<resolvente>(ra_void);
     for (int i = 0; i < len; i++) {
           id_Delete(ra + i, o);
-          omFreeSize((ADDRESS) ra, (len + 1)*sizeof(ideal));}});
+    }
+    omFreeSize((ADDRESS) ra, (len + 1)*sizeof(ideal));});
 
   Singular.method("res_Copy",[](void* ra_void, int len, ring o){ 
     auto ra = reinterpret_cast<resolvente>(ra_void);  
