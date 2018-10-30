@@ -18,13 +18,13 @@ elem_type(::Type{PolyRing{T}}) where T <: Nemo.RingElem = spoly{T}
 
 parent_type(::Type{spoly{T}}) where T <: Nemo.RingElem = PolyRing{T}
 
-doc"""
+@doc Markdown.doc"""
     ngens(R::PolyRing)
 > Return the number of variables in the given polynomial ring.
 """
 ngens(R::PolyRing) = Int(libSingular.rVar(R.ptr))
 
-doc"""
+@doc Markdown.doc"""
     has_global_ordering(R::PolyRing)
 > Return `true` if the given polynomial has a global ordering, i.e. if $1 < x$ for
 > each variable $x$ in the ring. This include `:lex`, `:deglex` and `:degrevlex`
@@ -32,7 +32,7 @@ doc"""
 """
 has_global_ordering(R::PolyRing) = Bool(libSingular.rHasGlobalOrdering(R.ptr))
 
-doc"""
+@doc Markdown.doc"""
     characteristic(R::PolyRing)
 > Return the characteristic of the polynomial ring, i.e. the characteristic of the
 > coefficient ring.
@@ -44,7 +44,7 @@ function gens(R::PolyRing)
    return [R(libSingular.rGetVar(Cint(i), R.ptr)) for i = 1:n]
 end
 
-doc"""
+@doc Markdown.doc"""
     degree_bound(R::PolyRing)
 > Return the internal degree bound in each variable, enforced by Singular. This is the
 > largest positive value any degree can have before an overflow will occur. This
@@ -210,7 +210,7 @@ function Base.done(sp::coeffs_expos, p)
   return p.cpp_object == C_NULL
 end
 
-doc"""
+@doc Markdown.doc"""
     lead_exponent(p::spoly)
 > Return the exponent vector of the leading term of the given polynomial. The return
 > value is a Julia 1-dimensional array giving the exponent for each variable of the
@@ -386,7 +386,7 @@ function lcm{T <: Nemo.RingElem}(x::spoly{T}, y::spoly{T})
    return divexact(x*y, gcd(x, y))
 end
 
-doc"""
+@doc Markdown.doc"""
     primpart(x::spoly)
 > Return the primitive part of the polynomial, i.e. the polynomial divided by the GCD
 > of its coefficients.
@@ -398,7 +398,7 @@ function primpart(x::spoly)
    return p
 end
 
-doc"""
+@doc Markdown.doc"""
     content(x::spoly)
 > Return the content of the polynomial, i.e. the GCD of its coefficients.
 """

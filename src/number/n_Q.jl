@@ -42,7 +42,7 @@ end
 
 isunit(n::n_Q) = !iszero(n)
 
-doc"""
+@doc Markdown.doc"""
     numerator(n::n_Q)
 > Return the numerator of the given fraction.
 """
@@ -54,7 +54,7 @@ function numerator(n::n_Q)
    return ZZ(pp)
 end
 
-doc"""
+@doc Markdown.doc"""
     denominator(n::n_Q)
 > Return the denominator of the given fraction.
 """
@@ -66,7 +66,7 @@ function denominator(n::n_Q)
    return ZZ(pp)
 end
 
-doc"""
+@doc Markdown.doc"""
     abs(n::n_Q)
 > Return the absolute value of the given fraction.
 """
@@ -270,7 +270,7 @@ end
 #
 ###############################################################################
 
-doc"""
+@doc Markdown.doc"""
     reconstruct(x::n_Z, y::n_Z)
 > Given $x$ modulo $y$, find $r/s$ such that $x \equiv r/s \pmod{y}$ for values
 > $r$ and $s$ satisfying the bound $y > 2(|r| + 1)(s + 1)$.

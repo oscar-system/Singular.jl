@@ -16,7 +16,7 @@ base_ring(a::n_Zp) = Union{}
 
 base_ring(a::N_ZpField) = Union{}
 
-doc"""
+@doc Markdown.doc"""
     characteristic(R::N_ZpField)
 > Return the characteristic of the field.
 """
@@ -48,7 +48,7 @@ function iszero(n::n_Zp)
    return libSingular.n_IsZero(n.ptr, c.ptr)
 end
 
-doc"""
+@doc Markdown.doc"""
     isunit(n::n_Zp)
 > Return `true` if $n$ is a unit in the field, i.e. nonzero.
 """

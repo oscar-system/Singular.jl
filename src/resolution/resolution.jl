@@ -34,7 +34,7 @@ function getindex(r::sresolution, i::Int)
    return Module(R, ptr)
 end
 
-doc"""
+@doc Markdown.doc"""
     length(r::sresolution)
 > Return the length of the resolution. This is what is mathematically meant by the
 > length of a resolution. Over a field, this should be at most the number of variables
@@ -55,7 +55,7 @@ end
 #
 ###############################################################################
 
-doc"""
+@doc Markdown.doc"""
     betti(r::sresolution)
 > Return the Betti numbers, i.e. the ranks of the free modules in the given
 > free resolution. These are returned as a Julia array of `Int`s.
@@ -71,7 +71,7 @@ end
 #
 ###############################################################################
 
-doc"""
+@doc Markdown.doc"""
     minres{T <: AbstractAlgebra.RingElem}(r::sresolution{T})
 > Return a minimal free resolution, given any free resolution. If the supplied
 > resolution is already minimal, it may be returned without making a copy.

@@ -19,14 +19,14 @@ elem_type(::Type{ModuleClass{T}}) where T <: AbstractAlgebra.RingElem = smodule{
 parent_type(::Type{smodule{T}}) where T <: AbstractAlgebra.RingElem = ModuleClass{T}
 
 
-doc"""
+@doc Markdown.doc"""
     ngens(I::smodule)
 > Return the number of generators in the current representation of the module (as a list
 > of vectors).
 """
 ngens(I::smodule) = I.ptr == C_NULL ? 0 : Int(libSingular.ngens(I.ptr))
 
-doc"""
+@doc Markdown.doc"""
     rank(I::smodule)
 > Return the rank $n$ of the ambient space $R^n$ of which this module is a submodule.
 """
@@ -44,7 +44,7 @@ function getindex(I::smodule{T}, i::Int) where T <: AbstractAlgebra.RingElem
    return svector{T}(R, rank(I), libSingular.p_Copy(p, R.ptr))
 end
 
-doc"""
+@doc Markdown.doc"""
     iszero(p::smodule)
 > Return `true` if this is algebraically the zero module.
 """
@@ -86,7 +86,7 @@ end
 #
 ###############################################################################
 
-doc"""
+@doc Markdown.doc"""
     std(I::smodule; complete_reduction::Bool=false)
 > Compute the Groebner basis of the module $I$. If `complete_reduction` is
 > set to `true`, the result is unique, up to permutation of the generators
@@ -104,7 +104,7 @@ function std(I::smodule; complete_reduction::Bool=false)
    return z
 end
 
-doc"""
+@doc Markdown.doc"""
    slimgb(I::smodule; complete_reduction::Bool=false)
 > Given a module $I$ this function computes a Groebner basis for it.
 > Compared to `std`, `slimgb` uses different strategies for choosing
@@ -128,7 +128,7 @@ end
 #
 ###############################################################################
 
-doc"""
+@doc Markdown.doc"""
     syz(M::smodule)
 > Compute the module of syzygies of the given module. This will be given as
 > a set of generators in an ambient space $R^n$, where $n$ is the number of
@@ -147,7 +147,7 @@ end
 #
 ###############################################################################
 
-doc"""
+@doc Markdown.doc"""
     sres{T <: Nemo.RingElem}(I::smodule{T}, max_length::Int)
 > Compute a free resolution of the given module $I$ of length up to the given
 > maximum length. If `max_length` is set to zero, a full length free

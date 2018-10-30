@@ -16,7 +16,7 @@ base_ring(a::n_GF) = Union{}
 
 base_ring(a::N_GField) = Union{}
 
-doc"""
+@doc Markdown.doc"""
    characteristic(R::N_GField)
 > Return the characteristic of the field.
 """
@@ -24,7 +24,7 @@ function characteristic(R::N_GField)
    return ZZ(libSingular.n_GetChar(R.ptr))
 end
 
-doc"""
+@doc Markdown.doc"""
     degree(R::N_GField)
 > Return the degree of the field as an extension of $\mathbb{F}_p$.
 """
@@ -56,7 +56,7 @@ function iszero(n::n_GF)
    return libSingular.n_IsZero(n.ptr, c.ptr)
 end
 
-doc"""
+@doc Markdown.doc"""
    isunit(n::n_GF)
 > Return `true` if $n$ is a unit in the field, i.e. nonzero.
 """
@@ -340,7 +340,7 @@ end
 #
 ###############################################################################
 
-doc"""
+@doc Markdown.doc"""
     FiniteField(p::Int, n::Int, S::String; cached=true)
 > Returns a tuple `K, a` consisting of a finite field `K` of characteristic $p$
 > and degree $n$, and its generator `a`. The string used to print the
