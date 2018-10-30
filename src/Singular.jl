@@ -32,8 +32,7 @@ export ZZ, QQ, FiniteField, CoefficientRing, Fp
 const pkgdir = realpath(joinpath(dirname(@__FILE__), ".."))
 const libsingular = joinpath(pkgdir, "local", "lib", "libSingular")
 
-prefix = joinpath(Pkg.dir("Singular"), "local");
-nemoinc = joinpath(Pkg.dir("Nemo"), "local");
+prefix = abspath(joinpath(dirname(Base.find_package("Singular")), "..", "local"))
 
 function __init__()
 
