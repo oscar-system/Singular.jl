@@ -3,8 +3,6 @@ module Singular
 import AbstractAlgebra
 using Nemo
 
-using CxxWrap
-
 import Base: abs, checkbounds, deepcopy, deepcopy_internal,
              denominator, div, divrem, exponent,
              gcd, gcdx, getindex, indices, inv, isequal, isless, lcm, length,
