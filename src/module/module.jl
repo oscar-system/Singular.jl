@@ -6,7 +6,7 @@ export smodule, ModuleClass, rank, slimgb
 #
 ###############################################################################
 
-parent{T <: Nemo.RingElem}(a::smodule{T}) = ModuleClass{T}(a.base_ring)
+parent(a::smodule{T}) where T <: Nemo.RingElem = ModuleClass{T}(a.base_ring)
 
 base_ring(S::ModuleClass) = S.base_ring
 
@@ -153,8 +153,8 @@ end
 > maximum length. If `max_length` is set to zero, a full length free
 > resolution is computed. Each element of the resolution is itself a module.
 """
-function sres{T <: Nemo.RingElem}(I::smodule{T}, max_length::Int)
-   I.isGB == false && error("Not a Groebner basis ideal")
+function sres(I::smodule{T}, max_length::Int) where T <: Nemo.RingElem
+   I.isGB == false && error("Not a Groebner basis ideal")  
    R = base_ring(I)
    if max_length == 0
         max_length = ngens(R)
@@ -178,12 +178,12 @@ end
 #
 ###############################################################################
 
-function Module{T <: Nemo.RingElem}(R::PolyRing{T}, vecs::svector{spoly{T}}...)
+function Module(R::PolyRing{T}, vecs::svector{spoly{T}}...) where T <: Nemo.RingElem
    S = elem_type(R)
    return smodule{S}(R, vecs...)
 end
 
-function Module{T <: Nemo.RingElem}(R::PolyRing{T}, id::libSingular.idealRef)
+function Module(R::PolyRing{T}, id::libSingular.idealRef) where T <: Nemo.RingElem
    S = elem_type(R)
    return smodule{S}(R, id)
 end

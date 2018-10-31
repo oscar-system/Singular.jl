@@ -229,11 +229,11 @@ function deepcopy_internal(p::spoly, dict::ObjectIdDict)
    return parent(p)(p2)
 end
 
-function check_parent{T <: Nemo.RingElem}(a::spoly{T}, b::spoly{T})
+function check_parent(a::spoly{T}, b::spoly{T}) where T <: Nemo.RingElem
    parent(a) != parent(b) && error("Incompatible parent objects")
 end
 
-function canonical_unit{T <: Nemo.RingElem}(a::spoly{T})
+function canonical_unit(a::spoly{T}) where T <: Nemo.RingElem
   return a == 0 ? one(base_ring(a)) : canonical_unit(coeff(a, 0))
 end
    
@@ -257,7 +257,7 @@ function show(io::IO, a::spoly)
    print(io, s)
 end
 
-show_minus_one{T <: Nemo.RingElem}(::Type{spoly{T}}) = show_minus_one(T)
+show_minus_one(::Type{spoly{T}}) where T <: Nemo.RingElem = show_minus_one(T)
 
 needs_parentheses(x::spoly) = length(x) > 1
 
@@ -281,7 +281,7 @@ end
 #
 ###############################################################################
 
-function +{T <: Nemo.RingElem}(a::spoly{T}, b::spoly{T})
+function (a::spoly{T} + b::spoly{T}) where T <: Nemo.RingElem
    check_parent(a, b)
    a1 = libSingular.p_Copy(a.ptr, parent(a).ptr)
    b1 = libSingular.p_Copy(b.ptr, parent(a).ptr)
@@ -289,7 +289,7 @@ function +{T <: Nemo.RingElem}(a::spoly{T}, b::spoly{T})
    return parent(a)(s) 
 end
 
-function -{T <: Nemo.RingElem}(a::spoly{T}, b::spoly{T})
+function (a::spoly{T} - b::spoly{T}) where T <: Nemo.RingElem
    check_parent(a, b)
    a1 = libSingular.p_Copy(a.ptr, parent(a).ptr)
    b1 = libSingular.p_Copy(b.ptr, parent(a).ptr)
@@ -297,7 +297,7 @@ function -{T <: Nemo.RingElem}(a::spoly{T}, b::spoly{T})
    return parent(a)(s) 
 end
 
-function *{T <: Nemo.RingElem}(a::spoly{T}, b::spoly{T})
+function (a::spoly{T} * b::spoly{T}) where T <: Nemo.RingElem
    check_parent(a, b)
    a1 = libSingular.p_Copy(a.ptr, parent(a).ptr)
    b1 = libSingular.p_Copy(b.ptr, parent(a).ptr)
@@ -332,7 +332,7 @@ end
 #
 ###############################################################################
 
-function =={T <: Nemo.RingElem}(x::spoly{T}, y::spoly{T})
+function (x::spoly{T} == y::spoly{T}) where T <: Nemo.RingElem
     check_parent(x, y)
     return Bool(libSingular.p_EqualPolys(x.ptr, y.ptr, parent(x).ptr))
 end
@@ -358,7 +358,7 @@ end
 #
 ###############################################################################
 
-function gcd{T <: Nemo.RingElem}(x::spoly{T}, y::spoly{T})
+function gcd(x::spoly{T}, y::spoly{T}) where T <: Nemo.RingElem
    check_parent(x, y)
    R = parent(x)   
    x1 = libSingular.p_Copy(x.ptr, R.ptr)   
@@ -367,7 +367,7 @@ function gcd{T <: Nemo.RingElem}(x::spoly{T}, y::spoly{T})
    return R(p)
 end
 
-function gcdx{T <: Nemo.FieldElem}(x::spoly{T}, y::spoly{T})
+function gcdx(x::spoly{T}, y::spoly{T}) where T <: Nemo.FieldElem
    check_parent(x, y)
    R = parent(x)
    x1 = libSingular.p_Copy(x.ptr, R.ptr)
@@ -379,7 +379,7 @@ function gcdx{T <: Nemo.FieldElem}(x::spoly{T}, y::spoly{T})
    return R(p[]), R(s[]), R(t[])
 end
 
-function lcm{T <: Nemo.RingElem}(x::spoly{T}, y::spoly{T})
+function lcm(x::spoly{T}, y::spoly{T}) where T <: Nemo.RingElem
    if iszero(x) && iszero(y)
       return parent(x)()
    end
@@ -518,15 +518,15 @@ function (R::PolyRing)(n::libSingular.poly)
    return z
 end
 
-function (R::PolyRing{T}){T <: Nemo.RingElem}(n::T)
+function (R::PolyRing{T})(n::T) where T <: Nemo.RingElem
    parent(n) != base_ring(R) && error("Unable to coerce into polynomial ring")
    z = spoly{T}(R, n.ptr)
    z.parent = R
    return z
 end
 
-function (R::PolyRing{S}){S <: Nemo.RingElem, T <: Nemo.RingElem}(n::T)
-   return R(base_ring(R)(n))
+function (R::PolyRing{S})(n::T) where {S <: Nemo.RingElem, T <: Nemo.RingElem} 
+   return R(base_ring(R)(n))   
 end
 
 function (R::PolyRing)(p::spoly)

@@ -281,7 +281,7 @@ end
 #
 ###############################################################################
 
-promote_rule{T <: Integer}(C::Type{n_GF}, ::Type{T}) = n_GF
+promote_rule(C::Type{n_GF}, ::Type{T}) where T <: Integer = n_GF
 
 promote_rule(C::Type{n_GF}, ::Type{n_Z}) = n_GF
 
