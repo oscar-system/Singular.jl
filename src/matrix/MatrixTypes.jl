@@ -6,7 +6,7 @@
 
 const MatrixSpaceID = Dict{Tuple{Ring, Int, Int}, Set}()
 
-type MatrixSpace{T <: Nemo.RingElem} <: Set
+mutable struct MatrixSpace{T <: Nemo.RingElem} <: Set
    base_ring::PolyRing
    nrows::Int
    ncols::Int
@@ -20,7 +20,7 @@ type MatrixSpace{T <: Nemo.RingElem} <: Set
    end
 end
 
-type smatrix{T <: Nemo.RingElem} <: Nemo.SetElem
+mutable struct smatrix{T <: Nemo.RingElem} <: Nemo.SetElem
    ptr::libSingular.matrix_ref
    base_ring::PolyRing
 

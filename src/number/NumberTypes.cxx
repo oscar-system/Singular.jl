@@ -11,7 +11,7 @@ end
 
 const IntegersID = Dict{Symbol, Ring}()
 
-type Integers <: Ring
+mutable struct Integers <: Ring
    ptr::libSingular.coeffs
    refcount::Int
 
@@ -34,7 +34,7 @@ function _Integers_clear_fn(cf::Integers)
    end
 end
 
-type n_Z <: Nemo.RingElem
+mutable struct n_Z <: Nemo.RingElem
     ptr::libSingular.number
 
     function n_Z()
@@ -81,7 +81,7 @@ end
 
 const RationalsID = Dict{Symbol, Field}()
 
-type Rationals <: Field
+mutable struct Rationals <: Field
    ptr::libSingular.coeffs
    refcount::Int
 
@@ -105,7 +105,7 @@ function _Rationals_clear_fn(cf::Rationals)
    nothing
 end
 
-type n_Q <: Nemo.FieldElem
+mutable struct n_Q <: Nemo.FieldElem
     ptr::libSingular.number
 
     function n_Q()
@@ -152,14 +152,14 @@ end
 #
 ###############################################################################
 
-type ZnmInfo
+mutable struct ZnmInfo
    n::BigInt
    exp::UInt
 end
 
 const N_ZnRingID = Dict{Int, Ring}()
 
-type N_ZnRing <: Ring
+mutable struct N_ZnRing <: Ring
    ptr::libSingular.coeffs
    from_n_Z::Cxx.CppFptr
    to_n_Z::Cxx.CppFptr
@@ -188,7 +188,7 @@ function _N_ZnRing_clear_fn(cf::N_ZnRing)
    nothing
 end
 
-type n_Zn <: Nemo.RingElem
+mutable struct n_Zn <: Nemo.RingElem
     ptr::libSingular.number
     parent::N_ZnRing
 
@@ -229,7 +229,7 @@ end
 
 const N_ZpFieldID = Dict{Int, Field}()
 
-type N_ZpField <: Field
+mutable struct N_ZpField <: Field
    ptr::libSingular.coeffs
    from_n_Z::Cxx.CppFptr
    to_n_Z::Cxx.CppFptr
@@ -258,7 +258,7 @@ function _N_ZpField_clear_fn(cf::N_ZpField)
    nothing
 end
 
-type n_Zp <: Nemo.FieldElem
+mutable struct n_Zp <: Nemo.FieldElem
     ptr::libSingular.number
     parent::N_ZpField
 
@@ -297,7 +297,7 @@ end
 #
 ###############################################################################
 
-type GFInfo
+mutable struct GFInfo
    p::Cint
    n::Cint
    s::Ptr{UInt8}
@@ -305,7 +305,7 @@ end
 
 const N_GFieldID = Dict{Tuple{Int, Int, Symbol}, Field}()
 
-type N_GField <: Field
+mutable struct N_GField <: Field
    ptr::libSingular.coeffs
    deg::Int
    from_n_Z::Cxx.CppFptr
@@ -335,7 +335,7 @@ function _N_GField_clear_fn(cf::N_GField)
    nothing
 end
 
-type n_GF <: Nemo.FieldElem
+mutable struct n_GF <: Nemo.FieldElem
     ptr::libSingular.number
     parent::N_GField
 
@@ -376,7 +376,7 @@ end
 
 const CoeffRingID = Dict{Nemo.Ring, Ring}()
 
-type CoefficientRing{T <: Nemo.RingElem} <: Ring
+mutable struct CoefficientRing{T <: Nemo.RingElem} <: Ring
    ptr::libSingular.coeffs
    base_ring::Nemo.Ring
 
@@ -395,7 +395,7 @@ type CoefficientRing{T <: Nemo.RingElem} <: Ring
    end
 end
 
-type n_unknown{T <: Nemo.RingElem} <: Nemo.RingElem
+mutable struct n_unknown{T <: Nemo.RingElem} <: Nemo.RingElem
    ptr::libSingular.number
    parent::CoefficientRing{T}
 end

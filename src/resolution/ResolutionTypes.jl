@@ -6,7 +6,7 @@
 
 const ResolutionSetID = Dict{Ring, Set}()
 
-type ResolutionSet{T <: Nemo.RingElem} <: Set
+mutable struct ResolutionSet{T <: Nemo.RingElem} <: Set
    base_ring::PolyRing
 
    function ResolutionSet{T}(R::PolyRing) where T
@@ -18,7 +18,7 @@ type ResolutionSet{T <: Nemo.RingElem} <: Set
    end
 end
 
-type sresolution{T <: Nemo.RingElem} <: Nemo.SetElem
+mutable struct sresolution{T <: Nemo.RingElem} <: Nemo.SetElem
    ptr::Ptr{Void}
    len::Int
    minimal::Bool

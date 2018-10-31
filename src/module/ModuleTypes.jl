@@ -6,7 +6,7 @@
 
 const FreeModID = Dict{Tuple{Ring, Int}, Module}()
 
-type FreeMod{T <: Nemo.RingElem} <: Module{T}
+mutable struct FreeMod{T <: Nemo.RingElem} <: Module{T}
    base_ring::PolyRing
    rank::Int
 
@@ -19,7 +19,7 @@ type FreeMod{T <: Nemo.RingElem} <: Module{T}
    end
 end
 
-type svector{T <: Nemo.RingElem} <: Nemo.ModuleElem{T}
+mutable struct svector{T <: Nemo.RingElem} <: Nemo.ModuleElem{T}
    ptr::libSingular.poly # not really a polynomial
    rank::Int
    base_ring::PolyRing
@@ -46,7 +46,7 @@ end
 
 const ModuleClassID = Dict{Ring, Set}()
 
-type ModuleClass{T <: Nemo.RingElem} <: Set
+mutable struct ModuleClass{T <: Nemo.RingElem} <: Set
    base_ring::PolyRing
 
    function ModuleClass{T}(R::PolyRing) where T
@@ -58,7 +58,7 @@ type ModuleClass{T <: Nemo.RingElem} <: Set
    end
 end
 
-type smodule{T <: Nemo.RingElem} <: Module{T}
+mutable struct smodule{T <: Nemo.RingElem} <: Module{T}
    ptr::libSingular.ideal # ideal and module types are the same in Singular
    base_ring::PolyRing
    isGB::Bool

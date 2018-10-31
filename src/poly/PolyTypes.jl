@@ -7,7 +7,7 @@
 const PolyRingID = Dict{Tuple{Union{Ring, Field}, Array{Symbol, 1},
          libSingular.rRingOrder_t, libSingular.rRingOrder_t, Int}, Ring}()
 
-type PolyRing{T <: Nemo.RingElem} <: Ring
+mutable struct PolyRing{T <: Nemo.RingElem} <: Ring
    ptr::libSingular.ring
    base_ring::Union{Ring, Field}
    refcount::Int
@@ -71,7 +71,7 @@ function _PolyRing_clear_fn(R::PolyRing)
    end
 end
 
-type spoly{T <: Nemo.RingElem} <: Nemo.RingElem
+mutable struct spoly{T <: Nemo.RingElem} <: Nemo.RingElem
    ptr::libSingular.poly
    parent::PolyRing{T}
 

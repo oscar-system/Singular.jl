@@ -57,7 +57,7 @@ end
 
 #=
 
-type live_cache
+mutable struct live_cache
    num::Int
    A::Array{Nemo.RingElem, 1}
 end
