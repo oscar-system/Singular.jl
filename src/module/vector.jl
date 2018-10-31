@@ -6,17 +6,17 @@ export FreeMod, svector, gens, rank, vector
 #
 ###############################################################################
 
-parent{T <: Nemo.RingElem}(v::svector{T}) = FreeMod{T}(v.base_ring, v.rank)
+parent(v::svector{T}) where {T <: Nemo.RingElem} = FreeMod{T}(v.base_ring, v.rank)
 
 base_ring(R::FreeMod) = R.base_ring
 
 base_ring(v::svector) = v.base_ring
 
-elem_type{T <: Nemo.RingElem}(::FreeMod{T}) = svector{T}
+elem_type(::FreeMod{T}) where {T <: Nemo.RingElem} = svector{T}
 
-elem_type{T <: Nemo.RingElem}(::Type{FreeMod{T}}) = svector{T}
+elem_type(::Type{FreeMod{T}}) where {T <: Nemo.RingElem} = svector{T}
 
-parent_type{T <: Nemo.RingElem}(::Type{svector{T}}) = FreeMod{T}
+parent_type(::Type{svector{T}}) where {T <: Nemo.RingElem} = FreeMod{T}
 
 @doc Markdown.doc"""
     rank(M::FreeMod)
@@ -39,7 +39,7 @@ function deepcopy_internal(p::svector{T}, dict::ObjectIdDict) where T <: Abstrac
    return svector{T}(p.base_ring, p.rank, p2)
 end
 
-function check_parent{T <: Nemo.RingElem}(a::svector{T}, b::svector{T})
+function check_parent(a::svector{T}, b::svector{T}) where T <: Nemo.RingElem
    base_ring(a) != base_ring(b) && error("Incompatible base rings")
    a.rank != b.rank && error("Vectors of incompatible rank")
 end
@@ -115,7 +115,7 @@ function *(a::svector{spoly{T}}, b::spoly{T}) where T <: AbstractAlgebra.RingEle
    return svector{spoly{T}}(R, a.rank, s)
 end
 
-function *{T <: Nemo.RingElem}(a::spoly{T}, b::svector{spoly{T}})
+function (a::spoly{T} * b::svector{spoly{T}}) where T <: Nemo.RingElem
    base_ring(b) != parent(a) && error("Incompatible base rings")
    R = base_ring(b)
    a1 = libSingular.p_Copy(a.ptr, R.ptr)
@@ -124,9 +124,9 @@ function *{T <: Nemo.RingElem}(a::spoly{T}, b::svector{spoly{T}})
    return svector{spoly{T}}(R, b.rank, s)
 end
 
-*{T <: Nemo.RingElem}(a::svector{spoly{T}}, b::T) = a*base_ring(a)(b)
+(a::svector{spoly{T}} * b::T) where T <: Nemo.RingElem = a*base_ring(a)(b)
 
-*{T <: Nemo.RingElem}(a::T, b::svector{spoly{T}}) = base_ring(b)(a)*b
+(a::T * b::svector{spoly{T}}) where T <: Nemo.RingElem = base_ring(b)(a)*b
 
 *(a::svector, b::Integer) = a*base_ring(a)(b)
 
@@ -138,7 +138,7 @@ end
 #
 ###############################################################################
 
-function =={T <: Nemo.RingElem}(x::svector{T}, y::svector{T})
+function (x::svector{T} == y::svector{T}) where T <: Nemo.RingElem
    check_parent(x, y)
    return Bool(libSingular.p_EqualPolys(x.ptr, y.ptr, base_ring(x).ptr))
 end
@@ -163,7 +163,7 @@ end
 #
 ###############################################################################
 
-function Array{T <: Nemo.RingElem}(v::svector{spoly{T}})
+function Array(v::svector{spoly{T}}) where T <: Nemo.RingElem
    n = v.rank
    aa_val = Array{Ptr{Void},1}(n)
    R = base_ring(v)
@@ -193,7 +193,7 @@ end
 ###############################################################################
 
 # free module of rank n
-function FreeModule{T <: Nemo.RingElem}(R::PolyRing{T}, n::Int)
+function FreeModule(R::PolyRing{T}, n::Int) where T <: Nemo.RingElem
    (n > typemax(Cint) || n < 0) && throw(DomainError())
    S = elem_type(R)
    return FreeMod{S}(R, n)

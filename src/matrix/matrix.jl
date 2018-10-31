@@ -137,10 +137,10 @@ end
 #
 ###############################################################################
 
-function Matrix{T <: Nemo.RingElem}(I::smodule{T})
+function Matrix(I::smodule{T}) where T <: Nemo.RingElem
    return smatrix{T}(base_ring(I), I.ptr)
 end
 
-function Matrix{T <: Nemo.RingElem}(I::sideal{T})
+function Matrix(I::sideal{T}) where T <: Nemo.RingElem
    return smatrix{T}(base_ring(I), I.ptr)
 end

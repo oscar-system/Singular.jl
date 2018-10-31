@@ -8,7 +8,7 @@ export sideal, IdealSet, syz, lead, normalize!, isconstant, iszerodim, fres,
 #
 ###############################################################################
 
-parent{T <: Nemo.RingElem}(a::sideal{T}) = IdealSet{T}(a.base_ring)
+parent(a::sideal{T}) where {T <: Nemo.RingElem} = IdealSet{T}(a.base_ring)
 
 base_ring(S::IdealSet) = S.base_ring
 
@@ -30,7 +30,7 @@ function checkbounds(I::sideal, i::Int)
    (i > ngens(I) || i < 1) && throw(BoundsError(I, i))
 end   
 
-function setindex!{T <: Nemo.RingElem}(I::sideal{spoly{T}}, p::spoly{T}, i::Int)
+function setindex!(I::sideal{spoly{T}}, p::spoly{T}, i::Int) where T <: Nemo.RingElem
    checkbounds(I, i)
    R = base_ring(I)
    p0 = libSingular.getindex(I.ptr, Cint(i - 1))
@@ -101,7 +101,7 @@ function deepcopy_internal(I::sideal, dict::ObjectIdDict)
    return Ideal(R, ptr)
 end
 
-function check_parent{T <: Nemo.RingElem}(I::sideal{T}, J::sideal{T})
+function check_parent(I::sideal{T}, J::sideal{T}) where T <: Nemo.RingElem
    base_ring(I) != base_ring(J) && error("Incompatible ideals")
 end
 
@@ -136,14 +136,14 @@ end
 #
 ###############################################################################
 
-function +{T <: Nemo.RingElem}(I::sideal{T}, J::sideal{T})
+function (I::sideal{T} + J::sideal{T}) where T <: Nemo.RingElem
    check_parent(I, J)
    R = base_ring(I)
    ptr = libSingular.id_Add(I.ptr, J.ptr, R.ptr)
    return Ideal(R, ptr)
 end
 
-function *{T <: Nemo.RingElem}(I::sideal{T}, J::sideal{T})
+function (I::sideal{T} * J::sideal{T}) where T <: Nemo.RingElem
    check_parent(I, J)
    R = base_ring(I)
    ptr = libSingular.id_Mult(I.ptr, J.ptr, R.ptr)
@@ -242,7 +242,7 @@ end
     intersection{T <: Nemo.RingElem}(I::sideal{T}, J::sideal{T})
 > Returns the intersection of the two given ideals.
 """
-function intersection{T <: Nemo.RingElem}(I::sideal{T}, J::sideal{T})
+function intersection(I::sideal{T}, J::sideal{T}) where T <: Nemo.RingElem
    check_parent(I, J)
    R = base_ring(I)
    ptr = libSingular.id_Intersection(I.ptr, J.ptr, R.ptr)
@@ -262,7 +262,7 @@ end
 > $(I:J)$ over a polynomial ring $R$ is defined by
 > $\{r \in R \;|\; rJ \subseteq I\}$. 
 """
-function quotient{T <: Nemo.RingElem}(I::sideal{T}, J::sideal{T})
+function quotient(I::sideal{T}, J::sideal{T}) where T <: Nemo.RingElem
    check_parent(I, J)
    R = base_ring(I)
    ptr = libSingular.id_Quotient(I.ptr, J.ptr, I.isGB, R.ptr)
@@ -280,7 +280,7 @@ end
 > Returns the saturation of the ideal $I$ with respect to $J$, i.e. returns
 > the quotient ideal $(I:J^\infty)$.
 """
-function saturation{T <: Nemo.RingElem}(I::sideal{T}, J::sideal{T})
+function saturation(I::sideal{T}, J::sideal{T}) where T <: Nemo.RingElem
    check_parent(I, J)
    R = base_ring(I)
    !has_global_ordering(R) && error("Must be over a ring with global ordering")
@@ -459,8 +459,7 @@ end
 > the syzygy module of the previous module, starting with the given ideal.
 > The `max_length` can be set to $0$ if the full free resolution is required.
 """
-function fres{T <: Nemo.RingElem}(id::sideal{T}, max_length::Int,
-      method::String="complete")
+function fres(id::sideal{T}, max_length::Int, method::String = "complete") where T <: Nemo.RingElem
    id.isGB == false && error("ideal is not a standard basis")
    max_length < 0 && error("length for fres must not be negative")
    R = base_ring(id)
@@ -486,7 +485,7 @@ end
 > the syzygy module of the previous module, starting with the given ideal.
 > The `max_length` can be set to $0$ if the full free resolution is required.
 """
-function sres{T <: Nemo.RingElem}(I::sideal{T}, max_length::Int)
+function sres(I::sideal{T}, max_length::Int) where T <: Nemo.RingElem
    I.isGB == false && error("Not a Groebner basis ideal")
    R = base_ring(I)
    if max_length == 0
@@ -511,24 +510,23 @@ end
 #
 ###############################################################################
 
-function Ideal{T <: Nemo.RingElem}(R::PolyRing{T}, ids::spoly{T}...)
+function Ideal(R::PolyRing{T}, ids::spoly{T}...) where T <: Nemo.RingElem
    S = elem_type(R)
    return sideal{S}(R, ids...)
 end
 
-function Ideal{T <: Nemo.RingElem}(R::PolyRing{T}, ids::Array{spoly{T}, 1})
+function Ideal(R::PolyRing{T}, ids::Array{spoly{T}, 1}) where T <: Nemo.RingElem
    S = elem_type(R)
    return sideal{S}(R, ids...)
 end
 
-
-function Ideal{T <: Nemo.RingElem}(R::PolyRing{T}, id::libSingular.ideal)
+function Ideal(R::PolyRing{T}, id::libSingular.ideal) where T <: Nemo.RingElem
    S = elem_type(R)
    return sideal{S}(R, id)
 end
 
 # maximal ideal in degree d
-function MaximalIdeal{T <: Nemo.RingElem}(R::PolyRing{T}, d::Int)
+function MaximalIdeal(R::PolyRing{T}, d::Int) where T <: Nemo.RingElem
    (d > typemax(Cint) || d < 0) && throw(DomainError())
    S = elem_type(R)
    ptr = libSingular.id_MaxIdeal(Cint(d), R.ptr)
