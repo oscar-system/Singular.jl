@@ -1,7 +1,7 @@
 module libSingular
 
 using CxxWrap
-@wrapmodule(joinpath(dirname(Base.find_package("Singular")), "..", "local", "lib", "libsingularwrap.so"))
+@wrapmodule(realpath(joinpath(@__DIR__, "..", "local", "lib", "libsingularwrap.so")))
 
 function __init__()
    @initcxx

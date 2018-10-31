@@ -32,7 +32,7 @@ export ZZ, QQ, FiniteField, CoefficientRing, Fp
 const pkgdir = realpath(joinpath(dirname(@__FILE__), ".."))
 const libsingular = joinpath(pkgdir, "local", "lib", "libSingular")
 
-prefix = abspath(joinpath(dirname(Base.find_package("Singular")), "..", "local"))
+prefix = realpath(joinpath(@__DIR__, "..", "local"))
 
 function __init__()
 

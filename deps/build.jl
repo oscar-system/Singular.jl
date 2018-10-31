@@ -1,8 +1,10 @@
+import CxxWrap
 import Libdl
+import Nemo
 
 const oldwdir = pwd()
-const pkgdir = dirname(dirname(Base.find_package("Singular")))
-const nemodir = dirname(dirname(Base.find_package("Nemo")))
+const pkgdir = realpath(joinpath(@__DIR__, ".."))
+const nemodir = realpath(joinpath(dirname(pathof(Nemo)), ".."))
 
 const debug_build = true # N.B: debug builds are up to 50 times slower at runtime!
 
@@ -108,13 +110,13 @@ push!(Libdl.DL_LOAD_PATH, "$pkgdir/local/lib")
 
 cd(oldwdir)
 
-jlcxx_cmake_dir = abspath(joinpath(dirname(Base.find_package("CxxWrap")), "..", "deps", "usr", "lib", "cmake", "JlCxx"))
+jlcxx_cmake_dir = realpath(joinpath(dirname(pathof(CxxWrap)), "..", "deps", "usr", "lib", "cmake", "JlCxx"))
 
-julia_include = abspath(joinpath(Sys.BINDIR, "..", "include", "julia"))
-julia_lib = abspath(joinpath(Sys.BINDIR, "..", "lib"))
+julia_include = realpath(joinpath(Sys.BINDIR, "..", "include", "julia"))
+julia_lib = realpath(joinpath(Sys.BINDIR, "..", "lib"))
 julia_exec = joinpath(Sys.BINDIR, "julia")
 
-cmake_build_path = abspath(joinpath(dirname(Base.find_package("Singular")), "..", "deps", "src"))
+cmake_build_path = joinpath(@__DIR__, "src")
 
 cd(cmake_build_path)
 
