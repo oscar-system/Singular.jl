@@ -353,7 +353,7 @@ end
 #
 ###############################################################################
 
-promote_rule{T <: Integer}(C::Type{n_Z}, ::Type{T}) = n_Z
+promote_rule(C::Type{n_Z}, ::Type{T}) where {T <: Integer} = n_Z
 
 ###############################################################################
 #
@@ -373,7 +373,7 @@ promote_rule{T <: Integer}(C::Type{n_Z}, ::Type{T}) = n_Z
 
 function (R::Integers)(x::Nemo.fmpz)
    a = BigInt()
-   ccall((:flint_mpz_init_set_readonly, :libflint), Void,
+   ccall((:flint_mpz_init_set_readonly, :libflint), Nothing,
          (Ptr{BigInt}, Ptr{fmpz}), &a, &x)
    return R(libSingular.n_InitMPZ(a, R.ptr))   
 end

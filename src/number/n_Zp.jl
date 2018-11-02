@@ -271,7 +271,7 @@ end
 #
 ###############################################################################
 
-promote_rule{T <: Integer}(C::Type{n_Zp}, ::Type{T}) = n_Zp
+promote_rule(C::Type{n_Zp}, ::Type{T}) where {T <: Integer} = n_Zp
 
 promote_rule(C::Type{n_Zp}, ::Type{n_Z}) = n_Zp
 
@@ -316,7 +316,7 @@ end
 
 function (R::N_ZpField)(x::Nemo.fmpz)
    a = BigInt()
-   ccall((:flint_mpz_init_set_readonly, :libflint), Void,
+   ccall((:flint_mpz_init_set_readonly, :libflint), Nothing,
          (Ptr{BigInt}, Ptr{fmpz}), &a, &x)
    z = R(libSingular.n_InitMPZ(a, R.ptr))
       z.parent = R

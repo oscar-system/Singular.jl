@@ -117,7 +117,7 @@ end
 #
 ###############################################################################
 
-function (S::ResolutionSet{T})(ptr::Ptr{Void}, len::Int) where T <: AbstractAlgebra.RingElem
+function (S::ResolutionSet{T})(ptr::Ptr{Nothing}, len::Int) where T <: AbstractAlgebra.RingElem
    R = base_ring(S)
    return sresolution{T}(R, len, ptr)
 end

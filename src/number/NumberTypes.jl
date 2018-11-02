@@ -5,7 +5,7 @@
 ###############################################################################
 
 function get_n_Z()
-   d = libSingular.nInitChar(libSingular.n_Z, Ptr{Void}(0))
+   d = libSingular.nInitChar(libSingular.n_Z, Ptr{Nothing}(0))
 end
 
 const IntegersID = Dict{Symbol, Ring}()
@@ -74,7 +74,7 @@ end
 ###############################################################################
 
 function get_n_Q()
-   d = libSingular.nInitChar(libSingular.n_Q, Ptr{Void}(0))
+   d = libSingular.nInitChar(libSingular.n_Q, Ptr{Nothing}(0))
 end
 
 const RationalsID = Dict{Symbol, Field}()
@@ -160,8 +160,8 @@ const N_ZnRingID = Dict{Int, Ring}()
 
 mutable struct N_ZnRing <: Ring
    ptr::libSingular.coeffs
-   from_n_Z::Ptr{Void}
-   to_n_Z::Ptr{Void}
+   from_n_Z::Ptr{Nothing}
+   to_n_Z::Ptr{Nothing}
    refcount::Int
 
    function N_ZnRing(n::Int) 
@@ -232,8 +232,8 @@ const N_ZpFieldID = Dict{Int, Field}()
 
 mutable struct N_ZpField <: Field
    ptr::libSingular.coeffs
-   from_n_Z::Ptr{Void}
-   to_n_Z::Ptr{Void}
+   from_n_Z::Ptr{Nothing}
+   to_n_Z::Ptr{Nothing}
    refcount::Int
 
    function N_ZpField(n::Int) 
@@ -310,8 +310,8 @@ const N_GFieldID = Dict{Tuple{Int, Int, Symbol}, Field}()
 mutable struct N_GField <: Field
    ptr::libSingular.coeffs
    deg::Int
-   from_n_Z::Ptr{Void}
-   to_n_Z::Ptr{Void}
+   from_n_Z::Ptr{Nothing}
+   to_n_Z::Ptr{Nothing}
    refcount::Int
 
    function N_GField(p::Int, n::Int, S::Symbol) 
