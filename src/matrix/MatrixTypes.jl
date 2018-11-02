@@ -29,13 +29,13 @@ mutable struct smatrix{T <: Nemo.RingElem} <: Nemo.SetElem
       ptr = libSingular.id_Copy(m, R.ptr)
       ptr = libSingular.id_Module2Matrix(ptr, R.ptr)
       z = new(ptr, R)
-      finalizer(z, _smatrix_clear_fn)
+      finalizer(_smatrix_clear_fn, z)
       return z
    end
 
    function smatrix{T}(R::PolyRing, ptr::libSingular.matrix_ref) where {T}
       z = new(ptr, R)
-      finalizer(z, _smatrix_clear_fn)
+      finalizer(_smatrix_clear_fn, z)
       return z
    end
 end

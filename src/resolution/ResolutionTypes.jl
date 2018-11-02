@@ -28,7 +28,7 @@ mutable struct sresolution{T <: Nemo.RingElem} <: Nemo.SetElem
    function sresolution{T}(R::PolyRing, n::Int, ptr::Ptr{Nothing}, minimal::Bool=false) where T
       R.refcount += 1
       z = new(ptr, n, minimal, R)
-      finalizer(z, _sresolution_clear_fn)
+      finalizer(_sresolution_clear_fn, z)
       return z
    end
 end

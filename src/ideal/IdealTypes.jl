@@ -28,7 +28,7 @@ mutable struct sideal{T <: Nemo.RingElem} <: Module{T}
       id = libSingular.idInit(Cint(n),1)
       z = new(id, R, false)
       R.refcount += 1
-      finalizer(z, _sideal_clear_fn)
+      finalizer(_sideal_clear_fn, z)
       for i = 1:n
          p = libSingular.p_Copy(ids[i].ptr, R.ptr)
          libSingular.setindex_internal(id, p, Cint(i - 1))
@@ -39,7 +39,7 @@ mutable struct sideal{T <: Nemo.RingElem} <: Module{T}
    function sideal{T}(R::PolyRing, id::libSingular.ideal) where T
       z = new(id, R, false)
       R.refcount += 1
-      finalizer(z, _sideal_clear_fn)
+      finalizer(_sideal_clear_fn, z)
       return z
    end
 end

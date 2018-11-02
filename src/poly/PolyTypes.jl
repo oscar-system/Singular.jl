@@ -58,7 +58,7 @@ mutable struct PolyRing{T <: Nemo.RingElem} <: Ring
          @assert degree_bound_adjusted == Int(libSingular.rBitmask(ptr))
          d = PolyRingID[R, s, ordering, ordering2, degree_bound_adjusted] =
                new(ptr, R, 1)
-         finalizer(d, _PolyRing_clear_fn)
+         finalizer(_PolyRing_clear_fn, d)
          return d
       end
    end
@@ -79,14 +79,14 @@ mutable struct spoly{T <: Nemo.RingElem} <: Nemo.RingElem
       p = libSingular.p_ISet(0, R.ptr)
 	  z = new(p, R)
       R.refcount += 1
-      finalizer(z, _spoly_clear_fn)
+      finalizer(_spoly_clear_fn, z)
       return z
    end
     
    function spoly{T}(R::PolyRing{T}, p::libSingular.poly) where T <: Nemo.RingElem
       z = new(p, R)
       R.refcount += 1
-      finalizer(z, _spoly_clear_fn)
+      finalizer(_spoly_clear_fn, z)
       return z
    end
     
@@ -95,7 +95,7 @@ mutable struct spoly{T <: Nemo.RingElem} <: Nemo.RingElem
       r = libSingular.p_NSet(n, R.ptr)
       z = new(r, R)
       R.refcount += 1
-      finalizer(z, _spoly_clear_fn)
+      finalizer(_spoly_clear_fn, z)
       return z
    end
     
@@ -103,7 +103,7 @@ mutable struct spoly{T <: Nemo.RingElem} <: Nemo.RingElem
       p = libSingular.p_NSet(n, R.ptr)
       z = new(p, R)
       R.refcount += 1
-      finalizer(z, _spoly_clear_fn)
+      finalizer(_spoly_clear_fn, z)
       return z
    end 
 
@@ -111,7 +111,7 @@ mutable struct spoly{T <: Nemo.RingElem} <: Nemo.RingElem
       p = libSingular.p_ISet(b, R.ptr)
       z = new(p, R)
       R.refcount += 1
-      finalizer(z, _spoly_clear_fn)
+      finalizer(_spoly_clear_fn, z)
       return z
    end
 
@@ -120,7 +120,7 @@ mutable struct spoly{T <: Nemo.RingElem} <: Nemo.RingElem
       p = libSingular.p_NSet(n, R.ptr)
       z = new(p, R)
       R.refcount += 1
-      finalizer(z, _spoly_clear_fn)
+      finalizer(_spoly_clear_fn, z)
       return z
    end
 end

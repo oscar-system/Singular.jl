@@ -27,7 +27,7 @@ mutable struct svector{T <: Nemo.RingElem} <: Nemo.ModuleElem{T}
    function svector{T}(R::PolyRing, r::Int, p::libSingular.poly) where T
       z = new(p, r, R)
       R.refcount += 1
-      finalizer(z, _svector_clear_fn)
+      finalizer(_svector_clear_fn, z)
       return z
    end
 end
@@ -72,7 +72,7 @@ mutable struct smodule{T <: Nemo.RingElem} <: Module{T}
       m = libSingular.idInit(Cint(n), Cint(r))
       z = new(m, R, false)
       R.refcount += 1
-      finalizer(z, _smodule_clear_fn)
+      finalizer(_smodule_clear_fn, z)
       for i = 1:n
          v = libSingular.p_Copy(vecs[i].ptr, R.ptr)
          libSingular.setindex_internal(m, v, Cint(i - 1))
@@ -83,7 +83,7 @@ mutable struct smodule{T <: Nemo.RingElem} <: Module{T}
    function smodule{T}(R::PolyRing, m::libSingular.ideal) where T
       z = new(m, R, false)
       R.refcount += 1
-      finalizer(z, _smodule_clear_fn)
+      finalizer(_smodule_clear_fn, z)
       return z
    end
 end

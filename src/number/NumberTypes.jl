@@ -20,7 +20,7 @@ mutable struct Integers <: Ring
       else
          d = new()
          IntegersID[:ZZ] = d
-         finalizer(d, _Integers_clear_fn)
+         finalizer(_Integers_clear_fn, d)
       end
       return d
    end
@@ -40,7 +40,7 @@ mutable struct n_Z <: Nemo.RingElem
         c = ZZ.ptr
         z = new(libSingular.n_Init(0, c))
         parent(z).refcount += 1
-        finalizer(z, _n_Z_clear_fn)
+        finalizer(_n_Z_clear_fn, z)
         return z
     end
 
@@ -48,14 +48,14 @@ mutable struct n_Z <: Nemo.RingElem
         c = ZZ.ptr
         z = new(libSingular.n_Init(n, c))
         parent(z).refcount += 1
-        finalizer(z, _n_Z_clear_fn)
+        finalizer(_n_Z_clear_fn, z)
         return z
     end
 
     function n_Z(n::libSingular.number)
         z = new(n)
         parent(z).refcount += 1
-        finalizer(z, _n_Z_clear_fn)
+        finalizer(_n_Z_clear_fn, z)
         return z
     end
 end
@@ -89,7 +89,7 @@ mutable struct Rationals <: Field
       else
          d = new()
          RationalsID[:QQ] = d
-         finalizer(d, _Rationals_clear_fn)
+         finalizer(_Rationals_clear_fn, d)
       end
       return d
    end
@@ -110,7 +110,7 @@ mutable struct n_Q <: Nemo.FieldElem
         c = QQ.ptr
         z = new(libSingular.n_Init(0, c))
         parent(z).refcount += 1
-        finalizer(z, _n_Q_clear_fn)
+        finalizer(_n_Q_clear_fn, z)
         return z
     end
 
@@ -118,21 +118,21 @@ mutable struct n_Q <: Nemo.FieldElem
         c = QQ.ptr
         z = new(libSingular.n_Init(n, c))
         parent(z).refcount += 1
-        finalizer(z, _n_Q_clear_fn)
+        finalizer(_n_Q_clear_fn, z)
         return z
     end
 
     function n_Q(n::n_Z)
         z = new(libSingular.nApplyMapFunc(n_Z_2_n_Q, n.ptr, ZZ.ptr, QQ.ptr))
         parent(z).refcount += 1
-        finalizer(z, _n_Q_clear_fn)
+        finalizer(_n_Q_clear_fn, z)
         return z
     end
 
     function n_Q(n::libSingular.number)
         z = new(n)
         parent(z).refcount += 1
-        finalizer(z, _n_Q_clear_fn)
+        finalizer(_n_Q_clear_fn, z)
         return z
     end
 end
@@ -172,7 +172,7 @@ mutable struct N_ZnRing <: Ring
          d = new(ptr, libSingular.n_SetMap(ZZ.ptr, ptr), 
               libSingular.n_SetMap(ptr, ZZ.ptr), 1)
          N_ZnRingID[n] = d
-         finalizer(d, _N_ZnRing_clear_fn)
+         finalizer(_N_ZnRing_clear_fn, d)
       end
       return d
    end
@@ -193,21 +193,21 @@ mutable struct n_Zn <: Nemo.RingElem
     function n_Zn(c::N_ZnRing)
     	z = new(libSingular.n_Init(0, c.ptr))
         c.refcount += 1
-        finalizer(z, _n_Zn_clear_fn)
+        finalizer(_n_Zn_clear_fn, z)
         return z
     end
 
     function n_Zn(c::N_ZnRing, n::Int)
     	z = new(libSingular.n_Init(n, c.ptr))
         c.refcount += 1
-        finalizer(z, _n_Zn_clear_fn)
+        finalizer(_n_Zn_clear_fn, z)
         return z
     end
 
     function n_Zn(c::N_ZnRing, n::libSingular.number)
     	z = new(n)
         c.refcount += 1
-        finalizer(z, _n_Zn_clear_fn)
+        finalizer(_n_Zn_clear_fn, z)
         return z
     end
 end
@@ -244,7 +244,7 @@ mutable struct N_ZpField <: Field
          d = new(ptr, libSingular.n_SetMap(ZZ.ptr, ptr), 
               libSingular.n_SetMap(ptr, ZZ.ptr), 1)
          N_ZpFieldID[n] = d
-         finalizer(d, _N_ZpField_clear_fn)
+         finalizer(_N_ZpField_clear_fn, d)
       end
       return d
    end
@@ -265,21 +265,21 @@ mutable struct n_Zp <: Nemo.FieldElem
     function n_Zp(c::N_ZpField)
     	z = new(libSingular.n_Init(0, c.ptr))
         c.refcount += 1
-        finalizer(z, _n_Zp_clear_fn)
+        finalizer(_n_Zp_clear_fn, z)
         return z
     end
 
     function n_Zp(c::N_ZpField, n::Int)
     	z = new(libSingular.n_Init(n, c.ptr))
         c.refcount += 1
-        finalizer(z, _n_Zp_clear_fn)
+        finalizer(_n_Zp_clear_fn, z)
         return z
     end
 
     function n_Zp(c::N_ZpField, n::libSingular.number)
     	z = new(n)
         c.refcount += 1
-        finalizer(z, _n_Zp_clear_fn)
+        finalizer(_n_Zp_clear_fn, z)
         return z
     end
 end
@@ -322,7 +322,7 @@ mutable struct N_GField <: Field
          d = new(ptr, n, libSingular.n_SetMap(ZZ.ptr, ptr), 
               libSingular.n_SetMap(ptr, ZZ.ptr), 1)
          N_GFieldID[p, n, S] = d
-         finalizer(d, _N_GField_clear_fn)
+         finalizer(_N_GField_clear_fn, d)
       end
       return d
    end
@@ -343,21 +343,21 @@ mutable struct n_GF <: Nemo.FieldElem
     function n_GF(c::N_GField)
     	z = new(libSingular.n_Init(0, c.ptr))
         c.refcount += 1
-        finalizer(z, _n_GF_clear_fn)
+        finalizer(_n_GF_clear_fn, z)
         return z
     end
 
     function n_GF(c::N_GField, n::Int)
     	z = new(libSingular.n_Init(n, c.ptr))
         c.refcount += 1
-        finalizer(z, _n_GF_clear_fn)
+        finalizer(_n_GF_clear_fn, z)
         return z
     end
 
     function n_GF(c::N_GField, n::libSingular.number)
     	z = new(n)
         c.refcount += 1
-        finalizer(z, _n_GF_clear_fn)
+        finalizer(_n_GF_clear_fn, z)
         return z
     end
 end
