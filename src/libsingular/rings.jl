@@ -1,4 +1,4 @@
-function rDefault(f::coeffs, vars::Array{T,1}, ord::Array{rRingOrder_t, 1}, 
+function rDefault(cf::coeffs, vars::Array{T,1}, ord::Array{rRingOrder_t, 1},
    blk0::Array{Cint, 1}, blk1::Array{Cint, 1}, bitmask::Culong) where {T}
    blk0ptr = pointer(blk0)
    blk1ptr = pointer(blk1)
