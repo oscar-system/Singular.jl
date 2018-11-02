@@ -37,7 +37,7 @@ mutable struct n_Z <: Nemo.RingElem
     ptr::libSingular.number
 
     function n_Z()
-        const c = ZZ.ptr
+        c = ZZ.ptr
         z = new(libSingular.n_Init(0, c))
         parent(z).refcount += 1
         finalizer(z, _n_Z_clear_fn)
@@ -45,7 +45,7 @@ mutable struct n_Z <: Nemo.RingElem
     end
 
     function n_Z(n::Int)
-        const c = ZZ.ptr
+        c = ZZ.ptr
         z = new(libSingular.n_Init(n, c))
         parent(z).refcount += 1
         finalizer(z, _n_Z_clear_fn)
@@ -107,7 +107,7 @@ mutable struct n_Q <: Nemo.FieldElem
     ptr::libSingular.number
 
     function n_Q()
-        const c = QQ.ptr
+        c = QQ.ptr
         z = new(libSingular.n_Init(0, c))
         parent(z).refcount += 1
         finalizer(z, _n_Q_clear_fn)
@@ -115,7 +115,7 @@ mutable struct n_Q <: Nemo.FieldElem
     end
 
     function n_Q(n::Int)
-        const c = QQ.ptr
+        c = QQ.ptr
         z = new(libSingular.n_Init(n, c))
         parent(z).refcount += 1
         finalizer(z, _n_Q_clear_fn)
