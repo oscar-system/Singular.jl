@@ -310,7 +310,7 @@ function crt(r1::n_Z, m1::n_Z, r2::n_Z, m2::n_Z, signed=false)
    println("type par",typeof(par.ptr))
    println("type r",typeof(r))
    println("type m",typeof(m))
-   a = libSingular.n_ChineseRemainderSym(reinterpret(Ptr{Void},pointer(r)), reinterpret(Ptr{Void},pointer(m)), Cint(2), Cint(signed), par.ptr)
+   a = libSingular.n_ChineseRemainderSym(reinterpret(Ptr{Nothing},pointer(r)), reinterpret(Ptr{Nothing},pointer(m)), Cint(2), Cint(signed), par.ptr)
    println("Got through")
    return par(a)
 end

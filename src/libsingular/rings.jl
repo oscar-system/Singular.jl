@@ -18,8 +18,8 @@ function p_SetExpV(p::poly, ev::Array{Cint, 1}, r::ring)
 end
 
 function p_ExtGcd(a::polyRef, b::polyRef, res::Ptr{polyRef}, s::Ptr{polyRef}, t::Ptr{polyRef}, r::ring)
-    sp = reinterpret(Ptr{Void},s)
-    tp = reinterpret(Ptr{Void},t)
-    rp = reinterpret(Ptr{Void},res)
+    sp = reinterpret(Ptr{Nothing},s)
+    tp = reinterpret(Ptr{Nothing},t)
+    rp = reinterpret(Ptr{Nothing},res)
     return p_ExtGcd_internal(a, b, rp, sp, tp, r)
  end

@@ -1,5 +1,5 @@
 #= function res_Delete(r::resolvente, length::Cint, R::ring)
-    r_ptr = reinterpret(Ptr{Void},r)
+    r_ptr = reinterpret(Ptr{Nothing},r)
     return res_Delete_helper(r_ptr,length,R)
 end
 

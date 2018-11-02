@@ -58,7 +58,7 @@ end
 function show(io::IO, a::svector)
    m = libSingular.p_String(a.ptr, base_ring(a).ptr)
 #   s = unsafe_string(m)
-#   libSingular.omFree(Ptr{Void}(m))
+#   libSingular.omFree(Ptr{Nothing}(m))
    print(io, m)
 end
 
@@ -153,7 +153,7 @@ function (S::FreeMod{T})(a::Array{T, 1}) where T <: AbstractAlgebra.RingElem
    R = base_ring(S) # polynomial ring
    n = size(a)[1]
    aa = [p.ptr.cpp_object for p in a]
-   v = libSingular.id_Array2Vector(reinterpret(Ptr{Void},pointer(aa)), n, base_ring(S).ptr)
+   v = libSingular.id_Array2Vector(reinterpret(Ptr{Nothing},pointer(aa)), n, base_ring(S).ptr)
    return svector{T}(R, n, v)
 end
 
@@ -165,9 +165,9 @@ end
 
 function Array(v::svector{spoly{T}}) where T <: Nemo.RingElem
    n = v.rank
-   aa_val = Array{Ptr{Void},1}(n)
+   aa_val = Array{Ptr{Nothing},1}(n)
    R = base_ring(v)
-   libSingular.p_Vector2Array(v.ptr, reinterpret(Ptr{Void},pointer(aa_val)), n, R.ptr)
+   libSingular.p_Vector2Array(v.ptr, reinterpret(Ptr{Nothing},pointer(aa_val)), n, R.ptr)
    aa = [libSingular.internal_void_to_poly_helper(p) for p in aa_val]
    return [spoly{T}(R, p) for p in aa]
 end
@@ -181,7 +181,7 @@ end
 function vector(R::PolyRing{T}, coords::spoly{T}...) where T <: AbstractAlgebra.RingElem
    n = length(coords)
    aa = [p.ptr.cpp_object for p in coords]
-   v = libSingular.id_Array2Vector(reinterpret(Ptr{Void},pointer(aa)), n, R.ptr)
+   v = libSingular.id_Array2Vector(reinterpret(Ptr{Nothing},pointer(aa)), n, R.ptr)
    
    return svector{spoly{T}}(R, n, v)
 end

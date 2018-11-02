@@ -11,19 +11,19 @@ function n_Write(n::numberRef, cf::coeffs, bShortOut::Bool = false)
 end
 
 function n_ExtGcd(a::number, b::number, s::Ptr{numberRef}, t::Ptr{numberRef}, cf:: coeffs)
-   sp = reinterpret(Ptr{Void},s)
-   tp = reinterpret(Ptr{Void},t)
+   sp = reinterpret(Ptr{Nothing},s)
+   tp = reinterpret(Ptr{Nothing},t)
    return n_ExtGcd_internal(a, b, sp, tp, cf);
 end
 
 function n_QuotRem(a::number, b::number, p::Ptr{number}, cf::coeffs)
-   pp = reinterpret(Ptr{Void}, p)
+   pp = reinterpret(Ptr{Nothing}, p)
    n_QuotRem_internal(a, b, pp, cf)
 end
 
 function n_ChineseRemainderSym(a::Array{number, 1}, b::Array{number, 1}, n::Cint, signed::Cint, cf::coeffs)
-   p1 = reinterpret(Ptr{Void},pointer(a))
-   p2 = reinterpret(Ptr{Void},pointer(b))
+   p1 = reinterpret(Ptr{Nothing},pointer(a))
+   p2 = reinterpret(Ptr{Nothing},pointer(b))
    return n_ChineseRemainderSym_internal(p1, p2, n, signed, cf)
 end
 
@@ -34,7 +34,7 @@ end
 
 # omalloc free
 function omFree(m :: Ptr{T}) where {T}
-   mp = reinterpret(Ptr{Void}, m)
+   mp = reinterpret(Ptr{Nothing}, m)
    omFree_internal(m)
 end
 
@@ -45,7 +45,7 @@ end
 ###############################################################################
 
 function setindex!(ptr::Ptr{number}, n::number)
-   pp = reinterpret(Ptr{Void}, ptr)
+   pp = reinterpret(Ptr{Nothing}, ptr)
    setindex_internal(pp, n)
 end
 
@@ -62,7 +62,7 @@ mutable struct live_cache
    A::Array{Nemo.RingElem, 1}
 end
 
-function nRegister(t::n_coeffType, f::Ptr{Void})
+function nRegister(t::n_coeffType, f::Ptr{Nothing})
    return icxx"""return nRegister($t, (cfInitCharProc)$f);"""
 end
 
@@ -78,7 +78,7 @@ function julia(p::number)
     return unsafe_pointer_to_objref(ptr)
 end
 
-function number_pop!(D::Base.Dict{UInt, live_cache}, ptr::Ptr{Void})
+function number_pop!(D::Base.Dict{UInt, live_cache}, ptr::Ptr{Nothing})
    iptr = reinterpret(UInt, ptr) >> 24
    val = D[iptr]
    val.num -= 1

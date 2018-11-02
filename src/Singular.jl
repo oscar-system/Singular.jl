@@ -21,7 +21,7 @@ export base_ring, elem_type, parent_type, parent
 
 export ResidueRing, PolynomialRing, Ideal, MaximalIdeal, FreeModule
 
-export ZZ, QQ, FiniteField, CoefficientRing, Fp 
+export ZZ, QQ, FiniteField, CoefficientRing, Fp
 
 ###############################################################################
 #
@@ -37,7 +37,7 @@ prefix = realpath(joinpath(@__DIR__, "..", "local"))
 function __init__()
 
    # Initialise Singular
-   
+
    binSingular = joinpath(prefix, "bin", "Singular")
    ENV["SINGULAR_EXECUTABLE"] = binSingular
    libSingular.siInit(binSingular)
@@ -68,9 +68,9 @@ function __init__()
 
  global const sym2ringorder = Dict{Symbol, libSingular.rRingOrder_t}(
   	  :lex => ringorder_lp,
-     :revlex => ringorder_rp, 
+     :revlex => ringorder_rp,
   	  :neglex => ringorder_ls,
-     :negrevlex => ringorder_rs, 
+     :negrevlex => ringorder_rs,
 	  :degrevlex => ringorder_dp,
      :deglex => ringorder_Dp,
 	  :negdegrevlex => ringorder_ds,

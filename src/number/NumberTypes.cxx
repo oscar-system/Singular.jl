@@ -6,7 +6,7 @@
 
 function get_n_Z()
    n_Z = @cxx n_Z
-   d = libSingular.nInitChar(n_Z, Ptr{Void}(0))
+   d = libSingular.nInitChar(n_Z, Ptr{Nothing}(0))
 end
 
 const IntegersID = Dict{Symbol, Ring}()
@@ -76,7 +76,7 @@ end
 
 function get_n_Q()
    n_Q = @cxx n_Q
-   d = libSingular.nInitChar(n_Q, Ptr{Void}(0))
+   d = libSingular.nInitChar(n_Q, Ptr{Nothing}(0))
 end
 
 const RationalsID = Dict{Symbol, Field}()
@@ -240,7 +240,7 @@ mutable struct N_ZpField <: Field
          d = N_ZpFieldID[n]::N_ZpField
       else
          n_Zp = @cxx n_Zp
-         ptr = libSingular.nInitChar(n_Zp, Ptr{Void}(n))
+         ptr = libSingular.nInitChar(n_Zp, Ptr{Nothing}(n))
          d = new(ptr, libSingular.n_SetMap(ZZ.ptr, ptr), 
               libSingular.n_SetMap(ptr, ZZ.ptr), 1)
          N_ZpFieldID[n] = d

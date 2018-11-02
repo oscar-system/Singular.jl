@@ -240,7 +240,7 @@ mutable struct N_ZpField <: Field
       if haskey(N_ZpFieldID, n)
          d = N_ZpFieldID[n]::N_ZpField
       else
-         ptr = libSingular.nInitChar(libSingular.n_Zp, Ptr{Void}(n))
+         ptr = libSingular.nInitChar(libSingular.n_Zp, Ptr{Nothing}(n))
          d = new(ptr, libSingular.n_SetMap(ZZ.ptr, ptr), 
               libSingular.n_SetMap(ptr, ZZ.ptr), 1)
          N_ZpFieldID[n] = d
