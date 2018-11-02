@@ -52,22 +52,22 @@ function __init__()
 
    # done in __init__ since headers must be included first
 
-  global const n_Z_2_n_Q = libSingular.n_SetMap(ZZ.ptr, QQ.ptr)
-  global const n_Q_2_n_Z = libSingular.n_SetMap(QQ.ptr, ZZ.ptr)
+  global n_Z_2_n_Q = libSingular.n_SetMap(ZZ.ptr, QQ.ptr)
+  global n_Q_2_n_Z = libSingular.n_SetMap(QQ.ptr, ZZ.ptr)
 
-  global const ringorder_no = libSingular.ringorder_no
-  global const ringorder_lp = libSingular.ringorder_lp
-  global const ringorder_rp = libSingular.ringorder_rp
-  global const ringorder_dp = libSingular.ringorder_dp
-  global const ringorder_Dp = libSingular.ringorder_Dp
-  global const ringorder_ls = libSingular.ringorder_ls
-  global const ringorder_rs = libSingular.ringorder_rs
-  global const ringorder_ds = libSingular.ringorder_ds
-  global const ringorder_Ds = libSingular.ringorder_Ds
-  global const ringorder_c  = libSingular.ringorder_c
-  global const ringorder_C  = libSingular.ringorder_C
+  global ringorder_no = libSingular.ringorder_no
+  global ringorder_lp = libSingular.ringorder_lp
+  global ringorder_rp = libSingular.ringorder_rp
+  global ringorder_dp = libSingular.ringorder_dp
+  global ringorder_Dp = libSingular.ringorder_Dp
+  global ringorder_ls = libSingular.ringorder_ls
+  global ringorder_rs = libSingular.ringorder_rs
+  global ringorder_ds = libSingular.ringorder_ds
+  global ringorder_Ds = libSingular.ringorder_Ds
+  global ringorder_c  = libSingular.ringorder_c
+  global ringorder_C  = libSingular.ringorder_C
 
- global const sym2ringorder = Dict{Symbol, libSingular.rRingOrder_t}(
+ global sym2ringorder = Dict{Symbol, libSingular.rRingOrder_t}(
   	  :lex => ringorder_lp,
      :revlex => ringorder_rp,
   	  :neglex => ringorder_ls,
