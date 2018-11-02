@@ -1,6 +1,7 @@
 module Singular
 
 import AbstractAlgebra
+using Markdown
 using Nemo
 
 import Base: abs, checkbounds, deepcopy, deepcopy_internal,
