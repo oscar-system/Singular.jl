@@ -144,23 +144,23 @@ function exponent(p::spoly, i::Int)
    return A
 end
 
-function exponent!(A::Array{Int, 1}, p::spoly, i::Int)
-   i = length(p) - i - 1
+function exponent!(A::Array{Int, 1}, p::spoly, j::Int)
+   i = length(p) - j - 1
    R = parent(p)
    n = ngens(R)
    @assert length(A) == n
    if i < 0 || iszero(p)
-      for i=1:n
-        A[i] = 0
+      for l=1:n
+        A[l] = 0
       end
       return A
    end
    ptr = p.ptr
-   for i = 1:i
+   for k = 1:i
       ptr = libSingular.pNext(ptr)
       if ptr.cpp_object == C_NULL
-        for i=1:n
-          A[i] = 0
+        for l=1:n
+          A[l] = 0
         end
       end
    end
