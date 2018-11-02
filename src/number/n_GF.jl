@@ -327,7 +327,7 @@ end
 
 function (R::N_GField)(x::Nemo.fmpz)
    a = BigInt()
-   ccall((:flint_mpz_init_set_readonly, :libflint), Void,
+   ccall((:flint_mpz_init_set_readonly, :libflint), Nothing,
          (Ptr{BigInt}, Ptr{fmpz}), &a, &x)
    z = R(libSingular.n_InitMPZ(a, R.ptr))
       z.parent = R

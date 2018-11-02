@@ -33,7 +33,7 @@ function StringSetS(m)
 end
 
 # omalloc free
-function omFree{T}(m :: Ptr{T})
+function omFree(m :: Ptr{T}) where {T}
    mp = reinterpret(Ptr{Void}, m)
    omFree_internal(m)
 end
