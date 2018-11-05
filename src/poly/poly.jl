@@ -602,7 +602,7 @@ end
 #
 ###############################################################################
 
-doc"""
+@doc Markdown.doc"""
     AsEquivalentSingularPolynomialRing(R::AbstractAlgebra.Generic.MPolyRing{T}; cached::Bool = true,
       ordering::Symbol = :degrevlex, ordering2::Symbol = :comp1min,
       degree_bound::Int = 0)  where {T <: RingElem}
@@ -614,7 +614,7 @@ function AsEquivalentSingularPolynomialRing(R::AbstractAlgebra.Generic.MPolyRing
    return PolynomialRing(AbstractAlgebra.Generic.base_ring(R), [string(v) for v in AbstractAlgebra.Generic.symbols(R)], cached=cached, ordering=ordering, ordering2=ordering2, degree_bound=degree_bound)
 end
 
-doc"""
+@doc Markdown.doc"""
     AsEquivalentAbstractAlgebraPolynomialRing(R::Singular.PolyRing{Singular.n_unknown{T}}; ordering::Symbol = :degrevlex)  where {T <: RingElem}
 > Return an AbstractAlgebra (multivariate) polynomial ring over the base ring of $R$ in variables having the same names as those of R.
 """
@@ -623,11 +623,11 @@ function AsEquivalentAbstractAlgebraPolynomialRing(R::Singular.PolyRing{Singular
 end
 
 
-doc"""
+@doc Markdown.doc"""
     (R::PolyRing){T <: RingElem}(p::AbstractAlgebra.Generic.MPoly{T})
 > Return a Singular polynomial in $R$ with the same coefficients and exponents as $p$.
 """
-function (R::PolyRing){T <: Nemo.RingElem}(p::AbstractAlgebra.Generic.MPoly{T})
+function (R::PolyRing)(p::AbstractAlgebra.Generic.MPoly{T}) where T <: Nemo.RingElem
    parent_ring = parent(p)
    n = nvars(parent_ring)
    exps = p.exps
@@ -652,11 +652,11 @@ function (R::PolyRing){T <: Nemo.RingElem}(p::AbstractAlgebra.Generic.MPoly{T})
    return(new_p)
 end
 
-doc"""
+@doc Markdown.doc"""
    (R::AbstractAlgebra.Generic.MPolyRing{T}){T <: Nemo.RingElem}(p::Singular.spoly{Singular.n_unknown{T}})
 > Return a AbstractAlgebra polynomial in R with the same coefficients and exponents as $p$.
 """
-function (R::AbstractAlgebra.Generic.MPolyRing{T}){T <: Nemo.RingElem}(p::Singular.spoly{Singular.n_unknown{T}})
+function (R::AbstractAlgebra.Generic.MPolyRing{T})(p::Singular.spoly{Singular.n_unknown{T}}) where T <: Nemo.RingElem
    parent_ring = parent(p)
    n = ngens(parent_ring)
    new_p = zero(R)
