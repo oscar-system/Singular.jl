@@ -7,9 +7,13 @@ using Nemo
 import Base: abs, checkbounds, deepcopy, deepcopy_internal,
              denominator, div, divrem, exponent,
              gcd, gcdx, getindex, indices, inv, isequal, isless, lcm, length,
-             mod, normalize!, numerator, one, rank, reduce, rem, setindex!, show,
-             std, zero, +, -, *, ==, ^, &, |, $, <<, >>, ~, <=, >=, <, >, //,
+             mod, numerator, one, reduce, rem, setindex!, show,
+             zero, +, -, *, ==, ^, &, |, <<, >>, ~, <=, >=, <, >, //,
              /, !=
+
+import LinearAlgebra: normalize!, rank
+
+import Statistics: std
 
 import Nemo: add!, addeq!, base_ring, canonical_unit, check_parent, coeff,
              contains, content, crt, divexact,
