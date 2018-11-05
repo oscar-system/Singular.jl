@@ -32,7 +32,7 @@ function degree(R::N_GField)
    return R.deg
 end
 
-function deepcopy_internal(a::n_GF, dict::ObjectIdDict)
+function deepcopy_internal(a::n_GF, dict::IdDict)
    return parent(a)(libSingular.n_Copy(a.ptr, parent(a).ptr))
 end
 

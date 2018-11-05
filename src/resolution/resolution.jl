@@ -42,7 +42,7 @@ end
 """
 length(r::sresolution) = r.len - 1
 
-function deepcopy_internal(r::sresolution, dict::ObjectIdDict)
+function deepcopy_internal(r::sresolution, dict::IdDict)
    R = base_ring(r)
    ptr = libSingular.res_Copy(r.ptr, Cint(r.len), R.ptr)
    S = parent(r)

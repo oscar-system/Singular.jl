@@ -224,7 +224,7 @@ function lead_exponent(p::spoly)
    return A
 end
 
-function deepcopy_internal(p::spoly, dict::ObjectIdDict)
+function deepcopy_internal(p::spoly, dict::IdDict)
    p2 = libSingular.p_Copy(p.ptr, parent(p).ptr)
    return parent(p)(p2)
 end

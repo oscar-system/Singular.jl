@@ -41,7 +41,7 @@ function iszero(M::smatrix)
    return true
 end
 
-function deepcopy_internal(M::smatrix, dict::ObjectIdDict)
+function deepcopy_internal(M::smatrix, dict::IdDict)
    R = base_ring(M)
    ptr = libSingular.mp_Copy(M.ptr, R.ptr)
    return parent(M)(ptr)

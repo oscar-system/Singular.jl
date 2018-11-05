@@ -95,7 +95,7 @@ function normalize!(I::sideal)
    nothing
 end
 
-function deepcopy_internal(I::sideal, dict::ObjectIdDict)
+function deepcopy_internal(I::sideal, dict::IdDict)
    R = base_ring(I)
    ptr = libSingular.id_Copy(I.ptr, R.ptr)
    return Ideal(R, ptr)

@@ -24,7 +24,7 @@ function canonical_unit(a::n_unknown)
    return R(libSingular.number(canonical_unit(n)))
 end
 
-function deepcopy_internal(a::n_unknown, dict::ObjectIdDict)
+function deepcopy_internal(a::n_unknown, dict::IdDict)
    R = parent(a)
    n = libSingular.julia(a.ptr)
    return R(libSingular.number(deepcopy(n)))

@@ -16,7 +16,7 @@ base_ring(a::n_Z) = Union{}
 
 base_ring(a::Integers) = Union{}
 
-function deepcopy_internal(a::n_Z, dict::ObjectIdDict)
+function deepcopy_internal(a::n_Z, dict::IdDict)
    return parent(a)(libSingular.n_Copy(a.ptr, parent(a).ptr))
 end
 

@@ -34,7 +34,7 @@ function gens(M::FreeMod{T}) where T <: AbstractAlgebra.RingElem
    return [svector{T}(R, M.rank, libSingular.getindex(ptr, Cint(i - 1))) for i in 1:M.rank]
 end
 
-function deepcopy_internal(p::svector{T}, dict::ObjectIdDict) where T <: AbstractAlgebra.RingElem
+function deepcopy_internal(p::svector{T}, dict::IdDict) where T <: AbstractAlgebra.RingElem
    p2 = libSingular.p_Copy(p.ptr, base_ring(p).ptr)
    return svector{T}(p.base_ring, p.rank, p2)
 end

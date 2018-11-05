@@ -50,7 +50,7 @@ end
 """
 iszero(p::smodule) = Bool(libSingular.idIs0(p.ptr))
 
-function deepcopy_internal(I::smodule, dict::ObjectIdDict)
+function deepcopy_internal(I::smodule, dict::IdDict)
    R = base_ring(I)
    ptr = libSingular.id_Copy(I.ptr, R.ptr)
    return Module(R, ptr)
