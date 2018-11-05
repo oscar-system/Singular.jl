@@ -1,6 +1,6 @@
 export spoly, PolyRing, coeff, coeffs_expos, degree, exponent!, isgen, content,
        exponent, lead_exponent, ngens, degree_bound, primpart, @PolynomialRing,
-       has_global_ordering
+       has_global_ordering, symbols
 
 ###############################################################################
 #
@@ -43,6 +43,21 @@ function gens(R::PolyRing)
    n = ngens(R)
    return [R(libSingular.rGetVar(Cint(i), R.ptr)) for i = 1:n]
 end
+
+@doc Markdown.doc"""
+    symbols(R::PolyRing)
+> Return symbols for the generators of the polynomial ring $R$.
+"""
+function symbols(R::PolyRing)
+   io = IOBuffer();
+   symbols = Array{Symbol,1}(0)
+   for g in gens(R)
+      show(io,g)
+      push!(symbols, Symbol(String(take!(io))))
+   end
+   return symbols
+end
+
 
 @doc Markdown.doc"""
     degree_bound(R::PolyRing)
@@ -581,3 +596,76 @@ macro PolynomialRing(R, s, n)
    return esc(v1)
 end
 
+###############################################################################
+#
+#   Conversion functions
+#
+###############################################################################
+
+doc"""
+    AsEquivalentSingularPolynomialRing(R::AbstractAlgebra.Generic.MPolyRing{T}; cached::Bool = true,
+      ordering::Symbol = :degrevlex, ordering2::Symbol = :comp1min,
+      degree_bound::Int = 0)  where {T <: RingElem}
+> Return a Singular (multivariate) polynomial ring over the base ring of $R$ in variables having the same names as those of R.
+"""
+function AsEquivalentSingularPolynomialRing(R::AbstractAlgebra.Generic.MPolyRing{T}; cached::Bool = true,
+      ordering::Symbol = :degrevlex, ordering2::Symbol = :comp1min,
+      degree_bound::Int = 0)  where {T <: RingElem}
+   return PolynomialRing(AbstractAlgebra.Generic.base_ring(R), [string(v) for v in AbstractAlgebra.Generic.symbols(R)], cached=cached, ordering=ordering, ordering2=ordering2, degree_bound=degree_bound)
+end
+
+doc"""
+    AsEquivalentAbstractAlgebraPolynomialRing(R::Singular.PolyRing{Singular.n_unknown{T}}; ordering::Symbol = :degrevlex)  where {T <: RingElem}
+> Return an AbstractAlgebra (multivariate) polynomial ring over the base ring of $R$ in variables having the same names as those of R.
+"""
+function AsEquivalentAbstractAlgebraPolynomialRing(R::Singular.PolyRing{Singular.n_unknown{T}}; ordering::Symbol = :degrevlex)  where {T <: RingElem}
+   return AbstractAlgebra.Generic.PolynomialRing(base_ring(R).base_ring, Base.convert( Array{String,1}, symbols(R)), ordering=ordering)
+end
+
+
+doc"""
+    (R::PolyRing){T <: RingElem}(p::AbstractAlgebra.Generic.MPoly{T})
+> Return a Singular polynomial in $R$ with the same coefficients and exponents as $p$.
+"""
+function (R::PolyRing){T <: Nemo.RingElem}(p::AbstractAlgebra.Generic.MPoly{T})
+   parent_ring = parent(p)
+   n = nvars(parent_ring)
+   exps = p.exps
+
+   size_exps = size(p.exps)
+   if parent_ring.ord != :lex
+      exps = exps[2:size_exps[1],:]
+   end
+   if parent_ring.ord == :degrevlex
+      exps = exps[end:-1:1,:]
+   end
+
+   new_p = zero(R)
+
+   for i=1:length(p)
+      prod = p.coeffs[i]
+      for j=1:n
+         prod = prod * gens(R)[j]^Int(exps[j,i])
+      end
+      new_p = new_p + prod
+   end
+   return(new_p)
+end
+
+doc"""
+   (R::AbstractAlgebra.Generic.MPolyRing{T}){T <: Nemo.RingElem}(p::Singular.spoly{Singular.n_unknown{T}})
+> Return a AbstractAlgebra polynomial in R with the same coefficients and exponents as $p$.
+"""
+function (R::AbstractAlgebra.Generic.MPolyRing{T}){T <: Nemo.RingElem}(p::Singular.spoly{Singular.n_unknown{T}})
+   parent_ring = parent(p)
+   n = ngens(parent_ring)
+   new_p = zero(R)
+   gens = AbstractAlgebra.Generic.gens(R)
+   iterator = coeffs_expos(p)
+   t = start(iterator)
+   while !done(iterator,t)
+      (coeff,exps),t = next(iterator,t)
+      new_p = new_p + libSingular.julia(coeff.ptr) * prod(gens.^exps)
+   end
+   return(new_p)
+end

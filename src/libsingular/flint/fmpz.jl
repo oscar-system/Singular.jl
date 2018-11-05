@@ -116,6 +116,12 @@ function fmpzDiv(a::number, b::number, cf::coeffs)
    return number(divexact(n1, n2))
 end
 
+function fmpzDivBy(a::number, b::number, cf::coeffs)
+   n1 = julia(a)::Nemo.fmpz
+   n2 = julia(b)::Nemo.fmpz
+   return Cint(divides(n1, n2)[1])
+end
+
 ###############################################################################
 #
 #   Comparison
@@ -224,6 +230,7 @@ function fmpzInitChar(cf::coeffs, p::Ptr{Void})
     pMult = cfunction(fmpzMult, number, (number, number, coeffs))
     pInpMult = cfunction(fmpzInpMult, Void, (Ptr{number}, number, coeffs))
     pDiv = cfunction(fmpzDiv, number, (number, number, coeffs))
+    pDivBy = cfunction(fmpzDivBy, Cint, (number, number, coeffs))
     pInvers = cfunction(fmpzInvers, number, (number, coeffs))
     pGcd = cfunction(fmpzGcd, number, (number, number, coeffs))
     pExtGcd = cfunction(fmpzExtGcd, number, (number, number, Ptr{number}, Ptr{number}, coeffs))
@@ -256,6 +263,7 @@ function fmpzInitChar(cf::coeffs, p::Ptr{Void})
       cf->cfMult = (numberfunc) $pMult;
       cf->cfInpMult = (void (*)(number &, number, const coeffs)) $pInpMult;
       cf->cfDiv = (numberfunc) $pDiv;
+      cf->cfDivBy = (BOOLEAN (*)(number, number, const coeffs)) $pDivBy;
       cf->cfInvers = (number (*)(number, const coeffs)) $pInvers;
       cf->cfGcd = (numberfunc) $pGcd;
       cf->cfExtGcd = (number (*)(number, number, number *, number *, const coeffs)) $pExtGcd;

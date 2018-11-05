@@ -68,6 +68,9 @@ function test_spoly_constructors()
    @test !isgen(x^2)
 
    @test has_global_ordering(R)
+   
+   @test length(symbols(R)) == 2
+   @test symbols(R) == [:x, :y]
 
    println("PASS")
 end
@@ -250,6 +253,35 @@ function test_spoly_Polynomials()
    println("PASS")
 end
 
+function test_convert_between_MPoly_and_SingularPoly()
+   print("spoly.test_convert_MPoly_to_SingularPoly...")
+   for num_vars=2:10
+      var_names = ["x$j" for j in 1:num_vars]
+      ord = AbstractAlgebra.rand_ordering()
+
+      R, vars_R = AbstractAlgebra.Generic.PolynomialRing(Nemo.ZZ, var_names; ordering=ord)
+      Rsing, vars_Rsing = Singular.AsEquivalentSingularPolynomialRing(R)
+      for iter in 1:10
+         f = AbstractAlgebra.Generic.rand(R, 5:10, 1:10, -100:100)
+         g = AbstractAlgebra.Generic.rand(R, 5:10, 1:10, -100:100)
+         @test Rsing(f * g) == Rsing(f) * Rsing(g)
+         @test Rsing(f + g) == Rsing(f) + Rsing(g)
+         @test Rsing(f - g) == Rsing(f) - Rsing(g)
+         @test R(Rsing(f)) == f
+      end
+
+      S, vars_S = Singular.PolynomialRing(Nemo.ZZ, var_names; ordering=ord)
+      SAA, vars_SAA = Singular.AsEquivalentAbstractAlgebraPolynomialRing(S)
+      # FIXME: Better generate random polynomials
+      f = 1+vars_S[1]*vars_S[2]
+      g = vars_S[1]^2 + vars_S[2]^3
+      @test SAA(f * g) == SAA(f) * SAA(g)
+      @test SAA(f + g) == SAA(f) + SAA(g)
+      @test SAA(f - g) == SAA(f) - SAA(g)
+      @test S(SAA(f)) == f
+   end
+end
+
 function test_spoly()
    test_spoly_constructors()
    test_spoly_printing()
@@ -262,6 +294,7 @@ function test_spoly()
    test_spoly_gcd_lcm()
    test_spoly_extended_gcd()
    test_spoly_Polynomials()
+   test_convert_between_MPoly_and_SingularPoly()
 
    println("")
 end

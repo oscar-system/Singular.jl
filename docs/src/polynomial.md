@@ -52,7 +52,7 @@ PolynomialRing(R::Union{Ring, Field}, s::Array{String, 1};
       ordering2::Symbol = :comp1min, degree_bound::Int = 0)
 ```
 
-Returns a tuple, $S, x$ consisting of a multivariate polynomial ring $S$ and an array
+Returns a tuple, $S, x$ consisting of a multivariate polynomial ring $S$ and an array $x$
 of variables (from which polynomials can be constructed). The ring $R$ must be a valid
 Singular coefficient ring, or any Nemo/AbstractAlgebra coefficient ring. The array $s$
 must be a list of strings corresponding to how the variables will be printed. By default,
@@ -94,6 +94,13 @@ T, x = PolynomialRing(ZZ, ["x$i" for i in 1:5];
 
 See also the convenience macros below for simple use cases.
 
+The following function allows creating a Singular polynomial ring from a given
+polynomial ring of type AbstractAlgebra.Generic.MPolyRing:
+
+```@docs
+PolynomialRing(R::AbstractAlgebra.Generic.MPolyRing{T}; cached::Bool = true, ordering::Symbol = :degrevlex, ordering2::Symbol = :comp1min, degree_bound::Int = 0)  where {T <: RingElement}
+```
+
 ### Polynomial ring macros
 
 For convenience, we provide some macros for constructing polynomial rings and injecting
@@ -132,6 +139,10 @@ T = @PolynomialRing(QQ, "y", 10)
 
 ```@docs
 ngens(::PolyRing)
+```
+
+```@docs
+symbols(::PolyRing)
 ```
 
 ```@docs
@@ -186,5 +197,37 @@ p = primpart(f)
 c = content(f)
 ```
 
+### Conversion between Singular.jl polynomials and MPoly polynomials
 
+There are conversion functions between the polynomial ring implementation
+from Singular.jl and the generic MPoly implementation from AbstractAlgebra.jl.
 
+```@docs
+AsEquivalentSingularPolynomialRing(R::AbstractAlgebra.Generic.MPolyRing{T}; cached::Bool = true,
+      ordering::Symbol = :degrevlex, ordering2::Symbol = :comp1min,
+      degree_bound::Int = 0)  where {T <: RingElem}
+```
+
+```@docs
+AsEquivalentAbstractAlgebraPolynomialRing(R::Singular.PolyRing{Singular.n_unknown{T}}; ordering::Symbol = :degrevlex)  where {T <: Nemo.RingElem}
+```
+
+**Examples**
+
+Conversion of generic AbstractAlgebra polynomials to Singular.jl polynomials:
+
+```
+K = Nemo.ZZ
+R,(x,y) = AbstractAlgebra.Generic.PolynomialRing(K, ["x","y"]);
+Rsing,vars_Rsing = Singular.AsEquivalentSingularPolynomialRing(R);
+Rsing(x+y) == Rsing(x) + Rsing(y)
+```
+
+Conversion of Singular.jl polynomials to generic AbstractAlgebra polynomials:
+
+```
+K = Nemo.ZZ
+S,(u,v) = Singular.PolynomialRing(K, ["u","v"])
+Saa,(uu,vv) = Singular.AsEquivalentAbstractAlgebraPolynomialRing(S)
+Saa(u) + Saa(v) == Saa(u) + Saa(v)
+```
