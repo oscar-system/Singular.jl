@@ -318,9 +318,12 @@ mutable struct N_GField <: Field
       if haskey(N_GFieldID, (p, n, S))
          d = N_GFieldID[p, n, S]::N_GField
       else
-         ptr = libSingular.nInitChar(libSingular.n_GF, pointer_from_objref(GFInfo(Cint(p), Cint(n), pointer(Base.Vector{UInt8}(string(S)*"\0")))))
+         gfinfo = GFInfo(Cint(p), Cint(n), pointer(Base.Vector{UInt8}(string(S)*"\0")))
+         GC.@preserve gfinfo begin
+         ptr = libSingular.nInitChar(libSingular.n_GF, pointer_from_objref(gfinfo))
          d = new(ptr, n, libSingular.n_SetMap(ZZ.ptr, ptr), 
               libSingular.n_SetMap(ptr, ZZ.ptr), 1)
+         end
          N_GFieldID[p, n, S] = d
          finalizer(_N_GField_clear_fn, d)
       end
