@@ -37,9 +37,9 @@ mutable struct PolyRing{T <: Nemo.RingElem} <: Ring
          
          ord  = unsafe_wrap(Array, 
       	   Ptr{libSingular.rRingOrder_t}(libSingular.omAlloc0(Csize_t(3*sizeof(libSingular.rRingOrder_t)))), 
-      	       (Cint(3),), false)
-         blk0 = unsafe_wrap(Array, Ptr{Cint}(libSingular.omAlloc0(Csize_t(3*sizeof(Cint)))), (Cint(3),), false)
-         blk1 = unsafe_wrap(Array, Ptr{Cint}(libSingular.omAlloc0(Csize_t(3*sizeof(Cint)))), (Cint(3),), false)
+              (Cint(3),); own=false)
+         blk0 = unsafe_wrap(Array, Ptr{Cint}(libSingular.omAlloc0(Csize_t(3*sizeof(Cint)))), (Cint(3),); own=false)
+         blk1 = unsafe_wrap(Array, Ptr{Cint}(libSingular.omAlloc0(Csize_t(3*sizeof(Cint)))), (Cint(3),); own=false)
          if (ordering == ringorder_c || ordering == ringorder_C)
             blk0[1] = 0
             blk1[1] = 0
