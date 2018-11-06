@@ -154,7 +154,7 @@ function exponent(p::spoly, i::Int)
          return zeros(Int, n)
       end
    end
-   A = Array{Int}(n)
+   A = Array{Int}(undef, n)
    libSingular.p_GetExpVL(ptr, A, R.ptr)
    return A
 end
