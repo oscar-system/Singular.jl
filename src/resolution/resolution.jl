@@ -62,7 +62,7 @@ end
 """
 function betti(r::sresolution)
    array = libSingular.syBetti(r.ptr, Cint(r.len), r.base_ring.ptr)
-   return unsafe_wrap(Array, array[1], array[2:3],true)
+   return unsafe_wrap(Array, array[1], array[2:3]; own=true)
 end
 
 ###############################################################################
