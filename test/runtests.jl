@@ -1,4 +1,5 @@
 using Singular
+import Nemo
 
 if VERSION < v"0.7.0-DEV.2004"
    using Base.Test
