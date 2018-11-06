@@ -47,8 +47,7 @@ isunit(n::n_Q) = !iszero(n)
 > Return the numerator of the given fraction.
 """
 function numerator(n::n_Q)
-   nn = libSingular.number_ref(n.ptr);
-   p = libSingular.n_GetNumerator(nn, parent(n).ptr)
+   p = libSingular.n_GetNumerator(n.ptr, parent(n).ptr)
    pp = libSingular.nApplyMapFunc(n_Q_2_n_Z, p, QQ.ptr, ZZ.ptr)
    libSingular.n_Delete(p, QQ.ptr)
    return ZZ(pp)
@@ -59,8 +58,7 @@ end
 > Return the denominator of the given fraction.
 """
 function denominator(n::n_Q)
-   nn = libSingular.number_ref(n.ptr);
-   p = libSingular.n_GetDenom(nn, parent(n).ptr)
+   p = libSingular.n_GetDenom(n.ptr, parent(n).ptr)
    pp = libSingular.nApplyMapFunc(n_Q_2_n_Z, p, QQ.ptr, ZZ.ptr)
    libSingular.n_Delete(p, QQ.ptr)
    return ZZ(pp)
@@ -99,9 +97,7 @@ end
 function show(io::IO, n::n_Q)
     libSingular.StringSetS("")
 
-    nn = libSingular.number_ref(n.ptr)	
-    libSingular.n_Write(nn, parent(n).ptr, false)
-    n.ptr = nn
+    libSingular.n_Write(n.ptr, parent(n).ptr, false)
  
     m = libSingular.StringEndS()
  

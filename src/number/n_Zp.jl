@@ -74,8 +74,7 @@ end
 
 function show(io::IO, n::n_Zp)
    libSingular.StringSetS("")
-   nn = libSingular.number_ref(n.ptr)	
-   libSingular.n_Write(nn, parent(n).ptr, false)
+   libSingular.n_Write(n.ptr, parent(n).ptr, false)
    m = libSingular.StringEndS()
    print(io, m)
 end
