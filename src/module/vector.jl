@@ -165,7 +165,7 @@ end
 
 function Array(v::svector{spoly{T}}) where T <: Nemo.RingElem
    n = v.rank
-   aa_val = Array{Ptr{Nothing},1}(n)
+   aa_val = Array{Ptr{Nothing},1}(undef, n)
    R = base_ring(v)
    libSingular.p_Vector2Array(v.ptr, reinterpret(Ptr{Nothing},pointer(aa_val)), n, R.ptr)
    aa = [libSingular.internal_void_to_poly_helper(p) for p in aa_val]

@@ -50,7 +50,7 @@ end
 """
 function symbols(R::PolyRing)
    io = IOBuffer();
-   symbols = Array{Symbol,1}(0)
+   symbols = Array{Symbol,1}(undef, 0)
    for g in gens(R)
       show(io,g)
       push!(symbols, Symbol(String(take!(io))))
@@ -229,7 +229,7 @@ end
 function lead_exponent(p::spoly)
    R = parent(p)
    n = ngens(R)
-   A = Array{Int}(n)
+   A = Array{Int}(undef, n)
    libSingular.p_GetExpVL(p.ptr, A, R.ptr)
    return A
 end
