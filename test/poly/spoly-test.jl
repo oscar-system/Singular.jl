@@ -294,7 +294,7 @@ function test_spoly()
    test_spoly_gcd_lcm()
    test_spoly_extended_gcd()
    test_spoly_Polynomials()
-   test_convert_between_MPoly_and_SingularPoly()
+   # test_convert_between_MPoly_and_SingularPoly()
 
    println("")
 end
