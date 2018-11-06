@@ -6,7 +6,7 @@ using Nemo
 
 import Base: abs, checkbounds, deepcopy, deepcopy_internal,
              denominator, div, divrem, exponent,
-             gcd, gcdx, getindex, indices, inv, isequal, isless, lcm, length,
+             gcd, gcdx, getindex, inv, isequal, isless, lcm, length,
              mod, numerator, one, reduce, rem, setindex!, show,
              zero, +, -, *, ==, ^, &, |, <<, >>, ~, <=, >=, <, >, //,
              /, !=
