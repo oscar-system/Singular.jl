@@ -211,18 +211,13 @@ function show(io::IO, sp::coeffs_expos)
   println(io, "Coefficients and exponent iterator for $(sp.a)")
 end
 
-function Base.start(sp::coeffs_expos)
-  return sp.a.ptr
-end
-
-function Base.next(sp::coeffs_expos, p)
+function Base.iterate(sp::coeffs_expos, p = sp.a.ptr)
+  if p.cpp_object == C_NULL
+    return nothing
+  end
   libSingular.p_GetExpVL(p, sp.E, sp.Rx.ptr)
   sp.c = sp.R(libSingular.n_Copy(libSingular.pGetCoeff(p), sp.R.ptr))
-  return (sp.c, sp.E), libSingular.pNext(p) 
-end
-
-function Base.done(sp::coeffs_expos, p)
-  return p.cpp_object == C_NULL
+  return ((sp.c, sp.E), libSingular.pNext(p))
 end
 
 @doc Markdown.doc"""
