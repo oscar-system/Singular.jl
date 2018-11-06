@@ -6,7 +6,7 @@ const oldwdir = pwd()
 const pkgdir = realpath(joinpath(@__DIR__, ".."))
 const nemodir = realpath(joinpath(dirname(pathof(Nemo)), ".."))
 
-const debug_build = true # N.B: debug builds are up to 50 times slower at runtime!
+const debug_build = false # N.B: debug builds are up to 50 times slower at runtime!
 
 wdir = "$pkgdir/deps"
 vdir = "$pkgdir/local"
