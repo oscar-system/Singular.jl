@@ -35,9 +35,6 @@ mutable struct PolyRing{T <: Nemo.RingElem} <: Ring
          v = [pointer(Base.Vector{UInt8}(string(str)*"\0")) for str in s]
          r = libSingular.nCopyCoeff(R.ptr)
          
-         ord  = unsafe_wrap(Array, 
-      	   Ptr{libSingular.rRingOrder_t}(libSingular.omAlloc0(Csize_t(3*sizeof(libSingular.rRingOrder_t)))), 
-              (Cint(3),); own=false)
          blk0 = unsafe_wrap(Array, Ptr{Cint}(libSingular.omAlloc0(Csize_t(3*sizeof(Cint)))), (Cint(3),); own=false)
          blk1 = unsafe_wrap(Array, Ptr{Cint}(libSingular.omAlloc0(Csize_t(3*sizeof(Cint)))), (Cint(3),); own=false)
          if (ordering == ringorder_c || ordering == ringorder_C)
@@ -51,6 +48,7 @@ mutable struct PolyRing{T <: Nemo.RingElem} <: Ring
             blk0[2] = 0
             blk1[2] = 0
          end
+         ord = Array{libSingular.rRingOrder_t, 1}(undef, 3)
          ord[1] = ordering
          ord[2] = ordering2
          ord[3] = ringorder_no
