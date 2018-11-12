@@ -52,8 +52,7 @@ end
 function show(io::IO, a::n_unknown)
    libSingular.StringSetS("")
 
-   nn = libSingular.number_ref(a.ptr)	
-   libSingular.n_Write(nn, parent(a).ptr, false)
+   libSingular.n_Write(a.ptr, parent(a).ptr, false)
 
    m = libSingular.StringEndS()
 
