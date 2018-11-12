@@ -61,6 +61,6 @@ function syBetti(res::resolvente, length::Cint, R::ring)
          delete($iv);
          return &betti[0];
       """
-   unsafe_wrap(Array, betti, (nrows, ncols), true)
+   unsafe_wrap(Array, betti, (nrows, ncols); own=true)
 end
  =#
