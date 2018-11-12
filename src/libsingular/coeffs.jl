@@ -93,7 +93,7 @@ function number{T <: RingElem}(j::T, cache::Bool=true)
     if cache
        iptr = reinterpret(UInt, ptr) >> 24
        if !haskey(nemoNumberID, iptr)
-          nemoNumberID[iptr] = live_cache(0, Array{Nemo.RingElem}(64))
+          nemoNumberID[iptr] = live_cache(0, Array{Nemo.RingElem}(undef, 64))
        end
        val = nemoNumberID[iptr]
        val.num += 1
