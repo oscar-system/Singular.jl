@@ -210,13 +210,11 @@ function test_spoly_gcd_lcm()
    b = 2x + 4
    c = 2x^2 + 1
 
-  @test gcd(a*c, b*c) == c
+   @test gcd(a*c, b*c) == c
 
- # segfault in p_Divide
-   # @test lcm(a, b) == a*b
+   @test lcm(a, b) == a*b
 
-   # seems to fail
-   # @test primpart(2*a) == a
+   @test primpart(2*a) == a
 
    @test content(2*a) == 2
 
