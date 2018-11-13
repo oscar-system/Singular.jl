@@ -43,12 +43,12 @@ function test_spoly_constructors()
 
    @test isa(h, spoly)
 
-   T, (z, ) = PolynomialRing(Nemo.ZZ, ["z", ])
+#=    T, (z, ) = PolynomialRing(Nemo.ZZ, ["z", ])
 
    k = T(123)
 
    @test isa(k, spoly)
-
+ =#
    S = @PolynomialRing(ZZ, "x", 50)
 
    @test isa(x17, spoly)
@@ -57,7 +57,7 @@ function test_spoly_constructors()
 
    @test isa(y7, spoly)
 
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (x, y) = PolynomialRing(QQ, ["x", "y"])    
 
    @test isgen(x)
    @test isgen(y)
@@ -97,13 +97,12 @@ function test_spoly_manipulation()
    @test isgen(x)
    @test !isgen(R(1)) && !isgen(x + 1)
    @test isconstant(R(0)) && isconstant(R(1))
-   @test !isconstant(x) && !isconstant(x + 1)
-
+   @test !isconstant(x) && !isconstant(x + 1)   
    @test length(x^2 + 2x + 1) == 3
    @test degree(x^2 + 2x + 1) == 2
 
    @test exponent(x^5 + 3x + 2, 2) == [5]
-
+   
    A = [0]
 
    exponent!(A, x^5 + 3x + 2, 2)
@@ -117,17 +116,18 @@ function test_spoly_manipulation()
    @test characteristic(R) == 0
 
    @test ngens(R) == 1
-
    pol = x^5 + 3x + 2
    c_iter = coeffs_expos(pol)
    
    i = length(pol) - 1
-   for (c, ex) in c_iter
-      @test coeff(pol, i) == c
-      @test exponent(pol, i) == ex
-      i -= 1
-   end
 
+   for (c, ex) in c_iter
+      @test coeff(pol, i) == c      
+      @test exponent(pol, i) == ex 
+      i -= 1
+    end
+   
+   
    R, (x, ) = PolynomialRing(ResidueRing(ZZ, 6), ["x", ])
 
    @test characteristic(R) == 6
@@ -206,18 +206,15 @@ function test_spoly_gcd_lcm()
    print("spoly.gcd_lcm...")
 
    R, (x, ) = PolynomialRing(ZZ, ["x", ])
-
    a = x^2 + 3x + 1
    b = 2x + 4
    c = 2x^2 + 1
 
    @test gcd(a*c, b*c) == c
 
-   # segfault in p_Divide
-   # @test lcm(a, b) == a*b
+   @test lcm(a, b) == a*b
 
-   # seems to fail
-   # @test primpart(2*a) == a
+   @test primpart(2*a) == a
 
    @test content(2*a) == 2
 
@@ -241,7 +238,6 @@ end
 
 function test_spoly_Polynomials()
    print("spoly.Polynomials...")
-
    R, (x, ) = PolynomialRing(ZZ, ["x", ])
 
    S, y = Nemo.PolynomialRing(R, "y")
@@ -296,7 +292,7 @@ function test_spoly()
    test_spoly_gcd_lcm()
    test_spoly_extended_gcd()
    test_spoly_Polynomials()
-   test_convert_between_MPoly_and_SingularPoly()
+   # test_convert_between_MPoly_and_SingularPoly()
 
    println("")
 end

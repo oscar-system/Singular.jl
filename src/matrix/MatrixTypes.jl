@@ -6,7 +6,7 @@
 
 const MatrixSpaceID = Dict{Tuple{Ring, Int, Int}, Set}()
 
-type MatrixSpace{T <: Nemo.RingElem} <: Set
+mutable struct MatrixSpace{T <: Nemo.RingElem} <: Set
    base_ring::PolyRing
    nrows::Int
    ncols::Int
@@ -20,8 +20,8 @@ type MatrixSpace{T <: Nemo.RingElem} <: Set
    end
 end
 
-type smatrix{T <: Nemo.RingElem} <: Nemo.SetElem
-   ptr::libSingular.matrix
+mutable struct smatrix{T <: Nemo.RingElem} <: Nemo.SetElem
+   ptr::libSingular.matrix_ref
    base_ring::PolyRing
 
    # really takes a Singular module, which has type ideal
@@ -29,13 +29,13 @@ type smatrix{T <: Nemo.RingElem} <: Nemo.SetElem
       ptr = libSingular.id_Copy(m, R.ptr)
       ptr = libSingular.id_Module2Matrix(ptr, R.ptr)
       z = new(ptr, R)
-      finalizer(z, _smatrix_clear_fn)
+      finalizer(_smatrix_clear_fn, z)
       return z
    end
 
-   function smatrix{T}(R::PolyRing, ptr::libSingular.matrix) where {T}
+   function smatrix{T}(R::PolyRing, ptr::libSingular.matrix_ref) where {T}
       z = new(ptr, R)
-      finalizer(z, _smatrix_clear_fn)
+      finalizer(_smatrix_clear_fn, z)
       return z
    end
 end

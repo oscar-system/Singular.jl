@@ -16,7 +16,7 @@ base_ring(a::n_Q) = ZZ
 
 base_ring(a::Rationals) = ZZ
 
-function deepcopy_internal(a::n_Q, dict::ObjectIdDict)
+function deepcopy_internal(a::n_Q, dict::IdDict)
    return parent(a)(libSingular.n_Copy(a.ptr, parent(a).ptr))
 end
 
@@ -42,31 +42,29 @@ end
 
 isunit(n::n_Q) = !iszero(n)
 
-doc"""
+@doc Markdown.doc"""
     numerator(n::n_Q)
 > Return the numerator of the given fraction.
 """
 function numerator(n::n_Q)
-   nn = libSingular.number_ref(n.ptr);
-   p = libSingular.n_GetNumerator(nn, parent(n).ptr)
+   p = libSingular.n_GetNumerator(n.ptr, parent(n).ptr)
    pp = libSingular.nApplyMapFunc(n_Q_2_n_Z, p, QQ.ptr, ZZ.ptr)
    libSingular.n_Delete(p, QQ.ptr)
    return ZZ(pp)
 end
 
-doc"""
+@doc Markdown.doc"""
     denominator(n::n_Q)
 > Return the denominator of the given fraction.
 """
 function denominator(n::n_Q)
-   nn = libSingular.number_ref(n.ptr);
-   p = libSingular.n_GetDenom(nn, parent(n).ptr)
+   p = libSingular.n_GetDenom(n.ptr, parent(n).ptr)
    pp = libSingular.nApplyMapFunc(n_Q_2_n_Z, p, QQ.ptr, ZZ.ptr)
    libSingular.n_Delete(p, QQ.ptr)
    return ZZ(pp)
 end
 
-doc"""
+@doc Markdown.doc"""
     abs(n::n_Q)
 > Return the absolute value of the given fraction.
 """
@@ -97,17 +95,13 @@ function show(io::IO, c::Rationals)
 end
 
 function show(io::IO, n::n_Q)
-   libSingular.StringSetS("")
+    libSingular.StringSetS("")
 
-   nn = libSingular.number_ref(n.ptr)	
-   libSingular.n_Write(nn, parent(n).ptr, false)
-   n.ptr = nn[]
-
-   m = libSingular.StringEndS()
-   s = unsafe_string(m) 
-   libSingular.omFree(Ptr{Void}(m))
-
-   print(io, s)
+    libSingular.n_Write(n.ptr, parent(n).ptr, false)
+ 
+    m = libSingular.StringEndS()
+ 
+    print(io,m)
 end
 
 needs_parentheses(x::n_Q) = false
@@ -272,7 +266,7 @@ end
 #
 ###############################################################################
 
-doc"""
+@doc Markdown.doc"""
     reconstruct(x::n_Z, y::n_Z)
 > Given $x$ modulo $y$, find $r/s$ such that $x \equiv r/s \pmod{y}$ for values
 > $r$ and $s$ satisfying the bound $y > 2(|r| + 1)(s + 1)$.
@@ -293,10 +287,8 @@ reconstruct(x::Integer, y::n_Z) = reconstruct(ZZ(x), y)
 ###############################################################################
 
 function addeq!(x::n_Q, y::n_Q)
-    xx = libSingular.number_ref(x.ptr)
-    libSingular.n_InpAdd(xx, y.ptr, parent(x).ptr)
-    x.ptr = xx[]
-    return x
+   x.ptr = libSingular.n_InpAdd(x.ptr, y.ptr, parent(x).ptr)
+   return x
 end
 
 function mul!(x::n_Q, y::n_Q, z::n_Q)
@@ -326,7 +318,7 @@ end
 #
 ###############################################################################
 
-promote_rule{T <: Integer}(C::Type{n_Q}, ::Type{T}) = n_Q
+promote_rule(C::Type{n_Q}, ::Type{T}) where {T <: Integer} = n_Q
 
 promote_rule(C::Type{n_Q}, ::Type{Nemo.fmpz}) = n_Q
 
@@ -352,8 +344,8 @@ promote_rule(C::Type{n_Q}, ::Type{n_Q}) = n_Z
 
 function (R::Rationals)(x::Nemo.fmpz)
    a = BigInt()
-   ccall((:flint_mpz_init_set_readonly, :libflint), Void,
-         (Ptr{BigInt}, Ptr{fmpz}), &a, &x)
+   ccall((:flint_mpz_init_set_readonly, :libflint), Nothing,
+         (Ptr{BigInt}, Ptr{fmpz}), Ref(a), Ref(x))
    return R(libSingular.n_InitMPZ(a, R.ptr))   
 end
 

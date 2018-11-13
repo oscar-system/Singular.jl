@@ -16,7 +16,7 @@ base_ring(a::n_GF) = Union{}
 
 base_ring(a::N_GField) = Union{}
 
-doc"""
+@doc Markdown.doc"""
    characteristic(R::N_GField)
 > Return the characteristic of the field.
 """
@@ -24,7 +24,7 @@ function characteristic(R::N_GField)
    return ZZ(libSingular.n_GetChar(R.ptr))
 end
 
-doc"""
+@doc Markdown.doc"""
     degree(R::N_GField)
 > Return the degree of the field as an extension of $\mathbb{F}_p$.
 """
@@ -32,7 +32,7 @@ function degree(R::N_GField)
    return R.deg
 end
 
-function deepcopy_internal(a::n_GF, dict::ObjectIdDict)
+function deepcopy_internal(a::n_GF, dict::IdDict)
    return parent(a)(libSingular.n_Copy(a.ptr, parent(a).ptr))
 end
 
@@ -56,7 +56,7 @@ function iszero(n::n_GF)
    return libSingular.n_IsZero(n.ptr, c.ptr)
 end
 
-doc"""
+@doc Markdown.doc"""
    isunit(n::n_GF)
 > Return `true` if $n$ is a unit in the field, i.e. nonzero.
 """
@@ -83,15 +83,11 @@ end
 function show(io::IO, n::n_GF)
    libSingular.StringSetS("")
 
-   nn = libSingular.number_ref(n.ptr)	
-   libSingular.n_Write(nn, parent(n).ptr, false)
-   n.ptr = nn[]
+   libSingular.n_Write(n.ptr, parent(n).ptr, false)
 
    m = libSingular.StringEndS()
-   s = unsafe_string(m) 
-   libSingular.omFree(Ptr{Void}(m))
-
-   print(io, s)
+   
+   print(io, m)
 end
 
 needs_parentheses(x::n_GF) = false
@@ -253,10 +249,8 @@ end
 ###############################################################################
 
 function addeq!(x::n_GF, y::n_GF)
-    xx = libSingular.number_ref(x.ptr)
-    libSingular.n_InpAdd(xx, y.ptr, parent(x).ptr)
-    x.ptr = xx[]
-    return x
+   x.ptr = libSingular.n_InpAdd(x.ptr, y.ptr, parent(x).ptr)
+   return x
 end
 
 function mul!(x::n_GF, y::n_GF, z::n_GF)
@@ -286,7 +280,7 @@ end
 #
 ###############################################################################
 
-promote_rule{T <: Integer}(C::Type{n_GF}, ::Type{T}) = n_GF
+promote_rule(C::Type{n_GF}, ::Type{T}) where T <: Integer = n_GF
 
 promote_rule(C::Type{n_GF}, ::Type{n_Z}) = n_GF
 
@@ -332,8 +326,8 @@ end
 
 function (R::N_GField)(x::Nemo.fmpz)
    a = BigInt()
-   ccall((:flint_mpz_init_set_readonly, :libflint), Void,
-         (Ptr{BigInt}, Ptr{fmpz}), &a, &x)
+   ccall((:flint_mpz_init_set_readonly, :libflint), Nothing,
+         (Ptr{BigInt}, Ptr{fmpz}), Ref(a), Ref(x))
    z = R(libSingular.n_InitMPZ(a, R.ptr))
       z.parent = R
    return z
@@ -345,7 +339,7 @@ end
 #
 ###############################################################################
 
-doc"""
+@doc Markdown.doc"""
     FiniteField(p::Int, n::Int, S::String; cached=true)
 > Returns a tuple `K, a` consisting of a finite field `K` of characteristic $p$
 > and degree $n$, and its generator `a`. The string used to print the

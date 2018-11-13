@@ -4,17 +4,9 @@
 #
 ###############################################################################
 
-const coeffs = @pcpp_str "n_Procs_s"
+const number_ref = numberRef
 
-const n_coeffType = Cxx.CppEnum{:n_coeffType}
-
-const number = @pcpp_str "snumber"
-
-const number_ref = Ref{number}
-
-const __mpz_struct = @pcpp_str "__mpz_struct"
-
-const mpz_t = @pcpp_str "mpz_t"
+const mpz_t = Ptr{__mpz_struct}
 
 ###############################################################################
 #
@@ -22,15 +14,9 @@ const mpz_t = @pcpp_str "mpz_t"
 #
 ###############################################################################
 
-const ring = @pcpp_str "ip_sring"
+const poly_ref = polyRef
 
-const poly = @pcpp_str "spolyrec"
-
-const poly_ref = Ref{poly}
-
-const vector = @pcpp_str "spolyrec"
-
-const rRingOrder_t = Cxx.CppEnum{:rRingOrder_t, Cuint}
+const vector = poly
 
 ###############################################################################
 #
@@ -38,9 +24,7 @@ const rRingOrder_t = Cxx.CppEnum{:rRingOrder_t, Cuint}
 #
 ###############################################################################
 
-const ideal = @pcpp_str "sip_sideal"
-
-const ideal_ref = Ref{ideal}
+const ideal_ref = idealRef
 
 ###############################################################################
 #
@@ -48,7 +32,7 @@ const ideal_ref = Ref{ideal}
 #
 ###############################################################################
 
-const matrix = @pcpp_str "ip_smatrix"
+const matrix_ref = ip_smatrixRef
 
 ###############################################################################
 #
@@ -56,12 +40,10 @@ const matrix = @pcpp_str "ip_smatrix"
 #
 ###############################################################################
 
-const resolvente = Cxx.CppPtr{ideal, (false, false, false)}
+const resolvente = Ptr{ideal}
 
 ###############################################################################
 #
 #   Syzygies
 #
 ###############################################################################
-
-const syStrategy = @pcpp_str "ssyStrategy" 

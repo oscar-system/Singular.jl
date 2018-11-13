@@ -1,10 +1,11 @@
 module libSingular
 
-using Cxx
+using CxxWrap
+@wrapmodule(realpath(joinpath(@__DIR__, "..", "local", "lib", "libsingularwrap.so")))
 
-using Nemo
-
-import Base:setindex!, getindex
+function __init__()
+   @initcxx
+end
 
 include("libsingular/LibSingularTypes.jl")
 

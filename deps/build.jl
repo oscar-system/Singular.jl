@@ -1,6 +1,10 @@
+import CxxWrap
+import Libdl
+import Nemo
+
 const oldwdir = pwd()
-const pkgdir = Pkg.dir("Singular") 
-const nemodir = Pkg.dir("Nemo")
+const pkgdir = realpath(joinpath(@__DIR__, ".."))
+const nemodir = realpath(joinpath(dirname(pathof(Nemo)), ".."))
 
 const debug_build = false # N.B: debug builds are up to 50 times slower at runtime!
 
@@ -90,9 +94,9 @@ end
 cd(joinpath(wdir, "Singular_build"))
 withenv("CPP_FLAGS"=>"-I$vdir/include", "LD_LIBRARY_PATH"=>"$vdir/lib:$nemodir/lib") do
    if !debug_build
-      run(`$srcs/configure --prefix=$vdir --disable-static --disable-p-procs-static --disable-gfanlib --enable-p-procs-dynamic --enable-shared --with-gmp=$nemovdir --with-flint=$nemovdir --with-ntl=$vdir --without-python --with-readline=no`)
+      run(`$srcs/configure --prefix=$vdir --disable-static --enable-p-procs-static --disable-p-procs-dynamic --disable-gfanlib --enable-shared --with-gmp=$nemovdir --with-flint=$nemovdir --with-ntl=$vdir --without-python --with-readline=no`)
    else
-      run(`$srcs/configure --prefix=$vdir --disable-static --disable-p-procs-static --disable-gfanlib --enable-p-procs-dynamic --enable-shared --with-gmp=$nemovdir --with-flint=$nemovdir --with-ntl=$vdir --without-python --with-readline=no --with-debug --enable-debug --disable-optimizationflags`)
+      run(`$srcs/configure --prefix=$vdir --disable-static --enable-p-procs-static --disable-p-procs-dynamic --disable-gfanlib --enable-shared --with-gmp=$nemovdir --with-flint=$nemovdir --with-ntl=$vdir --without-python --with-readline=no --with-debug --enable-debug --disable-optimizationflags`)
    end
    withenv("LDFLAGS"=>LDFLAGS) do
       run(`make -j4`)
@@ -105,3 +109,19 @@ cd(wdir)
 push!(Libdl.DL_LOAD_PATH, "$pkgdir/local/lib")
 
 cd(oldwdir)
+
+jlcxx_cmake_dir = realpath(joinpath(dirname(pathof(CxxWrap)), "..", "deps", "usr", "lib", "cmake", "JlCxx"))
+
+julia_include = realpath(joinpath(Sys.BINDIR, "..", "include", "julia"))
+julia_lib = realpath(joinpath(Sys.BINDIR, "..", "lib"))
+julia_exec = joinpath(Sys.BINDIR, "julia")
+
+cmake_build_path = joinpath(@__DIR__, "src")
+
+cd(cmake_build_path)
+
+run(`cmake -DJulia_EXECUTABLE=$julia_exec -DJlCxx_DIR=$jlcxx_cmake_dir -DJuliaIncludeDir=$julia_include -DJULIA_LIB_DIR=$julia_lib -Dnemo_includes=$nemovdir/include -Dsingular_includes=$vdir/include -Dsingular_libdir=$vdir/lib -DCMAKE_INSTALL_LIBDIR=$vdir/lib .`)
+
+run(`make`)
+run(`make install`)
+

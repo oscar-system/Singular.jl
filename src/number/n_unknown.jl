@@ -24,7 +24,7 @@ function canonical_unit(a::n_unknown)
    return R(libSingular.number(canonical_unit(n)))
 end
 
-function deepcopy_internal(a::n_unknown, dict::ObjectIdDict)
+function deepcopy_internal(a::n_unknown, dict::IdDict)
    R = parent(a)
    n = libSingular.julia(a.ptr)
    return R(libSingular.number(deepcopy(n)))
@@ -52,14 +52,11 @@ end
 function show(io::IO, a::n_unknown)
    libSingular.StringSetS("")
 
-   nn = libSingular.number_ref(a.ptr)	
-   libSingular.n_Write(nn, parent(a).ptr, false)
+   libSingular.n_Write(a.ptr, parent(a).ptr, false)
 
    m = libSingular.StringEndS()
-   s = unsafe_string(m) 
-   libSingular.omFree(Ptr{Void}(m))
 
-   print(io, s)
+   print(io, m)
 end
 
 ###############################################################################

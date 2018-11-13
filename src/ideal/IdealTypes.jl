@@ -6,7 +6,7 @@
 
 const IdealSetID = Dict{Ring, Set}()
 
-type IdealSet{T <: Nemo.RingElem} <: Set
+mutable struct IdealSet{T <: Nemo.RingElem} <: Set
    base_ring::PolyRing
 
    function IdealSet{T}(R::PolyRing) where T
@@ -18,20 +18,20 @@ type IdealSet{T <: Nemo.RingElem} <: Set
    end
 end
 
-type sideal{T <: Nemo.RingElem} <: Module{T}
+mutable struct sideal{T <: Nemo.RingElem} <: Module{T}
    ptr::libSingular.ideal
    base_ring::PolyRing
    isGB::Bool
 
    function sideal{T}(R::PolyRing, ids::spoly...) where T
       n = length(ids)
-      id = libSingular.idInit(Cint(n))
+      id = libSingular.idInit(Cint(n),1)
       z = new(id, R, false)
       R.refcount += 1
-      finalizer(z, _sideal_clear_fn)
+      finalizer(_sideal_clear_fn, z)
       for i = 1:n
          p = libSingular.p_Copy(ids[i].ptr, R.ptr)
-         libSingular.setindex!(id, p, Cint(i - 1))
+         libSingular.setindex_internal(id, p, Cint(i - 1))
       end
       return z
    end
@@ -39,7 +39,7 @@ type sideal{T <: Nemo.RingElem} <: Module{T}
    function sideal{T}(R::PolyRing, id::libSingular.ideal) where T
       z = new(id, R, false)
       R.refcount += 1
-      finalizer(z, _sideal_clear_fn)
+      finalizer(_sideal_clear_fn, z)
       return z
    end
 end

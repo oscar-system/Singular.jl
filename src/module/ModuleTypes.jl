@@ -6,7 +6,7 @@
 
 const FreeModID = Dict{Tuple{Ring, Int}, Module}()
 
-type FreeMod{T <: Nemo.RingElem} <: Module{T}
+mutable struct FreeMod{T <: Nemo.RingElem} <: Module{T}
    base_ring::PolyRing
    rank::Int
 
@@ -19,7 +19,7 @@ type FreeMod{T <: Nemo.RingElem} <: Module{T}
    end
 end
 
-type svector{T <: Nemo.RingElem} <: Nemo.ModuleElem{T}
+mutable struct svector{T <: Nemo.RingElem} <: Nemo.ModuleElem{T}
    ptr::libSingular.poly # not really a polynomial
    rank::Int
    base_ring::PolyRing
@@ -27,7 +27,7 @@ type svector{T <: Nemo.RingElem} <: Nemo.ModuleElem{T}
    function svector{T}(R::PolyRing, r::Int, p::libSingular.poly) where T
       z = new(p, r, R)
       R.refcount += 1
-      finalizer(z, _svector_clear_fn)
+      finalizer(_svector_clear_fn, z)
       return z
    end
 end
@@ -46,7 +46,7 @@ end
 
 const ModuleClassID = Dict{Ring, Set}()
 
-type ModuleClass{T <: Nemo.RingElem} <: Set
+mutable struct ModuleClass{T <: Nemo.RingElem} <: Set
    base_ring::PolyRing
 
    function ModuleClass{T}(R::PolyRing) where T
@@ -58,7 +58,7 @@ type ModuleClass{T <: Nemo.RingElem} <: Set
    end
 end
 
-type smodule{T <: Nemo.RingElem} <: Module{T}
+mutable struct smodule{T <: Nemo.RingElem} <: Module{T}
    ptr::libSingular.ideal # ideal and module types are the same in Singular
    base_ring::PolyRing
    isGB::Bool
@@ -72,10 +72,10 @@ type smodule{T <: Nemo.RingElem} <: Module{T}
       m = libSingular.idInit(Cint(n), Cint(r))
       z = new(m, R, false)
       R.refcount += 1
-      finalizer(z, _smodule_clear_fn)
+      finalizer(_smodule_clear_fn, z)
       for i = 1:n
          v = libSingular.p_Copy(vecs[i].ptr, R.ptr)
-         libSingular.setindex!(m, v, Cint(i - 1))
+         libSingular.setindex_internal(m, v, Cint(i - 1))
       end
       return z
    end
@@ -83,7 +83,7 @@ type smodule{T <: Nemo.RingElem} <: Module{T}
    function smodule{T}(R::PolyRing, m::libSingular.ideal) where T
       z = new(m, R, false)
       R.refcount += 1
-      finalizer(z, _smodule_clear_fn)
+      finalizer(_smodule_clear_fn, z)
       return z
    end
 end

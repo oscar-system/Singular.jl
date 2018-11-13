@@ -16,7 +16,7 @@ base_ring(a::n_Zp) = Union{}
 
 base_ring(a::N_ZpField) = Union{}
 
-doc"""
+@doc Markdown.doc"""
     characteristic(R::N_ZpField)
 > Return the characteristic of the field.
 """
@@ -24,7 +24,7 @@ function characteristic(R::N_ZpField)
    return ZZ(libSingular.n_GetChar(R.ptr))
 end
 
-function deepcopy_internal(a::n_Zp, dict::ObjectIdDict)
+function deepcopy_internal(a::n_Zp, dict::IdDict)
    return parent(a)(libSingular.n_Copy(a.ptr, parent(a).ptr))
 end
 
@@ -48,7 +48,7 @@ function iszero(n::n_Zp)
    return libSingular.n_IsZero(n.ptr, c.ptr)
 end
 
-doc"""
+@doc Markdown.doc"""
     isunit(n::n_Zp)
 > Return `true` if $n$ is a unit in the field, i.e. nonzero.
 """
@@ -74,16 +74,9 @@ end
 
 function show(io::IO, n::n_Zp)
    libSingular.StringSetS("")
-
-   nn = libSingular.number_ref(n.ptr)	
-   libSingular.n_Write(nn, parent(n).ptr, false)
-   n.ptr = nn[]
-
+   libSingular.n_Write(n.ptr, parent(n).ptr, false)
    m = libSingular.StringEndS()
-   s = unsafe_string(m) 
-   libSingular.omFree(Ptr{Void}(m))
-
-   print(io, s)
+   print(io, m)
 end
 
 needs_parentheses(x::n_Zp) = false
@@ -246,10 +239,8 @@ end
 ###############################################################################
 
 function addeq!(x::n_Zp, y::n_Zp)
-    xx = libSingular.number_ref(x.ptr)
-    libSingular.n_InpAdd(xx, y.ptr, parent(x).ptr)
-    x.ptr = xx[]
-    return x
+   x.ptr = libSingular.n_InpAdd(x.ptr, y.ptr, parent(x).ptr)
+   return x
 end
 
 function mul!(x::n_Zp, y::n_Zp, z::n_Zp)
@@ -279,7 +270,7 @@ end
 #
 ###############################################################################
 
-promote_rule{T <: Integer}(C::Type{n_Zp}, ::Type{T}) = n_Zp
+promote_rule(C::Type{n_Zp}, ::Type{T}) where {T <: Integer} = n_Zp
 
 promote_rule(C::Type{n_Zp}, ::Type{n_Z}) = n_Zp
 
@@ -324,8 +315,8 @@ end
 
 function (R::N_ZpField)(x::Nemo.fmpz)
    a = BigInt()
-   ccall((:flint_mpz_init_set_readonly, :libflint), Void,
-         (Ptr{BigInt}, Ptr{fmpz}), &a, &x)
+   ccall((:flint_mpz_init_set_readonly, :libflint), Nothing,
+         (Ptr{BigInt}, Ptr{fmpz}), Ref(a), Ref(x))
    z = R(libSingular.n_InitMPZ(a, R.ptr))
       z.parent = R
    return z
@@ -347,5 +338,5 @@ function Fp(a::Int; cached=true)
 end
 
 function Base.Int(a::n_Zp)
-  return reinterpret(Int, a.ptr)
+  return reinterpret(Int, a.ptr.cpp_object)
 end

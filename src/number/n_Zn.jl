@@ -16,7 +16,7 @@ base_ring(a::n_Zn) = ZZ
 
 base_ring(a::N_ZnRing) = ZZ
 
-doc"""
+@doc Markdown.doc"""
     characteristic(R::N_ZnRing)
 > Return the characteristic $n$ of the ring.
 """
@@ -24,7 +24,7 @@ function characteristic(R::N_ZnRing)
    return ZZ(libSingular.n_GetChar(R.ptr))
 end
 
-function deepcopy_internal(a::n_Zn, dict::ObjectIdDict)
+function deepcopy_internal(a::n_Zn, dict::IdDict)
    return parent(a)(libSingular.n_Copy(a.ptr, parent(a).ptr))
 end
 
@@ -48,7 +48,7 @@ function iszero(n::n_Zn)
    return libSingular.n_IsZero(n.ptr, c.ptr)
 end
 
-doc"""
+@doc Markdown.doc"""
     isunit(n::n_Zn)
 > Return `true` if the given value is a unit in the integers modulo $n$.
 """
@@ -74,16 +74,9 @@ end
 
 function show(io::IO, n::n_Zn)
    libSingular.StringSetS("")
-
-   nn = libSingular.number_ref(n.ptr)	
-   libSingular.n_Write(nn, parent(n).ptr, false)
-   n.ptr = nn[]
-
+   libSingular.n_Write(n.ptr, parent(n).ptr, false)
    m = libSingular.StringEndS()
-   s = unsafe_string(m) 
-   libSingular.omFree(Ptr{Void}(m))
-
-   print(io, s)
+   print(io, m)
 end
 
 needs_parentheses(x::n_Zn) = false
@@ -249,10 +242,8 @@ end
 ###############################################################################
 
 function addeq!(x::n_Zn, y::n_Zn)
-    xx = libSingular.number_ref(x.ptr)
-    libSingular.n_InpAdd(xx, y.ptr, parent(x).ptr)
-    x.ptr = xx[]
-    return x
+   x.ptr = libSingular.n_InpAdd(x.ptr, y.ptr, parent(x).ptr)
+   return x
 end
 
 function mul!(x::n_Zn, y::n_Zn, z::n_Zn)
@@ -282,7 +273,7 @@ end
 #
 ###############################################################################
 
-promote_rule{T <: Integer}(C::Type{n_Zn}, ::Type{T}) = n_Zn
+promote_rule(C::Type{n_Zn}, ::Type{T}) where {T <: Integer} = n_Zn
 
 promote_rule(C::Type{n_Zn}, ::Type{n_Z}) = n_Zn
 
@@ -327,8 +318,8 @@ end
 
 function (R::N_ZnRing)(x::Nemo.fmpz)
    a = BigInt()
-   ccall((:flint_mpz_init_set_readonly, :libflint), Void,
-         (Ptr{BigInt}, Ptr{fmpz}), &a, &x)
+   ccall((:flint_mpz_init_set_readonly, :libflint), Nothing,
+         (Ptr{BigInt}, Ptr{fmpz}), Ref(a), Ref(x))
    z = R(libSingular.n_InitMPZ(a, R.ptr))
       z.parent = R
    return z

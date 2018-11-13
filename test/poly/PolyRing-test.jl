@@ -30,7 +30,7 @@ function test_PolyRing_degree_bound()
    println("PASS")
 end
 
-function test_PolyRing_ordering()
+ function test_PolyRing_ordering()
    print("PolyRing.ordering...")
 
    R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"])

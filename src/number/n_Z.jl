@@ -16,7 +16,7 @@ base_ring(a::n_Z) = Union{}
 
 base_ring(a::Integers) = Union{}
 
-function deepcopy_internal(a::n_Z, dict::ObjectIdDict)
+function deepcopy_internal(a::n_Z, dict::IdDict)
    return parent(a)(libSingular.n_Copy(a.ptr, parent(a).ptr))
 end
 
@@ -40,13 +40,13 @@ function iszero(n::n_Z)
    return libSingular.n_IsZero(n.ptr, c.ptr)
 end
 
-doc"""
+@doc Markdown.doc"""
     isunit(n::n_Z)
 > Return `true` if $n$ is $\pm 1$.
 """
 isunit(n::n_Z) = n == 1 || n == -1
 
-doc"""
+@doc Markdown.doc"""
     numerator(n::n_Z)
 > Return the numerator of $n$ (which is $n$ itself).
 """
@@ -56,7 +56,7 @@ function numerator(n::n_Z)
    return par(r)
 end
 
-doc"""
+@doc Markdown.doc"""
     denominator(n::n_Z)
 > Return the denominator of $n$ (which will always be $1$).
 """
@@ -64,7 +64,7 @@ function denominator(n::n_Z)
    return one(parent(n))
 end
 
-doc"""
+@doc Markdown.doc"""
     abs(n::n_Z)
 > Return the absolute value of $n$.
 """
@@ -97,15 +97,12 @@ end
 function show(io::IO, n::n_Z)
    libSingular.StringSetS("")
 
-   nn = libSingular.number_ref(n.ptr)	
-   libSingular.n_Write(nn, parent(n).ptr, false)
-   n.ptr = nn[]
+   libSingular.n_Write(n.ptr, parent(n).ptr, false)
 
    m = libSingular.StringEndS()
-   s = unsafe_string(m) 
-   libSingular.omFree(Ptr{Void}(m))
 
-   print(io, s)
+   print(io,m)
+
 end
 
 needs_parentheses(x::n_Z) = false
@@ -308,7 +305,11 @@ function crt(r1::n_Z, m1::n_Z, r2::n_Z, m2::n_Z, signed=false)
    par = parent(r1)
    r = [r1.ptr, r2.ptr]
    m = [m1.ptr, m2.ptr]
-   a = libSingular.n_ChineseRemainderSym(r, m, Cint(2), Cint(signed), par.ptr)
+   println("type par",typeof(par.ptr))
+   println("type r",typeof(r))
+   println("type m",typeof(m))
+   a = libSingular.n_ChineseRemainderSym(reinterpret(Ptr{Nothing},pointer(r)), reinterpret(Ptr{Nothing},pointer(m)), Cint(2), Cint(signed), par.ptr)
+   println("Got through")
    return par(a)
 end
 
@@ -319,9 +320,7 @@ end
 ###############################################################################
 
 function addeq!(x::n_Z, y::n_Z)
-    xx = libSingular.number_ref(x.ptr)
-    libSingular.n_InpAdd(xx, y.ptr, parent(x).ptr)
-    x.ptr = xx[]
+    x.ptr = libSingular.n_InpAdd(x.ptr, y.ptr, parent(x).ptr)
     return x
 end
 
@@ -352,7 +351,7 @@ end
 #
 ###############################################################################
 
-promote_rule{T <: Integer}(C::Type{n_Z}, ::Type{T}) = n_Z
+promote_rule(C::Type{n_Z}, ::Type{T}) where {T <: Integer} = n_Z
 
 ###############################################################################
 #
@@ -372,8 +371,8 @@ promote_rule{T <: Integer}(C::Type{n_Z}, ::Type{T}) = n_Z
 
 function (R::Integers)(x::Nemo.fmpz)
    a = BigInt()
-   ccall((:flint_mpz_init_set_readonly, :libflint), Void,
-         (Ptr{BigInt}, Ptr{fmpz}), &a, &x)
+   ccall((:flint_mpz_init_set_readonly, :libflint), Nothing,
+         (Ptr{BigInt}, Ptr{fmpz}), Ref(a), Ref(x))
    return R(libSingular.n_InitMPZ(a, R.ptr))   
 end
 

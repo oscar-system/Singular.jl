@@ -1,8 +1,6 @@
-function res_Delete(r::resolvente, length::Cint, R::ring)
-   icxx"""for (int i = 0; i < $length; i++)
-          id_Delete($r + i, $R);
-          omFreeSize((ADDRESS) $r, ($length + 1)*sizeof(ideal));
-       """
+#= function res_Delete(r::resolvente, length::Cint, R::ring)
+    r_ptr = reinterpret(Ptr{Nothing},r)
+    return res_Delete_helper(r_ptr,length,R)
 end
 
 function res_Copy(r::resolvente, length::Cint, R::ring)
@@ -63,5 +61,6 @@ function syBetti(res::resolvente, length::Cint, R::ring)
          delete($iv);
          return &betti[0];
       """
-   unsafe_wrap(Array, betti, (nrows, ncols), true)
+   unsafe_wrap(Array, betti, (nrows, ncols); own=true)
 end
+ =#

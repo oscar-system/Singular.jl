@@ -1,16 +1,19 @@
 module Singular
 
 import AbstractAlgebra
+using Markdown
 using Nemo
-
-using Cxx
 
 import Base: abs, checkbounds, deepcopy, deepcopy_internal,
              denominator, div, divrem, exponent,
-             gcd, gcdx, getindex, indices, inv, isequal, isless, lcm, length,
-             mod, normalize!, numerator, one, rank, reduce, rem, setindex!, show,
-             std, zero, +, -, *, ==, ^, &, |, $, <<, >>, ~, <=, >=, <, >, //,
+             gcd, gcdx, getindex, inv, isequal, isless, lcm, length,
+             mod, numerator, one, reduce, rem, setindex!, show,
+             zero, +, -, *, ==, ^, &, |, <<, >>, ~, <=, >=, <, >, //,
              /, !=
+
+import LinearAlgebra: normalize!, rank
+
+import Statistics: std
 
 import Nemo: add!, addeq!, base_ring, canonical_unit, check_parent, coeff,
              contains, content, crt, divexact,
@@ -34,56 +37,15 @@ export ZZ, QQ, FiniteField, CoefficientRing, Fp
 const pkgdir = realpath(joinpath(dirname(@__FILE__), ".."))
 const libsingular = joinpath(pkgdir, "local", "lib", "libSingular")
 
-prefix = joinpath(Pkg.dir("Singular"), "local");
-nemoinc = joinpath(Pkg.dir("Nemo"), "local");
-
-addHeaderDir(joinpath(prefix, "include"), kind = C_User)
-addHeaderDir(joinpath(prefix, "include", "singular"), kind = C_User)
-addHeaderDir(joinpath(prefix, "include", "resources"), kind = C_User)
-addHeaderDir(joinpath(nemoinc, "include"), kind = C_User)
+prefix = realpath(joinpath(@__DIR__, "..", "local"))
 
 function __init__()
-   Libdl.dlopen(libsingular, Libdl.RTLD_GLOBAL)
-
-   # include Singular header files
-
-   cxxinclude(joinpath("gmp.h"), isAngled = false)
-   cxxinclude(joinpath("omalloc", "omalloc.h"), isAngled = false)
-   cxxinclude(joinpath("misc", "intvec.h"), isAngled = false)
-   cxxinclude(joinpath("misc", "auxiliary.h"), isAngled = false)
-   cxxinclude(joinpath("reporter", "reporter.h"), isAngled = false)
-   cxxinclude(joinpath("feFopen.h"), isAngled = false)
-   cxxinclude(joinpath("coeffs", "coeffs.h"), isAngled = false)
-   cxxinclude(joinpath("polys", "clapsing.h"), isAngled = false)
-   cxxinclude(joinpath("coeffs", "bigintmat.h"), isAngled = false)
-   cxxinclude(joinpath("coeffs", "rmodulon.h"), isAngled = false)
-   cxxinclude(joinpath("polys", "monomials", "ring.h"), isAngled = false)
-   cxxinclude(joinpath("polys", "monomials", "p_polys.h"), isAngled = false)
-   cxxinclude(joinpath("polys", "simpleideals.h"), isAngled = false)
-   cxxinclude(joinpath("kernel", "GBEngine", "kstd1.h"), isAngled = false) 
-   cxxinclude(joinpath("kernel", "GBEngine", "syz.h"), isAngled = false)
-   cxxinclude(joinpath("kernel", "GBEngine", "tgb.h"), isAngled = false)
-   cxxinclude(joinpath("kernel", "ideals.h"), isAngled = false)
-   cxxinclude(joinpath("kernel", "polys.h"), isAngled = false)
-   cxxinclude(joinpath("Singular", "grammar.h"), isAngled = false) 
-   cxxinclude(joinpath("Singular", "libsingular.h"), isAngled = false)
-   cxxinclude(joinpath("Singular", "fevoices.h"), isAngled = false)
-   cxxinclude(joinpath("Singular", "ipshell.h"), isAngled = false)
-   cxxinclude(joinpath("Singular", "ipid.h"), isAngled = false)
-   cxxinclude(joinpath("Singular", "subexpr.h"), isAngled = false)
-   cxxinclude(joinpath("Singular", "lists.h"), isAngled = false)
-   cxxinclude(joinpath("Singular", "idrec.h"), isAngled = false)
-   cxxinclude(joinpath("Singular", "tok.h"), isAngled = false)
-   cxxinclude(joinpath("Singular", "links", "silink.h"), isAngled = false)
-   cxxinclude(joinpath("Singular", "fehelp.h"), isAngled = false)
 
    # Initialise Singular
-   
+
    binSingular = joinpath(prefix, "bin", "Singular")
    ENV["SINGULAR_EXECUTABLE"] = binSingular
-
-   @cxx siInit(pointer(binSingular))
-
+   libSingular.siInit(binSingular)
    # set up Singular parents (we cannot do this before Singular is initialised)
 
    ZZ.ptr = get_n_Z()
@@ -94,33 +56,33 @@ function __init__()
 
    # done in __init__ since headers must be included first
 
-   global const n_Z_2_n_Q = libSingular.n_SetMap(ZZ.ptr, QQ.ptr)
-   global const n_Q_2_n_Z = libSingular.n_SetMap(QQ.ptr, ZZ.ptr)
+  global n_Z_2_n_Q = libSingular.n_SetMap(ZZ.ptr, QQ.ptr)
+  global n_Q_2_n_Z = libSingular.n_SetMap(QQ.ptr, ZZ.ptr)
 
-   global const ringorder_no = @cxx ringorder_no
-   global const ringorder_lp = @cxx ringorder_lp
-   global const ringorder_rp = @cxx ringorder_rp
-   global const ringorder_dp = @cxx ringorder_dp
-   global const ringorder_Dp = @cxx ringorder_Dp
-   global const ringorder_ls = @cxx ringorder_ls
-   global const ringorder_rs = @cxx ringorder_rs
-   global const ringorder_ds = @cxx ringorder_ds
-   global const ringorder_Ds = @cxx ringorder_Ds
-   global const ringorder_c  = @cxx ringorder_c
-   global const ringorder_C  = @cxx ringorder_C
+  global ringorder_no = libSingular.ringorder_no
+  global ringorder_lp = libSingular.ringorder_lp
+  global ringorder_rp = libSingular.ringorder_rp
+  global ringorder_dp = libSingular.ringorder_dp
+  global ringorder_Dp = libSingular.ringorder_Dp
+  global ringorder_ls = libSingular.ringorder_ls
+  global ringorder_rs = libSingular.ringorder_rs
+  global ringorder_ds = libSingular.ringorder_ds
+  global ringorder_Ds = libSingular.ringorder_Ds
+  global ringorder_c  = libSingular.ringorder_c
+  global ringorder_C  = libSingular.ringorder_C
 
-   global const sym2ringorder = Dict{Symbol, Cxx.CppEnum}(
-   	  :lex => ringorder_lp,
-      :revlex => ringorder_rp, 
-   	  :neglex => ringorder_ls,
-      :negrevlex => ringorder_rs, 
+ global sym2ringorder = Dict{Symbol, libSingular.rRingOrder_t}(
+  	  :lex => ringorder_lp,
+     :revlex => ringorder_rp,
+  	  :neglex => ringorder_ls,
+     :negrevlex => ringorder_rs,
 	  :degrevlex => ringorder_dp,
-      :deglex => ringorder_Dp,
+     :deglex => ringorder_Dp,
 	  :negdegrevlex => ringorder_ds,
-      :negdeglex => ringorder_Ds,
+     :negdeglex => ringorder_Ds,
 	  :comp1max => ringorder_c,
-      :comp1min => ringorder_C
-   )
+     :comp1min => ringorder_C
+  )
 end
 
 ###############################################################################
@@ -153,7 +115,8 @@ include("Resolution.jl")
 #
 ###############################################################################
 
-QQ = Rationals()
 ZZ = Integers()
+
+QQ = Rationals()
 
 end # module

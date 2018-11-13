@@ -5,7 +5,8 @@
 ###############################################################################
 
 function get_n_Z()
-   d = libSingular.nInitChar(libSingular.n_Z, Ptr{Nothing}(0))
+   n_Z = @cxx n_Z
+   d = libSingular.nInitChar(n_Z, Ptr{Nothing}(0))
 end
 
 const IntegersID = Dict{Symbol, Ring}()
@@ -14,7 +15,7 @@ mutable struct Integers <: Ring
    ptr::libSingular.coeffs
    refcount::Int
 
-   function Integers()
+   function Integers() 
       if haskey(IntegersID, :ZZ)
          d = IntegersID[:ZZ]::Integers
       else
@@ -37,7 +38,7 @@ mutable struct n_Z <: Nemo.RingElem
     ptr::libSingular.number
 
     function n_Z()
-        c = ZZ.ptr
+    	const c = ZZ.ptr
         z = new(libSingular.n_Init(0, c))
         parent(z).refcount += 1
         finalizer(_n_Z_clear_fn, z)
@@ -45,7 +46,7 @@ mutable struct n_Z <: Nemo.RingElem
     end
 
     function n_Z(n::Int)
-        c = ZZ.ptr
+    	const c = ZZ.ptr
         z = new(libSingular.n_Init(n, c))
         parent(z).refcount += 1
         finalizer(_n_Z_clear_fn, z)
@@ -53,7 +54,7 @@ mutable struct n_Z <: Nemo.RingElem
     end
 
     function n_Z(n::libSingular.number)
-        z = new(n)
+    	z = new(n)
         parent(z).refcount += 1
         finalizer(_n_Z_clear_fn, z)
         return z
@@ -74,7 +75,8 @@ end
 ###############################################################################
 
 function get_n_Q()
-   d = libSingular.nInitChar(libSingular.n_Q, Ptr{Nothing}(0))
+   n_Q = @cxx n_Q
+   d = libSingular.nInitChar(n_Q, Ptr{Nothing}(0))
 end
 
 const RationalsID = Dict{Symbol, Field}()
@@ -83,7 +85,7 @@ mutable struct Rationals <: Field
    ptr::libSingular.coeffs
    refcount::Int
 
-   function Rationals()
+   function Rationals() 
       if haskey(RationalsID, :QQ)
          d = RationalsID[:QQ]::Rationals
       else
@@ -107,7 +109,7 @@ mutable struct n_Q <: Nemo.FieldElem
     ptr::libSingular.number
 
     function n_Q()
-        c = QQ.ptr
+    	const c = QQ.ptr
         z = new(libSingular.n_Init(0, c))
         parent(z).refcount += 1
         finalizer(_n_Q_clear_fn, z)
@@ -115,7 +117,7 @@ mutable struct n_Q <: Nemo.FieldElem
     end
 
     function n_Q(n::Int)
-        c = QQ.ptr
+    	const c = QQ.ptr
         z = new(libSingular.n_Init(n, c))
         parent(z).refcount += 1
         finalizer(_n_Q_clear_fn, z)
@@ -123,14 +125,14 @@ mutable struct n_Q <: Nemo.FieldElem
     end
 
     function n_Q(n::n_Z)
-        z = new(libSingular.nApplyMapFunc(n_Z_2_n_Q, n.ptr, ZZ.ptr, QQ.ptr))
+    	z = new(libSingular.nApplyMapFunc(n_Z_2_n_Q, n.ptr, ZZ.ptr, QQ.ptr))
         parent(z).refcount += 1
         finalizer(_n_Q_clear_fn, z)
         return z
     end
 
     function n_Q(n::libSingular.number)
-        z = new(n)
+    	z = new(n)
         parent(z).refcount += 1
         finalizer(_n_Q_clear_fn, z)
         return z
@@ -139,11 +141,10 @@ end
 
 function _n_Q_clear_fn(n::n_Q)
    R = parent(n)
-   libSingular.n_Delete_Q(n.ptr.cpp_object, parent(n).ptr)
+   libSingular.n_Delete(n.ptr, parent(n).ptr)
    _Rationals_clear_fn(R)
    nothing
 end
-
 
 ###############################################################################
 #
@@ -160,15 +161,16 @@ const N_ZnRingID = Dict{Int, Ring}()
 
 mutable struct N_ZnRing <: Ring
    ptr::libSingular.coeffs
-   from_n_Z::Ptr{Nothing}
-   to_n_Z::Ptr{Nothing}
+   from_n_Z::Cxx.CppFptr
+   to_n_Z::Cxx.CppFptr
    refcount::Int
 
    function N_ZnRing(n::Int) 
       if haskey(N_ZnRingID, n)
          d = N_ZnRingID[n]::N_ZnRing
       else
-         ptr = libSingular.nInitChar(libSingular.n_Zn, pointer_from_objref(ZnmInfo(BigInt(n), UInt(1))))
+         n_Zn = @cxx n_Zn
+         ptr = libSingular.nInitChar(n_Zn, pointer_from_objref(ZnmInfo(BigInt(n), UInt(1))))
          d = new(ptr, libSingular.n_SetMap(ZZ.ptr, ptr), 
               libSingular.n_SetMap(ptr, ZZ.ptr), 1)
          N_ZnRingID[n] = d
@@ -219,9 +221,6 @@ function _n_Zn_clear_fn(n::n_Zn)
    nothing
 end
 
-
-
-
 ###############################################################################
 #
 #   N_ZpField/n_Zp
@@ -232,15 +231,16 @@ const N_ZpFieldID = Dict{Int, Field}()
 
 mutable struct N_ZpField <: Field
    ptr::libSingular.coeffs
-   from_n_Z::Ptr{Nothing}
-   to_n_Z::Ptr{Nothing}
+   from_n_Z::Cxx.CppFptr
+   to_n_Z::Cxx.CppFptr
    refcount::Int
 
    function N_ZpField(n::Int) 
       if haskey(N_ZpFieldID, n)
          d = N_ZpFieldID[n]::N_ZpField
       else
-         ptr = libSingular.nInitChar(libSingular.n_Zp, Ptr{Nothing}(n))
+         n_Zp = @cxx n_Zp
+         ptr = libSingular.nInitChar(n_Zp, Ptr{Nothing}(n))
          d = new(ptr, libSingular.n_SetMap(ZZ.ptr, ptr), 
               libSingular.n_SetMap(ptr, ZZ.ptr), 1)
          N_ZpFieldID[n] = d
@@ -291,8 +291,6 @@ function _n_Zp_clear_fn(n::n_Zp)
    nothing
 end
 
-
-
 ###############################################################################
 #
 #   SingularFiniteField/n_GF
@@ -310,20 +308,18 @@ const N_GFieldID = Dict{Tuple{Int, Int, Symbol}, Field}()
 mutable struct N_GField <: Field
    ptr::libSingular.coeffs
    deg::Int
-   from_n_Z::Ptr{Nothing}
-   to_n_Z::Ptr{Nothing}
+   from_n_Z::Cxx.CppFptr
+   to_n_Z::Cxx.CppFptr
    refcount::Int
 
    function N_GField(p::Int, n::Int, S::Symbol) 
       if haskey(N_GFieldID, (p, n, S))
          d = N_GFieldID[p, n, S]::N_GField
       else
-         gfinfo = GFInfo(Cint(p), Cint(n), pointer(Base.Vector{UInt8}(string(S)*"\0")))
-         GC.@preserve gfinfo begin
-         ptr = libSingular.nInitChar(libSingular.n_GF, pointer_from_objref(gfinfo))
+         n_GF = @cxx n_GF
+         ptr = libSingular.nInitChar(n_GF, pointer_from_objref(GFInfo(Cint(p), Cint(n), pointer(Base.Vector{UInt8}(string(S)*"\0")))))
          d = new(ptr, n, libSingular.n_SetMap(ZZ.ptr, ptr), 
               libSingular.n_SetMap(ptr, ZZ.ptr), 1)
-         end
          N_GFieldID[p, n, S] = d
          finalizer(_N_GField_clear_fn, d)
       end

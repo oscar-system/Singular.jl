@@ -7,7 +7,7 @@
 const PolyRingID = Dict{Tuple{Union{Ring, Field}, Array{Symbol, 1},
          libSingular.rRingOrder_t, libSingular.rRingOrder_t, Int}, Ring}()
 
-type PolyRing{T <: Nemo.RingElem} <: Ring
+mutable struct PolyRing{T <: Nemo.RingElem} <: Ring
    ptr::libSingular.ring
    base_ring::Union{Ring, Field}
    refcount::Int
@@ -35,22 +35,20 @@ type PolyRing{T <: Nemo.RingElem} <: Ring
          v = [pointer(Base.Vector{UInt8}(string(str)*"\0")) for str in s]
          r = libSingular.nCopyCoeff(R.ptr)
          
-         ord  = unsafe_wrap(Array, 
-      	   Ptr{libSingular.rRingOrder_t}(libSingular.omAlloc0(Csize_t(3*sizeof(libSingular.rRingOrder_t)))), 
-      	       (Cint(3),), false)
-         blk0 = unsafe_wrap(Array, Ptr{Cint}(libSingular.omAlloc0(Csize_t(3*sizeof(Cint)))), (Cint(3),), false)
-         blk1 = unsafe_wrap(Array, Ptr{Cint}(libSingular.omAlloc0(Csize_t(3*sizeof(Cint)))), (Cint(3),), false)
+         blk0 = unsafe_wrap(Array, Ptr{Cint}(libSingular.omAlloc0(Csize_t(3*sizeof(Cint)))), 3; own=false)
+         blk1 = unsafe_wrap(Array, Ptr{Cint}(libSingular.omAlloc0(Csize_t(3*sizeof(Cint)))), 3; own=false)
          if (ordering == ringorder_c || ordering == ringorder_C)
-            blk0[1] = 0
-            blk1[1] = 0
-            blk0[2] = 1
-            blk1[2] = length(v)
+            blk0[1] = Cint(0)
+            blk1[1] = Cint(0)
+            blk0[2] = Cint(1)
+            blk1[2] = Cint(length(v))
          else
-            blk0[1] = 1
-            blk1[1] = length(v)
-            blk0[2] = 0
-            blk1[2] = 0
+            blk0[1] = Cint(1)
+            blk1[1] = Cint(length(v))
+            blk0[2] = Cint(0)
+            blk1[2] = Cint(0)
          end
+         ord = Array{libSingular.rRingOrder_t, 1}(undef, 3)
          ord[1] = ordering
          ord[2] = ordering2
          ord[3] = ringorder_no
@@ -58,7 +56,7 @@ type PolyRing{T <: Nemo.RingElem} <: Ring
          @assert degree_bound_adjusted == Int(libSingular.rBitmask(ptr))
          d = PolyRingID[R, s, ordering, ordering2, degree_bound_adjusted] =
                new(ptr, R, 1)
-         finalizer(d, _PolyRing_clear_fn)
+         finalizer(_PolyRing_clear_fn, d)
          return d
       end
    end
@@ -71,7 +69,7 @@ function _PolyRing_clear_fn(R::PolyRing)
    end
 end
 
-type spoly{T <: Nemo.RingElem} <: Nemo.RingElem
+mutable struct spoly{T <: Nemo.RingElem} <: Nemo.RingElem
    ptr::libSingular.poly
    parent::PolyRing{T}
 
@@ -79,14 +77,14 @@ type spoly{T <: Nemo.RingElem} <: Nemo.RingElem
       p = libSingular.p_ISet(0, R.ptr)
 	  z = new(p, R)
       R.refcount += 1
-      finalizer(z, _spoly_clear_fn)
+      finalizer(_spoly_clear_fn, z)
       return z
    end
     
    function spoly{T}(R::PolyRing{T}, p::libSingular.poly) where T <: Nemo.RingElem
       z = new(p, R)
       R.refcount += 1
-      finalizer(z, _spoly_clear_fn)
+      finalizer(_spoly_clear_fn, z)
       return z
    end
     
@@ -95,7 +93,7 @@ type spoly{T <: Nemo.RingElem} <: Nemo.RingElem
       r = libSingular.p_NSet(n, R.ptr)
       z = new(r, R)
       R.refcount += 1
-      finalizer(z, _spoly_clear_fn)
+      finalizer(_spoly_clear_fn, z)
       return z
    end
     
@@ -103,7 +101,7 @@ type spoly{T <: Nemo.RingElem} <: Nemo.RingElem
       p = libSingular.p_NSet(n, R.ptr)
       z = new(p, R)
       R.refcount += 1
-      finalizer(z, _spoly_clear_fn)
+      finalizer(_spoly_clear_fn, z)
       return z
    end 
 
@@ -111,7 +109,7 @@ type spoly{T <: Nemo.RingElem} <: Nemo.RingElem
       p = libSingular.p_ISet(b, R.ptr)
       z = new(p, R)
       R.refcount += 1
-      finalizer(z, _spoly_clear_fn)
+      finalizer(_spoly_clear_fn, z)
       return z
    end
 
@@ -120,7 +118,7 @@ type spoly{T <: Nemo.RingElem} <: Nemo.RingElem
       p = libSingular.p_NSet(n, R.ptr)
       z = new(p, R)
       R.refcount += 1
-      finalizer(z, _spoly_clear_fn)
+      finalizer(_spoly_clear_fn, z)
       return z
    end
 end

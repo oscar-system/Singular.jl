@@ -1,190 +1,41 @@
-# initialise a coefficient ring
-function nInitChar(n::n_coeffType, p::Ptr{Void})
-   return icxx"""nInitChar($n, $p);"""
-end
-
-# get the characteristic of a coefficient domain
-function n_GetChar(n::coeffs)
-   return icxx"""n_GetChar($n);"""
-end
-
-# make a copy of a coefficient domain (actually just increments a reference count)
-function nCopyCoeff(n::coeffs)
-   return icxx"""nCopyCoeff($n);"""
-end
-
-# kill a coefficient ring
-function nKillChar(cf::coeffs)
-   icxx"""nKillChar($cf);"""
-end
-
-# return a function to convert between rings
-function n_SetMap(src::coeffs, dst::coeffs)
-   icxx"""n_SetMap($src, $dst);"""
-end
-
-function nApplyMapFunc(f::Cxx.CppFptr, n::number, src::coeffs, dst::coeffs)
-   icxx"""$f($n, $src, $dst);"""
-end
-
-function nCoeff_has_simple_Alloc(cf::coeffs)
-   icxx"""nCoeff_has_simple_Alloc($cf);""" > 0
-end
-
-# initialise a number from an Int
-function n_Init(i::Int, cf::coeffs) 
-   icxx"""n_Init($i, $cf);"""
-end
-
-# initialise a number from an Int
-function n_Copy(n::number, cf::coeffs) 
-   icxx"""n_Copy($n, $cf);"""
-end
-
 # initialise a number from an mpz
 function n_InitMPZ(b::BigInt, cf::coeffs)
-    bb = __mpz_struct(pointer_from_objref(b))
-    icxx"""n_InitMPZ($bb, $cf);"""
-end
-
-# delete a number
-function n_Delete(n::number, cf::coeffs) 
-   icxx"""number t = $n; if (t != NULL) n_Delete(&t, $cf);"""
+    bb = pointer_from_objref(b)
+    return n_InitMPZ_internal(bb, cf)
 end
 
 # write a number to a Singular string
-function n_Write(n::number_ref, cf::coeffs, bShortOut::Bool = false)
+function n_Write(n::numberRef, cf::coeffs, bShortOut::Bool = false)
    d = Int(bShortOut)
-   icxx"""n_Write($n, $cf, $d);"""
+   n_Write_internal(n, cf, d);
 end
 
-function n_Add(a::number, b::number, cf::coeffs)
-   icxx"""n_Add($a, $b, $cf);"""
-end
-
-function n_Sub(a::number, b::number, cf::coeffs)
-   icxx"""n_Sub($a, $b, $cf);"""
-end
-
-function n_Mult(a::number, b::number, cf::coeffs)
-   icxx"""n_Mult($a, $b, $cf);"""
-end
-
-function n_Neg(n::number, cf::coeffs)
-   icxx"""number nn = n_Copy($n, $cf); nn = n_InpNeg(nn, $cf); nn;"""
-end
-
-function n_Invers(a::number, cf::coeffs)
-   icxx"""n_Invers($a, $cf);"""
-end
-
-function n_ExactDiv(a::number, b::number, cf::coeffs)
-   icxx"""n_ExactDiv($a, $b, $cf);"""
-end
-
-function n_Div(a::number, b::number, cf::coeffs)
-   icxx"""number z = n_Div($a, $b, $cf); n_Normalize(z, $cf); z;"""
-end
-
-function n_GetNumerator(a::number_ref, cf::coeffs)
-   icxx"""return n_GetNumerator($a, $cf);"""
-end
-
-function n_GetDenom(a::number_ref, cf::coeffs)
-   icxx"""return n_GetDenom($a, $cf);"""
-end
-
-function n_Power(a::number, b::Int, cf::coeffs)
-   icxx"""number res; n_Power($a, $b, &res, $cf); res;"""
-end
-
-function n_Gcd(a::number, b::number, cf::coeffs)
-   icxx"""n_Gcd($a, $b, $cf);"""
-end
-
-function n_SubringGcd(a::number, b::number, cf::coeffs)
-   icxx"""n_SubringGcd($a, $b, $cf);"""
-end
-
-function n_Lcm(a::number, b::number, cf::coeffs)
-   icxx"""n_Lcm($a, $b, $cf);"""
-end
-
-function n_ExtGcd(a::number, b::number, s::Ptr{number}, t::Ptr{number}, cf:: coeffs)
-   icxx"""n_ExtGcd($a, $b, $s, $t, $cf);"""
-end
-
-function n_IsZero(a::number, cf::coeffs)
-   icxx"""n_IsZero($a, $cf);""" > 0
-end
-
-function n_IsOne(a::number, cf::coeffs)
-   icxx"""n_IsOne($a, $cf);""" > 0
-end
-
-function n_Greater(a::number, b::number, cf::coeffs)
-   icxx"""n_Greater($a, $b, $cf);""" > 0
-end
-
-function n_GreaterZero(a::number, cf::coeffs)
-   icxx"""n_GreaterZero($a, $cf);""" > 0
-end
-
-function n_Equal(a::number, b::number, cf::coeffs)
-   icxx"""n_Equal($a, $b, $cf);""" > 0
-end
-
-function n_InpAdd(a::number_ref, b::number, cf::coeffs)
-   icxx"""n_InpAdd($a, $b, $cf);"""
-end
-
-function n_InpMult(a::number_ref, b::number, cf::coeffs)
-   icxx"""n_InpMult($a, $b, $cf);"""
+function n_ExtGcd(a::number, b::number, s::Ptr{numberRef}, t::Ptr{numberRef}, cf:: coeffs)
+   sp = reinterpret(Ptr{Nothing},s)
+   tp = reinterpret(Ptr{Nothing},t)
+   return n_ExtGcd_internal(a, b, sp, tp, cf);
 end
 
 function n_QuotRem(a::number, b::number, p::Ptr{number}, cf::coeffs)
-   icxx"""n_QuotRem($a, $b, $p, $cf);"""
-end
-
-function n_Rem(a::number, b::number, cf::coeffs)
-   icxx"""number qq; n_QuotRem($a, $b, &qq, $cf);"""
-end
-
-function n_IntMod(a::number, b::number, cf::coeffs)
-   icxx"""n_IntMod($a, $b, $cf);"""
-end
-
-function n_Farey(a::number, b::number, cf::coeffs)
-   icxx"""n_Farey($a, $b, $cf);"""
+   pp = reinterpret(Ptr{Nothing}, p)
+   n_QuotRem_internal(a, b, pp, cf)
 end
 
 function n_ChineseRemainderSym(a::Array{number, 1}, b::Array{number, 1}, n::Cint, signed::Cint, cf::coeffs)
-   p1 = pointer(a)
-   p2 = pointer(b)
-   icxx"""CFArray inv_cache($n); n_ChineseRemainderSym($p1, $p2, $n, $signed, inv_cache, $cf);"""
-end
-
-function n_Param(a::Cint, cf::coeffs)
-   icxx"""n_Param($a, $cf);"""
+   p1 = reinterpret(Ptr{Nothing},pointer(a))
+   p2 = reinterpret(Ptr{Nothing},pointer(b))
+   return n_ChineseRemainderSym_internal(p1, p2, n, signed, cf)
 end
 
 # create a Singular string environment
 function StringSetS(m) 
-   @cxx StringSetS(pointer(m))
-end
-
-# end a Singular string environment
-function StringEndS() 
-   icxx"""StringEndS();"""
-end
-
-function omAlloc0(size :: Csize_t)
-   icxx"""(void*) omAlloc0($size);"""
+   StringSetS_internal(m)
 end
 
 # omalloc free
-function omFree{T}(m :: Ptr{T})
-   icxx"""omFree((void*) $m);"""
+function omFree(m :: Ptr{T}) where {T}
+   mp = reinterpret(Ptr{Nothing}, m)
+   omFree_internal(m)
 end
 
 ###############################################################################
@@ -194,8 +45,8 @@ end
 ###############################################################################
 
 function setindex!(ptr::Ptr{number}, n::number)
-   icxx"""*$ptr = $n;"""
-   nothing
+   pp = reinterpret(Ptr{Nothing}, ptr)
+   setindex_internal(pp, n)
 end
 
 ###############################################################################
@@ -204,12 +55,14 @@ end
 #
 ###############################################################################
 
-type live_cache
+#=
+
+mutable struct live_cache
    num::Int
    A::Array{Nemo.RingElem, 1}
 end
 
-function nRegister(t::n_coeffType, f::Ptr{Void})
+function nRegister(t::n_coeffType, f::Ptr{Nothing})
    return icxx"""return nRegister($t, (cfInitCharProc)$f);"""
 end
 
@@ -225,7 +78,7 @@ function julia(p::number)
     return unsafe_pointer_to_objref(ptr)
 end
 
-function number_pop!(D::Base.Dict{UInt, live_cache}, ptr::Ptr{Void})
+function number_pop!(D::Base.Dict{UInt, live_cache}, ptr::Ptr{Nothing})
    iptr = reinterpret(UInt, ptr) >> 24
    val = D[iptr]
    val.num -= 1
@@ -240,7 +93,7 @@ function number{T <: RingElem}(j::T, cache::Bool=true)
     if cache
        iptr = reinterpret(UInt, ptr) >> 24
        if !haskey(nemoNumberID, iptr)
-          nemoNumberID[iptr] = live_cache(0, Array{Nemo.RingElem}(64))
+          nemoNumberID[iptr] = live_cache(0, Array{Nemo.RingElem}(undef, 64))
        end
        val = nemoNumberID[iptr]
        val.num += 1
@@ -258,6 +111,9 @@ function number{T <: RingElem}(j::T, j_old::T)
     end
 end
 
+=#
+
+#=
 include("flint/fmpz.jl")
 include("flint/fmpq.jl")
 include("flint/fq.jl")
@@ -265,4 +121,4 @@ include("flint/fq_nmod.jl")
 include("antic/nf_elem.jl")
 include("nemo/Rings.jl")
 include("nemo/Fields.jl")
-
+=#

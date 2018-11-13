@@ -41,7 +41,7 @@ function iszero(M::smatrix)
    return true
 end
 
-function deepcopy_internal(M::smatrix, dict::ObjectIdDict)
+function deepcopy_internal(M::smatrix, dict::IdDict)
    R = base_ring(M)
    ptr = libSingular.mp_Copy(M.ptr, R.ptr)
    return parent(M)(ptr)
@@ -127,7 +127,7 @@ end
 #
 ###############################################################################
 
-function (S::MatrixSpace{T})(ptr::libSingular.matrix) where T <: AbstractAlgebra.RingElem
+function (S::MatrixSpace{T})(ptr::libSingular.matrix_ref) where T <: AbstractAlgebra.RingElem
    return smatrix{T}(base_ring(S), ptr)
 end
 
@@ -137,10 +137,10 @@ end
 #
 ###############################################################################
 
-function Matrix{T <: Nemo.RingElem}(I::smodule{T})
+function Matrix(I::smodule{T}) where T <: Nemo.RingElem
    return smatrix{T}(base_ring(I), I.ptr)
 end
 
-function Matrix{T <: Nemo.RingElem}(I::sideal{T})
+function Matrix(I::sideal{T}) where T <: Nemo.RingElem
    return smatrix{T}(base_ring(I), I.ptr)
 end

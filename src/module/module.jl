@@ -6,7 +6,7 @@ export smodule, ModuleClass, rank, slimgb
 #
 ###############################################################################
 
-parent{T <: Nemo.RingElem}(a::smodule{T}) = ModuleClass{T}(a.base_ring)
+parent(a::smodule{T}) where T <: Nemo.RingElem = ModuleClass{T}(a.base_ring)
 
 base_ring(S::ModuleClass) = S.base_ring
 
@@ -18,17 +18,19 @@ elem_type(::Type{ModuleClass{T}}) where T <: AbstractAlgebra.RingElem = smodule{
 
 parent_type(::Type{smodule{T}}) where T <: AbstractAlgebra.RingElem = ModuleClass{T}
 
-doc"""
+
+@doc Markdown.doc"""
     ngens(I::smodule)
 > Return the number of generators in the current representation of the module (as a list
 > of vectors).
 """
 ngens(I::smodule) = I.ptr == C_NULL ? 0 : Int(libSingular.ngens(I.ptr))
 
-doc"""
+@doc Markdown.doc"""
     rank(I::smodule)
 > Return the rank $n$ of the ambient space $R^n$ of which this module is a submodule.
 """
+
 rank(I::smodule) = Int(libSingular.rank(I.ptr))
 
 function checkbounds(I::smodule, i::Int)
@@ -42,13 +44,13 @@ function getindex(I::smodule{T}, i::Int) where T <: AbstractAlgebra.RingElem
    return svector{T}(R, rank(I), libSingular.p_Copy(p, R.ptr))
 end
 
-doc"""
+@doc Markdown.doc"""
     iszero(p::smodule)
 > Return `true` if this is algebraically the zero module.
 """
 iszero(p::smodule) = Bool(libSingular.idIs0(p.ptr))
 
-function deepcopy_internal(I::smodule, dict::ObjectIdDict)
+function deepcopy_internal(I::smodule, dict::IdDict)
    R = base_ring(I)
    ptr = libSingular.id_Copy(I.ptr, R.ptr)
    return Module(R, ptr)
@@ -84,7 +86,7 @@ end
 #
 ###############################################################################
 
-doc"""
+@doc Markdown.doc"""
     std(I::smodule; complete_reduction::Bool=false)
 > Compute the Groebner basis of the module $I$. If `complete_reduction` is
 > set to `true`, the result is unique, up to permutation of the generators
@@ -95,14 +97,14 @@ doc"""
 """
 function std(I::smodule; complete_reduction::Bool=false) 
    R = base_ring(I)
-   ptr = libSingular.id_Std(I.ptr, R.ptr; complete_reduction=complete_reduction)
+   ptr = libSingular.id_Std(I.ptr, R.ptr, complete_reduction)
    libSingular.idSkipZeroes(ptr)
    z = Module(R, ptr)
    z.isGB = true
    return z
 end
 
-doc"""
+@doc Markdown.doc"""
    slimgb(I::smodule; complete_reduction::Bool=false)
 > Given a module $I$ this function computes a Groebner basis for it.
 > Compared to `std`, `slimgb` uses different strategies for choosing
@@ -113,7 +115,7 @@ doc"""
 """
 function slimgb(I::smodule; complete_reduction::Bool=false)
    R = base_ring(I)
-   ptr = libSingular.id_Slimgb(I.ptr, R.ptr; complete_reduction=complete_reduction)
+   ptr = libSingular.id_Slimgb(I.ptr, R.ptr, complete_reduction)
    libSingular.idSkipZeroes(ptr)
    z = Module(R, ptr)
    z.isGB = true
@@ -126,7 +128,7 @@ end
 #
 ###############################################################################
 
-doc"""
+@doc Markdown.doc"""
     syz(M::smodule)
 > Compute the module of syzygies of the given module. This will be given as
 > a set of generators in an ambient space $R^n$, where $n$ is the number of
@@ -145,14 +147,14 @@ end
 #
 ###############################################################################
 
-doc"""
+@doc Markdown.doc"""
     sres{T <: Nemo.RingElem}(I::smodule{T}, max_length::Int)
 > Compute a free resolution of the given module $I$ of length up to the given
 > maximum length. If `max_length` is set to zero, a full length free
 > resolution is computed. Each element of the resolution is itself a module.
 """
-function sres{T <: Nemo.RingElem}(I::smodule{T}, max_length::Int)
-   I.isGB == false && error("Not a Groebner basis ideal")
+function sres(I::smodule{T}, max_length::Int) where T <: Nemo.RingElem
+   I.isGB == false && error("Not a Groebner basis ideal")  
    R = base_ring(I)
    if max_length == 0
         max_length = ngens(R)
@@ -161,7 +163,7 @@ function sres{T <: Nemo.RingElem}(I::smodule{T}, max_length::Int)
    r, length, minimal = libSingular.id_sres(I.ptr, Cint(max_length + 1), R.ptr)
    for i = 1:length
       ptr = libSingular.getindex(r, Cint(i - 1))
-      if ptr == C_NULL
+      if ptr.cpp_object == C_NULL
          length = i - 1
          break
       end
@@ -176,12 +178,12 @@ end
 #
 ###############################################################################
 
-function Module{T <: Nemo.RingElem}(R::PolyRing{T}, vecs::svector{spoly{T}}...)
+function Module(R::PolyRing{T}, vecs::svector{spoly{T}}...) where T <: Nemo.RingElem
    S = elem_type(R)
    return smodule{S}(R, vecs...)
 end
 
-function Module{T <: Nemo.RingElem}(R::PolyRing{T}, id::libSingular.ideal)
+function Module(R::PolyRing{T}, id::libSingular.idealRef) where T <: Nemo.RingElem
    S = elem_type(R)
    return smodule{S}(R, id)
 end
