@@ -18,7 +18,7 @@ cd(wdir)
 
 # INSTALL NTL
 
-const ntl="ntl-9.3.0"
+const ntl="ntl-10.5.0"
 
 try
   run(`wget -q -nc -c -O "$wdir/$ntl.tar.gz" "http://www.shoup.net/ntl/$ntl.tar.gz"`)
