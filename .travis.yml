@@ -34,9 +34,8 @@ script:
          tar xzf binutils-2.27.tar.gz;
          (cd binutils-2.27 && ./configure --prefix=$HOME/usr && make && make install);
       fi;
-    - if [ ! -f $HOME/early_abort ]; then julia -e 'using Pkg; Pkg.clone("https://github.com/oscar-system/Singular.jl")' || false; fi
     - while sleep 30; do echo "still alive"; done &
-    - if [ ! -f $HOME/early_abort ]; then julia -e 'Pkg.build("Singular")' || false; fi
+    - if [ ! -f $HOME/early_abort ]; then julia -e 'using Pkg; pkg"add https://github.com/oscar-system/Singular.jl"' || false; fi
     - if [ ! -f $HOME/early_abort ]; then julia -e 'Pkg.test("Singular"; coverage=true)' || false; fi
 
 notifications:
