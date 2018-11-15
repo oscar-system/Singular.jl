@@ -19,14 +19,12 @@ addons:
 matrix:
     include:
        - language: julia
-         julia: 0.6
+         julia: 1.0
          os: linux
        - language: julia
-         julia: 0.6
+         julia: 1.0
          os: osx
 install:
-    - if [ "$TRAVIS_OS_NAME" = "linux" ]; then export CXX="g++-6" CC="gcc-6"; fi
-    - if [ "$TRAVIS_OS_NAME" = "osx" ]; then export CXX="clang++" CC="clang"; fi
     - if [ "$TRAVIS_OS_NAME" = "linux" ]; then export PATH="$HOME/usr/bin:$PATH"; fi
     - export THE_PKG_DIR=`julia -e 'println(Pkg.dir())'`
 
@@ -36,9 +34,7 @@ script:
          tar xzf binutils-2.27.tar.gz;
          (cd binutils-2.27 && ./configure --prefix=$HOME/usr && make && make install);
       fi;
-    - if [ ! -f $HOME/early_abort ]; then julia -e 'Pkg.clone("https://github.com/Keno/Cxx.jl")' || false; fi
-    - if [ ! -f $HOME/early_abort ]; then PREBUILT_CI_BINARIES=1 julia -e 'Pkg.build("Cxx")' || false; fi
-    - if [ ! -f $HOME/early_abort ]; then julia -e 'Pkg.clone("https://github.com/wbhart/Singular.jl")' || false; fi
+    - if [ ! -f $HOME/early_abort ]; then julia -e 'Pkg.clone("https://github.com/oscar-system/Singular.jl")' || false; fi
     - if [ ! -f $HOME/early_abort ]; then julia -e 'Pkg.build("Singular")' || false; fi
     - if [ ! -f $HOME/early_abort ]; then julia -e 'Pkg.test("Singular"; coverage=true)' || false; fi
 
