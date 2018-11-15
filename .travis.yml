@@ -1,15 +1,20 @@
-sudo: false
+# Force Ubuntu 16.04 "Xenial" to get newer GCC, binutils etc.
+dist: xenial
+
+language: julia
+julia: 1.0
+
 addons:
     apt:
-        sources:
-           - ubuntu-toolchain-r-test
-           - george-edison55-precise-backports
+        #sources:
+        #   - ubuntu-toolchain-r-test
+        #   - george-edison55-precise-backports
         packages:
            - cmake
            - cmake-data
-           - gcc-6
-           - g++-6
-           - binutils
+           #- gcc-6
+           #- g++-6
+           #- binutils
            - gfortran
            - libblas-dev
            - liblapack-dev
@@ -18,13 +23,11 @@ addons:
  
 matrix:
     include:
-       - language: julia
-         julia: 1.0
-         os: linux
-       - language: julia
-         julia: 1.0
-         os: osx
+       - os: linux
+       - os: osx
+
 install:
+    - if [ "$TRAVIS_OS_NAME" = "osx" ]; then export CXX="clang++" CC="clang"; fi
     - if [ "$TRAVIS_OS_NAME" = "linux" ]; then export PATH="$HOME/usr/bin:$PATH"; fi
     - export THE_PKG_DIR=`julia -e 'println(Pkg.dir())'`
 
