@@ -12,8 +12,7 @@ wdir = "$pkgdir/deps"
 vdir = "$pkgdir/local"
 nemovdir = "$nemodir/local"
 
-LDFLAGS = "-rpath $vdir/lib -R$vdir/lib -R$nemovdir/lib -R\$\$ORIGIN/../share/julia/site/v$(VERSION.major).$(VERSION.minor)/Singular/local/lib"
-
+LDFLAGS = "-Wl,-rpath,$vdir/lib -Wl,-rpath,\$\$ORIGIN/../share/julia/site/v$(VERSION.major).$(VERSION.minor)/Singular/local/lib"
 cd(wdir)
 
 # INSTALL NTL
