@@ -55,6 +55,7 @@ void singular_define_rings(jlcxx::Module& Singular){
   Singular.method("p_ISet",[](long i, ip_sring* r){ return p_ISet(i,r);});
   Singular.method("p_NSet",[](snumber* p, ip_sring* r){ return p_NSet(p,r);});
   Singular.method("pLength",[](spolyrec* p){ return pLength(p);});
+  Singular.method("SetpNext",[](spolyrec* p, spolyrec* q){ p->next = q; });
   Singular.method("pNext",[](spolyrec* a){ poly p = pNext(a); return p;  });
   Singular.method("p_Neg",[](spolyrec* p, ip_sring* r){ return p_Neg(p,r); });
   Singular.method("pGetCoeff",[](spolyrec* p){ return pGetCoeff(p);});
