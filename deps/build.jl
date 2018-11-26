@@ -103,6 +103,8 @@ withenv("CPP_FLAGS"=>"-I$vdir/include", "LD_LIBRARY_PATH"=>"$vdir/lib:$nemodir/l
    end
 end
 
+print("Done building Singular")
+
 cd(wdir)
 
 push!(Libdl.DL_LOAD_PATH, "$pkgdir/local/lib")
@@ -119,8 +121,12 @@ cmake_build_path = joinpath(@__DIR__, "src")
 
 cd(cmake_build_path)
 
+print("Initializing cmake")
+
 run(`cmake -DJulia_EXECUTABLE=$julia_exec -DJlCxx_DIR=$jlcxx_cmake_dir -DJuliaIncludeDir=$julia_include -DJULIA_LIB_DIR=$julia_lib -Dnemo_includes=$nemovdir/include -Dsingular_includes=$vdir/include -Dsingular_libdir=$vdir/lib -DCMAKE_INSTALL_LIBDIR=$vdir/lib .`)
 
-run(`make`)
+print("Running cmake")
+
+run(`make VERBOSE=1`)
 run(`make install`)
 
