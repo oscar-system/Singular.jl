@@ -3,7 +3,6 @@
 
 #include "includes.h"
 
-void singular_define_coeffs(jlcxx::Module&);
+void singular_define_coeffs(jlcxx::Module &);
 
 #endif
-
