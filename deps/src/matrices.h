@@ -3,7 +3,6 @@
 
 #include "includes.h"
 
-void singular_define_matrices(jlcxx::Module&);
+void singular_define_matrices(jlcxx::Module &);
 
 #endif
-
