@@ -1,5 +1,5 @@
 export sideal, IdealSet, syz, lead, normalize!, isconstant, iszerodim, fres,
-       sres, lres, intersection, quotient, reduce, eliminate, kernel, equal,
+       sres, intersection, quotient, reduce, eliminate, kernel, equal,
        contains, isvar_generated, saturation, satstd, slimgb, std
 
 ###############################################################################
