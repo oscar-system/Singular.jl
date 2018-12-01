@@ -55,30 +55,25 @@ end
 #
 ###############################################################################
 
-#=
+import Nemo
 
 mutable struct live_cache
    num::Int
    A::Array{Nemo.RingElem, 1}
 end
 
-function nRegister(t::n_coeffType, f::Ptr{Nothing})
-   return icxx"""return nRegister($t, (cfInitCharProc)$f);"""
-end
-
 const nemoNumberID = Base.Dict{UInt, live_cache}()
 
 function julia(cf::coeffs)
-   ptr = @cxx cf->data
+   ptr = get_coeff_data(cf)
    return unsafe_pointer_to_objref(ptr)
 end
 
-function julia(p::number)
-    ptr = icxx"""return (void*)$p;"""
-    return unsafe_pointer_to_objref(ptr)
+function julia(p::Ptr{Cvoid})
+    return unsafe_pointer_to_objref(p)
 end
 
-function number_pop!(D::Base.Dict{UInt, live_cache}, ptr::Ptr{Nothing})
+function number_pop!(D::Base.Dict{UInt, live_cache}, ptr::Ptr{Cvoid})
    iptr = reinterpret(UInt, ptr) >> 24
    val = D[iptr]
    val.num -= 1
@@ -87,9 +82,9 @@ function number_pop!(D::Base.Dict{UInt, live_cache}, ptr::Ptr{Nothing})
    end
 end
 
-function number{T <: RingElem}(j::T, cache::Bool=true)
+function number(j::T, cache::Bool=true) where {T <: Nemo.RingElem}
     ptr = pointer_from_objref(j)
-    n = number(ptr)
+    n = ptr
     if cache
        iptr = reinterpret(UInt, ptr) >> 24
        if !haskey(nemoNumberID, iptr)
@@ -102,7 +97,7 @@ function number{T <: RingElem}(j::T, cache::Bool=true)
     return n
 end
 
-function number{T <: RingElem}(j::T, j_old::T)
+function number(j::T, j_old::T) where {T <: Nemo.RingElem}
     if j == j_old   # for inplace operations
         return number(j, false)
     else
@@ -111,10 +106,11 @@ function number{T <: RingElem}(j::T, j_old::T)
     end
 end
 
-=#
 
-#=
+
+
 include("flint/fmpz.jl")
+#=
 include("flint/fmpq.jl")
 include("flint/fq.jl")
 include("flint/fq_nmod.jl")

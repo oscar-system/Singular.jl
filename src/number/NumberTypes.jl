@@ -389,6 +389,7 @@ mutable struct CoefficientRing{T <: Nemo.RingElem} <: Ring
          return CoeffRingID[R]::CoefficientRing{T}
       else 
          c = libSingular.register(R)
+         println("here")
          ptr = pointer_from_objref(R)
          z = new(libSingular.nInitChar(c, ptr), R)
          if cached
@@ -400,7 +401,7 @@ mutable struct CoefficientRing{T <: Nemo.RingElem} <: Ring
 end
 
 mutable struct n_unknown{T <: Nemo.RingElem} <: Nemo.RingElem
-   ptr::libSingular.number
+   ptr::Ptr{Cvoid}
    parent::CoefficientRing{T}
 end
 
