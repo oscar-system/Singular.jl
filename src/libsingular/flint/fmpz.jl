@@ -191,8 +191,8 @@ function fmpzExtGcd(a::Ptr{Cvoid}, b::Ptr{Cvoid}, s::Ptr{Ptr{Cvoid}}, t::Ptr{Ptr
       number_pop!(nemoNumberID, t1)
    end
    g1, s1, t1 = gcdx(n1, n2)
-   setindex_internal_void(s, number(s1))
-   setindex_internal_void(t, number(t1))
+   setindex_internal_void(reinterpret(Ptr{Cvoid},s), number(s1))
+   setindex_internal_void(reinterpret(Ptr{Cvoid},t), number(t1))
    return number(g1)
 end
 

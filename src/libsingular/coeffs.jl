@@ -82,12 +82,14 @@ function julia(p::Ptr{Cvoid})
 end
 
 function number_pop!(D::Base.Dict{UInt, live_cache}, ptr::Ptr{Cvoid})
-   iptr = reinterpret(UInt, ptr) >> 24
-   val = D[iptr]
-   val.num -= 1
-   if val.num == 0
-      pop!(D, iptr)
-   end
+    iptr = reinterpret(UInt, ptr) >> 24
+    if haskey(D,iptr)
+        val = D[iptr]
+        val.num -= 1
+        if val.num == 0
+            pop!(D, iptr)
+        end
+    end
 end
 
 function number(j::T, cache::Bool=true) where {T <: Nemo.RingElem}
