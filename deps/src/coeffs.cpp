@@ -208,4 +208,9 @@ void singular_define_coeffs(jlcxx::Module & Singular)
     Singular.method("mpz_init_set_internal", [](void* x, void* y ){
         mpz_init_set(reinterpret_cast<mpz_ptr>(x),reinterpret_cast<mpz_ptr>(y));
     });
+
+    Singular.method("mpz_init_set_si_internal", [](void* x, long y ){
+        mpz_init_set_si(reinterpret_cast<mpz_ptr>(x),y);
+    });
+
 }

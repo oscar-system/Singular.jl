@@ -4,20 +4,21 @@
 #
 ###############################################################################
 
-function nemoFieldInit(i::Clong, cf::coeffs)
-   R = julia(cf)
+function nemoFieldInit(i::Clong, cf::Ptr{Cvoid})
+   data_ptr = get_coeff_data_void(cf)
+   R = unsafe_pointer_to_objref(data_ptr)
    return number(R(i))
 end
    
-function nemoFieldDelete(ptr::Ptr{number}, cf::coeffs)
+function nemoFieldDelete(ptr::Ptr{Ptr{Cvoid}}, cf::Ptr{Cvoid})
    n = unsafe_load(ptr)
    if n != C_NULL
-      number_pop!(nemoNumberID, Ptr{Void}(n))
+      number_pop!(nemoNumberID, n)
    end
    nothing
 end
 
-function nemoFieldCopy(a::number, cf::coeffs)
+function nemoFieldCopy(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n = julia(a)
    return number(deepcopy(n))
 end
@@ -28,25 +29,27 @@ end
 #
 ###############################################################################
 
-function nemoFieldGreaterZero(a::number, cf::coeffs)
+function nemoFieldGreaterZero(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
+   ## Fixme: Is this in any sense correct?
    return Cint(1)
 end
 
-function nemoFieldCoeffWrite(cf::coeffs, d::Cint)
-   r = julia(cf)
-   str = string(r)
-   icxx"""PrintS($str);"""
-   nothing
+function nemoFieldCoeffWrite(cf::Ptr{Cvoid}, d::Cint)
+  data_ptr = get_coeff_data(cf)
+  r = unsafe_pointer_to_objref(data_ptr)
+  str = string(r)
+  libSingular.PrintS(str);
+  nothing
 end
 
-function nemoFieldWrite(a::number, cf::coeffs)
+function nemoFieldWrite(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n = julia(a)
    if needs_parentheses(n)
       str = "("*string(n)*")"
    else
       str = string(n)
    end
-   icxx"""StringAppendS($str);"""
+   libSingular.StringAppendS(str);
    nothing
 end
 
@@ -56,63 +59,64 @@ end
 #
 ###############################################################################
 
-function nemoFieldNeg(a::number, cf::coeffs)
+function nemoFieldNeg(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n = julia(a)
    return number(-n)
 end
 
-function nemoFieldInpNeg(a::number, cf::coeffs)
-   R = julia(cf)
+function nemoFieldInpNeg(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
+   data_ptr = get_coeff_data_void(cf)
+   R = unsafe_pointer_to_objref(data_ptr)
    n = julia(a)
    mone = R(-1)
    n_new = mul!(n, n, mone)
    return number(n_new, n)
 end
 
-function nemoFieldInvers(a::number, cf::coeffs)
+function nemoFieldInvers(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n = julia(a)
    return number(inv(n))
 end
 
-function nemoFieldMult(a::number, b::number, cf::coeffs)
+function nemoFieldMult(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n1 = julia(a)
    n2 = julia(b)
    return number(n1*n2)
 end
 
-function nemoFieldInpMult(a::Ptr{number}, b::number, cf::coeffs)
+function nemoFieldInpMult(a::Ptr{Ptr{Cvoid}}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    r = unsafe_load(a)
    aa = julia(r)
    bb = julia(b)
    cc = mul!(aa, aa, bb)
    n = number(cc, aa)
-   unsafe_store!(a, n, 1)
+   setindex_internal_void(reinterpret(Ptr{Cvoid},a), n)
    nothing
 end
 
-function nemoFieldAdd(a::number, b::number, cf::coeffs)
+function nemoFieldAdd(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n1 = julia(a)
    n2 = julia(b)
    return number(n1 + n2)
 end
 
-function nemoFieldInpAdd(a::Ptr{number}, b::number, cf::coeffs)
+function nemoFieldInpAdd(a::Ptr{Ptr{Cvoid}}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    r = unsafe_load(a)
    aa = julia(r)
    bb = julia(b)
    cc = addeq!(aa, bb)
    n = number(cc, aa)
-   unsafe_store!(a, n, 1)
+   setindex_internal_void(reinterpret(Ptr{Cvoid},a), n)
    nothing
 end
 
-function nemoFieldSub(a::number, b::number, cf::coeffs)
+function nemoFieldSub(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n1 = julia(a)
    n2 = julia(b)
    return number(n1 - n2)
 end
 
-function nemoFieldDiv(a::number, b::number, cf::coeffs)
+function nemoFieldDiv(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n1 = julia(a)
    n2 = julia(b)
    return number(divexact(n1, n2))
@@ -124,29 +128,29 @@ end
 #
 ###############################################################################
 
-function nemoFieldGreater(a::number, b::number, cf::coeffs)
+function nemoFieldGreater(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n1 = julia(a)
    n2 = julia(b)
    return Cint(n1 != n2)
 end
 
-function nemoFieldEqual(a::number, b::number, cf::coeffs)
+function nemoFieldEqual(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n1 = julia(a)
    n2 = julia(b)
    return Cint(n1 == n2)
 end
 
-function nemoFieldIsZero(a::number, cf::coeffs)
+function nemoFieldIsZero(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n = julia(a)
    return Cint(iszero(n))
 end
 
-function nemoFieldIsOne(a::number, cf::coeffs)
+function nemoFieldIsOne(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n = julia(a)
    return Cint(isone(n))
 end
 
-function nemoFieldIsMOne(a::number, cf::coeffs)
+function nemoFieldIsMOne(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n = julia(a)
    return Cint(n == -1)
 end
@@ -157,7 +161,7 @@ end
 #
 ###############################################################################
 
-function nemoFieldGcd(a::number, b::number, cf::coeffs)
+function nemoFieldGcd(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n1 = julia(a)
    n2 = julia(b)
    return number(gcd(n1, n2))
@@ -169,8 +173,9 @@ end
 #
 ###############################################################################
 
-function nemoFieldSubringGcd(a::number, b::number, cf::coeffs)
-   R = julia(cf)
+function nemoFieldSubringGcd(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
+   data_ptr = get_coeff_data_void(cf)
+   R =unsafe_load(data_ptr)
    if isa(R, FracField)
       n1 = numerator(julia(a))
       n2 = numerator(julia(b))
@@ -186,13 +191,13 @@ end
 #
 ###############################################################################
 
-function nemoFieldInt(ptr::Ptr{number}, cf::coeffs)
+function nemoFieldInt(ptr::Ptr{Ptr{Cvoid}}, cf::Ptr{Cvoid})
    return Clong(0)
 end
 
-function nemoFieldMPZ(b::BigInt, ptr::Ptr{number}, cf::coeffs)
+function nemoFieldMPZ(b::BigInt, ptr::Ptr{Ptr{Cvoid}}, cf::Ptr{Cvoid})
    bptr = pointer_from_objref(b)
-   icxx"""mpz_init_set_si((__mpz_struct *) $bptr, 0);"""
+   mpz_init_set_si_internal(reinterpret(Ptr{Cvoid},bptr),0)
    nothing
 end
 
@@ -202,70 +207,46 @@ end
 #
 ###############################################################################
 
-function nemoFieldInitChar(cf::coeffs, p::Ptr{Void})
-        
-    pInit = cfunction(nemoFieldInit, number, (Clong, coeffs))
-    pInt = cfunction(nemoFieldInt, Clong, (Ptr{number}, coeffs))
-    pMPZ = cfunction(nemoFieldMPZ, Void, (BigInt, Ptr{number}, coeffs))
-    pInpNeg = cfunction(nemoFieldInpNeg, number, (number, coeffs))
-    pCopy = cfunction(nemoFieldCopy, number, (number, coeffs))
-    pDelete = cfunction(nemoFieldDelete, Void, (Ptr{number}, coeffs))
-    pAdd = cfunction(nemoFieldAdd, number, (number, number, coeffs))
-    pInpAdd = cfunction(nemoFieldInpAdd, Void, (Ptr{number}, number, coeffs))
-    pSub = cfunction(nemoFieldSub, number, (number, number, coeffs))
-    pMult = cfunction(nemoFieldMult, number, (number, number, coeffs))
-    pInpMult = cfunction(nemoFieldInpMult, Void, (Ptr{number}, number, coeffs))
-    pDiv = cfunction(nemoFieldDiv, number, (number, number, coeffs))
-    pInvers = cfunction(nemoFieldInvers, number, (number, coeffs))
-    pGcd = cfunction(nemoFieldGcd, number, (number, number, coeffs))
-    pSubringGcd = cfunction(nemoFieldSubringGcd, number, (number, number, coeffs))
-    pGreater = cfunction(nemoFieldGreater, Cint, (number, number, coeffs))
-    pEqual = cfunction(nemoFieldEqual, Cint, (number, number, coeffs))
-    pIsZero = cfunction(nemoFieldIsZero, Cint, (number, coeffs))
-    pIsOne = cfunction(nemoFieldIsOne, Cint, (number, coeffs))
-    pIsMOne = cfunction(nemoFieldIsMOne, Cint, (number, coeffs))
-    pGreaterZero = cfunction(nemoFieldGreaterZero, Cint, (number, coeffs))
-    pWrite = cfunction(nemoFieldWrite, Void, (number, coeffs))
-    pCoeffWrite = cfunction(nemoFieldCoeffWrite, Void, (coeffs, Cint))
+function nemoFieldInitChar(cf::Ptr{Cvoid}, p::Ptr{Cvoid})
+    
+    ring_struct = singular_coeff_ring_struct()
 
-    icxx""" 
-      coeffs cf = (coeffs)($cf);
-      cf->has_simple_Alloc = FALSE;  
-      cf->has_simple_Inverse= FALSE;          
-      cf->is_field  = TRUE;
-      cf->is_domain = TRUE;
-      cf->ch = 0;
-      cf->data = $p;
-      cf->cfInit = (number (*)(long, const coeffs)) $pInit;
-      cf->cfInt = (long (*)(number &, const coeffs)) $pInt;
-      cf->cfMPZ = (void (*)(__mpz_struct *, number &, const coeffs)) $pMPZ;
-      cf->cfInpNeg = (number (*)(number, const coeffs)) $pInpNeg;
-      cf->cfCopy = (number (*)(number, const coeffs)) $pCopy;
-      cf->cfDelete = (void (*)(number *, const coeffs)) $pDelete;
-      cf->cfAdd = (numberfunc) $pAdd;
-      cf->cfInpAdd = (void (*)(number &, number, const coeffs)) $pInpAdd;
-      cf->cfSub = (numberfunc) $pSub;
-      cf->cfMult = (numberfunc) $pMult;
-      cf->cfInpMult = (void (*)(number &, number, const coeffs)) $pInpMult;
-      cf->cfDiv = (numberfunc) $pDiv;
-      cf->cfInvers = (number (*)(number, const coeffs)) $pInvers;
-      cf->cfGcd = (numberfunc) $pGcd;
-      cf->cfSubringGcd = (numberfunc) $pSubringGcd;
-      cf->cfGreater = (BOOLEAN (*)(number, number, const coeffs)) $pGreater;
-      cf->cfEqual = (BOOLEAN (*)(number, number, const coeffs)) $pEqual;
-      cf->cfIsZero = (BOOLEAN (*)(number, const coeffs)) $pIsZero;
-      cf->cfIsOne = (BOOLEAN (*)(number, const coeffs)) $pIsOne;
-      cf->cfIsMOne = (BOOLEAN (*)(number, const coeffs)) $pIsMOne;
-      cf->cfGreaterZero = (BOOLEAN (*)(number, const coeffs)) $pGreaterZero;
-      cf->cfWriteLong = (void (*)(number, const coeffs)) $pWrite;
-      cf->cfCoeffWrite = (void (*)(const coeffs, BOOLEAN)) $pCoeffWrite;
-    """
+    ring_struct.has_simple_alloc = 0
+    ring_struct.has_simple_inverse = 0
+    ring_struct.is_field = 1
+    ring_struct.is_domain = 1
+    ring_struct.ch = 0
+    ring_struct.data = p
+    ring_struct.cfInit = @cfunction(nemoFieldInit, Ptr{Cvoid}, (Clong, Ptr{Cvoid}))
+    ring_struct.cfInt = @cfunction(nemoFieldInt, Clong, (Ptr{Ptr{Cvoid}}, Ptr{Cvoid}))
+    ring_struct.cfMPZ = @cfunction(nemoFieldMPZ, Cvoid, (BigInt, Ptr{Ptr{Cvoid}}, Ptr{Cvoid}))
+    ring_struct.cfInpNeg = @cfunction(nemoFieldInpNeg, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfCopy = @cfunction(nemoFieldCopy, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfDelete = @cfunction(nemoFieldDelete, Cvoid, (Ptr{Ptr{Cvoid}}, Ptr{Cvoid}))
+    ring_struct.cfAdd = @cfunction(nemoFieldAdd, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfInpAdd = @cfunction(nemoFieldInpAdd, Cvoid, (Ptr{Ptr{Cvoid}}, Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfSub = @cfunction(nemoFieldSub, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfMult = @cfunction(nemoFieldMult, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfInpMult = @cfunction(nemoFieldInpMult, Cvoid, (Ptr{Ptr{Cvoid}}, Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfDiv = @cfunction(nemoFieldDiv, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfInvers = @cfunction(nemoFieldInvers, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfGcd = @cfunction(nemoFieldGcd, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfSubringGcd = @cfunction(nemoFieldSubringGcd, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfGreater = @cfunction(nemoFieldGreater, Cint, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfEqual = @cfunction(nemoFieldEqual, Cint, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfIsZero = @cfunction(nemoFieldIsZero, Cint, (Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfIsOne = @cfunction(nemoFieldIsOne, Cint, (Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfIsMOne = @cfunction(nemoFieldIsMOne, Cint, (Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfGreaterZero = @cfunction(nemoFieldGreaterZero, Cint, (Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfWriteLong = @cfunction(nemoFieldWrite, Cvoid, (Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfCoeffWrite = @cfunction(nemoFieldCoeffWrite, Cvoid, (Ptr{Cvoid}, Cint))
+
+    fill_coeffs_with_function_data(ring_struct,cf)
 
     return Cint(0)
 end
 
 function register(R::Nemo.Field)
-   c = cfunction(nemoFieldInitChar, Cint, (coeffs, Ptr{Void}))
-   ptr = @cxx n_unknown
-   return nRegister(ptr, c)
+   c = @cfunction(nemoFieldInitChar, Cint, (Ptr{Cvoid}, Ptr{Cvoid}))
+   return nRegister(n_unknown, c)
 end
