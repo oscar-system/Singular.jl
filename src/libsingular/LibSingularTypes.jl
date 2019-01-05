@@ -76,6 +76,7 @@ mutable struct singular_coeff_ring_struct
     cfDivBy::Ptr{Cvoid}
     cfInvers::Ptr{Cvoid}
     cfGcd::Ptr{Cvoid}
+    cfSubringGcd::Ptr{Cvoid}
     cfExtGcd::Ptr{Cvoid}
     cfGreater::Ptr{Cvoid}
     cfEqual::Ptr{Cvoid}
@@ -88,5 +89,5 @@ mutable struct singular_coeff_ring_struct
 end
 
 function singular_coeff_ring_struct()
-    singular_coeff_ring_struct(Tuple(cat([0 for i in 1:5 ],[ Ptr{Cvoid}(0) for i in 1:25 ],dims=1))...)
+    singular_coeff_ring_struct(Tuple(cat([0 for i in 1:5 ],[ Ptr{Cvoid}(0) for i in 1:26 ],dims=1))...)
 end

@@ -26,6 +26,7 @@ typedef struct __singular_coeff_ring_struct {
       void* cfDivBy;
       void* cfInvers;
       void* cfGcd;
+      void* cfSubringGcd;
       void* cfExtGcd;
       void* cfGreater;
       void* cfEqual;
@@ -63,6 +64,7 @@ void fill_coeffs_with_function_data(jl_value_t* coeff_struct, void* cf_void){
     cf->cfDivBy = (BOOLEAN (*)(number, number, const coeffs)) cf_input->cfDivBy;
     cf->cfInvers = (number (*)(number, const coeffs)) cf_input->cfInvers;
     cf->cfGcd = (numberfunc) cf_input->cfGcd;
+    cf->cfSubringGcd = (numberfunc) cf_input->cfSubringGcd;
     cf->cfExtGcd = (number (*)(number, number, number *, number *, const coeffs)) cf_input->cfExtGcd;
     cf->cfGreater = (BOOLEAN (*)(number, number, const coeffs)) cf_input->cfGreater;
     cf->cfEqual = (BOOLEAN (*)(number, number, const coeffs)) cf_input->cfEqual;
@@ -80,6 +82,7 @@ void singular_define_coeff_rings(jlcxx::Module & singular){
     singular.method("fill_coeffs_with_function_data",fill_coeffs_with_function_data);
     singular.method("nRegister",[](n_coeffType type, void* func ){ return nRegister( type, (cfInitCharProc)func );});
     singular.method("get_coeff_data",[](coeffs c){ return c->data;} );
+    singular.method("get_coeff_data_void",[](void* c){ return reinterpret_cast<coeffs>(c)->data; });
     singular.method("cast_number_to_void",[](number n){ return reinterpret_cast<void*>(n); });
     singular.method("cast_void_to_number",[](void* n){ return reinterpret_cast<number>(n); });
 }
