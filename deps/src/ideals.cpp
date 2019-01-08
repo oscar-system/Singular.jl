@@ -50,7 +50,7 @@ auto id_Slimgb_helper(ideal a, ring b, bool complete_reduction = false)
 {
     //  bool complete_reduction= false;
     unsigned int crbit;
-    if (complete_reduction == false)
+    if (complete_reduction)
         auto crbit = Sy_bit(OPT_REDSB);
     else
         crbit = 0;
@@ -77,7 +77,7 @@ auto id_Std_helper(ideal a, ring b, bool complete_reduction = false)
 {
     // bool complete_reduction= false;
     unsigned int crbit;
-    if (complete_reduction == false)
+    if (complete_reduction)
         crbit = Sy_bit(OPT_REDSB);
     else
         crbit = 0;
