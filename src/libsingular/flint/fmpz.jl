@@ -67,10 +67,8 @@ function fmpzNeg(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
 end
 
 function fmpzInpNeg(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
-    n = julia(a)::Nemo.fmpz
-    nptr = pointer_from_objref(n)
-    ccall((:fmpz_neg, :libflint), Cvoid, (Ptr{Nemo.fmpz}, Ptr{Nemo.fmpz}), nptr, nptr)
-    return number(n, false)
+    ccall((:fmpz_neg, :libflint), Cvoid, (Ptr{Nemo.fmpz}, Ptr{Nemo.fmpz}), a, a)
+    return a
 end
 
 function fmpzInvers(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
@@ -88,9 +86,7 @@ function fmpzInpMult(a::Ptr{Ptr{Cvoid}}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
     r = unsafe_load(a)
     aa = julia(r)::Nemo.fmpz
     bb = julia(b)::Nemo.fmpz
-    cc = mul!(aa, aa, bb)
-    n = number(cc, aa)
-    unsafe_store!(a, n, 1)
+    mul!(aa, aa, bb)
     nothing
 end
 
@@ -104,9 +100,7 @@ function fmpzInpAdd(a::Ptr{Ptr{Cvoid}}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
     r = unsafe_load(a)
     aa = julia(r)::Nemo.fmpz
     bb = julia(b)::Nemo.fmpz
-    cc = addeq!(aa, bb)
-    n = number(cc, aa)
-    unsafe_store!(a, n, 1)
+    addeq!(aa, bb)
     nothing
 end
 

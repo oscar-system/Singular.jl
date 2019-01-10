@@ -94,7 +94,6 @@ end
 
 function number(j::T, cache::Bool=true) where {T <: Nemo.RingElem}
     ptr = pointer_from_objref(j)
-    n = ptr
     if cache
        iptr = reinterpret(UInt, ptr) >> 24
        if !haskey(nemoNumberID, iptr)
@@ -104,16 +103,12 @@ function number(j::T, cache::Bool=true) where {T <: Nemo.RingElem}
        val.num += 1
        push!(val.A, j)
     end
-    return n
+    return ptr
 end
 
 function number(j::T, j_old::T) where {T <: Nemo.RingElem}
-    if j == j_old   # for inplace operations
-        return number(j, false)
-    else
-        number_pop!(nemoNumberID, pointer_from_objref(j_old))
-        return number(j)
-    end
+    number_pop!(nemoNumberID, reinterpret(Ptr{Cvoid},pointer_from_objref(j_old)))
+    return number(j)
 end
 
 
