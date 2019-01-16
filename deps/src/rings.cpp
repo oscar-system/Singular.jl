@@ -183,4 +183,9 @@ void singular_define_rings(jlcxx::Module & Singular)
                         r->CanShortOut = FALSE;
                         rComplete(r);
                     });
+
+    Singular.method("p_Subst", [](poly p, int i, poly q, ring r) {
+        poly p_cp = p_Copy(p, r);
+        return p_Subst(p_cp, i, q, r);
+    });
 }

@@ -426,6 +426,23 @@ end
 
 ###############################################################################
 #
+#   Variable substitution
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    substitute_variable(p::spoly,i::Int64,q::spoly)
+> Substitutes the `i`-th variable of the polynomial `p` with the polynomial `q`.
+> Returns a new polynomial.
+"""
+function substitute_variable(p::spoly, i::Int64, q::spoly)
+    R = parent(p)
+    check_parent(p, q)
+    return R( libSingular.p_Subst(p.ptr,i, q.ptr, R.ptr) )
+end
+
+###############################################################################
+#
 #   Unsafe operations
 #
 ###############################################################################
