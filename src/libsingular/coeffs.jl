@@ -1,39 +1,46 @@
 # initialise a number from an mpz
 function n_InitMPZ(b::BigInt, cf::coeffs)
+    println(@__LINE__)
     bb = pointer_from_objref(b)
     return n_InitMPZ_internal(bb, cf)
 end
 
 # write a number to a Singular string
 function n_Write(n::numberRef, cf::coeffs, bShortOut::Bool = false)
+    println(@__LINE__)
    d = Int(bShortOut)
    n_Write_internal(n, cf, d);
 end
 
 function n_ExtGcd(a::number, b::number, s::Ptr{numberRef}, t::Ptr{numberRef}, cf:: coeffs)
+    println(@__LINE__)
    sp = reinterpret(Ptr{Nothing},s)
    tp = reinterpret(Ptr{Nothing},t)
    return n_ExtGcd_internal(a, b, sp, tp, cf);
 end
 
 function n_QuotRem(a::number, b::number, p::Ptr{number}, cf::coeffs)
+    println(@__LINE__)
    pp = reinterpret(Ptr{Nothing}, p)
    n_QuotRem_internal(a, b, pp, cf)
 end
 
 function n_ChineseRemainderSym(a::Array{number, 1}, b::Array{number, 1}, n::Cint, signed::Cint, cf::coeffs)
+    println(@__LINE__)
    p1 = reinterpret(Ptr{Nothing},pointer(a))
    p2 = reinterpret(Ptr{Nothing},pointer(b))
    return n_ChineseRemainderSym_internal(p1, p2, n, signed, cf)
 end
 
 # create a Singular string environment
-function StringSetS(m) 
+function StringSetS(m)
+    println(@__LINE__) 
    StringSetS_internal(m)
 end
 
 # omalloc free
 function omFree(m :: Ptr{T}) where {T}
+    println(@__LINE__)
    mp = reinterpret(Ptr{Nothing}, m)
    omFree_internal(m)
 end
@@ -45,6 +52,7 @@ end
 ###############################################################################
 
 function setindex!(ptr::Ptr{number}, n::number)
+    println(@__LINE__)
    pp = reinterpret(Ptr{Nothing}, ptr)
    setindex_internal(pp, n)
 end
@@ -62,7 +70,13 @@ mutable struct live_cache
    A::Array{Nemo.RingElem, 1}
 end
 
+mutable struct my_counter
+    added::BigInt
+    deleted::BigInt
+end
+
 const nemoNumberID = Base.Dict{UInt, live_cache}()
+const my_actual_counter = my_counter(0,0)
 
 function julia(cf::coeffs)
    ptr = get_coeff_data(cf)
@@ -78,8 +92,9 @@ function number_pop!(D::Base.Dict{UInt, live_cache}, ptr::Ptr{Cvoid})
     if haskey(D,iptr)
         val = D[iptr]
         val.num -= 1
+        my_actual_counter.deleted += 1
         if val.num == 0
-            pop!(D, iptr)
+            delete!(D, iptr)
         end
     end
 end
@@ -93,15 +108,16 @@ function number(j::T, cache::Bool=true) where {T <: Nemo.RingElem}
        end
        val = nemoNumberID[iptr]
        val.num += 1
+       my_actual_counter.added += 1
        push!(val.A, j)
     end
-    return ptr
+    return reinterpret(Ptr{Cvoid},ptr)
 end
 
-function number(j::T, j_old::T) where {T <: Nemo.RingElem}
-    number_pop!(nemoNumberID, reinterpret(Ptr{Cvoid},pointer_from_objref(j_old)))
-    return number(j)
-end
+# function number(j::T, j_old::T) where {T <: Nemo.RingElem}
+#     number_pop!(nemoNumberID, reinterpret(Ptr{Cvoid},pointer_from_objref(j_old)))
+#     return number(j)
+# end
 
 
 

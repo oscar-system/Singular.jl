@@ -13,10 +13,7 @@ end
    
 function fmpzDelete(ptr::Ptr{Ptr{Cvoid}}, cf::Ptr{Cvoid})
     ptr_new = unsafe_load(ptr)
-    n = julia(ptr_new)::Nemo.fmpz
-    if n != C_NULL
-        number_pop!(nemoNumberID, ptr_new)
-    end
+    number_pop!(nemoNumberID, ptr_new)
     nothing
 end
 
