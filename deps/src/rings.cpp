@@ -188,4 +188,10 @@ void singular_define_rings(jlcxx::Module & Singular)
         poly p_cp = p_Copy(p, r);
         return p_Subst(p_cp, i, q, r);
     });
+
+    Singular.method("p_PermPoly", [](poly p, int * perm, ring old_ring,
+                                     ring new_ring, void * map_func_ptr) {
+        nMapFunc map_func = reinterpret_cast<nMapFunc>(map_func_ptr);
+        return p_PermPoly(p, perm, old_ring, new_ring, map_func);
+    });
 }

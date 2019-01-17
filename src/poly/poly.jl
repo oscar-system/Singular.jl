@@ -441,6 +441,22 @@ function substitute_variable(p::spoly, i::Int64, q::spoly)
     return R( libSingular.p_Subst(p.ptr,i, q.ptr, R.ptr) )
 end
 
+@doc Markdown.doc"""
+    permute_variables(p::spoly, perm::Array{Int64,1}, new_ring::PolyRing)
+> Permutes the indeterminates of `p` according to `perm` to the indeterminates
+> of the ring `new_ring`.
+"""
+function permute_variables(p::spoly, perm::Array{Int64,1}, new_ring::PolyRing)
+    old_ring = parent(p)
+    perm_64 = [0]
+    append!(perm_64,perm)
+    perm_32 = convert(Array{Int32,1},perm_64)
+    map_ptr = libSingular.n_SetMap(base_ring(old_ring).ptr, base_ring(new_ring).ptr)
+    poly_ptr = libSingular.p_PermPoly(p.ptr, perm_32, old_ring.ptr, new_ring.ptr, map_ptr)
+    poly = new_ring(poly_ptr)
+    return poly
+end
+
 ###############################################################################
 #
 #   Unsafe operations
