@@ -132,6 +132,11 @@ function test_spoly_manipulation()
 
    @test characteristic(R) == 6
 
+   R,(x,y) = PolynomialRing(QQ,["x","y"])
+   p = x+y
+   q = x
+   @test Singular.substitute_variable(p,2,q) == 2*x
+
    println("PASS")
 end
 
