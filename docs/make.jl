@@ -1,7 +1,7 @@
 using Documenter, Singular
 
 makedocs(
-         format   = :html,
+         format   = Documenter.HTML(),
          sitename = "Singular.jl",
          pages    = [
              "index.md",
