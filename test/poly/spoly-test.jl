@@ -101,14 +101,6 @@ function test_spoly_manipulation()
    @test length(x^2 + 2x + 1) == 3
    @test degree(x^2 + 2x + 1) == 2
 
-   @test exponent(x^5 + 3x + 2, 2) == [5]
-   
-   A = [0]
-
-   exponent!(A, x^5 + 3x + 2, 2)
-
-   @test A == [5]
-
    @test lead_exponent(x^3 + 2x + 1) == [3]
 
    @test deepcopy(x + 2) == x + 2
@@ -117,16 +109,9 @@ function test_spoly_manipulation()
 
    @test ngens(R) == 1
    pol = x^5 + 3x + 2
-   c_iter = coeffs_expos(pol)
    
-   i = length(pol) - 1
-
-   for (c, ex) in c_iter
-      @test coeff(pol, i) == c      
-      @test exponent(pol, i) == ex 
-      i -= 1
-    end
-   
+   @test length(collect(coeffs(pol))) == length(pol)
+   @test length(collect(exponent_vectors(pol))) == length(pol)
    
    R, (x, ) = PolynomialRing(ResidueRing(ZZ, 6), ["x", ])
 

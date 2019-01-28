@@ -69,20 +69,20 @@ function _PolyRing_clear_fn(R::PolyRing)
    end
 end
 
-mutable struct spoly{T <: Nemo.RingElem} <: Nemo.RingElem
+mutable struct spoly{T <: Nemo.RingElem} <: Nemo.MPolyElem{T}
    ptr::libSingular.poly
    parent::PolyRing{T}
 
    function spoly{T}(R::PolyRing{T}) where T <: Nemo.RingElem
       p = libSingular.p_ISet(0, R.ptr)
-	  z = new(p, R)
+      z = new{T}(p, R)
       R.refcount += 1
       finalizer(_spoly_clear_fn, z)
       return z
    end
     
    function spoly{T}(R::PolyRing{T}, p::libSingular.poly) where T <: Nemo.RingElem
-      z = new(p, R)
+      z = new{T}(p, R)
       R.refcount += 1
       finalizer(_spoly_clear_fn, z)
       return z
@@ -91,7 +91,7 @@ mutable struct spoly{T <: Nemo.RingElem} <: Nemo.RingElem
    function spoly{T}(R::PolyRing{T}, p::T) where T <: Nemo.RingElem
       n = libSingular.n_Copy(p.ptr, parent(p).ptr)
       r = libSingular.p_NSet(n, R.ptr)
-      z = new(r, R)
+      z = new{T}(r, R)
       R.refcount += 1
       finalizer(_spoly_clear_fn, z)
       return z
@@ -99,7 +99,7 @@ mutable struct spoly{T <: Nemo.RingElem} <: Nemo.RingElem
     
    function spoly{T}(R::PolyRing{T}, n::libSingular.number) where T <: Nemo.RingElem
       p = libSingular.p_NSet(n, R.ptr)
-      z = new(p, R)
+      z = new{T}(p, R)
       R.refcount += 1
       finalizer(_spoly_clear_fn, z)
       return z
@@ -107,7 +107,7 @@ mutable struct spoly{T <: Nemo.RingElem} <: Nemo.RingElem
 
    function spoly{T}(R::PolyRing{T}, b::Int) where T <: Nemo.RingElem
       p = libSingular.p_ISet(b, R.ptr)
-      z = new(p, R)
+      z = new{T}(p, R)
       R.refcount += 1
       finalizer(_spoly_clear_fn, z)
       return z
@@ -116,7 +116,7 @@ mutable struct spoly{T <: Nemo.RingElem} <: Nemo.RingElem
    function spoly{T}(R::PolyRing{T}, b::BigInt) where T <: Nemo.RingElem
       n = libSingular.n_InitMPZ(b, R.base_ring.ptr)
       p = libSingular.p_NSet(n, R.ptr)
-      z = new(p, R)
+      z = new{T}(p, R)
       R.refcount += 1
       finalizer(_spoly_clear_fn, z)
       return z
@@ -128,3 +128,4 @@ function _spoly_clear_fn(p::spoly)
    libSingular.p_Delete(p.ptr, R.ptr)
    _PolyRing_clear_fn(R)
 end
+

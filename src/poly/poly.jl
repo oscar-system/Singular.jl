@@ -1,6 +1,8 @@
-export spoly, PolyRing, coeff, coeffs_expos, degree, exponent!, isgen, content,
-       exponent, lead_exponent, ngens, degree_bound, primpart, @PolynomialRing,
-       has_global_ordering, symbols
+export spoly, PolyRing, coeff, coeffs, coeffs_expos,
+       content, degree, degree_bound, exponent, exponent!,
+       exponent_vectors, has_global_ordering, isgen,
+       lead_exponent, monomials, ngens, @PolynomialRing, primpart,
+       symbols, terms
 
 ###############################################################################
 #
@@ -124,100 +126,9 @@ end
 
 length(p::spoly) = Int(libSingular.pLength(p.ptr))
 
-function coeff(p::spoly, i::Int)
-   i = length(p) - i - 1
-   R = base_ring(p)
-   if i < 0 || iszero(p)
-      return R()
-   end
-   ptr = p.ptr
-   for i = 1:i
-      ptr = libSingular.pNext(ptr)
-      if ptr.cpp_object == C_NULL
-         return R()
-      end
-   end
-   return R(libSingular.n_Copy(libSingular.pGetCoeff(ptr), R.ptr))
-end
-
-function exponent(p::spoly, i::Int)
-   i = length(p) - i - 1
-   R = parent(p)
-   n = ngens(R)
-   if i < 0 || iszero(p)
-      return zeros(Int, n)
-   end
-   ptr = p.ptr
-   for i = 1:i
-      ptr = libSingular.pNext(ptr)
-      if ptr.cpp_object == C_NULL
-         return zeros(Int, n)
-      end
-   end
-   A = Array{Int}(undef, n)
-   libSingular.p_GetExpVL(ptr, A, R.ptr)
-   return A
-end
-
-function exponent!(A::Array{Int, 1}, p::spoly, j::Int)
-   i = length(p) - j - 1
-   R = parent(p)
-   n = ngens(R)
-   @assert length(A) == n
-   if i < 0 || iszero(p)
-      for l=1:n
-        A[l] = 0
-      end
-      return A
-   end
-   ptr = p.ptr
-   for k = 1:i
-      ptr = libSingular.pNext(ptr)
-      if ptr.cpp_object == C_NULL
-        for l=1:n
-          A[l] = 0
-        end
-      end
-   end
-   libSingular.p_GetExpVL(ptr, A, R.ptr)
-   return A
-end
-
 function degree(p::spoly)
    R = parent(p)
    libSingular.pLDeg(p.ptr, R.ptr)
-end
-
-mutable struct coeffs_expos
-  E::Array{Int, 1}
-  c::Nemo.RingElem
-  R::Nemo.Ring
-  Rx::Nemo.Ring
-  a::spoly
-  function coeffs_expos(p::spoly)
-    r = new()
-    Rx = parent(p)
-    n = ngens(Rx)
-    r.E = zeros(Int, n)
-    r.Rx = Rx
-    r.R = base_ring(p)
-    r.c = r.R(0)
-    r.a = p
-    return r
-  end
-end
-
-function show(io::IO, sp::coeffs_expos)
-  println(io, "Coefficients and exponent iterator for $(sp.a)")
-end
-
-function Base.iterate(sp::coeffs_expos, p = sp.a.ptr)
-  if p.cpp_object == C_NULL
-    return nothing
-  end
-  libSingular.p_GetExpVL(p, sp.E, sp.Rx.ptr)
-  sp.c = sp.R(libSingular.n_Copy(libSingular.pGetCoeff(p), sp.R.ptr))
-  return ((sp.c, sp.E), libSingular.pNext(p))
 end
 
 @doc Markdown.doc"""
@@ -246,7 +157,59 @@ end
 function canonical_unit(a::spoly{T}) where T <: Nemo.RingElem
   return a == 0 ? one(base_ring(a)) : canonical_unit(coeff(a, 0))
 end
-   
+
+###############################################################################
+#
+#   Iterators
+#
+###############################################################################
+
+function Base.iterate(x::Nemo.Generic.MPolyCoeffs{spoly{T}}) where T <: Nemo.RingElem
+   p = x.poly
+   ptr = p.ptr
+   if ptr.cpp_object == C_NULL
+      return nothing
+   else
+      R = base_ring(p)
+      return R(libSingular.n_Copy(libSingular.pGetCoeff(ptr), R.ptr)), ptr
+   end
+end
+
+function Base.iterate(x::Nemo.Generic.MPolyCoeffs{spoly{T}}, state) where T <: Nemo.RingElem
+   state = libSingular.pNext(state)
+   if state.cpp_object == C_NULL
+      return nothing
+   else
+      R = base_ring(x.poly)
+      return R(libSingular.n_Copy(libSingular.pGetCoeff(state), R.ptr)), state
+   end
+end
+
+function Base.iterate(x::Nemo.Generic.MPolyExponentVectors{spoly{T}}) where T <: Nemo.RingElem
+   p = x.poly
+   ptr = p.ptr
+   if ptr.cpp_object == C_NULL
+      return nothing
+   else
+      R = parent(p)
+      A = Array{Int}(undef, ngens(R))
+      libSingular.p_GetExpVL(ptr, A, R.ptr)
+      return A, ptr
+   end
+end
+
+function Base.iterate(x::Nemo.Generic.MPolyExponentVectors{spoly{T}}, state) where T <: Nemo.RingElem
+   state = libSingular.pNext(state)
+   if state.cpp_object == C_NULL
+      return nothing
+   else
+      R = parent(x.poly)
+      A = Array{Int}(undef, ngens(R))
+      libSingular.p_GetExpVL(state, A, R.ptr)
+      return A, state
+   end
+end
+
 ###############################################################################
 #
 #   String I/O
@@ -415,8 +378,8 @@ end
 function content(x::spoly)
    R = base_ring(x)
    d = R()
-   for i = 1:length(x)
-      d = gcd(d, coeff(x, i - 1))
+   for c in coeffs(x)
+      d = gcd(d, c)
       if isone(d)
          break
       end
