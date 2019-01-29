@@ -112,7 +112,16 @@ function test_spoly_manipulation()
    
    @test length(collect(coeffs(pol))) == length(pol)
    @test length(collect(exponent_vectors(pol))) == length(pol)
-   
+
+   polzip = zip(coeffs(pol), monomials(pol), terms(pol))
+   r = R()
+   for (c, m, t) in polzip
+      r += c*m
+      @test t == c*m
+   end
+
+   @test pol == r
+    
    R, (x, ) = PolynomialRing(ResidueRing(ZZ, 6), ["x", ])
 
    @test characteristic(R) == 6

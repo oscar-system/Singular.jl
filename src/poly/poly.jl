@@ -210,6 +210,57 @@ function Base.iterate(x::Nemo.Generic.MPolyExponentVectors{spoly{T}}, state) whe
    end
 end
 
+function Base.iterate(x::Nemo.Generic.MPolyTerms{spoly{T}}) where T <: Nemo.RingElem
+   p = x.poly
+   ptr = p.ptr
+   if ptr.cpp_object == C_NULL
+      return nothing
+   else
+      R = parent(p)
+      return R(libSingular.p_Head(ptr, R.ptr)), ptr
+   end
+end
+
+function Base.iterate(x::Nemo.Generic.MPolyTerms{spoly{T}}, state) where T <: Nemo.RingElem
+   state = libSingular.pNext(state)
+   if state.cpp_object == C_NULL
+      return nothing
+   else
+      R = parent(x.poly)
+      return R(libSingular.p_Head(state, R.ptr)), state
+   end
+end
+
+function Base.iterate(x::Nemo.Generic.MPolyMonomials{spoly{T}}) where T <: Nemo.RingElem
+   p = x.poly
+   ptr = p.ptr
+   if ptr.cpp_object == C_NULL
+      return nothing
+   else
+      S = parent(p)
+      R = base_ring(p)
+      mptr = libSingular.p_Head(ptr, S.ptr)
+      n = libSingular.n_Copy(one(R).ptr, R.ptr)
+      libSingular.p_SetCoeff0(mptr, n, S.ptr)
+      return S(mptr), ptr
+   end
+end
+
+function Base.iterate(x::Nemo.Generic.MPolyMonomials{spoly{T}}, state) where T <: Nemo.RingElem
+   state = libSingular.pNext(state)
+   if state.cpp_object == C_NULL
+      return nothing
+   else
+      p = x.poly
+      S = parent(p)
+      R = base_ring(p)
+      mptr = libSingular.p_Head(state, S.ptr)
+      n = libSingular.n_Copy(one(R).ptr, R.ptr)
+      libSingular.p_SetCoeff0(mptr, n, S.ptr)
+      return S(mptr), state
+   end
+end
+
 ###############################################################################
 #
 #   String I/O

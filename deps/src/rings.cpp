@@ -95,6 +95,10 @@ void singular_define_rings(jlcxx::Module & Singular)
         poly p = pNext(a);
         return p;
     });
+    Singular.method("p_Head", [](spolyrec * a, ip_sring * r) {
+        poly p = p_Head(a, r); return p; });
+    Singular.method("p_SetCoeff0", [](spolyrec * a, snumber * n, ip_sring * r) {
+        p_SetCoeff0(a, n, r); });
     Singular.method("p_Neg",
                     [](spolyrec * p, ip_sring * r) { return p_Neg(p, r); });
     Singular.method("pGetCoeff", [](spolyrec * p) { return pGetCoeff(p); });
