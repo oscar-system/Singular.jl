@@ -5,9 +5,9 @@
 ###############################################################################
 
 const PolyRingID = Dict{Tuple{Union{Ring, Field}, Array{Symbol, 1},
-         libSingular.rRingOrder_t, libSingular.rRingOrder_t, Int}, Ring}()
+         libSingular.rRingOrder_t, libSingular.rRingOrder_t, Int}, Nemo.MPolyRing}()
 
-mutable struct PolyRing{T <: Nemo.RingElem} <: Ring
+mutable struct PolyRing{T <: Nemo.RingElem} <: Nemo.MPolyRing{T}
    ptr::libSingular.ring
    base_ring::Union{Ring, Field}
    refcount::Int

@@ -72,6 +72,16 @@ function test_spoly_constructors()
    @test length(symbols(R)) == 2
    @test symbols(R) == [:x, :y]
 
+   R, (x, y) = PolynomialRing(ZZ, ["x", "y"]; ordering=:lex)
+
+   M = MPolyBuildCtx(R)
+   push_term!(M, ZZ(2), [1, 2])
+   push_term!(M, ZZ(1), [1, 1])
+   push_term!(M, ZZ(2), [3, 2])
+   f = finish(M)
+
+   @test f == 2*x^3*y^2+2*x*y^2+x*y
+
    println("PASS")
 end
 
@@ -107,7 +117,7 @@ function test_spoly_manipulation()
 
    @test characteristic(R) == 0
 
-   @test ngens(R) == 1
+   @test nvars(R) == 1
    pol = x^5 + 3x + 2
    
    @test length(collect(coeffs(pol))) == length(pol)
@@ -126,8 +136,8 @@ function test_spoly_manipulation()
 
    @test characteristic(R) == 6
 
-   R,(x,y) = PolynomialRing(QQ,["x", "y"])
-   p = x+y
+   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   p = x + y
    q = x
    @test Singular.substitute_variable(p, 2, q) == 2*x
    @test Singular.permute_variables(q, [2, 1], R) == y

@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-const ResolutionSetID = Dict{Ring, Set}()
+const ResolutionSetID = Dict{PolyRing, Set}()
 
 mutable struct ResolutionSet{T <: Nemo.RingElem} <: Set
    base_ring::PolyRing

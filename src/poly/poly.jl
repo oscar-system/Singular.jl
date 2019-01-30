@@ -1,8 +1,9 @@
 export spoly, PolyRing, coeff, coeffs, coeffs_expos,
        content, degree, degree_bound, exponent, exponent!,
-       exponent_vectors, has_global_ordering, isgen,
-       lead_exponent, monomials, ngens, @PolynomialRing, primpart,
-       symbols, terms
+       exponent_vectors, finish, has_global_ordering, isgen,
+       lead_exponent, monomials, MPolyBuildCtx,
+       nvars, @PolynomialRing, primpart,
+       push_term!, sort_terms, symbols, terms
 
 ###############################################################################
 #
@@ -21,10 +22,10 @@ elem_type(::Type{PolyRing{T}}) where T <: Nemo.RingElem = spoly{T}
 parent_type(::Type{spoly{T}}) where T <: Nemo.RingElem = PolyRing{T}
 
 @doc Markdown.doc"""
-    ngens(R::PolyRing)
+    nvars(R::PolyRing)
 > Return the number of variables in the given polynomial ring.
 """
-ngens(R::PolyRing) = Int(libSingular.rVar(R.ptr))
+nvars(R::PolyRing) = Int(libSingular.rVar(R.ptr))
 
 @doc Markdown.doc"""
     has_global_ordering(R::PolyRing)
@@ -42,7 +43,7 @@ has_global_ordering(R::PolyRing) = Bool(libSingular.rHasGlobalOrdering(R.ptr))
 characteristic(R::PolyRing) = Int(libSingular.rChar(R.ptr))
 
 function gens(R::PolyRing)
-   n = ngens(R)
+   n = nvars(R)
    return [R(libSingular.rGetVar(Cint(i), R.ptr)) for i = 1:n]
 end
 
@@ -89,7 +90,7 @@ function isgen(p::spoly)
       return false
    end
     n = 0
-   for i = 1:ngens(R)
+   for i = 1:nvars(R)
       d = libSingular.p_GetExp(p.ptr, Cint(i), R.ptr)
       if d > 1
          return false
@@ -111,7 +112,7 @@ function isconstant(p::spoly)
    if libSingular.pNext(p.ptr).cpp_object != C_NULL
       return false
    end
-   for i = 1:ngens(R)
+   for i = 1:nvars(R)
       if libSingular.p_GetExp(p.ptr, Cint(i), R.ptr) != 0
          return false
       end
@@ -139,7 +140,7 @@ end
 """
 function lead_exponent(p::spoly)
    R = parent(p)
-   n = ngens(R)
+   n = nvars(R)
    A = Array{Int}(undef, n)
    libSingular.p_GetExpVL(p.ptr, A, R.ptr)
    return A
@@ -192,7 +193,7 @@ function Base.iterate(x::Nemo.Generic.MPolyExponentVectors{spoly{T}}) where T <:
       return nothing
    else
       R = parent(p)
-      A = Array{Int}(undef, ngens(R))
+      A = Array{Int}(undef, nvars(R))
       libSingular.p_GetExpVL(ptr, A, R.ptr)
       return A, ptr
    end
@@ -204,7 +205,7 @@ function Base.iterate(x::Nemo.Generic.MPolyExponentVectors{spoly{T}}, state) whe
       return nothing
    else
       R = parent(x.poly)
-      A = Array{Int}(undef, ngens(R))
+      A = Array{Int}(undef, nvars(R))
       libSingular.p_GetExpVL(state, A, R.ptr)
       return A, state
    end
@@ -477,6 +478,12 @@ end
 #
 ###############################################################################
 
+function sort_terms!(x::spoly)
+   S = parent(x)
+   x.ptr = libSingular.p_SortMerge(x.ptr, S.ptr)
+   return x
+end
+
 function addeq!(x::spoly, y::spoly)
     R = parent(x)
     if y.ptr == C_NULL
@@ -530,6 +537,43 @@ promote_rule(::Type{spoly{T}}, ::Type{spoly{T}}) where T <: Nemo.RingElem = spol
 
 function promote_rule(::Type{spoly{T}}, ::Type{U}) where {T <: Nemo.RingElem, U <: Nemo.RingElem}
    promote_rule(T, U) == T ? spoly{T} : Union{}
+end
+
+###############################################################################
+#
+#   Build context
+#
+###############################################################################
+
+function MPolyBuildCtx(R::PolyRing)
+   return MPolyBuildCtx(R, R().ptr)
+end
+
+function push_term!(M::MPolyBuildCtx{spoly{S}, U}, c::S, expv::Vector{Int}) where {U, S <: Nemo.RingElem}
+   if c == 0
+      return
+   end
+   R = parent(M.poly)
+   nv = nvars(R)
+   nv != length(expv) && error("Incorrect number of exponents in push_term!")
+   p = M.poly
+   ptr = libSingular.p_Init(R.ptr)
+   libSingular.p_SetCoeff0(ptr, libSingular.n_Copy(c.ptr, base_ring(R).ptr), R.ptr)
+   for i = 1:nv
+      libSingular.p_SetExp(ptr, i, expv[i], R.ptr)
+   end
+   if iszero(p)
+      p.ptr = ptr
+   else
+      libSingular.p_SetNext(M.state, ptr)
+   end
+   M.state = ptr
+   return M.poly
+end
+
+function finish(M::MPolyBuildCtx{spoly{S}, U}) where {S, U}
+   p = sort_terms!(M.poly)
+   return p
 end
 
 ###############################################################################
@@ -700,7 +744,7 @@ end
 """
 function (R::AbstractAlgebra.Generic.MPolyRing{T})(p::Singular.spoly{Singular.n_unknown{T}}) where T <: Nemo.RingElem
    parent_ring = parent(p)
-   n = ngens(parent_ring)
+   n = nvars(parent_ring)
    new_p = zero(R)
    gens = AbstractAlgebra.Generic.gens(R)
    iterator = coeffs_expos(p)

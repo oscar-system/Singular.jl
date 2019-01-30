@@ -70,7 +70,6 @@ void singular_define_rings(jlcxx::Module & Singular)
     Singular.method("p_IsOne",
                     [](spolyrec * p, ip_sring * r) { return p_IsOne(p, r); });
     Singular.method("p_One", [](ip_sring * r) { return p_One(r); });
-    Singular.method("p_Init", [](ip_sring * r) { return p_Init(r); });
     Singular.method("p_IsUnit", [](spolyrec * p, ip_sring * r) {
         return p_IsUnit(p, r);
     });
@@ -95,10 +94,17 @@ void singular_define_rings(jlcxx::Module & Singular)
         poly p = pNext(a);
         return p;
     });
+    Singular.method("p_Init", [](ip_sring * r) { return p_Init(r); });
     Singular.method("p_Head", [](spolyrec * a, ip_sring * r) {
         poly p = p_Head(a, r); return p; });
     Singular.method("p_SetCoeff0", [](spolyrec * a, snumber * n, ip_sring * r) {
         p_SetCoeff0(a, n, r); });
+    Singular.method("p_SetExp", [](spolyrec * a, int i, int v, ip_sring * r) {
+        p_SetExp(a, i, v, r); });
+    Singular.method("p_SetNext", [](spolyrec * a, spolyrec * m) {
+        pNext(a) = m; });
+    Singular.method("p_SortMerge", [](spolyrec * a, ip_sring * r) {
+        return p_SortMerge(a, r); });
     Singular.method("p_Neg",
                     [](spolyrec * p, ip_sring * r) { return p_Neg(p, r); });
     Singular.method("pGetCoeff", [](spolyrec * p) { return pGetCoeff(p); });
