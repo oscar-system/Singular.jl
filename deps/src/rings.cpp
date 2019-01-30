@@ -105,6 +105,8 @@ void singular_define_rings(jlcxx::Module & Singular)
         pNext(a) = m; });
     Singular.method("p_SortMerge", [](spolyrec * a, ip_sring * r) {
         return p_SortMerge(a, r); });
+    Singular.method("p_SortAdd", [](spolyrec * a, ip_sring * r) {
+        return p_SortAdd(a, r); });
     Singular.method("p_Neg",
                     [](spolyrec * p, ip_sring * r) { return p_Neg(p, r); });
     Singular.method("pGetCoeff", [](spolyrec * p) { return pGetCoeff(p); });
