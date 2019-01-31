@@ -83,6 +83,11 @@ mutable struct my_counter
     deleted::BigInt
 end
 
+const line_counter_dict = Base.Dict{Ptr{Cvoid},Int64}()
+const undeletable_list = Ptr{Cvoid}[]
+
+const pointer_compare = Any[]
+
 const nemoNumberID = Base.Dict{UInt, live_cache}()
 const my_actual_counter = my_counter(0,0)
 
@@ -96,6 +101,11 @@ function julia(p::Ptr{Cvoid})
 end
 
 function number_pop!(D::Base.Dict{UInt, live_cache}, ptr::Ptr{Cvoid})
+    if haskey(line_counter_dict,ptr)
+        pop!(line_counter_dict,ptr)
+    else
+        push!(undeletable_list,ptr)
+    end
     iptr = reinterpret(UInt, ptr) >> 24
     if haskey(D,iptr)
         val = D[iptr]
@@ -107,9 +117,12 @@ function number_pop!(D::Base.Dict{UInt, live_cache}, ptr::Ptr{Cvoid})
     end
 end
 
-function number(j::T, cache::Bool=true) where {T <: Nemo.RingElem}
+function number(j::T, line_number) where {T <: Nemo.RingElem}
     ptr = pointer_from_objref(j)
-    if cache
+    push!(pointer_compare,reinterpret(Ptr{Cvoid},ptr))
+    push!(pointer_compare,line_number)
+    line_counter_dict[reinterpret(Ptr{Cvoid},ptr)] = line_number
+    if true
        iptr = reinterpret(UInt, ptr) >> 24
        if !haskey(nemoNumberID, iptr)
           nemoNumberID[iptr] = live_cache(0, Array{Nemo.RingElem}(undef, 64))
