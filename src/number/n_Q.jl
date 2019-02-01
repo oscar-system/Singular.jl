@@ -336,6 +336,8 @@ promote_rule(C::Type{n_Q}, ::Type{n_Q}) = n_Z
 
 (::Rationals)(n::Int, m::Int) = n_Q(n) // n_Q(m)
 
+(::Rationals)(x::Rational{Int}) = n_Q(numerator(x)) // n_Q(denominator(x))
+
 (R::Rationals)(x::Integer) = R(libSingular.n_InitMPZ(BigInt(x), R.ptr)) 
 
 (::Rationals)(n::n_Z) = n_Q(n)
