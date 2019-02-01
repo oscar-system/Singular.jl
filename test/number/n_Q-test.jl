@@ -39,6 +39,11 @@ function test_n_Q_constructors()
 
    @test isa(h, n_Q)
 
+   i = QQ(1//2)
+
+   @test isa(i, n_Q)
+   @test i == QQ(1) // QQ(2)
+
    println("PASS")
 end
 
