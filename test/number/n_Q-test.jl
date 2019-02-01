@@ -43,6 +43,11 @@ function test_n_Q_constructors()
 
    @test isa(i, n_Q)
    @test i == QQ(1) // QQ(2)
+   
+   j = QQ(BigInt(1)//BigInt(2))
+
+   @test isa(j, n_Q)
+   @test j == QQ(1) // QQ(2)
 
    println("PASS")
 end
