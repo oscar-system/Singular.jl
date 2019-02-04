@@ -1,6 +1,10 @@
 export spoly, PolyRing, coeff, coeffs_expos, degree, exponent!, isgen, content,
        exponent, lead_exponent, ngens, degree_bound, primpart, @PolynomialRing,
+<<<<<<< HEAD
        has_global_ordering, symbols, jet, Diff, jacob
+=======
+       has_global_ordering, symbols
+>>>>>>> upstream/master
 
 ###############################################################################
 #

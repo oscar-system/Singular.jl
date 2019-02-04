@@ -1,7 +1,11 @@
 export sideal, IdealSet, syz, lead, normalize!, isconstant, iszerodim, fres,
        sres, intersection, quotient, reduce, eliminate, kernel, equal,
+<<<<<<< HEAD
        contains, isvar_generated, saturation, satstd, slimgb, std, jet, jacob,
        vdim, kbase, highcorner
+=======
+       contains, isvar_generated, saturation, satstd, slimgb, std
+>>>>>>> upstream/master
 
 ###############################################################################
 #

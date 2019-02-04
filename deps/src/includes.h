@@ -15,7 +15,7 @@
 #include <misc/intvec.h>
 #include <misc/auxiliary.h>
 #include <reporter/reporter.h>
-//#include <feFopen.h>
+// #include <feFopen.h>
 #include <coeffs/coeffs.h>
 #include <coeffs/longrat.h>
 #include <polys/clapsing.h>
@@ -29,7 +29,10 @@
 #include <kernel/GBEngine/tgb.h>
 #include <kernel/ideals.h>
 #include <kernel/polys.h>
+<<<<<<< HEAD
 #include <kernel/combinatorics/stairc.h>
+=======
+>>>>>>> upstream/master
 #include <Singular/grammar.h>
 #include <Singular/libsingular.h>
 #include <Singular/fevoices.h>
@@ -49,4 +52,8 @@ template <> struct IsBits<rRingOrder_t> : std::true_type {
 };
 }    // namespace jlcxx
 
+<<<<<<< HEAD
 #endif
+=======
+#endif
+>>>>>>> upstream/master

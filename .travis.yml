@@ -1,15 +1,14 @@
-sudo: false
+# Force Ubuntu 16.04 "Xenial" to get newer GCC, binutils etc.
+dist: xenial
+
+language: julia
+julia: 1.0
+
 addons:
     apt:
-        sources:
-           - ubuntu-toolchain-r-test
-           - george-edison55-precise-backports
         packages:
            - cmake
            - cmake-data
-           - gcc-6
-           - g++-6
-           - binutils
            - gfortran
            - libblas-dev
            - liblapack-dev
@@ -18,38 +17,20 @@ addons:
  
 matrix:
     include:
-       - language: julia
-         julia: 0.6
-         os: linux
-       - language: julia
-         julia: 0.6
-         os: osx
-install:
-    - if [ "$TRAVIS_OS_NAME" = "linux" ]; then export CXX="g++-6" CC="gcc-6"; fi
-    - if [ "$TRAVIS_OS_NAME" = "osx" ]; then export CXX="clang++" CC="clang"; fi
-    - if [ "$TRAVIS_OS_NAME" = "linux" ]; then export PATH="$HOME/usr/bin:$PATH"; fi
-    - export THE_PKG_DIR=`julia -e 'println(Pkg.dir())'`
+       - os: linux
+       - os: osx
 
 script:
-    - if [ "$TRAVIS_OS_NAME" = "linux" ] && [ ! -f $HOME/usr/bin/ld ]; then
-         wget https://ftp.gnu.org/gnu/binutils/binutils-2.27.tar.gz;
-         tar xzf binutils-2.27.tar.gz;
-         (cd binutils-2.27 && ./configure --prefix=$HOME/usr && make && make install);
-      fi;
-    - if [ ! -f $HOME/early_abort ]; then julia -e 'Pkg.clone("https://github.com/Keno/Cxx.jl")' || false; fi
-    - if [ ! -f $HOME/early_abort ]; then PREBUILT_CI_BINARIES=1 julia -e 'Pkg.build("Cxx")' || false; fi
-    - if [ ! -f $HOME/early_abort ]; then julia -e 'Pkg.clone("https://github.com/wbhart/Singular.jl")' || false; fi
-    - if [ ! -f $HOME/early_abort ]; then julia -e 'Pkg.build("Singular")' || false; fi
-    - if [ ! -f $HOME/early_abort ]; then julia -e 'Pkg.test("Singular"; coverage=true)' || false; fi
+    - while sleep 30; do echo "still alive"; done &
+    - git fetch --unshallow
+    - julia --color=yes -e  'using Pkg; Pkg.clone(pwd()); Pkg.build("Singular")'
+    - julia --check-bounds=yes --color=yes -e 'using Pkg; Pkg.test("Singular"; coverage=true)'
 
 notifications:
   email: false
-# uncomment the following lines to override the default test script
-#script:
-#  - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-#  - julia -e 'Pkg.clone(pwd()); Pkg.build("Singular"); Pkg.test("Singular"; coverage=true)'
+
 after_success:
   # push coverage results to Coveralls
-  - julia -e 'cd(Pkg.dir("Singular")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())'
+  - julia --color=yes -e 'using Pkg; cd(Pkg.dir("Singular")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())'
   # push coverage results to Codecov
-  - julia -e 'cd(Pkg.dir("Singular")); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'
+  - julia --color=yes -e 'using Pkg; cd(Pkg.dir("Singular")); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'
