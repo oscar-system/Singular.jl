@@ -201,9 +201,8 @@ void singular_define_ideals(jlcxx::Module & Singular)
         "maGetPreimage", [](ring trgt, ideal a, ideal b, ring src) {
             sip_smap sing_map = {a->m, (char *)"julia_ring", 1, a->ncols};
             return maGetPreimage(trgt, &sing_map, b, src);
-<<<<<<< HEAD
     });
-    
+
     Singular.method("id_Jet", [](ideal I, int n, ring r) {
         ideal res = id_Jet(I,n,r);
         return res;
@@ -217,7 +216,7 @@ void singular_define_ideals(jlcxx::Module & Singular)
 	return n;
     });
 
-    Singular.method("id_kbase", [](ideal I, ring r) { 
+    Singular.method("id_kbase", [](ideal I, ring r) {
         ideal res;
 	const ring origin = currRing;
         rChangeCurrRing(r);
@@ -234,10 +233,4 @@ void singular_define_ideals(jlcxx::Module & Singular)
         rChangeCurrRing(origin);
         return h;
     });
-
-
-=======
-
-        });
->>>>>>> upstream/master
 }

@@ -1,15 +1,11 @@
 export sideal, IdealSet, syz, lead, normalize!, isconstant, iszerodim, fres,
        sres, intersection, quotient, reduce, eliminate, kernel, equal,
-<<<<<<< HEAD
        contains, isvar_generated, saturation, satstd, slimgb, std, jet, jacob,
        vdim, kbase, highcorner
-=======
-       contains, isvar_generated, saturation, satstd, slimgb, std
->>>>>>> upstream/master
 
 ###############################################################################
 #
-#   Basic manipulation 
+#   Basic manipulation
 #
 ###############################################################################
 
@@ -33,7 +29,7 @@ ngens(I::sideal) = Int(libSingular.ngens(I.ptr))
 
 function checkbounds(I::sideal, i::Int)
    (i > ngens(I) || i < 1) && throw(BoundsError(I, i))
-end   
+end
 
 function setindex!(I::sideal{spoly{T}}, p::spoly{T}, i::Int) where T <: Nemo.RingElem
    checkbounds(I, i)
@@ -139,7 +135,7 @@ function jacob(I::sideal)
 end
 ###############################################################################
 #
-#   String I/O 
+#   String I/O
 #
 ###############################################################################
 
@@ -292,7 +288,7 @@ end
     quotient{T <: Nemo.RingElem}(I::sideal{T}, J::sideal{T})
 > Returns the quotient of the two given ideals. Recall that the ideal quotient
 > $(I:J)$ over a polynomial ring $R$ is defined by
-> $\{r \in R \;|\; rJ \subseteq I\}$. 
+> $\{r \in R \;|\; rJ \subseteq I\}$.
 """
 function quotient(I::sideal{T}, J::sideal{T}) where T <: Nemo.RingElem
    check_parent(I, J)
@@ -357,7 +353,7 @@ end
 > constants). If `complete_reduction` is set to `true` (and the ordering is
 > a global ordering) then the Groebner basis is unique.
 """
-function std(I::sideal; complete_reduction::Bool=false) 
+function std(I::sideal; complete_reduction::Bool=false)
    R = base_ring(I)
    ptr = libSingular.id_Std(I.ptr, R.ptr, complete_reduction)
    libSingular.idSkipZeroes(ptr)
@@ -468,7 +464,7 @@ end
     syz(I::sideal)
 > Compute the module of syzygies of the ideal.
 """
-function syz(I::sideal) 
+function syz(I::sideal)
    R = base_ring(I)
    ptr = libSingular.id_Syzygies(I.ptr, R.ptr)
    libSingular.idSkipZeroes(ptr)

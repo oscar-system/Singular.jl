@@ -29,10 +29,7 @@
 #include <kernel/GBEngine/tgb.h>
 #include <kernel/ideals.h>
 #include <kernel/polys.h>
-<<<<<<< HEAD
 #include <kernel/combinatorics/stairc.h>
-=======
->>>>>>> upstream/master
 #include <Singular/grammar.h>
 #include <Singular/libsingular.h>
 #include <Singular/fevoices.h>
@@ -51,9 +48,4 @@ template <> struct IsBits<n_coeffType> : std::true_type {
 template <> struct IsBits<rRingOrder_t> : std::true_type {
 };
 }    // namespace jlcxx
-
-<<<<<<< HEAD
 #endif
-=======
-#endif
->>>>>>> upstream/master

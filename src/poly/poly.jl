@@ -1,10 +1,6 @@
 export spoly, PolyRing, coeff, coeffs_expos, degree, exponent!, isgen, content,
        exponent, lead_exponent, ngens, degree_bound, primpart, @PolynomialRing,
-<<<<<<< HEAD
        has_global_ordering, symbols, jet, Diff, jacob
-=======
-       has_global_ordering, symbols
->>>>>>> upstream/master
 
 ###############################################################################
 #
@@ -67,7 +63,7 @@ end
     degree_bound(R::PolyRing)
 > Return the internal degree bound in each variable, enforced by Singular. This is the
 > largest positive value any degree can have before an overflow will occur. This
-> internal bound may be higher than the bound requested by the user via the 
+> internal bound may be higher than the bound requested by the user via the
 > `degree_bound` parameter of the `PolynomialRing` constructor.
 """
 function degree_bound(R::PolyRing)
@@ -86,7 +82,7 @@ end
 
 function isgen(p::spoly)
    R = parent(p)
-   if p.ptr.cpp_object == C_NULL || libSingular.pNext(p.ptr).cpp_object != C_NULL || 
+   if p.ptr.cpp_object == C_NULL || libSingular.pNext(p.ptr).cpp_object != C_NULL ||
      !Bool(libSingular.n_IsOne(libSingular.pGetCoeff(p.ptr), base_ring(p).ptr))
       return false
    end
@@ -102,7 +98,7 @@ function isgen(p::spoly)
          n = 1
       end
    end
-   return n == 1    
+   return n == 1
 end
 
 function isconstant(p::spoly)
@@ -118,7 +114,7 @@ function isconstant(p::spoly)
          return false
       end
    end
-   return true   
+   return true
 end
 
 function isunit(p::spoly)
@@ -250,7 +246,7 @@ end
 function canonical_unit(a::spoly{T}) where T <: Nemo.RingElem
   return a == 0 ? one(base_ring(a)) : canonical_unit(coeff(a, 0))
 end
-  
+
 
 @doc Markdown.doc"""
    jet(x::spoly, n::Int)
@@ -326,7 +322,7 @@ isnegative(x::spoly) = isconstant(x) && !iszero(x) && isnegative(coeff(x, 0))
 function -(a::spoly)
    a1 = libSingular.p_Copy(a.ptr, parent(a).ptr)
    s = libSingular.p_Neg(a1, parent(a).ptr)
-   return parent(a)(s) 
+   return parent(a)(s)
 end
 
 ###############################################################################
@@ -340,7 +336,7 @@ function (a::spoly{T} + b::spoly{T}) where T <: Nemo.RingElem
    a1 = libSingular.p_Copy(a.ptr, parent(a).ptr)
    b1 = libSingular.p_Copy(b.ptr, parent(a).ptr)
    s = libSingular.p_Add_q(a1, b1, parent(a).ptr)
-   return parent(a)(s) 
+   return parent(a)(s)
 end
 
 function (a::spoly{T} - b::spoly{T}) where T <: Nemo.RingElem
@@ -348,7 +344,7 @@ function (a::spoly{T} - b::spoly{T}) where T <: Nemo.RingElem
    a1 = libSingular.p_Copy(a.ptr, parent(a).ptr)
    b1 = libSingular.p_Copy(b.ptr, parent(a).ptr)
    s = libSingular.p_Sub(a1, b1, parent(a).ptr)
-   return parent(a)(s) 
+   return parent(a)(s)
 end
 
 function (a::spoly{T} * b::spoly{T}) where T <: Nemo.RingElem
@@ -356,7 +352,7 @@ function (a::spoly{T} * b::spoly{T}) where T <: Nemo.RingElem
    a1 = libSingular.p_Copy(a.ptr, parent(a).ptr)
    b1 = libSingular.p_Copy(b.ptr, parent(a).ptr)
    s = libSingular.p_Mult_q(a1, b1, parent(a).ptr)
-   return parent(a)(s) 
+   return parent(a)(s)
 end
 
 ###############################################################################
@@ -414,8 +410,8 @@ end
 
 function gcd(x::spoly{T}, y::spoly{T}) where T <: Nemo.RingElem
    check_parent(x, y)
-   R = parent(x)   
-   x1 = libSingular.p_Copy(x.ptr, R.ptr)   
+   R = parent(x)
+   x1 = libSingular.p_Copy(x.ptr, R.ptr)
    y1 = libSingular.p_Copy(y.ptr, R.ptr)
    p = libSingular.singclap_gcd(x1, y1, R.ptr)
    return R(p)
@@ -518,7 +514,7 @@ function addeq!(x::spoly, y::spoly)
     return x
 end
 
-function mul!(c::spoly, x::spoly, y::spoly) 
+function mul!(c::spoly, x::spoly, y::spoly)
    R = parent(x)
    x1 = libSingular.p_Copy(x.ptr, R.ptr)
    y1 = libSingular.p_Copy(y.ptr, R.ptr)
@@ -530,7 +526,7 @@ function mul!(c::spoly, x::spoly, y::spoly)
    return c
 end
 
-function add!(c::spoly, x::spoly, y::spoly) 
+function add!(c::spoly, x::spoly, y::spoly)
    R = parent(x)
    x1 = libSingular.p_Copy(x.ptr, R.ptr)
    y1 = libSingular.p_Copy(y.ptr, R.ptr)
@@ -612,8 +608,8 @@ function (R::PolyRing{T})(n::T) where T <: Nemo.RingElem
    return z
 end
 
-function (R::PolyRing{S})(n::T) where {S <: Nemo.RingElem, T <: Nemo.RingElem} 
-   return R(base_ring(R)(n))   
+function (R::PolyRing{S})(n::T) where {S <: Nemo.RingElem, T <: Nemo.RingElem}
+   return R(base_ring(R)(n))
 end
 
 function (R::PolyRing)(p::spoly)
