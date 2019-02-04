@@ -112,8 +112,8 @@ end
 > up to degree $n$.
 """
 function jet(I::sideal, n::Int)
-   J=deepcopy(I)
-   J.ptr=libSingular.id_Jet(I.ptr,Cint(n),base_ring(I).ptr)
+   J = deepcopy(I)
+   J.ptr = libSingular.id_Jet(I.ptr, Cint(n), base_ring(I).ptr)
    return J
 end
 
@@ -123,12 +123,12 @@ end
 > the generatos of $I$. The output is a matrix object.
 """
 function jacob(I::sideal)
-   R=base_ring(I)
-   n=ngens(R)
-   J=zero_matrix(R,n,n)
+   R = base_ring(I)
+   n = ngens(R)
+   J = zero_matrix(R, n, n)
    for i in 1:n
       for j in 1:n
-         J[i,j]=Diff(I[i],j)
+         J[i,j] = Diff(I[i], j)
       end
    end
    return J
@@ -575,12 +575,12 @@ end
 > over a polynomial ring over a field, and a Groebner basis.
 """
 function vdim(I::sideal)
-   if I.isGB==false
+   if I.isGB == false
       error("Ideal does not have a standard basis")
-   elseif iszerodim==false
+   elseif iszerodim == false
       error("Ideal is not zero-dimensional")
    else
-      libSingular.id_vdim(I.ptr,base_ring(I).ptr)
+      libSingular.id_vdim(I.ptr, base_ring(I).ptr)
    end
 end
 
@@ -592,13 +592,13 @@ end
 > over a polynomial ring over a field, and a Groebner basis.
 """
 function kbase(I::sideal)
-   if I.isGB==false
+   if I.isGB == false
       error("Ideal does not have a standard basis")
-   elseif iszerodim==false
+   elseif iszerodim == false
       error("Ideal is not zero-dimensional")
    else
-      K=deepcopy(I)
-      K.ptr=libSingular.id_kbase(I.ptr,base_ring(I).ptr)
+      K = deepcopy(I)
+      K.ptr = libSingular.id_kbase(I.ptr, base_ring(I).ptr)
       return K
    end
 end
@@ -611,13 +611,13 @@ end
 > a Groebner basis.
 """
 function highcorner(I::sideal)
-   if I.isGB==false
+   if I.isGB == false
       error("Ideal does not have a standard basis")
    elseif iszerodim==false
       error("Ideal is not zero-dimensional")
    else
-      K=deepcopy(I[1])
-      K.ptr=libSingular.id_highcorner(I.ptr,base_ring(I).ptr)
+      K = deepcopy(I[1])
+      K.ptr = libSingular.id_highcorner(I.ptr, base_ring(I).ptr)
       return K
    end
 end

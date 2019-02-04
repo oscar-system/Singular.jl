@@ -204,7 +204,7 @@ void singular_define_ideals(jlcxx::Module & Singular)
     });
 
     Singular.method("id_Jet", [](ideal I, int n, ring r) {
-        ideal res = id_Jet(I,n,r);
+        ideal res = id_Jet(I, n, r);
         return res;
     });
 
@@ -220,7 +220,7 @@ void singular_define_ideals(jlcxx::Module & Singular)
         ideal res;
 	const ring origin = currRing;
         rChangeCurrRing(r);
-        res=scKBase(-1,I, r->qideal);
+        res = scKBase(-1, I, r->qideal);
         rChangeCurrRing(origin);
         return res;
     });
@@ -229,7 +229,7 @@ void singular_define_ideals(jlcxx::Module & Singular)
         poly h;
         const ring origin = currRing;
         rChangeCurrRing(r);
-        h=iiHighCorner(I,0);
+        h = iiHighCorner(I, 0);
         rChangeCurrRing(origin);
         return h;
     });

@@ -252,9 +252,9 @@ end
    jet(x::spoly, n::Int)
 > Given a polynomial $x$ this function truncates $x$ up to degree $n$.
 """
-function jet(x::spoly,n::Int)
-   p=deepcopy(x)
-   p.ptr=libSingular.p_Jet(x.ptr,Cint(n),parent(x).ptr)
+function jet(x::spoly, n::Int)
+   p = deepcopy(x)
+   p.ptr = libSingular.p_Jet(x.ptr, Cint(n), parent(x).ptr)
    return p
 end
 
@@ -263,13 +263,13 @@ end
 > Given a polynomial $x$ this function returns the derivative of $x$
 > with respect to the variable with number $n$.
 """
-function Diff(x::spoly,n::Int)
-   R=parent(x)
+function Diff(x::spoly, n::Int)
+   R = parent(x)
    if n>ngens(R) || n<1
        error("Variable does not exist")
    else
-       p=deepcopy(x)
-       p.ptr=libSingular.p_Diff(p.ptr,Cint(n),R.ptr)
+       p = deepcopy(x)
+       p.ptr = libSingular.p_Diff(p.ptr, Cint(n), R.ptr)
        return p
    end
 end
@@ -279,11 +279,11 @@ end
 > Given a polynomial $x$ this function the Jacobian ideal of $x$.
 """
 function jacob(p::spoly)
-   R=parent(p)
-   n=ngens(R)
-   I=Ideal(R,Diff(p,1))
+   R = parent(p)
+   n = ngens(R)
+   I = Ideal(R, Diff(p, 1))
    for i in 2:n
-       I=I+Ideal(R,Diff(p,i))
+       I = I + Ideal(R, Diff(p, i))
    end
   return I
 end
