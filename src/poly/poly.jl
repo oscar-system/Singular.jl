@@ -1,5 +1,6 @@
 export spoly, PolyRing, coeff, coeffs, coeffs_expos,
-       content, degree, degree_bound, exponent, exponent!,
+       content, degree, degree_bound,
+       derivative, exponent, exponent!,
        exponent_vectors, finish, has_global_ordering, isgen,
        ismonomial, lead_exponent, monomials, MPolyBuildCtx,
        nvars, @PolynomialRing, primpart,
