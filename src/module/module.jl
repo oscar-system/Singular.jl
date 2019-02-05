@@ -61,12 +61,6 @@ end
 > Given a module $M$ this function truncates the generators of $M$
 > up to degree $n$.
 """
-function jet(M::smodule, n::Int)
-      R = base_ring(M)
-      ptr = libSingular.id_Jet(M.ptr, Cint(n), R.ptr)
-      libSingular.idSkipZeroes(ptr)
-      return Module(R, ptr)
-end
 
 ###############################################################################
 #

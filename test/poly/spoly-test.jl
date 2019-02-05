@@ -299,16 +299,16 @@ function test_spoly_differential()
 
    J = jacobi(f)
    f1 = derivative(f, 1)
-   f2 = derivative(f, 2)
+   f2 = derivative(f, y)
    jf = jet(f, 3)
 
    I = Ideal(R, x^2, y^5)
 
-   # Check Diff
+   # Check derivative
    @test f1 == 3*x^2
    @test f2 == 6*y^5
 
-   #Check jacob
+   #Check jacobi
    @test equal(I, J)
 
    #Check jet

@@ -797,8 +797,7 @@ function derivative(x::spoly, v::spoly)
    R = parent(x)
    if R == parent(v) && isgen(v)
        p = deepcopy(x)
-       n = var_index(v)
-       p.ptr = libSingular.p_Diff(p.ptr, Cint(n), R.ptr)
+       return(derivative(p,var_index(v)))
    else
        error("Second argument is not a variable")
        return p
