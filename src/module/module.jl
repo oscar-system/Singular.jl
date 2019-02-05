@@ -56,12 +56,6 @@ function deepcopy_internal(I::smodule, dict::IdDict)
    return Module(R, ptr)
 end
 
-@doc Markdown.doc"""
-   jet(M::smodule, n::Int)
-> Given a module $M$ this function truncates the generators of $M$
-> up to degree $n$.
-"""
-
 ###############################################################################
 #
 #   String I/O
