@@ -209,9 +209,11 @@ void singular_define_rings(jlcxx::Module & Singular)
 
    Singular.method("p_Jet", [](poly p, int i, ring r) {
         poly p_cp = p_Copy(p, r);
-        return p_Jet(p_cp, i, r); });
+        return p_Jet(p_cp, i, r);
+    });
 
    Singular.method("p_Diff", [](poly p, int i, ring r) {
         poly p_cp = p_Copy(p, r);
-        return p_Diff(p_cp, i, r); });
+        return p_Diff(p_cp, i, r);
+    });
 }
