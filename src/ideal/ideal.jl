@@ -106,33 +106,6 @@ function check_parent(I::sideal{T}, J::sideal{T}) where T <: Nemo.RingElem
    base_ring(I) != base_ring(J) && error("Incompatible ideals")
 end
 
-@doc Markdown.doc"""
-   jet(I::sideal, n::Int)
-> Given an ideal $I$ this function truncates the generators of $I$
-> up to degree $n$.
-"""
-function jet(I::sideal, n::Int)
-   J = deepcopy(I)
-   J.ptr = libSingular.id_Jet(I.ptr, Cint(n), base_ring(I).ptr)
-   return J
-end
-
-@doc Markdown.doc"""
-   jacob(I::sideal)
-> Given an ideal $I$ this function computes the jacobi matrix of
-> the generatos of $I$. The output is a matrix object.
-"""
-function jacob(I::sideal)
-   R = base_ring(I)
-   n = ngens(R)
-   J = zero_matrix(R, n, n)
-   for i in 1:n
-      for j in 1:n
-         J[i,j] = Diff(I[i], j)
-      end
-   end
-   return J
-end
 ###############################################################################
 #
 #   String I/O
