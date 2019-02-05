@@ -203,4 +203,35 @@ void singular_define_ideals(jlcxx::Module & Singular)
             return maGetPreimage(trgt, &sing_map, b, src);
 
         });
+
+    Singular.method("id_Jet", [](ideal I, int n, ring r) {
+        ideal res = id_Jet(I, n, r);
+        return res;
+    });
+
+    Singular.method("id_vdim", [](ideal I, ring r) {
+        const ring origin = currRing;
+        rChangeCurrRing(r);
+	int n=scMult0Int(I, r->qideal);
+	rChangeCurrRing(origin);
+	return n;
+    });
+
+    Singular.method("id_kbase", [](ideal I, ring r) {
+        ideal res;
+	const ring origin = currRing;
+        rChangeCurrRing(r);
+        res = scKBase(-1, I, r->qideal);
+        rChangeCurrRing(origin);
+        return res;
+    });
+
+    Singular.method("id_highcorner", [](ideal I, ring r) {
+        poly h;
+        const ring origin = currRing;
+        rChangeCurrRing(r);
+        h = iiHighCorner(I, 0);
+        rChangeCurrRing(origin);
+        return h;
+    });
 }

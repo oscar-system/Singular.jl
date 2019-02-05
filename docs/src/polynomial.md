@@ -66,8 +66,8 @@ for ordering of module components. They can occur in either order, the first tak
 precedence over the other, when the polynomials are used to represent module generators.
 If either is not specified, the indicated default is used.
 
-The options for polynomial term ordering are the symbols, `:lex`, `:deglex` and
-`:degrevlex`, and the options for module component ordering are `comp1min` and
+The options for polynomial term ordering are the symbols, `:lex`, `:deglex`, `:degrevlex`,
+`:neglex`, `:negdeglex` and `:negdegrevlex`, and the options for module component ordering are `comp1min` and
 `comp1max`.
 
 If one has an a priori bound on the degree in each variable of a polynomial (including

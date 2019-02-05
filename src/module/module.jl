@@ -1,8 +1,8 @@
-export smodule, ModuleClass, rank, slimgb
+export jet, ModuleClass, rank, smodule, slimgb
 
 ###############################################################################
 #
-#   Basic manipulation 
+#   Basic manipulation
 #
 ###############################################################################
 
@@ -58,7 +58,7 @@ end
 
 ###############################################################################
 #
-#   String I/O 
+#   String I/O
 #
 ###############################################################################
 
@@ -95,7 +95,7 @@ end
 > course). Presently the polynomial ring used must be over a field or over
 > the Singular integers.
 """
-function std(I::smodule; complete_reduction::Bool=false) 
+function std(I::smodule; complete_reduction::Bool=false)
    R = base_ring(I)
    ptr = libSingular.id_Std(I.ptr, R.ptr, complete_reduction)
    libSingular.idSkipZeroes(ptr)
@@ -154,7 +154,7 @@ end
 > resolution is computed. Each element of the resolution is itself a module.
 """
 function sres(I::smodule{T}, max_length::Int) where T <: Nemo.RingElem
-   I.isGB == false && error("Not a Groebner basis ideal")  
+   I.isGB == false && error("Not a Groebner basis ideal")
    R = base_ring(I)
    if max_length == 0
         max_length = nvars(R)
@@ -186,5 +186,23 @@ end
 function Module(R::PolyRing{T}, id::libSingular.idealRef) where T <: Nemo.RingElem
    S = elem_type(R)
    return smodule{S}(R, id)
+end
+
+###############################################################################
+#
+#   Differential functions
+#
+###############################################################################
+
+@doc Markdown.doc"""
+   jet(M::smodule, n::Int)
+> Given a module $M$ this function truncates the generators of $M$
+> up to degree $n$.
+"""
+function jet(M::smodule, n::Int)
+      R = base_ring(M)
+      ptr = libSingular.id_Jet(M.ptr, Cint(n), R.ptr)
+      libSingular.idSkipZeroes(ptr)
+      return Module(R, ptr)
 end
 

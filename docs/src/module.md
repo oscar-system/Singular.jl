@@ -166,3 +166,20 @@ M2 = Singular.Matrix(F[2])
 iszero(M1*M2)
 ```
 
+### Jet of module
+
+```@docs
+jet(::smodule, ::Int)
+```
+
+**Examples**
+
+```julia
+R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+
+v1 = vector(R, x + 1, x*y + 1, y)
+v2 = vector(R, x^5 + 1, 2x^3 + 3y^2, x^2)
+
+M = Singular.Module(R, v1, v2)
+N = jet(M,3)
+```

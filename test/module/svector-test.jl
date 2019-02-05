@@ -26,6 +26,22 @@ function test_svector_constructors()
    println("PASS")
 end
 
+function test_svector_jet()
+   print("svector.jet...")
+
+   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+
+   a = vector(R, x^5 + 1, 2x^3 + 3y^2, x^2)
+
+   b = vector(R, R(1), 2*x^3 + 3*y^2, x^2)
+
+   c = jet(a, 3)
+
+   @test b == c
+
+   println("PASS")
+end
+
 function test_svector_manipulation()
    print("svector.manipulation...")
 
@@ -85,7 +101,7 @@ function test_svector_adhoc_binary()
    @test 2*(v1 + v2) == v1*2 + v2*2
    @test QQ(2)*(v1 + v2) == v1*QQ(2) + v2*QQ(2)
    @test x*(v1 + v2) == v1*x + v2*x
-   
+
    println("PASS")
 end
 
@@ -117,6 +133,7 @@ end
 
 function test_svector()
    test_svector_constructors()
+   test_svector_jet
    test_svector_manipulation()
    test_svector_unary_ops()
    test_svector_binary_ops()
@@ -124,6 +141,6 @@ function test_svector()
    test_svector_comparison()
    test_svector_conversion()
 
-   
+
  println("")
 end

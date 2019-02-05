@@ -79,7 +79,7 @@ function test_sideal_binary_ops()
 
    @test equal(I1 + I2, I3)
    @test equal(I1*I2, I4)
-   
+
    println("PASS")
 end
 
@@ -223,7 +223,7 @@ function test_sideal_std()
    @test isequal(lead(A), Ideal(R, 2y^2, x^2)) ||
          isequal(lead(A), Ideal(R, x^2, 2*y^2))
    @test A.isGB == true
-   
+
    B = std(I, complete_reduction=true)
 
    @test isequal(B, Ideal(R, 2y^2 + 3, x^2 + x*y + 1)) ||
@@ -262,7 +262,7 @@ function test_sideal_free_resolution()
 
    F1 = fres(std(I), 4)
    F2 = sres(std(I), 4)
-   
+
    # check resolution is of the correct length
    @test length(F1) == 2
    @test length(F2) == 2
@@ -302,7 +302,7 @@ function test_sideal_kernel()
    print("sideal.kernel...")
 
    # twisted cubic
-   
+
    P1, (t_0, t_1) = PolynomialRing(QQ, ["t_0", "t_1"])
    P3, (x, y, z, w) = PolynomialRing(QQ, ["x", "y", "z", "w"])
    I = Ideal(P1, t_0^3, t_0^2*t_1, t_0*t_1^2, t_1^3)
@@ -329,6 +329,65 @@ function test_sideal_eliminate()
    println("PASS")
 end
 
+function test_sideal_jet()
+   print("sideal.jet...")
+
+   R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"])
+
+   I = Ideal(R, x^5 - y^2, y^3 - x^6 + z^3)
+
+   J = jet(I, 3)
+
+   @test equal(J, Ideal(R, - y^2, y^3 + z^3))
+
+   println("PASS")
+end
+
+function test_sideal_jacobi()
+   print("sideal.jacob...")
+
+   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+
+   I = Ideal(R, 2*x + 5*y, 2*y + 5*x)
+
+   J = jacobi(I)
+
+   M = R[2 5; 5 2]
+
+   @test equal(J, M)
+
+   println("PASS")
+end
+
+function test_sideal_zerodim()
+   print("sideal.zerodim...")
+
+   R, (x, y) = PolynomialRing(QQ, ["x", "y"]; ordering=:negdegrevlex)
+
+   I = Ideal(R, 3*x^2 + y^3, x*y^2)
+
+   I = std(I)
+
+   dim = vdim(I)
+
+   J = kbase(I)
+
+   B = Ideal(R, R(1), x, y, x*y, y^2, y^3, y^4)
+
+   f = highcorner(I)
+
+   # Check dimension
+   @test dim == 7
+
+   # Check vector space basis
+   @test equal(J,B)
+
+   #Check highcorner
+   @test f == y^4
+
+   println("PASS")
+end
+
 function test_sideal()
    test_sideal_constructors()
    test_sideal_manipulation()
@@ -347,6 +406,9 @@ function test_sideal()
    test_sideal_syzygy()
    test_sideal_eliminate()
    test_sideal_kernel()
+   test_sideal_jet()
+   test_sideal_jacobi()
+   test_sideal_zerodim()
 
    println("")
 end
