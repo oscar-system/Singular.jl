@@ -1,4 +1,4 @@
 julia 1.0
-AbstractAlgebra
+AbstractAlgebra 0.3.3
 Nemo
 CxxWrap

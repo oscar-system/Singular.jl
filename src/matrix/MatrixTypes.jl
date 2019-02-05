@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-const MatrixSpaceID = Dict{Tuple{Ring, Int, Int}, Set}()
+const MatrixSpaceID = Dict{Tuple{PolyRing, Int, Int}, Set}()
 
 mutable struct MatrixSpace{T <: Nemo.RingElem} <: Set
    base_ring::PolyRing

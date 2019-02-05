@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-const IdealSetID = Dict{Ring, Set}()
+const IdealSetID = Dict{PolyRing, Set}()
 
 mutable struct IdealSet{T <: Nemo.RingElem} <: Set
    base_ring::PolyRing

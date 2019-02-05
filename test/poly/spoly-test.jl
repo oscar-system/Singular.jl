@@ -72,6 +72,16 @@ function test_spoly_constructors()
    @test length(symbols(R)) == 2
    @test symbols(R) == [:x, :y]
 
+   R, (x, y) = PolynomialRing(ZZ, ["x", "y"]; ordering=:lex)
+
+   M = MPolyBuildCtx(R)
+   push_term!(M, ZZ(2), [1, 2])
+   push_term!(M, ZZ(1), [1, 1])
+   push_term!(M, ZZ(2), [3, 2])
+   f = finish(M)
+
+   @test f == 2*x^3*y^2+2*x*y^2+x*y
+
    println("PASS")
 end
 
@@ -101,39 +111,33 @@ function test_spoly_manipulation()
    @test length(x^2 + 2x + 1) == 3
    @test degree(x^2 + 2x + 1) == 2
 
-   @test exponent(x^5 + 3x + 2, 2) == [5]
-   
-   A = [0]
-
-   exponent!(A, x^5 + 3x + 2, 2)
-
-   @test A == [5]
-
    @test lead_exponent(x^3 + 2x + 1) == [3]
 
    @test deepcopy(x + 2) == x + 2
 
    @test characteristic(R) == 0
 
-   @test ngens(R) == 1
+   @test nvars(R) == 1
    pol = x^5 + 3x + 2
-   c_iter = coeffs_expos(pol)
    
-   i = length(pol) - 1
+   @test length(collect(coeffs(pol))) == length(pol)
+   @test length(collect(exponent_vectors(pol))) == length(pol)
 
-   for (c, ex) in c_iter
-      @test coeff(pol, i) == c      
-      @test exponent(pol, i) == ex 
-      i -= 1
-    end
-   
-   
+   polzip = zip(coeffs(pol), monomials(pol), terms(pol))
+   r = R()
+   for (c, m, t) in polzip
+      r += c*m
+      @test t == c*m
+   end
+
+   @test pol == r
+    
    R, (x, ) = PolynomialRing(ResidueRing(ZZ, 6), ["x", ])
 
    @test characteristic(R) == 6
 
-   R,(x,y) = PolynomialRing(QQ,["x", "y"])
-   p = x+y
+   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   p = x + y
    q = x
    @test Singular.substitute_variable(p, 2, q) == 2*x
    @test Singular.permute_variables(q, [2, 1], R) == y

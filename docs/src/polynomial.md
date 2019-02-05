@@ -13,7 +13,7 @@ The associated polynomial ring is represented by a parent object which can be
 constructed by a call to the `PolynomialRing` constructor.
 
 The types of the polynomial ring parent objects and elements thereof are given in the
-following table according to the library provding them.
+following table according to the library providing them.
 
  Library        | Element type  | Parent type
 ----------------|---------------|-----------------------
@@ -22,8 +22,8 @@ Singular        | `spoly{T}`    | `Singular.PolyRing{T}`
 These types are parameterised by the type of elements in the coefficient ring of the
 polynomials.
 
-All polynomial types belong directly to the abstract type `RingElem` and
-all the polynomial ring parent object types belong to the abstract type `Ring`.
+All polynomial types belong directly to the abstract type `MPolyElem` and
+all the polynomial ring parent object types belong to the abstract type `MPolyRing`.
 
 ## Multivariate polynomial functionality
 
@@ -99,6 +99,26 @@ polynomial ring of type AbstractAlgebra.Generic.MPolyRing:
 
 ```@docs
 PolynomialRing(R::AbstractAlgebra.Generic.MPolyRing{T}; cached::Bool = true, ordering::Symbol = :degrevlex, ordering2::Symbol = :comp1min, degree_bound::Int = 0)  where {T <: RingElement}
+```
+
+Polynomials can be constructed using arithmetic operations on the generators,
+but this can be extremely inefficient. For this purpose, Singular polynomials
+support construction using a build context, as described in the AbstractAlgebra
+documentation:
+
+[https://nemocas.github.io/AbstractAlgebra.jl/mpolynomial_rings.html](https://nemocas.git
+hub.io/AbstractAlgebra.jl/mpolynomial_rings.html)
+
+**Examples**
+
+```julia
+R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+C = MPolyBuildCtx(R)
+
+push_term!(C, ZZ(1), [1, 2])
+push_term!(C, ZZ(3), [1, 1])
+push_term!(C, -ZZ(1), [0, 1])
+f = finish(C)
 ```
 
 ### Polynomial ring macros

@@ -157,7 +157,7 @@ function sres(I::smodule{T}, max_length::Int) where T <: Nemo.RingElem
    I.isGB == false && error("Not a Groebner basis ideal")  
    R = base_ring(I)
    if max_length == 0
-        max_length = ngens(R)
+        max_length = nvars(R)
         # TODO: consider qrings
    end
    r, length, minimal = libSingular.id_sres(I.ptr, Cint(max_length + 1), R.ptr)

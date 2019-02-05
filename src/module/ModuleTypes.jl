@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-const FreeModID = Dict{Tuple{Ring, Int}, Module}()
+const FreeModID = Dict{Tuple{PolyRing, Int}, Module}()
 
 mutable struct FreeMod{T <: Nemo.RingElem} <: Module{T}
    base_ring::PolyRing
@@ -44,7 +44,7 @@ end
 #
 ###############################################################################
 
-const ModuleClassID = Dict{Ring, Set}()
+const ModuleClassID = Dict{PolyRing, Set}()
 
 mutable struct ModuleClass{T <: Nemo.RingElem} <: Set
    base_ring::PolyRing
