@@ -148,6 +148,10 @@ function test_spoly_manipulation()
    @test gen(R, 1) == x
 
    @test ordering(R) == :degrevlex
+   @test degree(x^2*y^3 + 1, 1) == 2
+   @test degree(x^2*y^3 + 1, y) == 3
+   @test degree(R(), 1) == -1
+   @test degrees(x^2*y^3) == [2, 3]
 
    println("PASS")
 end

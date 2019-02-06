@@ -158,7 +158,7 @@ T = @PolynomialRing(QQ, "y", 10)
 ### Basic manipulation
 
 ```@docs
-ngens(::PolyRing)
+nvars(::PolyRing)
 ```
 
 ```@docs
@@ -236,18 +236,18 @@ AsEquivalentAbstractAlgebraPolynomialRing(R::Singular.PolyRing{Singular.n_unknow
 
 Conversion of generic AbstractAlgebra polynomials to Singular.jl polynomials:
 
-```
+```julia
 K = Nemo.ZZ
-R,(x,y) = AbstractAlgebra.Generic.PolynomialRing(K, ["x","y"]);
-Rsing,vars_Rsing = Singular.AsEquivalentSingularPolynomialRing(R);
-Rsing(x+y) == Rsing(x) + Rsing(y)
+R, (x, y) = AbstractAlgebra.Generic.PolynomialRing(K, ["x", "y"]);
+Rsing, vars_Rsing = Singular.AsEquivalentSingularPolynomialRing(R);
+Rsing(x + y) == Rsing(x) + Rsing(y)
 ```
 
 Conversion of Singular.jl polynomials to generic AbstractAlgebra polynomials:
 
-```
+```julia
 K = Nemo.ZZ
-S,(u,v) = Singular.PolynomialRing(K, ["u","v"])
-Saa,(uu,vv) = Singular.AsEquivalentAbstractAlgebraPolynomialRing(S)
+S, (u, v) = Singular.PolynomialRing(K, ["u", "v"])
+Saa, (uu, vv) = Singular.AsEquivalentAbstractAlgebraPolynomialRing(S)
 Saa(u) + Saa(v) == Saa(u) + Saa(v)
 ```
