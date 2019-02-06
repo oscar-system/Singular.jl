@@ -2,7 +2,7 @@ export spoly, PolyRing, coeff, coeffs, coeffs_expos,
        content, degree, degrees, degree_bound,
        derivative, exponent, exponent!,
        exponent_vectors, finish, gen, has_global_ordering, isgen,
-       ismonomial, jacobi, jet, lead_exponent, monomials, MPolyBuildCtx,
+       ismonomial, isterm, jacobi, jet, lead_exponent, monomials, MPolyBuildCtx,
        nvars, ordering, @PolynomialRing, primpart,
        push_term!, sort_terms, symbols, terms, total_degree, var_index
 
