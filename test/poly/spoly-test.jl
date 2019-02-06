@@ -107,7 +107,8 @@ function test_spoly_manipulation()
    @test isgen(x)
    @test !isgen(R(1)) && !isgen(x + 1)
    @test isconstant(R(0)) && isconstant(R(1))
-   @test !isconstant(x) && !isconstant(x + 1)
+   @test !isconstant(x) && !isconstant(x + 1)   
+   @test isterm(2x)
    @test length(x^2 + 2x + 1) == 3
    @test total_degree(x^2 + 2x + 1) == 2
 
