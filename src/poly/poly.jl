@@ -1,7 +1,7 @@
 export spoly, PolyRing, coeff, coeffs, coeffs_expos,
        content, degree, degree_bound,
        derivative, exponent, exponent!,
-       exponent_vectors, finish, has_global_ordering, isgen,
+       exponent_vectors, finish, gen, has_global_ordering, isgen,
        ismonomial, jacobi, jet, lead_exponent, monomials, MPolyBuildCtx,
        nvars, @PolynomialRing, primpart,
        push_term!, sort_terms, symbols, terms, var_index
@@ -46,6 +46,10 @@ characteristic(R::PolyRing) = Int(libSingular.rChar(R.ptr))
 function gens(R::PolyRing)
    n = nvars(R)
    return [R(libSingular.rGetVar(Cint(i), R.ptr)) for i = 1:n]
+end
+
+function gen(R::PolyRing, i::Int)
+   return R(libSingular.rGetVar(Cint(i), R.ptr))
 end
 
 @doc Markdown.doc"""

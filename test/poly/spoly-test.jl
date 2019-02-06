@@ -142,6 +142,11 @@ function test_spoly_manipulation()
    @test Singular.substitute_variable(p, 2, q) == 2*x
    @test Singular.permute_variables(q, [2, 1], R) == y
 
+   for i = 1:nvars(R)
+      @test gen(R, i) == gens(R)[i]
+   end
+   @test gen(R, 1) == x
+
    println("PASS")
 end
 
