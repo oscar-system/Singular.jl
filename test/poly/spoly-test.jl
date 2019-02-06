@@ -147,6 +147,8 @@ function test_spoly_manipulation()
    end
    @test gen(R, 1) == x
 
+   @test ordering(R) == :degrevlex
+
    println("PASS")
 end
 

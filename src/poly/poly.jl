@@ -3,7 +3,7 @@ export spoly, PolyRing, coeff, coeffs, coeffs_expos,
        derivative, exponent, exponent!,
        exponent_vectors, finish, gen, has_global_ordering, isgen,
        ismonomial, jacobi, jet, lead_exponent, monomials, MPolyBuildCtx,
-       nvars, @PolynomialRing, primpart,
+       nvars, ordering, @PolynomialRing, primpart,
        push_term!, sort_terms, symbols, terms, var_index
 
 ###############################################################################
@@ -66,6 +66,7 @@ function symbols(R::PolyRing)
    return symbols
 end
 
+ordering(R::PolyRing) = R.ord
 
 @doc Markdown.doc"""
     degree_bound(R::PolyRing)
@@ -647,7 +648,7 @@ function PolynomialRing(R::Union{Ring, Field}, s::Array{String, 1};
       ordering2::Symbol = :comp1min, degree_bound::Int = 0)
    U = [Symbol(v) for v in s]
    T = elem_type(R)
-   parent_obj = PolyRing{T}(R, U, cached, sym2ringorder[ordering],
+   parent_obj = PolyRing{T}(R, U, ordering, cached, sym2ringorder[ordering],
          sym2ringorder[ordering2], degree_bound)
    return tuple(parent_obj, gens(parent_obj))
 end
@@ -658,7 +659,7 @@ function PolynomialRing(R::Nemo.Ring, s::Array{String, 1}; cached::Bool = true,
    S = CoefficientRing(R)
    U = [Symbol(v) for v in s]
    T = elem_type(S)
-   parent_obj = PolyRing{T}(S, U, cached, sym2ringorder[ordering],
+   parent_obj = PolyRing{T}(S, U, ordering, cached, sym2ringorder[ordering],
          sym2ringorder[ordering2], degree_bound)
    return tuple(parent_obj, gens(parent_obj))
 end
@@ -729,9 +730,9 @@ function (R::PolyRing)(p::AbstractAlgebra.Generic.MPoly{T}) where T <: Nemo.Ring
 
    new_p = zero(R)
 
-   for i=1:length(p)
+   for i = 1:length(p)
       prod = p.coeffs[i]
-      for j=1:n
+      for j = 1:n
          prod = prod * gens(R)[j]^Int(exps[j,i])
       end
       new_p = new_p + prod
@@ -751,7 +752,7 @@ function (R::AbstractAlgebra.Generic.MPolyRing{T})(p::Singular.spoly{Singular.n_
    iterator = coeffs_expos(p)
    t = start(iterator)
    while !done(iterator,t)
-      (coeff,exps),t = next(iterator,t)
+      (coeff, exps),t = next(iterator,t)
       new_p = new_p + libSingular.julia(coeff.ptr) * prod(gens.^exps)
    end
    return(new_p)
