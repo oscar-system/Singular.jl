@@ -4,7 +4,7 @@ export spoly, PolyRing, coeff, coeffs, coeffs_expos,
        exponent_vectors, finish, gen, has_global_ordering, isgen,
        ismonomial, jacobi, jet, lead_exponent, monomials, MPolyBuildCtx,
        nvars, ordering, @PolynomialRing, primpart,
-       push_term!, sort_terms, symbols, terms, var_index
+       push_term!, sort_terms, symbols, terms, total_degree, var_index
 
 ###############################################################################
 #
@@ -133,7 +133,7 @@ end
 
 length(p::spoly) = Int(libSingular.pLength(p.ptr))
 
-function degree(p::spoly)
+function total_degree(p::spoly)
    R = parent(p)
    libSingular.pLDeg(p.ptr, R.ptr)
 end

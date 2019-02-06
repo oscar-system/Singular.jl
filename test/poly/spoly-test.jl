@@ -109,7 +109,7 @@ function test_spoly_manipulation()
    @test isconstant(R(0)) && isconstant(R(1))
    @test !isconstant(x) && !isconstant(x + 1)
    @test length(x^2 + 2x + 1) == 3
-   @test degree(x^2 + 2x + 1) == 2
+   @test total_degree(x^2 + 2x + 1) == 2
 
    @test lead_exponent(x^3 + 2x + 1) == [3]
 
