@@ -226,6 +226,31 @@ function test_spoly_exact_division()
    println("PASS")
 end
 
+function test_spoly_adhoc_exact_division()
+   print("spoly.adhoc_exact_division...")
+
+   R, (x, ) = PolynomialRing(ZZ, ["x", ])
+
+   a = x^2 + 3x + 1
+
+   @test divexact(2a, 2) == a
+   @test divexact(2a, BigInt(2)) == a
+   @test divexact(2a, ZZ(2)) == a
+
+   R, (x, ) = PolynomialRing(QQ, ["x", ])
+
+   a = x^2 + 3x + 1
+
+   @test divexact(2a, 2) == a
+   @test divexact(2a, BigInt(2)) == a
+   @test divexact(2a, ZZ(2)) == a
+   @test divexact(2a, 2//3) == 3a
+   @test divexact(2a, QQ(2//3)) == 3a
+   @test divexact(2a, BigInt(2)//3) == 3a
+
+   println("PASS")
+end
+
 function test_spoly_gcd_lcm()
    print("spoly.gcd_lcm...")
 
@@ -338,6 +363,7 @@ function test_spoly()
    test_spoly_comparison()
    test_spoly_powering()
    test_spoly_exact_division()
+   test_spoly_adhoc_exact_division()
    test_spoly_gcd_lcm()
    test_spoly_extended_gcd()
    test_spoly_Polynomials()
