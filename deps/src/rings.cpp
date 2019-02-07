@@ -50,7 +50,9 @@ void singular_define_rings(jlcxx::Module & Singular)
     Singular.method("rDelete", &rDelete);
     Singular.method("rString", [](ip_sring * r) {
         auto s = rString(r);
-        return std::string(s);
+        std::string ret_string(s);
+        omFree(s);
+        return ret_string;
     });
     Singular.method("rChar", &rChar);
     Singular.method("rGetVar", &rGetVar);
@@ -80,7 +82,9 @@ void singular_define_rings(jlcxx::Module & Singular)
         return p_GetComp(p, r);
     });
     Singular.method("p_String", [](spolyrec * p, ip_sring * r) {
-        std::string s(p_String(p, r));
+        auto s_ptr = p_String(p, r);
+        std::string s(s_ptr);
+        omFree(s_ptr);
         return s;
     });
     Singular.method("p_ISet",
