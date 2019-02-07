@@ -381,6 +381,52 @@ end
 
 ###############################################################################
 #
+#   Ad hoc exact division
+#
+###############################################################################
+
+function divexact(x::spoly{T}, y::T) where T <: Nemo.RingElem
+   R = parent(x)
+   base_ring(x) != parent(y) && error("Incompatible rings")
+   x1 = libSingular.p_Copy(x.ptr, R.ptr)
+   p = libSingular.p_Div_nn(x1, y.ptr, R.ptr)
+   return R(p)
+end
+
+function divexact(x::spoly, y::n_Z)
+   y1 = base_ring(x)(y)
+   R = parent(x)
+   x1 = libSingular.p_Copy(x.ptr, R.ptr)
+   p = libSingular.p_Div_nn(x1, y1.ptr, R.ptr)
+   return R(p)
+end
+
+function divexact(x::spoly, y::n_Q)
+   y1 = base_ring(x)(y)
+   R = parent(x)
+   x1 = libSingular.p_Copy(x.ptr, R.ptr)
+   p = libSingular.p_Div_nn(x1, y1.ptr, R.ptr)
+   return R(p)
+end
+
+function divexact(x::spoly, y::Int)
+   R = base_ring(x)
+   S = parent(x)
+   y1 = libSingular.n_Init(y, R.ptr)
+   x1 = libSingular.p_Copy(x.ptr, S.ptr)
+   p = libSingular.p_Div_nn(x1, y1, S.ptr)
+   libSingular.n_Delete(y1, R.ptr)
+   return S(p)
+end
+
+divexact(x::spoly, y::Integer) = divexact(x, base_ring(x)(y))
+
+function divexact(x::spoly, y::Rational)
+   return divexact(x, base_ring(x)(y))
+end
+
+###############################################################################
+#
 #   GCD
 #
 ###############################################################################
