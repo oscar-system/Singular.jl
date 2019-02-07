@@ -270,15 +270,11 @@ end
 
 function show(io::IO, R::PolyRing)
    s = libSingular.rString(R.ptr)
-  #  s = unsafe_string(m)
-  #  libSingular.omFree(Ptr{Nothing}(m))
    print(io, "Singular Polynomial Ring ", s)
 end
 
 function show(io::IO, a::spoly)
    s = libSingular.p_String(a.ptr, parent(a).ptr)
-  #  s = unsafe_string(m)
-  #  libSingular.omFree(Ptr{Nothing}(m))
    print(io, s)
 end
 
