@@ -148,14 +148,21 @@ void singular_define_ideals(jlcxx::Module & Singular)
 
     Singular.method("rank", [](ideal m) { return (int)m->rank; });
 
-    // Singular.method("p_Copy",[](void o, ring r){ return p_Copy(o,r);});
-
     Singular.method("id_Quotient", [](ideal a, ideal b, bool c, ring d) {
         const ring origin = currRing;
         rChangeCurrRing(d);
         ideal id = idQuot(a, b, c, TRUE);
         rChangeCurrRing(origin);
         return id;
+    });
+
+    Singular.method("idLift", [](ideal a, ideal b, void ** ptr1,
+                                 bool f1, bool f2, bool f3, void * ptr2, ring d) {
+       const ring origin = currRing;
+       rChangeCurrRing(d);
+       ideal q = idLift(a, b, reinterpret_cast<sip_sideal **>(ptr1), f1, f2, f3, reinterpret_cast<ip_smatrix **>(ptr2));
+       rChangeCurrRing(origin);
+       return q;
     });
 
     Singular.method("id_Intersection", [](ideal a, ideal b, ring c) {

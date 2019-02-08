@@ -427,6 +427,35 @@ end
 
 ###############################################################################
 #
+#   Euclidean division
+#
+###############################################################################
+
+function divrem(x::spoly{T}, y::spoly{T}) where T <: Nemo.FieldElem
+   check_parent(x, y)
+   R = parent(x)
+   xid = libSingular.idInit(1, 1)
+   px = libSingular.p_Copy(x.ptr, R.ptr)
+   libSingular.setindex_internal(xid, px, 0)
+   yid = libSingular.idInit(1, 1)
+   py = libSingular.p_Copy(y.ptr, R.ptr)
+   libSingular.setindex_internal(yid, py, 0)
+   r = libSingular.idInit(0, 1)
+   rid = [r]
+   q = libSingular.idLift(yid, xid, reinterpret(Ptr{Ptr{Nothing}}, pointer(rid)), false, true, true, C_NULL, R.ptr)
+   q1 = libSingular.getindex(q, 0)
+   q1 = libSingular.p_Copy(q1, R.ptr)
+   r1 = libSingular.getindex(rid[1], 0)
+   r1 = libSingular.p_Copy(r1, R.ptr)
+   libSingular.id_Delete(xid, R.ptr)
+   libSingular.id_Delete(yid, R.ptr)
+   libSingular.id_Delete(q, R.ptr)
+   libSingular.id_Delete(r, R.ptr)
+   return R(q1), R(r1)
+end
+
+###############################################################################
+#
 #   GCD
 #
 ###############################################################################
