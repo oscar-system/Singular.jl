@@ -559,8 +559,9 @@ end
 function jacobi(I::sideal)
    R = base_ring(I)
    n = nvars(R)
+   m = ngens(I)
    J = zero_matrix(R, n, n)
-   for i in 1:n
+   for i in 1:m
       for j in 1:n
          J[i, j] = derivative(I[i], j)
       end
