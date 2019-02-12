@@ -152,6 +152,10 @@ void singular_define_rings(jlcxx::Module & Singular)
     Singular.method("p_Divide", [](spolyrec * p, spolyrec * q, ip_sring * r) {
         return p_Divide(p, q, r);
     });
+    Singular.method("p_DivRem", [](spolyrec * a, spolyrec * b,
+                                             spolyrec * rest, ip_sring * r) {
+        return p_DivRem(a, b, reinterpret_cast<spolyrec *&>(rest), r);
+    });
     Singular.method("p_Div_nn", [](spolyrec * p, snumber * n, ip_sring * r) {
         return p_Div_nn(p, n, r);
     });

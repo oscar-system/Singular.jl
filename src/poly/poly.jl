@@ -1,6 +1,6 @@
 export spoly, PolyRing, coeff, coeffs, coeffs_expos,
        content, degree, degrees, degree_bound,
-       derivative, exponent, exponent!,
+       derivative, divrem, exponent, exponent!,
        exponent_vectors, finish, gen, has_global_ordering, isgen,
        ismonomial, isterm, jacobi, jet, lead_exponent, monomials, MPolyBuildCtx,
        nvars, ordering, @PolynomialRing, primpart,
@@ -434,24 +434,20 @@ end
 function divrem(x::spoly{T}, y::spoly{T}) where T <: Nemo.FieldElem
    check_parent(x, y)
    R = parent(x)
-   xid = libSingular.idInit(1, 1)
    px = libSingular.p_Copy(x.ptr, R.ptr)
-   libSingular.setindex_internal(xid, px, 0)
-   yid = libSingular.idInit(1, 1)
    py = libSingular.p_Copy(y.ptr, R.ptr)
-   libSingular.setindex_internal(yid, py, 0)
-   r = libSingular.idInit(0, 1)
-   rid = [r]
-   q = libSingular.idLift(yid, xid, reinterpret(Ptr{Ptr{Nothing}}, pointer(rid)), false, true, true, C_NULL, R.ptr)
-   q1 = libSingular.getindex(q, 0)
-   q1 = libSingular.p_Copy(q1, R.ptr)
-   r1 = libSingular.getindex(rid[1], 0)
-   r1 = libSingular.p_Copy(r1, R.ptr)
-   libSingular.id_Delete(xid, R.ptr)
-   libSingular.id_Delete(yid, R.ptr)
-   libSingular.id_Delete(q, R.ptr)
-   libSingular.id_Delete(r, R.ptr)
-   return R(q1), R(r1)
+   r = libSingular.p_Init(R.ptr)
+   q = libSingular.p_DivRem(px, py, r, R.ptr)
+   return R(q), R(r)
+end
+
+function div(x::spoly{T}, y::spoly{T}) where T <: Nemo.FieldElem
+   check_parent(x, y)
+   R = parent(x)
+   px = libSingular.p_Copy(x.ptr, R.ptr)
+   py = libSingular.p_Copy(y.ptr, R.ptr)
+   q = libSingular.p_Divide(px, py, R.ptr)
+   return R(q)
 end
 
 ###############################################################################

@@ -156,15 +156,6 @@ void singular_define_ideals(jlcxx::Module & Singular)
         return id;
     });
 
-    Singular.method("idLift", [](ideal a, ideal b, void ** ptr1,
-                                 bool f1, bool f2, bool f3, void * ptr2, ring d) {
-       const ring origin = currRing;
-       rChangeCurrRing(d);
-       ideal q = idLift(a, b, reinterpret_cast<sip_sideal **>(ptr1), f1, f2, f3, reinterpret_cast<ip_smatrix **>(ptr2));
-       rChangeCurrRing(origin);
-       return q;
-    });
-
     Singular.method("id_Intersection", [](ideal a, ideal b, ring c) {
         const ring origin = currRing;
         rChangeCurrRing(c);
