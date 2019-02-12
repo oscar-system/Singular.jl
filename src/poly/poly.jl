@@ -1,6 +1,6 @@
 export spoly, PolyRing, coeff, coeffs, coeffs_expos,
        content, degree, degrees, degree_bound,
-       derivative, divrem, exponent, exponent!,
+       derivative, evaluate, exponent, exponent!,
        exponent_vectors, finish, gen, has_global_ordering, isgen,
        ismonomial, isterm, jacobi, jet, lead_exponent, monomials, MPolyBuildCtx,
        nvars, ordering, @PolynomialRing, primpart,
@@ -510,6 +510,66 @@ function content(x::spoly)
       end
    end
    return d
+end
+
+###############################################################################
+#
+#   Evaluation
+#
+###############################################################################
+
+function (a::spoly{T})(vals::T...) where T <: RingElem
+   length(vals) != nvars(parent(a)) && error("Number of variables does not match number o
+f values")
+   return evaluate(a, [vals...])
+end
+
+function (a::spoly{T})(vals::U...) where {T <: RingElem, U <: Union{Integer, Rational,
+ AbstractFloat}}
+   length(vals) != nvars(parent(a)) && error("Number of variables does not match number o
+f values")
+   return evaluate(a, [vals...])
+end
+
+function (a::spoly{T})(vals::Union{Nemo.NCRingElem, Nemo.RingElement}...) where T <: RingElem
+   length(vals) != nvars(parent(a)) && error("Number of variables does not match number o
+f values")
+   R = base_ring(a)
+   # The best we can do here is to cache previously used powers of the values
+   # being substituted, as we cannot assume anything about the relative
+   # performance of powering vs multiplication. The function should not try
+   # to optimise computing new powers in any way.
+   # Note that this function accepts values in a non-commutative ring, so operations
+   # must be done in a certain order.
+   powers = [Dict{Int, Any}() for i in 1:length(vals)]
+   # First work out types of products
+   r = R()
+   c = zero(R)
+   U = Array{Any, 1}(undef, length(vals))
+   for j = 1:length(vals)
+      W = typeof(vals[j])
+      if ((W <: Integer && W != BigInt) ||
+          (W <: Rational && W != Rational{BigInt}))
+         c = c*zero(W)
+         U[j] = parent(c)
+      else
+         U[j] = parent(vals[j])
+         c = c*zero(parent(vals[j]))
+      end
+   end
+   cvzip = zip(coeffs(a), exponent_vectors(a))
+   for (c, v) in cvzip
+      t = c
+      for j = 1:length(vals)
+         exp = v[j]
+         if !haskey(powers[j], exp)
+            powers[j][exp] = (U[j](vals[j]))^exp
+         end
+         t = t*powers[j][exp]
+      end
+      r += t
+   end
+   return r
 end
 
 ###############################################################################

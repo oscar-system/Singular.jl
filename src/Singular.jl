@@ -18,13 +18,13 @@ import Statistics: std
 import Nemo: add!, addeq!, base_ring, canonical_unit,
              characteristic, check_parent, coeff,
              coeffs, contains, content, crt, degree, derivative, divexact,
-             elem_type, exponent_vectors, finish, gcdinv,
+             elem_type, evaluate, exponent_vectors, finish, gcdinv,
              gen, gens, intersect, isconstant, isgen, ismonomial, isnegative, isone,
              isterm, isunit, iszero, lead, monomials,
              MPolyBuildCtx, mul!, needs_parentheses,
              nvars, ordering, parent_type,
              parent, primpart, promote_rule, push_term!,
-             reconstruct, show_minus_one, sort_terms!,
+             reconstruct, show_minus_one, sort_terms!, symbols,
              terms, total_degree, var_index, zero!, ResidueRing
 
 export base_ring, elem_type, parent_type, parent
