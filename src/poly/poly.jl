@@ -1,6 +1,6 @@
 export spoly, PolyRing, change_base_ring, coeff, coeffs, coeffs_expos,
        content, deflation, deflate, degree, degrees, degree_bound,
-       derivative, evaluate, exponent, exponent!,
+       derivative, div, divides, direm, evaluate, exponent, exponent!,
        exponent_vectors, finish, gen, has_global_ordering,
        inflate, isgen,
        ismonomial, isterm, jacobi, jet, lc, lt, lm, lead_exponent,
@@ -425,6 +425,30 @@ divexact(x::spoly, y::Integer) = divexact(x, base_ring(x)(y))
 
 function divexact(x::spoly, y::Rational)
    return divexact(x, base_ring(x)(y))
+end
+
+###############################################################################
+#
+#   Divisibility testing
+#
+###############################################################################
+
+function divides(x::spoly{T}, y::spoly{T}) where T <: Nemo.FieldElem
+   check_parent(x, y)
+   R = parent(x)
+   # First check divisibility in a cheap way
+   x2 = libSingular.p_Copy(x.ptr, R.ptr)
+   y2 = libSingular.p_Copy(y.ptr, R.ptr)
+   flag = libSingular.p_IsDivisibleBy(x2, y2, R.ptr)
+   if flag
+      # now compute exact quotient
+      x2 = libSingular.p_Copy(x.ptr, R.ptr)
+      y2 = libSingular.p_Copy(y.ptr, R.ptr)
+      q = libSingular.p_Divide(x2, y2, R.ptr)
+      return true, R(q)
+   else
+      return false, R()
+   end   
 end
 
 ###############################################################################

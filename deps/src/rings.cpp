@@ -163,6 +163,23 @@ void singular_define_rings(jlcxx::Module & Singular)
     Singular.method("p_Div_nn", [](spolyrec * p, snumber * n, ip_sring * r) {
         return p_Div_nn(p, n, r);
     });
+    Singular.method("p_IsDivisibleBy", [](spolyrec * p, spolyrec * q, ip_sring * r) {
+       poly res;
+       ideal I = idInit(1, 1);
+       const ring origin = currRing;
+       I->m[0] = q;
+       rChangeCurrRing(r);
+       res = kNF(I, NULL, p, 0, KSTD_NF_LAZY);
+       rChangeCurrRing(origin);
+       id_Delete(&I, r);
+       if (res == NULL)
+          return true;
+       else
+       {
+          p_Delete(&res, r);
+          return false;
+       }
+    });
     Singular.method("singclap_gcd",
                     [](spolyrec * p, spolyrec * q, ip_sring * r) {
                         return singclap_gcd(p, q, r);

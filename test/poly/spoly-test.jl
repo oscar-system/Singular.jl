@@ -251,6 +251,40 @@ function test_spoly_adhoc_exact_division()
    println("PASS")
 end
 
+function test_spoly_euclidean_division()
+   print("spoly.euclidean_division...")
+
+   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+
+   a = x^2*y^2 + 3x + 1
+   b = x*y + 1
+
+   q, r = divrem(a, b)
+   @test a == b*q + r
+
+   q2 = div(a, b)
+   @test q2 == q
+
+   println("PASS")
+end
+
+function test_spoly_divides()
+   print("spoly.divides...")
+
+   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+
+   a = x^2 + 3x + 1
+   b = x*y + 1
+
+   flag, q = divides(a*b, b)
+   @test flag && q == a
+
+   flag, q = divides(a, y)
+   @test !flag
+
+   println("PASS")
+end
+
 function test_spoly_gcd_lcm()
    print("spoly.gcd_lcm...")
 
@@ -364,6 +398,8 @@ function test_spoly()
    test_spoly_powering()
    test_spoly_exact_division()
    test_spoly_adhoc_exact_division()
+   test_spoly_divides()
+   test_spoly_euclidean_division()
    test_spoly_gcd_lcm()
    test_spoly_extended_gcd()
    test_spoly_Polynomials()
