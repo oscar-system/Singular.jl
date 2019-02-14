@@ -354,7 +354,7 @@ function test_sideal_jacobi()
 
    M = R[2 5; 5 2]
 
-   @test equal(J, M)
+   @test J == M
 
    println("PASS")
 end
@@ -380,7 +380,7 @@ function test_sideal_zerodim()
    @test dim == 7
 
    # Check vector space basis
-   @test equal(J,B)
+   @test equal(J, B)
 
    #Check highcorner
    @test f == y^4
