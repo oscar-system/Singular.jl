@@ -6,7 +6,7 @@ export spoly, PolyRing, change_base_ring, coeff, coeffs, coeffs_expos,
        ismonomial, isterm, jacobi, jet, lc, lt, lm, lead_exponent,
        monomials, MPolyBuildCtx,
        nvars, ordering, @PolynomialRing, primpart,
-       push_term!, sort_terms, symbols, terms, total_degree, var_index, vars
+       push_term!, sort_terms!, symbols, terms, total_degree, var_index, vars
 
 ###############################################################################
 #
@@ -545,6 +545,26 @@ end
 #
 ###############################################################################
 
+function evaluate(a::spoly{T}, C::Vector{T}) where T <: Nemo.RingElem
+   S = parent(a)
+   R = base_ring(a)
+   @GC.preserve C begin
+      carr = [c.ptr.cpp_object for c in C]
+      n = libSingular.maEvalAt(a.ptr, carr, S.ptr)
+      return base_ring(a)(n)
+   end
+end
+
+function evaluate(a::spoly{T}, C::Vector{U}) where {T <: Nemo.RingElem, U <: Union{Integer, Rational}}
+   C2 = [base_ring(a)(c) for c in C]
+   return evaluate(a, C2)
+end
+
+function evaluate(a::spoly{T}, C::Vector{n_Z}) where T <: Nemo.RingElem
+   C2 = [base_ring(a)(c) for c in C]
+   return evaluate(a, C2)
+end
+
 function (a::spoly{T})(vals::T...) where T <: RingElem
    length(vals) != nvars(parent(a)) && error("Number of variables does not match number o
 f values")
@@ -722,6 +742,7 @@ function push_term!(M::MPolyBuildCtx{spoly{S}, U}, c::S, expv::Vector{Int}) wher
    for i = 1:nv
       libSingular.p_SetExp(ptr, i, expv[i], R.ptr)
    end
+   libSingular.p_Setm(ptr, R.ptr)
    if iszero(p)
       p.ptr = ptr
    else

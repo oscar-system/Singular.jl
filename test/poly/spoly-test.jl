@@ -319,6 +319,24 @@ function test_spoly_extended_gcd()
    println("PASS")
 end
 
+function test_spoly_evaluate()
+   print("spoly.evaluate...")
+
+   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+
+   f = x^2*y + 2x + 1
+
+   @test evaluate(f, [2, 3]) == 17
+   @test evaluate(f, [ZZ(2), ZZ(3)]) == 17
+   @test evaluate(f, [QQ(2), QQ(3)]) == 17
+   @test evaluate(f, [x + 1, y - 1]) == x^2*y - x^2 + 2*x*y + y + 2
+   @test evaluate(f, [2, 3], QQ) == 17
+   @test evaluate(f, [x], [1]) == y + 3
+   @test f(2, 3) == 17
+
+   println("PASS")
+end
+
 function test_spoly_Polynomials()
    print("spoly.Polynomials...")
    R, (x, ) = PolynomialRing(ZZ, ["x", ])
@@ -402,6 +420,7 @@ function test_spoly()
    test_spoly_euclidean_division()
    test_spoly_gcd_lcm()
    test_spoly_extended_gcd()
+   test_spoly_evaluate()
    test_spoly_Polynomials()
    # test_convert_between_MPoly_and_SingularPoly()
    test_spoly_differential()

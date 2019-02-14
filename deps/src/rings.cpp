@@ -114,6 +114,8 @@ void singular_define_rings(jlcxx::Module & Singular)
         return p_SortMerge(a, r); });
     Singular.method("p_SortAdd", [](spolyrec * a, ip_sring * r) {
         return p_SortAdd(a, r); });
+    Singular.method("p_Setm", [](spolyrec * a, ip_sring * r) {
+        p_Setm(a, r); });
     Singular.method("p_Neg",
                     [](spolyrec * p, ip_sring * r) { return p_Neg(p, r); });
     Singular.method("pGetCoeff", [](spolyrec * p) { return pGetCoeff(p); });
@@ -232,7 +234,14 @@ void singular_define_rings(jlcxx::Module & Singular)
         poly p_cp = p_Copy(p, r);
         return p_Subst(p_cp, i, q, r);
     });
-
+    Singular.method("maEvalAt", [](poly p, jlcxx::ArrayRef<void*> vals, ring r) {
+       number * varr = (number *) omAlloc0(vals.size() * sizeof(number));
+       for (int i = 0; i < vals.size(); i++)
+          varr[i] = (number) vals[i];
+       number res = maEvalAt(p, varr, r);
+       omFree(varr);
+       return res;
+    });
     Singular.method("p_PermPoly", [](poly p, int * perm, ring old_ring,
                                      ring new_ring, void * map_func_ptr) {
         nMapFunc map_func = reinterpret_cast<nMapFunc>(map_func_ptr);
