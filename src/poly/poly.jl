@@ -1,10 +1,12 @@
-export spoly, PolyRing, coeff, coeffs, coeffs_expos,
-       content, degree, degrees, degree_bound,
+export spoly, PolyRing, change_base_ring, coeff, coeffs, coeffs_expos,
+       content, deflation, deflate, degree, degrees, degree_bound,
        derivative, evaluate, exponent, exponent!,
-       exponent_vectors, finish, gen, has_global_ordering, isgen,
-       ismonomial, isterm, jacobi, jet, lead_exponent, monomials, MPolyBuildCtx,
+       exponent_vectors, finish, gen, has_global_ordering,
+       inflate, isgen,
+       ismonomial, isterm, jacobi, jet, lc, lt, lm, lead_exponent,
+       monomials, MPolyBuildCtx,
        nvars, ordering, @PolynomialRing, primpart,
-       push_term!, sort_terms, symbols, terms, total_degree, var_index
+       push_term!, sort_terms, symbols, terms, total_degree, var_index, vars
 
 ###############################################################################
 #
@@ -436,9 +438,10 @@ function divrem(x::spoly{T}, y::spoly{T}) where T <: Nemo.FieldElem
    R = parent(x)
    px = libSingular.p_Copy(x.ptr, R.ptr)
    py = libSingular.p_Copy(y.ptr, R.ptr)
-   r = libSingular.p_Init(R.ptr)
-   q = libSingular.p_DivRem(px, py, r, R.ptr)
-   return R(q), R(r)
+   q, r = libSingular.p_DivRem(px, py, R.ptr)
+   qref = libSingular.toPolyRef(q)
+   rref = libSingular.toPolyRef(r)
+   return R(qref), R(rref)
 end
 
 function div(x::spoly{T}, y::spoly{T}) where T <: Nemo.FieldElem
