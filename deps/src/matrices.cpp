@@ -27,6 +27,9 @@ void singular_define_matrices(jlcxx::Module & Singular)
     Singular.method("mp_Equal", &mp_Equal);
 
     Singular.method("iiStringMatrix", [](matrix I, int d, ring o) {
-        return std::string(iiStringMatrix(I, d, o));
+        auto str_ptr = iiStringMatrix(I, d, o);
+        std::string s(iiStringMatrix(I, d, o));
+        omFree(str_ptr);
+        return s;
     });
 }

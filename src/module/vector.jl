@@ -57,8 +57,6 @@ end
 
 function show(io::IO, a::svector)
    m = libSingular.p_String(a.ptr, base_ring(a).ptr)
-#   s = unsafe_string(m)
-#   libSingular.omFree(Ptr{Nothing}(m))
    print(io, m)
 end
 

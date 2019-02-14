@@ -1,5 +1,6 @@
 export spoly, PolyRing, coeff, coeffs, coeffs_expos,
-       content, degree, degree_bound, derivative, exponent, exponent!,
+       content, degree, degree_bound,
+       derivative, exponent, exponent!,
        exponent_vectors, finish, has_global_ordering, isgen,
        ismonomial, jacobi, jet, lead_exponent, monomials, MPolyBuildCtx,
        nvars, @PolynomialRing, primpart,
@@ -270,15 +271,11 @@ end
 
 function show(io::IO, R::PolyRing)
    s = libSingular.rString(R.ptr)
-  #  s = unsafe_string(m)
-  #  libSingular.omFree(Ptr{Nothing}(m))
    print(io, "Singular Polynomial Ring ", s)
 end
 
 function show(io::IO, a::spoly)
    s = libSingular.p_String(a.ptr, parent(a).ptr)
-  #  s = unsafe_string(m)
-  #  libSingular.omFree(Ptr{Nothing}(m))
    print(io, s)
 end
 
