@@ -113,3 +113,17 @@ v1 = vector(R, x + 1, x*y + 1, y)
 V = Array(v1)
 ```
 
+### Jet of vectors
+
+```@docs
+jet{T <: AbstractAlgebra.RingElem}(::svector{spoly{T}}, ::Int)
+```
+
+**Examples**
+```julia
+R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+
+v = vector(R, x^5 + 1, 2x^3 + 3y^2, x^2)
+w = jet(v, 3)
+```
+

@@ -25,6 +25,29 @@ function test_smodule_constructors()
    println("PASS")
 end
 
+function test_smodule_jet()
+   print("smodule.jet...")
+
+   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+
+   v1 = vector(R, x + 1, x*y + 1, y)
+   v2 = vector(R, x^5 + 1, 2x^3 + 3y^2, x^2)
+
+   w1 = vector(R, x+1, x*y+1, y)
+   w2 = vector(R, R(1), 2*x^3 + 3*y^2, x^2)
+
+   M = Singular.Module(R, v1, v2)
+
+   N = jet(M,3)
+
+   P = Singular.Module(R, w1, w2)
+
+   @test P[1] == N[1]
+   @test P[2] == N[2]
+
+   println("PASS")
+end
+
 function test_smodule_manipulation()
    print("smodule.manipulation...")
 
@@ -138,7 +161,7 @@ function test_smodule_sres()
    v2 = vector(R, x^2 + 1, 2x + 3y, x)
 
    M = std(Singular.Module(R, v1, v2))
-   
+
    F = sres(M, 0)
 
    @test length(F) == 1
@@ -171,6 +194,7 @@ end
 
 function test_smodule()
    test_smodule_constructors()
+   test_smodule_jet()
    test_smodule_manipulation()
 #    test_smodule_slimgb()
    test_smodule_std()

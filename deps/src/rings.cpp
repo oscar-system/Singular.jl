@@ -210,4 +210,14 @@ void singular_define_rings(jlcxx::Module & Singular)
         nMapFunc map_func = reinterpret_cast<nMapFunc>(map_func_ptr);
         return p_PermPoly(p, perm, old_ring, new_ring, map_func);
     });
+
+   Singular.method("p_Jet", [](poly p, int i, ring r) {
+        poly p_cp = p_Copy(p, r);
+        return p_Jet(p_cp, i, r);
+    });
+
+   Singular.method("p_Diff", [](poly p, int i, ring r) {
+        poly p_cp = p_Copy(p, r);
+        return p_Diff(p_cp, i, r);
+    });
 }

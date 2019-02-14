@@ -1,4 +1,4 @@
-export FreeMod, svector, gens, rank, vector
+export FreeMod, svector, gens, rank, vector, jet
 
 ###############################################################################
 #
@@ -71,7 +71,7 @@ function -(a::svector{T}) where T <: AbstractAlgebra.RingElem
    R = base_ring(a)
    a1 = libSingular.p_Copy(a.ptr, R.ptr)
    s = libSingular.p_Neg(a1, R.ptr)
-   return svector{T}(R, a.rank, s) 
+   return svector{T}(R, a.rank, s)
 end
 
 ###############################################################################
@@ -86,7 +86,7 @@ function +(a::svector{T}, b::svector{T}) where T <: AbstractAlgebra.RingElem
    a1 = libSingular.p_Copy(a.ptr, R.ptr)
    b1 = libSingular.p_Copy(b.ptr, R.ptr)
    s = libSingular.p_Add_q(a1, b1, R.ptr)
-   return svector{T}(R, a.rank, s) 
+   return svector{T}(R, a.rank, s)
 end
 
 function -(a::svector{T}, b::svector{T}) where T <: AbstractAlgebra.RingElem
@@ -95,7 +95,7 @@ function -(a::svector{T}, b::svector{T}) where T <: AbstractAlgebra.RingElem
    a1 = libSingular.p_Copy(a.ptr, R.ptr)
    b1 = libSingular.p_Copy(b.ptr, R.ptr)
    s = libSingular.p_Sub(a1, b1, R.ptr)
-   return svector{T}(R, a.rank, s) 
+   return svector{T}(R, a.rank, s)
 end
 
 ###############################################################################
@@ -180,7 +180,7 @@ function vector(R::PolyRing{T}, coords::spoly{T}...) where T <: AbstractAlgebra.
    n = length(coords)
    aa = [p.ptr.cpp_object for p in coords]
    v = libSingular.id_Array2Vector(reinterpret(Ptr{Nothing},pointer(aa)), n, R.ptr)
-   
+
    return svector{spoly{T}}(R, n, v)
 end
 
@@ -197,3 +197,19 @@ function FreeModule(R::PolyRing{T}, n::Int) where T <: Nemo.RingElem
    return FreeMod{S}(R, n)
 end
 
+###############################################################################
+#
+#   Differential functions
+#
+###############################################################################
+
+@doc Markdown.doc"""
+   jet(x::svector{spoly{T}}, n::Int)
+> Given a vector $x$ this function truncates each entry of $x$ up to degree $n$.
+"""
+function jet(x::svector{spoly{T}}, n::Int) where T <: AbstractAlgebra.RingElem
+   R = base_ring(x)
+   p = libSingular.p_Copy(x.ptr, R.ptr)
+   s = libSingular.p_Jet(p, Cint(n), R.ptr)
+   return svector{spoly{T}}(R, x.rank, s)
+end

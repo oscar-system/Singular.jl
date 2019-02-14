@@ -57,7 +57,7 @@ function test_spoly_constructors()
 
    @test isa(y7, spoly)
 
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])    
+   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    @test isgen(x)
    @test isgen(y)
@@ -68,7 +68,7 @@ function test_spoly_constructors()
    @test !isgen(x^2)
 
    @test has_global_ordering(R)
-   
+
    @test length(symbols(R)) == 2
    @test symbols(R) == [:x, :y]
 
@@ -103,11 +103,11 @@ function test_spoly_manipulation()
    @test isone(one(R))
    @test iszero(zero(R))
    @test isunit(R(1)) && isunit(R(-1))
-   @test !isunit(R(2)) && !isunit(R(0)) && !isunit(x) 
+   @test !isunit(R(2)) && !isunit(R(0)) && !isunit(x)
    @test isgen(x)
    @test !isgen(R(1)) && !isgen(x + 1)
    @test isconstant(R(0)) && isconstant(R(1))
-   @test !isconstant(x) && !isconstant(x + 1)   
+   @test !isconstant(x) && !isconstant(x + 1)
    @test length(x^2 + 2x + 1) == 3
    @test degree(x^2 + 2x + 1) == 2
 
@@ -119,7 +119,7 @@ function test_spoly_manipulation()
 
    @test nvars(R) == 1
    pol = x^5 + 3x + 2
-   
+
    @test length(collect(coeffs(pol))) == length(pol)
    @test length(collect(exponent_vectors(pol))) == length(pol)
 
@@ -131,7 +131,7 @@ function test_spoly_manipulation()
    end
 
    @test pol == r
-    
+
    R, (x, ) = PolynomialRing(ResidueRing(ZZ, 6), ["x", ])
 
    @test characteristic(R) == 6
@@ -251,7 +251,7 @@ function test_spoly_Polynomials()
    R, (x, ) = PolynomialRing(ZZ, ["x", ])
 
    S, y = Nemo.PolynomialRing(R, "y")
-   
+
    f = (1 + 2x + 3x^2)*y + (2x + 3)
 
    g = f^2
@@ -290,6 +290,31 @@ function test_convert_between_MPoly_and_SingularPoly()
    end
 end
 
+function test_spoly_differential()
+   print("spoly.test_spoly_differential")
+
+   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+
+   f = x^3 + y^6
+
+   J = jacobi(f)
+   f1 = derivative(f, 1)
+   f2 = derivative(f, y)
+   jf = jet(f, 3)
+
+   I = Ideal(R, x^2, y^5)
+
+   # Check derivative
+   @test f1 == 3*x^2
+   @test f2 == 6*y^5
+
+   #Check jacobi
+   @test equal(I, J)
+
+   #Check jet
+   @test jf == x^3
+end
+
 function test_spoly()
    test_spoly_constructors()
    test_spoly_printing()
@@ -303,6 +328,7 @@ function test_spoly()
    test_spoly_extended_gcd()
    test_spoly_Polynomials()
    # test_convert_between_MPoly_and_SingularPoly()
+   test_spoly_differential()
 
    println("")
 end

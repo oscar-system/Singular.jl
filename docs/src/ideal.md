@@ -341,3 +341,51 @@ F1 = fres(std(I), 0)
 F2 = sres(std(I), 2)
 ```
 
+### Differential operations
+
+```@docs
+jet(::sideal, ::Int)
+```
+
+```@docs
+jacobi(::sideal)
+```
+
+**Examples**
+
+```julia
+R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"])
+
+I = Ideal(R, x^5 - y^2, y^3 - x^6 + z^3)
+
+J1 = jet(I, 3)
+J2 = jacobi(I)
+```
+
+### Operations on zero-dimensional ideals
+
+```@docs
+vdim(::sideal)
+```
+
+```@docs
+kbase(::sideal)
+```
+
+```@docs
+highcorner(::sideal)
+```
+
+**Examples**
+
+```julia
+R, (x, y) = PolynomialRing(QQ, ["x", "y"]; ordering=:negdegrevlex)
+
+I = Ideal(R, 3*x^2 + y^3, x*y^2)
+
+I = std(I)
+
+n = vdim(I)
+J = kbase(I)
+f = highcorner(I)
+```
