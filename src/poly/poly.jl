@@ -6,7 +6,8 @@ export spoly, PolyRing, change_base_ring, coeff, coeffs, coeffs_expos,
        ismonomial, isterm, jacobi, jet, lc, lt, lm, lead_exponent,
        monomials, MPolyBuildCtx,
        nvars, ordering, @PolynomialRing, primpart,
-       push_term!, sort_terms!, symbols, terms, total_degree, var_index, vars
+       push_term!, remove, sort_terms!, symbols, terms,
+       total_degree, valuation, var_index, vars
 
 ###############################################################################
 #

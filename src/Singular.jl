@@ -26,8 +26,9 @@ import Nemo: add!, addeq!, base_ring, canonical_unit,
              MPolyBuildCtx, mul!, needs_parentheses,
              nvars, ordering, parent_type,
              parent, primpart, promote_rule, push_term!,
-             reconstruct, show_minus_one, sort_terms!, symbols,
-             terms, total_degree, var_index, vars, zero!, ResidueRing
+             reconstruct, remove, show_minus_one, sort_terms!, symbols,
+             terms, total_degree, valuation, 
+             var_index, vars, zero!, ResidueRing
 
 export base_ring, elem_type, parent_type, parent
 
