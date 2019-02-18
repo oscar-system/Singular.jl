@@ -45,6 +45,9 @@ auto rDefault_long_helper(coeffs                        cf,
 
 void singular_define_rings(jlcxx::Module & Singular)
 {
+    Singular.method("toPolyRef", [](void * ptr) {
+       return reinterpret_cast<spolyrec*>(ptr);
+    });
     Singular.method("rDefault_helper", &rDefault_helper);
     Singular.method("rDefault_long_helper", &rDefault_long_helper);
     Singular.method("rDelete", &rDelete);
@@ -111,6 +114,8 @@ void singular_define_rings(jlcxx::Module & Singular)
         return p_SortMerge(a, r); });
     Singular.method("p_SortAdd", [](spolyrec * a, ip_sring * r) {
         return p_SortAdd(a, r); });
+    Singular.method("p_Setm", [](spolyrec * a, ip_sring * r) {
+        p_Setm(a, r); });
     Singular.method("p_Neg",
                     [](spolyrec * p, ip_sring * r) { return p_Neg(p, r); });
     Singular.method("pGetCoeff", [](spolyrec * p) { return pGetCoeff(p); });
@@ -151,6 +156,31 @@ void singular_define_rings(jlcxx::Module & Singular)
                     });
     Singular.method("p_Divide", [](spolyrec * p, spolyrec * q, ip_sring * r) {
         return p_Divide(p, q, r);
+    });
+    Singular.method("p_DivRem", [](spolyrec * a, spolyrec * b, ip_sring * r) {
+       poly rest;
+       poly q = p_DivRem(a, b, rest, r);
+       return std::make_tuple(reinterpret_cast<void *>(q), reinterpret_cast<void *>(rest));
+    });
+    Singular.method("p_Div_nn", [](spolyrec * p, snumber * n, ip_sring * r) {
+        return p_Div_nn(p, n, r);
+    });
+    Singular.method("p_IsDivisibleBy", [](spolyrec * p, spolyrec * q, ip_sring * r) {
+       poly res;
+       ideal I = idInit(1, 1);
+       const ring origin = currRing;
+       I->m[0] = q;
+       rChangeCurrRing(r);
+       res = kNF(I, NULL, p, 0, KSTD_NF_LAZY);
+       rChangeCurrRing(origin);
+       id_Delete(&I, r);
+       if (res == NULL)
+          return true;
+       else
+       {
+          p_Delete(&res, r);
+          return false;
+       }
     });
     Singular.method("singclap_gcd",
                     [](spolyrec * p, spolyrec * q, ip_sring * r) {
@@ -204,7 +234,14 @@ void singular_define_rings(jlcxx::Module & Singular)
         poly p_cp = p_Copy(p, r);
         return p_Subst(p_cp, i, q, r);
     });
-
+    Singular.method("maEvalAt", [](poly p, jlcxx::ArrayRef<void*> vals, ring r) {
+       number * varr = (number *) omAlloc0(vals.size() * sizeof(number));
+       for (int i = 0; i < vals.size(); i++)
+          varr[i] = (number) vals[i];
+       number res = maEvalAt(p, varr, r);
+       omFree(varr);
+       return res;
+    });
     Singular.method("p_PermPoly", [](poly p, int * perm, ring old_ring,
                                      ring new_ring, void * map_func_ptr) {
         nMapFunc map_func = reinterpret_cast<nMapFunc>(map_func_ptr);

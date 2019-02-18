@@ -148,8 +148,6 @@ void singular_define_ideals(jlcxx::Module & Singular)
 
     Singular.method("rank", [](ideal m) { return (int)m->rank; });
 
-    // Singular.method("p_Copy",[](void o, ring r){ return p_Copy(o,r);});
-
     Singular.method("id_Quotient", [](ideal a, ideal b, bool c, ring d) {
         const ring origin = currRing;
         rChangeCurrRing(d);

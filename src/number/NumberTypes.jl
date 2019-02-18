@@ -4,10 +4,6 @@
 #
 ###############################################################################
 
-function get_n_Z()
-   d = libSingular.nInitChar(libSingular.n_Z, Ptr{Nothing}(0))
-end
-
 const IntegersID = Dict{Symbol, Ring}()
 
 mutable struct Integers <: Ring
@@ -18,7 +14,8 @@ mutable struct Integers <: Ring
       if haskey(IntegersID, :ZZ)
          d = IntegersID[:ZZ]::Integers
       else
-         d = new()
+         ptr = libSingular.nInitChar(libSingular.n_Z, Ptr{Nothing}(0))
+         d = new(ptr, 0)
          IntegersID[:ZZ] = d
          finalizer(_Integers_clear_fn, d)
       end
@@ -73,10 +70,6 @@ end
 #
 ###############################################################################
 
-function get_n_Q()
-   d = libSingular.nInitChar(libSingular.n_Q, Ptr{Nothing}(0))
-end
-
 const RationalsID = Dict{Symbol, Field}()
 
 mutable struct Rationals <: Field
@@ -87,7 +80,8 @@ mutable struct Rationals <: Field
       if haskey(RationalsID, :QQ)
          d = RationalsID[:QQ]::Rationals
       else
-         d = new()
+         ptr = libSingular.nInitChar(libSingular.n_Q, Ptr{Nothing}(0))
+         d = new(ptr, 0)
          RationalsID[:QQ] = d
          finalizer(_Rationals_clear_fn, d)
       end

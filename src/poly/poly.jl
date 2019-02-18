@@ -1,10 +1,13 @@
-export spoly, PolyRing, coeff, coeffs, coeffs_expos,
-       content, degree, degree_bound,
-       derivative, exponent, exponent!,
-       exponent_vectors, finish, has_global_ordering, isgen,
-       ismonomial, jacobi, jet, lead_exponent, monomials, MPolyBuildCtx,
-       nvars, @PolynomialRing, primpart,
-       push_term!, sort_terms, symbols, terms, var_index
+export spoly, PolyRing, change_base_ring, coeff, coeffs, coeffs_expos,
+       content, deflation, deflate, degree, degrees, degree_bound,
+       derivative, div, divides, direm, evaluate, exponent, exponent!,
+       exponent_vectors, finish, gen, has_global_ordering,
+       inflate, isgen,
+       ismonomial, isterm, jacobi, jet, lc, lt, lm, lead_exponent,
+       monomials, MPolyBuildCtx,
+       nvars, ordering, @PolynomialRing, primpart,
+       push_term!, remove, sort_terms!, symbols, terms,
+       total_degree, valuation, var_index, vars
 
 ###############################################################################
 #
@@ -48,6 +51,10 @@ function gens(R::PolyRing)
    return [R(libSingular.rGetVar(Cint(i), R.ptr)) for i = 1:n]
 end
 
+function gen(R::PolyRing, i::Int)
+   return R(libSingular.rGetVar(Cint(i), R.ptr))
+end
+
 @doc Markdown.doc"""
     symbols(R::PolyRing)
 > Return symbols for the generators of the polynomial ring $R$.
@@ -62,6 +69,7 @@ function symbols(R::PolyRing)
    return symbols
 end
 
+ordering(R::PolyRing) = R.ord
 
 @doc Markdown.doc"""
     degree_bound(R::PolyRing)
@@ -128,7 +136,7 @@ end
 
 length(p::spoly) = Int(libSingular.pLength(p.ptr))
 
-function degree(p::spoly)
+function total_degree(p::spoly)
    R = parent(p)
    libSingular.pLDeg(p.ptr, R.ptr)
 end
@@ -376,6 +384,102 @@ end
 
 ###############################################################################
 #
+#   Ad hoc exact division
+#
+###############################################################################
+
+function divexact(x::spoly{T}, y::T) where T <: Nemo.RingElem
+   R = parent(x)
+   base_ring(x) != parent(y) && error("Incompatible rings")
+   x1 = libSingular.p_Copy(x.ptr, R.ptr)
+   p = libSingular.p_Div_nn(x1, y.ptr, R.ptr)
+   return R(p)
+end
+
+function divexact(x::spoly, y::n_Z)
+   y1 = base_ring(x)(y)
+   R = parent(x)
+   x1 = libSingular.p_Copy(x.ptr, R.ptr)
+   p = libSingular.p_Div_nn(x1, y1.ptr, R.ptr)
+   return R(p)
+end
+
+function divexact(x::spoly, y::n_Q)
+   y1 = base_ring(x)(y)
+   R = parent(x)
+   x1 = libSingular.p_Copy(x.ptr, R.ptr)
+   p = libSingular.p_Div_nn(x1, y1.ptr, R.ptr)
+   return R(p)
+end
+
+function divexact(x::spoly, y::Int)
+   R = base_ring(x)
+   S = parent(x)
+   y1 = libSingular.n_Init(y, R.ptr)
+   x1 = libSingular.p_Copy(x.ptr, S.ptr)
+   p = libSingular.p_Div_nn(x1, y1, S.ptr)
+   libSingular.n_Delete(y1, R.ptr)
+   return S(p)
+end
+
+divexact(x::spoly, y::Integer) = divexact(x, base_ring(x)(y))
+
+function divexact(x::spoly, y::Rational)
+   return divexact(x, base_ring(x)(y))
+end
+
+###############################################################################
+#
+#   Divisibility testing
+#
+###############################################################################
+
+function divides(x::spoly{T}, y::spoly{T}) where T <: Nemo.FieldElem
+   check_parent(x, y)
+   R = parent(x)
+   # First check divisibility in a cheap way
+   x2 = libSingular.p_Copy(x.ptr, R.ptr)
+   y2 = libSingular.p_Copy(y.ptr, R.ptr)
+   flag = libSingular.p_IsDivisibleBy(x2, y2, R.ptr)
+   if flag
+      # now compute exact quotient
+      x2 = libSingular.p_Copy(x.ptr, R.ptr)
+      y2 = libSingular.p_Copy(y.ptr, R.ptr)
+      q = libSingular.p_Divide(x2, y2, R.ptr)
+      return true, R(q)
+   else
+      return false, R()
+   end   
+end
+
+###############################################################################
+#
+#   Euclidean division
+#
+###############################################################################
+
+function divrem(x::spoly{T}, y::spoly{T}) where T <: Nemo.FieldElem
+   check_parent(x, y)
+   R = parent(x)
+   px = libSingular.p_Copy(x.ptr, R.ptr)
+   py = libSingular.p_Copy(y.ptr, R.ptr)
+   q, r = libSingular.p_DivRem(px, py, R.ptr)
+   qref = libSingular.toPolyRef(q)
+   rref = libSingular.toPolyRef(r)
+   return R(qref), R(rref)
+end
+
+function div(x::spoly{T}, y::spoly{T}) where T <: Nemo.FieldElem
+   check_parent(x, y)
+   R = parent(x)
+   px = libSingular.p_Copy(x.ptr, R.ptr)
+   py = libSingular.p_Copy(y.ptr, R.ptr)
+   q = libSingular.p_Divide(px, py, R.ptr)
+   return R(q)
+end
+
+###############################################################################
+#
 #   GCD
 #
 ###############################################################################
@@ -434,6 +538,86 @@ function content(x::spoly)
       end
    end
    return d
+end
+
+###############################################################################
+#
+#   Evaluation
+#
+###############################################################################
+
+function evaluate(a::spoly{T}, C::Vector{T}) where T <: Nemo.RingElem
+   S = parent(a)
+   R = base_ring(a)
+   @GC.preserve C begin
+      carr = [c.ptr.cpp_object for c in C]
+      n = libSingular.maEvalAt(a.ptr, carr, S.ptr)
+      return base_ring(a)(n)
+   end
+end
+
+function evaluate(a::spoly{T}, C::Vector{U}) where {T <: Nemo.RingElem, U <: Union{Integer, Rational}}
+   C2 = [base_ring(a)(c) for c in C]
+   return evaluate(a, C2)
+end
+
+function evaluate(a::spoly{T}, C::Vector{n_Z}) where T <: Nemo.RingElem
+   C2 = [base_ring(a)(c) for c in C]
+   return evaluate(a, C2)
+end
+
+function (a::spoly{T})(vals::T...) where T <: RingElem
+   length(vals) != nvars(parent(a)) && error("Number of variables does not match number o
+f values")
+   return evaluate(a, [vals...])
+end
+
+function (a::spoly{T})(vals::U...) where {T <: RingElem, U <: Union{Integer, Rational,
+ AbstractFloat}}
+   length(vals) != nvars(parent(a)) && error("Number of variables does not match number o
+f values")
+   return evaluate(a, [vals...])
+end
+
+function (a::spoly{T})(vals::Union{Nemo.NCRingElem, Nemo.RingElement}...) where T <: RingElem
+   length(vals) != nvars(parent(a)) && error("Number of variables does not match number o
+f values")
+   R = base_ring(a)
+   # The best we can do here is to cache previously used powers of the values
+   # being substituted, as we cannot assume anything about the relative
+   # performance of powering vs multiplication. The function should not try
+   # to optimise computing new powers in any way.
+   # Note that this function accepts values in a non-commutative ring, so operations
+   # must be done in a certain order.
+   powers = [Dict{Int, Any}() for i in 1:length(vals)]
+   # First work out types of products
+   r = R()
+   c = zero(R)
+   U = Array{Any, 1}(undef, length(vals))
+   for j = 1:length(vals)
+      W = typeof(vals[j])
+      if ((W <: Integer && W != BigInt) ||
+          (W <: Rational && W != Rational{BigInt}))
+         c = c*zero(W)
+         U[j] = parent(c)
+      else
+         U[j] = parent(vals[j])
+         c = c*zero(parent(vals[j]))
+      end
+   end
+   cvzip = zip(coeffs(a), exponent_vectors(a))
+   for (c, v) in cvzip
+      t = c
+      for j = 1:length(vals)
+         exp = v[j]
+         if !haskey(powers[j], exp)
+            powers[j][exp] = (U[j](vals[j]))^exp
+         end
+         t = t*powers[j][exp]
+      end
+      r += t
+   end
+   return r
 end
 
 ###############################################################################
@@ -559,6 +743,7 @@ function push_term!(M::MPolyBuildCtx{spoly{S}, U}, c::S, expv::Vector{Int}) wher
    for i = 1:nv
       libSingular.p_SetExp(ptr, i, expv[i], R.ptr)
    end
+   libSingular.p_Setm(ptr, R.ptr)
    if iszero(p)
       p.ptr = ptr
    else
@@ -643,7 +828,7 @@ function PolynomialRing(R::Union{Ring, Field}, s::Array{String, 1};
       ordering2::Symbol = :comp1min, degree_bound::Int = 0)
    U = [Symbol(v) for v in s]
    T = elem_type(R)
-   parent_obj = PolyRing{T}(R, U, cached, sym2ringorder[ordering],
+   parent_obj = PolyRing{T}(R, U, ordering, cached, sym2ringorder[ordering],
          sym2ringorder[ordering2], degree_bound)
    return tuple(parent_obj, gens(parent_obj))
 end
@@ -654,7 +839,7 @@ function PolynomialRing(R::Nemo.Ring, s::Array{String, 1}; cached::Bool = true,
    S = CoefficientRing(R)
    U = [Symbol(v) for v in s]
    T = elem_type(S)
-   parent_obj = PolyRing{T}(S, U, cached, sym2ringorder[ordering],
+   parent_obj = PolyRing{T}(S, U, ordering, cached, sym2ringorder[ordering],
          sym2ringorder[ordering2], degree_bound)
    return tuple(parent_obj, gens(parent_obj))
 end
@@ -725,9 +910,9 @@ function (R::PolyRing)(p::AbstractAlgebra.Generic.MPoly{T}) where T <: Nemo.Ring
 
    new_p = zero(R)
 
-   for i=1:length(p)
+   for i = 1:length(p)
       prod = p.coeffs[i]
-      for j=1:n
+      for j = 1:n
          prod = prod * gens(R)[j]^Int(exps[j,i])
       end
       new_p = new_p + prod
@@ -747,7 +932,7 @@ function (R::AbstractAlgebra.Generic.MPolyRing{T})(p::Singular.spoly{Singular.n_
    iterator = coeffs_expos(p)
    t = start(iterator)
    while !done(iterator,t)
-      (coeff,exps),t = next(iterator,t)
+      (coeff, exps),t = next(iterator,t)
       new_p = new_p + libSingular.julia(coeff.ptr) * prod(gens.^exps)
    end
    return(new_p)

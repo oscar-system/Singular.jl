@@ -10,10 +10,11 @@ const PolyRingID = Dict{Tuple{Union{Ring, Field}, Array{Symbol, 1},
 mutable struct PolyRing{T <: Nemo.RingElem} <: Nemo.MPolyRing{T}
    ptr::libSingular.ring
    base_ring::Union{Ring, Field}
+   ord::Symbol
    refcount::Int
 
    function PolyRing{T}(R::Union{Ring, Field}, s::Array{Symbol, 1},
-         cached::Bool = true,
+         ord_sym::Symbol, cached::Bool = true,
          ordering::libSingular.rRingOrder_t = ringorder_dp,
          ordering2::libSingular.rRingOrder_t = ringorder_C,
          degree_bound::Int = 0) where T
@@ -55,7 +56,7 @@ mutable struct PolyRing{T <: Nemo.RingElem} <: Nemo.MPolyRing{T}
          ptr = libSingular.rDefault(r, v, ord, blk0, blk1, bitmask)
          @assert degree_bound_adjusted == Int(libSingular.rBitmask(ptr))
          d = PolyRingID[R, s, ordering, ordering2, degree_bound_adjusted] =
-               new(ptr, R, 1)
+               new(ptr, R, ord_sym, 1)
          finalizer(_PolyRing_clear_fn, d)
          return d
       end
