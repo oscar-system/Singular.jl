@@ -147,6 +147,9 @@ void singular_define_rings(jlcxx::Module & Singular)
     Singular.method("p_Mult_q", [](spolyrec * p, spolyrec * q, ip_sring * r) {
         return p_Mult_q(p, q, r);
     });
+    Singular.method("pp_Mult_qq", [](spolyrec * p, spolyrec * q, ip_sring * r) {
+        return pp_Mult_qq(p, q, r);
+    });
     Singular.method("p_Power", [](spolyrec * p, int q, ip_sring * r) {
         return p_Power(p, q, r);
     });

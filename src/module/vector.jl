@@ -107,18 +107,14 @@ end
 function *(a::svector{spoly{T}}, b::spoly{T}) where T <: AbstractAlgebra.RingElem
    base_ring(a) != parent(b) && error("Incompatible base rings")
    R = base_ring(a)
-   a1 = libSingular.p_Copy(a.ptr, R.ptr)
-   b1 = libSingular.p_Copy(b.ptr, R.ptr)
-   s = libSingular.p_Mult_q(a1, b1, R.ptr)
+   s = libSingular.pp_Mult_qq(a.ptr, b.ptr, R.ptr)
    return svector{spoly{T}}(R, a.rank, s)
 end
 
 function (a::spoly{T} * b::svector{spoly{T}}) where T <: Nemo.RingElem
    base_ring(b) != parent(a) && error("Incompatible base rings")
    R = base_ring(b)
-   a1 = libSingular.p_Copy(a.ptr, R.ptr)
-   b1 = libSingular.p_Copy(b.ptr, R.ptr)
-   s = libSingular.p_Mult_q(a1, b1, R.ptr)
+   s = libSingular.pp_Mult_qq(a.ptr, b.ptr, R.ptr)
    return svector{spoly{T}}(R, b.rank, s)
 end
 

@@ -329,9 +329,7 @@ end
 
 function (a::spoly{T} * b::spoly{T}) where T <: Nemo.RingElem
    check_parent(a, b)
-   a1 = libSingular.p_Copy(a.ptr, parent(a).ptr)
-   b1 = libSingular.p_Copy(b.ptr, parent(a).ptr)
-   s = libSingular.p_Mult_q(a1, b1, parent(a).ptr)
+   s = libSingular.pp_Mult_qq(a.ptr, b.ptr, parent(a).ptr)
    return parent(a)(s)
 end
 
@@ -678,9 +676,7 @@ end
 
 function mul!(c::spoly, x::spoly, y::spoly)
    R = parent(x)
-   x1 = libSingular.p_Copy(x.ptr, R.ptr)
-   y1 = libSingular.p_Copy(y.ptr, R.ptr)
-   ptr = libSingular.p_Mult_q(x1, y1, R.ptr)
+   ptr = libSingular.pp_Mult_qq(x.ptr, y.ptr, R.ptr)
    if c.ptr != C_NULL
       libSingular.p_Delete(c.ptr, R.ptr)
    end
