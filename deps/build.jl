@@ -10,7 +10,7 @@ const debug_build = false # N.B: debug builds are up to 50 times slower at runti
 
 wdir = "$pkgdir/deps"
 vdir = "$pkgdir/local"
-nemovdir = "$nemodir/local"
+nemovdir = "$nemodir/deps/usr"
 
 LDFLAGS = "-Wl,-rpath,$vdir/lib -Wl,-rpath,\$\$ORIGIN/../share/julia/site/v$(VERSION.major).$(VERSION.minor)/Singular/local/lib"
 cd(wdir)
