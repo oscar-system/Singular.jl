@@ -99,7 +99,8 @@ mutable struct spoly{T <: Nemo.RingElem} <: Nemo.MPolyElem{T}
    end
     
    function spoly{T}(R::PolyRing{T}, n::libSingular.number) where T <: Nemo.RingElem
-      p = libSingular.p_NSet(n, R.ptr)
+      nn = libSingular.n_Copy(n, base_ring(R).ptr)
+      p = libSingular.p_NSet(nn, R.ptr)
       z = new{T}(p, R)
       R.refcount += 1
       finalizer(_spoly_clear_fn, z)
