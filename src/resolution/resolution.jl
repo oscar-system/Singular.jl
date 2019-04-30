@@ -122,3 +122,19 @@ function (S::ResolutionSet{T})(ptr::Ptr{Nothing}, len::Int) where T <: AbstractA
    return sresolution{T}(R, len, ptr)
 end
 
+###############################################################################
+#
+#   Resolution constructors
+#
+###############################################################################
+
+function Resolution(C::Array{smodule{T}, 1}) where T <: AbstractAlgebra.RingElem
+    len = size(C, 1)+1
+    len > 1 || error("no module specified")
+    R = base_ring(C[1])
+    CC = (m -> m.ptr).(C)
+    C_ptr = reinterpret(Ptr{Nothing}, pointer(CC))
+    ptr = libSingular.res_Copy(C_ptr, Cint(len), R.ptr)
+    return sresolution{T}(R, len, ptr)
+end
+
