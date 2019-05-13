@@ -101,6 +101,10 @@ isvar_generated(::sideal)
 normalize!(::sideal)
 ```
 
+```@docs
+radical(::sideal)
+```
+
 **Examples**
 
 ```

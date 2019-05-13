@@ -1,7 +1,7 @@
 export sideal, IdealSet, syz, lead, normalize!, isconstant, iszerodim, fres,
        highcorner, jacobi, jet, kbase, ngens, sres, intersection, quotient,
        reduce, eliminate, kernel, equal, contains, isvar_generated, saturation,
-       satstd, slimgb, std, vdim
+       satstd, slimgb, std, vdim, radical
 
 ###############################################################################
 #
@@ -332,6 +332,17 @@ function std(I::sideal; complete_reduction::Bool=false)
    libSingular.idSkipZeroes(ptr)
    z = Ideal(R, ptr)
    z.isGB = true
+   return z
+end
+
+@doc Markdown.doc"""
+    radical(I::sideal)
+> Compute for thedical of an ideal $I$.
+"""
+function radical(I::sideal)
+   R = base_ring(I)
+   ptr = libSingular.id_Radical(I.ptr, R.ptr)
+   z = Ideal(R, ptr)
    return z
 end
 

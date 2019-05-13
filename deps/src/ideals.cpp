@@ -100,6 +100,54 @@ auto id_Std_helper(ideal a, ring b, bool complete_reduction = false)
     return id;
 }
 
+auto id_Radical_helper(ideal a, ring b)
+{
+    ideal id = NULL;
+    if (!idIs0(a))
+    {
+        id = ii_CallProcId2Id("primdec.lib","radical",a,b);
+    }
+    else
+        id = idInit(0, a->rank);
+    return id;
+}
+
+auto id_RadicalZ_helper(ideal a, ring b)
+{
+    ideal id = NULL;
+    if (!idIs0(a))
+    {
+        id = ii_CallProcId2Id("primdecint.lib","radicalZ",a,b);
+    }
+    else
+        id = idInit(0, a->rank);
+    return id;
+}
+
+auto id_equiRadical_helper(ideal a, ring b)
+{
+    ideal id = NULL;
+    if (!idIs0(a))
+    {
+        id = ii_CallProcId2Id("primdec.lib","equiRadical",a,b);
+    }
+    else
+        id = idInit(0, a->rank);
+    return id;
+}
+
+auto id_equidimMax_helper(ideal a, ring b)
+{
+    ideal id = NULL;
+    if (!idIs0(a))
+    {
+        id = ii_CallProcId2Id("primdec.lib","equidimMax",a,b);
+    }
+    else
+        id = idInit(0, a->rank);
+    return id;
+}
+
 void singular_define_ideals(jlcxx::Module & Singular)
 {
     Singular.method("id_Delete",
@@ -122,6 +170,10 @@ void singular_define_ideals(jlcxx::Module & Singular)
     Singular.method("id_IsZeroDim", &id_IsZeroDim);
 
     Singular.method("idElem", &idElem);
+
+    Singular.method("id_equiRadical", &id_equiRadical_helper);
+
+    Singular.method("id_equidimMax", &id_equidimMax_helper);
 
     Singular.method("id_Normalize", &id_Normalize);
 
@@ -173,6 +225,10 @@ void singular_define_ideals(jlcxx::Module & Singular)
     Singular.method("id_Slimgb", &id_Slimgb_helper);
 
     Singular.method("id_Std", &id_Std_helper);
+
+    Singular.method("id_Radical", &id_Radical_helper);
+
+    Singular.method("id_RadicalZ", &id_RadicalZ_helper);
 
     Singular.method("id_Eliminate", [](ideal m, poly p, ring o) {
         const ring origin = currRing;
