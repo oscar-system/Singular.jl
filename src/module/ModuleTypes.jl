@@ -105,7 +105,11 @@ end
 
 If R is called with a low-level ideal pointer, along with
 Val(:module), it will interpret the ideal pointer as a module.
+<<<<<<< HEAD
 This needs to be indicated due to the fact that Singular's
+=======
+This needs to be indicated due to the fact that Singulars
+>>>>>>> First version of caller - WIP
 modules and ideals are both stored in the ideal data structure.
 """
 function (R::PolyRing{T})(m::libSingular.ideal,::Val{:module}) where T

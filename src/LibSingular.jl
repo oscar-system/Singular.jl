@@ -1,6 +1,7 @@
 module libSingular
 
 import Libdl
+
 using CxxWrap
 @wrapmodule(realpath(joinpath(@__DIR__, "..", "local", "lib", "libsingularwrap." * Libdl.dlext)))
 
