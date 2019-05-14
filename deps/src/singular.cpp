@@ -4,6 +4,7 @@
 #include "rings.h"
 #include "ideals.h"
 #include "matrices.h"
+#include "caller.h"
 
 static std::string singular_return;
 static std::string singular_error;
@@ -48,6 +49,7 @@ JLCXX_MODULE define_julia_module(jlcxx::Module & Singular)
     Singular.add_type<ip_smatrix>("ip_smatrix");
     Singular.add_type<ssyStrategy>("syStrategy");
     Singular.add_type<sip_smap>("sip_smap");
+    Singular.add_type<bigintmat>("bigintmat");
 
     /* monomial orderings */
     Singular.set_const("ringorder_no", ringorder_no);
@@ -73,6 +75,7 @@ JLCXX_MODULE define_julia_module(jlcxx::Module & Singular)
     singular_define_rings(Singular);
     singular_define_ideals(Singular);
     singular_define_matrices(Singular);
+    singular_define_caller(Singular);
 
 
     // Calls the Singular interpreter with `input`.
@@ -124,60 +127,69 @@ JLCXX_MODULE define_julia_module(jlcxx::Module & Singular)
      ** from resolutions.jl
      ***************************/
 
-    Singular.method("res_Delete_helper", [](void * ra_void, int len, ring o) {
-        auto ra = reinterpret_cast<resolvente>(ra_void);
-        for (int i = 0; i < len; i++) {
-            id_Delete(ra + i, o);
-        }
-        omFreeSize((ADDRESS)ra, (len + 1) * sizeof(ideal));
-    });
+    Singular.method("res_Delete_helper",
+                    [](syStrategy ra, ring o) { syKillComputation(ra, o); });
 
-    Singular.method("res_Copy", [](void * ra_void, int len, ring o) {
-        auto       ra = reinterpret_cast<resolvente>(ra_void);
-        resolvente res = (resolvente)omAlloc0((len + 1) * sizeof(ideal));
-        rChangeCurrRing(o);
-        for (int i = len - 1; i >= 0; i--) {
-            if (ra[i] != NULL)
-                res[i] = id_Copy(ra[i], o);
-        }
-        return reinterpret_cast<void *>(res);
-    });
-
-
-    Singular.method("getindex", [](void * ra_void, int k) {
-        auto ra = reinterpret_cast<resolvente>(ra_void);
-        return (ideal)ra[k];
-    });
-
-    Singular.method("syMinimize", [](void * ra_void, int len, ring o) {
-        auto       ra = reinterpret_cast<resolvente>(ra_void);
+    Singular.method("res_Copy", [](syStrategy ra, ring o) {
         const ring origin = currRing;
-        syStrategy temp = (syStrategy)omAlloc0(sizeof(ssyStrategy));
-        resolvente result;
         rChangeCurrRing(o);
-        temp->fullres = (resolvente)omAlloc0((len + 1) * sizeof(ideal));
-        for (int i = len - 1; i >= 0; i--) {
-            if (ra[i] != NULL)
-                temp->fullres[i] = idCopy(ra[i]);
-        }
-        temp->length = len;
-        syMinimize(temp);
-        result = temp->minres;
-        temp->minres = NULL;
-        // syMinimize increments this as it returns a value we ignore
-        temp->references--;
-        syKillComputation(temp, o);
+        syStrategy temp = syCopy(ra);
         rChangeCurrRing(origin);
-        return reinterpret_cast<void *>(result);
+        return temp;
     });
 
+    Singular.method("getindex_internal",
+                    [](syStrategy ra, int64_t k, bool minimal) {
+                        if (minimal) {
+                            return ra->minres[k];
+                        }
+                        return (ideal)ra->fullres[k];
+                    });
 
-    Singular.method("syBetti", [](void * ra_void, int len, ring o) {
-        auto       ra = reinterpret_cast<resolvente>(ra_void);
+    Singular.method("syMinimize", [](syStrategy ra, ring o) {
+        const ring origin = currRing;
+        rChangeCurrRing(o);
+        syStrategy temp = syCopy(ra);
+        syMinimize(temp);
+        rChangeCurrRing(origin);
+        return reinterpret_cast<void *>(temp);
+    });
+
+    Singular.method("get_minimal_res", [](syStrategy ra) {
+        return reinterpret_cast<void *>(ra->minres);
+    });
+
+    Singular.method("get_full_res", [](syStrategy ra) {
+        return reinterpret_cast<void *>(ra->fullres);
+    });
+
+    Singular.method("get_sySize", [](syStrategy ra) {
+        return static_cast<int64_t>(sySize(ra));
+    });
+
+    Singular.method("create_SyStrategy", [](void * res_void, int64_t len,
+                                            ring r) {
+        resolvente res = reinterpret_cast<resolvente>(res_void);
+        syStrategy result = (syStrategy)omAlloc0(sizeof(ssyStrategy));
+        result->list_length = static_cast<short>(len);
+        result->length = static_cast<int>(len);
+        resolvente res_cp = (resolvente)omAlloc0((len + 1) * sizeof(ideal));
+        for (int i = 0; i <= len; i++) {
+            if (res[i] != NULL) {
+                res_cp[i] = id_Copy(res[i], r);
+            }
+        }
+        result->fullres = res_cp;
+        result->syRing = r;
+        return result;
+    });
+
+    Singular.method("syBetti_internal", [](void * ra, int len, ring o) {
         const ring origin = currRing;
         rChangeCurrRing(o);
         int      dummy;
-        intvec * iv = syBetti(ra, len, &dummy, NULL, FALSE, NULL);
+        intvec * iv = syBetti(reinterpret_cast<resolvente>(ra), len, &dummy,
+                              NULL, FALSE, NULL);
         rChangeCurrRing(origin);
         int  nrows = iv->rows();
         int  ncols = iv->cols();

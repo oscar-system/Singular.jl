@@ -44,11 +44,10 @@ void singular_define_coeffs(jlcxx::Module & Singular)
         }
     });
 
-    Singular.method("n_Delete_Q", [](void * n, coeffs cf) {
-        number   tt = reinterpret_cast<number>(n);
-        number * t = &tt;
+    Singular.method("n_Delete_Q", [](snumber * n, coeffs cf) {
+        ;
         if (n != NULL) {
-            n_Delete(t, cf);
+            n_Delete(&n, cf);
         }
     });
 

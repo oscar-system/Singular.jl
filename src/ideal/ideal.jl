@@ -484,8 +484,8 @@ function fres(id::Union{sideal{T}, smodule{T}}, max_length::Int, method::String 
          && method != "single module")
       error("wrong optional argument for fres")
    end
-   r, length, minimal = libSingular.id_fres(id.ptr, Cint(max_length + 1), method, R.ptr)
-   return sresolution{T}(R, Int(length), r, minimal)
+   r, minimal = libSingular.id_fres(id.ptr, Cint(max_length + 1), method, R.ptr)
+   return sresolution{T}(R, r, minimal)
 end
 
 @doc Markdown.doc"""
@@ -503,16 +503,8 @@ function sres(I::sideal{T}, max_length::Int) where T <: Nemo.RingElem
         max_length = nvars(R)
         # TODO: consider qrings
    end
-   r, length, minimal = libSingular.id_sres(I.ptr, Cint(max_length + 1), R.ptr)
-   for i = 1:length
-      ptr = libSingular.getindex(r, Cint(i - 1))
-      if ptr.cpp_object == C_NULL
-         length = i - 1
-         break
-      end
-     libSingular.idSkipZeroes(ptr)
-   end
-   return sresolution{T}(R, length, r, minimal)
+   r, minimal = libSingular.id_sres(I.ptr, Cint(max_length + 1), R.ptr)
+   return sresolution{T}(R, r, minimal)
 end
 
 ###############################################################################
@@ -534,6 +526,10 @@ end
 function Ideal(R::PolyRing{T}, id::libSingular.ideal) where T <: Nemo.RingElem
    S = elem_type(R)
    return sideal{S}(R, id)
+end
+
+function (R::PolyRing{T})(id::libSingular.ideal) where T <: Nemo.RingElem
+    return Ideal(R,id)
 end
 
 # maximal ideal in degree d

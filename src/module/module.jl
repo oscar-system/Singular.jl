@@ -160,16 +160,8 @@ function sres(I::smodule{T}, max_length::Int) where T <: Nemo.RingElem
         max_length = nvars(R)
         # TODO: consider qrings
    end
-   r, length, minimal = libSingular.id_sres(I.ptr, Cint(max_length + 1), R.ptr)
-   for i = 1:length
-      ptr = libSingular.getindex(r, Cint(i - 1))
-      if ptr.cpp_object == C_NULL
-         length = i - 1
-         break
-      end
-     libSingular.idSkipZeroes(ptr)
-   end
-   return sresolution{T}(R, length, r, minimal)
+   r, minimal = libSingular.id_sres(I.ptr, Cint(max_length + 1), R.ptr)
+   return sresolution{T}(R, r, minimal)
 end
 
 ###############################################################################
