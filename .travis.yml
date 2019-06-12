@@ -22,9 +22,14 @@ matrix:
 
 script:
     - while sleep 30; do echo "still alive"; done &
-    - git fetch --unshallow
-    - julia --color=yes -e  'using Pkg; Pkg.clone(pwd()); Pkg.build("Singular")'
-    - julia --check-bounds=yes --color=yes -e 'using Pkg; Pkg.test("Singular"; coverage=true)'
+      #- julia -e 'using Pkg;Pkg.add("Nemo"); Pkg.clone(pwd());'
+      #- julia -e 'using Pkg; Pkg.build("Hecke");'
+    - julia -e 'using Pkg; Pkg.build("Singular"); Pkg.test("Singular");'
+
+      #    - while sleep 30; do echo "still alive"; done &
+      #    - git fetch --unshallow
+      #    - julia --color=yes -e  'using Pkg; Pkg.clone(pwd()); Pkg.build("Singular")'
+      #    - julia --check-bounds=yes --color=yes -e 'using Pkg; Pkg.test("Singular"; coverage=true)'
 
 notifications:
   email: false
