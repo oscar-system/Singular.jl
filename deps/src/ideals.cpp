@@ -193,7 +193,7 @@ void singular_define_ideals(jlcxx::Module & Singular)
     });
 
     Singular.method("internal_void_to_poly_helper",
-                    [](void * p) { return reinterpret_cast<poly *>(p); });
+                    [](void * p) { return reinterpret_cast<poly>(p); });
 
     Singular.method(
         "maGetPreimage", [](ring trgt, ideal a, ideal b, ring src) {
