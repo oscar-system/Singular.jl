@@ -2,7 +2,10 @@
 dist: xenial
 
 language: julia
-julia: 1.0
+julia:
+   - 1.0
+   - 1.1
+   - nightly
 
 addons:
     apt:
@@ -22,9 +25,7 @@ matrix:
 
 script:
     - while sleep 30; do echo "still alive"; done &
-    - git fetch --unshallow
-    - julia --color=yes -e  'using Pkg; Pkg.clone(pwd()); Pkg.build("Singular")'
-    - julia --check-bounds=yes --color=yes -e 'using Pkg; Pkg.test("Singular"; coverage=true)'
+    - julia -e 'using Pkg; Pkg.build("Singular"); Pkg.test("Singular");'
 
 notifications:
   email: false
