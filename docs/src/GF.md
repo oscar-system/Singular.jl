@@ -63,7 +63,8 @@ isunit(::n_GF)
 **Examples**
 
 ```julia
-R = FiniteField(7, 2)
+R,w = FiniteField(7, 2, "w")
+w^48 == 1
 a = R(5)
 
 isunit(a)
