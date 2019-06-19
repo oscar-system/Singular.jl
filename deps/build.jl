@@ -114,7 +114,7 @@ withenv("CPP_FLAGS"=>"-I$vdir/include", "LD_LIBRARY_PATH"=>"$vdir/lib:$nemodir/l
       "--disable-optimizationflags",
     ])
   end
-  run(Cmd(cmd))
+  run(Cmd(string.(cmd)))
    withenv("LDFLAGS"=>LDFLAGS) do
       run(`make -j4`)
       run(`make install`)
