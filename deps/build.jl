@@ -92,11 +92,29 @@ end
 
 cd(joinpath(wdir, "Singular_build"))
 withenv("CPP_FLAGS"=>"-I$vdir/include", "LD_LIBRARY_PATH"=>"$vdir/lib:$nemodir/lib") do
-   if !debug_build
-      run(`$srcs/configure --prefix=$vdir --disable-static --enable-p-procs-static --disable-p-procs-dynamic --disable-gfanlib --enable-shared --with-gmp=$nemovdir --with-flint=$nemovdir --with-ntl=$vdir --without-python --with-readline=no`)
-   else
-      run(`$srcs/configure --prefix=$vdir --disable-static --enable-p-procs-static --disable-p-procs-dynamic --disable-gfanlib --enable-shared --with-gmp=$nemovdir --with-flint=$nemovdir --with-ntl=$vdir --without-python --with-readline=no --with-debug --enable-debug --disable-optimizationflags`)
-   end
+   cmd = split(
+     """
+     $srcs/configure
+     --prefix=$vdir
+     --disable-static
+     --enable-p-procs-static
+     --disable-p-procs-dynamic
+     --disable-gfanlib
+     --enable-shared
+     --with-gmp=$nemovdir
+     --with-flint=$nemovdir
+     --with-ntl=$vdir
+     --without-python
+     --with-readline=no
+     """, "\n", keepempty = false)
+  if debug_build
+    append!(cmd, [
+      "--with-debug",
+      "--enable-debug",
+      "--disable-optimizationflags",
+    ])
+  end
+  run(Cmd(cmd))
    withenv("LDFLAGS"=>LDFLAGS) do
       run(`make -j4`)
       run(`make install`)
