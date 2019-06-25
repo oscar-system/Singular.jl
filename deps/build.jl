@@ -15,6 +15,9 @@ nemovdir = "$nemodir/deps/usr"
 LDFLAGS = "-Wl,-rpath,$vdir/lib -Wl,-rpath,\$\$ORIGIN/../share/julia/site/v$(VERSION.major).$(VERSION.minor)/Singular/local/lib"
 cd(wdir)
 
+cores = Sys.CPU_THREADS
+println("Detected $cores CPU threads.")
+
 # INSTALL NTL
 
 const ntl="ntl-10.5.0"
@@ -32,7 +35,7 @@ run(`tar -C "$tmp" -xkvf "$wdir/$ntl.tar.gz"`)
 cd(joinpath(tmp, ntl, "src"))
 withenv("CPP_FLAGS"=>"-I$vdir/include", "LD_LIBRARY_PATH"=>"$vdir/lib:$nemovdir/lib", "LDFLAGS"=>LDFLAGS) do
    run(`./configure PREFIX=$vdir DEF_PREFIX=$nemovdir SHARED=on NTL_THREADS=off NTL_EXCEPTIONS=off NTL_GMP_LIP=on CXXFLAGS="-I$nemovdir/include"`)
-   run(`make -j4`)
+   run(`make -j$cores`)
    run(`make install`)
 end
 cd(wdir)
@@ -58,7 +61,7 @@ rm(tmp; recursive=true)
 # cd(joinpath(tmp2, cddlib))
 # withenv("CPP_FLAGS"=>"-I$vdir/include", "LD_LIBRARY_PATH"=>"$vdir/lib:$nemovdir/lib", "LDFLAGS"=>LDFLAGS) do
 #    run(`./configure --prefix=$vdir --with-gmp=$nemovdir`)
-#    run(`make -j4`)
+#    run(`make -j$cores`)
 #    run(`make install`)
 # end
 # cd(wdir)
@@ -116,7 +119,7 @@ withenv("CPP_FLAGS"=>"-I$vdir/include", "LD_LIBRARY_PATH"=>"$vdir/lib:$nemodir/l
   end
   run(Cmd(string.(cmd)))
    withenv("LDFLAGS"=>LDFLAGS) do
-      run(`make -j4`)
+      run(`make -j$cores`)
       run(`make install`)
    end
 end
