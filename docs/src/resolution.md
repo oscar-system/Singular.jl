@@ -84,9 +84,9 @@ F[n::Int]
 **Examples**
 
 ```julia
-R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+R, (w, x, y, z) = PolynomialRing(QQ, ["w", "x", "y", "z"])
 
-I = Ideal(R, x*y + 1, x^2 + 1)
+I = Ideal(R, w^2 - x*z, w*x - y*z, x^2 - w*y, x*y - z^2, y^2 - w*z)
 F = fres(std(I), 0)
 
 n = length(F)
@@ -102,9 +102,9 @@ betti(::sresolution)
 **Examples**
 
 ```julia
-R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+R, (w, x, y, z) = PolynomialRing(QQ, ["w", "x", "y", "z"])
 
-I = Ideal(R, x*y + 1, x^2 + 1)
+I = Ideal(R, w^2 - x*z, w*x - y*z, x^2 - w*y, x*y - z^2, y^2 - w*z)
 F = fres(std(I), 3)
 M = minres(F)
 
@@ -120,9 +120,9 @@ minres{T <: AbstractAlgebra.RingElem}(::sresolution{T})
 **Examples**
 
 ```julia
-R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+R, (w, x, y, z) = PolynomialRing(QQ, ["w", "x", "y", "z"])
 
-I = Ideal(R, x*y + 1, x^2 + 1)
+I = Ideal(R, w^2 - x*z, w*x - y*z, x^2 - w*y, x*y - z^2, y^2 - w*z)
 F = fres(std(I), 3)
 M = minres(F)
 ```

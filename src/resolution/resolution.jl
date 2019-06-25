@@ -58,7 +58,8 @@ end
 @doc Markdown.doc"""
     betti(r::sresolution)
 > Return the Betti numbers, i.e. the ranks of the free modules in the given
-> free resolution. These are returned as a Julia array of `Int`s.
+> free resolution. These are returned as a Julia array of `Int`s. Note that the
+> output of this command is useful only in the graded case.
 """
 function betti(r::sresolution)
    array = libSingular.syBetti(r.ptr, Cint(r.len), r.base_ring.ptr)
@@ -73,7 +74,8 @@ end
 
 @doc Markdown.doc"""
     minres{T <: AbstractAlgebra.RingElem}(r::sresolution{T})
-> Return a minimal free resolution, given any free resolution. If the supplied
+> Return a minimal free resolution, given any free resolution. In the graded
+> case, there exists a uniquely determined minimal resolution. If the supplied
 > resolution is already minimal, it may be returned without making a copy.
 """
 function minres(r::sresolution{T}) where T <: AbstractAlgebra.RingElem
