@@ -25,7 +25,6 @@ makedocs(
 )
 
 deploydocs(
-   julia = "nightly",
    repo   = "github.com/wbhart/Singular.jl.git",
    target = "build",
    deps = Deps.pip("pygments", "mkdocs", "python-markdown-math"),
