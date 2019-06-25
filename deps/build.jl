@@ -99,6 +99,7 @@ withenv("CPP_FLAGS"=>"-I$vdir/include", "LD_LIBRARY_PATH"=>"$vdir/lib:$nemodir/l
      """
      $srcs/configure
      --prefix=$vdir
+     --libdir=$vdir/lib
      --disable-static
      --enable-p-procs-static
      --disable-p-procs-dynamic
