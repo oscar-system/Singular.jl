@@ -1,9 +1,9 @@
 function test_sresolution_constructors()
    print("sresolution.constructors...")
 
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (w, x, y, z) = PolynomialRing(QQ, ["w", "x", "y", "z"])
 
-   I = Ideal(R, x*y + 1, x^2 + 1)
+   I = Ideal(R, w^2 - x*z, w*x - y*z, x^2 - w*y, x*y - z^2, y^2 - w*z)
    F = fres(std(I), 3)
    S = parent(F)
 
@@ -25,24 +25,24 @@ end
 function test_sresolution_manipulation()
    print("sresolution.manipulation...")
 
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (w, x, y, z) = PolynomialRing(QQ, ["w", "x", "y", "z"])
 
-   I = Ideal(R, x*y + 1, x^2 + 1)
+   I = Ideal(R, w^2 - x*z, w*x - y*z, x^2 - w*y, x*y - z^2, y^2 - w*z)
    F = fres(std(I), 1)
 
    @test length(F) == 1
 
    F = fres(std(I), 0)
 
-   @test length(F) == 2
-
-   F = fres(std(I), 2)
-
-   @test length(F) == 2
+   @test length(F) == 3
 
    F = fres(std(I), 3)
 
-   @test length(F) == 2
+   @test length(F) == 3
+
+   F = fres(std(I), 4)
+
+   @test length(F) == 3
 
    @test isa(F[1], smodule)
    @test isa(F[2], smodule)
@@ -59,18 +59,19 @@ end
 function test_sresolution_betti()
    print("sresolution.betti...")
 
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (w, x, y, z) = PolynomialRing(QQ, ["w", "x", "y", "z"])
 
-   I = Ideal(R, x*y + 1, x^2 + 1)
+   I = Ideal(R, w^2 - x*z, w*x - y*z, x^2 - w*y, x*y - z^2, y^2 - w*z)
    F = fres(std(I), 3)
    M = minres(F)
 
    B = betti(M)
 
-   @test size(B) == (2, 3)
+   @test size(B) == (3, 4)
 
-   @test B[1, 1] == 1 && B[1, 2] == 1 && B[1, 3] == 0
-   @test B[2, 1] == 0 && B[2, 2] == 1 && B[2, 3] == 1
+   @test B[1, 1] == 1 && B[1, 2] == 0 && B[1, 3] == 0 && B[1, 4] == 0
+   @test B[2, 1] == 0 && B[2, 2] == 5 && B[2, 3] == 5 && B[2, 4] == 0
+   @test B[3, 1] == 0 && B[3, 2] == 0 && B[3, 3] == 0 && B[3, 4] == 1
 
    println("PASS")
 end
@@ -78,14 +79,14 @@ end
 function test_sresolution_minres()
    print("sresolution.minres...")
 
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (w, x, y, z) = PolynomialRing(QQ, ["w", "x", "y", "z"])
 
-   I = Ideal(R, x*y + 1, x^2 + 1)
+   I = Ideal(R, w^2 - x*z, w*x - y*z, x^2 - w*y, x*y - z^2, y^2 - w*z)
    F = fres(std(I), 3)
 
    M = minres(F)
 
-   @test length(M) == 2
+   @test length(M) == 3
 
    M1 = Singular.Matrix(M[1])
    M2 = Singular.Matrix(M[2])
