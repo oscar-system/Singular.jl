@@ -208,6 +208,14 @@ function test_n_Z_Polynomials()
    println("PASS")
 end
 
+function test_n_Z_conversions()
+   print("n_Z.conversions...")
+   for n in [-1, 0, 1, -BigInt(2)^65, BigInt(2)^65]
+      @test convert(BigInt, Singular.ZZ(n)) == n
+   end
+   println("PASS")
+end
+
 function test_n_Z()
    test_n_Z_constructors()
    test_n_Z_printing()
@@ -224,6 +232,7 @@ function test_n_Z()
    test_n_Z_extended_gcd()
    test_n_Z_chinese_remainder()
    test_n_Z_Polynomials()
+   test_n_Z_conversions()
 
    println("")
 end
