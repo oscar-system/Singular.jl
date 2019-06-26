@@ -43,6 +43,7 @@ function test_sideal_manipulation()
 
    @test ngens(I0) == 0
    @test ngens(I1) == 2
+   @test x in gens(I1) && y in gens(I1)
 
    I2 = deepcopy(I1)
 
