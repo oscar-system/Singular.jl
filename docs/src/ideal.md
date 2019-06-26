@@ -74,6 +74,10 @@ I2 = Ideal(R, [x*y + 1, x^2])
 ngens(::sideal)
 ```
 
+```@docs
+gens(::sideal)
+```
+
 Singular.jl overloads the `setindex!` and `getindex` functions so that one can access
 the generators of an ideal using array notation.
 
