@@ -378,6 +378,6 @@ function (R::Integers)(x::Nemo.fmpz)
 end
 
 function convert(::Type{BigInt}, n::n_Z)
-   return deepcopy(unsafe_load(reinterpret(Ptr{BigInt},n.ptr.cpp_object)))
+   return deepcopy(unsafe_load(reinterpret(Ptr{BigInt}, n.ptr.cpp_object)))
 end
 
