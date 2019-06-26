@@ -27,6 +27,14 @@ parent_type(::Type{sideal{spoly{T}}}) where T <: Nemo.RingElem = IdealSet{spoly{
 """
 ngens(I::sideal) = Int(libSingular.ngens(I.ptr))
 
+@doc Markdown.doc"""
+    gens(I::sideal)
+> Return the generators in the internal representation of the ideal $I$ as an array.
+"""
+function gens(I::sideal)
+   return [I[i] for i in 1:Singular.ngens(I)]
+end
+
 function checkbounds(I::sideal, i::Int)
    (i > ngens(I) || i < 1) && throw(BoundsError(I, i))
 end
