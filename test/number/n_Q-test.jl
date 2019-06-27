@@ -203,6 +203,15 @@ function test_n_Q_Polynomials()
    println("PASS")
 end
 
+function test_n_Q_conversions()
+   print("n_Q.conversions...")
+
+   @test Singular.QQ(1//2) == Singular.QQ(1) // Singular.QQ(2)
+   @test AbstractAlgebra.QQ(Singular.QQ(1) // Singular.QQ(2)) == 1//2
+
+   println("PASS")
+end
+
 function test_n_Q()
    test_n_Q_constructors()
    test_n_Q_printing()
@@ -217,6 +226,7 @@ function test_n_Q()
    test_n_Q_gcd_lcm()
    test_n_Q_reconstruct()
    test_n_Q_Polynomials()
+   test_n_Q_conversions()
 
    println("")
 end

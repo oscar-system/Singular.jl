@@ -350,6 +350,8 @@ promote_rule(C::Type{n_Q}, ::Type{n_Q}) = n_Z
 
 (::Rationals)(n::libSingular.number) = n_Q(n) 
 
+(Rational{BigInt})(x::Singular.n_Q) = convert(BigInt, numerator(x)) // convert(BigInt, denominator(x))
+
 function (R::Rationals)(x::Nemo.fmpz)
    a = BigInt()
    ccall((:flint_mpz_init_set_readonly, :libflint), Nothing,
