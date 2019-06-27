@@ -433,7 +433,7 @@ function test_convert_between_MPoly_and_SingularPoly()
 end
 
 function test_spoly_differential()
-   print("spoly.test_spoly_differential")
+   print("spoly.test_spoly_differential...")
 
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
@@ -455,6 +455,8 @@ function test_spoly_differential()
 
    #Check jet
    @test jf == x^3
+   
+   println("PASS")
 end
 
 function test_spoly()
