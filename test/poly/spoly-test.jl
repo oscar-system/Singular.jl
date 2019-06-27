@@ -402,6 +402,7 @@ end
 
 function test_convert_between_MPoly_and_SingularPoly()
    print("spoly.test_convert_MPoly_to_SingularPoly...")
+   
    for num_vars=2:10
       var_names = ["x$j" for j in 1:num_vars]
       ord = AbstractAlgebra.rand_ordering()
@@ -427,6 +428,8 @@ function test_convert_between_MPoly_and_SingularPoly()
       @test SAA(f - g) == SAA(f) - SAA(g)
       @test S(SAA(f)) == f
    end
+   
+   println("PASS")
 end
 
 function test_spoly_differential()
