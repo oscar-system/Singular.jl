@@ -454,6 +454,16 @@ function test_spoly_differential()
    @test jf == x^3
 end
 
+function test_spoly_unique()
+   print("spoly.unique...")
+   
+   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+
+   @test unique([x, x+y-y]) == [x]
+   
+   println("PASS")
+end
+
 function test_spoly()
    test_spoly_constructors()
    test_spoly_printing()
@@ -475,6 +485,7 @@ function test_spoly()
    test_spoly_Polynomials()
    # test_convert_between_MPoly_and_SingularPoly()
    test_spoly_differential()
+   test_spoly_unique()
 
    println("")
 end
