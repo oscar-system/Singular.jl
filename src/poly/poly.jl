@@ -277,8 +277,8 @@ end
 #
 ###############################################################################
 
-function Base.hash(p::spoly{T}) where T <: Nemo.RingElem
-   return 0 # FIXME: Implement a useful hash function instead
+function Base.hash(p::spoly{T}, h::UInt) where T <: Nemo.RingElem
+   return h # FIXME: Implement a useful hash function instead
 end
 
 
