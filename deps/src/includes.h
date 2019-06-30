@@ -16,7 +16,7 @@
 #include <misc/intvec.h>
 #include <misc/auxiliary.h>
 #include <reporter/reporter.h>
-// #include <feFopen.h>
+#include <resources/feFopen.h>
 #include <coeffs/coeffs.h>
 #include <coeffs/longrat.h>
 #include <polys/clapsing.h>

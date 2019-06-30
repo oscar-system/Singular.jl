@@ -5,6 +5,27 @@
 #include "ideals.h"
 #include "matrices.h"
 
+static std::string singular_return;
+static std::string singular_error;
+static std::string singular_warning;
+
+// Internal singular interpreter variable
+extern int         inerror;
+
+static void WerrorS_for_julia(const char * s)
+{
+    singular_error += s;
+}
+
+static void PrintS_for_julia(const char * s)
+{
+    singular_return += s;
+}
+
+static void WarningS_for_julia(const char * s)
+{
+    singular_warning += s;
+}
 
 JLCXX_MODULE define_julia_module(jlcxx::Module & Singular)
 {
@@ -52,6 +73,52 @@ JLCXX_MODULE define_julia_module(jlcxx::Module & Singular)
     singular_define_rings(Singular);
     singular_define_ideals(Singular);
     singular_define_matrices(Singular);
+
+
+    // Calls the Singular interpreter with `input`.
+    // `input` needs to be valid Singular input. 
+    // Returns a 4-tuple:
+    // 1. entry is a bool, indicated if an error has happened
+    // 2. entry is the output as a string
+    // 3. entry is the error output as a string
+    // 4. entry is the warning output as a string
+    Singular.method("call_interpreter", [](std::string input) {
+        // save callbacks
+        auto default_print = PrintS_callback;
+        auto default_error = WerrorS_callback;
+        auto default_warning = WarnS_callback;
+
+        // set temporary new callbacks
+        PrintS_callback = PrintS_for_julia;
+        WerrorS_callback = WerrorS_for_julia;
+        WarnS_callback = WarningS_for_julia;
+
+        // cleanup return strings
+        singular_return.clear();
+        singular_error.clear();
+        singular_warning.clear();
+
+        // call interpreter
+        std::string input_str = input + "\nreturn();";
+        bool err = iiAllStart(NULL, const_cast<char *>(input_str.c_str()),
+                              BT_proc, 0);
+        inerror = 0;
+        errorreported = 0;
+
+        // get output
+        jl_array_t * result = jl_alloc_array_1d(jl_array_any_type, 4);
+        jl_arrayset(result, err ? jl_true : jl_false, 0);
+        jl_arrayset(result, jl_cstr_to_string(singular_return.c_str()), 1);
+        jl_arrayset(result, jl_cstr_to_string(singular_error.c_str()), 2);
+        jl_arrayset(result, jl_cstr_to_string(singular_warning.c_str()), 3);
+
+        // restore old callbacks
+        PrintS_callback = default_print;
+        WerrorS_callback = default_error;
+        WarnS_callback = default_warning;
+
+        return reinterpret_cast<jl_value_t *>(result);
+    });
 
     /****************************
      ** from resolutions.jl
