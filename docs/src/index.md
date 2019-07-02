@@ -5,7 +5,7 @@ written by Oleksandr Motsak, William Hart and other contributors, and is maintai
 William Hart, Hans Schoenemann and Andreas Steenpas. It is part of the Oscar project.
 
 - [https://www.singular.uni-kl.de/](https://www.singular.uni-kl.de/) (Singular website)
-- [https://github.com/wbhart/Singular.jl](https://github.com/wbhart/Singular.jl) (Singular.jl source code)
+- [https://github.com/oscar-system/Singular.jl](https://github.com/oscar-system/Singular.jl) (Singular.jl source code)
 - [http://wbhart.github.io/Singular.jl/](http://wbhart.github.io/Singular.jl/) (Singular.jl online documentation)
 
 The features of Singular so far include:
