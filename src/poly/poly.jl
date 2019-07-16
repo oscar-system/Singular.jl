@@ -278,7 +278,7 @@ end
 ###############################################################################
 
 function Base.hash(p::spoly{T}, h::UInt) where T <: Nemo.RingElem
-   return total_degree(p) * h # FIXME: Implement a more useful hash function instead
+   return total_degree(p) + h # FIXME: Implement a more useful hash function instead
 end
 
 
