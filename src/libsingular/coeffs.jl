@@ -4,6 +4,14 @@ function n_InitMPZ(b::BigInt, cf::coeffs)
     return n_InitMPZ_internal(bb, cf)
 end
 
+# get an mpz from a number
+function n_GetMPZ(s::numberRef, r::coeffs)
+   res = BigInt(1)
+   resp = pointer_from_objref(res)
+   n_GetMPZ_internal(resp, s, r)
+   return res
+end
+
 # write a number to a Singular string
 function n_Write(n::numberRef, cf::coeffs, bShortOut::Bool = false)
    d = Int(bShortOut)
