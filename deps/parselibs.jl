@@ -34,8 +34,7 @@ open(output_filename, "w") do outputfile
             error("from libparse: $(libs.stderr)")
         end
         libs_splitted = split(libs.stdout,"\n")[4:end-1]
-        libs_splitted = [ split(i," ") for i in libs_splitted ]
-        libs_splitted = [ [ j for j in i if j != ""] for i in libs_splitted ]
+        libs_splitted = [ split(i," ", keepempty = false) for i in libs_splitted ]
         println(outputfile, ":$(i[1:end - 4]) => [")
         for j in libs_splitted
             println(outputfile, """[ "$(j[1])", "$(j[3])" ],""")

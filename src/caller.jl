@@ -47,7 +47,7 @@ end
 
 function convert_return_value(single_value, rng = nothing)
     if single_value[1]
-        error("recieved list instead of single value")
+        error("received list instead of single value")
     end
     cast = casting_functions[single_value[3]][1](single_value[2])
     if cast isa Array{Any}

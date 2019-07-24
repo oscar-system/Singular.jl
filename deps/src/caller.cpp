@@ -6,8 +6,6 @@
 #include <Singular/lists.h>
 #include <misc/intvec.h>
 
-// #include <julia/julia.h>
-
 static jl_value_t * jl_int64_vector_type;
 static jl_value_t * jl_int64_matrix_type;
 static jl_value_t * jl_singular_number_type;
