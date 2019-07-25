@@ -1,5 +1,7 @@
-include("libsingular/nemo-test.jl")
+include("libsingular/singular-test.jl")
+#include("libsingular/nemo-test.jl")
 
 function test_libsingular()
-   test_nemo()
+   test_singular()
+   #test_nemo()
 end
