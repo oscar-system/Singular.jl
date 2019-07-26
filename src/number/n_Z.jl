@@ -378,6 +378,6 @@ function (R::Integers)(x::Nemo.fmpz)
 end
 
 function convert(::Type{BigInt}, n::n_Z)
-   return deepcopy(unsafe_load(reinterpret(Ptr{BigInt}, n.ptr.cpp_object)))
+  return libSingular.n_GetMPZ(n.ptr, parent(n).ptr)
 end
 
