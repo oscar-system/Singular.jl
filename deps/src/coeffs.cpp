@@ -34,7 +34,7 @@ void singular_define_coeffs(jlcxx::Module & Singular)
                     [](coeffs x) { return nCoeff_has_simple_Alloc(x) > 0; });
 
     Singular.method("n_GetMPZ_internal", [](void * ptr, number n, coeffs x) {
-        n_MPZ(reinterpret_cast<__mpz_struct *>(ptr), reinterpret_cast<number&>(n), x);
+        n_MPZ(reinterpret_cast<__mpz_struct *>(ptr), n, x);
     });
 
     Singular.method("n_InitMPZ_internal", [](void * ptr, coeffs x) {
