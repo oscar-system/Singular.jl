@@ -7,10 +7,12 @@ function recursive_translate(x, R)
     end
 end
 
-# function LIST_CMD_CASTER(x)
-#     x_new = LIST_CMD_TRAVERSAL(x)
-# end
-
+## Entries in this array are as follows
+## 1. CMD type of return lvar
+## 2. Casting function to correct CxxWrap pointer type
+## 3. True if this pointer needs to be passed to a ring to construct the right object
+## 4. If the pointer type if ambigious (module, ideal), an additional argument that
+##    needs to be passed to the ring to construct the right object.
 casting_functions_pre = Dict(:NUMBER_CMD     => (libSingular.NUMBER_CMD_CASTER,     true, ()),
     :RING_CMD       => (libSingular.RING_CMD_CASTER,       false, ()),
     :POLY_CMD       => (libSingular.POLY_CMD_CASTER,       true, ()),
@@ -45,6 +47,8 @@ function convert_ring_content(value_list, rng)
     return return_dict
 end
 
+## Converts a single return value back to Julia, i.e.,
+## a single lvar, not a linked list of such.
 function convert_return_value(single_value, rng = nothing)
     if single_value[1]
         error("received list instead of single value")
@@ -65,7 +69,8 @@ function convert_return_value(single_value, rng = nothing)
     return cast
 end
 
-
+## Converts a linked list of lvars (already converted to Julia array) back
+## to Singular.jl types.
 function convert_return_list(list_value, ring = nothing)
     if list_value[1]
         return map(i -> convert_return_value(i, ring), list_value[2:end])
@@ -114,26 +119,22 @@ end
 
 function prepare_argument(x::spoly)
     rng = parent(x)
-    rng_ptr = rng.ptr
-    return Any[ mapping_types_reversed[:POLY_CMD], libSingular.copy_polyptr_to_void(x.ptr, rng_ptr) ], rng
+    return Any[ mapping_types_reversed[:POLY_CMD], libSingular.copy_polyptr_to_void(x.ptr, rng.ptr) ], rng
 end
 
 function prepare_argument(x::svector)
     rng = parent(x).base_ring
-    rng_ptr = rng.ptr
-    return Any[ mapping_types_reversed[:VECTOR_CMD], libSingular.copy_polyptr_to_void(x.ptr, rng_ptr) ], rng
+    return Any[ mapping_types_reversed[:VECTOR_CMD], libSingular.copy_polyptr_to_void(x.ptr, rng.ptr) ], rng
 end
 
 function prepare_argument(x::sideal)
     rng = parent(x).base_ring
-    rng_ptr = rng.ptr
-    return Any[ mapping_types_reversed[:IDEAL_CMD], libSingular.copy_idealptr_to_void(x.ptr, rng_ptr)], rng
+    return Any[ mapping_types_reversed[:IDEAL_CMD], libSingular.copy_idealptr_to_void(x.ptr, rng.ptr)], rng
 end
 
 function prepare_argument(x::smodule)
     rng = parent(x).base_ring
-    rng_ptr = rng.ptr
-    return Any[ mapping_types_reversed[:MODUL_CMD], libSingular.copy_idealptr_to_void(x.ptr, rng_ptr)], rng
+    return Any[ mapping_types_reversed[:MODUL_CMD], libSingular.copy_idealptr_to_void(x.ptr, rng.ptr)], rng
 end
 
 function prepare_argument(x::sresolution)
@@ -180,10 +181,7 @@ function low_level_caller(lib::String, name::String, args...)
     end
     arguments = Any[ i for (i, j) in arguments ]
     return_values = nothing
-    if rng == nothing
-        return_value = libSingular.call_singular_library_procedure(name, arguments)
-    else
-        return_value = libSingular.call_singular_library_procedure(name, rng.ptr, arguments)
-    end
+    rng = (rng == nothing) ? C_NULL : rng.ptr
+    return_value = libSingular.call_singular_library_procedure(name, rng, arguments)
     return convert_return_list(return_value, rng)
 end

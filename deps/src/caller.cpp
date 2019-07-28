@@ -21,32 +21,33 @@ static jl_value_t * jl_singular_vector_type;
 
 static jl_value_t * get_type_mapper()
 {
-    std::vector<std::pair<int, std::string>> types = {
-        std::pair<int, std::string>(BIGINT_CMD, "BIGINT_CMD"),
-        std::pair<int, std::string>(NUMBER_CMD, "NUMBER_CMD"),
-        std::pair<int, std::string>(RING_CMD, "RING_CMD"),
-        std::pair<int, std::string>(POLY_CMD, "POLY_CMD"),
-        std::pair<int, std::string>(IDEAL_CMD, "IDEAL_CMD"),
-        std::pair<int, std::string>(INT_CMD, "INT_CMD"),
-        std::pair<int, std::string>(STRING_CMD, "STRING_CMD"),
-        std::pair<int, std::string>(LIST_CMD, "LIST_CMD"),
-        std::pair<int, std::string>(INTMAT_CMD, "INTMAT_CMD"),
-        std::pair<int, std::string>(BIGINTMAT_CMD, "BIGINTMAT_CMD"),
-        std::pair<int, std::string>(MAP_CMD, "MAP_CMD"),
-        std::pair<int, std::string>(RESOLUTION_CMD, "RESOLUTION_CMD"),
-        std::pair<int, std::string>(MODUL_CMD, "MODUL_CMD"),
-        std::pair<int, std::string>(VECTOR_CMD, "VECTOR_CMD"),
-        std::pair<int, std::string>(INTVEC_CMD, "INTVEC_CMD")};
+    // clang-format off
+    struct { int cmd; const char * name; } types[] = {
+        {BIGINT_CMD, "BIGINT_CMD"},
+        {NUMBER_CMD, "NUMBER_CMD"},
+        {RING_CMD, "RING_CMD"},
+        {POLY_CMD, "POLY_CMD"},
+        {IDEAL_CMD, "IDEAL_CMD"},
+        {INT_CMD, "INT_CMD"},
+        {STRING_CMD, "STRING_CMD"},
+        {LIST_CMD, "LIST_CMD"},
+        {INTMAT_CMD, "INTMAT_CMD"},
+        {BIGINTMAT_CMD, "BIGINTMAT_CMD"},
+        {MAP_CMD, "MAP_CMD"},
+        {RESOLUTION_CMD, "RESOLUTION_CMD"},
+        {MODUL_CMD, "MODUL_CMD"},
+        {VECTOR_CMD, "VECTOR_CMD"},
+        {INTVEC_CMD, "INTVEC_CMD"}};
+    // clang-format on
 
-    jl_array_t * return_array =
-        jl_alloc_array_1d(jl_array_any_type, types.size());
+    jl_array_t * return_array = jl_alloc_array_1d(
+        jl_array_any_type, sizeof(types) / sizeof(types[0]));
 
-    for (int i = 0; i < types.size(); i++) {
+    for (int i = 0; i < sizeof(types) / sizeof(types[0]); i++) {
         jl_array_t * current_return = jl_alloc_array_1d(jl_array_any_type, 2);
-        jl_arrayset(current_return, jl_box_int64(types[i].first), 0);
+        jl_arrayset(current_return, jl_box_int64(types[i].cmd), 0);
         jl_arrayset(current_return,
-                    reinterpret_cast<jl_value_t *>(
-                        jl_symbol(types[i].second.c_str())),
+                    reinterpret_cast<jl_value_t *>(jl_symbol(types[i].name)),
                     1);
         jl_arrayset(return_array,
                     reinterpret_cast<jl_value_t *>(current_return), i);
@@ -118,8 +119,18 @@ void * jl_array_to_intvec(jl_value_t * array_val)
     intvec *     result = new intvec(size);
     int *        result_content = result->ivGetVec();
     for (int i = 0; i < size; i++) {
-        result_content[i] =
-            static_cast<int>(jl_unbox_int64(jl_arrayref(array, i)));
+        jl_value_t * current_entry = jl_arrayref(array, i);
+        if (jl_is_int32(current_entry)) {
+            result_content[i] =
+                static_cast<int>(jl_unbox_int32(current_entry));
+        }
+        else if (jl_is_int64(current_entry)) {
+            int64_t current_int64 = jl_unbox_int64(current_entry);
+            result_content[i] = static_cast<int>(current_int64);
+            if (result_content[i] != current_int64) {
+                jl_error("Input entry does not fit in 32 bit integer");
+            }
+        }
     }
     return reinterpret_cast<void *>(result);
 }
@@ -130,12 +141,20 @@ void * jl_array_to_intmat(jl_value_t * array_val)
     int          rows = jl_array_dim(array, 0);
     int          cols = jl_array_dim(array, 1);
     intvec *     result = new intvec(rows, cols, 0);
+    if (!jl_subtype(reinterpret_cast<jl_value_t *>(jl_typeof(array_val)),
+                    reinterpret_cast<jl_value_t *>(jl_int64_matrix_type))) {
+        jl_error("Input is not an Int64 matrix");
+    }
     int64_t * array_data = reinterpret_cast<int64_t *>(jl_array_data(array));
     int *     vec_data = result->ivGetVec();
     for (int i = 0; i < cols; i++) {
         for (int j = 0; j < rows; j++) {
-            IMATELEM(*result, i + 1, j + 1) =
-                static_cast<int>(array_data[j + (i * rows)]);
+            int64_t current_elem = array_data[j + (i * rows)];
+            int     current_elem_32 = static_cast<int>(current_elem);
+            if (current_elem != current_elem_32) {
+                jl_error("Input entry does not fit in 32 bit integer");
+            }
+            IMATELEM(*result, i + 1, j + 1) = current_elem_32;
         }
     }
     return reinterpret_cast<void *>(result);
@@ -143,6 +162,9 @@ void * jl_array_to_intmat(jl_value_t * array_val)
 
 static void * get_ring_ref(ring r)
 {
+    // Since a call to a Singular library function destroys its arguments,
+    // the call will decrease the number of references to the ring. So we
+    // increase the reference count.
     r->ref++;
     return reinterpret_cast<void *>(r);
 }
@@ -254,11 +276,13 @@ jl_value_t * call_singular_library_procedure(
     return retObj;
 }
 
-jl_value_t * call_singular_library_procedure_wo_ring(
-    std::string name, jlcxx::ArrayRef<jl_value_t *> arguments)
+jl_value_t * call_singular_library_procedure_wo_rng(
+    std::string name, void* rng, jlcxx::ArrayRef<jl_value_t *> arguments)
 {
-    return call_singular_library_procedure(name, NULL, arguments);
+    return call_singular_library_procedure(name, reinterpret_cast<ring>(rng), arguments);
 }
+
+
 
 jl_value_t * convert_nested_list(void * l_void)
 {
@@ -305,7 +329,7 @@ void singular_define_caller(jlcxx::Module & Singular)
     Singular.method("call_singular_library_procedure",
                     &call_singular_library_procedure);
     Singular.method("call_singular_library_procedure",
-                    &call_singular_library_procedure_wo_ring);
+                    &call_singular_library_procedure_wo_rng);
     Singular.method("get_type_mapper", &get_type_mapper);
     Singular.method("initialize_jl_c_types", &initialize_jl_c_types);
 

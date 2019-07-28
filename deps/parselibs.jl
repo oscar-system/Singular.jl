@@ -25,6 +25,12 @@ filenames = filter(x -> endswith(x, ".lib"), readdir(library_dir))
 
 output_filename = abspath(joinpath(@__DIR__, "..", "src", "libraryfuncdictionary.jl"))
 
+## Loops over all libraries and executes libparse on it.
+## The first three lines of the libparse output are general information
+## about the library, so we ignore it. We are only interested in the
+## first column (library name) and the third column (globally exposed or not).
+## All other columns (containing info such as line numbers, library name, etc)
+## are ignored.
 open(output_filename, "w") do outputfile
     println(outputfile, "libraryfunctiondictionary = Dict(")
     for i in filenames
