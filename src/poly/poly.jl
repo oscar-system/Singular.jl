@@ -625,13 +625,13 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    factor(p::spoly)
-> Returns the factorization of $p$.
+    factor(x::spoly)
+> Returns the factorization of $x$.
 """
-function factor(p::spoly)
-  R = parent(p)
+function factor(x::spoly)
+  R = parent(x)
   a = Array{Int32, 1}()
-  I = Ideal(R, libSingular.singclap_factorize(p.ptr, a, R.ptr))
+  I = Ideal(R, libSingular.singclap_factorize(x.ptr, a, R.ptr))
   D = Dict{typeof(I[1]), Int64}()
   n = ngens(I)
   if n == 1
@@ -643,7 +643,6 @@ function factor(p::spoly)
   return Fac(I[1], D)
   end
 end
-
 
 ###############################################################################
 #
