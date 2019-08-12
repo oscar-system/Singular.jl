@@ -196,6 +196,18 @@ void singular_define_rings(jlcxx::Module & Singular)
                                reinterpret_cast<spolyrec *&>(s),
                                reinterpret_cast<spolyrec *&>(t), r);
     });
+    Singular.method("singclap_factorize",
+                    [](spolyrec * p, jlcxx::ArrayRef<int> a, ip_sring * r) {
+                        rChangeCurrRing(r);
+			intvec * v = NULL;
+			ideal I = singclap_factorize(pCopy(p), &v, 0, currRing);
+			int * content = v->ivGetVec();
+			for(int i=0; i<v->length();i++)
+			{
+			  a.push_back(content[i]);
+			}
+		        return I;
+    });
     Singular.method("p_Content", [](spolyrec * p, ip_sring * r) {
         return p_Content(p, r);
     });

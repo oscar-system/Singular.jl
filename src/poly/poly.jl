@@ -1,7 +1,7 @@
 export spoly, PolyRing, change_base_ring, coeff, coeffs, coeffs_expos,
        content, deflation, deflate, degree, degrees, degree_bound,
        derivative, div, divides, direm, evaluate, exponent, exponent!,
-       exponent_vectors, finish, gen, has_global_ordering,
+       exponent_vectors, factor, finish, gen, has_global_ordering,
        inflate, isgen,
        ismonomial, isterm, jacobi, jet, lc, lt, lm, lead_exponent,
        monomials, MPolyBuildCtx,
@@ -447,7 +447,7 @@ function divides(x::spoly{T}, y::spoly{T}) where T <: Nemo.FieldElem
       return true, R(q)
    else
       return false, R()
-   end   
+   end
 end
 
 ###############################################################################
@@ -617,6 +617,33 @@ f values")
    end
    return r
 end
+
+###############################################################################
+#
+#   Factorization
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    factor(p::spoly)
+> Returns the factorization of $p$.
+"""
+function factor(p::spoly)
+  R = parent(p)
+  a = Array{Int32, 1}()
+  I = Ideal(R, libSingular.singclap_factorize(p.ptr, a, R.ptr))
+  D = Dict{typeof(I[1]), Int64}()
+  n = ngens(I)
+  if n == 1
+    return Fac(I[1], D)
+  else
+    for i in 2:n
+      push!(D, I[i] => Int64(a[i]))
+    end
+  return Fac(I[1], D)
+  end
+end
+
 
 ###############################################################################
 #
