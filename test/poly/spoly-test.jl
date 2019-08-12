@@ -464,23 +464,32 @@ function test_spoly_factor()
 
    # Test over Singular.QQ
    R1 , (x, y, z, w) = Singular.PolynomialRing(Singular.QQ, ["x", "y", "z", "w"]; ordering=:negdegrevlex)
-   f1 = 113*(2*y^7 + w^2)^3*(1 + x)^2
+   f1 = 113*(2*y^7 + w^2)^3*(1 + x)^2*(x + yz)^2
+
+   F1sq = squarefree_factorization(f1)
 
    F1 = factor(f1)
 
    g1 = F1.unit
 
+   g1sq = F1sq.unit
+
    for p in keys(F1.fac)
       g1 = g1*p^F1[p]
    end
 
-   @test f1 == g1
+   for p in keys(F1sq.fac)
+      g1sq = g1sq*p
+   end
 
-   # Test over Singular.ZZ
+   @test f1 == g1
+   @test f1 == g1sq
+
+   # Test over Singular.ZZ (only factor)
 
    R2 , (x, y, z, w) = Singular.PolynomialRing(Singular.ZZ, ["x", "y", "z", "w"]; ordering=:negdegrevlex)
 
-   f2 = 123*(57*y^3 + w^5)^3*(x^2 + x+1)^2
+   f2 = 123*(57*y^3 + w^5)^3*(x^2 + x+1)^2*(x + yz)^2
 
    F2 = factor(f2)
 
@@ -492,21 +501,31 @@ function test_spoly_factor()
 
    @test f2 == g2
 
-   # Test over Singular.FF_3
+   # Test over Singular.Fp
 
    R3 , (x, y, z, w) = Singular.PolynomialRing(Singular.Fp(3), ["x", "y", "z", "w"]; ordering=:negdegrevlex)
 
-   f3 = 7*(y^3 + w^3)*(1 + x)^2
+   f3 = 7*(y^3 + w^3)*(1 + x)^2*(x + yz)^2
+
+   F3sq = squarefree_factorization(f3)
 
    F3 = factor(f3)
 
    g3 = F3.unit
 
+   g3sq = F3sq.unit
+
    for p in keys(F3.fac)
       g3 = g3*p^F3[p]
    end
 
+   for p in keys(F3sq.fac)
+      g3sq = g3sq*p
+   end
+
    @test f3 == g3
+   @test f3 == g3sq
+
    println("PASS")
 end
 
