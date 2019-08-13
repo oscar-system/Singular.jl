@@ -196,8 +196,32 @@ void singular_define_rings(jlcxx::Module & Singular)
                                reinterpret_cast<spolyrec *&>(s),
                                reinterpret_cast<spolyrec *&>(t), r);
     });
+    Singular.method("singclap_sqrfree",
+                    [](spolyrec * p, jlcxx::ArrayRef<int> a, ip_sring * r) {
+                        rChangeCurrRing(r);
+			intvec * v = NULL;
+			ideal I = singclap_sqrfree(pCopy(p), &v, 0, currRing);
+			int * content = v->ivGetVec();
+			for(int i=0; i<v->length(); i++)
+			{
+			  a.push_back(content[i]);
+			}
+		        return I;
+    });
+    Singular.method("singclap_factorize",
+                    [](spolyrec * p, jlcxx::ArrayRef<int> a, ip_sring * r) {
+                        rChangeCurrRing(r);
+			intvec * v = NULL;
+			ideal I = singclap_factorize(pCopy(p), &v, 0, currRing);
+			int * content = v->ivGetVec();
+			for(int i=0; i<v->length(); i++)
+			{
+			  a.push_back(content[i]);
+			}
+		        return I;
+    });
     Singular.method("p_Content", [](spolyrec * p, ip_sring * r) {
-        return p_Content(p, r);
+                        return p_Content(p, r);
     });
     Singular.method("p_GetExpVL_internal",
                     [](spolyrec * p, long * ev, ip_sring * r) {
@@ -250,14 +274,14 @@ void singular_define_rings(jlcxx::Module & Singular)
         nMapFunc map_func = reinterpret_cast<nMapFunc>(map_func_ptr);
         return p_PermPoly(p, perm, old_ring, new_ring, map_func);
     });
-
-   Singular.method("p_Jet", [](poly p, int i, ring r) {
-        poly p_cp = p_Copy(p, r);
-        return p_Jet(p_cp, i, r);
+   Singular.method("p_Jet",
+                   [](poly p, int i, ring r) {
+                       poly p_cp = p_Copy(p, r);
+                       return p_Jet(p_cp, i, r);
     });
-
-   Singular.method("p_Diff", [](poly p, int i, ring r) {
-        poly p_cp = p_Copy(p, r);
-        return p_Diff(p_cp, i, r);
+   Singular.method("p_Diff",
+                   [](poly p, int i, ring r) {
+                       poly p_cp = p_Copy(p, r);
+                       return p_Diff(p_cp, i, r);
     });
 }

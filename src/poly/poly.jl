@@ -1,13 +1,13 @@
 export spoly, PolyRing, change_base_ring, coeff, coeffs, coeffs_expos,
        content, deflation, deflate, degree, degrees, degree_bound,
        derivative, div, divides, direm, evaluate, exponent, exponent!,
-       exponent_vectors, finish, gen, has_global_ordering,
-       inflate, isgen,
+       exponent_vectors, factor, factor_squarefree, finish, gen, 
+       has_global_ordering, inflate, isgen,
        ismonomial, isterm, jacobi, jet, lc, lt, lm, lead_exponent,
        monomials, MPolyBuildCtx,
        nvars, ordering, @PolynomialRing, primpart,
-       push_term!, remove, sort_terms!, symbols, terms,
-       total_degree, valuation, var_index, vars
+       push_term!, remove, sort_terms!, symbols, terms, total_degree,
+       valuation, var_index, vars
 
 ###############################################################################
 #
@@ -447,7 +447,7 @@ function divides(x::spoly{T}, y::spoly{T}) where T <: Nemo.FieldElem
       return true, R(q)
    else
       return false, R()
-   end   
+   end
 end
 
 ###############################################################################
@@ -616,6 +616,65 @@ f values")
       r += t
    end
    return r
+end
+
+###############################################################################
+#
+#   Factorization
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    factor_squarefree(x::spoly)
+> Returns a squarefree factorization of $x$.
+"""
+function factor_squarefree(x::spoly)
+  R = parent(x)
+
+  # Check if base ring is valid
+  if((R.base_ring != Singular.QQ) && (typeof(R.base_ring) != N_ZpField))
+    error("Base ring is not supported.")
+  end
+
+  a = Array{Int32, 1}()
+  I = Ideal(R, libSingular.singclap_sqrfree(x.ptr, a, R.ptr))
+  D = Dict{typeof(I[1]), Int64}()
+  n = ngens(I)
+  if n == 1
+    return Fac(I[1], D)
+  else
+    for i in 2:n
+      push!(D, I[i] => Int64(a[i]))
+    end
+  end
+  return Fac(I[1], D)
+end
+
+@doc Markdown.doc"""
+    factor(x::spoly)
+> Returns the factorization of $x$.
+"""
+function factor(x::spoly)
+  R = parent(x)
+
+  # Check if base ring is valid
+  if((R.base_ring != Singular.QQ) && (R.base_ring != Singular.ZZ) &&
+  (typeof(R.base_ring) != N_ZpField))
+    error("Base ring is not supported.")
+  end
+
+  a = Array{Int32, 1}()
+  I = Ideal(R, libSingular.singclap_factorize(x.ptr, a, R.ptr))
+  D = Dict{typeof(I[1]), Int64}()
+  n = ngens(I)
+  if n == 1
+    return Fac(I[1], D)
+  else
+    for i in 2:n
+      push!(D, I[i] => Int64(a[i]))
+    end
+  return Fac(I[1], D)
+  end
 end
 
 ###############################################################################

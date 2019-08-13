@@ -107,7 +107,7 @@ function test_spoly_manipulation()
    @test isgen(x)
    @test !isgen(R(1)) && !isgen(x + 1)
    @test isconstant(R(0)) && isconstant(R(1))
-   @test !isconstant(x) && !isconstant(x + 1)   
+   @test !isconstant(x) && !isconstant(x + 1)
    @test ismonomial(x) && ismonomial(R(1))
    @test !ismonomial(2x) && !ismonomial(x + 1)
    @test isterm(2x) && !isterm(x + 1)
@@ -174,7 +174,7 @@ function test_spoly_change_base_ring()
    b = change_base_ring(a, QQ)
 
    @test isa(b, spoly{n_Q})
-   
+
    println("PASS")
 end
 
@@ -402,7 +402,7 @@ end
 
 function test_convert_between_MPoly_and_SingularPoly()
    print("spoly.test_convert_MPoly_to_SingularPoly...")
-   
+
    for num_vars=2:10
       var_names = ["x$j" for j in 1:num_vars]
       ord = AbstractAlgebra.rand_ordering()
@@ -428,7 +428,7 @@ function test_convert_between_MPoly_and_SingularPoly()
       @test SAA(f - g) == SAA(f) - SAA(g)
       @test S(SAA(f)) == f
    end
-   
+
    println("PASS")
 end
 
@@ -455,7 +455,45 @@ function test_spoly_differential()
 
    #Check jet
    @test jf == x^3
-   
+
+   println("PASS")
+end
+
+function test_spoly_factor()
+   print("spoly.test_spoly_factor...")
+
+   R1 , (x, y, z, w) = Singular.PolynomialRing(Singular.QQ, 
+   ["x", "y", "z", "w"]; ordering=:negdegrevlex)
+   f1 = 113*(2*y^7 + w^2)^3*(1 + x)^2*(x + y*z)^2
+
+   R2 , (x, y, z, w) = Singular.PolynomialRing(Singular.ZZ,
+   ["x", "y", "z", "w"]; ordering=:negdegrevlex)
+   f2 = 123*(57*y^3 + w^5)^3*(x^2 + x+1)^2*(x + y*z)^2
+
+   R3 , (x, y, z, w) = Singular.PolynomialRing(Singular.Fp(3),
+   ["x", "y", "z", "w"]; ordering=:negdegrevlex)
+   f3 = 7*(y^3 + w^3)*(1 + x)^2*(x + y*z)^2
+
+   for f in [f1, f2, f3]
+      #Test factor
+      F = factor(f)
+      g = F.unit
+      for p in keys(F.fac)
+         g = g*p^F[p]
+      end
+     @test f == g
+
+     #Test factor_squarefree over QQ and Fp
+      if typeof(f.parent) != PolyRing{n_Z}
+         F = factor_squarefree(f)
+         g = F.unit
+         for p in keys(F.fac)
+            g = g*p^F[p]
+         end
+         @test f == g
+      end
+   end
+
    println("PASS")
 end
 
@@ -480,7 +518,7 @@ function test_spoly()
    test_spoly_Polynomials()
    # test_convert_between_MPoly_and_SingularPoly()
    test_spoly_differential()
-
+   test_spoly_factor()
    println("")
 end
 
