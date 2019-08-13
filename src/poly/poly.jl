@@ -1,13 +1,13 @@
 export spoly, PolyRing, change_base_ring, coeff, coeffs, coeffs_expos,
        content, deflation, deflate, degree, degrees, degree_bound,
        derivative, div, divides, direm, evaluate, exponent, exponent!,
-       exponent_vectors, factor, finish, gen, has_global_ordering,
-       inflate, isgen,
+       exponent_vectors, factor, factor_squarefree, finish, gen, 
+       has_global_ordering, inflate, isgen,
        ismonomial, isterm, jacobi, jet, lc, lt, lm, lead_exponent,
        monomials, MPolyBuildCtx,
        nvars, ordering, @PolynomialRing, primpart,
-       push_term!, remove, sort_terms!, squarefree_factorization,
-       symbols, terms, total_degree, valuation, var_index, vars
+       push_term!, remove, sort_terms!, symbols, terms, total_degree,
+       valuation, var_index, vars
 
 ###############################################################################
 #
@@ -625,10 +625,10 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    squarefree_factorization(x::spoly)
+    factor_squarefree(x::spoly)
 > Returns a squarefree factorization of $x$.
 """
-function squarefree_factorization(x::spoly)
+function factor_squarefree(x::spoly)
   R = parent(x)
 
   # Check if base ring is valid
@@ -658,7 +658,8 @@ function factor(x::spoly)
   R = parent(x)
 
   # Check if base ring is valid
-  if((R.base_ring != Singular.QQ) && (R.base_ring != Singular.ZZ) && (typeof(R.base_ring) != N_ZpField))
+  if((R.base_ring != Singular.QQ) && (R.base_ring != Singular.ZZ) &&
+  (typeof(R.base_ring) != N_ZpField))
     error("Base ring is not supported.")
   end
 
