@@ -484,7 +484,7 @@ function test_spoly_factor()
      @test f == g
 
      #Test factor_squarefree over QQ and Fp
-      if typeof(f.parent != PolyRing{n_Z}
+      if typeof(f.parent) != PolyRing{n_Z}
          F = factor_squarefree(f)
          g = F.unit
          for p in keys(F.fac)
