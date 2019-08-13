@@ -231,4 +231,11 @@ void singular_define_ideals(jlcxx::Module & Singular)
         rChangeCurrRing(origin);
         return h;
     });
+    Singular.method("maMapIdeal", [](ideal map_id, ring pr, ideal im_id,
+                    ring im) {
+
+        rChangeCurrRing(pr);
+        nMapFunc nMap =n_SetMap(currRing->cf, im->cf);
+        return maMapIdeal(map_id, pr, im_id, im, nMap);
+    });
 }

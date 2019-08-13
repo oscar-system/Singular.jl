@@ -284,4 +284,10 @@ void singular_define_rings(jlcxx::Module & Singular)
                        poly p_cp = p_Copy(p, r);
                        return p_Diff(p_cp, i, r);
     });
+    Singular.method("maMapPoly",
+                   [](poly map_p, ring pr, ideal im_id, ring im) {
+                       rChangeCurrRing(pr);
+                       nMapFunc nMap =n_SetMap(currRing->cf, im->cf);
+                       return maMapPoly(map_p, pr, im_id, im, nMap);
+    });
 }
