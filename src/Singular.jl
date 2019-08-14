@@ -16,11 +16,11 @@ import LinearAlgebra: normalize!, rank
 import Statistics: std
 
 import Nemo: add!, addeq!, base_ring, canonical_unit,
-             change_base_ring, characteristic, check_parent, coeff,
-             coeffs, contains, content, crt,
-             deflate, deflation, degree, degrees, derivative, divexact, divides,
-             elem_type, evaluate, exponent_vectors, finish, gcdinv,
-             gen, gens, intersect, isconstant,
+             change_base_ring, characteristic, check_parent, codomain,
+             coeff, coeffs, compose, contains, content, crt,
+             deflate, deflation, degree, degrees, derivative, divexact,
+             divides, domain, elem_type, evaluate, exponent_vectors, finish,
+             gcdinv, gen, gens, intersect, isconstant,
              isgen, ismonomial, inflate, isnegative, isone,
              isterm, isunit, iszero, lc, lt, lm, monomials,
              MPolyBuildCtx, mul!, needs_parentheses,
