@@ -26,11 +26,11 @@ function map_poly(f::AbstractAlgebra.Map(SIdAlgHom), p::spoly)
    return p
 end
 
-function (f::AbstractAlgebra.Map(SIdAlgHom))(p::spoly)
+function (f::SIdAlgHom)(p::spoly)
    return map_poly(f, p)
 end
 
-function (f::AbstractAlgebra.Map(SIdAlgHom))(I::sideal)
+function (f::SIdAlgHom)(I::sideal)
    return map_ideal(f, I)
 end
 ###############################################################################

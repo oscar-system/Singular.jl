@@ -43,11 +43,11 @@ function map_poly(f::AbstractAlgebra.Map(SAlgHom), p::spoly)
           f.codomain.ptr))
 end
 
-function (f::AbstractAlgebra.Map(SAlgHom))(p::spoly)
+function (f::SAlgHom)(p::spoly)
    return map_poly(f, p)
 end
 
-function (f::AbstractAlgebra.Map(SAlgHom))(I::sideal)
+function (f::SAlgHom)(I::sideal)
    return map_ideal(f, I)
 end
 
