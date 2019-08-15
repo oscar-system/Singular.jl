@@ -62,9 +62,30 @@ function test_aglhom_compose()
    h4 = idR*idR
 
    @test h1.domain == R && h1.codomain == R && equal(h1.image, L)
-   @test h2.domain == R && h2.codomain == S && equal(h2.image, MaximalIdeal(S, 1))
-   @test h3.domain == R && h3.codomain == S && equal(h3.image, MaximalIdeal(S, 1))
+   @test h2.domain == R && h2.codomain == S && equal(h2.image,
+                              MaximalIdeal(S, 1))
+   @test h3.domain == R && h3.codomain == S && equal(h3.image,
+                              MaximalIdeal(S, 1))
    @test h4.domain == R && equal(h4.image, MaximalIdeal(R, 1))
+
+   println("PASS")
+end
+
+function test_aglhom_preimage()
+
+   R, (x, y, z, w) = Singular.PolynomialRing(Singular.QQ, ["x", "y", "z", "w"];
+                             ordering=:negdegrevlex)
+   S, (a, b, c) = Singular.PolynomialRing(Singular.QQ, ["a", "b", "c"];
+                             ordering=:degrevlex)
+   I = Ideal(S, [a, a + b^2, b - c, c + b])
+
+   f = Singular.Algebra_Homomorphism(R, S, I)
+   idS  = Singular.Identity_Algebra_Homomorphism(S)
+
+   @test equal(Singular.preimage(f, I), MaximalIdeal(R, 1))
+   @test equal(Singular.kernel(f), Ideal(R, 4*x - 4*y + z^2 + 2*z*w + w^2))
+   @test equal(Singular.preimage(idS, I), I)
+   @test equal(Singular.kernel(idS), Ideal(S,))
 
    println("PASS")
 end
@@ -73,6 +94,7 @@ function test_alghom()
    test_alghom_constructors()
    test_alghom_apply()
    test_aglhom_compose()
+   test_aglhom_preimage()
 
    println("")
 end

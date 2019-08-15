@@ -1,4 +1,4 @@
-export check_composable, get_field, set_field!
+export get_field, set_field!
 
 ################################################################################
 #

@@ -65,6 +65,10 @@ void singular_define_rings(jlcxx::Module & Singular)
         return static_cast<unsigned int>(rGetExpSize(bitmask, bits, N));
     });
     Singular.method("rHasGlobalOrdering", &rHasGlobalOrdering);
+    Singular.method("rIsQuotientRing", [](ring r) {
+
+    return r->qideal != NULL;
+    });
     Singular.method("rBitmask",
                     [](ip_sring * r) { return (unsigned int)r->bitmask; });
     Singular.method("p_Delete", [](spolyrec * p, ip_sring * r) {

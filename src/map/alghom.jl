@@ -1,4 +1,4 @@
-export Algebra_Homomorphism, compose, Identity_Algebra_Homomorphism
+export Algebra_Homomorphism, codomain, compose, domain, kernel, preimage
 
 ###############################################################################
 #
@@ -72,6 +72,39 @@ end
 
 ###############################################################################
 #
+#   Preimage and Kernel for Algebra Homomorphisms
+#
+###############################################################################
+
+@doc Markdown.doc"""
+   preimage(f::AbstractAlgebra.Map(SAlgHom), I::sideal)
+> Returns the preimage of the ideal $I$ under the algebra homomorphism $f$.
+"""
+function preimage(f::AbstractAlgebra.Map(SAlgHom), I::sideal)
+
+   if base_ring(I) != f.codomain
+      error("Ideal is not contained in codomain.")
+   end
+
+   # The following catches an error returned by Singular in iparith.cc
+   if (isquotientring(f.domain) && !has_global_ordering(f.domain)) ||
+          (isquotientring(f.codomain) && !has_global_ordering(f.codomain))
+      error("Algorithm not implemented for local quotient rings.")
+   end
+
+   return Ideal(f.domain, Singular.libSingular.maGetPreimage(f.codomain.ptr,
+                        f.image.ptr, I.ptr, f.domain.ptr))
+end
+
+@doc Markdown.doc"""
+   kernel(f::AbstractAlgebra.Map(SAlgHom))
+> Returns the kernel of the algebra homomorphism $f$.
+"""
+function kernel(f::AbstractAlgebra.Map(SAlgHom))
+   return preimage(f, Ideal(f.codomain, ))
+end
+###############################################################################
+#
 #   Algebra Homomorphism constructor
 #
 ###############################################################################
@@ -103,88 +136,7 @@ function Algebra_Homomorphism(D::PolyRing, C::PolyRing, I::sideal)
    return SAlgHom{typeof(D.base_ring)}(D, C, I)
 end
 
-###############################################################################
-#
-#   Basic Operations with Identity Algebra Homomorphisms
-#
-###############################################################################
+domain(f::AbstractAlgebra.Map(Singular.SAlgHom)) = f.domain
 
-function map_ideal(f::AbstractAlgebra.Map(SIdAlgHom), I::sideal)
-
-   if base_ring(I) != f.domain
-      error("Ideal is not in the domain of the
-            algebra homomorphism.")
-   end
-
-   return I
-end
-
-function map_poly(f::AbstractAlgebra.Map(SIdAlgHom), p::spoly)
-
-   if parent(p) != f.domain
-      error("Polynomial is not in the domain of the
-            algebra homomorphism.")
-   end
-   return p
-end
-
-function (f::AbstractAlgebra.Map(SIdAlgHom))(p::spoly)
-   return map_poly(f, p)
-end
-
-function (f::AbstractAlgebra.Map(SIdAlgHom))(I::sideal)
-   return map_ideal(f, I)
-end
-###############################################################################
-#
-#   I/O for Identity Algebra Homomorphisms
-#
-###############################################################################
-
-function show(io::IO, M::AbstractAlgebra.Map(SIdAlgHom))
-   println(io, "Identity Algebra Homomorphism with")
-   println(io, "")
-   println(io, "Domain: ", domain(M))
-   println(io, "")
-   println(io, "Defining Equations: ", gens(M.image))
-end
-
-###############################################################################
-#
-#   Composition Identity Algebra Homomorphisms
-#
-###############################################################################
-
-function compose(f::AbstractAlgebra.Map(Singular.SIdAlgHom),
-                                g::AbstractAlgebra.Map(Singular.SAlgHom))
-   check_composable(f, g)
-   return g
-end
-
-function compose(f::AbstractAlgebra.Map(Singular.SAlgHom),
-                              g::AbstractAlgebra.Map(Singular.SIdAlgHom))
-   check_composable(f, g)
-   return f
-end
-
-function compose(f::AbstractAlgebra.Map(Singular.SIdAlgHom),
-                          g::AbstractAlgebra.Map(Singular.SIdAlgHom))
-   check_composable(f, g)
-   return g
-end
-
-################################################################################
-#
-#  Identity Algebra Homomorphism Constructor
-#
-################################################################################
-
-@doc Markdown.doc"""
-   Identity_Algebra_Homomorphism(R::PolyRing)
-> Constructs the canonical identity algebra homomorphism $id: D --> D$,
-> where the $i$-th variable of $D$ is mapped to itself.
-"""
-Identity_Algebra_Homomorphism(R::PolyRing)  = Singular.SIdAlgHom{typeof(R.base_ring)}(R)
-
-codomain(f::AbstractAlgebra.Map(Singular.SIdAlgHom)) = domain(f)
+codomain(f::AbstractAlgebra.Map(Singular.SAlgHom)) = f.codomain
 
