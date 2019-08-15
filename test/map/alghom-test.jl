@@ -39,7 +39,7 @@ function test_alghom_apply()
    println("PASS")
 end
 
-function test_aglhom_compose()
+function test_alghom_compose()
 
    R, (x, y, z, w) = Singular.PolynomialRing(Singular.QQ, ["x", "y", "z", "w"];
                              ordering=:negdegrevlex)
@@ -71,7 +71,7 @@ function test_aglhom_compose()
    println("PASS")
 end
 
-function test_aglhom_preimage()
+function test_alghom_preimage()
 
    R, (x, y, z, w) = Singular.PolynomialRing(Singular.QQ, ["x", "y", "z", "w"];
                              ordering=:negdegrevlex)
@@ -93,8 +93,8 @@ end
 function test_alghom()
    test_alghom_constructors()
    test_alghom_apply()
-   test_aglhom_compose()
-   test_aglhom_preimage()
+   test_alghom_compose()
+   test_alghom_preimage()
 
    println("")
 end
