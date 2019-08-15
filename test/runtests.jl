@@ -12,6 +12,7 @@ end
 include("../test/number-test.jl")
 include("../test/poly-test.jl")
 include("../test/ideal-test.jl")
+include("../test/map-test.jl")
 include("../test/matrix-test.jl")
 include("../test/resolution-test.jl")
 include("../test/module-test.jl")
@@ -26,4 +27,5 @@ test_resolution()
 test_module()
 test_call_interpreter()
 # test_libsingular()
+test_map()
 
