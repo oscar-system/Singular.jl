@@ -8,5 +8,5 @@ abstract type Module{T <: AbstractAlgebra.RingElem} <: AbstractAlgebra.Module{T}
 
 abstract type Map <: AbstractAlgebra.SetMap end
 
-abstract type AlgebraHomomorphism <: Map end
+abstract type AbstractAlgebraHomomorphism <: Map end
 

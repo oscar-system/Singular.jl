@@ -6,7 +6,7 @@ function test_alghom_constructors()
    S, (a, b, c) = Singular.PolynomialRing(L[1], ["a", "b", "c"];
                              ordering=:degrevlex)
    I = Ideal(S, [a, a + b^2, b - c, c + b])
-   f = Singular.Algebra_Homomorphism(R, S, I)
+   f = Singular.AlgebraHomomorphism(R, S, I)
 
    @test f.domain == R
    @test f.codomain == S
@@ -22,8 +22,8 @@ function test_alghom_apply()
    S, (a, b, c) = Singular.PolynomialRing(Singular.Fp(3), ["a", "b", "c"];
                              ordering=:degrevlex)
    I = Ideal(S, [a, a + b^2, b - c, c + b])
-   f = Singular.Algebra_Homomorphism(R, S, I)
-   id  = Singular.Identity_Algebra_Homomorphism(S)
+   f = Singular.AlgebraHomomorphism(R, S, I)
+   id  = Singular.IdentityAlgebraHomomorphism(S)
 
    J = Ideal(R, [x, y^3])
    p = x + y^3 + z*w
@@ -51,10 +51,10 @@ function test_alghom_compose()
    L = Ideal(R, [x^2, 2*x^2 + 2*x*y + y^2 + 2*x*z + 2*y*z + z^2, x + y + z - y*z,
                 x + y + z + y*z])
 
-   f = Singular.Algebra_Homomorphism(R, S, I)
-   g = Singular.Algebra_Homomorphism(S, R, K)
-   idR  = Singular.Identity_Algebra_Homomorphism(R)
-   idS  = Singular.Identity_Algebra_Homomorphism(S)
+   f = Singular.AlgebraHomomorphism(R, S, I)
+   g = Singular.AlgebraHomomorphism(S, R, K)
+   idR  = Singular.IdentityAlgebraHomomorphism(R)
+   idS  = Singular.IdentityAlgebraHomomorphism(S)
 
    h1 = f*g
    h2 = f*idS
@@ -79,8 +79,8 @@ function test_alghom_preimage()
                              ordering=:degrevlex)
    I = Ideal(S, [a, a + b^2, b - c, c + b])
 
-   f = Singular.Algebra_Homomorphism(R, S, I)
-   idS  = Singular.Identity_Algebra_Homomorphism(S)
+   f = Singular.AlgebraHomomorphism(R, S, I)
+   idS  = Singular.IdentityAlgebraHomomorphism(S)
 
    @test equal(Singular.preimage(f, I), MaximalIdeal(R, 1))
    @test equal(Singular.kernel(f), Ideal(R, 4*x - 4*y + z^2 + 2*z*w + w^2))

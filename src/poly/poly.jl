@@ -3,7 +3,7 @@ export spoly, PolyRing, change_base_ring, coeff, coeffs, coeffs_expos,
        derivative, div, divides, direm, evaluate, exponent, exponent!,
        exponent_vectors, factor, factor_squarefree, finish, gen,
        has_global_ordering, inflate, isgen,
-       ismonomial, isquotientring, isterm, jacobi, jet, lc, lt, lm,
+       ismonomial, isquotient_ring, isterm, jacobi, jet, lc, lt, lm,
        lead_exponent, monomials, MPolyBuildCtx,
        nvars, ordering, @PolynomialRing, primpart,
        push_term!, remove, sort_terms!, symbols, terms, total_degree,
@@ -40,11 +40,11 @@ nvars(R::PolyRing) = Int(libSingular.rVar(R.ptr))
 has_global_ordering(R::PolyRing) = Bool(libSingular.rHasGlobalOrdering(R.ptr))
 
 @doc Markdown.doc"""
-    isquotientring(R::PolyRing)
+    isquotient_ring(R::PolyRing)
 > Return `true` if the given ring is the quotient of a polynomial ring with
 > a non - zero ideal.
 """
-isquotientring(R::PolyRing) = Bool(Singular.libSingular.rIsQuotientRing(R.ptr))
+isquotient_ring(R::PolyRing) = Bool(Singular.libSingular.rIsQuotientRing(R.ptr))
 
 @doc Markdown.doc"""
     characteristic(R::PolyRing)

@@ -1,10 +1,12 @@
+export Map
+
 ###############################################################################
 #
 #   GeneralType
 #
 ###############################################################################
 
-Map(::Type{T}) where T <: AbstractAlgebra.Map = supertype(T)
+Map(::Type{T}) where T <: AbstractAlgebra.Map = AbstractAlgebra.Map(T)
 
 ###############################################################################
 #
@@ -12,8 +14,8 @@ Map(::Type{T}) where T <: AbstractAlgebra.Map = supertype(T)
 #
 ###############################################################################
 
-struct SIdAlgHom{T} <: AbstractAlgebra.Map{PolyRing, PolyRing,
-        Singular.AlgebraHomomorphism, SIdAlgHom} where T <: Union{Ring, Field}
+mutable struct SIdAlgHom{T} <: AbstractAlgebra.Map{PolyRing, PolyRing,
+        Singular.AbstractAlgebraHomomorphism, SIdAlgHom} where T <: Union{Ring, Field}
    domain::PolyRing
    image::sideal
    function SIdAlgHom{T}(R::PolyRing) where T <: Union{Ring, Field}
@@ -28,7 +30,7 @@ end
 ###############################################################################
 
 mutable struct SAlgHom{T} <: AbstractAlgebra.Map{PolyRing, PolyRing,
-          Singular.AlgebraHomomorphism, SAlgHom} where T <: Union{Ring, Field}
+          Singular.AbstractAlgebraHomomorphism, SAlgHom} where T <: Union{Ring, Field}
 
    domain::PolyRing
    codomain::PolyRing

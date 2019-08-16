@@ -1,4 +1,4 @@
-export Algebra_Homomorphism, codomain, compose, domain, kernel, preimage
+export AlgebraHomomorphism, codomain, compose, domain, kernel, preimage
 
 ###############################################################################
 #
@@ -6,7 +6,7 @@ export Algebra_Homomorphism, codomain, compose, domain, kernel, preimage
 #
 ###############################################################################
 
-function show(io::IO, M::Singular.Map(SAlgHom))
+function show(io::IO, M::Map(SAlgHom))
    println(io, "Algebra Homomorphism with")
    println(io, "")
    println(io, "Domain: ", domain(M))
@@ -22,7 +22,7 @@ end
 #
 ###############################################################################
 
-function map_ideal(f::AbstractAlgebra.Map(SAlgHom), I::sideal)
+function map_ideal(f::Map(SAlgHom), I::sideal)
 
    if base_ring(I) != f.domain
       error("Ideal is not in the domain of the
@@ -33,7 +33,7 @@ function map_ideal(f::AbstractAlgebra.Map(SAlgHom), I::sideal)
                 f.image.ptr, f.codomain.ptr))
 end
 
-function map_poly(f::AbstractAlgebra.Map(SAlgHom), p::spoly)
+function map_poly(f::Map(SAlgHom), p::spoly)
 
    if parent(p) != f.domain
       error("Polynomial is not in the domain of the
@@ -53,7 +53,7 @@ end
 
 ###############################################################################
 #
-#   Composition Algebra Homomorphisms
+#   Composition of Algebra Homomorphisms
 #
 ###############################################################################
 
@@ -63,11 +63,10 @@ end
 > Returns an algebra homomorphism $h: domain(f) --> codomain(g)$,
 > where $h = g(f)$.
 """
-function compose(f::AbstractAlgebra.Map(Singular.SAlgHom),
-                         g::AbstractAlgebra.Map(Singular.SAlgHom))
+function compose(f::Map(SAlgHom), g::Map(SAlgHom))
    check_composable(f, g)
    I = g(f.image)
-   return Algebra_Homomorphism(f.domain, g.codomain, I)
+   return AlgebraHomomorphism(f.domain, g.codomain, I)
 end
 
 ###############################################################################
@@ -80,15 +79,15 @@ end
    preimage(f::AbstractAlgebra.Map(SAlgHom), I::sideal)
 > Returns the preimage of the ideal $I$ under the algebra homomorphism $f$.
 """
-function preimage(f::AbstractAlgebra.Map(SAlgHom), I::sideal)
+function preimage(f::Map(SAlgHom), I::sideal)
 
    if base_ring(I) != f.codomain
       error("Ideal is not contained in codomain.")
    end
 
    # The following catches an error returned by Singular in iparith.cc
-   if (isquotientring(f.domain) && !has_global_ordering(f.domain)) ||
-          (isquotientring(f.codomain) && !has_global_ordering(f.codomain))
+   if (isquotient_ring(f.domain) && !has_global_ordering(f.domain)) ||
+          (isquotient_ring(f.codomain) && !has_global_ordering(f.codomain))
       error("Algorithm not implemented for local quotient rings.")
    end
 
@@ -100,9 +99,10 @@ end
    kernel(f::AbstractAlgebra.Map(SAlgHom))
 > Returns the kernel of the algebra homomorphism $f$.
 """
-function kernel(f::AbstractAlgebra.Map(SAlgHom))
+function kernel(f::Map(SAlgHom))
    return preimage(f, Ideal(f.codomain, ))
 end
+
 ###############################################################################
 #
 #   Algebra Homomorphism constructor
@@ -115,7 +115,7 @@ end
 > $D$ is mapped to the $i$-th entry of $I$. $D$ and $C$ must be polynomial
 > rings over the same base ring.
 """
-function Algebra_Homomorphism(D::PolyRing, C::PolyRing, I::sideal)
+function AlgebraHomomorphism(D::PolyRing, C::PolyRing, I::sideal)
 
    if D.base_ring == Singular.ZZ
       error("Base ring ZZ not implemented.")
