@@ -55,17 +55,17 @@ end
 ###############################################################################
 
 function compose(f::Map(SIdAlgHom), g::Map(SAlgHom))
-   check_composable(f, g)
+   AbstractAlgebra.check_composable(f, g)
    return g
 end
 
 function compose(f::Map(SAlgHom), g::Map(SIdAlgHom))
-   check_composable(f, g)
+   AbstractAlgebra.check_composable(f, g)
    return f
 end
 
 function compose(f::Map(SIdAlgHom), g::Map(SIdAlgHom))
-   check_composable(f, g)
+   AbstractAlgebra.check_composable(f, g)
    return g
 end
 

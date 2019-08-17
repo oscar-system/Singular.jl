@@ -64,7 +64,7 @@ end
 > where $h = g(f)$.
 """
 function compose(f::Map(SAlgHom), g::Map(SAlgHom))
-   check_composable(f, g)
+   AbstractAlgebra.check_composable(f, g)
    I = g(f.image)
    return AlgebraHomomorphism(f.domain, g.codomain, I)
 end
