@@ -55,18 +55,30 @@ end
 ###############################################################################
 
 function compose(f::Map(SIdAlgHom), g::Map(SAlgHom))
-   AbstractAlgebra.check_composable(f, g)
+   check_composable(f, g)
    return g
 end
 
 function compose(f::Map(SAlgHom), g::Map(SIdAlgHom))
-   AbstractAlgebra.check_composable(f, g)
+   check_composable(f, g)
    return f
 end
 
 function compose(f::Map(SIdAlgHom), g::Map(SIdAlgHom))
-   AbstractAlgebra.check_composable(f, g)
+   check_composable(f, g)
    return g
+end
+
+function check_composable(f::Map(SIdAlgHom), g::Map(SAlgHom))
+   codomain(f) != domain(g) && error("Incompatible maps")
+end
+
+function check_composable(f::Map(SAlgHom), g::Map(SIdAlgHom))
+   codomain(f) != domain(g) && error("Incompatible maps")
+end
+
+function check_composable(f::Map(SIdAlgHom), g::Map(SIdAlgHom))
+   codomain(f) != domain(g) && error("Incompatible maps")
 end
 
 ###############################################################################

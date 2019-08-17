@@ -64,9 +64,13 @@ end
 > where $h = g(f)$.
 """
 function compose(f::Map(SAlgHom), g::Map(SAlgHom))
-   AbstractAlgebra.check_composable(f, g)
+   check_composable(f, g)
    I = g(f.image)
    return AlgebraHomomorphism(f.domain, g.codomain, I)
+end
+
+function check_composable(f::Map(SAlgHom), g::Map(SAlgHom))
+   codomain(f) != domain(g) && error("Incompatible maps")
 end
 
 ###############################################################################
