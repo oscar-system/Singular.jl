@@ -1,10 +1,10 @@
 export spoly, PolyRing, change_base_ring, coeff, coeffs, coeffs_expos,
        content, deflation, deflate, degree, degrees, degree_bound,
        derivative, div, divides, direm, evaluate, exponent, exponent!,
-       exponent_vectors, factor, factor_squarefree, finish, gen, 
+       exponent_vectors, factor, factor_squarefree, finish, gen,
        has_global_ordering, inflate, isgen,
-       ismonomial, isterm, jacobi, jet, lc, lt, lm, lead_exponent,
-       monomials, MPolyBuildCtx,
+       ismonomial, isquotient_ring, isterm, jacobi, jet, lc, lt, lm,
+       lead_exponent, monomials, MPolyBuildCtx,
        nvars, ordering, @PolynomialRing, primpart,
        push_term!, remove, sort_terms!, symbols, terms, total_degree,
        valuation, var_index, vars
@@ -33,11 +33,18 @@ nvars(R::PolyRing) = Int(libSingular.rVar(R.ptr))
 
 @doc Markdown.doc"""
     has_global_ordering(R::PolyRing)
-> Return `true` if the given polynomial has a global ordering, i.e. if $1 < x$ for
+> Return `true` if the given ring has a global ordering, i.e. if $1 < x$ for
 > each variable $x$ in the ring. This include `:lex`, `:deglex` and `:degrevlex`
-> orderings..
+> orderings.
 """
 has_global_ordering(R::PolyRing) = Bool(libSingular.rHasGlobalOrdering(R.ptr))
+
+@doc Markdown.doc"""
+    isquotient_ring(R::PolyRing)
+> Return `true` if the given ring is the quotient of a polynomial ring with
+> a non - zero ideal.
+"""
+isquotient_ring(R::PolyRing) = Bool(Singular.libSingular.rIsQuotientRing(R.ptr))
 
 @doc Markdown.doc"""
     characteristic(R::PolyRing)
