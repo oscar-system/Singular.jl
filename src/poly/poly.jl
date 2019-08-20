@@ -2,7 +2,8 @@ export spoly, PolyRing, change_base_ring, coeff, coeffs, coeffs_expos,
        content, deflation, deflate, degree, degrees, degree_bound,
        derivative, div, divides, direm, evaluate, exponent, exponent!,
        exponent_vectors, factor, factor_squarefree, finish, gen,
-       has_global_ordering, has_mixed_ordering, inflate, isgen,
+       has_global_ordering, has_mixed_ordering, has_local_ordering,
+       inflate, isgen,
        ismonomial, isquotient_ring, isterm, jacobi, jet, lc, lt, lm,
        lead_exponent, monomials, MPolyBuildCtx,
        nvars, order, ordering, @PolynomialRing, primpart,
@@ -45,6 +46,15 @@ has_global_ordering(R::PolyRing) = Bool(libSingular.rHasGlobalOrdering(R.ptr))
 > a variable $x_i$ and $1>x_j$ for another variable $x_j$.
 """
 has_mixed_ordering(R::PolyRing) = Bool(libSingular.rHasMixedOrdering(R.ptr))
+
+@doc Markdown.doc"""
+    has_local_ordering(R::PolyRing)
+> Return `true` if the given ring has a local ordering, i.e. if $1 > x$ for
+> all variables $x$.
+"""
+function has_local_ordering(R::PolyRing) 
+   return !has_global_ordering(R) && !has_mixed_ordering(R)
+end
 
 @doc Markdown.doc"""
     isquotient_ring(R::PolyRing)
