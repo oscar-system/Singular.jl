@@ -1,5 +1,6 @@
 export sideal, IdealSet, syz, lead, normalize!, isconstant, iszerodim, fres,
-       highcorner, jacobi, jet, kbase, ngens, sres, intersection, quotient,
+       highcorner, jacobi, jet, kbase, minimal_generating_set,
+       ngens, sres, intersection, quotient,
        reduce, eliminate, kernel, equal, contains, isvar_generated, saturation,
        satstd, slimgb, std, vdim
 
@@ -640,3 +641,22 @@ function highcorner(I::sideal)
    end
 end
 
+###############################################################################
+#
+#   Functions for local rings
+#
+###############################################################################
+
+@doc Markdown.doc"""
+   minimal_generating_set(I::sideal)
+> Given an ideal $I$ in ring $R$ with local ordering, this returns an array
+> containing the minimal generators of $I$.
+"""
+function minimal_generating_set(I::sideal)
+   R = base_ring(I)
+   if has_global_ordering(R) || has_mixed_ordering(R)
+      error("Ring needs local ordering.")
+   end
+   return gens(Ideal(R, Singular.libSingular.idMinBase(I.ptr, R.ptr)))
+end
+ 

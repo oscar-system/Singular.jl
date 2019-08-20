@@ -65,6 +65,7 @@ void singular_define_rings(jlcxx::Module & Singular)
         return static_cast<unsigned int>(rGetExpSize(bitmask, bits, N));
     });
     Singular.method("rHasGlobalOrdering", &rHasGlobalOrdering);
+    Singular.method("rHasMixedOrdering", &rHasMixedOrdering);
     Singular.method("rIsQuotientRing", [](ring r) {
 
     return r->qideal != NULL;
@@ -293,5 +294,14 @@ void singular_define_rings(jlcxx::Module & Singular)
                        rChangeCurrRing(pr);
                        nMapFunc nMap =n_SetMap(currRing->cf, im->cf);
                        return maMapPoly(map_p, pr, im_id, im, nMap);
+    });
+    Singular.method("p_GetOrder",
+                   [](poly p, ring r) {
+		       long res;
+                       if( p != NULL)
+		       {  res = p_GetOrder(p, r);}
+		       else 
+		       {  res = -1;}
+		       return res; 
     });
 }

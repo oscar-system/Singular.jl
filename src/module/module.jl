@@ -1,4 +1,4 @@
-export jet, ModuleClass, rank, smodule, slimgb
+export jet, minimal_generating_set, ModuleClass, rank, smodule, slimgb
 
 ###############################################################################
 #
@@ -205,4 +205,26 @@ function jet(M::smodule, n::Int)
       libSingular.idSkipZeroes(ptr)
       return Module(R, ptr)
 end
+
+###############################################################################
+#
+#   Functions for local rings
+#
+###############################################################################
+
+@doc Markdown.doc"""
+   minimal_generating_set(M::smodule)
+> Given a module $M$ in ring $R$ with local ordering, this returns an array
+> containing the minimal generators of $M$.
+"""
+function minimal_generating_set(M::smodule)
+   R = base_ring(M)
+   if has_global_ordering(R) || has_mixed_ordering(R)
+      error("Ring needs local ordering.")
+   end
+   N = Singular.Module(R, Singular.libSingular.idMinBase(M.ptr, R.ptr))
+   return [N[i] for i in 1:ngens(N)]
+end
+
+
 

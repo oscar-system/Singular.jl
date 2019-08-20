@@ -137,6 +137,18 @@ function test_sideal_leading_terms()
    println("PASS")
 end
 
+function test_sideal_local()
+   print("sideal.local...")
+
+   R, (x, y) = PolynomialRing(QQ, ["x", "y"], ordering=:negdegrevlex)
+
+   I = Ideal(R, y, x^2, (1 + y^3) * (x^2 - y))
+   M = Singular.minimal_generating_set(I)
+
+   @test equal(I, Ideal(R, x^2, y))
+   println("PASS")
+end
+
 function test_sideal_intersection()
    print("sideal.intersection...")
 
