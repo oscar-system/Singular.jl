@@ -4,12 +4,12 @@
 #
 ###############################################################################
 
-function fq_nmodInit(i::Clong, cf::coeffs)
+function fq_nmodInit(i::Clong, cf::Ptr{Cvoid})
    R = julia(cf)::Nemo.FqNmodFiniteField
    return number(R(Int(i)))
 end
    
-function fq_nmodDelete(ptr::Ptr{number}, cf::coeffs)
+function fq_nmodDelete(ptr::Ptr{Ptr{Cvoid}}, cf::Ptr{Cvoid})
    n = unsafe_load(ptr)
    if n != C_NULL
       number_pop!(nemoNumberID, Ptr{Void}(n))
@@ -17,7 +17,7 @@ function fq_nmodDelete(ptr::Ptr{number}, cf::coeffs)
    nothing
 end
 
-function fq_nmodCopy(a::number, cf::coeffs)
+function fq_nmodCopy(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n = julia(a)::Nemo.fq_nmod
    return number(deepcopy(n))
 end
@@ -28,18 +28,18 @@ end
 #
 ###############################################################################
 
-function fq_nmodGreaterZero(a::number, cf::coeffs)
+function fq_nmodGreaterZero(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    return Cint(1)
 end
 
-function fq_nmodCoeffWrite(cf::coeffs, d::Cint)
+function fq_nmodCoeffWrite(cf::Ptr{Cvoid}, d::Cint)
    r = julia(cf)::Nemo.FqNmodFiniteField
    str = string(r)
    icxx"""PrintS($str);"""
    nothing
 end
 
-function fq_nmodWrite(a::number, cf::coeffs)
+function fq_nmodWrite(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n = julia(a)::Nemo.fq_nmod
    if needs_parentheses(n)
       str = "("*string(n)*")"
@@ -56,30 +56,30 @@ end
 #
 ###############################################################################
 
-function fq_nmodNeg(a::number, cf::coeffs)
+function fq_nmodNeg(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n = julia(a)::Nemo.fq_nmod
    return number(-n)
 end
 
-function fq_nmodInpNeg(a::number, cf::coeffs)
+function fq_nmodInpNeg(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    R = julia(cf)::Nemo.FqNmodFiniteField
    n = julia(a)::Nemo.fq_nmod
    ccall((:fq_nmod_neg, :libflint), Void, (Ptr{Nemo.fq_nmod}, Ptr{Nemo.fq_nmod}, Ptr{FqNmodFiniteField}), &n, &n, &R)
    return number(n, false)
 end
 
-function fq_nmodInvers(a::number, cf::coeffs)
+function fq_nmodInvers(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n = julia(a)::Nemo.fq_nmod
    return number(inv(n))
 end
 
-function fq_nmodMult(a::number, b::number, cf::coeffs)
+function fq_nmodMult(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n1 = julia(a)::Nemo.fq_nmod
    n2 = julia(b)::Nemo.fq_nmod
    return number(n1*n2)
 end
 
-function fq_nmodInpMult(a::Ptr{number}, b::number, cf::coeffs)
+function fq_nmodInpMult(a::Ptr{Ptr{Cvoid}}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    r = unsafe_load(a)
    aa = julia(r)::Nemo.fq_nmod
    bb = julia(b)::Nemo.fq_nmod
@@ -89,13 +89,13 @@ function fq_nmodInpMult(a::Ptr{number}, b::number, cf::coeffs)
    nothing
 end
 
-function fq_nmodAdd(a::number, b::number, cf::coeffs)
+function fq_nmodAdd(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n1 = julia(a)::Nemo.fq_nmod
    n2 = julia(b)::Nemo.fq_nmod
    return number(n1 + n2)
 end
 
-function fq_nmodInpAdd(a::Ptr{number}, b::number, cf::coeffs)
+function fq_nmodInpAdd(a::Ptr{Ptr{Cvoid}}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    r = unsafe_load(a)
    aa = julia(r)::Nemo.fq_nmod
    bb = julia(b)::Nemo.fq_nmod
@@ -105,13 +105,13 @@ function fq_nmodInpAdd(a::Ptr{number}, b::number, cf::coeffs)
    nothing
 end
 
-function fq_nmodSub(a::number, b::number, cf::coeffs)
+function fq_nmodSub(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n1 = julia(a)::Nemo.fq_nmod
    n2 = julia(b)::Nemo.fq_nmod
    return number(n1 - n2)
 end
 
-function fq_nmodDiv(a::number, b::number, cf::coeffs)
+function fq_nmodDiv(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n1 = julia(a)::Nemo.fq_nmod
    n2 = julia(b)::Nemo.fq_nmod
    return number(divexact(n1, n2))
@@ -123,29 +123,29 @@ end
 #
 ###############################################################################
 
-function fq_nmodGreater(a::number, b::number, cf::coeffs)
+function fq_nmodGreater(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n1 = julia(a)::Nemo.fq_nmod
    n2 = julia(b)::Nemo.fq_nmod
    return Cint(n1 != n2)
 end
 
-function fq_nmodEqual(a::number, b::number, cf::coeffs)
+function fq_nmodEqual(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n1 = julia(a)::Nemo.fq_nmod
    n2 = julia(b)::Nemo.fq_nmod
    return Cint(n1 == n2)
 end
 
-function fq_nmodIsZero(a::number, cf::coeffs)
+function fq_nmodIsZero(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n = julia(a)::Nemo.fq_nmod
    return Cint(iszero(n))
 end
 
-function fq_nmodIsOne(a::number, cf::coeffs)
+function fq_nmodIsOne(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n = julia(a)::Nemo.fq_nmod
    return Cint(isone(n))
 end
 
-function fq_nmodIsMOne(a::number, cf::coeffs)
+function fq_nmodIsMOne(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n = julia(a)::Nemo.fq_nmod
    return Cint(n == -1)
 end
@@ -156,7 +156,7 @@ end
 #
 ###############################################################################
 
-function fq_nmodGcd(a::number, b::number, cf::coeffs)
+function fq_nmodGcd(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n1 = julia(a)::Nemo.fq_nmod
    n2 = julia(b)::Nemo.fq_nmod
    return number(gcd(n1, n2))
@@ -168,11 +168,11 @@ end
 #
 ###############################################################################
 
-function fq_nmodInt(ptr::Ptr{number}, cf::coeffs)
+function fq_nmodInt(ptr::Ptr{Ptr{Cvoid}}, cf::Ptr{Cvoid})
    return Clong(0)
 end
 
-function fq_nmodMPZ(b::BigInt, ptr::Ptr{number}, cf::coeffs)
+function fq_nmodMPZ(b::BigInt, ptr::Ptr{Ptr{Cvoid}}, cf::Ptr{Cvoid})
    bptr = pointer_from_objref(b)
    icxx"""mpz_init_set_si((__mpz_struct *) $bptr, 0);"""
    nothing
@@ -184,68 +184,36 @@ end
 #
 ###############################################################################
 
-function fq_nmodInitChar(cf::coeffs, p::Ptr{Void})
+function fq_nmodInitChar(cf::Ptr{Cvoid}, p::Ptr{Void})
         
-    pInit = cfunction(fq_nmodInit, number, (Clong, coeffs))
-    pInt = cfunction(fq_nmodInt, Clong, (Ptr{number}, coeffs))
-    pMPZ = cfunction(fq_nmodMPZ, Void, (BigInt, Ptr{number}, coeffs))
-    pInpNeg = cfunction(fq_nmodInpNeg, number, (number, coeffs))
-    pCopy = cfunction(fq_nmodCopy, number, (number, coeffs))
-    pDelete = cfunction(fq_nmodDelete, Void, (Ptr{number}, coeffs))
-    pAdd = cfunction(fq_nmodAdd, number, (number, number, coeffs))
-    pInpAdd = cfunction(fq_nmodInpAdd, Void, (Ptr{number}, number, coeffs))
-    pSub = cfunction(fq_nmodSub, number, (number, number, coeffs))
-    pMult = cfunction(fq_nmodMult, number, (number, number, coeffs))
-    pInpMult = cfunction(fq_nmodInpMult, Void, (Ptr{number}, number, coeffs))
-    pDiv = cfunction(fq_nmodDiv, number, (number, number, coeffs))
-    pInvers = cfunction(fq_nmodInvers, number, (number, coeffs))
-    pGcd = cfunction(fq_nmodGcd, number, (number, number, coeffs))
-    pGreater = cfunction(fq_nmodGreater, Cint, (number, number, coeffs))
-    pEqual = cfunction(fq_nmodEqual, Cint, (number, number, coeffs))
-    pIsZero = cfunction(fq_nmodIsZero, Cint, (number, coeffs))
-    pIsOne = cfunction(fq_nmodIsOne, Cint, (number, coeffs))
-    pIsMOne = cfunction(fq_nmodIsMOne, Cint, (number, coeffs))
-    pGreaterZero = cfunction(fq_nmodGreaterZero, Cint, (number, coeffs))
-    pWrite = cfunction(fq_nmodWrite, Void, (number, coeffs))
-    pCoeffWrite = cfunction(fq_nmodCoeffWrite, Void, (coeffs, Cint))
-
-    icxx""" 
-      coeffs cf = (coeffs)($cf);
-      cf->has_simple_Alloc = FALSE;  
-      cf->has_simple_Inverse= FALSE;          
-      cf->is_field  = TRUE;
-      cf->is_domain = TRUE;
-      cf->ch = 0;
-      cf->data = $p;
-      cf->cfInit = (number (*)(long, const coeffs)) $pInit;
-      cf->cfInt = (long (*)(number &, const coeffs)) $pInt;
-      cf->cfMPZ = (void (*)(__mpz_struct *, number &, const coeffs)) $pMPZ;
-      cf->cfInpNeg = (number (*)(number, const coeffs)) $pInpNeg;
-      cf->cfCopy = (number (*)(number, const coeffs)) $pCopy;
-      cf->cfDelete = (void (*)(number *, const coeffs)) $pDelete;
-      cf->cfAdd = (numberfunc) $pAdd;
-      cf->cfInpAdd = (void (*)(number &, number, const coeffs)) $pInpAdd;
-      cf->cfSub = (numberfunc) $pSub;
-      cf->cfMult = (numberfunc) $pMult;
-      cf->cfInpMult = (void (*)(number &, number, const coeffs)) $pInpMult;
-      cf->cfDiv = (numberfunc) $pDiv;
-      cf->cfInvers = (number (*)(number, const coeffs)) $pInvers;
-      cf->cfGcd = (numberfunc) $pGcd;
-      cf->cfGreater = (BOOLEAN (*)(number, number, const coeffs)) $pGreater;
-      cf->cfEqual = (BOOLEAN (*)(number, number, const coeffs)) $pEqual;
-      cf->cfIsZero = (BOOLEAN (*)(number, const coeffs)) $pIsZero;
-      cf->cfIsOne = (BOOLEAN (*)(number, const coeffs)) $pIsOne;
-      cf->cfIsMOne = (BOOLEAN (*)(number, const coeffs)) $pIsMOne;
-      cf->cfGreaterZero = (BOOLEAN (*)(number, const coeffs)) $pGreaterZero;
-      cf->cfWriteLong = (void (*)(number, const coeffs)) $pWrite;
-      cf->cfCoeffWrite = (void (*)(const coeffs, BOOLEAN)) $pCoeffWrite;
-    """
+    pInit = cfunction(fq_nmodInit, Ptr{Cvoid}, (Clong, Ptr{Cvoid}))
+    pInt = cfunction(fq_nmodInt, Clong, (Ptr{Ptr{Cvoid}}, Ptr{Cvoid}))
+    pMPZ = cfunction(fq_nmodMPZ, Void, (BigInt, Ptr{Ptr{Cvoid}}, Ptr{Cvoid}))
+    pInpNeg = cfunction(fq_nmodInpNeg, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}))
+    pCopy = cfunction(fq_nmodCopy, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}))
+    pDelete = cfunction(fq_nmodDelete, Void, (Ptr{Ptr{Cvoid}}, Ptr{Cvoid}))
+    pAdd = cfunction(fq_nmodAdd, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
+    pInpAdd = cfunction(fq_nmodInpAdd, Void, (Ptr{Ptr{Cvoid}}, Ptr{Cvoid}, Ptr{Cvoid}))
+    pSub = cfunction(fq_nmodSub, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
+    pMult = cfunction(fq_nmodMult, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
+    pInpMult = cfunction(fq_nmodInpMult, Void, (Ptr{Ptr{Cvoid}}, Ptr{Cvoid}, Ptr{Cvoid}))
+    pDiv = cfunction(fq_nmodDiv, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
+    pInvers = cfunction(fq_nmodInvers, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}))
+    pGcd = cfunction(fq_nmodGcd, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
+    pGreater = cfunction(fq_nmodGreater, Cint, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
+    pEqual = cfunction(fq_nmodEqual, Cint, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
+    pIsZero = cfunction(fq_nmodIsZero, Cint, (Ptr{Cvoid}, Ptr{Cvoid}))
+    pIsOne = cfunction(fq_nmodIsOne, Cint, (Ptr{Cvoid}, Ptr{Cvoid}))
+    pIsMOne = cfunction(fq_nmodIsMOne, Cint, (Ptr{Cvoid}, Ptr{Cvoid}))
+    pGreaterZero = cfunction(fq_nmodGreaterZero, Cint, (Ptr{Cvoid}, Ptr{Cvoid}))
+    pWrite = cfunction(fq_nmodWrite, Void, (Ptr{Cvoid}, Ptr{Cvoid}))
+    pCoeffWrite = cfunction(fq_nmodCoeffWrite, Void, (Ptr{Cvoid}, Cint))
 
     return Cint(0)
 end
 
 function register(R::FqNmodFiniteField)
-   c = cfunction(fq_nmodInitChar, Cint, (coeffs, Ptr{Void}))
+   c = cfunction(fq_nmodInitChar, Cint, (Ptr{Cvoid}, Ptr{Void}))
    ptr = @cxx n_unknown
    return nRegister(ptr, c)
 end
