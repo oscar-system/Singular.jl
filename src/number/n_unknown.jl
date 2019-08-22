@@ -194,7 +194,7 @@ promote_rule(::Type{n_unknown{S}}, ::Type{Nemo.fmpq}) where {S <: Nemo.FieldElem
 ###############################################################################
 
 function (R::CoefficientRing{T})(a::T) where T <: Nemo.RingElem
-   return n_unknown(libSingular.number(a, @__LINE__), R)
+   return n_unknown(libSingular.number(a), R)
 end
 
 function (R::CoefficientRing{T})(a::Integer) where T <: Nemo.RingElem

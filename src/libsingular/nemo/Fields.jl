@@ -7,7 +7,7 @@
 function nemoFieldInit(i::Clong, cf::Ptr{Cvoid})
    data_ptr = get_coeff_data_void(cf)
    R = unsafe_pointer_to_objref(data_ptr)
-   return number(R(i), @__LINE__)
+   return number(R(i))
 end
    
 function nemoFieldDelete(ptr::Ptr{Ptr{Cvoid}}, cf::Ptr{Cvoid})
@@ -20,7 +20,7 @@ end
 
 function nemoFieldCopy(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n = julia(a)
-   return number(deepcopy(n), @__LINE__)
+   return number(deepcopy(n))
 end
 
 ###############################################################################
@@ -61,7 +61,7 @@ end
 
 function nemoFieldNeg(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n = julia(a)
-   return number(-n, @__LINE__)
+   return number(-n)
 end
 
 function nemoFieldInpNeg(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
@@ -75,13 +75,13 @@ end
 
 function nemoFieldInvers(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n = julia(a)
-   return number(Nemo.inv(n), @__LINE__)
+   return number(Nemo.inv(n))
 end
 
 function nemoFieldMult(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n1 = julia(a)
    n2 = julia(b)
-   return number(n1*n2, @__LINE__)
+   return number(n1*n2)
 end
 
 function nemoFieldInpMult(a::Ptr{Ptr{Cvoid}}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
@@ -97,7 +97,7 @@ end
 function nemoFieldAdd(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n1 = julia(a)
    n2 = julia(b)
-   return number(n1 + n2, @__LINE__)
+   return number(n1 + n2)
 end
 
 function nemoFieldInpAdd(a::Ptr{Ptr{Cvoid}}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
@@ -113,13 +113,13 @@ end
 function nemoFieldSub(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n1 = julia(a)
    n2 = julia(b)
-   return number(n1 - n2, @__LINE__)
+   return number(n1 - n2)
 end
 
 function nemoFieldDiv(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n1 = julia(a)
    n2 = julia(b)
-   return number(Nemo.divexact(n1, n2), @__LINE__)
+   return number(Nemo.divexact(n1, n2))
 end
 
 ###############################################################################
@@ -164,7 +164,7 @@ end
 function nemoFieldGcd(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n1 = julia(a)
    n2 = julia(b)
-   return number(Nemo.gcd(n1, n2), @__LINE__)
+   return number(Nemo.gcd(n1, n2))
 end
 
 ###############################################################################
@@ -179,9 +179,9 @@ function nemoFieldSubringGcd(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    if isa(R, FracField)
       n1 = numerator(julia(a))
       n2 = numerator(julia(b))
-      return number(R(Nemo.gcd(n1, n2)), @__LINE__)
+      return number(R(Nemo.gcd(n1, n2)))
    else
-      return number(deepcopy(julia(a)), @__LINE__)
+      return number(deepcopy(julia(a)))
    end
 end
 
