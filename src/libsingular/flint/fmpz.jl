@@ -1,6 +1,4 @@
 
-using Nemo
-
 ###############################################################################
 #
 #   Memory management
@@ -291,7 +289,7 @@ function fmpzInitChar(cf::Ptr{Cvoid}, p::Ptr{Cvoid})
     return Cint(0)
 end
 
-function register(R::FlintIntegerRing)
+function register(R::Nemo.FlintIntegerRing)
    c = @cfunction(fmpzInitChar, Cint, (Ptr{Cvoid}, Ptr{Cvoid}))
    return nRegister(n_unknown, c)
 end
