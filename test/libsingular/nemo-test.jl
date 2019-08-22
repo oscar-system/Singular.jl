@@ -32,9 +32,9 @@ function test_nemo_fmpq()
 
    @test gcd(f1c[1], f1c[2]) == Nemo.QQ(1)
 
-   @test divexact(f1c[1], f1c[2]) == Nemo.QQ(3)
+   @test divexact(f1c[2], f1c[1]) == Nemo.QQ(3)
 
-   @test f1c[1] - f1c[2] == Nemo.QQ(2)
+   @test f1c[2] - f1c[1] == Nemo.QQ(2)
 
    @test f1c[1] + f1c[2] == Nemo.QQ(4)
 
@@ -320,7 +320,7 @@ function test_nemo_ring()
 end
 
 function test_nemo()
-#    test_nemo_fmpq()
+   test_nemo_fmpq()
    test_nemo_fmpz()
 #    test_nemo_fq_nmod()
 #    test_nemo_fq()

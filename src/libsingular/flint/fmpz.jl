@@ -5,8 +5,7 @@
 ###############################################################################
 
 function fmpzInit(i::Clong, cf::Ptr{Cvoid})
-   new_num = Nemo.fmpz(i)
-   return number(new_num)
+   return number(Nemo.fmpz(i))
 end
    
 function fmpzDelete(ptr::Ptr{Ptr{Cvoid}}, cf::Ptr{Cvoid})
@@ -17,9 +16,7 @@ end
 
 function fmpzCopy(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
     n = julia(a)::Nemo.fmpz
-    cn = deepcopy(n)
-    ptr = number(cn)
-    return ptr
+    return number(deepcopy(n))
 end
 
 ###############################################################################
@@ -60,8 +57,7 @@ end
 
 function fmpzNeg(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
     n = julia(a)::Nemo.fmpz
-    new_num = -n
-    return number(new_num)
+    return number(-n)
 end
 
 function fmpzInpNeg(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
@@ -71,30 +67,27 @@ end
 
 function fmpzInvers(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
     n = julia(a)::Nemo.fmpz
-    new_num = Nemo.divexact(1, n)
-    return number(new_num)
+    return number(Nemo.divexact(1, n))
 end
 
 function fmpzMult(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
     n1 = julia(a)::Nemo.fmpz
     n2 = julia(b)::Nemo.fmpz
-    new_num = n1*n2
-    return number(new_num)
+    return number(n1*n2)
 end
 
 function fmpzInpMult(a::Ptr{Ptr{Cvoid}}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
     r = unsafe_load(a)
     aa = julia(r)::Nemo.fmpz
     bb = julia(b)::Nemo.fmpz
-    mul!(aa, aa, bb)
+    Nemo.mul!(aa, aa, bb)
     nothing
 end
 
 function fmpzAdd(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
     n1 = julia(a)::Nemo.fmpz
     n2 = julia(b)::Nemo.fmpz
-    new_num = n1 + n2
-    return number(new_num)
+    return number(n1 + n2)
 end
 
 function fmpzInpAdd(a::Ptr{Ptr{Cvoid}}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
@@ -108,15 +101,13 @@ end
 function fmpzSub(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
     n1 = julia(a)::Nemo.fmpz
     n2 = julia(b)::Nemo.fmpz
-    new_num = n1 - n2
-    return number(new_num)
+    return number(n1 - n2)
 end
 
 function fmpzDiv(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
     n1 = julia(a)::Nemo.fmpz
     n2 = julia(b)::Nemo.fmpz
-    new_num = Nemo.divexact(n1, n2)
-    return number(new_num)
+    return number(Nemo.divexact(n1, n2))
 end
 
 function fmpzDivBy(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
@@ -167,8 +158,7 @@ end
 function fmpzGcd(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
     n1 = julia(a)::Nemo.fmpz
     n2 = julia(b)::Nemo.fmpz
-    new_num = Nemo.gcd(n1, n2)
-    return number(new_num)
+    return number(Nemo.gcd(n1, n2))
 end
 
 ###############################################################################
@@ -208,7 +198,7 @@ function fmpzMPZ(b::BigInt, ptr::Ptr{Ptr{Cvoid}}, cf::Ptr{Cvoid})
     zptr = reinterpret(Ptr{Cvoid}, pointer_from_objref(z))
     number_pop!(nemoNumberID, ptr_load)
     mpz_init_set_internal(bptr, zptr)
-   nothing
+    nothing
 end
 
 ###############################################################################
@@ -251,7 +241,7 @@ function fmpzInitChar(cf::Ptr{Cvoid}, p::Ptr{Cvoid})
     ring_struct.cfWriteLong = @cfunction(fmpzWrite, Cvoid, (Ptr{Cvoid}, Ptr{Cvoid}))
     ring_struct.cfCoeffWrite = @cfunction(fmpzCoeffWrite, Cvoid, (Ptr{Cvoid}, Cint))
 
-    fill_coeffs_with_function_data(ring_struct,cf)
+    fill_coeffs_with_function_data(ring_struct, cf)
 
     return Cint(0)
 end

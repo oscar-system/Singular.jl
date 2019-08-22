@@ -4,19 +4,17 @@
 #
 ###############################################################################
 
-function fmpqInit(i::Clong, cf::coeffs)
+function fmpqInit(i::Clong, cf::Ptr{Cvoid})
    return number(Nemo.fmpq(i))
 end
    
-function fmpqDelete(ptr::Ptr{number}, cf::coeffs)
-   n = unsafe_load(ptr)
-   if n != C_NULL
-      number_pop!(nemoNumberID, Ptr{Void}(n))
-   end
+function fmpqDelete(ptr::Ptr{Ptr{Cvoid}}, cf::Ptr{Cvoid})
+   ptr_new = unsafe_load(ptr)
+   number_pop!(nemoNumberID, ptr_new)
    nothing
 end
 
-function fmpqCopy(a::number, cf::coeffs)
+function fmpqCopy(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n = julia(a)::Nemo.fmpq
    return number(deepcopy(n))
 end
@@ -27,27 +25,28 @@ end
 #
 ###############################################################################
 
-function fmpqGreaterZero(a::number, cf::coeffs)
+function fmpqGreaterZero(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n = julia(a)::Nemo.fmpq
    return Cint(n > 0)
 end
 
-function fmpqCoeffWrite(cf::coeffs, d::Cint)
-   r = julia(cf)::Nemo.FlintRationalField
-   str = string(r)
-   icxx"""PrintS($str);"""
-   nothing
+function fmpqCoeffWrite(cf::Ptr{Cvoid}, d::Cint)
+    data_ptr = get_coeff_data(cf)
+    r = unsafe_pointer_to_objref(data_ptr)
+    str = string(r)
+    libSingular.PrintS(str);
+    nothing
 end
 
-function fmpqWrite(a::number, cf::coeffs)
+function fmpqWrite(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n = julia(a)::Nemo.fmpq
-   if needs_parentheses(n)
-      str = "("*string(n)*")"
-   else
-      str = string(n)
-   end
-   icxx"""StringAppendS($str);"""
-   nothing
+    if Nemo.needs_parentheses(n)
+        str = "("*string(n)*")"
+    else
+        str = string(n)
+    end
+    libSingular.StringAppendS(str);
+    nothing
 end
 
 ###############################################################################
@@ -56,64 +55,59 @@ end
 #
 ###############################################################################
 
-function fmpqNeg(a::number, cf::coeffs)
+function fmpqNeg(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n = julia(a)::Nemo.fmpq
    return number(-n)
 end
 
-function fmpqInpNeg(a::number, cf::coeffs)
-   n = julia(a)::Nemo.fmpq
-   ccall((:fmpq_neg, :libflint), Void, (Ptr{Nemo.fmpq}, Ptr{Nemo.fmpq}), &n, &n)
-   return number(n, false)
+function fmpqInpNeg(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
+    ccall((:fmpq_neg, :libflint), Cvoid, (Ptr{Nemo.fmpq}, Ptr{Nemo.fmpq}), a, a)
+    return a
 end
 
-function fmpqInvers(a::number, cf::coeffs)
+function fmpqInvers(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n = julia(a)::Nemo.fmpq
-   return number(inv(n))
+   return number(Nemo.inv(n))
 end
 
-function fmpqMult(a::number, b::number, cf::coeffs)
+function fmpqMult(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n1 = julia(a)::Nemo.fmpq
    n2 = julia(b)::Nemo.fmpq
    return number(n1*n2)
 end
 
-function fmpqInpMult(a::Ptr{number}, b::number, cf::coeffs)
+function fmpqInpMult(a::Ptr{Ptr{Cvoid}}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    r = unsafe_load(a)
    aa = julia(r)::Nemo.fmpq
    bb = julia(b)::Nemo.fmpq
-   cc = mul!(aa, aa, bb)
-   n = number(cc, aa)
-   unsafe_store!(a, n, 1)
+   Nemo.mul!(aa, aa, bb)
    nothing
 end
 
-function fmpqAdd(a::number, b::number, cf::coeffs)
+function fmpqAdd(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n1 = julia(a)::Nemo.fmpq
    n2 = julia(b)::Nemo.fmpq
    return number(n1 + n2)
 end
 
-function fmpqInpAdd(a::Ptr{number}, b::number, cf::coeffs)
+function fmpqInpAdd(a::Ptr{Ptr{Cvoid}}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    r = unsafe_load(a)
    aa = julia(r)::Nemo.fmpq
    bb = julia(b)::Nemo.fmpq
-   cc = addeq!(aa, bb)
-   n = number(cc, aa)
-   unsafe_store!(a, n, 1)
+   Nemo.addeq!(aa, bb)
    nothing
 end
 
-function fmpqSub(a::number, b::number, cf::coeffs)
+function fmpqSub(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n1 = julia(a)::Nemo.fmpq
    n2 = julia(b)::Nemo.fmpq
    return number(n1 - n2)
 end
 
-function fmpqDiv(a::number, b::number, cf::coeffs)
+function fmpqDiv(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n1 = julia(a)::Nemo.fmpq
    n2 = julia(b)::Nemo.fmpq
-   return number(divexact(n1, n2))
+   return number(Nemo.divexact(n1, n2))
 end
 
 ###############################################################################
@@ -122,29 +116,29 @@ end
 #
 ###############################################################################
 
-function fmpqGreater(a::number, b::number, cf::coeffs)
+function fmpqGreater(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n1 = julia(a)::Nemo.fmpq
    n2 = julia(b)::Nemo.fmpq
    return Cint(n1 > n2)
 end
 
-function fmpqEqual(a::number, b::number, cf::coeffs)
+function fmpqEqual(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n1 = julia(a)::Nemo.fmpq
    n2 = julia(b)::Nemo.fmpq
    return Cint(n1 == n2)
 end
 
-function fmpqIsZero(a::number, cf::coeffs)
+function fmpqIsZero(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n = julia(a)::Nemo.fmpq
-   return Cint(iszero(n))
+   return Cint(Nemo.iszero(n))
 end
 
-function fmpqIsOne(a::number, cf::coeffs)
+function fmpqIsOne(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n = julia(a)::Nemo.fmpq
-   return Cint(isone(n))
+   return Cint(Nemo.isone(n))
 end
 
-function fmpqIsMOne(a::number, cf::coeffs)
+function fmpqIsMOne(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n = julia(a)::Nemo.fmpq
    return Cint(n == -1)
 end
@@ -155,10 +149,10 @@ end
 #
 ###############################################################################
 
-function fmpqGcd(a::number, b::number, cf::coeffs)
+function fmpqGcd(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n1 = julia(a)::Nemo.fmpq
    n2 = julia(b)::Nemo.fmpq
-   return number(gcd(n1, n2))
+   return number(Nemo.gcd(n1, n2))
 end
 
 ###############################################################################
@@ -167,10 +161,10 @@ end
 #
 ###############################################################################
 
-function fmpqSubringGcd(a::number, b::number, cf::coeffs)
+function fmpqSubringGcd(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n1 = numerator(julia(a)::fmpq)
    n2 = numerator(julia(b)::fmpq)
-   return number(fmpq(gcd(n1, n2)))
+   return number(fmpq(Nemo.gcd(n1, n2)))
 end
 
 ###############################################################################
@@ -179,18 +173,23 @@ end
 #
 ###############################################################################
 
-function fmpqInt(ptr::Ptr{number}, cf::coeffs)
-   n = julia(unsafe_load(ptr))::fmpq
-   return Clong(num)
+function fmpqInt(ptr::Ptr{Ptr{Cvoid}}, cf::Ptr{Cvoid})
+    ptr_load = unsafe_load(ptr)
+    n = julia(ptr_load)::fmpq
+    ret_val = Clong(n)
+    number_pop!(nemoNumberID, ptr_load)
+    return ret_val
 end
 
-function fmpqMPZ(b::BigInt, ptr::Ptr{number}, cf::coeffs)
-   n = julia(unsafe_load(ptr))::fmpq
-   z = convert(BigInt, num(n))
-   bptr = pointer_from_objref(b)
-   zptr = pointer_from_objref(z)
-   icxx"""mpz_init_set((__mpz_struct *) $bptr, (mpz_ptr) $zptr);"""
-   nothing
+function fmpqMPZ(b::BigInt, ptr::Ptr{Ptr{Cvoid}}, cf::Ptr{Cvoid})
+    ptr_load = unsafe_load(ptr)
+    n = julia(unsafe_load(ptr))::fmpz
+    z = convert(BigInt, Nemo.numerator(n))
+    bptr = reinterpret(Ptr{Cvoid}, pointer_from_objref(b))
+    zptr = reinterpret(Ptr{Cvoid}, pointer_from_objref(z))
+    number_pop!(nemoNumberID, ptr_load)
+    mpz_init_set_internal(bptr, zptr)
+    nothing
 end
 
 ###############################################################################
@@ -199,70 +198,44 @@ end
 #
 ###############################################################################
 
-function fmpqInitChar(cf::coeffs, p::Ptr{Void})
-        
-    pInit = cfunction(fmpqInit, number, (Clong, coeffs))
-    pInt = cfunction(fmpqInt, Clong, (Ptr{number}, coeffs))
-    pMPZ = cfunction(fmpqMPZ, Void, (BigInt, Ptr{number}, coeffs))
-    pInpNeg = cfunction(fmpqInpNeg, number, (number, coeffs))
-    pCopy = cfunction(fmpqCopy, number, (number, coeffs))
-    pDelete = cfunction(fmpqDelete, Void, (Ptr{number}, coeffs))
-    pAdd = cfunction(fmpqAdd, number, (number, number, coeffs))
-    pInpAdd = cfunction(fmpqInpAdd, Void, (Ptr{number}, number, coeffs))
-    pSub = cfunction(fmpqSub, number, (number, number, coeffs))
-    pMult = cfunction(fmpqMult, number, (number, number, coeffs))
-    pInpMult = cfunction(fmpqInpMult, Void, (Ptr{number}, number, coeffs))
-    pDiv = cfunction(fmpqDiv, number, (number, number, coeffs))
-    pInvers = cfunction(fmpqInvers, number, (number, coeffs))
-    pGcd = cfunction(fmpqGcd, number, (number, number, coeffs))
-    pSubringGcd = cfunction(fmpqSubringGcd, number, (number, number, coeffs))
-    pGreater = cfunction(fmpqGreater, Cint, (number, number, coeffs))
-    pEqual = cfunction(fmpqEqual, Cint, (number, number, coeffs))
-    pIsZero = cfunction(fmpqIsZero, Cint, (number, coeffs))
-    pIsOne = cfunction(fmpqIsOne, Cint, (number, coeffs))
-    pIsMOne = cfunction(fmpqIsMOne, Cint, (number, coeffs))
-    pGreaterZero = cfunction(fmpqGreaterZero, Cint, (number, coeffs))
-    pWrite = cfunction(fmpqWrite, Void, (number, coeffs))
-    pCoeffWrite = cfunction(fmpqCoeffWrite, Void, (coeffs, Cint))
-
-    icxx""" 
-      coeffs cf = (coeffs)($cf);
-      cf->has_simple_Alloc = FALSE;  
-      cf->has_simple_Inverse= FALSE;          
-      cf->is_field  = TRUE;
-      cf->is_domain = TRUE;
-      cf->ch = 0;
-      cf->data = $p;
-      cf->cfInit = (number (*)(long, const coeffs)) $pInit;
-      cf->cfInt = (long (*)(number &, const coeffs)) $pInt;
-      cf->cfMPZ = (void (*)(__mpz_struct *, number &, const coeffs)) $pMPZ;
-      cf->cfInpNeg = (number (*)(number, const coeffs)) $pInpNeg;
-      cf->cfCopy = (number (*)(number, const coeffs)) $pCopy;
-      cf->cfDelete = (void (*)(number *, const coeffs)) $pDelete;
-      cf->cfAdd = (numberfunc) $pAdd;
-      cf->cfInpAdd = (void (*)(number &, number, const coeffs)) $pInpAdd;
-      cf->cfSub = (numberfunc) $pSub;
-      cf->cfMult = (numberfunc) $pMult;
-      cf->cfInpMult = (void (*)(number &, number, const coeffs)) $pInpMult;
-      cf->cfDiv = (numberfunc) $pDiv;
-      cf->cfInvers = (number (*)(number, const coeffs)) $pInvers;
-      cf->cfGcd = (numberfunc) $pGcd;
-      cf->cfSubringGcd = (numberfunc) $pSubringGcd;
-      cf->cfGreater = (BOOLEAN (*)(number, number, const coeffs)) $pGreater;
-      cf->cfEqual = (BOOLEAN (*)(number, number, const coeffs)) $pEqual;
-      cf->cfIsZero = (BOOLEAN (*)(number, const coeffs)) $pIsZero;
-      cf->cfIsOne = (BOOLEAN (*)(number, const coeffs)) $pIsOne;
-      cf->cfIsMOne = (BOOLEAN (*)(number, const coeffs)) $pIsMOne;
-      cf->cfGreaterZero = (BOOLEAN (*)(number, const coeffs)) $pGreaterZero;
-      cf->cfWriteLong = (void (*)(number, const coeffs)) $pWrite;
-      cf->cfCoeffWrite = (void (*)(const coeffs, BOOLEAN)) $pCoeffWrite;
-    """
+function fmpqInitChar(cf::Ptr{Cvoid}, p::Ptr{Cvoid})
+    ring_struct = singular_coeff_ring_struct()
+    ring_struct.has_simple_alloc = 0
+    ring_struct.has_simple_inverse = 0
+    ring_struct.is_field = 1
+    ring_struct.is_domain = 1
+    ring_struct.ch = 0
+    ring_struct.data = p
+    ring_struct.cfInit = @cfunction(fmpqInit, Ptr{Cvoid}, (Clong, Ptr{Cvoid}))
+    ring_struct.cfInt = @cfunction(fmpqInt, Clong, (Ptr{Ptr{Cvoid}}, Ptr{Cvoid}))
+    ring_struct.cfMPZ = @cfunction(fmpqMPZ, Cvoid, (BigInt, Ptr{Ptr{Cvoid}}, Ptr{Cvoid}))
+    ring_struct.cfInpNeg = @cfunction(fmpqInpNeg, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfCopy = @cfunction(fmpqCopy, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfDelete = @cfunction(fmpqDelete, Cvoid, (Ptr{Ptr{Cvoid}}, Ptr{Cvoid}))
+    ring_struct.cfAdd = @cfunction(fmpqAdd, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfInpAdd = @cfunction(fmpqInpAdd, Cvoid, (Ptr{Ptr{Cvoid}}, Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfSub = @cfunction(fmpqSub, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfMult = @cfunction(fmpqMult, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfInpMult = @cfunction(fmpqInpMult, Cvoid, (Ptr{Ptr{Cvoid}}, Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfDiv = @cfunction(fmpqDiv, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfInvers = @cfunction(fmpqInvers, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfGcd = @cfunction(fmpqGcd, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfSubringGcd = @cfunction(fmpqSubringGcd, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfGreater = @cfunction(fmpqGreater, Cint, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfEqual = @cfunction(fmpqEqual, Cint, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfIsZero = @cfunction(fmpqIsZero, Cint, (Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfIsOne = @cfunction(fmpqIsOne, Cint, (Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfIsMOne = @cfunction(fmpqIsMOne, Cint, (Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfGreaterZero = @cfunction(fmpqGreaterZero, Cint, (Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfWriteLong = @cfunction(fmpqWrite, Cvoid, (Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfCoeffWrite = @cfunction(fmpqCoeffWrite, Cvoid, (Ptr{Cvoid}, Cint))
+    
+    fill_coeffs_with_function_data(ring_struct, cf)
 
     return Cint(0)
 end
 
-function register(R::FlintRationalField)
-   c = cfunction(fmpqInitChar, Cint, (coeffs, Ptr{Void}))
-   ptr = @cxx n_unknown
-   return nRegister(ptr, c)
+function register(R::Nemo.FlintRationalField)
+   c = @cfunction(fmpqInitChar, Cint, (Ptr{Cvoid}, Ptr{Cvoid}))
+   return nRegister(n_unknown, c)
 end
