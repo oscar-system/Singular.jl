@@ -114,7 +114,7 @@ function fmpzInpAdd(a::Ptr{Ptr{Cvoid}}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
     r = unsafe_load(a)
     aa = julia(r)::Nemo.fmpz
     bb = julia(b)::Nemo.fmpz
-    aa = Nemo.addeq!(aa, bb)
+    Nemo.addeq!(aa, bb)
     nothing
 end
 
