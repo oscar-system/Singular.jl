@@ -7,7 +7,7 @@
 function nemoFieldInit(i::Clong, cf::Ptr{Cvoid})
    data_ptr = get_coeff_data_void(cf)
    R = unsafe_pointer_to_objref(data_ptr)
-   return number(R(i))
+   return number(R(i), @__LINE__)
 end
    
 function nemoFieldDelete(ptr::Ptr{Ptr{Cvoid}}, cf::Ptr{Cvoid})
@@ -20,7 +20,7 @@ end
 
 function nemoFieldCopy(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n = julia(a)
-   return number(deepcopy(n))
+   return number(deepcopy(n), @__LINE__)
 end
 
 ###############################################################################
@@ -44,7 +44,7 @@ end
 
 function nemoFieldWrite(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n = julia(a)
-   if needs_parentheses(n)
+   if Nemo.needs_parentheses(n)
       str = "("*string(n)*")"
    else
       str = string(n)
@@ -61,7 +61,7 @@ end
 
 function nemoFieldNeg(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n = julia(a)
-   return number(-n)
+   return number(-n, @__LINE__)
 end
 
 function nemoFieldInpNeg(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
@@ -69,26 +69,26 @@ function nemoFieldInpNeg(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    R = unsafe_pointer_to_objref(data_ptr)
    n = julia(a)
    mone = R(-1)
-   n_new = mul!(n, n, mone)
+   n_new = Nemo.mul!(n, n, mone)
    return number(n_new, n)
 end
 
 function nemoFieldInvers(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n = julia(a)
-   return number(inv(n))
+   return number(Nemo.inv(n), @__LINE__)
 end
 
 function nemoFieldMult(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n1 = julia(a)
    n2 = julia(b)
-   return number(n1*n2)
+   return number(n1*n2, @__LINE__)
 end
 
 function nemoFieldInpMult(a::Ptr{Ptr{Cvoid}}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    r = unsafe_load(a)
    aa = julia(r)
    bb = julia(b)
-   cc = mul!(aa, aa, bb)
+   cc = Nemo.mul!(aa, aa, bb)
    n = number(cc, aa)
    setindex_internal_void(reinterpret(Ptr{Cvoid},a), n)
    nothing
@@ -97,14 +97,14 @@ end
 function nemoFieldAdd(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n1 = julia(a)
    n2 = julia(b)
-   return number(n1 + n2)
+   return number(n1 + n2, @__LINE__)
 end
 
 function nemoFieldInpAdd(a::Ptr{Ptr{Cvoid}}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    r = unsafe_load(a)
    aa = julia(r)
    bb = julia(b)
-   cc = addeq!(aa, bb)
+   cc = Nemo.addeq!(aa, bb)
    n = number(cc, aa)
    setindex_internal_void(reinterpret(Ptr{Cvoid},a), n)
    nothing
@@ -113,13 +113,13 @@ end
 function nemoFieldSub(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n1 = julia(a)
    n2 = julia(b)
-   return number(n1 - n2)
+   return number(n1 - n2, @__LINE__)
 end
 
 function nemoFieldDiv(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n1 = julia(a)
    n2 = julia(b)
-   return number(divexact(n1, n2))
+   return number(Nemo.divexact(n1, n2), @__LINE__)
 end
 
 ###############################################################################
@@ -142,12 +142,12 @@ end
 
 function nemoFieldIsZero(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n = julia(a)
-   return Cint(iszero(n))
+   return Cint(Nemo.iszero(n))
 end
 
 function nemoFieldIsOne(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n = julia(a)
-   return Cint(isone(n))
+   return Cint(Nemo.isone(n))
 end
 
 function nemoFieldIsMOne(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
@@ -164,7 +164,7 @@ end
 function nemoFieldGcd(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n1 = julia(a)
    n2 = julia(b)
-   return number(gcd(n1, n2))
+   return number(Nemo.gcd(n1, n2), @__LINE__)
 end
 
 ###############################################################################
@@ -179,9 +179,9 @@ function nemoFieldSubringGcd(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    if isa(R, FracField)
       n1 = numerator(julia(a))
       n2 = numerator(julia(b))
-      return number(R(gcd(n1, n2)))
+      return number(R(Nemo.gcd(n1, n2)), @__LINE__)
    else
-      return number(deepcopy(julia(a)))
+      return number(deepcopy(julia(a)), @__LINE__)
    end
 end
 
@@ -197,7 +197,7 @@ end
 
 function nemoFieldMPZ(b::BigInt, ptr::Ptr{Ptr{Cvoid}}, cf::Ptr{Cvoid})
    bptr = pointer_from_objref(b)
-   mpz_init_set_si_internal(reinterpret(Ptr{Cvoid},bptr),0)
+   mpz_init_set_si_internal(reinterpret(Ptr{Cvoid}, bptr),0)
    nothing
 end
 

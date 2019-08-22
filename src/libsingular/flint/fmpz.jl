@@ -21,7 +21,7 @@ end
 function fmpzCopy(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
     n = julia(a)::Nemo.fmpz
     cn = deepcopy(n)
-    ptr = number(cn,@__LINE__)
+    ptr = number(cn, @__LINE__)
     push!(pointer_compare,cn)
     push!(pointer_compare,reinterpret(Ptr{Cvoid},pointer_from_objref(cn)))
     return ptr
@@ -78,7 +78,7 @@ end
 
 function fmpzInvers(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
     n = julia(a)::Nemo.fmpz
-    new_num = divexact(1,n)
+    new_num = Nemo.divexact(1, n)
     push!(pointer_compare,new_num)
     push!(pointer_compare,reinterpret(Ptr{Cvoid},pointer_from_objref(new_num)))
     return number(new_num,@__LINE__)
@@ -114,7 +114,7 @@ function fmpzInpAdd(a::Ptr{Ptr{Cvoid}}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
     r = unsafe_load(a)
     aa = julia(r)::Nemo.fmpz
     bb = julia(b)::Nemo.fmpz
-    addeq!(aa, bb)
+    aa = Nemo.addeq!(aa, bb)
     nothing
 end
 
@@ -130,7 +130,7 @@ end
 function fmpzDiv(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
     n1 = julia(a)::Nemo.fmpz
     n2 = julia(b)::Nemo.fmpz
-    new_num = divexact(n1,n2)
+    new_num = Nemo.divexact(n1, n2)
     push!(pointer_compare,new_num)
     push!(pointer_compare,reinterpret(Ptr{Cvoid},pointer_from_objref(new_num)))
     return number(new_num,@__LINE__)
@@ -139,7 +139,7 @@ end
 function fmpzDivBy(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
     n1 = julia(a)::Nemo.fmpz
     n2 = julia(b)::Nemo.fmpz
-    return Cint(divides(n1, n2)[1])
+    return Cint(Nemo.divides(n1, n2)[1])
 end
 
 ###############################################################################
@@ -162,12 +162,12 @@ end
 
 function fmpzIsZero(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n = julia(a)::Nemo.fmpz
-   return Cint(iszero(n))
+   return Cint(Nemo.iszero(n))
 end
 
 function fmpzIsOne(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
     n = julia(a)::Nemo.fmpz
-    return Cint(isone(n))
+    return Cint(Nemo.isone(n))
 end
 
 function fmpzIsMOne(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
@@ -184,7 +184,7 @@ end
 function fmpzGcd(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
     n1 = julia(a)::Nemo.fmpz
     n2 = julia(b)::Nemo.fmpz
-    new_num = gcd(n1,n2)
+    new_num = Nemo.gcd(n1, n2)
     push!(pointer_compare,new_num)
     push!(pointer_compare,reinterpret(Ptr{Cvoid},pointer_from_objref(new_num)))
     return number(new_num,@__LINE__)
@@ -207,7 +207,7 @@ function fmpzExtGcd(a::Ptr{Cvoid}, b::Ptr{Cvoid}, s::Ptr{Ptr{Cvoid}}, t::Ptr{Ptr
 #    if t1 != C_NULL
 #       number_pop!(nemoNumberID, t1)
 #    end
-   g1, s1, t1 = gcdx(n1, n2)
+   g1, s1, t1 = Nemo.gcdx(n1, n2)
    push!(pointer_compare,s1)
    push!(pointer_compare,reinterpret(Ptr{Cvoid},pointer_from_objref(s1)))
    setindex_internal_void(reinterpret(Ptr{Cvoid},s), number(s1,@__LINE__))
@@ -229,7 +229,7 @@ function fmpzInt(ptr::Ptr{Ptr{Cvoid}}, cf::Ptr{Cvoid})
     ptr_load = unsafe_load(ptr) 
     n = julia(ptr_load)::fmpz
     ret_val = Clong(n)
-    number_pop!(nemoNumberID,ptr_load) 
+    number_pop!(nemoNumberID, ptr_load) 
     return ret_val
 end
 

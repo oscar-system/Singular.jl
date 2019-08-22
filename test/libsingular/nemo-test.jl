@@ -28,7 +28,7 @@ function test_nemo_fmpq()
 
    @test f1^3*f1^3 == f1^6
 
-   @test inv(f1c[1]) == Nemo.QQ(1, 3)
+   @test inv(f1c[2]) == Nemo.QQ(1, 3)
 
    @test gcd(f1c[1], f1c[2]) == Nemo.QQ(1)
 
@@ -74,9 +74,9 @@ function test_nemo_fmpz()
 
    @test gcd(f1c[1], f1c[2]) == Nemo.ZZ(1)
 
-   @test divexact(f1c[1], f1c[2]) == Nemo.ZZ(3)
+   @test divexact(f1c[2], f1c[1]) == Nemo.ZZ(3)
 
-   @test f1c[1] - f1c[2] == Nemo.ZZ(2)
+   @test f1c[2] - f1c[1] == Nemo.ZZ(2)
 
    @test f1c[1] + f1c[2] == Nemo.ZZ(4)
 
@@ -119,13 +119,13 @@ function test_nemo_fq_nmod()
 
    @test f1^3*f1^3 == f1^6
 
-   @test inv(f1c[1]) == F(5)
+   @test inv(f1c[2]) == F(5)
 
    @test gcd(f1c[1], f1c[2]) == F(1)
 
-   @test divexact(f1c[1], f1c[2]) == F(3)
+   @test divexact(f1c[2], f1c[1]) == F(3)
 
-   @test f1c[1] - f1c[2] == F(2)
+   @test f1c[2] - f1c[1] == F(2)
 
    @test f1c[1] + f1c[2] == F(4)
 
@@ -168,13 +168,13 @@ function test_nemo_fq()
 
    @test f1^3*f1^3 == f1^6
 
-   @test inv(f1c[1]) == F(5)
+   @test inv(f1c[2]) == F(5)
 
    @test gcd(f1c[1], f1c[2]) == F(1)
 
-   @test divexact(f1c[1], f1c[2]) == F(3)
+   @test divexact(f1c[2], f1c[1]) == F(3)
 
-   @test f1c[1] - f1c[2] == F(2)
+   @test f1c[2] - f1c[1] == F(2)
 
    @test f1c[1] + f1c[2] == F(4)
 
@@ -218,13 +218,13 @@ function test_nemo_nf_elem()
 
    @test f1^3*f1^3 == f1^6
 
-   @test inv(f1c[1]) == K(1)//3
+   @test inv(f1c[2]) == K(1)//3
 
    @test gcd(f1c[1], f1c[2]) == K(1)
 
-   @test divexact(f1c[1], f1c[2]) == K(3)
+   @test divexact(f1c[2], f1c[1]) == K(3)
 
-   @test f1c[1] - f1c[2] == K(2)
+   @test f1c[2] - f1c[1] == K(2)
 
    @test f1c[1] + f1c[2] == K(4)
 
@@ -263,13 +263,13 @@ function test_nemo_field()
 
    @test f1^3*f1^3 == f1^6
 
-   @test inv(f1c[1]) == U(1, 3)
+   @test inv(f1c[2]) == U(1, 3)
 
    @test gcd(f1c[1], f1c[2]) == U(1)
 
-   @test divexact(f1c[1], f1c[2]) == U(3)
+   @test divexact(f1c[2], f1c[1]) == U(3)
 
-   @test f1c[1] - f1c[2] == U(2)
+   @test f1c[2] - f1c[1] == U(2)
 
    @test f1c[1] + f1c[2] == U(4)
 
@@ -310,9 +310,9 @@ function test_nemo_ring()
 
    @test gcd(f1c[1], f1c[2]) == U(1)
 
-   @test divexact(f1c[1], f1c[2]) == U(3)
+   @test divexact(f1c[2], f1c[1]) == U(3)
 
-   @test f1c[1] - f1c[2] == U(2)
+   @test f1c[2] - f1c[1] == U(2)
 
    @test f1c[1] + f1c[2] == U(4)
 

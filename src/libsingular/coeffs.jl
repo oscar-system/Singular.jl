@@ -135,10 +135,10 @@ function number(j::T, line_number) where {T <: Nemo.RingElem}
     return reinterpret(Ptr{Cvoid},ptr)
 end
 
-# function number(j::T, j_old::T) where {T <: Nemo.RingElem}
-#     number_pop!(nemoNumberID, reinterpret(Ptr{Cvoid},pointer_from_objref(j_old)))
-#     return number(j)
-# end
+function number(j::T, j_old::T) where {T <: Nemo.RingElem}
+     number_pop!(nemoNumberID, reinterpret(Ptr{Cvoid},pointer_from_objref(j_old)))
+     return number(j, @__LINE__)
+end
 
 
 
