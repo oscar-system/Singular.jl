@@ -48,7 +48,7 @@ end
 
 function fmpzWrite(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
     n = julia(a)::Nemo.fmpz
-    if needs_parentheses(n)
+    if Nemo.needs_parentheses(n)
         str = "("*string(n)*")"
     else
         str = string(n)
