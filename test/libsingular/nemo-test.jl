@@ -326,7 +326,7 @@ function test_nemo()
    test_nemo_fq()
    test_nemo_nf_elem()
    test_nemo_field()
-#    test_nemo_ring()
+   test_nemo_ring()
 
    println("")
 end
