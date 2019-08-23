@@ -170,6 +170,14 @@ has_global_ordering(R::PolyRing)
 ```
 
 ```@docs
+has_mixed_ordering(R::PolyRing)
+```
+
+```@docs
+has_local_ordering(R::PolyRing)
+```
+
+```@docs
 Singular.characteristic(R::PolyRing)
 ```
 
@@ -179,6 +187,14 @@ degree_bound(R::PolyRing)
 
 ```@docs
 lead_exponent(p::spoly)
+```
+
+```@docs
+total_degree(p::spoly)
+```
+
+```@docs
+order(p::spoly)
 ```
 
 **Examples**
@@ -191,6 +207,8 @@ has_global_ordering(R) == true
 c = characteristic(R)
 L = degree_bound(R)
 exps = lead_exponent(x1*x2 + 3x1*x2^2 + x3 + 2)
+deg = total_degree(x1*x2 + 3x1*x2^2 + x3 + 2)
+ord = order(x1*x2 + 3x1*x2^2 + x3 + 2) 
 ```
 
 ### Content and primitive part
@@ -215,6 +233,42 @@ f = 3x1^2 + 3x1*x2 + 6x2^2
 
 p = primpart(f)
 c = content(f)
+```
+
+### Multivariate Factorisation
+
+For the Singular base fields `QQ` and `Fp` a function to compute a 
+squarefree factorization is available.
+
+```@docs
+Singular.factor_squarefree(p::spoly)
+```
+
+**Examples**
+
+```julia
+R = @PolynomialRing(QQ, "x", 4)
+
+f = 123*(57*x2^3 + x4^5)^3*(x1^2 + x1+1)^2*(x1 + x2*x3)^2
+
+Fac = factor(f)
+```
+
+For the Singular base rings `QQ`, `ZZ` and `Fp` a function to compute the
+multivariate factorization is available.
+
+```@docs
+Singular.factor(p::spoly)
+```
+
+**Examples**
+
+```julia
+R = @PolynomialRing(ZZ, "x", 4)
+
+f = 123*(57*x2^3 + x4^5)^3*(x1^2 + x1+1)^2*(x1 + x2*x3)^2
+
+Fac = factor(f)
 ```
 
 ### Conversion between Singular.jl polynomials and MPoly polynomials
