@@ -19,6 +19,7 @@ makedocs(
                   "module.md",
                   "vector.md"
             ],
+            "alghom.md",
             "resolution.md",
             "matrix.md"
          ]
