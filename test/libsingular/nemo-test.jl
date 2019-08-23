@@ -324,7 +324,7 @@ function test_nemo()
    test_nemo_fmpz()
    test_nemo_fq_nmod()
    test_nemo_fq()
-#    test_nemo_nf_elem()
+   test_nemo_nf_elem()
    test_nemo_field()
 #    test_nemo_ring()
 
