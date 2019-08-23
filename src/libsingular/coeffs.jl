@@ -171,9 +171,9 @@ end
 
 include("flint/fmpz.jl")
 include("flint/fmpq.jl")
-#=
 include("flint/fq.jl")
 include("flint/fq_nmod.jl")
+#=
 include("antic/nf_elem.jl")
 include("nemo/Rings.jl")
 =#
