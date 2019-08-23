@@ -2,10 +2,11 @@ export spoly, PolyRing, change_base_ring, coeff, coeffs, coeffs_expos,
        content, deflation, deflate, degree, degrees, degree_bound,
        derivative, div, divides, direm, evaluate, exponent, exponent!,
        exponent_vectors, factor, factor_squarefree, finish, gen,
-       has_global_ordering, inflate, isgen,
+       has_global_ordering, has_mixed_ordering, has_local_ordering,
+       inflate, isgen,
        ismonomial, isquotient_ring, isterm, jacobi, jet, lc, lt, lm,
        lead_exponent, monomials, MPolyBuildCtx,
-       nvars, ordering, @PolynomialRing, primpart,
+       nvars, order, ordering, @PolynomialRing, primpart,
        push_term!, remove, sort_terms!, symbols, terms, total_degree,
        valuation, var_index, vars
 
@@ -38,6 +39,22 @@ nvars(R::PolyRing) = Int(libSingular.rVar(R.ptr))
 > orderings.
 """
 has_global_ordering(R::PolyRing) = Bool(libSingular.rHasGlobalOrdering(R.ptr))
+
+@doc Markdown.doc"""
+    has_mixed_ordering(R::PolyRing)
+> Return `true` if the given ring has a mixed ordering, i.e. if $1 < x_i$ for
+> a variable $x_i$ and $1>x_j$ for another variable $x_j$.
+"""
+has_mixed_ordering(R::PolyRing) = Bool(libSingular.rHasMixedOrdering(R.ptr))
+
+@doc Markdown.doc"""
+    has_local_ordering(R::PolyRing)
+> Return `true` if the given ring has a local ordering, i.e. if $1 > x$ for
+> all variables $x$.
+"""
+function has_local_ordering(R::PolyRing) 
+   return !has_global_ordering(R) && !has_mixed_ordering(R)
+end
 
 @doc Markdown.doc"""
     isquotient_ring(R::PolyRing)
@@ -146,6 +163,28 @@ length(p::spoly) = Int(libSingular.pLength(p.ptr))
 function total_degree(p::spoly)
    R = parent(p)
    libSingular.pLDeg(p.ptr, R.ptr)
+end
+
+@doc Markdown.doc"""
+    order(p::spoly)
+> Returns the order of $p$.
+"""
+function order(p::spoly)
+   if p.ptr.cpp_object == C_NULL
+      return -1
+   end
+
+   R = parent(p)
+   x = deepcopy(p)
+   hptr = Singular.libSingular.p_Head(x.ptr, R.ptr)
+   ord = Singular.libSingular.pLDeg(hptr, R.ptr)
+   xptr = libSingular.pNext(p.ptr)
+   while xptr.cpp_object != C_NULL
+      hptr = Singular.libSingular.p_Head(xptr, R.ptr) 
+      ord = min(ord, Singular.libSingular.pLDeg(hptr, R.ptr))
+      xptr = libSingular.pNext(xptr)
+   end
+   return ord
 end
 
 @doc Markdown.doc"""

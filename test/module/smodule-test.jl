@@ -48,6 +48,25 @@ function test_smodule_jet()
    println("PASS")
 end
 
+function test_smodule_local()
+   print("smodule.local...")
+
+   R, (x, y) = PolynomialRing(QQ, ["x", "y"], ordering=:negdegrevlex)
+
+   v1 = vector(R, x, y^2)
+   v2 = vector(R, y - x, y - y^2)
+   v3 = v1 + v2
+
+   w1 = vector(R, y, y)
+   w2 = vector(R, x - y, y^2 - y)
+
+   M = Singular.Module(R, v1, v2, v3)
+   MM = Singular.minimal_generating_set(M)
+
+   @test MM[1] == w1 && MM[2] == w2
+   println("PASS")
+end
+
 function test_smodule_manipulation()
    print("smodule.manipulation...")
 
@@ -195,6 +214,7 @@ end
 function test_smodule()
    test_smodule_constructors()
    test_smodule_jet()
+   test_smodule_local()
    test_smodule_manipulation()
 #    test_smodule_slimgb()
    test_smodule_std()

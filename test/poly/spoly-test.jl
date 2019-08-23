@@ -68,6 +68,8 @@ function test_spoly_constructors()
    @test !isgen(x^2)
 
    @test has_global_ordering(R)
+   @test !has_local_ordering(R)
+   @test !has_mixed_ordering(R)
 
    @test length(symbols(R)) == 2
    @test symbols(R) == [:x, :y]
@@ -113,6 +115,7 @@ function test_spoly_manipulation()
    @test isterm(2x) && !isterm(x + 1)
    @test length(x^2 + 2x + 1) == 3
    @test total_degree(x^2 + 2x + 1) == 2
+   @test order(x^2 + 2x + 1) == 0
 
    @test lead_exponent(x^3 + 2x + 1) == [3]
 
@@ -462,7 +465,7 @@ end
 function test_spoly_factor()
    print("spoly.test_spoly_factor...")
 
-   R1 , (x, y, z, w) = Singular.PolynomialRing(Singular.QQ, 
+   R1 , (x, y, z, w) = Singular.PolynomialRing(Singular.QQ,
    ["x", "y", "z", "w"]; ordering=:negdegrevlex)
    f1 = 113*(2*y^7 + w^2)^3*(1 + x)^2*(x + y*z)^2
 
