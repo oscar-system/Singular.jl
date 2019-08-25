@@ -7,7 +7,8 @@ function test_nemo_fmpq()
    f2 = y^2 + 1
    f3 = x^2 + 2x + 1
 
-   @test isa(coeff(f1, 1), Singular.n_unknown{Nemo.fmpq})
+   f1c = [c for c in coeffs(f1)]
+   @test isa(f1c[1], Singular.n_unknown{Nemo.fmpq})
 
    @test f1 + 2 == 2 + f1
    @test f1 - 2 == -(2 - f1)
@@ -27,15 +28,15 @@ function test_nemo_fmpq()
 
    @test f1^3*f1^3 == f1^6
 
-   @test inv(coeff(f1, 1)) == Nemo.QQ(1, 3)
+   @test inv(f1c[2]) == Nemo.QQ(1, 3)
 
-   @test gcd(coeff(f1, 1), coeff(f1, 2)) == Nemo.QQ(1)
+   @test gcd(f1c[1], f1c[2]) == Nemo.QQ(1)
 
-   @test divexact(coeff(f1, 1), coeff(f1, 2)) == Nemo.QQ(3)
+   @test divexact(f1c[2], f1c[1]) == Nemo.QQ(3)
 
-   @test coeff(f1, 1) - coeff(f1, 2) == Nemo.QQ(2)
+   @test f1c[2] - f1c[1] == Nemo.QQ(2)
 
-   @test coeff(f1, 1) + coeff(f1, 2) == Nemo.QQ(4)
+   @test f1c[1] + f1c[2] == Nemo.QQ(4)
 
    println("PASS")
 end
@@ -49,7 +50,9 @@ function test_nemo_fmpz()
    f2 = y^2 + 1
    f3 = x^2 + 2x + 1
 
-   @test isa(coeff(f1, 1), Singular.n_unknown{Nemo.fmpz})
+   f1c = [c for c in coeffs(f1)]
+
+   @test isa(f1c[1], Singular.n_unknown{Nemo.fmpz})
 
    @test f1 + 2 == 2 + f1
    @test f1 - 2 == -(2 - f1)
@@ -69,13 +72,13 @@ function test_nemo_fmpz()
 
    @test f1^3*f1^3 == f1^6
 
-   @test gcd(coeff(f1, 1), coeff(f1, 2)) == Nemo.ZZ(1)
+   @test gcd(f1c[1], f1c[2]) == Nemo.ZZ(1)
 
-   @test divexact(coeff(f1, 1), coeff(f1, 2)) == Nemo.ZZ(3)
+   @test divexact(f1c[2], f1c[1]) == Nemo.ZZ(3)
 
-   @test coeff(f1, 1) - coeff(f1, 2) == Nemo.ZZ(2)
+   @test f1c[2] - f1c[1] == Nemo.ZZ(2)
 
-   @test coeff(f1, 1) + coeff(f1, 2) == Nemo.ZZ(4)
+   @test f1c[1] + f1c[2] == Nemo.ZZ(4)
 
    println("PASS")
 end
@@ -91,7 +94,8 @@ function test_nemo_fq_nmod()
    f2 = y^2 + 1
    f3 = x^2 + 2x + 1
 
-   @test isa(coeff(f1, 1), Singular.n_unknown{Nemo.fq_nmod})
+   f1c = [c for c in coeffs(f1)]
+   @test isa(f1c[1], Singular.n_unknown{Nemo.fq_nmod})
 
    @test f1 + 2 == 2 + f1
    @test f1 - 2 == -(2 - f1)
@@ -115,15 +119,15 @@ function test_nemo_fq_nmod()
 
    @test f1^3*f1^3 == f1^6
 
-   @test inv(coeff(f1, 1)) == F(5)
+   @test inv(f1c[2]) == F(5)
 
-   @test gcd(coeff(f1, 1), coeff(f1, 2)) == F(1)
+   @test gcd(f1c[1], f1c[2]) == F(1)
 
-   @test divexact(coeff(f1, 1), coeff(f1, 2)) == F(3)
+   @test divexact(f1c[2], f1c[1]) == F(3)
 
-   @test coeff(f1, 1) - coeff(f1, 2) == F(2)
+   @test f1c[2] - f1c[1] == F(2)
 
-   @test coeff(f1, 1) + coeff(f1, 2) == F(4)
+   @test f1c[1] + f1c[2] == F(4)
 
    println("PASS")
 end
@@ -139,7 +143,8 @@ function test_nemo_fq()
    f2 = y^2 + 1
    f3 = x^2 + 2x + 1
 
-   @test isa(coeff(f1, 1), Singular.n_unknown{Nemo.fq})
+   f1c = [c for c in coeffs(f1)]
+   @test isa(f1c[1], Singular.n_unknown{Nemo.fq})
 
    @test f1 + 2 == 2 + f1
    @test f1 - 2 == -(2 - f1)
@@ -163,15 +168,15 @@ function test_nemo_fq()
 
    @test f1^3*f1^3 == f1^6
 
-   @test inv(coeff(f1, 1)) == F(5)
+   @test inv(f1c[2]) == F(5)
 
-   @test gcd(coeff(f1, 1), coeff(f1, 2)) == F(1)
+   @test gcd(f1c[1], f1c[2]) == F(1)
 
-   @test divexact(coeff(f1, 1), coeff(f1, 2)) == F(3)
+   @test divexact(f1c[2], f1c[1]) == F(3)
 
-   @test coeff(f1, 1) - coeff(f1, 2) == F(2)
+   @test f1c[2] - f1c[1] == F(2)
 
-   @test coeff(f1, 1) + coeff(f1, 2) == F(4)
+   @test f1c[1] + f1c[2] == F(4)
 
    println("PASS")
 end
@@ -188,7 +193,8 @@ function test_nemo_nf_elem()
    f2 = y^2 + 1
    f3 = x^2 + 2x + 1
 
-   @test isa(coeff(f1, 1), Singular.n_unknown{Nemo.nf_elem})
+   f1c = [c for c in coeffs(f1)]
+   @test isa(f1c[1], Singular.n_unknown{Nemo.nf_elem})
 
    @test f1 + 2 == 2 + f1
    @test f1 - 2 == -(2 - f1)
@@ -212,15 +218,15 @@ function test_nemo_nf_elem()
 
    @test f1^3*f1^3 == f1^6
 
-   @test inv(coeff(f1, 1)) == K(1)//3
+   @test inv(f1c[2]) == K(1)//3
 
-   @test gcd(coeff(f1, 1), coeff(f1, 2)) == K(1)
+   @test gcd(f1c[1], f1c[2]) == K(1)
 
-   @test divexact(coeff(f1, 1), coeff(f1, 2)) == K(3)
+   @test divexact(f1c[2], f1c[1]) == K(3)
 
-   @test coeff(f1, 1) - coeff(f1, 2) == K(2)
+   @test f1c[2] - f1c[1] == K(2)
 
-   @test coeff(f1, 1) + coeff(f1, 2) == K(4)
+   @test f1c[1] + f1c[2] == K(4)
 
    println("PASS")
 end
@@ -236,7 +242,8 @@ function test_nemo_field()
    f2 = y^2 + 1
    f3 = x^2 + 2x + 1
 
-   @test isa(coeff(f1, 1), Singular.n_unknown{AbstractAlgebra.Generic.Frac{Nemo.fmpz}})
+   f1c = [c for c in coeffs(f1)]
+   @test isa(f1c[1], Singular.n_unknown{AbstractAlgebra.Generic.Frac{Nemo.fmpz}})
 
    @test f1 + 2 == 2 + f1
    @test f1 - 2 == -(2 - f1)
@@ -256,15 +263,15 @@ function test_nemo_field()
 
    @test f1^3*f1^3 == f1^6
 
-   @test inv(coeff(f1, 1)) == U(1, 3)
+   @test inv(f1c[2]) == U(1, 3)
 
-   @test gcd(coeff(f1, 1), coeff(f1, 2)) == U(1)
+   @test gcd(f1c[1], f1c[2]) == U(1)
 
-   @test divexact(coeff(f1, 1), coeff(f1, 2)) == U(3)
+   @test divexact(f1c[2], f1c[1]) == U(3)
 
-   @test coeff(f1, 1) - coeff(f1, 2) == U(2)
+   @test f1c[2] - f1c[1] == U(2)
 
-   @test coeff(f1, 1) + coeff(f1, 2) == U(4)
+   @test f1c[1] + f1c[2] == U(4)
 
    println("PASS")
 end
@@ -280,7 +287,8 @@ function test_nemo_ring()
    f2 = y^2 + 1
    f3 = x^2 + 2x + 1
 
-   @test isa(coeff(f1, 1), Singular.n_unknown{Nemo.fmpz_poly})
+   f1c = [c for c in coeffs(f1)]
+   @test isa(f1c[1], Singular.n_unknown{Nemo.fmpz_poly})
 
    @test f1 + 2 == 2 + f1
    @test f1 - 2 == -(2 - f1)
@@ -300,13 +308,13 @@ function test_nemo_ring()
 
    @test f1^3*f1^3 == f1^6
 
-   @test gcd(coeff(f1, 1), coeff(f1, 2)) == U(1)
+   @test gcd(f1c[1], f1c[2]) == U(1)
 
-   @test divexact(coeff(f1, 1), coeff(f1, 2)) == U(3)
+   @test divexact(f1c[2], f1c[1]) == U(3)
 
-   @test coeff(f1, 1) - coeff(f1, 2) == U(2)
+   @test f1c[2] - f1c[1] == U(2)
 
-   @test coeff(f1, 1) + coeff(f1, 2) == U(4)
+   @test f1c[1] + f1c[2] == U(4)
 
    println("PASS")
 end

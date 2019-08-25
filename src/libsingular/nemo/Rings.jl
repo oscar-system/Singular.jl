@@ -4,20 +4,21 @@
 #
 ###############################################################################
 
-function nemoRingInit(i::Clong, cf::coeffs)
-   R = julia(cf)
+function nemoRingInit(i::Clong, cf::Ptr{Cvoid})
+   data_ptr = get_coeff_data_void(cf)
+   R = unsafe_pointer_to_objref(data_ptr)
    return number(R(i))
 end
    
-function nemoRingDelete(ptr::Ptr{number}, cf::coeffs)
+function nemoRingDelete(ptr::Ptr{Ptr{Cvoid}}, cf::Ptr{Cvoid})
    n = unsafe_load(ptr)
    if n != C_NULL
-      number_pop!(nemoNumberID, Ptr{Void}(n))
+      number_pop!(nemoNumberID, n)
    end
    nothing
 end
 
-function nemoRingCopy(a::number, cf::coeffs)
+function nemoRingCopy(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n = julia(a)
    return number(deepcopy(n))
 end
@@ -28,25 +29,27 @@ end
 #
 ###############################################################################
 
-function nemoRingGreaterZero(a::number, cf::coeffs)
+function nemoRingGreaterZero(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
+   ## Fixme: Is this in any sense correct?
    return Cint(1)
 end
 
-function nemoRingCoeffWrite(cf::coeffs, d::Cint)
-   r = julia(cf)
-   str = string(r)
-   icxx"""PrintS($str);"""
-   nothing
+function nemoRingCoeffWrite(cf::Ptr{Cvoid}, d::Cint)
+  data_ptr = get_coeff_data(cf)
+  r = unsafe_pointer_to_objref(data_ptr)
+  str = string(r)
+  libSingular.PrintS(str);
+  nothing
 end
 
-function nemoRingWrite(a::number, cf::coeffs)
+function nemoRingWrite(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n = julia(a)
-   if needs_parentheses(n)
+   if Nemo.needs_parentheses(n)
       str = "("*string(n)*")"
    else
       str = string(n)
    end
-   icxx"""StringAppendS($str);"""
+   libSingular.StringAppendS(str);
    nothing
 end
 
@@ -56,72 +59,73 @@ end
 #
 ###############################################################################
 
-function nemoRingNeg(a::number, cf::coeffs)
+function nemoRingNeg(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n = julia(a)
    return number(-n)
 end
 
-function nemoRingInpNeg(a::number, cf::coeffs)
-   R = julia(cf)
+function nemoRingInpNeg(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
+   data_ptr = get_coeff_data_void(cf)
+   R = unsafe_pointer_to_objref(data_ptr)
    n = julia(a)
    mone = R(-1)
-   n_new = mul!(n, n, mone)
+   n_new = Nemo.mul!(n, n, mone)
    return number(n_new, n)
 end
 
-function nemoRingInvers(a::number, cf::coeffs)
+function nemoRingInvers(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n = julia(a)
-   return number(divexact(1, n))
+   return number(Nemo.divexact(1, n))
 end
 
-function nemoRingMult(a::number, b::number, cf::coeffs)
+function nemoRingMult(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n1 = julia(a)
    n2 = julia(b)
    return number(n1*n2)
 end
 
-function nemoRingInpMult(a::Ptr{number}, b::number, cf::coeffs)
+function nemoRingInpMult(a::Ptr{Ptr{Cvoid}}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    r = unsafe_load(a)
    aa = julia(r)
    bb = julia(b)
-   cc = mul!(aa, aa, bb)
+   cc = Nemo.mul!(aa, aa, bb)
    n = number(cc, aa)
-   unsafe_store!(a, n, 1)
+   setindex_internal_void(reinterpret(Ptr{Cvoid},a), n)
    nothing
 end
 
-function nemoRingAdd(a::number, b::number, cf::coeffs)
+function nemoRingAdd(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n1 = julia(a)
    n2 = julia(b)
    return number(n1 + n2)
 end
 
-function nemoRingInpAdd(a::Ptr{number}, b::number, cf::coeffs)
+function nemoRingInpAdd(a::Ptr{Ptr{Cvoid}}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    r = unsafe_load(a)
    aa = julia(r)
    bb = julia(b)
-   cc = addeq!(aa, bb)
+   cc = Nemo.addeq!(aa, bb)
    n = number(cc, aa)
-   unsafe_store!(a, n, 1)
+   setindex_internal_void(reinterpret(Ptr{Cvoid},a), n)
    nothing
 end
 
-function nemoRingSub(a::number, b::number, cf::coeffs)
+function nemoRingSub(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n1 = julia(a)
    n2 = julia(b)
    return number(n1 - n2)
 end
 
-function nemoRingDiv(a::number, b::number, cf::coeffs)
+function nemoRingDiv(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n1 = julia(a)
    n2 = julia(b)
-   return number(divexact(n1, n2))
+   return number(Nemo.divexact(n1, n2))
 end
 
-function nemoRingDivBy(a::number, b::number, cf::coeffs)
+function nemoRingDivBy(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n1 = julia(a)
    n2 = julia(b)
-   return Cint(divides(n1, n2)[1])
+   return Cint(Nemo.divides(n1, n2)[1])
 end
 
 ###############################################################################
@@ -130,29 +134,29 @@ end
 #
 ###############################################################################
 
-function nemoRingGreater(a::number, b::number, cf::coeffs)
+function nemoRingGreater(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n1 = julia(a)
    n2 = julia(b)
    return Cint(n1 != n2)
 end
 
-function nemoRingEqual(a::number, b::number, cf::coeffs)
+function nemoRingEqual(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n1 = julia(a)
    n2 = julia(b)
    return Cint(n1 == n2)
 end
 
-function nemoRingIsZero(a::number, cf::coeffs)
+function nemoRingIsZero(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n = julia(a)
-   return Cint(iszero(n))
+   return Cint(Nemo.iszero(n))
 end
 
-function nemoRingIsOne(a::number, cf::coeffs)
+function nemoRingIsOne(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n = julia(a)
-   return Cint(isone(n))
+   return Cint(Nemo.isone(n))
 end
 
-function nemoRingIsMOne(a::number, cf::coeffs)
+function nemoRingIsMOne(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n = julia(a)
    return Cint(n == -1)
 end
@@ -163,10 +167,10 @@ end
 #
 ###############################################################################
 
-function nemoRingGcd(a::number, b::number, cf::coeffs)
+function nemoRingGcd(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n1 = julia(a)
    n2 = julia(b)
-   return number(gcd(n1, n2))
+   return number(Nemo.gcd(n1, n2))
 end
 
 ###############################################################################
@@ -175,12 +179,12 @@ end
 #
 ###############################################################################
 
-function nemoRingExtGcd(a::number, b::number, s::Ptr{number}, t::Ptr{number}, cf::coeffs)
-   n1 = julia(a)
-   n2 = julia(b)
-   g1, s1, t1 = gcdx(n1, n2)
-   libSingular.setindex!(s, number(s1))
-   libSingular.setindex!(t, number(t1))
+function nemoRingExtGcd(a::Ptr{Cvoid}, b::Ptr{Cvoid}, s::Ptr{Ptr{Cvoid}}, t::Ptr{Ptr{Cvoid}}, cf::Ptr{Cvoid})
+   n1 = julia(a)::Nemo.RingElem
+   n2 = julia(b)::Nemo.RingElem
+   g1, s1, t1 = Nemo.gcdx(n1, n2)
+   setindex_internal_void(reinterpret(Ptr{Cvoid}, s), number(s1))
+   setindex_internal_void(reinterpret(Ptr{Cvoid}, t), number(t1))
    return number(g1)
 end
 
@@ -190,13 +194,13 @@ end
 #
 ###############################################################################
 
-function nemoRingInt(ptr::Ptr{number}, cf::coeffs)
+function nemoRingInt(ptr::Ptr{Ptr{Cvoid}}, cf::Ptr{Cvoid})
    return Clong(0)
 end
 
-function nemoRingMPZ(b::BigInt, ptr::Ptr{number}, cf::coeffs)
+function nemoRingMPZ(b::BigInt, ptr::Ptr{Ptr{Cvoid}}, cf::Ptr{Cvoid})
    bptr = pointer_from_objref(b)
-   icxx"""mpz_init_set_si((__mpz_struct *) $bptr, 0);"""
+   mpz_init_set_si_internal(reinterpret(Ptr{Cvoid}, bptr), 0)
    nothing
 end
 
@@ -206,72 +210,47 @@ end
 #
 ###############################################################################
 
-function nemoRingInitChar(cf::coeffs, p::Ptr{Void})
-        
-    pInit = cfunction(nemoRingInit, number, (Clong, coeffs))
-    pInt = cfunction(nemoRingInt, Clong, (Ptr{number}, coeffs))
-    pMPZ = cfunction(nemoRingMPZ, Void, (BigInt, Ptr{number}, coeffs))
-    pInpNeg = cfunction(nemoRingInpNeg, number, (number, coeffs))
-    pCopy = cfunction(nemoRingCopy, number, (number, coeffs))
-    pDelete = cfunction(nemoRingDelete, Void, (Ptr{number}, coeffs))
-    pAdd = cfunction(nemoRingAdd, number, (number, number, coeffs))
-    pInpAdd = cfunction(nemoRingInpAdd, Void, (Ptr{number}, number, coeffs))
-    pSub = cfunction(nemoRingSub, number, (number, number, coeffs))
-    pMult = cfunction(nemoRingMult, number, (number, number, coeffs))
-    pInpMult = cfunction(nemoRingInpMult, Void, (Ptr{number}, number, coeffs))
-    pDiv = cfunction(nemoRingDiv, number, (number, number, coeffs))
-    pDivBy = cfunction(nemoRingDivBy, Cint, (number, number, coeffs))
-    pInvers = cfunction(nemoRingInvers, number, (number, coeffs))
-    pGcd = cfunction(nemoRingGcd, number, (number, number, coeffs))
-    pExtGcd = cfunction(nemoRingExtGcd, number, (number, number, Ptr{number}, Ptr{number}, coeffs))
-    pGreater = cfunction(nemoRingGreater, Cint, (number, number, coeffs))
-    pEqual = cfunction(nemoRingEqual, Cint, (number, number, coeffs))
-    pIsZero = cfunction(nemoRingIsZero, Cint, (number, coeffs))
-    pIsOne = cfunction(nemoRingIsOne, Cint, (number, coeffs))
-    pIsMOne = cfunction(nemoRingIsMOne, Cint, (number, coeffs))
-    pGreaterZero = cfunction(nemoRingGreaterZero, Cint, (number, coeffs))
-    pWrite = cfunction(nemoRingWrite, Void, (number, coeffs))
-    pCoeffWrite = cfunction(nemoRingCoeffWrite, Void, (coeffs, Cint))
+function nemoRingInitChar(cf::Ptr{Cvoid}, p::Ptr{Cvoid})
+    
+    ring_struct = singular_coeff_ring_struct()
 
-    icxx""" 
-      coeffs cf = (coeffs)($cf);
-      cf->has_simple_Alloc = FALSE;  
-      cf->has_simple_Inverse= FALSE;          
-      cf->is_field  = FALSE;
-      cf->is_domain = TRUE;
-      cf->ch = 0;
-      cf->data = $p;
-      cf->cfInit = (number (*)(long, const coeffs)) $pInit;
-      cf->cfInt = (long (*)(number &, const coeffs)) $pInt;
-      cf->cfMPZ = (void (*)(__mpz_struct *, number &, const coeffs)) $pMPZ;
-      cf->cfInpNeg = (number (*)(number, const coeffs)) $pInpNeg;
-      cf->cfCopy = (number (*)(number, const coeffs)) $pCopy;
-      cf->cfDelete = (void (*)(number *, const coeffs)) $pDelete;
-      cf->cfAdd = (numberfunc) $pAdd;
-      cf->cfInpAdd = (void (*)(number &, number, const coeffs)) $pInpAdd;
-      cf->cfSub = (numberfunc) $pSub;
-      cf->cfMult = (numberfunc) $pMult;
-      cf->cfInpMult = (void (*)(number &, number, const coeffs)) $pInpMult;
-      cf->cfDiv = (numberfunc) $pDiv;
-      cf->cfDivBy = (BOOLEAN (*)(number, number, const coeffs)) $pDivBy;
-      cf->cfInvers = (number (*)(number, const coeffs)) $pInvers;
-      cf->cfGcd = (numberfunc) $pGcd;
-      cf->cfExtGcd = (number (*)(number, number, number *, number *, const coeffs)) $pExtGcd;
-      cf->cfGreater = (BOOLEAN (*)(number, number, const coeffs)) $pGreater;
-      cf->cfEqual = (BOOLEAN (*)(number, number, const coeffs)) $pEqual;
-      cf->cfIsZero = (BOOLEAN (*)(number, const coeffs)) $pIsZero;
-      cf->cfIsOne = (BOOLEAN (*)(number, const coeffs)) $pIsOne;
-      cf->cfIsMOne = (BOOLEAN (*)(number, const coeffs)) $pIsMOne;
-      cf->cfGreaterZero = (BOOLEAN (*)(number, const coeffs)) $pGreaterZero;
-      cf->cfWriteLong = (void (*)(number, const coeffs)) $pWrite;
-      cf->cfCoeffWrite = (void (*)(const coeffs, BOOLEAN)) $pCoeffWrite;
-    """
+    ring_struct.has_simple_alloc = 0
+    ring_struct.has_simple_inverse = 0
+    ring_struct.is_field = 0
+    ring_struct.is_domain = 1
+    ring_struct.ch = 0
+    ring_struct.data = p
+    ring_struct.cfInit = @cfunction(nemoRingInit, Ptr{Cvoid}, (Clong, Ptr{Cvoid}))
+    ring_struct.cfInt = @cfunction(nemoRingInt, Clong, (Ptr{Ptr{Cvoid}}, Ptr{Cvoid}))
+    ring_struct.cfMPZ = @cfunction(nemoRingMPZ, Cvoid, (BigInt, Ptr{Ptr{Cvoid}}, Ptr{Cvoid}))
+    ring_struct.cfInpNeg = @cfunction(nemoRingInpNeg, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfCopy = @cfunction(nemoRingCopy, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfDelete = @cfunction(nemoRingDelete, Cvoid, (Ptr{Ptr{Cvoid}}, Ptr{Cvoid}))
+    ring_struct.cfAdd = @cfunction(nemoRingAdd, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfInpAdd = @cfunction(nemoRingInpAdd, Cvoid, (Ptr{Ptr{Cvoid}}, Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfSub = @cfunction(nemoRingSub, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfMult = @cfunction(nemoRingMult, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfInpMult = @cfunction(nemoRingInpMult, Cvoid, (Ptr{Ptr{Cvoid}}, Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfDiv = @cfunction(nemoRingDiv, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfDivBy = @cfunction(nemoRingDivBy, Cint, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfInvers = @cfunction(nemoRingInvers, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfGcd = @cfunction(nemoRingGcd, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfExtGcd = @cfunction(nemoRingExtGcd, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Ptr{Cvoid}}, Ptr{Ptr{Cvoid}}, Ptr{Cvoid}))
+    ring_struct.cfGreater = @cfunction(nemoRingGreater, Cint, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfEqual = @cfunction(nemoRingEqual, Cint, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfIsZero = @cfunction(nemoRingIsZero, Cint, (Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfIsOne = @cfunction(nemoRingIsOne, Cint, (Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfIsMOne = @cfunction(nemoRingIsMOne, Cint, (Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfGreaterZero = @cfunction(nemoRingGreaterZero, Cint, (Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfWriteLong = @cfunction(nemoRingWrite, Cvoid, (Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfCoeffWrite = @cfunction(nemoRingCoeffWrite, Cvoid, (Ptr{Cvoid}, Cint))
+
+    fill_coeffs_with_function_data(ring_struct,cf)
 
     return Cint(0)
 end
 
 function register(R::Nemo.Ring)
-   c = cfunction(nemoRingInitChar, Cint, (coeffs, Ptr{Void}))
-   ptr = @cxx n_unknown
-   return nRegister(ptr, c)
+   c = @cfunction(nemoRingInitChar, Cint, (Ptr{Cvoid}, Ptr{Cvoid}))
+   return nRegister(n_unknown, c)
 end
