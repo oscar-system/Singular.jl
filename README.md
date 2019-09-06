@@ -19,3 +19,7 @@ To use Singular.jl, start julia and then type:
 ```julia
 julia> using Singular
 ```
+
+Documentation is available here:
+
+[https://oscar-system.github.io/Singular.jl/latest/index.html](https://oscar-system.github.io/Singular.jl/latest/index.html)
