@@ -29,10 +29,8 @@ matrix:
 notifications:
   - email: false
 script:
-  - julia -e 'using Pkg; Pkg.add(PackageSpec(path=pwd()))'
   - while sleep 30; do echo "still alive"; done &
-  - julia -e 'using Pkg; Pkg.build("Singular");'
-  - julia -e 'using Pkg; Pkg.test("Singular");'
+  - julia -e 'using Pkg; Pkg.build("Singular"); Pkg.test("Singular");'
 
 env:
    global:
