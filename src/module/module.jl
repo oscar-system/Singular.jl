@@ -30,7 +30,6 @@ ngens(I::smodule) = I.ptr == C_NULL ? 0 : Int(libSingular.ngens(I.ptr))
     rank(I::smodule)
 > Return the rank $n$ of the ambient space $R^n$ of which this module is a submodule.
 """
-
 rank(I::smodule) = Int(libSingular.rank(I.ptr))
 
 function checkbounds(I::smodule, i::Int)
