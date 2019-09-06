@@ -37,8 +37,13 @@ after_success:
   # push coverage results to Codecov
   - julia --color=yes -e 'using Pkg; cd(Pkg.dir("Singular")); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'
 
-jobs:                                                                             include:                                                                         - stage: "Documentation"                                                         julia: 1.0                                                                     os: linux                                                                      script:
-         - while sleep 30; do echo "still alive"; done &
-         - julia --project=docs/ -e 'using Pkg; Pkg.add(PackageSpec(path=pwd())); Pkg.instantiate();'
-         - julia --project=docs/ docs/make.jl
-       after_success: skip
+jobs:                     
+include:
+  - stage: "Documentation"
+    julia: 1.0 
+    os: linux  
+    script:
+      - while sleep 30; do echo "still alive"; done &
+      - julia --project=docs/ -e 'using Pkg; Pkg.add(PackageSpec(path=pwd())); Pkg.instantiate();'
+      - julia --project=docs/ docs/make.jl
+    after_success: skip
