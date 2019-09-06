@@ -26,7 +26,7 @@ makedocs(
 )
 
 deploydocs(
-   repo   = "github.com/wbhart/Singular.jl.git",
+   repo   = "github.com/oscar-system/Singular.jl.git",
    target = "build",
    deps = Deps.pip("pygments", "mkdocs", "python-markdown-math"),
    make   = nothing
