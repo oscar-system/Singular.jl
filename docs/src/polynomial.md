@@ -97,7 +97,7 @@ See also the convenience macros below for simple use cases.
 The following function allows creating a Singular polynomial ring from a given
 polynomial ring of type AbstractAlgebra.Generic.MPolyRing:
 
-```@docs
+```julia
 PolynomialRing(R::AbstractAlgebra.Generic.MPolyRing{T}; cached::Bool = true, ordering::Symbol = :degrevlex, ordering2::Symbol = :comp1min, degree_bound::Int = 0)  where {T <: RingElement}
 ```
 
