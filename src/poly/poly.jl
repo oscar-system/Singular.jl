@@ -963,7 +963,7 @@ end
 
 @doc Markdown.doc"""
    change_base_ring(p::Singular.spoly, N::Nemo.Ring, R::PolyRing)
-> Return a polynomial, whose parent is $R$.
+> Coerce the coefficients of $p$ into $N$. The parent is set to $R$.
 > Works for the moment only over $QQ$ and any Nemo Ring over $QQ$.
 """
 function change_base_ring(p::Singular.spoly, N::Nemo.Ring, R::PolyRing)   
@@ -991,11 +991,10 @@ end
 
 @doc Markdown.doc"""
    change_base_ring(p::Singular.spoly, N::Union{Ring, Field}, R::PolyRing)
-> Return a polynomial, whose parent is $R$.
-> Works for the moment only over $QQ$ and any Nemo Ring over $QQ$.
+> Coerce the coefficients of $p$ into $N$. The parent is set to $R$.
 """
 function change_base_ring(p::Singular.spoly, N::Union{Ring, Field}, R::PolyRing)   
-   base_ring(R) != CoefficientRing(N).base_ring && error("Base rings do not match.")
+   base_ring(R) != N && error("Base rings do not match.")
 
    x = deepcopy(p)
    P = parent(p)
@@ -1014,8 +1013,8 @@ function change_base_ring(p::Singular.spoly, N::Union{Ring, Field}, R::PolyRing)
 end
 
 @doc Markdown.doc"""
-   change_base_ring(p::Singular.spoly, N::Nemo.Ring)
-> Return a polynomial, whose parent is $R$.
+   change_base_ring(p::Singular.spoly, N::Union{Ring, Field, Nemo.Ring})
+> Coerce the coefficients of $p$ into $N$.
 """
 function change_base_ring(p::Singular.spoly, N::Union{Ring, Field, Nemo.Ring})
    R, = change_base_ring(parent(p), N)

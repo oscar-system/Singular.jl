@@ -1,5 +1,5 @@
 export sideal, IdealSet, syz, lead, normalize!, isconstant, iszerodim, fres,
-       highcorner, jacobi, jet, kbase, minimal_generating_set,
+       highcorner, jacobi, jet, kbase, minimal_generating_set, extend,
        ngens, sres, intersection, quotient,
        reduce, eliminate, kernel, equal, contains, isvar_generated, saturation,
        satstd, slimgb, std, vdim
@@ -659,4 +659,63 @@ function minimal_generating_set(I::sideal)
    end
    return gens(Ideal(R, Singular.libSingular.idMinBase(I.ptr, R.ptr)))
 end
- 
+
+###############################################################################
+#
+#   Extend base ring
+#
+###############################################################################
+
+@doc Markdown.doc"""
+   extend(I::Singular.sideal, N::Nemo.Ring, R::PolyRing)
+> Coerce the coefficients of the generators of $I$ into $N$.
+> The base ring is set to $R$.
+> Works for the moment only over $QQ$ and any Nemo Ring over $QQ$.
+"""
+function extend(I::Singular.sideal, N::Nemo.Ring, R::PolyRing)
+   base_ring(R) != CoefficientRing(N) && error("Base rings do not match.")
+
+   x = deepcopy(I)
+   P = base_ring(I)
+
+   if iszero(I)
+      return Ideal(R, )
+   end
+
+   # Catch Rational case
+   P.base_ring != Singular.QQ && error("Base ring of polynomial has to be Q")
+
+   G = gens(x)
+   n = length(G)
+   return Ideal(R, [change_base_ring(G[i], N, R) for i in 1:n])
+end
+
+@doc Markdown.doc"""
+   extend(I::Singular.sideal, N::Union{Ring, Field}, R::PolyRing)
+> Coerce the coefficients of the generators of $I$ into $N$.
+> The base ring is set to $R$.
+"""
+function extend(I::Singular.sideal, N::Union{Ring, Field}, R::PolyRing)   
+   base_ring(R) != N && error("Base rings do not match.")
+
+   x = deepcopy(I)
+   P = base_ring(I)
+
+   if iszero(I)
+      return Ideal(R, )
+   end
+
+   G = gens(x)
+   n = length(G)
+   return Ideal(R, [change_base_ring(G[i], N, R) for i in 1:n])
+end
+
+@doc Markdown.doc"""
+   extend(I::Singular.sideal, N::Union{Ring, Field, Nemo.Ring})
+> Coerce the coefficients of the generators of $I$ into $N$.
+> The base ring is set to $R$.
+"""
+function extend(I::Singular.sideal, N::Union{Ring, Field, Nemo.Ring})
+   R, = change_base_ring(base_ring(I), N)
+   return extend(I, N, R)
+end

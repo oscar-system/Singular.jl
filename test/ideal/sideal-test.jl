@@ -401,6 +401,41 @@ function test_sideal_zerodim()
    println("PASS")
 end
 
+function test_sideal_extend()
+   print("sideal.extend...")
+
+   R1 , (x, y, z) = Singular.PolynomialRing(Singular.QQ,
+   ["x", "y", "z"]; ordering=:negdegrevlex)
+
+   I1 = Ideal(R1, x^2+y, z*y+5)
+
+   S1, (x, y, z) = Singular.PolynomialRing(Nemo.QQ,
+   ["x", "y", "z"]; ordering=:negdegrevlex)
+
+   I2 = Ideal(S1, x^2+y, z*y+5)
+
+   I3 = extend(I1, Nemo.QQ, S1)
+
+   R2 , (x, y, z) = Singular.PolynomialRing(Singular.ZZ,
+   ["x", "y", "z"]; ordering=:negdegrevlex)
+
+   I4 = Ideal(R2, x^2+y, z*y+5)
+
+   S2, (x, y, z) = Singular.PolynomialRing(Singular.Fp(5),
+   ["x", "y", "z"]; ordering=:negdegrevlex)
+
+   I5 = Ideal(S2, x^2+y, z*y+5)
+
+   I6 = extend(I4, Singular.Fp(5), S2)
+
+   @test equal(I2, I3)
+
+   @test equal(I5, I6)
+
+
+   println("PASS")
+end
+
 function test_sideal()
    test_sideal_constructors()
    test_sideal_manipulation()
@@ -423,6 +458,7 @@ function test_sideal()
    test_sideal_jet()
    test_sideal_jacobi()
    test_sideal_zerodim()
+   test_sideal_extend()
 
    println("")
 end
