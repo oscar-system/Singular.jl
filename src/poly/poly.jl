@@ -971,6 +971,7 @@ function change_base_ring(p::Singular.spoly, N::Nemo.Ring, R::PolyRing)
 
    x = deepcopy(p)
    P = parent(p)
+
    if p == P(0)
       return R(0)
    end
@@ -989,11 +990,34 @@ function change_base_ring(p::Singular.spoly, N::Nemo.Ring, R::PolyRing)
 end
 
 @doc Markdown.doc"""
-   change_base_ring(p::Singular.spoly, N::Nemo.Ring)
+   change_base_ring(p::Singular.spoly, N::Union{Ring, Field}, R::PolyRing)
 > Return a polynomial, whose parent is $R$.
 > Works for the moment only over $QQ$ and any Nemo Ring over $QQ$.
 """
-function change_base_ring(p::Singular.spoly, N::Nemo.Ring)
+function change_base_ring(p::Singular.spoly, N::Union{Ring, Field}, R::PolyRing)   
+   base_ring(R) != CoefficientRing(N).base_ring && error("Base rings do not match.")
+
+   x = deepcopy(p)
+   P = parent(p)
+
+   if p == P(0)
+      return R(0)
+   end
+
+   M = MPolyBuildCtx(R)
+   B = base_ring(R)
+   while x.ptr.cpp_object != C_NULL 
+      push_term!(M, B(lc(x)), lead_exponent(x))
+      x.ptr = libSingular.pNext(x.ptr)
+   end
+   return finish(M)
+end
+
+@doc Markdown.doc"""
+   change_base_ring(p::Singular.spoly, N::Nemo.Ring)
+> Return a polynomial, whose parent is $R$.
+"""
+function change_base_ring(p::Singular.spoly, N::Union{Ring, Field, Nemo.Ring})
    R, = change_base_ring(parent(p), N)
    return change_base_ring(p, N, R)
 end

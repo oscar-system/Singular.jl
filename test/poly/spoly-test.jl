@@ -503,19 +503,35 @@ end
 function test_spoly_change_base_ring()
    print("spoly.test_spoly_change_base_ring...")
 
-   R , (x, y, z) = Singular.PolynomialRing(Singular.QQ,
+   R1 , (x, y, z) = Singular.PolynomialRing(Singular.QQ,
    ["x", "y", "z"]; ordering=:negdegrevlex)
 
    p1 = x^5 + y*z^3
 
-   S, (x, y, z) = Singular.PolynomialRing(Nemo.QQ,
+   S1, (x, y, z) = Singular.PolynomialRing(Nemo.QQ,
    ["x", "y", "z"]; ordering=:negdegrevlex)
 
    p2 = x^5 + y*z^3
 
-   p3 = change_base_ring(p1, Nemo.QQ, S)
+   p3 = change_base_ring(p1, Nemo.QQ, S1)
 
-   @test p3 == p2
+   R2 , (x, y, z) = Singular.PolynomialRing(Singular.ZZ,
+   ["x", "y", "z"]; ordering=:negdegrevlex)
+
+   p4 = x^5 + y*z^3
+
+   S2, (x, y, z) = Singular.PolynomialRing(Singular.Fp(5),
+   ["x", "y", "z"]; ordering=:negdegrevlex)
+
+   p5 = x^5 + y*z^3
+
+   p6 = change_base_ring(p4, Singular.Fp(5), S2)
+
+   @test p2 == p3
+
+   @test p5 == p6
+
+
 
    println("PASS")
 end
