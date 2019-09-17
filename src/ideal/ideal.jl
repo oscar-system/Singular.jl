@@ -695,7 +695,7 @@ end
 > Coerce the coefficients of the generators of $I$ into $N$.
 > The base ring is set to $R$.
 """
-function extend(I::Singular.sideal, N::Union{Ring, Field}, R::PolyRing)   
+function extend(I::Singular.sideal, N::Union{Ring, Field}, R::PolyRing)
    base_ring(R) != N && error("Base rings do not match.")
 
    x = deepcopy(I)

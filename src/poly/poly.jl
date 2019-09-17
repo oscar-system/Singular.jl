@@ -966,7 +966,7 @@ end
 > Coerce the coefficients of $p$ into $N$. The parent is set to $R$.
 > Works for the moment only over $QQ$ and any Nemo Ring over $QQ$.
 """
-function change_base_ring(p::Singular.spoly, N::Nemo.Ring, R::PolyRing)   
+function change_base_ring(p::Singular.spoly, N::Nemo.Ring, R::PolyRing)
    base_ring(R) != CoefficientRing(N) && error("Base rings do not match.")
 
    x = deepcopy(p)
@@ -993,7 +993,7 @@ end
    change_base_ring(p::Singular.spoly, N::Union{Ring, Field}, R::PolyRing)
 > Coerce the coefficients of $p$ into $N$. The parent is set to $R$.
 """
-function change_base_ring(p::Singular.spoly, N::Union{Ring, Field}, R::PolyRing)   
+function change_base_ring(p::Singular.spoly, N::Union{Ring, Field}, R::PolyRing)
    base_ring(R) != N && error("Base rings do not match.")
 
    x = deepcopy(p)
@@ -1005,7 +1005,7 @@ function change_base_ring(p::Singular.spoly, N::Union{Ring, Field}, R::PolyRing)
 
    M = MPolyBuildCtx(R)
    B = base_ring(R)
-   while x.ptr.cpp_object != C_NULL 
+   while x.ptr.cpp_object != C_NULL
       push_term!(M, B(lc(x)), lead_exponent(x))
       x.ptr = libSingular.pNext(x.ptr)
    end
