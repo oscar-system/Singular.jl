@@ -947,6 +947,59 @@ end
 
 ###############################################################################
 #
+#   Changing base ring
+#
+###############################################################################
+
+@doc Markdown.doc"""
+   change_base_ring(R::PolyRing, C::Union{Ring, Field, Nemo.Ring})
+> Return a polynomial ring, whose coefficient ring is subsituted by $C$.
+"""
+function change_base_ring(R::PolyRing, C::Union{Ring, Field, Nemo.Ring})
+   G = gens(R)
+   S = [String(Symbol(G[i])) for i in 1: length(G)]
+   return Singular.PolynomialRing(C, S, ordering = R.ord)
+end
+
+@doc Markdown.doc"""
+   change_base_ring(p::Singular.spoly, N::Nemo.Ring, R::PolyRing)
+> Return a polynomial, whose parent is $R$.
+> Works for the moment only over $QQ$ and any Nemo Ring over $QQ$.
+"""
+function change_base_ring(p::Singular.spoly, N::Nemo.Ring, R::PolyRing)   
+   base_ring(R) != CoefficientRing(N) && error("Base rings do not match.")
+
+   x = deepcopy(p)
+   P = parent(p)
+   if p == P(0)
+      return R(0)
+   end
+
+   # Catch Rational case
+   P.base_ring != Singular.QQ && error("Base ring of polynomial has to be Q")
+
+   M = MPolyBuildCtx(R)
+   B = base_ring(R)
+   while x.ptr.cpp_object != C_NULL
+      c = B(Nemo.QQ(Rational{BigInt}(lc(x))))
+      push_term!(M, c, lead_exponent(x))
+      x.ptr = libSingular.pNext(x.ptr)
+   end
+   return finish(M)
+end
+
+@doc Markdown.doc"""
+   change_base_ring(p::Singular.spoly, N::Nemo.Ring)
+> Return a polynomial, whose parent is $R$.
+> Works for the moment only over $QQ$ and any Nemo Ring over $QQ$.
+"""
+function change_base_ring(p::Singular.spoly, N::Nemo.Ring)
+   R, = change_base_ring(P, N)
+   return change_base_ring(p, N, R)
+end
+
+###############################################################################
+#
 #   Promote rules
 #
 ###############################################################################
@@ -976,7 +1029,15 @@ function push_term!(M::MPolyBuildCtx{spoly{S}, U}, c::S, expv::Vector{Int}) wher
    nv != length(expv) && error("Incorrect number of exponents in push_term!")
    p = M.poly
    ptr = libSingular.p_Init(R.ptr)
-   libSingular.p_SetCoeff0(ptr, libSingular.n_Copy(c.ptr, base_ring(R).ptr), R.ptr)
+
+   #make it work with n_unknown
+   if typeof(c.ptr) == Ptr{Nothing}
+      cptr = libSingular.cast_void_to_number(c.ptr)
+      libSingular.p_SetCoeff0(ptr, libSingular.n_Copy(cptr, base_ring(R).ptr), R.ptr)
+   else
+      libSingular.p_SetCoeff0(ptr, libSingular.n_Copy(c.ptr, base_ring(R).ptr), R.ptr)
+   end
+
    for i = 1:nv
       libSingular.p_SetExp(ptr, i, expv[i], R.ptr)
    end
@@ -1021,6 +1082,7 @@ function (R::PolyRing)(n::Integer)
    z.parent = R
    return z
 end
+
 
 function (R::PolyRing)(n::n_Z)
    n = base_ring(R)(n)
