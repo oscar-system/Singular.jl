@@ -500,6 +500,26 @@ function test_spoly_factor()
    println("PASS")
 end
 
+function test_spoly_change_base_ring()
+   print("spoly.test_spoly_change_base_ring...")
+
+   R , (x, y, z) = Singular.PolynomialRing(Singular.QQ,
+   ["x", "y", "z"]; ordering=:negdegrevlex)
+
+   p1 = x^5 + y*z^3
+
+   S, (x, y, z) = Singular.PolynomialRing(Nemo.QQ,
+   ["x", "y", "z"]; ordering=:negdegrevlex)
+
+   p2 = x^5 + y*z^3
+
+   p3 = change_base_ring(p1, Nemo.QQ, S)
+
+   @test p3 == p2
+
+   println("PASS")
+end
+
 function test_spoly()
    test_spoly_constructors()
    test_spoly_printing()
@@ -522,6 +542,7 @@ function test_spoly()
    # test_convert_between_MPoly_and_SingularPoly()
    test_spoly_differential()
    test_spoly_factor()
+   test_spoly_change_base_ring()
    println("")
 end
 

@@ -994,7 +994,7 @@ end
 > Works for the moment only over $QQ$ and any Nemo Ring over $QQ$.
 """
 function change_base_ring(p::Singular.spoly, N::Nemo.Ring)
-   R, = change_base_ring(P, N)
+   R, = change_base_ring(parent(p), N)
    return change_base_ring(p, N, R)
 end
 
@@ -1030,7 +1030,7 @@ function push_term!(M::MPolyBuildCtx{spoly{S}, U}, c::S, expv::Vector{Int}) wher
    p = M.poly
    ptr = libSingular.p_Init(R.ptr)
 
-   #make it work with n_unknown
+   #Workaround for n_unknown type
    if typeof(c.ptr) == Ptr{Nothing}
       cptr = libSingular.cast_void_to_number(c.ptr)
       libSingular.p_SetCoeff0(ptr, libSingular.n_Copy(cptr, base_ring(R).ptr), R.ptr)
