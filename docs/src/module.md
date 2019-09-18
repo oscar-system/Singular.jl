@@ -183,3 +183,28 @@ v2 = vector(R, x^5 + 1, 2x^3 + 3y^2, x^2)
 M = Singular.Module(R, v1, v2)
 N = jet(M,3)
 ```
+
+### Operations over local rings
+
+If the base ring `R` is a local ring, a minimal generating set can be computed
+using the following function
+
+```@docs
+minimal_generating_set(::smodule)
+```
+
+**Examples**
+
+```julia
+R, (x, y) = PolynomialRing(QQ, ["x", "y"]; ordering=:negdegrevlex)
+
+has_local_ordering(R) == true
+
+v1 = vector(R, x, y^2)
+v2 = vector(R, y - x, y - y^2)
+v3 = v1 + v2
+
+M = Singular.Module(R, v1, v2, v3)
+   
+min = minimal_generating_set(M)
+```

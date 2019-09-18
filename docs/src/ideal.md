@@ -393,3 +393,24 @@ n = vdim(I)
 J = kbase(I)
 f = highcorner(I)
 ```
+
+### Operations over local rings
+
+If the base ring `R` is a local ring, a minimal generating set can be computed
+using the following function
+
+```@docs
+minimal_generating_set(::sideal)
+```
+
+**Examples**
+
+```julia
+R, (x, y) = PolynomialRing(QQ, ["x", "y"]; ordering=:negdegrevlex)
+
+has_local_ordering(R) == true
+
+I = Ideal(R, y, x^2, (1 + y^3) * (x^2 - y))
+
+min = minimal_generating_set(I)
+```

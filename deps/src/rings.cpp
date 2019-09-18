@@ -65,6 +65,11 @@ void singular_define_rings(jlcxx::Module & Singular)
         return static_cast<unsigned int>(rGetExpSize(bitmask, bits, N));
     });
     Singular.method("rHasGlobalOrdering", &rHasGlobalOrdering);
+    Singular.method("rHasMixedOrdering", &rHasMixedOrdering);
+    Singular.method("rIsQuotientRing", [](ring r) {
+
+    return r->qideal != NULL;
+    });
     Singular.method("rBitmask",
                     [](ip_sring * r) { return (unsigned int)r->bitmask; });
     Singular.method("p_Delete", [](spolyrec * p, ip_sring * r) {
@@ -94,6 +99,9 @@ void singular_define_rings(jlcxx::Module & Singular)
                     [](long i, ip_sring * r) { return p_ISet(i, r); });
     Singular.method("p_NSet",
                     [](snumber * p, ip_sring * r) { return p_NSet(p, r); });
+    Singular.method("p_NSet",
+                    [](void * p, ip_sring * r) { return p_NSet(reinterpret_cast<snumber*>(p), r); }
+    );
     Singular.method("pLength", [](spolyrec * p) { return pLength(p); });
     Singular.method("SetpNext",
                     [](spolyrec * p, spolyrec * q) { p->next = q; });
@@ -196,8 +204,32 @@ void singular_define_rings(jlcxx::Module & Singular)
                                reinterpret_cast<spolyrec *&>(s),
                                reinterpret_cast<spolyrec *&>(t), r);
     });
+    Singular.method("singclap_sqrfree",
+                    [](spolyrec * p, jlcxx::ArrayRef<int> a, ip_sring * r) {
+                        rChangeCurrRing(r);
+			intvec * v = NULL;
+			ideal I = singclap_sqrfree(pCopy(p), &v, 0, currRing);
+			int * content = v->ivGetVec();
+			for(int i=0; i<v->length(); i++)
+			{
+			  a.push_back(content[i]);
+			}
+		        return I;
+    });
+    Singular.method("singclap_factorize",
+                    [](spolyrec * p, jlcxx::ArrayRef<int> a, ip_sring * r) {
+                        rChangeCurrRing(r);
+			intvec * v = NULL;
+			ideal I = singclap_factorize(pCopy(p), &v, 0, currRing);
+			int * content = v->ivGetVec();
+			for(int i=0; i<v->length(); i++)
+			{
+			  a.push_back(content[i]);
+			}
+		        return I;
+    });
     Singular.method("p_Content", [](spolyrec * p, ip_sring * r) {
-        return p_Content(p, r);
+                        return p_Content(p, r);
     });
     Singular.method("p_GetExpVL_internal",
                     [](spolyrec * p, long * ev, ip_sring * r) {
@@ -250,14 +282,29 @@ void singular_define_rings(jlcxx::Module & Singular)
         nMapFunc map_func = reinterpret_cast<nMapFunc>(map_func_ptr);
         return p_PermPoly(p, perm, old_ring, new_ring, map_func);
     });
-
-   Singular.method("p_Jet", [](poly p, int i, ring r) {
-        poly p_cp = p_Copy(p, r);
-        return p_Jet(p_cp, i, r);
+   Singular.method("p_Jet",
+                   [](poly p, int i, ring r) {
+                       poly p_cp = p_Copy(p, r);
+                       return p_Jet(p_cp, i, r);
     });
-
-   Singular.method("p_Diff", [](poly p, int i, ring r) {
-        poly p_cp = p_Copy(p, r);
-        return p_Diff(p_cp, i, r);
+   Singular.method("p_Diff",
+                   [](poly p, int i, ring r) {
+                       poly p_cp = p_Copy(p, r);
+                       return p_Diff(p_cp, i, r);
+    });
+    Singular.method("maMapPoly",
+                   [](poly map_p, ring pr, ideal im_id, ring im) {
+                       rChangeCurrRing(pr);
+                       nMapFunc nMap =n_SetMap(currRing->cf, im->cf);
+                       return maMapPoly(map_p, pr, im_id, im, nMap);
+    });
+    Singular.method("p_GetOrder",
+                   [](poly p, ring r) {
+		       long res;
+                       if( p != NULL)
+		       {  res = p_GetOrder(p, r);}
+		       else 
+		       {  res = -1;}
+		       return res; 
     });
 }

@@ -33,6 +33,10 @@ void singular_define_coeffs(jlcxx::Module & Singular)
     Singular.method("nCoeff_has_simple_Alloc",
                     [](coeffs x) { return nCoeff_has_simple_Alloc(x) > 0; });
 
+    Singular.method("n_GetMPZ_internal", [](void * ptr, number n, coeffs x) {
+        n_MPZ(reinterpret_cast<__mpz_struct *>(ptr), n, x);
+    });
+
     Singular.method("n_InitMPZ_internal", [](void * ptr, coeffs x) {
         return n_InitMPZ(reinterpret_cast<__mpz_struct *>(ptr), x);
     });
@@ -193,4 +197,17 @@ void singular_define_coeffs(jlcxx::Module & Singular)
     Singular.method("setindex_internal", [](void * x, snumber * y) {
         *reinterpret_cast<snumber **>(x) = y;
     });
+
+    Singular.method("setindex_internal_void", [](void * x, void * y) {
+        reinterpret_cast<void **>(x)[0] = y;
+    });
+
+    Singular.method("mpz_init_set_internal", [](void* x, void* y ){
+        mpz_init_set(reinterpret_cast<mpz_ptr>(x),reinterpret_cast<mpz_ptr>(y));
+    });
+
+    Singular.method("mpz_init_set_si_internal", [](void* x, long y ){
+        mpz_init_set_si(reinterpret_cast<mpz_ptr>(x),y);
+    });
+
 }

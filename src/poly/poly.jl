@@ -1,13 +1,14 @@
 export spoly, PolyRing, change_base_ring, coeff, coeffs, coeffs_expos,
        content, deflation, deflate, degree, degrees, degree_bound,
        derivative, div, divides, direm, evaluate, exponent, exponent!,
-       exponent_vectors, finish, gen, has_global_ordering,
+       exponent_vectors, factor, factor_squarefree, finish, gen,
+       has_global_ordering, has_mixed_ordering, has_local_ordering,
        inflate, isgen,
-       ismonomial, isterm, jacobi, jet, lc, lt, lm, lead_exponent,
-       monomials, MPolyBuildCtx,
-       nvars, ordering, @PolynomialRing, primpart,
-       push_term!, remove, sort_terms!, symbols, terms,
-       total_degree, valuation, var_index, vars
+       ismonomial, isquotient_ring, isterm, jacobi, jet, lc, lt, lm,
+       lead_exponent, monomials, MPolyBuildCtx,
+       nvars, order, ordering, @PolynomialRing, primpart,
+       push_term!, remove, sort_terms!, symbols, terms, total_degree,
+       valuation, var_index, vars
 
 ###############################################################################
 #
@@ -33,11 +34,34 @@ nvars(R::PolyRing) = Int(libSingular.rVar(R.ptr))
 
 @doc Markdown.doc"""
     has_global_ordering(R::PolyRing)
-> Return `true` if the given polynomial has a global ordering, i.e. if $1 < x$ for
+> Return `true` if the given ring has a global ordering, i.e. if $1 < x$ for
 > each variable $x$ in the ring. This include `:lex`, `:deglex` and `:degrevlex`
-> orderings..
+> orderings.
 """
 has_global_ordering(R::PolyRing) = Bool(libSingular.rHasGlobalOrdering(R.ptr))
+
+@doc Markdown.doc"""
+    has_mixed_ordering(R::PolyRing)
+> Return `true` if the given ring has a mixed ordering, i.e. if $1 < x_i$ for
+> a variable $x_i$ and $1>x_j$ for another variable $x_j$.
+"""
+has_mixed_ordering(R::PolyRing) = Bool(libSingular.rHasMixedOrdering(R.ptr))
+
+@doc Markdown.doc"""
+    has_local_ordering(R::PolyRing)
+> Return `true` if the given ring has a local ordering, i.e. if $1 > x$ for
+> all variables $x$.
+"""
+function has_local_ordering(R::PolyRing) 
+   return !has_global_ordering(R) && !has_mixed_ordering(R)
+end
+
+@doc Markdown.doc"""
+    isquotient_ring(R::PolyRing)
+> Return `true` if the given ring is the quotient of a polynomial ring with
+> a non - zero ideal.
+"""
+isquotient_ring(R::PolyRing) = Bool(Singular.libSingular.rIsQuotientRing(R.ptr))
 
 @doc Markdown.doc"""
     characteristic(R::PolyRing)
@@ -139,6 +163,28 @@ length(p::spoly) = Int(libSingular.pLength(p.ptr))
 function total_degree(p::spoly)
    R = parent(p)
    libSingular.pLDeg(p.ptr, R.ptr)
+end
+
+@doc Markdown.doc"""
+    order(p::spoly)
+> Returns the order of $p$.
+"""
+function order(p::spoly)
+   if p.ptr.cpp_object == C_NULL
+      return -1
+   end
+
+   R = parent(p)
+   x = deepcopy(p)
+   hptr = Singular.libSingular.p_Head(x.ptr, R.ptr)
+   ord = Singular.libSingular.pLDeg(hptr, R.ptr)
+   xptr = libSingular.pNext(p.ptr)
+   while xptr.cpp_object != C_NULL
+      hptr = Singular.libSingular.p_Head(xptr, R.ptr) 
+      ord = min(ord, Singular.libSingular.pLDeg(hptr, R.ptr))
+      xptr = libSingular.pNext(xptr)
+   end
+   return ord
 end
 
 @doc Markdown.doc"""
@@ -447,7 +493,7 @@ function divides(x::spoly{T}, y::spoly{T}) where T <: Nemo.FieldElem
       return true, R(q)
    else
       return false, R()
-   end   
+   end
 end
 
 ###############################################################################
@@ -620,6 +666,65 @@ end
 
 ###############################################################################
 #
+#   Factorization
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    factor_squarefree(x::spoly)
+> Returns a squarefree factorization of $x$.
+"""
+function factor_squarefree(x::spoly)
+  R = parent(x)
+
+  # Check if base ring is valid
+  if((R.base_ring != Singular.QQ) && (typeof(R.base_ring) != N_ZpField))
+    error("Base ring is not supported.")
+  end
+
+  a = Array{Int32, 1}()
+  I = Ideal(R, libSingular.singclap_sqrfree(x.ptr, a, R.ptr))
+  D = Dict{typeof(I[1]), Int64}()
+  n = ngens(I)
+  if n == 1
+    return Fac(I[1], D)
+  else
+    for i in 2:n
+      push!(D, I[i] => Int64(a[i]))
+    end
+  end
+  return Fac(I[1], D)
+end
+
+@doc Markdown.doc"""
+    factor(x::spoly)
+> Returns the factorization of $x$.
+"""
+function factor(x::spoly)
+  R = parent(x)
+
+  # Check if base ring is valid
+  if((R.base_ring != Singular.QQ) && (R.base_ring != Singular.ZZ) &&
+  (typeof(R.base_ring) != N_ZpField))
+    error("Base ring is not supported.")
+  end
+
+  a = Array{Int32, 1}()
+  I = Ideal(R, libSingular.singclap_factorize(x.ptr, a, R.ptr))
+  D = Dict{typeof(I[1]), Int64}()
+  n = ngens(I)
+  if n == 1
+    return Fac(I[1], D)
+  else
+    for i in 2:n
+      push!(D, I[i] => Int64(a[i]))
+    end
+  return Fac(I[1], D)
+  end
+end
+
+###############################################################################
+#
 #   Variable substitution
 #
 ###############################################################################
@@ -649,6 +754,142 @@ function permute_variables(p::spoly, perm::Array{Int64,1}, new_ring::PolyRing)
     poly_ptr = libSingular.p_PermPoly(p.ptr, perm_32, old_ring.ptr, new_ring.ptr, map_ptr)
     poly = new_ring(poly_ptr)
     return poly
+end
+
+###############################################################################
+#
+#   Conversion functions
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    AsEquivalentSingularPolynomialRing(R::AbstractAlgebra.Generic.MPolyRing{T}; cached::Bool = true,
+      ordering::Symbol = :degrevlex, ordering2::Symbol = :comp1min,
+      degree_bound::Int = 0)  where {T <: RingElem}
+> Return a Singular (multivariate) polynomial ring over the base ring of $R$ in variables having the same names as those of R.
+"""
+function AsEquivalentSingularPolynomialRing(R::AbstractAlgebra.Generic.MPolyRing{T}; cached::Bool = true,
+      ordering::Symbol = :degrevlex, ordering2::Symbol = :comp1min,
+      degree_bound::Int = 0)  where {T <: RingElem}
+   return PolynomialRing(AbstractAlgebra.Generic.base_ring(R), [string(v) for v in AbstractAlgebra.Generic.symbols(R)], cached=cached, ordering=ordering, ordering2=ordering2, degree_bound=degree_bound)
+end
+
+@doc Markdown.doc"""
+    AsEquivalentAbstractAlgebraPolynomialRing(R::Singular.PolyRing{Singular.n_unknown{T}}; ordering::Symbol = :degrevlex)  where {T <: RingElem}
+> Return an AbstractAlgebra (multivariate) polynomial ring over the base ring of $R$ in variables having the same names as those of R.
+"""
+function AsEquivalentAbstractAlgebraPolynomialRing(R::Singular.PolyRing{Singular.n_unknown{T}}; ordering::Symbol = :degrevlex)  where {T <: RingElem}
+   return AbstractAlgebra.Generic.PolynomialRing(base_ring(R).base_ring, Base.convert( Array{String,1}, symbols(R)), ordering=ordering)
+end
+
+
+@doc Markdown.doc"""
+    (R::PolyRing){T <: RingElem}(p::AbstractAlgebra.Generic.MPoly{T})
+> Return a Singular polynomial in $R$ with the same coefficients and exponents as $p$.
+"""
+function (R::PolyRing)(p::AbstractAlgebra.Generic.MPoly{T}) where T <: Nemo.RingElem
+   parent_ring = parent(p)
+   n = nvars(parent_ring)
+   exps = p.exps
+
+   size_exps = size(p.exps)
+   if parent_ring.ord != :lex
+      exps = exps[2:size_exps[1],:]
+   end
+   if parent_ring.ord == :degrevlex
+      exps = exps[end:-1:1,:]
+   end
+
+   new_p = zero(R)
+
+   for i = 1:length(p)
+      prod = p.coeffs[i]
+      for j = 1:n
+         prod = prod * gens(R)[j]^Int(exps[j,i])
+      end
+      new_p = new_p + prod
+   end
+   return(new_p)
+end
+
+@doc Markdown.doc"""
+   (R::AbstractAlgebra.Generic.MPolyRing{T}){T <: Nemo.RingElem}(p::Singular.spoly{Singular.n_unknown{T}})
+> Return a AbstractAlgebra polynomial in R with the same coefficients and exponents as $p$.
+"""
+function (R::AbstractAlgebra.Generic.MPolyRing{T})(p::Singular.spoly{Singular.n_unknown{T}}) where T <: Nemo.RingElem
+   parent_ring = parent(p)
+   n = nvars(parent_ring)
+   new_p = zero(R)
+   gens = AbstractAlgebra.Generic.gens(R)
+   iterator = coeffs_expos(p)
+   t = start(iterator)
+   while !done(iterator,t)
+      (coeff, exps),t = next(iterator,t)
+      new_p = new_p + libSingular.julia(coeff.ptr) * prod(gens.^exps)
+   end
+   return(new_p)
+end
+
+###############################################################################
+#
+#   Differential functions
+#
+###############################################################################
+
+@doc Markdown.doc"""
+   jet(x::spoly, n::Int)
+> Given a polynomial $x$ this function truncates $x$ up to degree $n$.
+"""
+function jet(x::spoly, n::Int)
+   p = deepcopy(x)
+   p.ptr = libSingular.p_Jet(x.ptr, Cint(n), parent(x).ptr)
+   return p
+end
+
+@doc Markdown.doc"""
+   derivative(x::spoly, n::Int)
+> Given a polynomial $x$ this function returns the derivative of $x$
+> with respect to the variable with number $n$.
+"""
+function derivative(x::spoly, n::Int)
+   R = parent(x)
+   if n > nvars(R) || n < 1
+       error("Variable does not exist")
+   else
+       p = deepcopy(x)
+       p.ptr = libSingular.p_Diff(p.ptr, Cint(n), R.ptr)
+       return p
+   end
+end
+
+@doc Markdown.doc"""
+   derivative(x::spoly, v::spoly)
+> Given a polynomial $x$ this function returns the derivative of $x$
+> with respect to the variable $v$.
+"""
+function derivative(x::spoly, v::spoly)
+   R = parent(x)
+   if R == parent(v) && isgen(v)
+       p = deepcopy(x)
+       return(derivative(p,var_index(v)))
+   else
+       error("Second argument is not a variable")
+       return p
+   end
+end
+
+@doc Markdown.doc"""
+   jacobi(x::spoly)
+> Given a polynomial $x$ this function the Jacobian ideal of $x$.
+"""
+function jacobi(p::spoly)
+   R = parent(p)
+   n = nvars(R)
+   I = Ideal(R, derivative(p, 1))
+   for i in 2:n
+       I = I + Ideal(R, derivative(p, i))
+   end
+  return I
 end
 
 ###############################################################################
@@ -864,138 +1105,3 @@ macro PolynomialRing(R, s, n)
    return esc(v1)
 end
 
-###############################################################################
-#
-#   Conversion functions
-#
-###############################################################################
-
-@doc Markdown.doc"""
-    AsEquivalentSingularPolynomialRing(R::AbstractAlgebra.Generic.MPolyRing{T}; cached::Bool = true,
-      ordering::Symbol = :degrevlex, ordering2::Symbol = :comp1min,
-      degree_bound::Int = 0)  where {T <: RingElem}
-> Return a Singular (multivariate) polynomial ring over the base ring of $R$ in variables having the same names as those of R.
-"""
-function AsEquivalentSingularPolynomialRing(R::AbstractAlgebra.Generic.MPolyRing{T}; cached::Bool = true,
-      ordering::Symbol = :degrevlex, ordering2::Symbol = :comp1min,
-      degree_bound::Int = 0)  where {T <: RingElem}
-   return PolynomialRing(AbstractAlgebra.Generic.base_ring(R), [string(v) for v in AbstractAlgebra.Generic.symbols(R)], cached=cached, ordering=ordering, ordering2=ordering2, degree_bound=degree_bound)
-end
-
-@doc Markdown.doc"""
-    AsEquivalentAbstractAlgebraPolynomialRing(R::Singular.PolyRing{Singular.n_unknown{T}}; ordering::Symbol = :degrevlex)  where {T <: RingElem}
-> Return an AbstractAlgebra (multivariate) polynomial ring over the base ring of $R$ in variables having the same names as those of R.
-"""
-function AsEquivalentAbstractAlgebraPolynomialRing(R::Singular.PolyRing{Singular.n_unknown{T}}; ordering::Symbol = :degrevlex)  where {T <: RingElem}
-   return AbstractAlgebra.Generic.PolynomialRing(base_ring(R).base_ring, Base.convert( Array{String,1}, symbols(R)), ordering=ordering)
-end
-
-
-@doc Markdown.doc"""
-    (R::PolyRing){T <: RingElem}(p::AbstractAlgebra.Generic.MPoly{T})
-> Return a Singular polynomial in $R$ with the same coefficients and exponents as $p$.
-"""
-function (R::PolyRing)(p::AbstractAlgebra.Generic.MPoly{T}) where T <: Nemo.RingElem
-   parent_ring = parent(p)
-   n = nvars(parent_ring)
-   exps = p.exps
-
-   size_exps = size(p.exps)
-   if parent_ring.ord != :lex
-      exps = exps[2:size_exps[1],:]
-   end
-   if parent_ring.ord == :degrevlex
-      exps = exps[end:-1:1,:]
-   end
-
-   new_p = zero(R)
-
-   for i = 1:length(p)
-      prod = p.coeffs[i]
-      for j = 1:n
-         prod = prod * gens(R)[j]^Int(exps[j,i])
-      end
-      new_p = new_p + prod
-   end
-   return(new_p)
-end
-
-@doc Markdown.doc"""
-   (R::AbstractAlgebra.Generic.MPolyRing{T}){T <: Nemo.RingElem}(p::Singular.spoly{Singular.n_unknown{T}})
-> Return a AbstractAlgebra polynomial in R with the same coefficients and exponents as $p$.
-"""
-function (R::AbstractAlgebra.Generic.MPolyRing{T})(p::Singular.spoly{Singular.n_unknown{T}}) where T <: Nemo.RingElem
-   parent_ring = parent(p)
-   n = nvars(parent_ring)
-   new_p = zero(R)
-   gens = AbstractAlgebra.Generic.gens(R)
-   iterator = coeffs_expos(p)
-   t = start(iterator)
-   while !done(iterator,t)
-      (coeff, exps),t = next(iterator,t)
-      new_p = new_p + libSingular.julia(coeff.ptr) * prod(gens.^exps)
-   end
-   return(new_p)
-end
-
-###############################################################################
-#
-#   Differential functions
-#
-###############################################################################
-
-@doc Markdown.doc"""
-   jet(x::spoly, n::Int)
-> Given a polynomial $x$ this function truncates $x$ up to degree $n$.
-"""
-function jet(x::spoly, n::Int)
-   p = deepcopy(x)
-   p.ptr = libSingular.p_Jet(x.ptr, Cint(n), parent(x).ptr)
-   return p
-end
-
-@doc Markdown.doc"""
-   derivative(x::spoly, n::Int)
-> Given a polynomial $x$ this function returns the derivative of $x$
-> with respect to the variable with number $n$.
-"""
-function derivative(x::spoly, n::Int)
-   R = parent(x)
-   if n > nvars(R) || n < 1
-       error("Variable does not exist")
-   else
-       p = deepcopy(x)
-       p.ptr = libSingular.p_Diff(p.ptr, Cint(n), R.ptr)
-       return p
-   end
-end
-
-@doc Markdown.doc"""
-   derivative(x::spoly, v::spoly)
-> Given a polynomial $x$ this function returns the derivative of $x$
-> with respect to the variable $v$.
-"""
-function derivative(x::spoly, v::spoly)
-   R = parent(x)
-   if R == parent(v) && isgen(v)
-       p = deepcopy(x)
-       return(derivative(p,var_index(v)))
-   else
-       error("Second argument is not a variable")
-       return p
-   end
-end
-
-@doc Markdown.doc"""
-   jacobi(x::spoly)
-> Given a polynomial $x$ this function the Jacobian ideal of $x$.
-"""
-function jacobi(p::spoly)
-   R = parent(p)
-   n = nvars(R)
-   I = Ideal(R, derivative(p, 1))
-   for i in 2:n
-       I = I + Ideal(R, derivative(p, i))
-   end
-  return I
-end

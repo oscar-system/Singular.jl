@@ -5,6 +5,7 @@
 #include "ideals.h"
 #include "matrices.h"
 #include "caller.h"
+#include "coeff_rings.h"
 
 static std::string singular_return;
 static std::string singular_error;
@@ -76,6 +77,7 @@ JLCXX_MODULE define_julia_module(jlcxx::Module & Singular)
     singular_define_ideals(Singular);
     singular_define_matrices(Singular);
     singular_define_caller(Singular);
+    singular_define_coeff_rings(Singular);
 
 
     // Calls the Singular interpreter with `input`.
@@ -202,4 +204,7 @@ JLCXX_MODULE define_julia_module(jlcxx::Module & Singular)
         delete (iv);
         return std::make_tuple(betti, nrows, ncols);
     });
+
+    Singular.method("PrintS",&PrintS);
+    Singular.method("StringAppendS",&StringAppendS);
 }
