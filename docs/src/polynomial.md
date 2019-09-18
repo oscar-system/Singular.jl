@@ -271,6 +271,39 @@ f = 123*(57*x2^3 + x4^5)^3*(x1^2 + x1+1)^2*(x1 + x2*x3)^2
 Fac = factor(f)
 ```
 
+### Change of coefficient rings
+
+It is possible to change the coefficient ring of a given polynomial $p$ via
+the function 'change_base_ring'.
+
+```@docs
+Singular.change_base_ring(p::spoly, g::any)
+```
+
+**Examples**
+
+```julia
+R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+
+p = x^5 + y^3+1
+
+change_base_ring(p, QQ)
+```
+
+It also possible to work with Nemo rings, if a type conversion for the 
+Singular coefficients is implemented. One has to cast the Nemo ring via
+'CoefficientRing' to a suitabel Singular type.
+
+**Examples**
+
+```julia
+R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+
+p = x^5 + y^3+1
+
+change_base_ring(p, CoefficientRing(Nemo.QQ))
+```
+
 ### Conversion between Singular.jl polynomials and MPoly polynomials
 
 There are conversion functions between the polynomial ring implementation
