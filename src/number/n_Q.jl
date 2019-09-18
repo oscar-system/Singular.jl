@@ -20,6 +20,14 @@ function deepcopy_internal(a::n_Q, dict::IdDict)
    return parent(a)(libSingular.n_Copy(a.ptr, parent(a).ptr))
 end
 
+function hash(a::n_Q, h::UInt)
+   n = numerator(a)
+   d = denominator(a)
+   nhash = hash(n, h)
+   dhash = hash(d, h)
+   return xor(xor(nhash, dhash), 0xf348b78c190e8fc1%UInt)
+end
+
 ###############################################################################
 #
 #   Basic manipulation

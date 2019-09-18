@@ -1,4 +1,3 @@
-import Base.convert
 export n_Z, Integers, crt
 
 ###############################################################################
@@ -19,6 +18,10 @@ base_ring(a::Integers) = Union{}
 
 function deepcopy_internal(a::n_Z, dict::IdDict)
    return parent(a)(libSingular.n_Copy(a.ptr, parent(a).ptr))
+end
+
+function hash(a::n_Z, h::UInt)
+   return xor(hash(convert(BigInt, a), h), 0x8ab976d24b6a0cca%UInt)
 end
 
 ###############################################################################
