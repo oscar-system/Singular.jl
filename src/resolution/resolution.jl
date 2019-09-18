@@ -49,6 +49,14 @@ function deepcopy_internal(r::sresolution, dict::IdDict)
    return S(ptr, r.len)
 end
 
+function hash(r::sresolution, h::UInt)
+   v = 0xc3143e8e499f1ba3%UInt
+   for i in 1:length(r)
+      v = xor(hash(r[i], h), v)
+   end
+   return v
+end
+
 ###############################################################################
 #
 #   Betti numbers
