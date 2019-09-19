@@ -25,12 +25,14 @@ filenames = filter(x -> endswith(x, ".lib"), readdir(library_dir))
 
 output_filename = abspath(joinpath(@__DIR__, "..", "src", "libraryfuncdictionary.jl"))
 
-## Loops over all libraries and executes libparse on it.
-## The first three lines of the libparse output are general information
-## about the library, so we ignore it. We are only interested in the
-## first column (library name) and the third column (globally exposed or not).
-## All other columns (containing info such as line numbers, library name, etc)
-## are ignored.
+#=
+  Loops over all libraries and executes libparse on it.
+  The first three lines of the libparse output are general information
+  about the library, so we ignore it. We are only interested in the
+  first column (library name) and the third column (globally exposed or not).
+  All other columns (containing info such as line numbers, library name, etc)
+  are ignored.
+=#
 open(output_filename, "w") do outputfile
     println(outputfile, "libraryfunctiondictionary = Dict(")
     for i in filenames
@@ -40,7 +42,7 @@ open(output_filename, "w") do outputfile
             error("from libparse: $(libs.stderr)")
         end
         libs_splitted = split(libs.stdout,"\n")[4:end-1]
-        libs_splitted = [ split(i," ", keepempty = false) for i in libs_splitted ]
+        libs_splitted = [split(i, " ", keepempty = false) for i in libs_splitted]
         println(outputfile, ":$(i[1:end - 4]) => [")
         for j in libs_splitted
             println(outputfile, """[ "$(j[1])", "$(j[3])" ],""")
