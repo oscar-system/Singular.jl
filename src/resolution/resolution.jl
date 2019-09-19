@@ -27,7 +27,7 @@ end
 function getindex(r::sresolution, i::Int)
    checkbounds(r, i)
    R = base_ring(r)
-   ptr = libSingular.getindex_internal(r.ptr, i-1, r.minimal )
+   ptr = libSingular.getindex_internal(r.ptr, i - 1, r.minimal )
    if ptr.cpp_object != C_NULL
       ptr = libSingular.id_Copy(ptr, R.ptr)
    end
@@ -113,7 +113,7 @@ function show(io::IO, r::sresolution)
       end
    end
    for i = 1:len - 1
-      ptr = libSingular.getindex_internal(r.ptr,i-1,r.minimal)
+      ptr = libSingular.getindex_internal(r.ptr, i - 1, r.minimal)
       if ptr.cpp_object == C_NULL
          break
       end
