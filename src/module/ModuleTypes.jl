@@ -41,7 +41,7 @@ This needs to be indicated due to the fact that Singulars
 vectors and polys are both stored in the poly data structure.
 """
 function (R::PolyRing{T})(m::libSingular.poly,::Val{:vector}) where T
-    return svector{T}(R,1,m)
+    return svector{T}(R, 1, m)
 end
 
 function _svector_clear_fn(p::svector)
