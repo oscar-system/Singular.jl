@@ -4,7 +4,7 @@
    to avoid confusion between the LIBRARYNAME modules and other types, for example "Ideal" or "Poly".
 =#
 
-This script calls singulars parse_libs and creates a dictionary
+# This script calls singulars parse_libs and creates a dictionary
 # containing Singulars libraries and the functions contained in those libraries.
 include("libraryfuncdictionary.jl")
 
