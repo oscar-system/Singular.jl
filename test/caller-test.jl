@@ -42,5 +42,7 @@ function test_caller()
     i1 = Ideal(R, x*z, y*z, x^3-y^3)
     @test Singular.LibNormal.normal(R, i1, "withDelta", "prim") isa Array
 
+    @test Singular.LibNormal.normal(i1, "withDelta", "prim") isa Array
+
     println("PASS")
 end
