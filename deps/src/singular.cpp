@@ -151,10 +151,10 @@ JLCXX_MODULE define_julia_module(jlcxx::Module & Singular)
     Singular.method("syMinimize", [](syStrategy ra, ring o) {
         const ring origin = currRing;
         rChangeCurrRing(o);
-        syStrategy temp = syCopy(ra);
-        syMinimize(temp);
+        syStrategy result = syCopy(ra);
+        syMinimize(result);
         rChangeCurrRing(origin);
-        return reinterpret_cast<void *>(temp);
+        return result;
     });
 
     Singular.method("get_minimal_res", [](syStrategy ra) {
