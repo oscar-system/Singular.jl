@@ -40,7 +40,7 @@ end
 > length of a resolution. Over a field, this should be at most the number of variables
 > in the polynomial ring.
 """
-length(r::sresolution) = libSingular.get_sySize(r.ptr)
+length(r::sresolution) = libSingular.get_sySize(r.ptr) - 1
 
 function deepcopy_internal(r::sresolution, dict::IdDict)
    R = base_ring(r)
