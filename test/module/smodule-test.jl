@@ -186,7 +186,7 @@ function test_smodule_sres()
    @test length(F) == 1
 
    M1 = Singular.Matrix(M)
-   M2 = Singular.Matrix(F[2])
+   M2 = Singular.Matrix(F[1])
 
    @test iszero(M1*M2)
 
@@ -195,7 +195,7 @@ function test_smodule_sres()
    @test length(F) == 1
 
    M1 = Singular.Matrix(M)
-   M2 = Singular.Matrix(F[2])
+   M2 = Singular.Matrix(F[1])
 
    @test iszero(M1*M2)
 
@@ -204,7 +204,7 @@ function test_smodule_sres()
    @test length(F) == 1
 
    M1 = Singular.Matrix(M)
-   M2 = Singular.Matrix(F[2])
+   M2 = Singular.Matrix(F[1])
 
    @test iszero(M1*M2)
 
