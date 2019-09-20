@@ -18,10 +18,11 @@
 #include <reporter/reporter.h>
 #include <resources/feFopen.h>
 #include <coeffs/coeffs.h>
+#include <coeffs/numbers.h>
 #include <coeffs/longrat.h>
-#include <polys/clapsing.h>
 #include <coeffs/bigintmat.h>
 #include <coeffs/rmodulon.h>
+#include <polys/clapsing.h>
 #include <polys/monomials/ring.h>
 #include <polys/monomials/p_polys.h>
 #include <polys/simpleideals.h>

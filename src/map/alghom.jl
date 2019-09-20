@@ -138,6 +138,10 @@ end
 function AlgebraHomomorphism(D::PolyRing, C::PolyRing, V::Vector, ptr::libSingular.ideal)
 
    n = length(V)
+   
+   if base_ring(I) != C
+      error("Defining equations have to be contained in the codomain.")
+   end
 
    if n != nvars(D)
       error("Number of defining equations does not match.")
