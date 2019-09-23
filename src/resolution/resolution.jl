@@ -21,7 +21,8 @@ elem_type(::ResolutionSet{T}) where T <: AbstractAlgebra.RingElem = sresolution{
 parent_type(::Type{sresolution{T}}) where T <: AbstractAlgebra.RingElem = ResolutionSet{T}
 
 function checkbounds(r::sresolution, i::Int)
-   (i < 1 || i > length(r)) && throw(BoundsError(r, i))
+   # structure has 1 more item than the mathematical length
+   (i < 1 || i > length(r) + 1) && throw(BoundsError(r, i))
 end
 
 function getindex(r::sresolution, i::Int)
