@@ -183,28 +183,31 @@ function test_smodule_sres()
 
    F = sres(M, 0)
 
+   # check mathematical length (structure has one more element)
    @test length(F) == 1
 
    M1 = Singular.Matrix(M)
-   M2 = Singular.Matrix(F[1])
+   M2 = Singular.Matrix(F[2])
 
    @test iszero(M1*M2)
 
    F = sres(M, 1)
 
+   # check mathematical length (structure has one more element)
    @test length(F) == 1
 
    M1 = Singular.Matrix(M)
-   M2 = Singular.Matrix(F[1])
+   M2 = Singular.Matrix(F[2])
 
    @test iszero(M1*M2)
 
    F = sres(M, 3)
 
+   # check mathematical length (structure has one more element)
    @test length(F) == 1
 
    M1 = Singular.Matrix(M)
-   M2 = Singular.Matrix(F[1])
+   M2 = Singular.Matrix(F[2])
 
    @test iszero(M1*M2)
 
