@@ -36,6 +36,13 @@ function deepcopy_internal(a::n_GF, dict::IdDict)
    return parent(a)(libSingular.n_Copy(a.ptr, parent(a).ptr))
 end
 
+function hash(a::n_GF, h::UInt)
+   i = reinterpret(Int, a.ptr.cpp_object)
+   chash = hash(characteristic(parent(a)), h)
+   ihash = hash(i, h)
+   return xor(xor(chash, ihash), 0x2c42e12d0c837511%UInt)
+end
+
 ###############################################################################
 #
 #   Basic manipulation

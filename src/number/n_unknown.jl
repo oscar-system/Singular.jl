@@ -38,6 +38,11 @@ function zero(R::CoefficientRing)
    return R(libSingular.n_Init(0, R.ptr))
 end
 
+function hash(a::n_unknown, h::UInt)
+   n = libSingular.julia(a.ptr)
+   return xor(hash(n, h), 0x664e59de562461fe%UInt)
+end
+
 ###############################################################################
 #
 #   String I/O

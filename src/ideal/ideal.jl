@@ -115,6 +115,14 @@ function check_parent(I::sideal{T}, J::sideal{T}) where T <: Nemo.RingElem
    base_ring(I) != base_ring(J) && error("Incompatible ideals")
 end
 
+function hash(I::sideal, h::UInt)
+   v = 0xebd7f23adcde5067%UInt
+   for p in gens(I)
+      v = xor(hash(p, h), v)
+   end
+   return v
+end
+
 ###############################################################################
 #
 #   String I/O

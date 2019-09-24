@@ -47,6 +47,16 @@ function deepcopy_internal(M::smatrix, dict::IdDict)
    return parent(M)(ptr)
 end
 
+function hash(M::smatrix, h::UInt)
+   v = 0x68bf046fc9d6afbf%UInt
+   for i in 1:nrows(M)
+      for j in 1:ncols(M)
+         v = xor(hash(M[i, j], h), v)
+      end
+   end
+   return v
+end
+
 ###############################################################################
 #
 #   String I/O 

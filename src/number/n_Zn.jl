@@ -28,6 +28,21 @@ function deepcopy_internal(a::n_Zn, dict::IdDict)
    return parent(a)(libSingular.n_Copy(a.ptr, parent(a).ptr))
 end
 
+function hash(a::n_Zn, h::UInt)
+   # get the number of limbs
+   sptr = convert(Ptr{Cint}, a.ptr.cpp_object) + sizeof(Cint)
+   s = unsafe_load(sptr)
+   # get the pointer after the first two Cints
+   d = convert(Ptr{Ptr{UInt}}, a.ptr.cpp_object) + 2*sizeof(Cint)
+   p = unsafe_load(d)
+   b = unsafe_load(p)
+   h = xor(Base.hash_uint(xor(ifelse(s < 0, -b, b), h)), h)
+   for k = 2:abs(s)
+      h = xor(Base.hash_uint(xor(unsafe_load(p, k), h)), h)
+   end
+   return xor(h, 0xe6ebab8a56a5461b%UInt)
+end
+
 ###############################################################################
 #
 #   Basic manipulation

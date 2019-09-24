@@ -500,6 +500,18 @@ function test_spoly_factor()
    println("PASS")
 end
 
+function test_spoly_hash()
+   print("spoly.hash...")
+   
+   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+
+   @test hash(x) == hash(x+y-y)
+   @test hash(x,zero(UInt)) == hash(x+y-y,zero(UInt))
+   @test hash(x,one(UInt)) == hash(x+y-y,one(UInt))
+   
+   println("PASS")
+end
+
 function test_spoly()
    test_spoly_constructors()
    test_spoly_printing()
@@ -522,6 +534,7 @@ function test_spoly()
    # test_convert_between_MPoly_and_SingularPoly()
    test_spoly_differential()
    test_spoly_factor()
+   test_spoly_hash()
    println("")
 end
 

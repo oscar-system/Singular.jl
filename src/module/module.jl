@@ -55,6 +55,14 @@ function deepcopy_internal(I::smodule, dict::IdDict)
    return Module(R, ptr)
 end
 
+function hash(M::smodule, h::UInt)
+   v = 0x403fd5a7748e75c9%UInt
+   for i in 1:ngens(M)
+      v = xor(hash(M[i], h), v)
+   end
+   return v
+end
+
 ###############################################################################
 #
 #   String I/O

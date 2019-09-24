@@ -214,6 +214,16 @@ function canonical_unit(a::spoly{T}) where T <: Nemo.RingElem
   return a == 0 ? one(base_ring(a)) : canonical_unit(coeff(a, 0))
 end
 
+function Base.hash(p::spoly{T}, h::UInt) where T <: Nemo.RingElem
+   v = 0x37eec82e994ab710%UInt
+   v = xor(hash(collect(exponent_vectors(p)), h), v)
+   for c in coeffs(p)
+      v = xor(hash(c, h), v)
+      v = (v << 1) | (v >> (sizeof(Int)*8 - 1))
+   end
+   return v
+end
+
 ###############################################################################
 #
 #   Iterators

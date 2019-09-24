@@ -44,6 +44,14 @@ function check_parent(a::svector{T}, b::svector{T}) where T <: Nemo.RingElem
    a.rank != b.rank && error("Vectors of incompatible rank")
 end
 
+function hash(V::svector, h::UInt)
+   v = 0xd2fd44bc67ee655e%UInt
+   for p in Array(V)
+      v = xor(hash(p, h), v)
+   end
+   return v
+end
+
 ###############################################################################
 #
 #   String I/O

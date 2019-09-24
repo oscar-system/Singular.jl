@@ -28,6 +28,12 @@ function deepcopy_internal(a::n_Zp, dict::IdDict)
    return parent(a)(libSingular.n_Copy(a.ptr, parent(a).ptr))
 end
 
+function hash(a::n_Zp, h::UInt)
+   chash = hash(characteristic(parent(a)), h)
+   ahash = hash(Int(a), h)
+   return xor(xor(chash, ahash), 0x77dc334c1532ce3c%UInt)
+end
+
 ###############################################################################
 #
 #   Basic manipulation
