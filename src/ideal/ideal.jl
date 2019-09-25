@@ -225,6 +225,10 @@ function equal(I1::sideal{T}, I2::sideal{T}) where T <: AbstractAlgebra.RingElem
    return contains(I1, I2) && contains(I2, I1)
 end
 
+function ==(I1::sideal{T}, I2::sideal{T}) where T <: AbstractAlgebra.RingElem
+   error("For equality of ideals, please use either equal or isequal")
+end
+
 ###############################################################################
 #
 #   Leading terms
