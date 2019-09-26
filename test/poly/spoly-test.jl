@@ -160,7 +160,7 @@ end
 
    a1 = x^2 + 3x + 1
 
-   b1 = change_base_ring(a1, QQ)
+   b1 = change_base_ring(QQ, a1)
 
    @test isa(b1, spoly{n_Q})
 
@@ -173,8 +173,8 @@ end
    R4, (x, y) = PolynomialRing(Nemo.QQ, ["x", "y"])
    a4 = x^5+y^3+1
 
-   a5 = change_base_ring(a2, QQ)
-   a6 = change_base_ring(a2, CoefficientRing(Nemo.QQ))
+   a5 = change_base_ring(QQ, a2)
+   a6 = change_base_ring(CoefficientRing(Nemo.QQ), a2)
 
    @test a3 == a5
    @test a4 == a6
