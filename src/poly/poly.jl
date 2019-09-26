@@ -1064,6 +1064,10 @@ function (R::PolyRing)(p::spoly)
    return p
 end
 
+function(R::PolyRing)(n::libSingular.number)
+    return R.base_ring(n)
+end
+
 ###############################################################################
 #
 #   PolynomialRing constructor

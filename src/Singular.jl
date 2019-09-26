@@ -47,6 +47,9 @@ const libsingular = joinpath(pkgdir, "local", "lib", "libSingular")
 
 prefix = realpath(joinpath(@__DIR__, "..", "local"))
 
+mapping_types = nothing
+mapping_types_reversed = nothing
+
 function __init__()
 
    # Initialise Singular
@@ -90,6 +93,10 @@ function __init__()
      :comp1max => ringorder_c,
      :comp1min => ringorder_C
    )
+   global mapping_types, mapping_types_reversed, casting_functions
+   mapping_types = Dict( i[1] => i[2] for i in libSingular.get_type_mapper() )
+   mapping_types_reversed = Dict( j => i for (i, j) in mapping_types )
+   casting_functions = create_casting_functions()
 end
 
 ###############################################################################
@@ -116,5 +123,10 @@ include("Vector.jl")
 
 include("Resolution.jl")
 
+include("caller.jl")
+
+include("Meta.jl")
+
 include("Map.jl")
+
 end # module

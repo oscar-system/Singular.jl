@@ -133,7 +133,7 @@ end
 
 function _n_Q_clear_fn(n::n_Q)
    R = parent(n)
-   libSingular.n_Delete_Q(n.ptr.cpp_object, parent(n).ptr)
+   libSingular.n_Delete_Q(n.ptr, parent(n).ptr)
    _Rationals_clear_fn(R)
    nothing
 end

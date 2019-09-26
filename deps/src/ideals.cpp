@@ -12,7 +12,7 @@ auto id_sres_helper(sip_sideal * m, int n, ring R)
         r = s->fullres;
         minimal = false;
     }
-    return std::make_tuple(reinterpret_cast<void *>(r), s->length, minimal);
+    return std::make_tuple(s, minimal);
 }
 
 
@@ -28,7 +28,7 @@ auto id_fres_helper(sip_sideal * I, int n, std::string method, ring R)
         r = s->fullres;
         minimal = false;
     }
-    return std::make_tuple(reinterpret_cast<void *>(r), s->length, minimal);
+    return std::make_tuple(s, minimal);
 }
 
 

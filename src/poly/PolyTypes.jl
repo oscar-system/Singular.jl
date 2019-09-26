@@ -63,6 +63,13 @@ mutable struct PolyRing{T <: Nemo.RingElem} <: Nemo.MPolyRing{T}
    end
 end
 
+function (R::PolyRing{T})(r::libSingular.ring) where T
+    new_r = deepcopy(R)
+    new_ptr = new_r.ptr
+    new_r.ptr = r
+    return new_r
+end
+
 function _PolyRing_clear_fn(R::PolyRing)
    R.refcount -= 1
    if R.refcount == 0

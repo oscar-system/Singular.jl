@@ -21,13 +21,14 @@ elem_type(::ResolutionSet{T}) where T <: AbstractAlgebra.RingElem = sresolution{
 parent_type(::Type{sresolution{T}}) where T <: AbstractAlgebra.RingElem = ResolutionSet{T}
 
 function checkbounds(r::sresolution, i::Int)
-   (i < 1 || i > r.len) && throw(BoundsError(I, i))
+   # structure has 1 more item than the mathematical length
+   (i < 1 || i > length(r) + 1) && throw(BoundsError(r, i))
 end
 
 function getindex(r::sresolution, i::Int)
    checkbounds(r, i)
    R = base_ring(r)
-   ptr = libSingular.getindex(r.ptr, Cint(i - 1))
+   ptr = libSingular.getindex_internal(r.ptr, i - 1, r.minimal )
    if ptr.cpp_object != C_NULL
       ptr = libSingular.id_Copy(ptr, R.ptr)
    end
@@ -40,13 +41,13 @@ end
 > length of a resolution. Over a field, this should be at most the number of variables
 > in the polynomial ring.
 """
-length(r::sresolution) = r.len - 1
+length(r::sresolution) = libSingular.get_sySize(r.ptr) - 1
 
 function deepcopy_internal(r::sresolution, dict::IdDict)
    R = base_ring(r)
-   ptr = libSingular.res_Copy(r.ptr, Cint(r.len), R.ptr)
+   ptr = libSingular.res_Copy(r.ptr, R.ptr)
    S = parent(r)
-   return S(ptr, r.len)
+   return S(ptr)
 end
 
 function hash(r::sresolution, h::UInt)
@@ -70,7 +71,12 @@ end
 > output of this command is useful only in the graded case.
 """
 function betti(r::sresolution)
-   array = libSingular.syBetti(r.ptr, Cint(r.len), r.base_ring.ptr)
+   if r.minimal
+        ideal_list = libSingular.get_minimal_res(r.ptr)
+   else
+        ideal_list = libSingular.get_full_res(r.ptr)
+   end 
+   array = libSingular.syBetti_internal(ideal_list, length(r), r.base_ring.ptr)
    return unsafe_wrap(Array, array[1], array[2:3]; own=true)
 end
 
@@ -91,8 +97,8 @@ function minres(r::sresolution{T}) where T <: AbstractAlgebra.RingElem
       return r
    end
    R = base_ring(r)
-   ptr = libSingular.syMinimize(r.ptr, Cint(r.len), R.ptr)
-   return sresolution{T}(R, r.len, ptr, true)
+   ptr = libSingular.syMinimize(r.ptr, R.ptr)
+   return sresolution{T}(R, ptr, true)
 end
 
 ###############################################################################
@@ -108,13 +114,16 @@ end
 
 function show(io::IO, r::sresolution)
    println(io, "Singular Resolution:")
-   if r.len > 0
-      ptr = libSingular.getindex(r.ptr, Cint(0))
-      print(io, "R^", libSingular.rank(ptr))
+   len = length(r)
+   if len > 0
+      ptr = libSingular.getindex_internal(r.ptr,0,r.minimal)
+      if ptr.cpp_object != C_NULL
+         print(io, "R^", libSingular.rank(ptr))
+      end
    end
-   for i = 1:r.len - 1
-      ptr = libSingular.getindex(r.ptr, Cint(i-1))
-      if ptr == C_NULL
+   for i = 1:len - 1
+      ptr = libSingular.getindex_internal(r.ptr, i - 1, r.minimal)
+      if ptr.cpp_object == C_NULL
          break
       end
       print(io, " <- R^", libSingular.ngens(ptr))
@@ -127,9 +136,13 @@ end
 #
 ###############################################################################
 
-function (S::ResolutionSet{T})(ptr::Ptr{Nothing}, len::Int) where T <: AbstractAlgebra.RingElem
+function (S::ResolutionSet{T})(ptr::libSingular.syStrategy, len::Int = 0) where T <: AbstractAlgebra.RingElem
    R = base_ring(S)
-   return sresolution{T}(R, len, ptr)
+   return sresolution{T}(R, ptr)
+end
+
+function (R::PolyRing{T})(ptr::libSingular.syStrategy, ::Val{:resolution}) where T <: AbstractAlgebra.RingElement
+    return sresolution{T}(R, ptr, libSingular.get_minimal_res(ptr) != C_NULL )
 end
 
 ###############################################################################
@@ -151,7 +164,7 @@ function Resolution(C::Array{smodule{T}, 1}) where T <: AbstractAlgebra.RingElem
     R = base_ring(C[1])
     CC = (m -> m.ptr).(C)
     C_ptr = reinterpret(Ptr{Nothing}, pointer(CC))
-    ptr = libSingular.res_Copy(C_ptr, Cint(len), R.ptr)
-    return sresolution{T}(R, len, ptr)
+    ptr = libSingular.create_SyStrategy(C_ptr, len, R.ptr)
+    return sresolution{T}(R, ptr)
 end
 

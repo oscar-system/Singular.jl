@@ -6,6 +6,7 @@ using CxxWrap
 
 function __init__()
    @initcxx
+   initialize_jl_c_types(@__MODULE__)
 end
 
 include("libsingular/LibSingularTypes.jl")
