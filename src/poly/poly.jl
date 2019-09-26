@@ -948,13 +948,14 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-   change_base_ring(p::spoly, C::Any)
-> Return a polynomial ring, whose coefficient ring is subsituted by $C$.
+   change_base_ring(C::T, p::spoly) where T <: Union{Ring, Field}
+> Return a polynomial ring, whose coefficient ring is subsituted by the ring 
+> $C$.
 """
-function change_base_ring(p::spoly, C::Any)
+function change_base_ring(C::T, p::spoly) where T <: Union{Ring, Field}
    S, = Singular.PolynomialRing(C, [String(v) for v in symbols(parent(p))],
           ordering = parent(p).ord)
-   return change_base_ring(p, C, S)
+   return change_base_ring(C, p, S)
 end
 
 ###############################################################################
@@ -989,7 +990,7 @@ function push_term!(M::MPolyBuildCtx{spoly{S}, U}, c::S, expv::Vector{Int}) wher
    p = M.poly
    ptr = libSingular.p_Init(R.ptr)
 
-   #Workaround for n_unknown type
+   # Workaround for n_unknown type
    if typeof(c.ptr) == Ptr{Nothing}
       cptr = libSingular.cast_void_to_number(c.ptr)
       libSingular.p_SetCoeff0(ptr, libSingular.n_Copy(cptr, base_ring(R).ptr), R.ptr)

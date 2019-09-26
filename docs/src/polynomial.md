@@ -277,7 +277,7 @@ It is possible to change the coefficient ring of a given polynomial $p$ via
 the function 'change_base_ring'.
 
 ```@docs
-Singular.change_base_ring(p::spoly, g::any)
+Singular.change_base_ring(p::spoly, C::Union{Ring, Field}) 
 ```
 
 **Examples**
