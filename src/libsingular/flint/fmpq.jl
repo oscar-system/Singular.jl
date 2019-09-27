@@ -164,7 +164,7 @@ end
 function fmpqSubringGcd(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n1 = numerator(julia(a)::Nemo.fmpq)
    n2 = numerator(julia(b)::Nemo.fmpq)
-   return number(fmpq(Nemo.gcd(n1, n2)))
+   return number(Nemo.fmpq(Nemo.gcd(n1, n2)))
 end
 
 ###############################################################################
