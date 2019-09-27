@@ -160,6 +160,10 @@ end
 
 length(p::spoly) = Int(libSingular.pLength(p.ptr))
 
+@doc Markdown.doc"""
+    total_degree(p::spoly)
+> Return the total degree (largest sum of exponents of any monomial) of $p$.
+"""
 function total_degree(p::spoly)
    R = parent(p)
    libSingular.pLDeg(p.ptr, R.ptr)
