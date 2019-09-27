@@ -15,7 +15,7 @@ SET( CMAKE_SHARED_LINKER_FLAGS  "${CMAKE_SHARED_LINKER_FLAGS} -L${JULIA_LIB_DIR}
 
 add_library(singularwrap SHARED singular.cpp rings.cpp coeffs.cpp ideals.cpp matrices.cpp caller.cpp coeff_rings.cpp)
 
-target_link_libraries(singularwrap JlCxx::cxxwrap_julia -ljulia "-lSingular -lpolys -lsingular_resources -lfactory -lomalloc -ldl")
+target_link_libraries(singularwrap JlCxx::cxxwrap_julia -ljulia "-lSingular -lpolys -lsingular_resources -lfactory -lomalloc -ldl -lgmp")
 
 install(TARGETS
   singularwrap
