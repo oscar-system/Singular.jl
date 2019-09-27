@@ -7,7 +7,7 @@
 function fmpqInit(i::Clong, cf::Ptr{Cvoid})
    return number(Nemo.fmpq(i))
 end
-   
+
 function fmpqDelete(ptr::Ptr{Ptr{Cvoid}}, cf::Ptr{Cvoid})
    ptr_new = unsafe_load(ptr)
    number_pop!(nemoNumberID, ptr_new)
@@ -162,9 +162,9 @@ end
 ###############################################################################
 
 function fmpqSubringGcd(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
-   n1 = numerator(julia(a)::fmpq)
-   n2 = numerator(julia(b)::fmpq)
-   return number(fmpq(Nemo.gcd(n1, n2)))
+   n1 = numerator(julia(a)::Nemo.fmpq)
+   n2 = numerator(julia(b)::Nemo.fmpq)
+   return number(Nemo.fmpq(Nemo.gcd(n1, n2)))
 end
 
 ###############################################################################
@@ -175,7 +175,7 @@ end
 
 function fmpqInt(ptr::Ptr{Ptr{Cvoid}}, cf::Ptr{Cvoid})
     ptr_load = unsafe_load(ptr)
-    n = julia(ptr_load)::fmpq
+    n = julia(ptr_load)::Nemo.fmpq
     ret_val = Clong(n)
     number_pop!(nemoNumberID, ptr_load)
     return ret_val
@@ -183,7 +183,7 @@ end
 
 function fmpqMPZ(b::BigInt, ptr::Ptr{Ptr{Cvoid}}, cf::Ptr{Cvoid})
     ptr_load = unsafe_load(ptr)
-    n = julia(unsafe_load(ptr))::fmpz
+    n = julia(unsafe_load(ptr))::Nemo.fmpz
     z = convert(BigInt, Nemo.numerator(n))
     bptr = reinterpret(Ptr{Cvoid}, pointer_from_objref(b))
     zptr = reinterpret(Ptr{Cvoid}, pointer_from_objref(z))
@@ -229,7 +229,7 @@ function fmpqInitChar(cf::Ptr{Cvoid}, p::Ptr{Cvoid})
     ring_struct.cfGreaterZero = @cfunction(fmpqGreaterZero, Cint, (Ptr{Cvoid}, Ptr{Cvoid}))
     ring_struct.cfWriteLong = @cfunction(fmpqWrite, Cvoid, (Ptr{Cvoid}, Ptr{Cvoid}))
     ring_struct.cfCoeffWrite = @cfunction(fmpqCoeffWrite, Cvoid, (Ptr{Cvoid}, Cint))
-    
+
     fill_coeffs_with_function_data(ring_struct, cf)
 
     return Cint(0)

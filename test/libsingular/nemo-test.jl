@@ -38,6 +38,8 @@ function test_nemo_fmpq()
 
    @test f1c[1] + f1c[2] == Nemo.QQ(4)
 
+   @test std(Ideal(R, x*y-1, x^2))[1] == Nemo.QQ(1)
+
    println("PASS")
 end
 
