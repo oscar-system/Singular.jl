@@ -7,7 +7,7 @@
 function fmpzInit(i::Clong, cf::Ptr{Cvoid})
    return number(Nemo.fmpz(i))
 end
-   
+
 function fmpzDelete(ptr::Ptr{Ptr{Cvoid}}, cf::Ptr{Cvoid})
     ptr_new = unsafe_load(ptr)
     number_pop!(nemoNumberID, ptr_new)
@@ -183,16 +183,16 @@ end
 ###############################################################################
 
 function fmpzInt(ptr::Ptr{Ptr{Cvoid}}, cf::Ptr{Cvoid})
-    ptr_load = unsafe_load(ptr) 
-    n = julia(ptr_load)::fmpz
+    ptr_load = unsafe_load(ptr)
+    n = julia(ptr_load)::Nemo.fmpz
     ret_val = Clong(n)
-    number_pop!(nemoNumberID, ptr_load) 
+    number_pop!(nemoNumberID, ptr_load)
     return ret_val
 end
 
 function fmpzMPZ(b::BigInt, ptr::Ptr{Ptr{Cvoid}}, cf::Ptr{Cvoid})
     ptr_load = unsafe_load(ptr)
-    n = julia(unsafe_load(ptr))::fmpz
+    n = julia(unsafe_load(ptr))::Nemo.fmpz
     z = convert(BigInt, n)
     bptr = reinterpret(Ptr{Cvoid}, pointer_from_objref(b))
     zptr = reinterpret(Ptr{Cvoid}, pointer_from_objref(z))
