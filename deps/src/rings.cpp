@@ -295,8 +295,7 @@ void singular_define_rings(jlcxx::Module & Singular)
     Singular.method("maMapPoly",
                    [](poly map_p, ring pr, ideal im_id, ring im) {
                        rChangeCurrRing(pr);
-                       nMapFunc nMap =n_SetMap(currRing->cf, im->cf);
-                       return maMapPoly(map_p, pr, im_id, im, nMap);
+                       return maMapPoly(map_p, pr, im_id, im, ndCopyMap);
     });
     Singular.method("p_GetOrder",
                    [](poly p, ring r) {

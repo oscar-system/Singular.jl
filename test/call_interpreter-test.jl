@@ -11,4 +11,5 @@ function test_call_interpreter()
     @test result[4] == ""
     @test length(result) == 4
     println("PASS")
+    println("")
 end

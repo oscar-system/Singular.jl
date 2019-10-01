@@ -15,11 +15,16 @@ Map(::Type{T}) where T <: AbstractAlgebra.Map = AbstractAlgebra.Map(T)
 ###############################################################################
 
 mutable struct SIdAlgHom{T} <: AbstractAlgebra.Map{PolyRing, PolyRing,
-        Singular.AbstractAlgebraHomomorphism, SIdAlgHom} where T <: Union{Ring, Field}
+         Singular.AbstractAlgebraHomomorphism, SIdAlgHom} where T <: Union{Ring, Field}
+
    domain::PolyRing
-   image::sideal
+   image::Vector
+   ptr::libSingular.ideal
+
    function SIdAlgHom{T}(R::PolyRing) where T <: Union{Ring, Field}
-   z = new(R, Singular.MaximalIdeal(R, 1))
+      M = Singular.MaximalIdeal(R, 1)
+      z = new(R, gens(M), M.ptr)
+      return z
    end
 end
 
@@ -30,15 +35,25 @@ end
 ###############################################################################
 
 mutable struct SAlgHom{T} <: AbstractAlgebra.Map{PolyRing, PolyRing,
-          Singular.AbstractAlgebraHomomorphism, SAlgHom} where T <: Union{Ring, Field}
+         Singular.AbstractAlgebraHomomorphism, SAlgHom} where T <: Union{Ring, Field}
 
    domain::PolyRing
    codomain::PolyRing
-   image::sideal
+   image::Vector
+   ptr::libSingular.ideal
 
    function SAlgHom{T}(domain::PolyRing, codomain::PolyRing,
-                                   m::sideal) where T <: Union{Ring, Field}
-      z = new(domain, codomain, m)
+             V::Vector) where T <: Union{Ring, Field}
+
+      I = Ideal(codomain, V)
+      z = new(domain, codomain, V, I.ptr)
+      return z
+   end
+
+   function SAlgHom{T}(domain::PolyRing, codomain::PolyRing,
+             V::Vector, ptr::libSingular.ideal) where T <: Union{Ring, Field}
+
+      z = new(domain, codomain, V, ptr)
       return z
    end
 end
