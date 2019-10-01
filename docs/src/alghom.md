@@ -4,7 +4,8 @@ CurrentModule = Singular
 
 # Algebra Homomorphisms
 
-Singular.jl allows the creation of algebra homomorphisms of Singular polynomial rings over the fields `QQ`, `Fp` and finite extensions of `Fp`. 
+Singular.jl allows the creation of algebra homomorphisms of Singular polynomial rings
+over Nemo/Singular coefficient rings.
 
 The default algebra homomorphism type in Singular.jl is the Singular `SAlgHom` type.
 
@@ -17,10 +18,14 @@ All algebra homomorphism types belong directly to the abstract type `AbstractAlg
 
 ### Constructors
 
-Given two Singular polynomial rings $R$ and $S$ over the same base field $K$, the following constructors are available for creating ideals.
+Given two Singular polynomial rings $R$ and $S$ over the same base ring, the following constructors are available for creating algebra homomorphisms.
 
 ```@docs
-AlgebraHomomorphism(D::PolyRing, C::PolyRing, I::sideal)
+AlgebraHomomorphism(D::PolyRing, C::PolyRing, V::Vector)
+```
+
+```@docs
+AlgebraHomomorphism(D::PolyRing, C::PolyRing, V::Vector, ptr::libSingular.ideal)
 ```
 
 ```@docs
@@ -38,9 +43,13 @@ R, (x, y, z, w) = PolynomialRing(L[1], ["x", "y", "z", "w"];
 S, (a, b, c) = PolynomialRing(L[1], ["a", "b", "c"];
                              ordering=:degrevlex)
 
-I = Ideal(S, [a, a + b^2, b - c, c + b])
+V = [a, a + b^2, b - c, c + b]
 
-f = AlgebraHomomorphism(R, S, I)
+I = Ideal(S, V)
+
+f = AlgebraHomomorphism(R, S, V)
+
+g = AlgebraHomomorphism(R, S, V, I.ptr)
 ```
 
 ### Operating on objects
@@ -50,15 +59,15 @@ It is possible to act on polynomials and ideals via algebra homomorphisms.
 **Examples**
 
 ```
-R, (x, y, z, w) = PolynomialRing(Singular.Fp(3), ["x", "y", "z", "w"];
+R, (x, y, z, w) = PolynomialRing(Nemo.ZZ, ["x", "y", "z", "w"];
                              ordering=:negdegrevlex)
    
-S, (a, b, c) = PolynomialRing(Singular.Fp(3), ["a", "b", "c"];
+S, (a, b, c) = PolynomialRing(Nemo.ZZ, ["a", "b", "c"];
                              ordering=:degrevlex)
    
-I = Ideal(S, [a, a + b^2, b - c, c + b])
+V = [a, a + b^2, b - c, c + b]
    
-f = AlgebraHomomorphism(R, S, I)
+f = AlgebraHomomorphism(R, S, V)
    
 id  = IdentityAlgebraHomomorphism(S)
 
@@ -84,22 +93,19 @@ A short command for the composition of $f$ and $g$ is `f*g`, which is the same a
 **Examples**
 
 ```
-R, (x, y, z, w) = PolynomialRing(Singular.QQ, ["x", "y", "z", "w"];
+R, (x, y, z, w) = PolynomialRing(QQ, ["x", "y", "z", "w"];
                              ordering=:negdegrevlex)
 
-S, (a, b, c) = PolynomialRing(Singular.QQ, ["a", "b", "c"];
+S, (a, b, c) = PolynomialRing(QQ, ["a", "b", "c"];
                              ordering=:degrevlex)
 
-I = Ideal(S, [a, a + b^2, b - c, c + b])
+V = [a, a + b^2, b - c, c + b]
 
-K = Ideal(R, [x^2, x + y + z, z*y])
+W = [x^2, x + y + z, z*y]
 
-L = Ideal(R, [x^2, 2*x^2 + 2*x*y + y^2 + 2*x*z + 2*y*z + z^2, x + y + z - y*z,
-                x + y + z + y*z])
+f = AlgebraHomomorphism(R, S, V)
 
-f = AlgebraHomomorphism(R, S, I)
-
-g = AlgebraHomomorphism(S, R, K)
+g = AlgebraHomomorphism(S, R, W)
 
 idR  = IdentityAlgebraHomomorphism(R)
 
@@ -119,6 +125,14 @@ preimage(f::SAlgHom, I::sideal)
 ```
 
 ```@docs
+preimage(f::SIdAlgHom, I::sideal)
+```
+
+```@docs
+kernel(f::SIdAlgHom)
+```
+
+```@docs
 kernel(f::SAlgHom)
 ```
 
@@ -133,12 +147,16 @@ S, (a, b, c) = PolynomialRing(QQ, ["a", "b", "c"];
    
 I = Ideal(S, [a, a + b^2, b - c, c + b])
    
-f = SAlgebraHomomorphism(R, S, I)
+f = SAlgebraHomomorphism(R, S, gens(I), I.ptr)
    
 idS  = IdentityAlgebraHomomorphism(S)
 
-P = preimage(f, I)
+P1 = preimage(f, I)
 
-K = kernel(f)
+P2 = preimage(idS, I)
+
+K1 = kernel(f)
+
+K2 = preimage(idS)
 ```
 

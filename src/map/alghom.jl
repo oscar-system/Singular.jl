@@ -13,7 +13,7 @@ function show(io::IO, M::Map(SAlgHom))
    println(io, "")
    println(io, "Codomain: ", codomain(M))
    println(io, "")
-   println(io, "Defining Equations: ", gens(M.image))
+   println(io, "Defining Equations: ", M.image)
 end
 
 ###############################################################################
@@ -30,7 +30,7 @@ function map_ideal(f::Map(SAlgHom), I::sideal)
    end
 
    return Ideal(f.codomain, libSingular.maMapIdeal(I.ptr, f.domain.ptr,
-                f.image.ptr, f.codomain.ptr))
+                f.ptr, f.codomain.ptr))
 end
 
 function map_poly(f::Map(SAlgHom), p::spoly)
@@ -39,7 +39,7 @@ function map_poly(f::Map(SAlgHom), p::spoly)
       error("Polynomial is not in the domain of the
             algebra homomorphism.")
    end
-   return f.codomain(libSingular.maMapPoly(p.ptr, f.domain.ptr, f.image.ptr,
+   return f.codomain(libSingular.maMapPoly(p.ptr, f.domain.ptr, f.ptr,
           f.codomain.ptr))
 end
 
@@ -65,8 +65,11 @@ end
 """
 function compose(f::Map(SAlgHom), g::Map(SAlgHom))
    check_composable(f, g)
-   I = g(f.image)
-   return AlgebraHomomorphism(f.domain, g.codomain, I)
+
+   I = Ideal(g.codomain, libSingular.maMapIdeal(f.ptr, g.domain.ptr,
+                g.ptr, g.codomain.ptr))
+
+   return AlgebraHomomorphism(f.domain, g.codomain, gens(I), I.ptr)
 end
 
 function check_composable(f::Map(SAlgHom), g::Map(SAlgHom))
@@ -96,7 +99,7 @@ function preimage(f::Map(SAlgHom), I::sideal)
    end
 
    return Ideal(f.domain, Singular.libSingular.maGetPreimage(f.codomain.ptr,
-                        f.image.ptr, I.ptr, f.domain.ptr))
+                        f.ptr, I.ptr, f.domain.ptr))
 end
 
 @doc Markdown.doc"""
@@ -114,22 +117,29 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-   Algebra_Homomorphism(D::PolyRing, C::PolyRing, I::sideal)
+   Algebra_Homomorphism(D::PolyRing, C::PolyRing, V::Vector)
 > Constructs an algebra homomorphism $f: D --> C$, where the $i$-th variable of
-> $D$ is mapped to the $i$-th entry of $I$. $D$ and $C$ must be polynomial
+> $D$ is mapped to the $i$-th entry of $V$. $D$ and $C$ must be polynomial
 > rings over the same base ring.
 """
-function AlgebraHomomorphism(D::PolyRing, C::PolyRing, I::sideal)
+function AlgebraHomomorphism(D::PolyRing, C::PolyRing, V::Vector)
 
-   if D.base_ring == Singular.ZZ
-      error("Base ring ZZ not implemented.")
-   end
+   I = Ideal(C, V)
 
-   if base_ring(I) != C
-      error("Defining equations have to be contained in the codomain.")
-   end
+   return AlgebraHomomorphism(D, C, V, I.ptr)
+end
 
-   if ngens(I) != nvars(D)
+@doc Markdown.doc"""
+   Algebra_Homomorphism(D::PolyRing, C::PolyRing, V::Vector, ptr::libSingular.ideal)
+> Constructs an algebra homomorphism $f: D --> C$, where the $i$-th variable of
+> $D$ is mapped to the $i$-th entry of $V$. $D$ and $C$ must be polynomial
+> rings over the same base ring.
+"""
+function AlgebraHomomorphism(D::PolyRing, C::PolyRing, V::Vector, ptr::libSingular.ideal)
+
+   n = length(V)
+
+   if n != nvars(D)
       error("Number of defining equations does not match.")
    end
 
@@ -137,7 +147,7 @@ function AlgebraHomomorphism(D::PolyRing, C::PolyRing, I::sideal)
       error("Base rings do not match.")
    end
 
-   return SAlgHom{typeof(D.base_ring)}(D, C, I)
+   return SAlgHom{typeof(D.base_ring)}(D, C, V, ptr)
 end
 
 domain(f::AbstractAlgebra.Map(Singular.SAlgHom)) = f.domain

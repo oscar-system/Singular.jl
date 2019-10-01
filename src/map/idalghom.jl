@@ -45,7 +45,7 @@ function show(io::IO, M::Map(SIdAlgHom))
    println(io, "")
    println(io, "Domain: ", domain(M))
    println(io, "")
-   println(io, "Defining Equations: ", gens(M.image))
+   println(io, "Defining Equations: ", M.image)
 end
 
 ###############################################################################
