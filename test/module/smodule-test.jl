@@ -174,42 +174,50 @@ end
 function test_smodule_sres()
    print("smodule.sres...")
 
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"])
 
-   v1 = vector(R, x + 1, x*y + 1, y)
-   v2 = vector(R, x^2 + 1, 2x + 3y, x)
-
-   M = std(Singular.Module(R, v1, v2))
+   I = Singular.Ideal(R, y*z + z^2, y^2 + x*z, x*y + z^2, z^3, x*z^2, x^2*z)
+   M = std(syz(I))
 
    F = sres(M, 0)
 
-   # check mathematical length (structure has one more element)
-   @test length(F) == 1
+   # We have R^6 <- R^9 <- R^5 <- R^1
+   # All references agree that when written as follows:
+   # 0 <- M <- R^6 <- R^9 <- R^5 <- R^1 <- 0
+   # the length is 3, as numbering starts at index 0 with R^6
 
-   M1 = Singular.Matrix(M)
+   @test length(F) == 3
+
+   M1 = Singular.Matrix(F[1])
    M2 = Singular.Matrix(F[2])
+   M3 = Singular.Matrix(F[3])
 
    @test iszero(M1*M2)
+   @test iszero(M2*M3)
 
    F = sres(M, 1)
 
-   # check mathematical length (structure has one more element)
-   @test length(F) == 1
+   @test length(F) >= 1 # Singular can return more than asked for
 
-   M1 = Singular.Matrix(M)
+   M1 = Singular.Matrix(F[1])
    M2 = Singular.Matrix(F[2])
 
    @test iszero(M1*M2)
 
-   F = sres(M, 3)
+   F = sres(M, 2)
 
-   # check mathematical length (structure has one more element)
-   @test length(F) == 1
+   @test length(F) >= 2 # Singular can return more than asked for
 
-   M1 = Singular.Matrix(M)
+   M1 = Singular.Matrix(F[1])
    M2 = Singular.Matrix(F[2])
+   M3 = Singular.Matrix(F[3])
 
    @test iszero(M1*M2)
+   @test iszero(M2*M3)
+
+   F = sres(M, 4)
+
+   @test length(F) == 3
 
    println("PASS")
 end
