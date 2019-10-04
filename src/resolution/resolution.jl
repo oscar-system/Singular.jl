@@ -116,12 +116,12 @@ function show(io::IO, r::sresolution)
    println(io, "Singular Resolution:")
    len = length(r)
    if len > 0
-      ptr = libSingular.getindex_internal(r.ptr,0,r.minimal)
+      ptr = libSingular.getindex_internal(r.ptr, 0, r.minimal)
       if ptr.cpp_object != C_NULL
          print(io, "R^", libSingular.rank(ptr))
       end
    end
-   for i = 1:len - 1
+   for i = 1:len
       ptr = libSingular.getindex_internal(r.ptr, i - 1, r.minimal)
       if ptr.cpp_object == C_NULL
          break
