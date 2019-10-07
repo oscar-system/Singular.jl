@@ -102,6 +102,7 @@ end
 
 """
     (R::PolyRing{T})(m::libSingular.ideal,::Val{:module}) where T
+
 If R is called with a low-level ideal pointer, along with
 Val(:module), it will interpret the ideal pointer as a module.
 This needs to be indicated due to the fact that Singular's
