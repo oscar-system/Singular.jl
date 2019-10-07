@@ -955,7 +955,7 @@ end
 function change_base_ring(C::T, p::spoly) where T <: Union{Ring, Field}
    S, = Singular.PolynomialRing(C, [String(v) for v in symbols(parent(p))],
           ordering = parent(p).ord)
-   return change_base_ring(C, S, p)
+   return change_base_ring(C, p, parent = S)
 end
 
 ###############################################################################

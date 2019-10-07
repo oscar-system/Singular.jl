@@ -277,8 +277,8 @@ It is possible to change the coefficient ring of a given polynomial $p$ via
 the function 'change_base_ring'.
 
 ```@docs
-Singular.change_base_ring(p::spoly, C::Union{Ring, Field}) 
-```
+Singular.change_base_ring(C::Union{Ring, Field} p::spoly)
+` ``
 
 **Examples**
 
@@ -287,10 +287,10 @@ R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 
 p = x^5 + y^3+1
 
-change_base_ring(p, QQ)
+change_base_ring(QQ, p)
 ```
 
-It also possible to work with Nemo rings, if a type conversion for the 
+It also possible to work with Nemo rings, if a type conversion for the
 Singular coefficients is implemented. One has to cast the Nemo ring via
 'CoefficientRing' to a suitabel Singular type.
 
@@ -301,7 +301,7 @@ R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 
 p = x^5 + y^3+1
 
-change_base_ring(p, CoefficientRing(Nemo.QQ))
+change_base_ring(CoefficientRing(Nemo.QQ), p)
 ```
 
 ### Conversion between Singular.jl polynomials and MPoly polynomials
