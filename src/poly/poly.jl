@@ -949,7 +949,7 @@ end
 
 @doc Markdown.doc"""
    change_base_ring(C::T, p::spoly) where T <: Union{Ring, Field}
-> Return a polynomial ring, whose coefficient ring is subsituted by the ring 
+> Return a polynomial ring, whose coefficient ring is subsituted by the ring
 > $C$.
 """
 function change_base_ring(C::T, p::spoly) where T <: Union{Ring, Field}

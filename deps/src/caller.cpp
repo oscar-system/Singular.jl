@@ -119,8 +119,18 @@ void * jl_array_to_intvec(jl_value_t * array_val)
     intvec *     result = new intvec(size);
     int *        result_content = result->ivGetVec();
     for (int i = 0; i < size; i++) {
-        result_content[i] =
-            static_cast<int>(jl_unbox_int64(jl_arrayref(array, i)));
+        jl_value_t * current_entry = jl_arrayref(array, i);
+        if (jl_is_int32(current_entry)) {
+            result_content[i] =
+                static_cast<int>(jl_unbox_int32(current_entry));
+        }
+        else if (jl_is_int64(current_entry)) {
+            int64_t current_int64 = jl_unbox_int64(current_entry);
+            result_content[i] = static_cast<int>(current_int64);
+            if (result_content[i] != current_int64) {
+                jl_error("Input entry does not fit in 32 bit integer");
+            }
+        }
     }
     return reinterpret_cast<void *>(result);
 }
@@ -131,12 +141,20 @@ void * jl_array_to_intmat(jl_value_t * array_val)
     int          rows = jl_array_dim(array, 0);
     int          cols = jl_array_dim(array, 1);
     intvec *     result = new intvec(rows, cols, 0);
+    if (!jl_subtype(reinterpret_cast<jl_value_t *>(jl_typeof(array_val)),
+                    reinterpret_cast<jl_value_t *>(jl_int64_matrix_type))) {
+        jl_error("Input is not an Int64 matrix");
+    }
     int64_t * array_data = reinterpret_cast<int64_t *>(jl_array_data(array));
     int *     vec_data = result->ivGetVec();
     for (int i = 0; i < cols; i++) {
         for (int j = 0; j < rows; j++) {
-            IMATELEM(*result, i + 1, j + 1) =
-                static_cast<int>(array_data[j + (i * rows)]);
+            int64_t current_elem = array_data[j + (i * rows)];
+            int     current_elem_32 = static_cast<int>(current_elem);
+            if (current_elem != current_elem_32) {
+                jl_error("Input entry does not fit in 32 bit integer");
+            }
+            IMATELEM(*result, i + 1, j + 1) = current_elem_32;
         }
     }
     return reinterpret_cast<void *>(result);
@@ -258,11 +276,13 @@ jl_value_t * call_singular_library_procedure(
     return retObj;
 }
 
-jl_value_t * call_singular_library_procedure_wo_ring(
-    std::string name, jlcxx::ArrayRef<jl_value_t *> arguments)
+jl_value_t * call_singular_library_procedure_wo_rng(
+    std::string name, void* rng, jlcxx::ArrayRef<jl_value_t *> arguments)
 {
-    return call_singular_library_procedure(name, NULL, arguments);
+    return call_singular_library_procedure(name, reinterpret_cast<ring>(rng), arguments);
 }
+
+
 
 jl_value_t * convert_nested_list(void * l_void)
 {
@@ -310,7 +330,6 @@ void singular_define_caller(jlcxx::Module & Singular)
                     &call_singular_library_procedure);
     Singular.method("call_singular_library_procedure",
                     &call_singular_library_procedure_wo_rng);
-
     Singular.method("get_type_mapper", &get_type_mapper);
     Singular.method("initialize_jl_c_types", &initialize_jl_c_types);
 
