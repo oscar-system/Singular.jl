@@ -369,7 +369,6 @@ function test_spoly_evaluate()
    @test evaluate(f, [ZZ(2), ZZ(3)]) == 17
    @test evaluate(f, [QQ(2), QQ(3)]) == 17
    @test evaluate(f, [x + 1, y - 1]) == x^2*y - x^2 + 2*x*y + y + 2
-   @test evaluate(f, [2, 3], QQ) == 17
    @test evaluate(f, [x], [1]) == y + 3
    @test f(2, 3) == 17
 
