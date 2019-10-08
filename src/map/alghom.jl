@@ -124,19 +124,6 @@ end
 """
 function AlgebraHomomorphism(D::PolyRing, C::PolyRing, V::Vector)
 
-   I = Ideal(C, V)
-
-   return AlgebraHomomorphism(D, C, V, I.ptr)
-end
-
-@doc Markdown.doc"""
-   Algebra_Homomorphism(D::PolyRing, C::PolyRing, V::Vector, ptr::libSingular.ideal)
-> Constructs an algebra homomorphism $f: D --> C$, where the $i$-th variable of
-> $D$ is mapped to the $i$-th entry of $V$. $D$ and $C$ must be polynomial
-> rings over the same base ring.
-"""
-function AlgebraHomomorphism(D::PolyRing, C::PolyRing, V::Vector, ptr::libSingular.ideal)
-
    n = length(V)
 
    if n != nvars(D)
@@ -147,7 +134,7 @@ function AlgebraHomomorphism(D::PolyRing, C::PolyRing, V::Vector, ptr::libSingul
       error("Base rings do not match.")
    end
 
-   return SAlgHom{typeof(D.base_ring)}(D, C, V, ptr)
+   return SAlgHom{typeof(D.base_ring)}(D, C, V)
 end
 
 domain(f::AbstractAlgebra.Map(Singular.SAlgHom)) = f.domain

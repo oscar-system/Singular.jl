@@ -22,10 +22,24 @@ mutable struct SIdAlgHom{T} <: AbstractAlgebra.Map{PolyRing, PolyRing,
    ptr::libSingular.ideal
 
    function SIdAlgHom{T}(R::PolyRing) where T <: Union{Ring, Field}
-      M = Singular.MaximalIdeal(R, 1)
-      z = new(R, gens(M), M.ptr)
+      V = gens(R)
+      n = nvars(R)
+      ptr = libSingular.idInit(Cint(n), 1)
+      z = new(R, V, ptr)
+      R.refcount += 1
+      finalizer(_SIdAlgHom_clear_fn, z)
+      for i = 1:n
+         p = libSingular.p_Copy(V[i].ptr, R.ptr)
+         libSingular.setindex_internal(ptr, p, Cint(i - 1))
+      end
       return z
    end
+end
+
+function _SIdAlgHom_clear_fn(f::SIdAlgHom)
+   R = f.domain
+   libSingular.id_Delete(f.ptr, R.ptr)
+   _PolyRing_clear_fn(R)
 end
 
 ###############################################################################
@@ -45,15 +59,21 @@ mutable struct SAlgHom{T} <: AbstractAlgebra.Map{PolyRing, PolyRing,
    function SAlgHom{T}(domain::PolyRing, codomain::PolyRing,
              V::Vector) where T <: Union{Ring, Field}
 
-      I = Ideal(codomain, V)
-      z = new(domain, codomain, V, I.ptr)
-      return z
-   end
-
-   function SAlgHom{T}(domain::PolyRing, codomain::PolyRing,
-             V::Vector, ptr::libSingular.ideal) where T <: Union{Ring, Field}
-
+      n = length(V)
+      ptr = libSingular.idInit(Cint(n), 1)
       z = new(domain, codomain, V, ptr)
+      codomain.refcount += 1
+      for i = 1:n
+         p = libSingular.p_Copy(V[i].ptr, codomain.ptr)
+         libSingular.setindex_internal(ptr, p, Cint(i - 1))
+      end
       return z
    end
 end
+
+function _SAlgHom_clear_fn(f::SAlgHom)
+   R = f.codomain
+   libSingular.id_Delete(f.ptr, R.ptr)
+   _PolyRing_clear_fn(R)
+end
+
