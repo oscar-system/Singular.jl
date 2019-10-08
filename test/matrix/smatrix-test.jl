@@ -1,6 +1,4 @@
-function test_smatrix_constructors()
-   print("smatrix.constructors...")
-
+@testset "smatrix.constructors..." begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    I = Ideal(R, x, y)
@@ -22,13 +20,9 @@ function test_smatrix_constructors()
 
    @test isa(M, smatrix)
    @test isa(V, smatrix)
-
-   println("PASS")
 end
 
-function test_smatrix_manipulation()
-   print("smatrix.manipulation...")
-
+@testset "smatrix.manipulation..." begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    I = Ideal(R, x, y)
@@ -44,13 +38,9 @@ function test_smatrix_manipulation()
    @test iszero(M - M)
 
    @test deepcopy(M) == M
-
-   println("PASS")
 end
 
-function test_smatrix_binary_ops()
-   print("smatrix.binary_ops...")
-
+@testset "smatrix.binary_ops..." begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    I1 = Ideal(R, x, y)
@@ -64,13 +54,9 @@ function test_smatrix_binary_ops()
    @test M1 + M2 == M2 + M1
    @test (M1 + M2) - M2 == M1
    @test M3*(M1 + M2) == M3*M1 + M3*M2
-
-   println("PASS")
 end
 
-function test_smatrix_comparison()
-   print("smatrix.comparison...")
-
+@testset "smatrix.comparison..." begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    I1 = Ideal(R, x, y)
@@ -82,16 +68,5 @@ function test_smatrix_comparison()
    @test M1 != M2
    @test M1 == M1
    @test M1 == deepcopy(M1)
-
-   println("PASS")
-end
-
-function test_smatrix()
-   test_smatrix_constructors()
-   test_smatrix_manipulation()
-   test_smatrix_binary_ops()
-   test_smatrix_comparison()
-
-   println("")
 end
 

@@ -1,6 +1,4 @@
-function test_sresolution_constructors()
-   print("sresolution.constructors...")
-
+@testset "sresolution.constructors..." begin
    R, (w, x, y, z) = PolynomialRing(QQ, ["w", "x", "y", "z"])
 
    I = Ideal(R, w^2 - x*z, w*x - y*z, x^2 - w*y, x*y - z^2, y^2 - w*z)
@@ -18,13 +16,9 @@ function test_sresolution_constructors()
    @test typeof(F) <: AbstractAlgebra.SetElem
 
    @test isa(F, sresolution)
-
-   println("PASS")
 end
 
-function test_sresolution_manipulation()
-   print("sresolution.manipulation...")
-
+@testset "sresolution.manipulation..." begin
    R, (w, x, y, z) = PolynomialRing(QQ, ["w", "x", "y", "z"])
 
    I = Ideal(R, w^2 - x*z, w*x - y*z, x^2 - w*y, x*y - z^2, y^2 - w*z)
@@ -52,13 +46,9 @@ function test_sresolution_manipulation()
 
    @test isa(G, sresolution)
    @test parent(F) === parent(G)
-
-   println("PASS")
 end
 
-function test_sresolution_betti()
-   print("sresolution.betti...")
-
+@testset "sresolution.betti..." begin
    R, (w, x, y, z) = PolynomialRing(QQ, ["w", "x", "y", "z"])
 
    I = Ideal(R, w^2 - x*z, w*x - y*z, x^2 - w*y, x*y - z^2, y^2 - w*z)
@@ -72,13 +62,9 @@ function test_sresolution_betti()
    @test B[1, 1] == 1 && B[1, 2] == 0 && B[1, 3] == 0 && B[1, 4] == 0
    @test B[2, 1] == 0 && B[2, 2] == 5 && B[2, 3] == 5 && B[2, 4] == 0
    @test B[3, 1] == 0 && B[3, 2] == 0 && B[3, 3] == 0 && B[3, 4] == 1
-
-   println("PASS")
 end
 
-function test_sresolution_minres()
-   print("sresolution.minres...")
-
+@testset "sresolution.minres..." begin
    R, (w, x, y, z) = PolynomialRing(QQ, ["w", "x", "y", "z"])
 
    I = Ideal(R, w^2 - x*z, w*x - y*z, x^2 - w*y, x*y - z^2, y^2 - w*z)
@@ -93,16 +79,5 @@ function test_sresolution_minres()
 
    # check it is a complex
    @test iszero(M1*M2)
-
-   println("PASS")
-end
-
-function test_sresolution()
-   test_sresolution_constructors()
-   test_sresolution_manipulation()
-   test_sresolution_betti()
-   test_sresolution_minres()
-
-   println("")
 end
 

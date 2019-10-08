@@ -1,6 +1,4 @@
-function test_caller()
-    print("caller...")
-
+@testset "caller.Lib..." begin
     R, (x, y) = PolynomialRing(Singular.ZZ, ["x", "y"])
     @test Singular.LibSets.isEqualInt(R, Singular.ZZ(1), Singular.ZZ(1)) == 1
 
@@ -43,6 +41,4 @@ function test_caller()
     @test Singular.LibNormal.normal(R, i1, "withDelta", "prim") isa Array
 
     @test Singular.LibNormal.normal(i1, "withDelta", "prim") isa Array
-
-    println("PASS")
 end

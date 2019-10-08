@@ -1,6 +1,4 @@
-function test_sideal_constructors()
-   print("sideal.constructors...")
-
+@testset "sideal.constructors..." begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    I = Ideal(R, x, y)
@@ -29,13 +27,9 @@ function test_sideal_constructors()
    @test isa(I4, sideal)
    @test isa(I5, sideal)
    @test isa(I6, sideal)
-
-   println("PASS")
 end
 
-function test_sideal_manipulation()
-   print("sideal.manipulation...")
-
+@testset "sideal.manipulation..." begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    I0 = Ideal(R)
@@ -64,13 +58,9 @@ function test_sideal_manipulation()
    @test isvar_generated(Ideal(R, x, y))
    @test !isvar_generated(Ideal(R, R(1)))
    @test !isvar_generated(Ideal(R, x + y))
-
-   println("PASS")
 end
 
-function test_sideal_binary_ops()
-   print("sideal.binary_ops...")
-
+@testset "sideal.binary_ops..." begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    I1 = Ideal(R, x)
@@ -80,13 +70,9 @@ function test_sideal_binary_ops()
 
    @test equal(I1 + I2, I3)
    @test equal(I1*I2, I4)
-
-   println("PASS")
 end
 
-function test_sideal_powering()
-   print("sideal.powering...")
-
+@testset "sideal.powering..." begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    I = Ideal(R, x^2, x*y + 1)
@@ -99,59 +85,40 @@ function test_sideal_powering()
       @test equal(S, I^i)
       S *= I
    end
-
-   println("PASS")
 end
 
-function test_sideal_containment()
-   print("sideal.containment...")
-
+@testset "sideal.containment..." begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    @test contains(Ideal(R, x, y), Ideal(R, x))
    @test !contains(Ideal(R, x), Ideal(R, x, y))
-
-   println("PASS")
 end
 
-function test_sideal_comparison()
-   print("sideal.comparison...")
-
+@testset "sideal.comparison..." begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    @test equal(Ideal(R, x, y, x - y), Ideal(R, x, y, x + y))
    @test !equal(Ideal(R, x), Ideal(R, x, y))
    @test !isequal(Ideal(R, x, y, x - y), Ideal(R, x, y, x + y))
    @test isequal(Ideal(R, x, y), Ideal(R, x, y))
-
-   println("PASS")
 end
 
-function test_sideal_leading_terms()
-   print("sideal.leading_terms...")
-
+@testset "sideal.leading_terms..." begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    @test equal(lead(Ideal(R, x^2 + x*y + 1, 2y^2 + 3, R(7))), Ideal(R, x^2, 2y^2, R(7)))
-
-   println("PASS")
 end
 
-function test_sideal_local()
-   print("sideal.local...")
-
+@testset "sideal.local..." begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"], ordering=:negdegrevlex)
 
    I = Ideal(R, y, x^2, (1 + y^3) * (x^2 - y))
    M = Singular.minimal_generating_set(I)
 
    @test equal(I, Ideal(R, x^2, y))
-   println("PASS")
 end
 
-function test_sideal_intersection()
-   print("sideal.intersection...")
-
+@testset "sideal.intersection..." begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    I1 = Ideal(R, x^2 + x*y + 1, 2y^2 + 3, R(7))
@@ -161,13 +128,9 @@ function test_sideal_intersection()
 
    @test contains(I1, I)
    @test contains(I2, I)
-
-   println("PASS")
 end
 
-function test_sideal_quotient()
-   print("sideal.quotient...")
-
+@testset "sideal.quotient..." begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    I = Ideal(R, x^2 + x*y + 1, 2y^2 + 3)
@@ -178,13 +141,9 @@ function test_sideal_quotient()
    B = intersection(quotient(I, J), quotient(I, K))
 
    @test equal(A, B)
-
-   println("PASS")
 end
 
- function test_sideal_saturation()
-   print("sideal.saturation...")
-
+@testset "sideal.saturation..." begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    I = Ideal(R, (x^2 + x*y + 1)*(2y^2+1)^3, (2y^2 + 3)*(2y^2+1)^2)
@@ -196,13 +155,9 @@ end
    J = Ideal(R, x)
 
    @test equal(satstd(I, J), std(saturation(I, J)))
-
-   println("PASS")
 end
 
-function test_sideal_slimgb()
-   print("sideal.slimgb...")
-
+@testset "sideal.slimgb..." begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    I = Ideal(R, x^2 + x*y + 1, 2y^2 + 3)
@@ -219,13 +174,9 @@ function test_sideal_slimgb()
    @test isequal(B, Ideal(R, 2y^2 + 3, x^2 + x*y + 1)) ||
          isequal(B, Ideal(x^2 + x*y + 1, 2y^2 + 3))
    @test B.isGB == true
-
-   println("PASS")
 end
 
-function test_sideal_std()
-   print("sideal.std...")
-
+@testset "sideal.std..." begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    I = Ideal(R, x^2 + x*y + 1, 2y^2 + 3)
@@ -242,13 +193,9 @@ function test_sideal_std()
    @test isequal(B, Ideal(R, 2y^2 + 3, x^2 + x*y + 1)) ||
          isequal(B, Ideal(x^2 + x*y + 1, 2y^2 + 3))
    @test B.isGB == true
-
-   println("PASS")
 end
 
-function test_sideal_reduction()
-   print("sideal.reduction...")
-
+@testset "sideal.reduction..." begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    f = x^2*y + 2y + 1
@@ -262,13 +209,9 @@ function test_sideal_reduction()
    h = (x^2 + 1)*f + (x + y)*g + x + 1
 
    @test reduce(h, J) == x + 1
-
-   println("PASS")
 end
 
-function test_sideal_free_resolution()
-   print("sideal.free_resolution...")
-
+@testset "sideal.free_resolution..." begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    I = Ideal(R, x^2*y + 2y + 1, y^2 + 1)
@@ -289,13 +232,9 @@ function test_sideal_free_resolution()
    # check we have a complex
    @test iszero(M1*N1)
    @test iszero(M2*N2)
-
-   println("PASS")
 end
 
-function test_sideal_syzygy()
-   print("sideal.syzygy...")
-
+@testset "sideal.syzygy..." begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    I = Ideal(R, x^2*y + 2y + 1, y^2 + 1)
@@ -307,26 +246,18 @@ function test_sideal_syzygy()
 
    # check they are actually syzygies
    @test iszero(M*N)
-
-   println("PASS")
 end
 
-function test_sideal_kernel()
-   print("sideal.kernel...")
-
+@testset "sideal.kernel..." begin
    # twisted cubic
-
    P1, (t_0, t_1) = PolynomialRing(QQ, ["t_0", "t_1"])
    P3, (x, y, z, w) = PolynomialRing(QQ, ["x", "y", "z", "w"])
    I = Ideal(P1, t_0^3, t_0^2*t_1, t_0*t_1^2, t_1^3)
    J = kernel(P3, I)
    @test ngens(J) == 3 && J[1] == z^2-y*w && J[2] == y*z-x*w && J[3] == y^2-x*z
-   println("PASS")
 end
 
-function test_sideal_eliminate()
-   print("sideal.eliminate...")
-
+@testset "sideal.eliminate..." begin
    R, (x, y, t) = PolynomialRing(QQ, ["x", "y", "t"])
 
    I = Ideal(R, x - t^2, y - t^3)
@@ -338,13 +269,9 @@ function test_sideal_eliminate()
    K = eliminate(I, t, x)
 
    @test equal(K, Ideal(R))
-
-   println("PASS")
 end
 
-function test_sideal_jet()
-   print("sideal.jet...")
-
+@testset "sideal.jet..." begin
    R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"])
 
    I = Ideal(R, x^5 - y^2, y^3 - x^6 + z^3)
@@ -352,13 +279,9 @@ function test_sideal_jet()
    J = jet(I, 3)
 
    @test equal(J, Ideal(R, - y^2, y^3 + z^3))
-
-   println("PASS")
 end
 
-function test_sideal_jacobi()
-   print("sideal.jacob...")
-
+@testset "sideal.jacob..." begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    I = Ideal(R, 2*x + 5*y, 2*y + 5*x)
@@ -368,13 +291,9 @@ function test_sideal_jacobi()
    M = R[2 5; 5 2]
 
    @test J == M
-
-   println("PASS")
 end
 
-function test_sideal_zerodim()
-   print("sideal.zerodim...")
-
+@testset "sideal.zerodim..." begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"]; ordering=:negdegrevlex)
 
    I = Ideal(R, 3*x^2 + y^3, x*y^2)
@@ -397,33 +316,5 @@ function test_sideal_zerodim()
 
    #Check highcorner
    @test f == y^4
-
-   println("PASS")
-end
-
-function test_sideal()
-   test_sideal_constructors()
-   test_sideal_manipulation()
-   test_sideal_binary_ops()
-   test_sideal_powering()
-   test_sideal_containment()
-   test_sideal_comparison()
-   test_sideal_local()
-   test_sideal_leading_terms()
-   test_sideal_intersection()
-   test_sideal_quotient()
-   test_sideal_saturation()
-   test_sideal_slimgb()
-   test_sideal_std()
-   test_sideal_reduction()
-   test_sideal_free_resolution()
-   test_sideal_syzygy()
-   test_sideal_eliminate()
-   test_sideal_kernel()
-   test_sideal_jet()
-   test_sideal_jacobi()
-   test_sideal_zerodim()
-
-   println("")
 end
 

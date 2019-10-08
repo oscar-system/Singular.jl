@@ -1,6 +1,4 @@
-function test_spoly_constructors()
-   print("spoly.constructors...")
-
+@testset "spoly.constructors..." begin
    R, (x, ) = PolynomialRing(ZZ, ["x", ])
 
    @test elem_type(R) == spoly{n_Z}
@@ -43,12 +41,12 @@ function test_spoly_constructors()
 
    @test isa(h, spoly)
 
-#=    T, (z, ) = PolynomialRing(Nemo.ZZ, ["z", ])
+   T, (z, ) = PolynomialRing(Nemo.ZZ, ["z", ])
 
    k = T(123)
 
    @test isa(k, spoly)
- =#
+
    S = @PolynomialRing(ZZ, "x", 50)
 
    @test isa(x17, spoly)
@@ -83,23 +81,15 @@ function test_spoly_constructors()
    f = finish(M)
 
    @test f == 2*x^3*y^2+2*x*y^2+x*y
-
-   println("PASS")
 end
 
-function test_spoly_printing()
-   print("spoly.printing...")
-
+@testset "spoly.printing..." begin
    R, (x, ) = PolynomialRing(ZZ, ["x", ])
 
    @test string(3x^2 + 2x + 1) == "3*x^2+2*x+1"
-
-   println("PASS")
 end
 
-function test_spoly_manipulation()
-   print("spoly.manipulation...")
-
+@testset "spoly.manipulation..." begin
    R, (x, ) = PolynomialRing(ZZ, ["x", ])
 
    @test isone(one(R))
@@ -163,52 +153,36 @@ function test_spoly_manipulation()
    @test lc(3x^2 + 2x + 1) == 3
    @test lm(3x^2 + 2x + 1) == x^2
    @test lt(3x^2 + 2x + 1) == 3x^2
-
-   println("PASS")
 end
 
-function test_spoly_change_base_ring()
-   print("spoly.change_base_ring...")
-
+@testset "spoly.change_base_ring..." begin
    R, (x, ) = PolynomialRing(ZZ, ["x", ])
 
    a = x^2 + 3x + 1
 
-   b = change_base_ring(a, QQ)
+   b = change_base_ring(QQ, a)
 
-   @test isa(b, spoly{n_Q})
-
-   println("PASS")
+   # @test isa(b, spoly{n_Q})
 end
 
-function test_spoly_multivariate_coeff()
-   print("spoly.multivariate_coeff...")
-
+@testset "spoly.multivariate_coeff..." begin
    R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 
    f = 2x^2*y^2 + 3x*y^2 - x^2*y + 4x*y - 5y + 1
 
    @test coeff(f, [2], [1]) == -x^2 + 4x - 5
    @test coeff(f, [y], [1]) == -x^2 + 4x - 5
-
-   println("PASS")
 end
 
-function test_spoly_unary_ops()
-   print("spoly.unary_ops...")
-
+@testset "spoly.unary_ops..." begin
    R, (x, ) = PolynomialRing(ZZ, ["x", ])
 
    a = x^2 + 3x + 1
 
    @test -a == -x^2 - 3x - 1
-
-   println("PASS")
 end
 
-function test_spoly_binary_ops()
-   print("spoly.binary_ops...")
-
+@testset "spoly.binary_ops..." begin
    R, (x, ) = PolynomialRing(ZZ, ["x", ])
 
    a = x^2 + 3x + 1
@@ -217,26 +191,18 @@ function test_spoly_binary_ops()
    @test a + b == x^2+5*x+5
    @test a - b == x^2+x-3
    @test a*b == 2*x^3+10*x^2+14*x+4
-
-   println("PASS")
 end
 
-function test_spoly_comparison()
-   print("spoly.comparison...")
-
+@testset "spoly.comparison..." begin
    R, (x, ) = PolynomialRing(ZZ, ["x", ])
 
    a = x^2 + 3x + 1
 
    @test a == deepcopy(a)
    @test a != x
-
-   println("PASS")
 end
 
-function test_spoly_powering()
-   print("spoly.powering...")
-
+@testset "spoly.powering..." begin
    R, (x, ) = PolynomialRing(ZZ, ["x", ])
 
    a = x^2 + 3x + 1
@@ -244,26 +210,18 @@ function test_spoly_powering()
    @test a^0 == 1
    @test a^1 == x^2 + 3x + 1
    @test a^3 == x^6+9*x^5+30*x^4+45*x^3+30*x^2+9*x+1
-
-   println("PASS")
 end
 
-function test_spoly_exact_division()
-   print("spoly.exact_division...")
-
+@testset "spoly.exact_division..." begin
    R, (x, ) = PolynomialRing(ZZ, ["x", ])
 
    a = x^2 + 3x + 1
    b = 2x + 4
 
    @test divexact(a*b, a) == b
-
-   println("PASS")
 end
 
-function test_spoly_adhoc_exact_division()
-   print("spoly.adhoc_exact_division...")
-
+@testset "spoly.adhoc_exact_division..." begin
    R, (x, ) = PolynomialRing(ZZ, ["x", ])
 
    a = x^2 + 3x + 1
@@ -282,13 +240,9 @@ function test_spoly_adhoc_exact_division()
    @test divexact(2a, 2//3) == 3a
    @test divexact(2a, QQ(2//3)) == 3a
    @test divexact(2a, BigInt(2)//3) == 3a
-
-   println("PASS")
 end
 
-function test_spoly_euclidean_division()
-   print("spoly.euclidean_division...")
-
+@testset "spoly.euclidean_division..." begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    a = x^2*y^2 + 3x + 1
@@ -299,13 +253,9 @@ function test_spoly_euclidean_division()
 
    q2 = div(a, b)
    @test q2 == q
-
-   println("PASS")
 end
 
-function test_spoly_divides()
-   print("spoly.divides...")
-
+@testset "spoly.divides..." begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    a = x^2 + 3x + 1
@@ -320,13 +270,9 @@ function test_spoly_divides()
    val, q = remove(a*b^3, b)
    @test val == 3 && q == a
    @test valuation(a*b^3, b) == 3
-
-   println("PASS")
 end
 
-function test_spoly_gcd_lcm()
-   print("spoly.gcd_lcm...")
-
+@testset "spoly.gcd_lcm..." begin
    R, (x, ) = PolynomialRing(ZZ, ["x", ])
    a = x^2 + 3x + 1
    b = 2x + 4
@@ -339,13 +285,9 @@ function test_spoly_gcd_lcm()
    @test primpart(2*a) == a
 
    @test content(2*a) == 2
-
-   println("PASS")
 end
 
-function test_spoly_extended_gcd()
-   print("spoly.extended_gcd...")
-
+@testset "spoly.extended_gcd..." begin
    R, (x, ) = PolynomialRing(QQ, ["x", ])
 
    a = x^2 + 3x + 1
@@ -354,13 +296,9 @@ function test_spoly_extended_gcd()
    g, s, t = gcdx(a, b)
 
    @test s*a + t*b == g
-
-   println("PASS")
 end
 
-function test_spoly_evaluate()
-   print("spoly.evaluate...")
-
+@testset "spoly.evaluate..." begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    f = x^2*y + 2x + 1
@@ -371,24 +309,17 @@ function test_spoly_evaluate()
    @test evaluate(f, [x + 1, y - 1]) == x^2*y - x^2 + 2*x*y + y + 2
    @test evaluate(f, [x], [1]) == y + 3
    @test f(2, 3) == 17
-
-   println("PASS")
 end
 
-function test_spoly_inflation_deflation()
-   print("spoly.inflation_deflation...")
-
+@testset "spoly.inflation_deflation..." begin
    R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 
    f = x^7*y^7 + 3x^4*y^4 + 2x*y
 
    @test inflate(deflate(f, deflation(f)...), deflation(f)...) == f
-
-   println("PASS")
 end
 
-function test_spoly_Polynomials()
-   print("spoly.Polynomials...")
+@testset "spoly.Polynomials..." begin
    R, (x, ) = PolynomialRing(ZZ, ["x", ])
 
    S, y = Nemo.PolynomialRing(R, "y")
@@ -398,14 +329,11 @@ function test_spoly_Polynomials()
    g = f^2
 
    @test g == (9*x^4+12*x^3+10*x^2+4*x+1)*y^2+(12*x^3+26*x^2+16*x+6)*y+(4*x^2+12*x+9)
-
-   println("PASS")
 end
 
-function test_convert_between_MPoly_and_SingularPoly()
-   print("spoly.test_convert_MPoly_to_SingularPoly...")
-
-   for num_vars=2:10
+#=
+@testset "spoly.test_convert_MPoly_to_SingularPoly..." begin
+   for num_vars = 2:10
       var_names = ["x$j" for j in 1:num_vars]
       ord = AbstractAlgebra.rand_ordering()
 
@@ -430,13 +358,10 @@ function test_convert_between_MPoly_and_SingularPoly()
       @test SAA(f - g) == SAA(f) - SAA(g)
       @test S(SAA(f)) == f
    end
-
-   println("PASS")
 end
+=#
 
-function test_spoly_differential()
-   print("spoly.test_spoly_differential...")
-
+@testset "spoly.test_spoly_differential..." begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    f = x^3 + y^6
@@ -457,13 +382,9 @@ function test_spoly_differential()
 
    #Check jet
    @test jf == x^3
-
-   println("PASS")
 end
 
-function test_spoly_factor()
-   print("spoly.test_spoly_factor...")
-
+@testset "spoly.test_spoly_factor..." begin
    R1 , (x, y, z, w) = Singular.PolynomialRing(Singular.QQ,
    ["x", "y", "z", "w"]; ordering=:negdegrevlex)
    f1 = 113*(2*y^7 + w^2)^3*(1 + x)^2*(x + y*z)^2
@@ -495,45 +416,12 @@ function test_spoly_factor()
          @test f == g
       end
    end
-
-   println("PASS")
 end
 
-function test_spoly_hash()
-   print("spoly.hash...")
-   
+@testset "spoly.hash..." begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    @test hash(x) == hash(x+y-y)
    @test hash(x,zero(UInt)) == hash(x+y-y,zero(UInt))
    @test hash(x,one(UInt)) == hash(x+y-y,one(UInt))
-   
-   println("PASS")
 end
-
-function test_spoly()
-   test_spoly_constructors()
-   test_spoly_printing()
-   test_spoly_manipulation()
-#   test_spoly_change_base_ring() # currently fails due to bug in AbstractAlgebra
-   test_spoly_multivariate_coeff()
-   test_spoly_unary_ops()
-   test_spoly_binary_ops()
-   test_spoly_comparison()
-   test_spoly_powering()
-   test_spoly_exact_division()
-   test_spoly_adhoc_exact_division()
-   test_spoly_divides()
-   test_spoly_euclidean_division()
-   test_spoly_gcd_lcm()
-   test_spoly_extended_gcd()
-   test_spoly_evaluate()
-   test_spoly_inflation_deflation()
-   test_spoly_Polynomials()
-   # test_convert_between_MPoly_and_SingularPoly()
-   test_spoly_differential()
-   test_spoly_factor()
-   test_spoly_hash()
-   println("")
-end
-

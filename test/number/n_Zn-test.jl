@@ -1,6 +1,4 @@
-function test_n_Zn_constructors()
-   print("n_Zn.constructors...")
-
+@testset "n_Zn.constructors..." begin
    R = ResidueRing(ZZ, 7)
 
    @test elem_type(R) == n_Zn
@@ -36,23 +34,15 @@ function test_n_Zn_constructors()
    f = R(Nemo.ZZ(123))
 
    @test isa(f, n_Zn)
-
-   println("PASS")
 end
 
-function test_n_Zn_printing()
-   print("n_Zn.printing...")
-
+@testset "n_Zn.printing..." begin
    R = ResidueRing(ZZ, 5)
 
    @test string(R(3)) == "3"
-
-   println("PASS")
 end
 
-function test_n_Zn_manipulation()
-   print("n_Zn.manipulation...")
-
+@testset "n_Zn.manipulation..." begin
    R = ResidueRing(ZZ, 6)
 
    @test isone(one(R))
@@ -63,24 +53,16 @@ function test_n_Zn_manipulation()
    @test characteristic(R) == 6
 
    @test deepcopy(R(2)) == R(2)
-
-   println("PASS")
 end
 
-function test_n_Zn_unary_ops()
-   print("n_Zn.unary_ops...")
-
+@testset "n_Zn.unary_ops..." begin
    R = ResidueRing(ZZ, 5)
 
    @test -R(3) == R(2)
    @test -R() == R()
-
-   println("PASS")
 end
 
-function test_n_Zn_binary_ops()
-   print("n_Zn.binary_ops...")
-
+@testset "n_Zn.binary_ops..." begin
    R = ResidueRing(ZZ, 5)
 
    a = R(2)
@@ -89,13 +71,9 @@ function test_n_Zn_binary_ops()
    @test a + b == R(0)
    @test a - b == R(4)
    @test a*b == R(1)
-
-   println("PASS")
 end
 
-function test_n_Zn_adhoc_binary()
-   print("n_Zn.adhoc_binary...")
-
+@testset "n_Zn.adhoc_binary..." begin
    R = ResidueRing(ZZ, 5)
 
    @test R(2) + 3 == R(0)
@@ -110,24 +88,16 @@ function test_n_Zn_adhoc_binary()
    @test ZZ(2) - R(3) == R(4)
    @test ZZ(2)*R(3) == R(1)
    @test R(2)*ZZ(3) == R(1)
-
-   println("PASS")
 end
 
-function test_n_Zn_comparison()
-   print("n_Zn.comparison...")
-
+@testset "n_Zn.comparison..." begin
    R = ResidueRing(ZZ, 5)
 
    @test R(2) == R(2)
    @test isequal(R(2), R(2))
-
-   println("PASS")
 end
 
-function test_n_Zn_adhoc_comparison()
-   print("n_Zn.ad_hoc_comparison...")
-
+@testset "n_Zn.ad_hoc_comparison..." begin
    R = ResidueRing(ZZ, 5)
 
    @test R(2) == 2
@@ -137,44 +107,28 @@ function test_n_Zn_adhoc_comparison()
 
    @test R(2) == ZZ(2)
    @test ZZ(2) == R(2)
-
-   println("PASS")
 end
 
-function test_n_Zn_powering()
-   print("n_Zn.powering...")
-
+@testset "n_Zn.powering..." begin
    R = ResidueRing(ZZ, 5)
 
    @test R(2)^10 == R(4)
-
-   println("PASS")
 end
 
-function test_n_Zn_exact_division()
-   print("n_Zn.exact_division...")
-
+@testset "n_Zn.exact_division..." begin
    R = ResidueRing(ZZ, 5)
 
    @test divexact(R(2), R(3)) == R(4)
-
-   println("PASS")
 end
 
-function test_n_Zn_gcd_lcm()
-   print("n_Zn.gcd_lcm...")
-
+@testset "n_Zn.gcd_lcm..." begin
    R = ResidueRing(ZZ, 5)
 
    @test gcd(R(2), R(3)) == R(1)
    @test gcd(R(0), R(0)) == R(0)
-
-   println("PASS")
 end
 
-function test_n_Zn_extended_gcd()
-   print("n_Zn.extended_gcd...")
-
+@testset "n_Zn.extended_gcd..." begin
    R = ResidueRing(ZZ, 6)
 
    g, s, t = gcdx(R(2), R(4))
@@ -184,13 +138,9 @@ function test_n_Zn_extended_gcd()
    g, s, t = gcdx(R(1), R(5))
 
    @test g == R(1)*s + R(5)*t
-
-   println("PASS")
 end
 
-function test_n_Zn_Polynomials()
-   print("n_Zn.Polynomials...")
-
+@testset "n_Zn.Polynomials..." begin
    R = ResidueRing(ZZ, 5)
    S, x = Nemo.PolynomialRing(R, "x")
 
@@ -199,25 +149,5 @@ function test_n_Zn_Polynomials()
    g = f^2
 
    @test g == -x^4+2*x^3-x+1
-
-   println("PASS")
-end
-
-function test_n_Zn()
-   test_n_Zn_constructors()
-   test_n_Zn_printing()
-   test_n_Zn_manipulation()
-   test_n_Zn_unary_ops()
-   test_n_Zn_binary_ops()
-   test_n_Zn_adhoc_binary()
-   test_n_Zn_comparison()
-   test_n_Zn_adhoc_comparison()
-   test_n_Zn_powering()
-   test_n_Zn_exact_division()
-   test_n_Zn_gcd_lcm()
-   test_n_Zn_extended_gcd()
-   test_n_Zn_Polynomials()
-
-   println("")
 end
 
