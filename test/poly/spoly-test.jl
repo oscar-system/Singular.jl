@@ -332,7 +332,7 @@ end
 end
 
 #=
-@testset "spoly.test_convert_MPoly_to_SingularPoly..." begin
+@testset "spoly.convert_MPoly_to_SingularPoly..." begin
    for num_vars = 2:10
       var_names = ["x$j" for j in 1:num_vars]
       ord = AbstractAlgebra.rand_ordering()
