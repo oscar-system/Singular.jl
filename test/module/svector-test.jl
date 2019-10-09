@@ -1,6 +1,4 @@
-function test_svector_constructors()
-   print("svector.constructors...")
-
+@testset "svector.constructors..." begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    v1 = vector(R, x + 1, x*y + 1, y)
@@ -22,13 +20,9 @@ function test_svector_constructors()
    @test typeof(v1) <: AbstractAlgebra.ModuleElem
 
    @test isa(v1, svector)
-
-   println("PASS")
 end
 
-function test_svector_jet()
-   print("svector.jet...")
-
+@testset "svector.jet..." begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    a = vector(R, x^5 + 1, 2x^3 + 3y^2, x^2)
@@ -38,13 +32,9 @@ function test_svector_jet()
    c = jet(a, 3)
 
    @test b == c
-
-   println("PASS")
 end
 
-function test_svector_manipulation()
-   print("svector.manipulation...")
-
+@testset "svector.manipulation..." begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    M = FreeModule(R, 3)
@@ -60,25 +50,17 @@ function test_svector_manipulation()
    @test g[1]*x + g[2]*y + g[3]*2 == v
 
    @test deepcopy(v) == v
-
-   println("PASS")
 end
 
-function test_svector_unary_ops()
-   print("svector.unary_ops...")
-
+@testset "svector.unary_ops..." begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    v = vector(R, x, y, R(2))
 
    @test -(-v) == v
-
-   println("PASS")
 end
 
-function test_svector_binary_ops()
-   print("svector.binary_ops...")
-
+@testset "svector.binary_ops..." begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    v1 = vector(R, x, y, R(2))
@@ -86,13 +68,9 @@ function test_svector_binary_ops()
 
    @test v1 + v2 == v2 + v1
    @test v1 + v2 - v2 == v1
-
-   println("PASS")
 end
 
-function test_svector_adhoc_binary()
-   print("svector.adhoc_binary...")
-
+@testset "svector.adhoc_binary..." begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    v1 = vector(R, x, y, R(2))
@@ -101,13 +79,9 @@ function test_svector_adhoc_binary()
    @test 2*(v1 + v2) == v1*2 + v2*2
    @test QQ(2)*(v1 + v2) == v1*QQ(2) + v2*QQ(2)
    @test x*(v1 + v2) == v1*x + v2*x
-
-   println("PASS")
 end
 
-function test_svector_comparison()
-   print("svector.comparison...")
-
+@testset "svector.comparison..." begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    v1 = vector(R, x, y, R(2))
@@ -115,32 +89,12 @@ function test_svector_comparison()
 
    @test v1 != v2
    @test v1 == deepcopy(v1)
-
-   println("PASS")
 end
 
-function test_svector_conversion()
-   print("svector.conversion...")
-
+@testset "svector.conversion..." begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    v1 = vector(R, x, y, R(2))
 
    @test Array(v1) == [x, y, R(2)]
-
-   println("PASS")
-end
-
-function test_svector()
-   test_svector_constructors()
-   test_svector_jet
-   test_svector_manipulation()
-   test_svector_unary_ops()
-   test_svector_binary_ops()
-   test_svector_adhoc_binary()
-   test_svector_comparison()
-   test_svector_conversion()
-
-
- println("")
 end

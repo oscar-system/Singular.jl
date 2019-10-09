@@ -1,6 +1,4 @@
-function test_PolyRing_degree_bound()
-   print("PolyRing.degree_bound...")
-
+@testset "PolyRing.degree_bound..." begin
    R1, = PolynomialRing(QQ, ["x", ])
    @test degree_bound(R1) == 65535
 
@@ -26,13 +24,9 @@ function test_PolyRing_degree_bound()
    elseif Sys.WORD_SIZE == 32
       @test degree_bound(R6) == 2147483647
    end
-
-   println("PASS")
 end
 
- function test_PolyRing_ordering()
-   print("PolyRing.ordering...")
-
+@testset "PolyRing.ordering..." begin
    R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"])
    I = Ideal(R, x+z, y+z)
    I.isGB = true
@@ -62,14 +56,4 @@ end
    S = fres(I, 0)
    M = S[2]
    @test string(M[1]) == "[-y-z,x+z]"
-
-   println("PASS")
 end
-
-function test_PolyRing()
-   test_PolyRing_degree_bound()
-   test_PolyRing_ordering()
-
-   println("")
-end
-

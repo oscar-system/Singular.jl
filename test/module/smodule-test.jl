@@ -1,6 +1,4 @@
-function test_smodule_constructors()
-   print("smodule.constructors...")
-
+@testset "smodule.constructors..." begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    v1 = vector(R, x + 1, x*y + 1, y)
@@ -21,13 +19,9 @@ function test_smodule_constructors()
    @test typeof(M) <: AbstractAlgebra.Module
 
    @test isa(M, smodule)
-
-   println("PASS")
 end
 
-function test_smodule_jet()
-   print("smodule.jet...")
-
+@testset "smodule.jet..." begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    v1 = vector(R, x + 1, x*y + 1, y)
@@ -44,13 +38,9 @@ function test_smodule_jet()
 
    @test P[1] == N[1]
    @test P[2] == N[2]
-
-   println("PASS")
 end
 
-function test_smodule_local()
-   print("smodule.local...")
-
+@testset "smodule.local..." begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"], ordering=:negdegrevlex)
 
    v1 = vector(R, x, y^2)
@@ -64,12 +54,9 @@ function test_smodule_local()
    MM = Singular.minimal_generating_set(M)
 
    @test MM[1] == w1 && MM[2] == w2
-   println("PASS")
 end
 
-function test_smodule_manipulation()
-   print("smodule.manipulation...")
-
+@testset "smodule.manipulation..." begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    v1 = vector(R, x + 1, x*y + 1, y)
@@ -90,13 +77,9 @@ function test_smodule_manipulation()
 
    @test N[1] == v1
    @test N[2] == v2
-
-   println("PASS")
 end
 
-#= function test_smodule_slimgb()
-   print("smodule.slimgb...")
-
+#= @testset "smodule.slimgb..." begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    v1 = vector(R, x + 1, x*y + 1, y)
@@ -119,13 +102,9 @@ end
    G2 = slimgb(M)
 
    @test G2.isGB == true
-
-   println("PASS")
 end =#
 
-function test_smodule_std()
-   print("smodule.std...")
-
+@testset "smodule.std..." begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    v1 = vector(R, x + 1, x*y + 1, y)
@@ -148,13 +127,9 @@ function test_smodule_std()
    G2 = std(M)
 
    @test G2.isGB == true
-
-   println("PASS")
 end
 
-function test_smodule_syz()
-   print("smodule.syz...")
-
+@testset "smodule.syz..." begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    v1 = vector(R, (x + 1)*y, (x*y + 1)*y, y)
@@ -167,13 +142,9 @@ function test_smodule_syz()
    @test ngens(Z) == 1
 
    @test Z[1] == vector(R, x, -y)
-
-   println("PASS")
 end
 
-function test_smodule_sres()
-   print("smodule.sres...")
-
+@testset "smodule.sres..." begin
    R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"])
 
    I = Singular.Ideal(R, y*z + z^2, y^2 + x*z, x*y + z^2, z^3, x*z^2, x^2*z)
@@ -218,19 +189,5 @@ function test_smodule_sres()
    F = sres(M, 4)
 
    @test length(F) == 3
-
-   println("PASS")
 end
 
-function test_smodule()
-   test_smodule_constructors()
-   test_smodule_jet()
-   test_smodule_local()
-   test_smodule_manipulation()
-#    test_smodule_slimgb()
-   test_smodule_std()
-   test_smodule_syz()
-   test_smodule_sres()
-
-   println("")
-end

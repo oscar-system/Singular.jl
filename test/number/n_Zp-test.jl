@@ -1,6 +1,4 @@
-function test_n_Zp_constructors()
-   print("n_Zp.constructors...")
-
+@testset "n_Zp.constructors..." begin
    R = Fp(7)
 
    @test elem_type(R) == n_Zp
@@ -36,23 +34,15 @@ function test_n_Zp_constructors()
    f = R(Nemo.ZZ(123))
 
    @test isa(f, n_Zp)
-
-   println("PASS")
 end
 
-function test_n_Zp_printing()
-   print("n_Zp.printing...")
-
+@testset "n_Zp.printing..." begin
    R = Fp(5)
 
    @test string(R(3)) == "-2"
-
-   println("PASS")
 end
 
-function test_n_Zp_manipulation()
-   print("n_Zp.manipulation...")
-
+@testset "n_Zp.manipulation..." begin
    R = Fp(5)
 
    @test isone(one(R))
@@ -65,24 +55,16 @@ function test_n_Zp_manipulation()
    @test deepcopy(R(2)) == R(2)
 
    @test Int(R(2)) == 2
-
-   println("PASS")
 end
 
-function test_n_Zp_unary_ops()
-   print("n_Zp.unary_ops...")
-
+@testset "n_Zp.unary_ops..." begin
    R = Fp(5)
 
    @test -R(3) == R(2)
    @test -R() == R()
-
-   println("PASS")
 end
 
-function test_n_Zp_binary_ops()
-   print("n_Zp.binary_ops...")
-
+@testset "n_Zp.binary_ops..." begin
    R = Fp(5)
 
    a = R(2)
@@ -91,13 +73,9 @@ function test_n_Zp_binary_ops()
    @test a + b == R(0)
    @test a - b == R(4)
    @test a*b == R(1)
-
-   println("PASS")
 end
 
-function test_n_Zp_adhoc_binary()
-   print("n_Zp.adhoc_binary...")
-
+@testset "n_Zp.adhoc_binary..." begin
    R = Fp(5)
 
    @test R(2) + 3 == R(0)
@@ -106,69 +84,45 @@ function test_n_Zp_adhoc_binary()
    @test 2 - R(3) == R(4)
    @test 2*R(3) == R(1)
    @test R(2)*3 == R(1)
-
-   println("PASS")
 end
 
-function test_n_Zp_comparison()
-   print("n_Zp.comparison...")
-
+@testset "n_Zp.comparison..." begin
    R = Fp(5)
 
    @test R(2) == R(2)
    @test isequal(R(2), R(2))
-
-   println("PASS")
 end
 
-function test_n_Zp_adhoc_comparison()
-   print("n_Zp.ad_hoc_comparison...")
-
+@testset "n_Zp.ad_hoc_comparison..." begin
    R = Fp(5)
 
    @test R(2) == 2
    @test 2 == R(2)
    @test isequal(R(2), 2)
    @test isequal(2, R(2))
-
-   println("PASS")
 end
 
-function test_n_Zp_powering()
-   print("n_Zp.powering...")
-
+@testset "n_Zp.powering..." begin
    R = Fp(5)
 
    @test R(2)^10 == R(4)
-
-   println("PASS")
 end
 
-function test_n_Zp_exact_division()
-   print("n_Zp.exact_division...")
-
+@testset "n_Zp.exact_division..." begin
    R = Fp(5)
 
    @test inv(R(2)) == R(3)
    @test divexact(R(2), R(3)) == R(4)
-
-   println("PASS")
 end
 
-function test_n_Zp_gcd_lcm()
-   print("n_Zp.gcd_lcm...")
-
+@testset "n_Zp.gcd_lcm..." begin
    R = Fp(5)
 
    @test gcd(R(2), R(3)) == R(1)
    @test gcd(R(0), R(0)) == R(0)
-
-   println("PASS")
 end
 
-function test_n_Zp_Polynomials()
-   print("n_Zp.Polynomials...")
-
+@testset "n_Zp.Polynomials..." begin
    R = Fp(5)
    S, x = Nemo.PolynomialRing(R, "x")
 
@@ -177,24 +131,5 @@ function test_n_Zp_Polynomials()
    g = f^2
 
    @test g == -x^4+2*x^3-x+1
-
-   println("PASS")
-end
-
-function test_n_Zp()
-   test_n_Zp_constructors()
-   test_n_Zp_printing()
-   test_n_Zp_manipulation()
-   test_n_Zp_unary_ops()
-   test_n_Zp_binary_ops()
-   test_n_Zp_adhoc_binary()
-   test_n_Zp_comparison()
-   test_n_Zp_adhoc_comparison()
-   test_n_Zp_powering()
-   test_n_Zp_exact_division()
-   test_n_Zp_gcd_lcm()
-   test_n_Zp_Polynomials()
-
-   println("")
 end
 
