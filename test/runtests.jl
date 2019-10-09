@@ -20,16 +20,3 @@ include("../test/call_interpreter-test.jl")
 include("../test/caller-test.jl")
 include("../test/libsingular-test.jl")
 
-@testset "Singular" begin
-    test_caller()
-    test_number()
-    test_poly()
-    test_ideal()
-    test_matrix()
-    test_resolution()
-    test_module()
-    test_call_interpreter()
-    test_map()
-    test_libsingular()
-end
-

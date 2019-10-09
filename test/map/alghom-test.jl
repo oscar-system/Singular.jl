@@ -1,5 +1,4 @@
-function test_alghom_constructors()
-   print("alghom.constructors...")
+@testset "alghom.constructors..." begin
    L = Singular.FiniteField(3, 2, String("a"))
    R, (x, y, z, w) = Singular.PolynomialRing(L[1], ["x", "y", "z", "w"];
                              ordering=:negdegrevlex)
@@ -16,12 +15,9 @@ function test_alghom_constructors()
    @test f.domain == R
    @test f.codomain == S
    @test isequal(f.image, gens(I))
-
-   println("PASS")
 end
 
-function test_alghom_apply()
-   print("alghom.apply...")
+@testset "alghom.apply..." begin
    R, (x, y, z, w) = Singular.PolynomialRing(Singular.Fp(3), ["x", "y", "z", "w"];
                              ordering=:negdegrevlex)
    S, (a, b, c) = Singular.PolynomialRing(Singular.Fp(3), ["a", "b", "c"];
@@ -40,12 +36,10 @@ function test_alghom_apply()
    @test f(p) == p1
    @test isequal(gens(id(I)), gens(I))
    @test id(f(p)) == f(p)
-
-   println("PASS")
 end
 
-function test_alghom_compose()
-   print("alghom.compose...")
+#=
+@testset "alghom.compose..." begin
    R, (x, y, z, w) = Singular.PolynomialRing(Singular.QQ, ["x", "y", "z", "w"];
                              ordering=:negdegrevlex)
    S, (a, b, c) = Singular.PolynomialRing(Singular.QQ, ["a", "b", "c"];
@@ -70,12 +64,10 @@ function test_alghom_compose()
    @test h2.domain == R && h2.codomain == S && isequal(h2.image, V)
    @test h3.domain == R && h3.codomain == S && isequal(h3.image, V)
    @test h4.domain == R && isequal(h4.image, gens(MaximalIdeal(R, 1)))
-
-   println("PASS")
 end
+=#
 
-function test_alghom_preimage()
-   print("alghom.preimage...")
+@testset "alghom.preimage..." begin
    R, (x, y, z, w) = Singular.PolynomialRing(Singular.QQ, ["x", "y", "z", "w"];
                              ordering=:negdegrevlex)
    S, (a, b, c) = Singular.PolynomialRing(Singular.QQ, ["a", "b", "c"];
@@ -89,15 +81,4 @@ function test_alghom_preimage()
    @test isequal(Singular.kernel(f), Ideal(R, 4*x - 4*y + z^2 + 2*z*w + w^2))
    @test isequal(Singular.preimage(idS, I), I)
    @test isequal(Singular.kernel(idS), Ideal(S,))
-
-   println("PASS")
-end
-
-function test_alghom()
-   test_alghom_constructors()
-   test_alghom_apply()
-   test_alghom_compose()
-   test_alghom_preimage()
-
-   println("")
 end

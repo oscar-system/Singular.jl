@@ -1,6 +1,4 @@
-function test_nemo_fmpq()
-   print("Nemo.fmpq...")
-
+@testset "Nemo.fmpq..." begin
    R, (x, y) = PolynomialRing(Nemo.QQ, ["x", "y"])
 
    f1 = 3x*y + x^2 + 2y
@@ -39,13 +37,9 @@ function test_nemo_fmpq()
    @test f1c[1] + f1c[2] == Nemo.QQ(4)
 
    @test std(Ideal(R, x*y-1, x^2))[1] == Nemo.QQ(1)
-
-   println("PASS")
 end
 
-function test_nemo_fmpz()
-   print("Nemo.fmpz...")
-
+@testset "Nemo.fmpz..." begin
    R, (x, y) = PolynomialRing(Nemo.ZZ, ["x", "y"])
 
    f1 = 3x*y + x^2 + 2y
@@ -81,13 +75,9 @@ function test_nemo_fmpz()
    @test f1c[2] - f1c[1] == Nemo.ZZ(2)
 
    @test f1c[1] + f1c[2] == Nemo.ZZ(4)
-
-   println("PASS")
 end
 
-function test_nemo_fq_nmod()
-   print("Nemo.fq_nmod...")
-
+@testset "Nemo.fq_nmod..." begin
    F, a = Nemo.FiniteField(7, 2, "a")
 
    R, (x, y) = PolynomialRing(F, ["x", "y"])
@@ -130,13 +120,9 @@ function test_nemo_fq_nmod()
    @test f1c[2] - f1c[1] == F(2)
 
    @test f1c[1] + f1c[2] == F(4)
-
-   println("PASS")
 end
 
-function test_nemo_fq()
-   print("Nemo.fq...")
-
+@testset "Nemo.fq..." begin
    F, a = Nemo.FiniteField(Nemo.ZZ(7), 2, "a")
 
    R, (x, y) = PolynomialRing(F, ["x", "y"])
@@ -179,13 +165,9 @@ function test_nemo_fq()
    @test f1c[2] - f1c[1] == F(2)
 
    @test f1c[1] + f1c[2] == F(4)
-
-   println("PASS")
 end
 
-function test_nemo_nf_elem()
-   print("Nemo.nf_elem...")
-
+@testset "Nemo.nf_elem..." begin
    U, z = Nemo.PolynomialRing(Nemo.QQ, "z")
    K, a = Nemo.NumberField(z^3 + 3z + 1, "a")
 
@@ -229,13 +211,9 @@ function test_nemo_nf_elem()
    @test f1c[2] - f1c[1] == K(2)
 
    @test f1c[1] + f1c[2] == K(4)
-
-   println("PASS")
 end
 
-function test_nemo_field()
-   print("Nemo.NemoField...")
-
+@testset "Nemo.NemoField..." begin
    U = Nemo.Generic.FractionField(Nemo.ZZ)
 
    R, (x, y) = PolynomialRing(U, ["x", "y"])
@@ -274,13 +252,9 @@ function test_nemo_field()
    @test f1c[2] - f1c[1] == U(2)
 
    @test f1c[1] + f1c[2] == U(4)
-
-   println("PASS")
 end
 
-function test_nemo_ring()
-   print("Nemo.NemoRing...")
-
+@testset "Nemo.NemoRing..." begin
    U, z = Nemo.PolynomialRing(Nemo.ZZ, "z")
 
    R, (x, y) = PolynomialRing(U, ["x", "y"])
@@ -317,18 +291,4 @@ function test_nemo_ring()
    @test f1c[2] - f1c[1] == U(2)
 
    @test f1c[1] + f1c[2] == U(4)
-
-   println("PASS")
-end
-
-function test_nemo()
-   test_nemo_fmpq()
-   test_nemo_fmpz()
-   test_nemo_fq_nmod()
-   test_nemo_fq()
-   test_nemo_nf_elem()
-   test_nemo_field()
-   test_nemo_ring()
-
-   println("")
 end

@@ -1,5 +1,4 @@
-function test_call_interpreter()
-    print("call_interpreter...")
+@testset "call.Interpreter..." begin
     Singular.libSingular.call_interpreter("ring r;")
     result = Singular.libSingular.call_interpreter("r;")
     @test result[1] == false
@@ -10,6 +9,4 @@ function test_call_interpreter()
     @test result[3] == ""
     @test result[4] == ""
     @test length(result) == 4
-    println("PASS")
-    println("")
 end

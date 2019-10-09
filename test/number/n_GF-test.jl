@@ -1,6 +1,4 @@
-function test_n_GF_constructors()
-   print("n_GF.constructors...")
-
+@testset "n_GF.constructors..." begin
    R, x = FiniteField(7, 2, "x")
 
    @test elem_type(R) == n_GF
@@ -39,23 +37,15 @@ function test_n_GF_constructors()
    @test isa(f, n_GF)
 
    @test isa(x, n_GF)
-
-   println("PASS")
 end
 
-function test_n_GF_printing()
-   print("n_GF.printing...")
-
+@testset "n_GF.printing..." begin
    R, x = FiniteField(5, 2, "x")
 
    @test string(3x + 2) == "x^11"
-
-   println("PASS")
 end
 
-function test_n_GF_manipulation()
-   print("n_GF.manipulation...")
-
+@testset "n_GF.manipulation..." begin
    R, x = FiniteField(5, 2, "x")
 
    @test isone(one(R))
@@ -67,13 +57,9 @@ function test_n_GF_manipulation()
    @test degree(R) == 2
 
    @test deepcopy(R(2)) == R(2)
-
-   println("PASS")
 end
 
-function test_n_GF_unary_ops()
-   print("n_GF.unary_ops...")
-
+@testset "n_GF.unary_ops..." begin
    R, x = FiniteField(5, 2, "x")
 
    a = 3x + 1
@@ -81,13 +67,9 @@ function test_n_GF_unary_ops()
    @test -R(3) == R(2)
    @test -R() == R()
    @test -a == 2x - 1
-
-   println("PASS")
 end
 
-function test_n_GF_binary_ops()
-   print("n_GF.binary_ops...")
-
+@testset "n_GF.binary_ops..." begin
    R, x = FiniteField(5, 2, "x")
 
    a = 2x + 1
@@ -96,13 +78,9 @@ function test_n_GF_binary_ops()
    @test a + b == R(3)
    @test a - b == -x - 1
    @test a*b == x^19
-
-   println("PASS")
 end
 
-function test_n_GF_adhoc_binary()
-   print("n_GF.adhoc_binary...")
-
+@testset "n_GF.adhoc_binary..." begin
    R, x = FiniteField(5, 2, "x")
 
    @test R(2) + 3 == R(0)
@@ -111,26 +89,18 @@ function test_n_GF_adhoc_binary()
    @test 2 - R(3) == R(4)
    @test 2*R(3) == R(1)
    @test R(2)*3 == R(1)
-
-   println("PASS")
 end
 
-function test_n_GF_comparison()
-   print("n_GF.comparison...")
-
+@testset "n_GF.comparison..." begin
    R, x = FiniteField(5, 2, "x")
 
    a = 2x + 3
 
    @test a == deepcopy(a)
    @test isequal(a, a)
-
-   println("PASS")
 end
 
-function test_n_GF_adhoc_comparison()
-   print("n_GF.ad_hoc_comparison...")
-
+@testset "n_GF.ad_hoc_comparison..." begin
    R, x = FiniteField(5, 2, "x")
 
    @test R(2) == 2
@@ -139,23 +109,15 @@ function test_n_GF_adhoc_comparison()
    @test 2 != x
    @test isequal(R(2), 2)
    @test isequal(2, R(2))
-
-   println("PASS")
 end
 
-function test_n_GF_powering()
-   print("n_GF.powering...")
-
+@testset "n_GF.powering..." begin
    R, x = FiniteField(5, 2, "x")
 
    @test (x + 1)^2 == x^20
-
-   println("PASS")
 end
 
-function test_n_GF_exact_division()
-   print("n_GF.exact_division...")
-
+@testset "n_GF.exact_division..." begin
    R, x = FiniteField(5, 2, "x")
 
    a = x + 1
@@ -163,13 +125,9 @@ function test_n_GF_exact_division()
 
    @test inv(a) == x^2
    @test divexact(a, b) == x^14
-
-   println("PASS")
 end
 
-function test_n_GF_gcd_lcm()
-   print("n_GF.gcd_lcm...")
-
+@testset "n_GF.gcd_lcm..." begin
    R, x = FiniteField(5, 2, "x")
 
    a = 2x + 1
@@ -177,13 +135,9 @@ function test_n_GF_gcd_lcm()
 
    @test gcd(a, b) == R(1)
    @test gcd(R(0), R(0)) == R(0)
-
-   println("PASS")
 end
 
-function test_n_GF_Polynomials()
-   print("n_GF.Polynomials...")
-
+@testset "n_GF.Polynomials..." begin
    R, x = FiniteField(5, 2, "x")
    S, y = Nemo.PolynomialRing(R, "y")
 
@@ -192,24 +146,5 @@ function test_n_GF_Polynomials()
    g = f^2
 
    @test g == x^16*y^4+x^9*y^3+x^5*y^2+x^23*y+x^20
-
-   println("PASS")
-end
-
-function test_n_GF()
-   test_n_GF_constructors()
-   test_n_GF_printing()
-   test_n_GF_manipulation()
-   test_n_GF_unary_ops()
-   test_n_GF_binary_ops()
-   test_n_GF_adhoc_binary()
-   test_n_GF_comparison()
-   test_n_GF_adhoc_comparison()
-   test_n_GF_powering()
-   test_n_GF_exact_division()
-   test_n_GF_gcd_lcm()
-   test_n_GF_Polynomials()
-
-   println("")
 end
 
