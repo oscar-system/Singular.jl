@@ -57,7 +57,7 @@ end
 function show(io::IO, a::n_unknown)
    libSingular.StringSetS("")
 
-   libSingular.n_Write(libSingular.cast_void_to_number(a.ptr), parent(a).ptr, false)
+   libSingular.n_Write(a.ptr, parent(a).ptr, false)
 
    m = libSingular.StringEndS()
 
@@ -72,7 +72,7 @@ end
 
 function -(a::n_unknown)
    R = parent(a)
-   n = libSingular.n_Neg(libSingular.cast_void_to_number(a.ptr), R.ptr)
+   n = libSingular.n_Neg(a.ptr, R.ptr)
    return R(n)
 end
 
@@ -85,21 +85,21 @@ end
 function +(a::n_unknown{T}, b::n_unknown{T}) where T <: Nemo.RingElem
    check_parent(a, b)
    R = parent(a)
-   n = libSingular.n_Add(libSingular.cast_void_to_number(a.ptr), libSingular.cast_void_to_number(b.ptr), R.ptr)
+   n = libSingular.n_Add(a.ptr, b.ptr, R.ptr)
    return R(n)
 end
 
 function -(a::n_unknown{T}, b::n_unknown{T}) where T <: Nemo.RingElem
    check_parent(a, b)
    R = parent(a)
-   n = libSingular.n_Sub(libSingular.cast_void_to_number(a.ptr), libSingular.cast_void_to_number(b.ptr), R.ptr)
+   n = libSingular.n_Sub(a.ptr, b.ptr, R.ptr)
    return R(n)
 end
 
 function *(a::n_unknown{T}, b::n_unknown{T}) where T <: Nemo.RingElem
    check_parent(a, b)
    R = parent(a)
-   n = libSingular.n_Mult(libSingular.cast_void_to_number(a.ptr), libSingular.cast_void_to_number(b.ptr), R.ptr)
+   n = libSingular.n_Mult(a.ptr, b.ptr, R.ptr)
    return R(n)
 end
 
@@ -112,7 +112,7 @@ end
 function ==(a::n_unknown{T}, b::n_unknown{T}) where T <: Nemo.RingElem
    check_parent(a, b)
    R = parent(a)
-   return libSingular.n_Equal(libSingular.cast_void_to_number(a.ptr), libSingular.cast_void_to_number(b.ptr), R.ptr)
+   return libSingular.n_Equal(a.ptr, b.ptr, R.ptr)
 end
 
 ###############################################################################
@@ -123,7 +123,7 @@ end
 
 function inv(a::n_unknown{T}) where T <: Nemo.FieldElem
    R = parent(a)
-   n = libSingular.n_Invers(libSingular.cast_void_to_number(a.ptr), R.ptr)
+   n = libSingular.n_Invers(a.ptr, R.ptr)
    return R(n)
 end
 
@@ -136,7 +136,7 @@ end
 function divexact(a::n_unknown{T}, b::n_unknown{T}) where T <: Nemo.RingElem
    check_parent(a, b)
    R = parent(a)
-   n = libSingular.n_ExactDiv(libSingular.cast_void_to_number(a.ptr), libSingular.cast_void_to_number(b.ptr), R.ptr)
+   n = libSingular.n_ExactDiv(a.ptr, b.ptr, R.ptr)
    return R(n)
 end
 
@@ -149,7 +149,7 @@ end
 function gcd(a::n_unknown{T}, b::n_unknown{T}) where T <: Nemo.RingElem
    check_parent(a, b)
    R = parent(a)
-   n = libSingular.n_Gcd(libSingular.cast_void_to_number(a.ptr), libSingular.cast_void_to_number(b.ptr), R.ptr)
+   n = libSingular.n_Gcd(a.ptr, b.ptr, R.ptr)
    return R(n)
 end
 
@@ -164,7 +164,7 @@ function gcdx(a::n_unknown{T}, b::n_unknown{T}) where T <: Nemo.RingElem
    R = parent(a)
    s = [libSingular.n_Init(0, R.ptr)]
    t = [libSingular.n_Init(0, R.ptr)]
-   n = libSingular.n_ExtGcd(libSingular.cast_void_to_number(a.ptr), libSingular.cast_void_to_number(b.ptr), pointer(s), pointer(t), R.ptr)
+   n = libSingular.n_ExtGcd(a.ptr, b.ptr, pointer(s), pointer(t), R.ptr)
    return R(n), R(s[]), R(t[])
 end
 
@@ -199,7 +199,7 @@ promote_rule(::Type{n_unknown{S}}, ::Type{Nemo.fmpq}) where {S <: Nemo.FieldElem
 ###############################################################################
 
 function (R::CoefficientRing{T})(a::T) where T <: Nemo.RingElem
-   return n_unknown(libSingular.number(a), R)
+   return n_unknown(libSingular.cast_void_to_number(libSingular.number(a)), R)
 end
 
 function (R::CoefficientRing{T})(a::Integer) where T <: Nemo.RingElem
@@ -212,7 +212,7 @@ function (R::CoefficientRing{T})(a::n_unknown{T}) where T <: Nemo.RingElem
 end
 
 function (R::CoefficientRing{T})(ptr::libSingular.number) where {T <: Nemo.RingElem}
-   return n_unknown{T}(libSingular.cast_number_to_void(ptr), R)
+   return n_unknown{T}(ptr, R)
 end
 
 function (R::CoefficientRing{T})(a::S) where {T <: Nemo.RingElem, S <: Nemo.RingElem}

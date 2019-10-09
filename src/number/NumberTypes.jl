@@ -394,7 +394,7 @@ mutable struct CoefficientRing{T <: Nemo.RingElem} <: Ring
 end
 
 mutable struct n_unknown{T <: Nemo.RingElem} <: Nemo.RingElem
-   ptr::Ptr{Cvoid}
+   ptr::libSingular.number
    parent::CoefficientRing{T}
 end
 
