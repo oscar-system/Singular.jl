@@ -331,7 +331,6 @@ end
    @test g == (9*x^4+12*x^3+10*x^2+4*x+1)*y^2+(12*x^3+26*x^2+16*x+6)*y+(4*x^2+12*x+9)
 end
 
-#=
 @testset "spoly.convert_MPoly_to_SingularPoly..." begin
    for num_vars = 2:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -359,7 +358,6 @@ end
       @test S(SAA(f)) == f
    end
 end
-=#
 
 @testset "spoly.test_spoly_differential..." begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
@@ -425,3 +423,4 @@ end
    @test hash(x,zero(UInt)) == hash(x+y-y,zero(UInt))
    @test hash(x,one(UInt)) == hash(x+y-y,one(UInt))
 end
+

@@ -101,7 +101,7 @@ function number(j::T) where {T <: Nemo.RingElem}
     val = nemoNumberID[iptr]
     val.num += 1
     push!(val.A, j)
-    return reinterpret(Ptr{Cvoid},ptr)
+    return reinterpret(Ptr{Cvoid}, ptr)
 end
 
 function number(j::T, j_old::T) where {T <: Nemo.RingElem}

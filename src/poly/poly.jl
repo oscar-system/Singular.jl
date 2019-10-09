@@ -793,7 +793,8 @@ end
 > Return an AbstractAlgebra (multivariate) polynomial ring over the base ring of $R$ in variables having the same names as those of R.
 """
 function AsEquivalentAbstractAlgebraPolynomialRing(R::Singular.PolyRing{Singular.n_unknown{T}}; ordering::Symbol = :degrevlex)  where {T <: RingElem}
-   return AbstractAlgebra.Generic.PolynomialRing(base_ring(R).base_ring, Base.convert( Array{String,1}, symbols(R)), ordering=ordering)
+   return AbstractAlgebra.Generic.PolynomialRing(base_ring(R).base_ring,
+	       [String(s) for s in symbols(R)], ordering=ordering)
 end
 
 
@@ -802,46 +803,27 @@ end
 > Return a Singular polynomial in $R$ with the same coefficients and exponents as $p$.
 """
 function (R::PolyRing)(p::AbstractAlgebra.Generic.MPoly{T}) where T <: Nemo.RingElem
-   parent_ring = parent(p)
-   n = nvars(parent_ring)
-   exps = p.exps
-
-   size_exps = size(p.exps)
-   if parent_ring.ord != :lex
-      exps = exps[2:size_exps[1],:]
+   S = base_ring(R)
+   B = MPolyBuildCtx(R)
+   cvzip = zip(coeffs(p), exponent_vectors(p))
+   for (c, v) in cvzip
+      push_term!(B, S(c), v)
    end
-   if parent_ring.ord == :degrevlex
-      exps = exps[end:-1:1,:]
-   end
-
-   new_p = zero(R)
-
-   for i = 1:length(p)
-      prod = p.coeffs[i]
-      for j = 1:n
-         prod = prod * gens(R)[j]^Int(exps[j,i])
-      end
-      new_p = new_p + prod
-   end
-   return(new_p)
+   return finish(B)
 end
 
 @doc Markdown.doc"""
    (R::AbstractAlgebra.Generic.MPolyRing{T}){T <: Nemo.RingElem}(p::Singular.spoly{Singular.n_unknown{T}})
-> Return a AbstractAlgebra polynomial in R with the same coefficients and exponents as $p$.
+> Return an AbstractAlgebra polynomial in the ring $R$ with the same
+> coefficients and exponents as $p$.
 """
 function (R::AbstractAlgebra.Generic.MPolyRing{T})(p::Singular.spoly{Singular.n_unknown{T}}) where T <: Nemo.RingElem
-   parent_ring = parent(p)
-   n = nvars(parent_ring)
-   new_p = zero(R)
-   gens = AbstractAlgebra.Generic.gens(R)
-   iterator = coeffs_expos(p)
-   t = start(iterator)
-   while !done(iterator,t)
-      (coeff, exps),t = next(iterator,t)
-      new_p = new_p + libSingular.julia(coeff.ptr) * prod(gens.^exps)
+   B = MPolyBuildCtx(R)
+   cvzip = zip(coeffs(p), exponent_vectors(p))
+   for (c, v) in cvzip
+      push_term!(B, libSingular.julia(libSingular.cast_number_to_void(c.ptr)), v)
    end
-   return(new_p)
+   return finish(B)
 end
 
 ###############################################################################
