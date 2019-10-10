@@ -72,7 +72,7 @@ end
                              ordering=:degrevlex)
    I = Ideal(S, [a, a + b^2, b - c, c + b])
 
-   f = Singular.AlgebraHomomorphism(R, S, gens(I), I.ptr)
+   f = Singular.AlgebraHomomorphism(R, S, gens(I))
    idS  = Singular.IdentityAlgebraHomomorphism(S)
 
    @test isequal(Singular.preimage(f, I), MaximalIdeal(R, 1))
