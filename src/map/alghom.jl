@@ -66,10 +66,20 @@ end
 function compose(f::Map(SAlgHom), g::Map(SAlgHom))
    check_composable(f, g)
 
-   I = Ideal(g.codomain, libSingular.maMapIdeal(f.ptr, g.domain.ptr,
-                g.ptr, g.codomain.ptr))
+   n = length(f.image)
+   R = g.domain
+   S = g.codomain
 
-   return AlgebraHomomorphism(f.domain, g.codomain, gens(I), I.ptr)
+   ptr = libSingular.maMapIdeal(f.ptr, R.ptr, g.ptr, S.ptr)
+
+   V = Array{spoly, 1}()
+
+   for i in 1:n
+      p = libSingular.getindex(ptr, Cint(i - 1))
+      push!(V, S(libSingular.p_Copy(p, S.ptr)))
+   end
+
+   return AlgebraHomomorphism(f.domain, g.codomain, V)
 end
 
 function check_composable(f::Map(SAlgHom), g::Map(SAlgHom))

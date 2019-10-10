@@ -36,7 +36,6 @@ end
    @test id(f(p)) == f(p)
 end
 
-#=
 @testset "alghom.compose..." begin
    R, (x, y, z, w) = Singular.PolynomialRing(Singular.QQ, ["x", "y", "z", "w"];
                              ordering=:negdegrevlex)
@@ -63,7 +62,6 @@ end
    @test h3.domain == R && h3.codomain == S && isequal(h3.image, V)
    @test h4.domain == R && isequal(h4.image, gens(MaximalIdeal(R, 1)))
 end
-=#
 
 @testset "alghom.preimage..." begin
    R, (x, y, z, w) = Singular.PolynomialRing(Singular.QQ, ["x", "y", "z", "w"];
