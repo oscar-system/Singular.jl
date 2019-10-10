@@ -25,10 +25,6 @@ AlgebraHomomorphism(D::PolyRing, C::PolyRing, V::Vector)
 ```
 
 ```@docs
-AlgebraHomomorphism(D::PolyRing, C::PolyRing, V::Vector, ptr::libSingular.ideal)
-```
-
-```@docs
 IdentityAlgebraHomomorphism(D::PolyRing)
 ```
 
@@ -45,11 +41,7 @@ S, (a, b, c) = PolynomialRing(L[1], ["a", "b", "c"];
 
 V = [a, a + b^2, b - c, c + b]
 
-I = Ideal(S, V)
-
 f = AlgebraHomomorphism(R, S, V)
-
-g = AlgebraHomomorphism(R, S, V, I.ptr)
 ```
 
 ### Operating on objects
@@ -147,7 +139,7 @@ S, (a, b, c) = PolynomialRing(QQ, ["a", "b", "c"];
    
 I = Ideal(S, [a, a + b^2, b - c, c + b])
    
-f = SAlgebraHomomorphism(R, S, gens(I), I.ptr)
+f = SAlgebraHomomorphism(R, S, gens(I))
    
 idS  = IdentityAlgebraHomomorphism(S)
 

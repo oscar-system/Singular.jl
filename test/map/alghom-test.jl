@@ -4,17 +4,15 @@
                              ordering=:negdegrevlex)
    S, (a, b, c) = Singular.PolynomialRing(L[1], ["a", "b", "c"];
                              ordering=:degrevlex)
-   I = Ideal(S, [a, a + b^2, b - c, c + b])
-   f = Singular.AlgebraHomomorphism(R, S, gens(I), I.ptr)
+   I = [a, a + b^2, b - c, c + b]
+   f = Singular.AlgebraHomomorphism(R, S, I)
 
    @test f.domain == R
    @test f.codomain == S
-   @test isequal(f.image, gens(I))
+   @test isequal(f.image, I)
 
-   f = Singular.AlgebraHomomorphism(R, S, gens(I))
-   @test f.domain == R
-   @test f.codomain == S
-   @test isequal(f.image, gens(I))
+   println("PASS")
+
 end
 
 @testset "alghom.apply..." begin
@@ -23,7 +21,7 @@ end
    S, (a, b, c) = Singular.PolynomialRing(Singular.Fp(3), ["a", "b", "c"];
                              ordering=:degrevlex)
    I = Ideal(S, [a, a + b^2, b - c, c + b])
-   f = Singular.AlgebraHomomorphism(R, S, gens(I), I.ptr)
+   f = Singular.AlgebraHomomorphism(R, S, gens(I))
    id  = Singular.IdentityAlgebraHomomorphism(S)
 
    J = Ideal(R, [x, y^3])
@@ -74,7 +72,7 @@ end
                              ordering=:degrevlex)
    I = Ideal(S, [a, a + b^2, b - c, c + b])
 
-   f = Singular.AlgebraHomomorphism(R, S, gens(I), I.ptr)
+   f = Singular.AlgebraHomomorphism(R, S, gens(I))
    idS  = Singular.IdentityAlgebraHomomorphism(S)
 
    @test isequal(Singular.preimage(f, I), MaximalIdeal(R, 1))
