@@ -69,7 +69,7 @@ function compose(f::Map(SAlgHom), g::Map(SAlgHom))
    I = Ideal(g.codomain, libSingular.maMapIdeal(f.ptr, g.domain.ptr,
                 g.ptr, g.codomain.ptr))
 
-   return AlgebraHomomorphism(f.domain, g.codomain, gens(I), I.ptr)
+   return AlgebraHomomorphism(f.domain, g.codomain, gens(I))
 end
 
 function check_composable(f::Map(SAlgHom), g::Map(SAlgHom))
