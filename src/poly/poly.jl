@@ -989,14 +989,7 @@ function push_term!(M::MPolyBuildCtx{spoly{S}, U}, c::S, expv::Vector{Int}) wher
    nv != length(expv) && error("Incorrect number of exponents in push_term!")
    p = M.poly
    ptr = libSingular.p_Init(R.ptr)
-
-   # Workaround for n_unknown type
-   if typeof(c.ptr) == Ptr{Nothing}
-      cptr = libSingular.cast_void_to_number(c.ptr)
-      libSingular.p_SetCoeff0(ptr, libSingular.n_Copy(cptr, base_ring(R).ptr), R.ptr)
-   else
-      libSingular.p_SetCoeff0(ptr, libSingular.n_Copy(c.ptr, base_ring(R).ptr), R.ptr)
-   end
+   libSingular.p_SetCoeff0(ptr, libSingular.n_Copy(c.ptr, base_ring(R).ptr), R.ptr)
 
    for i = 1:nv
       libSingular.p_SetExp(ptr, i, expv[i], R.ptr)
