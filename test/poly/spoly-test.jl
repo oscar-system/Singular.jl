@@ -167,6 +167,9 @@ end
    R2, (x, y) = PolynomialRing(ZZ, ["x", "y"])
    a2 = x^5 + y^3 + 1
 
+   R3, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   a3 = x^5+y^3+1
+
    R4, (x, y) = PolynomialRing(Nemo.QQ, ["x", "y"])
    a4 = x^5+y^3+1
 
