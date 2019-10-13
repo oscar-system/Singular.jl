@@ -156,13 +156,25 @@ end
 end
 
 @testset "spoly.change_base_ring..." begin
-   R, (x, ) = PolynomialRing(ZZ, ["x", ])
+   R1, (x, ) = PolynomialRing(ZZ, ["x", ])
 
-   a = x^2 + 3x + 1
+   a1 = x^2 + 3x + 1
 
-   b = change_base_ring(QQ, a)
+   b1 = change_base_ring(QQ, a1)
 
-   # @test isa(b, spoly{n_Q})
+   @test isa(b1, spoly{n_Q})
+
+   R2, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+   a2 = x^5 + y^3 + 1
+
+   R4, (x, y) = PolynomialRing(Nemo.QQ, ["x", "y"])
+   a4 = x^5+y^3+1
+
+   a5 = change_base_ring(QQ, a2)
+   a6 = change_base_ring(CoefficientRing(Nemo.QQ), a2)
+
+   @test a3 == a5
+   @test a4 == a6
 end
 
 @testset "spoly.multivariate_coeff..." begin
