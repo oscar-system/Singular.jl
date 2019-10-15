@@ -690,10 +690,12 @@ end
 """
 function factor_squarefree(x::spoly)
   R = parent(x)
+  br_type = typeof(base_ring(R))
+  bool = (br_type <: Union{Rationals, Integers, N_FField, N_ZpField})
 
   # Check if base ring is valid
-  if((R.base_ring != Singular.QQ) && (typeof(R.base_ring) != N_ZpField))
-    error("Base ring is not supported.")
+  if !bool
+    error("Base ring not supported.")
   end
 
   a = Array{Int32, 1}()
@@ -716,11 +718,12 @@ end
 """
 function factor(x::spoly)
   R = parent(x)
+  br_type = typeof(base_ring(R))
+  bool = (br_type <: Union{Rationals, Integers, N_FField, N_ZpField})
 
   # Check if base ring is valid
-  if((R.base_ring != Singular.QQ) && (R.base_ring != Singular.ZZ) &&
-  (typeof(R.base_ring) != N_ZpField))
-    error("Base ring is not supported.")
+  if !bool
+    error("Base ring not supported.")
   end
 
   a = Array{Int32, 1}()

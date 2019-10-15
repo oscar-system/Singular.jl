@@ -26,6 +26,8 @@
 #include <polys/monomials/ring.h>
 #include <polys/monomials/p_polys.h>
 #include <polys/simpleideals.h>
+#include "polys/ext_fields/algext.h"
+#include "polys/ext_fields/transext.h"
 #include <kernel/GBEngine/kstd1.h>
 #include <kernel/GBEngine/syz.h>
 #include <kernel/GBEngine/tgb.h>

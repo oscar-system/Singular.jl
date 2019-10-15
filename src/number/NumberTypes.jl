@@ -368,6 +368,74 @@ end
 
 ###############################################################################
 #
+#   SingularTranscendentalExtensionField/n_FF
+#
+###############################################################################
+
+const N_FFieldID = Dict{Tuple{Field, Array{Symbol, 1}}, Field}()
+
+mutable struct N_FField <: Field
+   ptr::libSingular.coeffs
+   base_ring::Field
+   refcount::Int
+
+   function N_FField(F::Field, S::Array{Symbol, 1})
+      if haskey(N_FFieldID, (F, S))
+         d = N_FFieldID[F, S]::N_FField
+      else
+         v = [pointer(Base.Vector{UInt8}(string(str)*"\0")) for str in S]
+         cf = libSingular.nCopyCoeff(F.ptr)
+         ptr = libSingular.transExt_helper(cf, v)
+         d = new(ptr, F, 1)
+         N_FFieldID[F, S] = d
+         finalizer(_N_FField_clear_fn, d)
+      end
+      return d
+   end
+end
+
+function _N_FField_clear_fn(cf::N_FField)
+   cf.refcount -= 1
+   if cf.refcount == 0
+      libSingular.nKillChar(cf.ptr)
+   end
+end
+
+mutable struct n_FF <: Nemo.FieldElem
+    ptr::libSingular.number
+    parent::N_FField
+
+    function n_FF(c::N_FField)
+    	z = new(libSingular.n_Init(0, c.ptr))
+        c.refcount += 1
+        finalizer(_n_FF_clear_fn, z)
+        return z
+    end
+
+    function n_FF(c::N_FField, n::Int)
+    	z = new(libSingular.n_Init(n, c.ptr))
+        c.refcount += 1
+        finalizer(_n_FF_clear_fn, z)
+        return z
+    end
+
+    function n_FF(c::N_FField, n::libSingular.number)
+    	z = new(n)
+        c.refcount += 1
+        finalizer(_n_FF_clear_fn, z)
+        return z
+    end
+end
+
+function _n_FF_clear_fn(n::n_FF)
+   R = parent(n)
+   libSingular.n_Delete(n.ptr, parent(n).ptr)
+   _N_FField_clear_fn(R)
+   nothing
+end
+
+###############################################################################
+#
 #   SingularCoefficientRing/n_unknown
 #
 ###############################################################################

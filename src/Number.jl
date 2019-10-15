@@ -10,4 +10,6 @@ include("number/n_Zp.jl")
 
 include("number/n_GF.jl")
 
+include("number/n_FF.jl")
+
 include("number/n_unknown.jl")
