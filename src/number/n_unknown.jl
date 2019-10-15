@@ -206,6 +206,18 @@ function (R::CoefficientRing{T})(a::Integer) where T <: Nemo.RingElem
    return R(base_ring(R)(a))
 end
 
+function (R::CoefficientRing{T})(a::Rational) where T <: Nemo.RingElem
+   return R(base_ring(R)(a))
+end
+
+function (R::CoefficientRing{T})(a::n_Z) where T <: Nemo.RingElem
+   return R(base_ring(R)(convert(BigInt, a)))
+end
+
+function (R::CoefficientRing{T})(a::n_Q) where T <: Nemo.RingElem
+   return R(base_ring(R)(Rational{BigInt}(a)))
+end
+
 function (R::CoefficientRing{T})(a::n_unknown{T}) where T <: Nemo.RingElem
    base_ring(a) != base_ring(R) && error("Unable to coerce element")
    return a
