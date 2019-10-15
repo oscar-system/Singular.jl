@@ -11,7 +11,7 @@ Nemo = "2edaba10-b0f1-5616-af89-8c11ac63239a"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
 [compat]
-AbstractAlgebra = "^0.7.0"
+AbstractAlgebra = "^0.7.1"
 Nemo = "^0.15.0"
 julia = "≥ 1.0.0"
 
