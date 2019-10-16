@@ -368,7 +368,7 @@ end
 
 ###############################################################################
 #
-#   SingularTranscendentalExtensionField/n_FF
+#   SingularTranscendentalExtensionField/n_transExt
 #
 ###############################################################################
 
@@ -401,33 +401,33 @@ function _N_FField_clear_fn(cf::N_FField)
    end
 end
 
-mutable struct n_FF <: Nemo.FieldElem
+mutable struct n_transExt <: Nemo.FieldElem
     ptr::libSingular.number
     parent::N_FField
 
-    function n_FF(c::N_FField)
+    function n_transExt(c::N_FField)
     	z = new(libSingular.n_Init(0, c.ptr))
         c.refcount += 1
-        finalizer(_n_FF_clear_fn, z)
+        finalizer(_n_transExt_clear_fn, z)
         return z
     end
 
-    function n_FF(c::N_FField, n::Int)
+    function n_transExt(c::N_FField, n::Int)
     	z = new(libSingular.n_Init(n, c.ptr))
         c.refcount += 1
-        finalizer(_n_FF_clear_fn, z)
+        finalizer(_n_transExt_clear_fn, z)
         return z
     end
 
-    function n_FF(c::N_FField, n::libSingular.number)
+    function n_transExt(c::N_FField, n::libSingular.number)
     	z = new(n)
         c.refcount += 1
-        finalizer(_n_FF_clear_fn, z)
+        finalizer(_n_transExt_clear_fn, z)
         return z
     end
 end
 
-function _n_FF_clear_fn(n::n_FF)
+function _n_transExt_clear_fn(n::n_transExt)
    R = parent(n)
    libSingular.n_Delete(n.ptr, parent(n).ptr)
    _N_FField_clear_fn(R)

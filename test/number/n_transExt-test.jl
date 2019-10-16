@@ -1,9 +1,9 @@
-@testset "n_FF.constructors..." begin
+@testset "n_transExt.constructors..." begin
    F, (a, b, c) = FunctionField(QQ, ["a", "b", "c"])
    
-   @test elem_type(F) == n_FF
-   @test elem_type(N_FField) == n_FF
-   @test parent_type(n_FF) == N_FField
+   @test elem_type(F) == n_transExt
+   @test elem_type(N_FField) == n_transExt
+   @test parent_type(n_transExt) == N_FField
    @test base_ring(F) == QQ
 
    typeof(F) <: Singular.Field
@@ -13,39 +13,44 @@
    @test base_ring(a) == Union{}
    @test parent(a) == F
 
-   @test isa(a, n_FF)
+   @test isa(a, n_transExt)
 
    b = F(3)
 
-   @test isa(b, n_FF)
+   @test isa(b, n_transExt)
 
    c = F(BigInt(3))
 
-   @test isa(c, n_FF)
+   @test isa(c, n_transExt)
 
    # segfault
    # d = R(ZZ(3))
 
-   # @test isa(d, n_FF);
+   # @test isa(d, n_transExt);
 
    f = F(c)
 
-   @test isa(f, n_FF)
+   @test isa(f, n_transExt)
 
    f = F(Nemo.ZZ(123))
 
-   @test isa(f, n_FF)
+   @test isa(f, n_transExt)
 end
 
-@testset "n_FF.printing..." begin
+@testset "n_transExt.printing..." begin
    F, (a, b, c) = FunctionField(QQ, ["a", "b", "c"])
 
    @test string(3*a*b + 2*c) == "(3*a*b+2*c)"
 end
 
-@testset "n_FF.manipulation..." begin
+@testset "n_transExt.manipulation..." begin
    F, (a, b, c) = FunctionField(Fp(5), ["a", "b", "c"])
 
+   x = (a*b+c^2) // (a+b)
+   
+   @test numerator(x) == a*b+c^2
+   @test denominator(x) == a+b
+   
    @test isone(one(F))
    @test iszero(zero(F))
    @test isunit(F(1)) && isunit(F(2))
@@ -57,7 +62,7 @@ end
    @test deepcopy(F(2)) == F(2)
 end
 
-@testset "n_FF.unary_ops..." begin
+@testset "n_transExt.unary_ops..." begin
    F, (a, b, c) = FunctionField(Fp(5), ["a", "b", "c"])
 
    x = 3*a + b
@@ -67,7 +72,7 @@ end
    @test -x == 2*a - b
 end
 
-@testset "n_FF.binary_ops..." begin
+@testset "n_transExt.binary_ops..." begin
    F, (a, b, c) = FunctionField(Fp(5), ["a", "b", "c"])
 
    x = 2*a + 2*c
@@ -78,7 +83,7 @@ end
    @test x*y == a*b - a*c + b*c - c^2
 end
 
-@testset "n_FF.comparison..." begin
+@testset "n_transExt.comparison..." begin
    F, (a, b, c) = FunctionField(Fp(5), ["a", "b", "c"])
 
    x = a^2*b*c + b^2*c + 5*a
@@ -87,13 +92,13 @@ end
    @test isequal(x, x)
 end
 
-@testset "n_FF.powering..." begin
+@testset "n_transExt.powering..." begin
    F, (a, b, c) = FunctionField(Fp(3), ["a", "b", "c"])
 
    @test (a*b*c + 1)^3 == a^3*b^3*c^3 + 1
 end
 
-@testset "n_FF.exact_division..." begin
+@testset "n_transExt.exact_division..." begin
    F, (a, b, c) = FunctionField(Fp(5), ["a", "b", "c"])
 
    x = a^2 - 1
@@ -103,7 +108,7 @@ end
    @test divexact(x, y) == a-1
 end
 
-@testset "n_FF.gcd_lcm..." begin
+@testset "n_transExt.gcd_lcm..." begin
    F, (a, b, c) = FunctionField(Fp(5), ["a", "b", "c"])
 
    x = a^2 - 1
@@ -113,7 +118,7 @@ end
    @test gcd(F(0), F(0)) == F(0)
 end
 
-@testset "n_FF.Polynomials..." begin
+@testset "n_transExt.Polynomials..." begin
    F, (a, b, c) = FunctionField(Fp(5), ["a", "b", "c"])
    R, (x, ) = PolynomialRing(F, ["x"])
 

@@ -4,7 +4,7 @@ CurrentModule = Singular
 
 # Function fields
 
-Function fields are implemented via the Singular `n_FF` type for prime fields of any characteristic.
+Function fields are implemented via the Singular `n_transExt` type for prime fields of any characteristic.
 
 The associated function field is represented by a parent object which can be constructed
 by a call to the `FunctionField` constructor.
@@ -14,7 +14,7 @@ in the following table according to the library providing them.
 
  Library        | Element type  | Parent type
 ----------------|---------------|--------------------
-Singular        | `n_FF`        | `Singular.N_FField`
+Singular        | `n_transExt`        | `Singular.N_FField`
 
 All function field element types belong directly to the abstract type `FieldElem` and
 all the parent object types belong to the abstract type `Field`.
@@ -55,6 +55,14 @@ Coerce a Flint integer value into the field.
 ### Basic manipulation
 
 ```@docs
+numerator(::n_transExt)
+```
+
+```@docs
+denominator(::n_transExt)
+```
+
+```@docs
 Singular.transcendence_degree(::N_FField)
 ```
 
@@ -67,7 +75,7 @@ Singular.characteristic(::N_FField)
 ```
 
 ```@docs
-isunit(::n_FF)
+isunit(::n_transExt)
 ```
 
 **Examples**
