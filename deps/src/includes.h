@@ -41,6 +41,7 @@
 #include <Singular/ipid.h>
 #include <Singular/subexpr.h>
 #include <Singular/lists.h>
+#include "Singular/maps_ip.h"
 #include <Singular/idrec.h>
 #include <Singular/tok.h>
 #include <Singular/links/silink.h>

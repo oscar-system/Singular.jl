@@ -1,12 +1,12 @@
 @testset "n_transExt.constructors..." begin
    F, (a, b, c) = FunctionField(QQ, ["a", "b", "c"])
-   
+
    @test elem_type(F) == n_transExt
    @test elem_type(N_FField) == n_transExt
    @test parent_type(n_transExt) == N_FField
    @test base_ring(F) == QQ
 
-   typeof(F) <: Singular.Field
+   @test typeof(F) <: Singular.Field
 
    a = F()
 
@@ -22,11 +22,6 @@
    c = F(BigInt(3))
 
    @test isa(c, n_transExt)
-
-   # segfault
-   # d = R(ZZ(3))
-
-   # @test isa(d, n_transExt);
 
    f = F(c)
 
@@ -45,26 +40,28 @@ end
 
 @testset "n_transExt.manipulation..." begin
    F, (a, b, c) = FunctionField(Fp(5), ["a", "b", "c"])
-
    x = (a*b+c^2) // (a+b)
-   
+
+   R, (x1, x2, x3) = PolynomialRing(Fp(5), ["x1", "x2", "x3"])
+   p = x1*x2 + x3^2
+
    @test numerator(x) == a*b+c^2
    @test denominator(x) == a+b
-   
+
    @test isone(one(F))
    @test iszero(zero(F))
    @test isunit(F(1)) && isunit(F(2))
-   @test !isunit(F(0)) 
+   @test !isunit(F(0))
 
    @test characteristic(F) == 5
    @test transcendence_degree(F) == 3
 
    @test deepcopy(F(2)) == F(2)
+   @test n_transExt_to_spoly(x, parent_ring = R) == p
 end
 
 @testset "n_transExt.unary_ops..." begin
    F, (a, b, c) = FunctionField(Fp(5), ["a", "b", "c"])
-
    x = 3*a + b
 
    @test -F(3) == F(2)

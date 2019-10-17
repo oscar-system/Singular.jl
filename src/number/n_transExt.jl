@@ -1,4 +1,5 @@
-export n_transExt, N_FField, transcendence_degree, transcendence_basis
+export n_transExt, N_FField, transcendence_degree, transcendence_basis,
+       n_transExt_to_spoly
 
 ###############################################################################
 #
@@ -43,9 +44,12 @@ function deepcopy_internal(a::n_transExt, dict::IdDict)
    return parent(a)(libSingular.n_Copy(a.ptr, parent(a).ptr))
 end
 
-#TODO: rewrite hash function
 function hash(a::n_transExt, h::UInt)
-   return 0x2c42e12d0c837511%UInt
+   n = n_transExt_to_spoly(numerator(a))
+   d = n_transExt_to_spoly(denominator(a))
+   nhash = hash(n, h)
+   dhash = hash(d, h)
+   return xor(xor(nhash, dhash), 0xf348b78c190e8fc1%UInt)
 end
 
 ###############################################################################
@@ -92,6 +96,32 @@ end
 """
 isunit(n::n_transExt) = !iszero(n)
 
+function _tExt_to_poly(R, cached)
+   n = transcendence_degree(R)
+   P, = PolynomialRing(base_ring(R), ["a$i" for i in 1:n], cached = cached)
+   return P
+end
+
+@doc Markdown.doc"""
+   n_transExt_to_spoly(x::n_transExt; parent::PolyRing)
+> Returns the numerator of $x$ as a polynomial in a polynomial
+> ring with the same number of variables, as the
+> transcendence degree of $parent(x)$. If a ring $parent_ring$ is
+> given to the function, it will be the parent ring of the output.
+"""
+function n_transExt_to_spoly(x::n_transExt; cached = true,
+     parent_ring::AbstractAlgebra.MPolyRing = _tExt_to_poly(parent(x), cached))
+   R = parent(x)
+   B = base_ring(R)
+   n = transcendence_degree(R)
+   S = parent_ring
+
+   if B != base_ring(S) || n != nvars(S)
+      error("Base rings do not match.")
+   end
+   return S(Singular.libSingular.transExt_to_poly(x.ptr, R.ptr, S.ptr))
+end
+
 ###############################################################################
 #
 #   Canonicalisation
@@ -121,8 +151,6 @@ function show(io::IO, n::n_transExt)
 end
 
 needs_parentheses(x::n_transExt) = false
-
-isnegative(x::n_transExt) = x == -1
 
 show_minus_one(::Type{n_transExt}) = false
 
@@ -312,7 +340,10 @@ function (R::N_FField)(n::Int)
    return z
 end
 
-(R::N_FField)(n::n_transExt) = n
+function (R::N_FField)(n::n_transExt)
+   R != parent(n) && error("Parent ring does not match.")
+   return n
+end
 
 function (R::N_FField)(n::libSingular.number)
    z = n_transExt(R, n) 
@@ -336,11 +367,11 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    FunctionField(F::Field, S::Array{String, 1})
+    FunctionField(F::Singular.Field, S::Array{String, 1})
 > Returns a tuple $K, a$ consisting of a function field $K$ over the field $F$
 > with transcendence basis stored in the array $S$.
 """
-function FunctionField(F::Field, S::Array{String, 1}; cached::Bool=true)
+function FunctionField(F::Singular.Field, S::Array{String, 1}; cached::Bool=true)
    typeof(F) == N_GField && error("Finite field extensions of Fp not supported.")
    l = length(S)
    isempty(l) && throw(DomainError())
@@ -349,11 +380,11 @@ function FunctionField(F::Field, S::Array{String, 1}; cached::Bool=true)
 end
 
 @doc Markdown.doc"""
-    FunctionField(F::Field, n::Int)
+    FunctionField(F::Singular.Field, n::Int)
 > Returns a tuple $K, a$ consisting of a function field $K$ over the field $F$
 > with transcendence degree $n$ and transcendence basis $a1, ..., an$.
 """
-function FunctionField(F::Field, n::Int; cached::Bool=true)
+function FunctionField(F::Singular.Field, n::Int; cached::Bool=true)
    S = ["a$i" for i in 1:n]
    return FunctionField(F, S)
 end

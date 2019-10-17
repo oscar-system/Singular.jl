@@ -15,12 +15,22 @@ auto transExt_helper(coeffs cf, jlcxx::ArrayRef<uint8_t *> param)
     return nInitChar(n_transExt, &extParam);
 }
 
+auto transExt_to_poly(number a, coeffs cf, ring r)
+{
+    assume(cf->extRing != NULL);
+    ring ext = cf->extRing;
+    fraction f = (fraction)a;
+    nMapFunc nMap = n_SetMap(ext->cf, r->cf);
+    rChangeCurrRing(r);
+    return p_PermPoly(f->numerator, NULL, ext, r, nMap, NULL);
+}
 void singular_define_coeffs(jlcxx::Module & Singular)
 {
     /* initialise a coefficient ring */
     Singular.method("nInitChar", &nInitChar);
     /* Helper to construct transcendental Extensions */
     Singular.method("transExt_helper", &transExt_helper);
+    Singular.method("transExt_to_poly", &transExt_to_poly);
     /* get the characteristic of a coefficient domain */
     Singular.method("n_GetChar", [](coeffs n) { return n_GetChar(n); });
 
@@ -34,6 +44,11 @@ void singular_define_coeffs(jlcxx::Module & Singular)
     /* return a function to convert between rings */
     Singular.method("n_SetMap", [](const coeffs x, const coeffs y) {
         return reinterpret_cast<void *>(n_SetMap(x, y));
+    });
+
+    /* Identity function on coefficient ring */
+    Singular.method("ndCopyMap", []() {
+        return reinterpret_cast<void *>(ndCopyMap);
     });
 
     Singular.method("nApplyMapFunc",

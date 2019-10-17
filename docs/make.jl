@@ -13,7 +13,7 @@ makedocs(
                   "rational.md",
                   "modn.md",
                   "modp.md",
-		            "transExt.md",
+                  "transExt.md",
                   "GF.md",
                   "nemo.md"
              ],

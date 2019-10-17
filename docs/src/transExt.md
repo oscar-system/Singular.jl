@@ -36,7 +36,7 @@ The following constructors are available to create function fields and their ele
 Singular.FunctionField(::Field, ::Array{String, 1}; ::Bool)
 ```
 
-In case the user does not want to specify a trancendece basis the following 
+In case the user does not want to specify a transcendece basis the following 
 constructor can be used.
 
 ```@docs
@@ -51,6 +51,18 @@ F(n::fmpz)
 ```
 
 Coerce a Flint integer value into the field.
+
+**Examples**
+
+```julia
+F1, (a, b, c) = FunctionField(QQ, ["a", "b", "c"])
+
+x1 = a*b + c
+
+F2, (a1, a2, a3) = FunctionField(Fp(5), 3)
+
+x2 = a1^5 + a2*a3^4
+```
 
 ### Basic manipulation
 
@@ -78,15 +90,24 @@ Singular.characteristic(::N_FField)
 isunit(::n_transExt)
 ```
 
+```@docs
+Singular.n_transExt_to_spoly(::n_transExt)
+```
+
 **Examples**
 
 ```julia
 F1, (a, b, c) = FunctionField(QQ, ["a", "b", "c"])
-x = F(5)
+x = F(5)*a
+y = a^2 *b+a*b+b^2
 
 isunit(x)
 char = characteristic(F1)
 d = transcendence_degree(F1)
+
+S, = PolynomialRing(QQ, ["a", "b", "c"])
+
+p = n_transExt_to_spoly(y, parent_ring = S)
 
 F2, = FunctionField(Fp(7), 4)
 B = transcendence_basis(F2)
