@@ -34,7 +34,7 @@ export base_ring, elem_type, parent_type, parent
 
 export ResidueRing, PolynomialRing, Ideal, MaximalIdeal, FreeModule
 
-export ZZ, QQ, FiniteField, CoefficientRing, Fp
+export ZZ, QQ, FiniteField, FunctionField, CoefficientRing, Fp
 
 ###############################################################################
 #

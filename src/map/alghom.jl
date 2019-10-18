@@ -30,7 +30,7 @@ function map_ideal(f::Map(SAlgHom), I::sideal)
    end
 
    return Ideal(f.codomain, libSingular.maMapIdeal(I.ptr, f.domain.ptr,
-                f.ptr, f.codomain.ptr))
+                f.ptr, f.codomain.ptr, libSingular.ndCopyMap()))
 end
 
 function map_poly(f::Map(SAlgHom), p::spoly)
@@ -40,7 +40,7 @@ function map_poly(f::Map(SAlgHom), p::spoly)
             algebra homomorphism.")
    end
    return f.codomain(libSingular.maMapPoly(p.ptr, f.domain.ptr, f.ptr,
-          f.codomain.ptr))
+          f.codomain.ptr, libSingular.ndCopyMap()))
 end
 
 function (f::SAlgHom)(p::spoly)
@@ -70,7 +70,8 @@ function compose(f::Map(SAlgHom), g::Map(SAlgHom))
    R = g.domain
    S = g.codomain
 
-   ptr = libSingular.maMapIdeal(f.ptr, R.ptr, g.ptr, S.ptr)
+   ptr = libSingular.maMapIdeal(f.ptr, R.ptr, g.ptr, S.ptr,
+                                libSingular.ndCopyMap())
 
    V = Array{spoly, 1}()
 

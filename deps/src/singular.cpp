@@ -38,6 +38,7 @@ JLCXX_MODULE define_julia_module(jlcxx::Module & Singular)
     Singular.set_const("n_Zn", n_Zn);
     Singular.set_const("n_Zp", n_Zp);
     Singular.set_const("n_GF", n_GF);
+    Singular.set_const("n_transExt", n_transExt);
     Singular.set_const("n_unknown", n_unknown);
     Singular.add_type<snumber>("number");
     Singular.add_type<__mpz_struct>("__mpz_struct");

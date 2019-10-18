@@ -232,10 +232,9 @@ void singular_define_ideals(jlcxx::Module & Singular)
         return h;
     });
     Singular.method("maMapIdeal", [](ideal map_id, ring pr, ideal im_id,
-                    ring im) {
-
+          ring im, void * cf_map) {
         rChangeCurrRing(pr);
-        return maMapIdeal(map_id, pr, im_id, im, ndCopyMap);
+        return maMapIdeal(map_id, pr, im_id, im, reinterpret_cast<nMapFunc>(cf_map));
     });
     Singular.method("idMinBase", [](ideal I, ring r) {
         rChangeCurrRing(r);

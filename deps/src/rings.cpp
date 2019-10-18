@@ -72,6 +72,10 @@ void singular_define_rings(jlcxx::Module & Singular)
     });
     Singular.method("rBitmask",
                     [](ip_sring * r) { return (unsigned int)r->bitmask; });
+    Singular.method("rPar", [](coeffs cf){
+                    coeffs cf_ptr = nCopyCoeff(cf);
+                    return n_NumberOfParameters(cf_ptr);
+    });
     Singular.method("p_Delete", [](spolyrec * p, ip_sring * r) {
         return p_Delete(&p, r);
     });
@@ -293,9 +297,9 @@ void singular_define_rings(jlcxx::Module & Singular)
                        return p_Diff(p_cp, i, r);
     });
     Singular.method("maMapPoly",
-                   [](poly map_p, ring pr, ideal im_id, ring im) {
-                       rChangeCurrRing(pr);
-                       return maMapPoly(map_p, pr, im_id, im, ndCopyMap);
+           [](poly map_p, ring pr, ideal im_id, ring im, void * cf_map) {
+        rChangeCurrRing(pr);
+        return maMapPoly(map_p, pr, im_id, im, reinterpret_cast<nMapFunc>(cf_map));
     });
     Singular.method("p_GetOrder",
                    [](poly p, ring r) {

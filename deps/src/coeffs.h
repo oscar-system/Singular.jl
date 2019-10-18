@@ -1,5 +1,6 @@
 #ifndef COEFFS_INCLUDE
 #define COEFFS_INCLUDE
+#define TRANSEXT_PRIVATES
 
 #include "includes.h"
 
