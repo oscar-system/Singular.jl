@@ -768,7 +768,7 @@ function permute_variables(p::spoly, perm::Array{Int64,1}, new_ring::PolyRing)
     append!(perm_64,perm)
     perm_32 = convert(Array{Int32,1},perm_64)
     map_ptr = libSingular.n_SetMap(base_ring(old_ring).ptr, base_ring(new_ring).ptr)
-    poly_ptr = libSingular.p_PermPoly(p.ptr, perm_32, old_ring.ptr, new_ring.ptr, map_ptr)
+    poly_ptr = libSingular.p_PermPoly(p.ptr, perm_32, old_ring.ptr, new_ring.ptr, map_ptr, Ptr{Int32}())
     poly = new_ring(poly_ptr)
     return poly
 end

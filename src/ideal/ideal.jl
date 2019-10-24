@@ -1,6 +1,6 @@
 export sideal, IdealSet, syz, lead, normalize!, isconstant, iszerodim, fres,
-       highcorner, jacobi, jet, kbase, minimal_generating_set,
-       ngens, sres, intersection, quotient,
+       dimension, highcorner, jacobi, jet, kbase, minimal_generating_set,
+       maximal_independent_set, ngens, sres, intersection, quotient,
        reduce, eliminate, kernel, equal, contains, isvar_generated, saturation,
        satstd, slimgb, std, vdim
 
@@ -71,6 +71,21 @@ iszero(I::sideal) = Bool(libSingular.idIs0(I.ptr))
 > $R/I$ is zero, where $R$ is the polynomial ring over which $I$ is an ideal..
 """
 iszerodim(I::sideal) = Bool(libSingular.id_IsZeroDim(I.ptr, base_ring(I).ptr))
+
+@doc Markdown.doc"""
+    dimension(I::sideal{T})
+> Given an ideal $I$ this function computes the Krull dimension
+> of the ring $R/I$, where $R$ is the polynomial ring over
+> which $I$ is an ideal. The ideal must be over a polynomial ring
+> over a field, and a Groebner basis.
+"""
+function dimension(I::sideal{T}) where T <: Singular.RingElem
+   I.isGB == false && error("I needs to be a Gröbner basis.")
+   R = base_ring(I)
+   !(typeof(base_ring(R)) <: Singular.Field) && 
+     error("Polynomial ring has to be over a Singular field.")
+   return Int(libSingular.scDimInt(I.ptr, R.ptr))
+end
 
 @doc Markdown.doc"""
     isconstant(I::sideal)
@@ -662,5 +677,47 @@ function minimal_generating_set(I::sideal)
       error("Ring needs local ordering.")
    end
    return gens(Ideal(R, Singular.libSingular.idMinBase(I.ptr, R.ptr)))
+end
+
+###############################################################################
+#
+#   Maximal independent set
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    maximal_independent_set{I::sideal{T}; all::Bool = false)
+> Returns, by default, an array containing a maximal independet set of
+> $lead(I)$. $I$ has to be given by a Gröbner basis.
+> If the additional parameter "all" is set to true, an array containing
+> all maximal independent sets iof $lead(I)$ is returned.
+"""
+function maximal_independent_set(I::sideal{T}; all::Bool = false) where T <: Singular.RingElem
+   I.isGB == false && error("I needs to be a Gröbner basis.")
+   R = base_ring(I)
+   !(typeof(base_ring(R)) <: Singular.Field) && 
+       error("Polynomial ring has to be over a Singular field.")
+   n = nvars(R)
+   a = Array{Int32, 1}()
+   libSingular.scIndIndset(I.ptr, R.ptr, a, all)
+   if all == true
+      m = Int(length(a)/n)
+      a = Int.(transpose(reshape(a, n, m)))
+      P = Array{Array{spoly, 1}, 1}()
+      for i in 1:m
+         b  = Array{spoly, 1}()
+         for j in findall(x->x==1, a[i, :])
+            push!(b, gen(R, j))
+         end
+         push!(P, b)
+      end
+      return P
+   else
+      P = Array{spoly, 1}()
+      for j in findall(x->x==1, a)
+         push!(P, gen(R, j))
+      end
+      return P
+   end
 end
  

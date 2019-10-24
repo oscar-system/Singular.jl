@@ -94,6 +94,10 @@ iszerodim(::sideal)
 ```
 
 ```@docs
+dimension(::sideal)
+```
+
+```@docs
 isconstant(::sideal)
 ```
 
@@ -118,6 +122,10 @@ I[1] = 2x + y^2
 isconstant(I) == false
 isvar_generated(I) == false
 iszerodim(I) == false
+
+S, (u, v) = PolynomialRing(QQ, ["u", "v"])
+J = Ideal(S, u^2 + 1, u*v)
+dimension(std(J)) == 0
 ```
 
 ### Containment
@@ -413,4 +421,30 @@ has_local_ordering(R) == true
 I = Ideal(R, y, x^2, (1 + y^3) * (x^2 - y))
 
 min = minimal_generating_set(I)
+```
+
+### Maximal independent sets of monomial ideals
+
+Let $I$ be an ideal of $K[x_1, ..., x_n].$ A maximal independent set is a
+subset $u \subseteq \{x_1, ..., x_n\},$ such that $I \cap K[u]= 0$ and
+$|u| = dim(K[x_1, ..., x_n]/I).$
+Using Singular.jl one can compute a maximal independent set, respectively
+all maximal independent sets for monomial ideals.
+If any ideal $I$ is passed to the function, the computation is performed on
+the leading ideal of $I$.
+
+```@docs
+maximal_independent_set(::sideal; ::Bool)
+```
+
+```julia
+R, (x,y,u,v,w) = PolynomialRing(QQ, ["x", "y", "u", "v", "w"])
+
+has_local_ordering(R) == true
+
+I = Ideal(R, x*y*w, y*v*w, u*y*w, x*v)
+
+L1 = maximal_independent_set(std(I))
+
+L2 = maximal_independent_set(std(I), all = true)
 ```

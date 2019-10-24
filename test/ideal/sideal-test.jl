@@ -50,6 +50,8 @@ end
    @test iszero(I0)
 
    @test iszerodim(I1)
+   @test dimension(std(I0)) == 2
+   @test dimension(std(I1)) == 0
 
    @test isconstant(Ideal(R, R(1), R(2)))
 
@@ -316,5 +318,18 @@ end
 
    #Check highcorner
    @test f == y^4
+end
+
+@testset "sideal.independentset..." begin
+   R, (x, y, u, v, w) = PolynomialRing(QQ, ["x", "y", "u", "v", "w"])
+
+   I = Ideal(R, x*y*w, y*v*w, u*y*w, x*v)
+
+   L1 = maximal_independent_set(std(I))
+
+   L2 = maximal_independent_set(std(I), all = true)
+
+   @test L1 == [x, y, u]
+   @test L2 == [[x,y,u], [y,u,v], [x,u,w], [u,v,w]]
 end
 
