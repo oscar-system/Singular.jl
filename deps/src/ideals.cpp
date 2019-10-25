@@ -244,24 +244,24 @@ void singular_define_ideals(jlcxx::Module & Singular)
         rChangeCurrRing(r);
         lists L = scIndIndset(I, all, r->qideal);
         int n = rVar(r);
-        if(all == true)
+        int m = lSize(L);
+        if(all == true && m >= 0)
         {
-           int m = lSize(L);
-           for(int i = 0; i<m; i++)
+           for(int i = 0; i<=m; i++)
            {
               intvec * v = reinterpret_cast<intvec *>(L->m[i].data);
               int * content = v->ivGetVec();
-              for(int j=0; j<n; j++)
+              for(int j = 0; j < n; j++)
               {
                  a.push_back(content[j]);
               }
            }
         }
-        else
+        else if(all == false && m >= 0)
         {
            intvec * v = reinterpret_cast<intvec *>(L->m[0].data);
            int * content = v->ivGetVec();
-           for(int j=0; j<n; j++)
+           for(int j = 0; j < n; j++)
            {
               a.push_back(content[j]);
            }

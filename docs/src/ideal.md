@@ -423,28 +423,40 @@ I = Ideal(R, y, x^2, (1 + y^3) * (x^2 - y))
 min = minimal_generating_set(I)
 ```
 
-### Maximal independent sets of monomial ideals
+### Independent sets of monomial ideals
 
-Let $I$ be an ideal of $K[x_1, ..., x_n].$ A maximal independent set is a
-subset $u \subseteq \{x_1, ..., x_n\},$ such that $I \cap K[u]= 0$ and
-$|u| = dim(K[x_1, ..., x_n]/I).$
-Using Singular.jl one can compute a maximal independent set, respectively
-all maximal independent sets for monomial ideals.
-If any ideal $I$ is passed to the function, the computation is performed on
+Let $I$ be an ideal of $K[x_1, ..., x_n].$ An `independent set` is a
+subset $u \subseteq \{x_1, ..., x_n\},$ such that $I \cap K[u]= 0.$ In case
+$u$ cannot be enlarged, it is called `non-extendable independent set`.
+If in addition $|u| = dim(K[x_1, ..., x_n]/I),$ $u$ is called
+`maximal independent set`.
+Using Singular.jl one can compute non-extendable, resp. maximal independent
+sets for monomial ideals.
+If an arbitrary ideal $I$ is passed to the function, the computation is performed on
 the leading ideal of $I$.
+
+```@docs
+independent_sets(::sideal)
+```
 
 ```@docs
 maximal_independent_set(::sideal; ::Bool)
 ```
 
 ```julia
-R, (x,y,u,v,w) = PolynomialRing(QQ, ["x", "y", "u", "v", "w"])
+R, (x, y, u, v, w) = PolynomialRing(QQ, ["x", "y", "u", "v", "w"])
 
 has_local_ordering(R) == true
 
 I = Ideal(R, x*y*w, y*v*w, u*y*w, x*v)
 
-L1 = maximal_independent_set(std(I))
+I = std(I)
 
-L2 = maximal_independent_set(std(I), all = true)
+L1 = independent_sets(I)
+
+L2 = maximal_independent_set(I)
+
+L3 = maximal_independent_set(I, all = true)
+
+
 ```

@@ -1,8 +1,8 @@
 export sideal, IdealSet, syz, lead, normalize!, isconstant, iszerodim, fres,
        dimension, highcorner, jacobi, jet, kbase, minimal_generating_set,
-       maximal_independent_set, ngens, sres, intersection, quotient,
-       reduce, eliminate, kernel, equal, contains, isvar_generated, saturation,
-       satstd, slimgb, std, vdim
+       independent_sets, maximal_independent_set, ngens, sres, intersection,
+       quotient, reduce, eliminate, kernel, equal, contains, isvar_generated,
+       saturation, satstd, slimgb, std, vdim
 
 ###############################################################################
 #
@@ -73,18 +73,20 @@ iszero(I::sideal) = Bool(libSingular.idIs0(I.ptr))
 iszerodim(I::sideal) = Bool(libSingular.id_IsZeroDim(I.ptr, base_ring(I).ptr))
 
 @doc Markdown.doc"""
-    dimension(I::sideal{T})
+    dimension(I::sideal{S}) where S <: Union{spoly{T}, spoly{n_unknown{T}}} where T <: Union{Singular.FieldElem, Nemo.FieldElem}
 > Given an ideal $I$ this function computes the Krull dimension
 > of the ring $R/I$, where $R$ is the polynomial ring over
 > which $I$ is an ideal. The ideal must be over a polynomial ring
 > over a field, and a Groebner basis.
 """
-function dimension(I::sideal{T}) where T <: Singular.RingElem
+function dimension(I::sideal{S}) where S <: Union{spoly{T}, spoly{n_unknown{T}}} where T <: Union{Singular.FieldElem, Nemo.FieldElem}
    I.isGB == false && error("I needs to be a Gröbner basis.")
    R = base_ring(I)
-   !(typeof(base_ring(R)) <: Singular.Field) && 
-     error("Polynomial ring has to be over a Singular field.")
    return Int(libSingular.scDimInt(I.ptr, R.ptr))
+end
+
+function dimension(I::sideal{spoly{T}}) where T <: Singular.RingElem
+   error("Polynomial ring has to be over a field.")
 end
 
 @doc Markdown.doc"""
@@ -681,43 +683,69 @@ end
 
 ###############################################################################
 #
-#   Maximal independent set
+#   Independent sets
 #
 ###############################################################################
 
 @doc Markdown.doc"""
-    maximal_independent_set{I::sideal{T}; all::Bool = false)
+    independent_sets(I::sideal{S}) where S <: Union{spoly{T}, spoly{n_unknown{T}}} where T <: Union{Singular.FieldElem, Nemo.FieldElem}
+> Returns all non-extendable independent sets of $lead(I)$. $I$ has to be given
+> by a Gröbner basis.
+"""
+function independent_sets(I::sideal{S}) where S <: Union{spoly{T}, spoly{n_unknown{T}}} where T <: Union{Singular.FieldElem, Nemo.FieldElem}
+   I.isGB == false && error("I needs to be a Gröbner basis.")
+   R = base_ring(I)
+   n = nvars(R)
+   a = Array{Int32, 1}()
+   libSingular.scIndIndset(I.ptr, R.ptr, a, true)
+   m = Int(div(length(a), n))
+   a = Int.(transpose(reshape(a, n, m)))
+   P = Array{Array{spoly, 1}, 1}()
+   for i in 1:m
+      b  = Array{spoly, 1}()
+      for j in findall(x->x == 1, a[i, :])
+         push!(b, gen(R, j))
+      end
+      push!(P, b)
+   end
+   return P
+end
+
+function independent_sets(I::sideal{spoly{T}}) where T <: Singular.RingElem
+   error("Polynomial ring has to be over a field.")
+end
+
+@doc Markdown.doc"""
+    maximal_independent_set(I::sideal{S}; all::Bool = false) where S <: Union{spoly{T}, spoly{n_unknown{T}}} where T <: Union{Singular.FieldElem, Nemo.FieldElem}
 > Returns, by default, an array containing a maximal independet set of
 > $lead(I)$. $I$ has to be given by a Gröbner basis.
 > If the additional parameter "all" is set to true, an array containing
 > all maximal independent sets iof $lead(I)$ is returned.
 """
-function maximal_independent_set(I::sideal{T}; all::Bool = false) where T <: Singular.RingElem
+function maximal_independent_set(I::sideal{S}; all::Bool = false) where S <: Union{spoly{T}, spoly{n_unknown{T}}} where T <: Union{Singular.FieldElem, Nemo.FieldElem}
    I.isGB == false && error("I needs to be a Gröbner basis.")
    R = base_ring(I)
-   !(typeof(base_ring(R)) <: Singular.Field) && 
-       error("Polynomial ring has to be over a Singular field.")
-   n = nvars(R)
-   a = Array{Int32, 1}()
-   libSingular.scIndIndset(I.ptr, R.ptr, a, all)
+   d = dimension(I)
    if all == true
-      m = Int(length(a)/n)
-      a = Int.(transpose(reshape(a, n, m)))
       P = Array{Array{spoly, 1}, 1}()
-      for i in 1:m
-         b  = Array{spoly, 1}()
-         for j in findall(x->x==1, a[i, :])
-            push!(b, gen(R, j))
+      res = independent_sets(I)
+      for i in 1:length(res)
+         if length(res[i]) == d
+            push!(P, res[i])
          end
-         push!(P, b)
       end
       return P
    else
+      a = Array{Int32, 1}()
+      libSingular.scIndIndset(I.ptr, R.ptr, a, all)
       P = Array{spoly, 1}()
-      for j in findall(x->x==1, a)
+      for j in findall(x->x == 1, a)
          push!(P, gen(R, j))
       end
       return P
    end
 end
- 
+
+function maximal_independent_set(I::sideal{spoly{T}}; all::Bool = false) where T <: Singular.RingElem
+   error("Polynomial ring has to be over a field.")
+end

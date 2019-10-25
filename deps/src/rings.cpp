@@ -284,20 +284,24 @@ void singular_define_rings(jlcxx::Module & Singular)
     Singular.method("p_PermPoly", [](poly p, int * perm, ring old_ring,
                                      ring new_ring, void * map_func_ptr, int * par_perm) {
         nMapFunc map_func = reinterpret_cast<nMapFunc>(map_func_ptr);
-        return p_PermPoly(p, perm, old_ring, new_ring, map_func);
+        return p_PermPoly(p, perm, old_ring, new_ring, map_func, par_perm);
     });
     Singular.method("maFindPerm", [](ring src, jlcxx::ArrayRef<int> perm, ring dst,
                                      jlcxx::ArrayRef<int> par_perm){
         int *perm1 = (int *)omAlloc0((rVar(src)+1)*sizeof(int));
         int *par_perm1 = NULL;
-        if (rPar(src)!=0) par_perm1=(int *)omAlloc0((rPar(src)+1)*sizeof(int));
-        maFindPerm(src->names,  rVar(src),  rParameter(src),  rPar(src),
+        if (rPar(src) != 0) par_perm1 = (int *)omAlloc0((rPar(src) + 1)*sizeof(int));
+        maFindPerm(src->names, rVar(src), rParameter(src), rPar(src),
                  dst->names, rVar(dst), rParameter(dst), rPar(dst),
                  perm1, par_perm1, dst->cf->type);
-        for(int i=0; i<rVar(src); i++)
-        {perm.push_back(perm1[i]);}
-        for(int j=0; j<rPar(src); j++)
-        {par_perm.push_back(par_perm1[j]);}
+        for(int i = 0; i < rVar(src); i++)
+        {
+           perm.push_back(perm1[i]);
+        }
+        for(int j = 0; j < rPar(src); j++)
+        {
+           par_perm.push_back(par_perm1[j]);
+        }
     });
    Singular.method("p_Jet",
                    [](poly p, int i, ring r) {

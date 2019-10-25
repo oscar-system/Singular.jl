@@ -320,16 +320,21 @@ end
    @test f == y^4
 end
 
-@testset "sideal.independentset..." begin
+@testset "sideal.independent_set..." begin
    R, (x, y, u, v, w) = PolynomialRing(QQ, ["x", "y", "u", "v", "w"])
 
    I = Ideal(R, x*y*w, y*v*w, u*y*w, x*v)
 
-   L1 = maximal_independent_set(std(I))
+   I = std(I)
 
-   L2 = maximal_independent_set(std(I), all = true)
+   L1 = maximal_independent_set(I)
+
+   L2 = maximal_independent_set(I, all = true)
+
+   L3 = independent_sets(I)
 
    @test L1 == [x, y, u]
-   @test L2 == [[x,y,u], [y,u,v], [x,u,w], [u,v,w]]
+   @test L2 == [[x, y, u], [y, u, v], [x, u, w], [u, v, w]]
+   @test L3 == [[x, y, u], [y, u, v], [x, u, w], [u, v, w], [y, w]]
 end
 
