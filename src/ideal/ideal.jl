@@ -73,13 +73,13 @@ iszero(I::sideal) = Bool(libSingular.idIs0(I.ptr))
 iszerodim(I::sideal) = Bool(libSingular.id_IsZeroDim(I.ptr, base_ring(I).ptr))
 
 @doc Markdown.doc"""
-    dimension(I::sideal{S}) where S <: Union{spoly{T}, spoly{n_unknown{T}}} where T <: Union{Singular.FieldElem, Nemo.FieldElem}
+    dimension(I::sideal{S}) where S <: Union{spoly{T}, spoly{n_unknown{U}}} where {T <: Singular.FieldElem, U <: Nemo.FieldElem}
 > Given an ideal $I$ this function computes the Krull dimension
 > of the ring $R/I$, where $R$ is the polynomial ring over
 > which $I$ is an ideal. The ideal must be over a polynomial ring
 > over a field, and a Groebner basis.
 """
-function dimension(I::sideal{S}) where S <: Union{spoly{T}, spoly{n_unknown{T}}} where T <: Union{Singular.FieldElem, Nemo.FieldElem}
+function dimension(I::sideal{S}) where S <: Union{spoly{T}, spoly{n_unknown{U}}} where {T <: Singular.FieldElem, U <: Nemo.FieldElem}
    I.isGB == false && error("I needs to be a Gröbner basis.")
    R = base_ring(I)
    return Int(libSingular.scDimInt(I.ptr, R.ptr))
@@ -684,11 +684,11 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    independent_sets(I::sideal{S}) where S <: Union{spoly{T}, spoly{n_unknown{T}}} where T <: Union{Singular.FieldElem, Nemo.FieldElem}
+    independent_sets(I::sideal{S}) where S <: Union{spoly{T}, spoly{n_unknown{U}}} where {T <: Singular.FieldElem, U <: Nemo.FieldElem}
 > Returns all non-extendable independent sets of $lead(I)$. $I$ has to be given
 > by a Gröbner basis.
 """
-function independent_sets(I::sideal{S}) where S <: Union{spoly{T}, spoly{n_unknown{T}}} where T <: Union{Singular.FieldElem, Nemo.FieldElem}
+function independent_sets(I::sideal{S}) where S <: Union{spoly{T}, spoly{n_unknown{U}}} where {T <: Singular.FieldElem, U <: Nemo.FieldElem}
    I.isGB == false && error("I needs to be a Gröbner basis.")
    R = base_ring(I)
    n = nvars(R)
@@ -708,13 +708,13 @@ function independent_sets(I::sideal{S}) where S <: Union{spoly{T}, spoly{n_unkno
 end
 
 @doc Markdown.doc"""
-    maximal_independent_set(I::sideal{S}; all::Bool = false) where S <: Union{spoly{T}, spoly{n_unknown{T}}} where T <: Union{Singular.FieldElem, Nemo.FieldElem}
+    maximal_independent_set(I::sideal{S}; all::Bool = false) where S <: Union{spoly{T}, spoly{n_unknown{U}}} where {T <: Singular.FieldElem, U <: Nemo.FieldElem} 
 > Returns, by default, an array containing a maximal independet set of
 > $lead(I)$. $I$ has to be given by a Gröbner basis.
 > If the additional parameter "all" is set to true, an array containing
 > all maximal independent sets iof $lead(I)$ is returned.
 """
-function maximal_independent_set(I::sideal{S}; all::Bool = false) where S <: Union{spoly{T}, spoly{n_unknown{T}}} where T <: Union{Singular.FieldElem, Nemo.FieldElem}
+function maximal_independent_set(I::sideal{S}; all::Bool = false) where S <: Union{spoly{T}, spoly{n_unknown{U}}} where {T <: Singular.FieldElem, U <: Nemo.FieldElem}
    I.isGB == false && error("I needs to be a Gröbner basis.")
    R = base_ring(I)
    d = dimension(I)
