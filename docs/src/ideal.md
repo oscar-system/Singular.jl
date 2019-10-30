@@ -359,10 +359,6 @@ F2 = sres(std(I), 2)
 jet(::sideal, ::Int)
 ```
 
-```@docs
-jacobi(::sideal)
-```
-
 **Examples**
 
 ```julia
@@ -371,7 +367,6 @@ R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"])
 I = Ideal(R, x^5 - y^2, y^3 - x^6 + z^3)
 
 J1 = jet(I, 3)
-J2 = jacobi(I)
 ```
 
 ### Operations on zero-dimensional ideals

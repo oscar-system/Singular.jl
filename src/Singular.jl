@@ -6,10 +6,10 @@ using Nemo
 
 import Base: abs, checkbounds, convert, deepcopy, deepcopy_internal,
              denominator, div, divrem, exponent,
-             gcd, gcdx, getindex, hash, inv, isequal, isless, lcm,
+             gcd, gcdx, getindex, hash, hcat, inv, isequal, isless, lcm,
              length, mod, numerator, one, reduce, rem, setindex!, show,
-             zero, +, -, *, ==, ^, &, |, <<, >>, ~, <=, >=, <, >, //,
-             /, !=
+             transpose, vcat, zero, +, -, *, ==, ^, &, |, <<, >>, ~, <=,
+             >=, <, >, //, /, !=
 
 import LinearAlgebra: normalize!, rank
 

@@ -4,8 +4,8 @@ export spoly, PolyRing, change_base_ring, coeff, coeffs, coeffs_expos,
        exponent_vectors, factor, factor_squarefree, finish, gen,
        has_global_ordering, has_mixed_ordering, has_local_ordering,
        inflate, isgen,
-       ismonomial, isquotient_ring, isterm, jacobi, jet, lc, lt, lm,
-       lead_exponent, monomials, MPolyBuildCtx,
+       ismonomial, isquotient_ring, isterm, jacobian_ideal, jacobian_matrix,
+       jet, lc, lt, lm, lead_exponent, monomials, MPolyBuildCtx,
        nvars, order, ordering, @PolynomialRing, primpart,
        push_term!, remove, sort_terms!, symbols, terms, total_degree,
        valuation, var_index, vars
@@ -878,17 +878,51 @@ function derivative(x::spoly, v::spoly)
 end
 
 @doc Markdown.doc"""
-   jacobi(x::spoly)
-> Given a polynomial $x$ this function the Jacobian ideal of $x$.
+   jacobian_ideal(x::spoly)
+> Given a polynomial $x$ this function returns the Jacobian ideal of $x$.
 """
-function jacobi(p::spoly)
+function jacobian_ideal(p::spoly)
+   R = parent(p)
+   B = base_ring(R)
+   n = nvars(R)
+   J = Array{spoly{elem_type(B)}, 1}()
+   for i in 1:n
+       push!(J, derivative(p, i))
+   end
+  return Ideal(R, J)
+end
+
+@doc Markdown.doc"""
+   jacobian_matrix(x::spoly)
+> Given a polynomial $x$ this function returns the Jacobian matrix of $x$.
+"""
+function jacobian_matrix(p::spoly)
    R = parent(p)
    n = nvars(R)
-   I = Ideal(R, derivative(p, 1))
-   for i in 2:n
-       I = I + Ideal(R, derivative(p, i))
+   J = zero_matrix(R, n, 1)
+   for i in 1:n
+      J[i, 1] = derivative(p, i)
    end
-  return I
+   return J
+end
+
+@doc Markdown.doc"""
+   jacobian_matrix(A::Array{spoly, 1})
+> Given an array $A$ of polynomials over the same base ring,
+> this function returns the Jacobian matrix of $A$.
+"""
+function jacobian_matrix(A::Vector{spoly{T}}) where T <: Nemo.RingElem
+   m = length(A)
+   m == 0 && error("Array has to be non-empty.")
+   R = parent(A[1])
+   n = nvars(R)
+   J = zero_matrix(R, n, m)
+   for i in 1:n
+      for j in 1:m
+         J[i, j] = derivative(A[j], i)
+      end
+   end
+   return J
 end
 
 ###############################################################################
