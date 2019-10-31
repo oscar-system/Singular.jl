@@ -31,7 +31,7 @@ const tmp = mktempdir(wdir)
 
 # http://www.shoup.net/ntl/WinNTL-9_3_0.zip
 cd(tmp)
-run(`tar -C "$tmp" -xkvf "$wdir/$ntl.tar.gz"`)
+run(`tar -C "$tmp" -zxkvf "$wdir/$ntl.tar.gz"`)
 cd(joinpath(tmp, ntl, "src"))
 withenv("CPP_FLAGS"=>"-I$vdir/include", "LD_LIBRARY_PATH"=>"$vdir/lib:$nemovdir/lib", "LDFLAGS"=>LDFLAGS) do
    run(`./configure PREFIX=$vdir DEF_PREFIX=$nemovdir SHARED=on NTL_THREADS=off NTL_EXCEPTIONS=off NTL_GMP_LIP=on CXXFLAGS="-I$nemovdir/include"`)
