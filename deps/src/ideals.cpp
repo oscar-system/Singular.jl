@@ -240,4 +240,35 @@ void singular_define_ideals(jlcxx::Module & Singular)
         rChangeCurrRing(r);
         return idMinBase(I);
     });
+    Singular.method("scIndIndset", [](ideal I, ring r, jlcxx::ArrayRef<int> a, bool all) {
+        rChangeCurrRing(r);
+        lists L = scIndIndset(I, all, r->qideal);
+        int n = rVar(r);
+        int m = lSize(L);
+        if(all == true && m >= 0)
+        {
+           for(int i = 0; i<=m; i++)
+           {
+              intvec * v = reinterpret_cast<intvec *>(L->m[i].data);
+              int * content = v->ivGetVec();
+              for(int j = 0; j < n; j++)
+              {
+                 a.push_back(content[j]);
+              }
+           }
+        }
+        else if(all == false && m >= 0)
+        {
+           intvec * v = reinterpret_cast<intvec *>(L->m[0].data);
+           int * content = v->ivGetVec();
+           for(int j = 0; j < n; j++)
+           {
+              a.push_back(content[j]);
+           }
+        }
+    });
+    Singular.method("scDimInt", [](ideal I, ring R) {
+        rChangeCurrRing(R);
+        return scDimInt(I, R->qideal);
+    });
 }

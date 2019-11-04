@@ -24,12 +24,14 @@ auto transExt_to_poly(number a, coeffs cf, ring r)
     rChangeCurrRing(r);
     return p_PermPoly(f->numerator, NULL, ext, r, nMap, NULL);
 }
+
 void singular_define_coeffs(jlcxx::Module & Singular)
 {
     /* initialise a coefficient ring */
     Singular.method("nInitChar", &nInitChar);
     /* Helper to construct transcendental Extensions */
     Singular.method("transExt_helper", &transExt_helper);
+    /* Helper to convert n_transExt into a polynomial */
     Singular.method("transExt_to_poly", &transExt_to_poly);
     /* get the characteristic of a coefficient domain */
     Singular.method("n_GetChar", [](coeffs n) { return n_GetChar(n); });
@@ -37,10 +39,8 @@ void singular_define_coeffs(jlcxx::Module & Singular)
     /* make a copy of a coefficient domain (actually just increments a
      * reference count) */
     Singular.method("nCopyCoeff", &nCopyCoeff);
-
     /* kill a coefficient ring */
     Singular.method("nKillChar", &nKillChar);
-
     /* return a function to convert between rings */
     Singular.method("n_SetMap", [](const coeffs x, const coeffs y) {
         return reinterpret_cast<void *>(n_SetMap(x, y));
