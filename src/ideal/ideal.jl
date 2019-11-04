@@ -33,6 +33,8 @@ ngens(I::sideal) = Int(libSingular.ngens(I.ptr))
 > Return the generators in the internal representation of the ideal $I$ as an array.
 """
 function gens(I::sideal)
+   R = base_ring(I)
+   ngens(I) == 0 && return Array{elem_type(R), 1}()
    return [I[i] for i in 1:Singular.ngens(I)]
 end
 
