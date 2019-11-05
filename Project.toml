@@ -15,7 +15,6 @@ BinaryProvider = "b99e7846-7c00-51b0-8f62-c81ae34c0232"
 AbstractAlgebra = "^0.7.1"
 Nemo = "^0.15.0"
 julia = "≥ 1.0.0"
-CxxWrap = "^0.8.1"
 BinaryProvider = "^0.5.8"
 
 [extras]
