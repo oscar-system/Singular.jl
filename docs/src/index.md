@@ -21,13 +21,14 @@ The features of Singular so far include:
 
 ## Installation
 
-To use Singular.jl we require Julia 0.6 or higher. Please see
+To use Singular.jl we require Julia 1.0 or higher. Please see
 [http://julialang.org/downloads](http://julialang.org/downloads/) for instructions on
 how to obtain julia for your system.
 
 At the Julia prompt simply type
 
 ```
+julia> using Pkg
 julia> Pkg.clone("https://github.com/oscar-system/Singular.jl")
 julia> Pkg.build("Singular")
 ```
