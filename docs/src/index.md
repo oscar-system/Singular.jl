@@ -28,7 +28,7 @@ how to obtain julia for your system.
 At the Julia prompt simply type
 
 ```
-julia> Pkg.clone("https://github.com/wbhart/Singular.jl")
+julia> Pkg.clone("https://github.com/oscar-system/Singular.jl")
 julia> Pkg.build("Singular")
 ```
 
