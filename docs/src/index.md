@@ -33,10 +33,6 @@ julia> Pkg.clone("https://github.com/oscar-system/Singular.jl")
 julia> Pkg.build("Singular")
 ```
 
-Note that Singular.jl depends on Cxx.jl which is not supported on every system.
-
-## Quick start
-
 Here is an example of using Singular.jl
 
 ```julia
