@@ -23,7 +23,7 @@ println("Detected $cores CPU threads.")
 const ntl="ntl-10.5.0"
 
 try
-  run(`wget -q -nc -c -O "$wdir/$ntl.tar.gz" "http://www.shoup.net/ntl/$ntl.tar.gz"`)
+  download("https://www.shoup.net/ntl/$ntl.tar.gz", "$wdir/$ntl.tar.gz")
 catch
 end
 
