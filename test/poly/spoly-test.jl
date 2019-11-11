@@ -390,7 +390,7 @@ end
    Z1 = zero_matrix(R, 2, 1)
    Z1[1, 1] = 3*x^2
    Z1[2, 1] = 6 * y^5
-   
+
    Z2 = zero_matrix(R, 2, 2)
    Z2[1, 1] = f1
    Z2[2, 1] = f2

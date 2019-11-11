@@ -88,7 +88,7 @@ transpose(M::smatrix{T}) where T <: AbstractAlgebra.RingElem
 ```
 
 ```@docs
-iszero(M::smatrix) 
+iszero(M::smatrix)
 ```
 
 **Examples**

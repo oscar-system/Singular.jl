@@ -17,7 +17,7 @@
 
    N = std(I)
    V = Singular.Matrix(N)
-   
+
    Z = zero_matrix(R, 2 ,3)
    E = identity_matrix(R, 3)
 
@@ -32,15 +32,11 @@ end
 
    I = Ideal(R, x, y)
    M = Singular.Matrix(I)
-   
+
    Z0 = zero_matrix(R, 3, 3)
    Z1 = zero_matrix(R, 3, 2)
    Z2 = zero_matrix(R, 2, 3)
 
-   H1 = hcat(Z0, Z1)
-   H2 = hcat([Z0, Z1, Z1])
-   V1 = vcat(Z0, Z2)
-   V2 = vcat([Z0, Z0, Z2])
    Z0[1, 1] = x
 
    @test nrows(M) == 1
@@ -49,12 +45,6 @@ end
    @test M[1, 1] == x
    @test M[1, 2] == y
    @test Z0[1, 1] == x
-   
-   @test H1 == zero_matrix(R, 3, 5)
-   @test H2 == zero_matrix(R, 3, 7)
-
-   @test V1 == zero_matrix(R, 5, 3)
-   @test V2 == zero_matrix(R, 8, 3)
 
    @test !iszero(M)
    @test iszero(M - M)

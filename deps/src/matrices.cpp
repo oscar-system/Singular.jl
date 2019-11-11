@@ -36,14 +36,12 @@ void singular_define_matrices(jlcxx::Module & Singular)
 
     Singular.method("mp_Equal", &mp_Equal);
 
-    Singular.method("mpNew", [](ring R, int r, int c) {
-        rChangeCurrRing(R);
+    Singular.method("mpNew", [](int r, int c) {
         return mpNew(r, c);
     });
 
     Singular.method("mp_InitP", [](int n, poly p, ring R) {
-        rChangeCurrRing(R);
-        return mp_InitP(n, n, pCopy(p), R);
+        return mp_InitP(n, n, p_Copy(p, R), R);
     });
 
     Singular.method("iiStringMatrix", [](matrix I, int d, ring o) {

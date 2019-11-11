@@ -213,7 +213,7 @@ ord = order(x1*x2 + 3x1*x2^2 + x3 + 2)
 
 ### Differential functions
 
-Working over any coefficient ring, basic functionality regarding
+Working over any coefficient ring, basic functionality involving
 differential operations is avaiable.
 
 ```@docs

@@ -1,6 +1,5 @@
 export sideal, IdealSet, syz, lead, normalize!, isconstant, iszerodim, fres,
-
-       dimension, highcorner, jacobi, jet, kbase, minimal_generating_set,
+       dimension, highcorner, jet, kbase, minimal_generating_set,
        independent_sets, maximal_independent_set, ngens, sres, intersection,
        quotient, reduce, eliminate, kernel, equal, contains, isvar_generated,
        saturation, satstd, slimgb, std, vdim
