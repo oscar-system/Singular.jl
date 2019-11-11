@@ -283,18 +283,6 @@ end
    @test equal(J, Ideal(R, - y^2, y^3 + z^3))
 end
 
-@testset "sideal.jacob..." begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
-
-   I = Ideal(R, 2*x + 5*y, 2*y + 5*x)
-
-   J = jacobi(I)
-
-   M = R[2 5; 5 2]
-
-   @test J == M
-end
-
 @testset "sideal.zerodim..." begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"]; ordering=:negdegrevlex)
 

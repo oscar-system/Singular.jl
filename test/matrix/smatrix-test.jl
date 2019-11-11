@@ -18,8 +18,13 @@
    N = std(I)
    V = Singular.Matrix(N)
 
+   Z = zero_matrix(R, 2 ,3)
+   E = identity_matrix(R, 3)
+
+   @test isa(E, smatrix)
    @test isa(M, smatrix)
    @test isa(V, smatrix)
+   @test isa(Z, smatrix)
 end
 
 @testset "smatrix.manipulation..." begin
@@ -28,15 +33,22 @@ end
    I = Ideal(R, x, y)
    M = Singular.Matrix(I)
 
+   Z0 = zero_matrix(R, 3, 3)
+   Z1 = zero_matrix(R, 3, 2)
+   Z2 = zero_matrix(R, 2, 3)
+
+   Z0[1, 1] = x
+
    @test nrows(M) == 1
    @test ncols(M) == 2
 
    @test M[1, 1] == x
    @test M[1, 2] == y
+   @test Z0[1, 1] == x
 
    @test !iszero(M)
    @test iszero(M - M)
-
+   @test transpose(Z1) == Z2
    @test deepcopy(M) == M
 end
 

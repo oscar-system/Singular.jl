@@ -1,5 +1,5 @@
 export sideal, IdealSet, syz, lead, normalize!, isconstant, iszerodim, fres,
-       dimension, highcorner, jacobi, jet, kbase, minimal_generating_set,
+       dimension, highcorner, jet, kbase, minimal_generating_set,
        independent_sets, maximal_independent_set, ngens, sres, intersection,
        quotient, reduce, eliminate, kernel, equal, contains, isvar_generated,
        saturation, satstd, slimgb, std, vdim
@@ -578,24 +578,6 @@ end
 function jet(I::sideal, n::Int)
    J = deepcopy(I)
    J.ptr = libSingular.id_Jet(I.ptr, Cint(n), base_ring(I).ptr)
-   return J
-end
-
-@doc Markdown.doc"""
-   jacobi(I::sideal)
-> Given an ideal $I$ this function computes the jacobi matrix of
-> the generatos of $I$. The output is a matrix object.
-"""
-function jacobi(I::sideal)
-   R = base_ring(I)
-   n = nvars(R)
-   m = ngens(I)
-   J = zero_matrix(R, m, n)
-   for i in 1:m
-      for j in 1:n
-         J[i, j] = derivative(I[i], j)
-      end
-   end
    return J
 end
 

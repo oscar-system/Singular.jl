@@ -211,6 +211,55 @@ deg = total_degree(x1*x2 + 3x1*x2^2 + x3 + 2)
 ord = order(x1*x2 + 3x1*x2^2 + x3 + 2) 
 ```
 
+### Differential functions
+
+Working over any coefficient ring, basic functionality involving
+differential operations is avaiable.
+
+```@docs
+Singular.jet(::spoly, ::Int)
+```
+
+```@docs
+Singular.derivative(::spoly, ::Int)
+```
+
+```@docs
+Singular.derivative(::spoly, ::spoly)
+```
+
+```@docs
+Singular.jacobian_ideal(::spoly)
+```
+
+```@docs
+Singular.jacobian_matrix(::spoly)
+```
+
+```@docs
+Singular.jacobian_matrix(A::Vector{spoly{T}}) where T <: Nemo.RingElem
+```
+
+**Examples**
+
+```julia
+R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"])
+
+f = x^2*y*z + z^2*x + x*y*z
+
+g = jet(f, 3)
+
+derivative(f, 1)
+
+derivative(f, y)
+
+J = jacobian_ideal(f)
+
+Jf1 = jacobian_matrix(f)
+
+Jf2 = jacobian_matrix([f, g])
+```
+
 ### Content and primitive part
 
 When coefficient rings have a meaningful GCD function, the following functions are
@@ -286,7 +335,7 @@ R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 
 p = x^5 + y^3+1
 
-change_base_ring(QQ, p)                                                                                 
+change_base_ring(QQ, p)
 ```
 
 It also possible to work with Nemo rings, if a type conversion for the

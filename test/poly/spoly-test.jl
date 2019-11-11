@@ -379,19 +379,32 @@ end
 
    f = x^3 + y^6
 
-   J = jacobi(f)
+   J1 = jacobian_ideal(f)
+   J2 = jacobian_matrix(f)
    f1 = derivative(f, 1)
    f2 = derivative(f, y)
    jf = jet(f, 3)
+   J3 = jacobian_matrix([f, jf])
 
    I = Ideal(R, x^2, y^5)
+   Z1 = zero_matrix(R, 2, 1)
+   Z1[1, 1] = 3*x^2
+   Z1[2, 1] = 6 * y^5
+
+   Z2 = zero_matrix(R, 2, 2)
+   Z2[1, 1] = f1
+   Z2[2, 1] = f2
+   Z2[1, 2] = 3*x^2
+   Z2[2, 2] = R(0)
 
    # Check derivative
    @test f1 == 3*x^2
    @test f2 == 6*y^5
 
-   #Check jacobi
-   @test equal(I, J)
+   #Check jacobians
+   @test equal(I, J1)
+   @test J2 == Z1
+   @test J3 == Z2
 
    #Check jet
    @test jf == x^3

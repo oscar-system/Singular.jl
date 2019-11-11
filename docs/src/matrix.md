@@ -38,11 +38,74 @@ These include:
 
 The following parts of the Matrix interface from AbstractAlgebra are also implemented:
 
-  * matrix dimensions: `nrows`, `ncols`
-  * accessing elements of a matrix `M[i, j]`
-  * iszero
   * arithmetic operations: `+`, `-`, `*`
   * comparison: `==`
 
-No other functionality is provided at this time.
+## Basic constructors
 
+Using Singular.jl, the user has two basic constructors for matrices.
+
+```@docs
+identity_matrix(::PolyRing, ::Int)
+```
+
+```@docs
+zero_matrix(::PolyRing, ::Int, ::Int)
+```
+
+**Examples**
+```julia
+R, (x, y, u, v, w) = Singular.PolynomialRing(Singular.QQ, ["x", "y", "u", "v", "w"])
+
+identity_matrix(R, 4)
+
+zero_matrix(R, 3, 8)
+```
+
+## Basic manipulation
+
+The following functions are provided to manipulate matrices and to set and
+retrieve entries other basic data associated with the matrices.
+
+```@docs
+nrows(::smatrix)
+```
+
+```@docs
+ncols(::smatrix)
+```
+
+```@docs
+getindex(::smatrix{T}, ::Int, ::Int) where T <: AbstractAlgebra.RingElem
+```
+
+```@docs
+setindex!(::smatrix, ::spoly, ::Int, ::Int)
+```
+
+```@docs
+transpose(M::smatrix{T}) where T <: AbstractAlgebra.RingElem
+```
+
+```@docs
+iszero(M::smatrix)
+```
+
+**Examples**
+```julia
+R, (x, y, u, v, w) = Singular.PolynomialRing(QQ, ["x", "y", "u", "v", "w"])
+
+M = identity_matrix(R, 4)
+
+nrows(M)
+
+ncols(M)
+
+iszero(M)
+
+M[3, 4] = x*y + 5*u*w
+
+N = transpose(M)
+
+N[4, 3]
+```
