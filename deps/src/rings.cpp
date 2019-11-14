@@ -210,7 +210,8 @@ void singular_define_rings(jlcxx::Module & Singular)
     });
     Singular.method("singclap_sqrfree",
                     [](spolyrec * p, jlcxx::ArrayRef<int> a, ip_sring * r) {
-                        rChangeCurrRing(r);
+                        const ring origin = currRing;
+		        rChangeCurrRing(r);
 			intvec * v = NULL;
 			ideal I = singclap_sqrfree(pCopy(p), &v, 0, currRing);
 			int * content = v->ivGetVec();
@@ -218,11 +219,13 @@ void singular_define_rings(jlcxx::Module & Singular)
 			{
 			  a.push_back(content[i]);
 			}
+			rChangeCurrRing(origin);
 		        return I;
     });
     Singular.method("singclap_factorize",
                     [](spolyrec * p, jlcxx::ArrayRef<int> a, ip_sring * r) {
-                        rChangeCurrRing(r);
+                        const ring origin = currRing;
+		        rChangeCurrRing(r);
 			intvec * v = NULL;
 			ideal I = singclap_factorize(pCopy(p), &v, 0, currRing);
 			int * content = v->ivGetVec();
@@ -230,6 +233,7 @@ void singular_define_rings(jlcxx::Module & Singular)
 			{
 			  a.push_back(content[i]);
 			}
+			rChangeCurrRing(origin);
 		        return I;
     });
     Singular.method("p_Content", [](spolyrec * p, ip_sring * r) {
@@ -315,7 +319,6 @@ void singular_define_rings(jlcxx::Module & Singular)
     });
     Singular.method("maMapPoly",
            [](poly map_p, ring pr, ideal im_id, ring im, void * cf_map) {
-        rChangeCurrRing(pr);
         return maMapPoly(map_p, pr, im_id, im, reinterpret_cast<nMapFunc>(cf_map));
     });
     Singular.method("p_GetOrder",
