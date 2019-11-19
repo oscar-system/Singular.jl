@@ -916,10 +916,10 @@ function jacobian_matrix(A::Vector{spoly{T}}) where T <: Nemo.RingElem
    m == 0 && error("Array has to be non-empty.")
    R = parent(A[1])
    n = nvars(R)
-   J = zero_matrix(R, n, m)
+   J = zero_matrix(R, m, n)
    for i in 1:n
       for j in 1:m
-         J[i, j] = derivative(A[j], i)
+         J[j, i] = derivative(A[j], i)
       end
    end
    return J

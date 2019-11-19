@@ -21,8 +21,11 @@ auto transExt_to_poly(number a, coeffs cf, ring r)
     ring ext = cf->extRing;
     fraction f = (fraction)a;
     nMapFunc nMap = n_SetMap(ext->cf, r->cf);
+    const ring origin = currRing;
     rChangeCurrRing(r);
-    return p_PermPoly(f->numerator, NULL, ext, r, nMap, NULL);
+    poly p = p_PermPoly(f->numerator, NULL, ext, r, nMap, NULL);
+    rChangeCurrRing(origin);
+    return p;
 }
 
 void singular_define_coeffs(jlcxx::Module & Singular)

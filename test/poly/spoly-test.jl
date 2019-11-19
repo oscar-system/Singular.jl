@@ -393,8 +393,8 @@ end
 
    Z2 = zero_matrix(R, 2, 2)
    Z2[1, 1] = f1
-   Z2[2, 1] = f2
-   Z2[1, 2] = 3*x^2
+   Z2[1, 2] = f2
+   Z2[2, 1] = 3*x^2
    Z2[2, 2] = R(0)
 
    # Check derivative

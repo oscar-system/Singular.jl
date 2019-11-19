@@ -233,15 +233,22 @@ void singular_define_ideals(jlcxx::Module & Singular)
     });
     Singular.method("maMapIdeal", [](ideal map_id, ring pr, ideal im_id,
           ring im, void * cf_map) {
+        const ring origin = currRing;
         rChangeCurrRing(pr);
-        return maMapIdeal(map_id, pr, im_id, im, reinterpret_cast<nMapFunc>(cf_map));
+        ideal I = maMapIdeal(map_id, pr, im_id, im, reinterpret_cast<nMapFunc>(cf_map));
+	rChangeCurrRing(origin);
+	return I;
     });
     Singular.method("idMinBase", [](ideal I, ring r) {
+        const ring origin = currRing;
         rChangeCurrRing(r);
-        return idMinBase(I);
+        ideal J = idMinBase(I);
+	rChangeCurrRing(origin);
+	return J;
     });
     Singular.method("scIndIndset", [](ideal I, ring r, jlcxx::ArrayRef<int> a, bool all) {
-        rChangeCurrRing(r);
+        const ring origin = currRing;
+	rChangeCurrRing(r);
         lists L = scIndIndset(I, all, r->qideal);
         int n = rVar(r);
         int m = lSize(L);
@@ -266,9 +273,13 @@ void singular_define_ideals(jlcxx::Module & Singular)
               a.push_back(content[j]);
            }
         }
+	rChangeCurrRing(origin);
     });
     Singular.method("scDimInt", [](ideal I, ring R) {
-        rChangeCurrRing(R);
-        return scDimInt(I, R->qideal);
+        const ring origin = currRing;
+	rChangeCurrRing(R);
+        int k = scDimInt(I, R->qideal);
+	rChangeCurrRing(origin);
+	return k;
     });
 }
