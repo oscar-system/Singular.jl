@@ -33,6 +33,9 @@ output_filename = abspath(joinpath(@__DIR__, "..", "src", "libraryfuncdictionary
   All other columns (containing info such as line numbers, library name, etc)
   are ignored.
 =#
+olddir = pwd()
+cd(abspath(joinpath(@__DIR__, "usr", "bin")))
+
 open(output_filename, "w") do outputfile
     println(outputfile, "libraryfunctiondictionary = Dict(")
     for i in filenames
@@ -51,3 +54,5 @@ open(output_filename, "w") do outputfile
     end
     println(outputfile, ")\n")
 end
+
+cd(pwd)
