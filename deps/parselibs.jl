@@ -11,14 +11,14 @@ function execute(cmd::Cmd)
       code = process.exitcode)
 end
 
-libparsepath = abspath(joinpath(@__DIR__, "..", "local", "bin", "libparse"))
+libparsepath = abspath(joinpath(@__DIR__, "usr", "bin", "libparse"))
 
 library_dir = ""
 
 if haskey(ENV, "SINGULAR_LIBRARY_DIR")
     library_dir = ENV["SINGULAR_LIBRARY_DIR"]
 else
-    library_dir = abspath(joinpath(@__DIR__, "..", "local", "share", "singular", "LIB"))
+    library_dir = abspath(joinpath(@__DIR__, "usr", "share", "singular", "LIB"))
 end
 
 filenames = filter(x -> endswith(x, ".lib"), readdir(library_dir))

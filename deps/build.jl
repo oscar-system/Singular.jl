@@ -38,8 +38,8 @@ if !issource_build
       end
    end
 
-   # Execute the build scripts for the dependencies in an isolated module to avoid overwriting
-   # any variables/constants here
+   # Execute the build scripts for the dependencies in an isolated module to
+   # avoid overwriting any variables/constants here
    for url in dependencies
       build_file = joinpath(@__DIR__, basename(url))
       m = @eval module $(gensym()); include($build_file); end
