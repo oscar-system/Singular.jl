@@ -2,7 +2,7 @@ module libSingular
 
 import Libdl
 using CxxWrap
-@wrapmodule(realpath(joinpath(@__DIR__, "..", "local", "lib", "libsingularwrap." * Libdl.dlext)))
+@wrapmodule(realpath(joinpath(@__DIR__, "..", "deps", "usr", "lib", "libsingularwrap." * Libdl.dlext)))
 
 function __init__()
    @initcxx
