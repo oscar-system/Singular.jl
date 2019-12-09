@@ -43,9 +43,9 @@ export ZZ, QQ, FiniteField, FunctionField, CoefficientRing, Fp
 ###############################################################################
 
 const pkgdir = realpath(joinpath(dirname(@__FILE__), ".."))
-const libsingular = joinpath(pkgdir, "usr", "lib", "libSingular")
+const libsingular = joinpath(pkgdir, "deps", "usr", "lib", "libSingular")
 
-prefix = realpath(joinpath(pkgdir, "usr"))
+prefix = realpath(joinpath(pkgdir, "deps", "usr"))
 
 mapping_types = nothing
 mapping_types_reversed = nothing
