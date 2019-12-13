@@ -5,7 +5,7 @@ function n_InitMPZ(b::BigInt, cf::coeffs)
 end
 
 # get an mpz from a number
-function n_GetMPZ(s::numberRef, r::coeffs)
+function n_GetMPZ(s::number_ref, r::coeffs)
    res = BigInt(1)
    resp = pointer_from_objref(res)
    n_GetMPZ_internal(resp, s, r)
@@ -13,12 +13,12 @@ function n_GetMPZ(s::numberRef, r::coeffs)
 end
 
 # write a number to a Singular string
-function n_Write(n::numberRef, cf::coeffs, bShortOut::Bool = false)
+function n_Write(n::number_ref, cf::coeffs, bShortOut::Bool = false)
    d = Int(bShortOut)
    n_Write_internal(n, cf, d);
 end
 
-function n_ExtGcd(a::number, b::number, s::Ptr{numberRef}, t::Ptr{numberRef}, cf:: coeffs)
+function n_ExtGcd(a::number, b::number, s::Ptr{number_ref}, t::Ptr{number_ref}, cf:: coeffs)
    sp = reinterpret(Ptr{Nothing}, s)
    tp = reinterpret(Ptr{Nothing}, t)
    return n_ExtGcd_internal(a, b, sp, tp, cf);
