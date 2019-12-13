@@ -182,7 +182,7 @@ function Module(R::PolyRing{T}, vecs::svector{spoly{T}}...) where T <: Nemo.Ring
    return smodule{S}(R, vecs...)
 end
 
-function Module(R::PolyRing{T}, id::libSingular.idealRef) where T <: Nemo.RingElem
+function Module(R::PolyRing{T}, id::libSingular.ideal_ref) where T <: Nemo.RingElem
    S = elem_type(R)
    return smodule{S}(R, id)
 end

@@ -19,7 +19,7 @@ mutable struct ResolutionSet{T <: Nemo.RingElem} <: Set
 end
 
 mutable struct sresolution{T <: Nemo.RingElem} <: Nemo.SetElem
-   ptr::libSingular.syStrategyRef
+   ptr::libSingular.syStrategy_ref
    minimal::Bool
    base_ring::PolyRing
 

@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-const number_ref = numberRef
+const number_ref = CxxRef{number}
 
 const mpz_t = Ptr{__mpz_struct}
 
@@ -14,7 +14,7 @@ const mpz_t = Ptr{__mpz_struct}
 #
 ###############################################################################
 
-const poly_ref = polyRef
+const poly_ref = CxxRef{poly}
 
 const vector = poly
 
@@ -24,7 +24,7 @@ const vector = poly
 #
 ###############################################################################
 
-const ideal_ref = idealRef
+const ideal_ref = CxxRef{ideal}
 
 ###############################################################################
 #
@@ -32,7 +32,7 @@ const ideal_ref = idealRef
 #
 ###############################################################################
 
-const matrix_ref = ip_smatrixRef
+const matrix_ref = CxxRef{ip_smatrix}
 
 ###############################################################################
 #
@@ -41,6 +41,8 @@ const matrix_ref = ip_smatrixRef
 ###############################################################################
 
 const resolvente = Ptr{ideal}
+
+const syStrategy_ref = CxxRef{syStrategy}
 
 ###############################################################################
 #
