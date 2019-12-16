@@ -168,7 +168,7 @@ function sres(I::smodule{T}, max_length::Int) where T <: Nemo.RingElem
         # TODO: consider qrings
    end
    r, minimal = libSingular.id_sres(I.ptr, Cint(max_length + 1), R.ptr)
-   return sresolution{T}(R, r, minimal)
+   return sresolution{T}(R, r, Bool(minimal))
 end
 
 ###############################################################################
@@ -182,7 +182,7 @@ function Module(R::PolyRing{T}, vecs::svector{spoly{T}}...) where T <: Nemo.Ring
    return smodule{S}(R, vecs...)
 end
 
-function Module(R::PolyRing{T}, id::libSingular.ideal_ref) where T <: Nemo.RingElem
+function Module(R::PolyRing{T}, id::libSingular.ideal_ptr) where T <: Nemo.RingElem
    S = elem_type(R)
    return smodule{S}(R, id)
 end

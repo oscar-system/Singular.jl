@@ -19,7 +19,7 @@ mutable struct SIdAlgHom{T} <: AbstractAlgebra.Map{PolyRing, PolyRing,
 
    domain::PolyRing
    image::Vector
-   ptr::libSingular.ideal
+   ptr::libSingular.ideal_ptr
 
    function SIdAlgHom{T}(R::PolyRing) where T <: Union{Ring, Field}
       V = gens(R)
@@ -54,7 +54,7 @@ mutable struct SAlgHom{T} <: AbstractAlgebra.Map{PolyRing, PolyRing,
    domain::PolyRing
    codomain::PolyRing
    image::Vector
-   ptr::libSingular.ideal
+   ptr::libSingular.ideal_ptr
 
    function SAlgHom{T}(domain::PolyRing, codomain::PolyRing,
              V::Vector) where T <: Union{Ring, Field}

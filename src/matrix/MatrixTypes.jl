@@ -21,11 +21,11 @@ mutable struct MatrixSpace{T <: Nemo.RingElem} <: Set
 end
 
 mutable struct smatrix{T <: Nemo.RingElem} <: Nemo.SetElem
-   ptr::libSingular.matrix_ref
+   ptr::libSingular.matrix_ptr
    base_ring::PolyRing
 
    # really takes a Singular module, which has type ideal
-   function smatrix{T}(R::PolyRing, m::libSingular.ideal) where T
+   function smatrix{T}(R::PolyRing, m::libSingular.ideal_ptr) where T
       ptr = libSingular.id_Copy(m, R.ptr)
       ptr = libSingular.id_Module2Matrix(ptr, R.ptr)
       z = new(ptr, R)
@@ -33,7 +33,7 @@ mutable struct smatrix{T <: Nemo.RingElem} <: Nemo.SetElem
       return z
    end
 
-   function smatrix{T}(R::PolyRing, ptr::libSingular.matrix_ref) where {T}
+   function smatrix{T}(R::PolyRing, ptr::libSingular.matrix_ptr) where {T}
       z = new(ptr, R)
       finalizer(_smatrix_clear_fn, z)
       return z

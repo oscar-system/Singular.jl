@@ -223,7 +223,7 @@ function (R::CoefficientRing{T})(a::n_unknown{T}) where T <: Nemo.RingElem
    return a
 end
 
-function (R::CoefficientRing{T})(ptr::libSingular.number) where {T <: Nemo.RingElem}
+function (R::CoefficientRing{T})(ptr::libSingular.number_ptr) where {T <: Nemo.RingElem}
    return n_unknown{T}(ptr, R)
 end
 

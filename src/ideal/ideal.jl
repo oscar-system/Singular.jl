@@ -509,7 +509,7 @@ function fres(id::Union{sideal{T}, smodule{T}}, max_length::Int, method::String 
       error("wrong optional argument for fres")
    end
    r, minimal = libSingular.id_fres(id.ptr, Cint(max_length + 1), method, R.ptr)
-   return sresolution{T}(R, r, minimal)
+   return sresolution{T}(R, r, Bool(minimal))
 end
 
 @doc Markdown.doc"""
@@ -528,7 +528,7 @@ function sres(I::sideal{T}, max_length::Int) where T <: Nemo.RingElem
         # TODO: consider qrings
    end
    r, minimal = libSingular.id_sres(I.ptr, Cint(max_length + 1), R.ptr)
-   return sresolution{T}(R, r, minimal)
+   return sresolution{T}(R, r, Bool(minimal))
 end
 
 ###############################################################################
@@ -547,12 +547,12 @@ function Ideal(R::PolyRing{T}, ids::Array{spoly{T}, 1}) where T <: Nemo.RingElem
    return sideal{S}(R, ids...)
 end
 
-function Ideal(R::PolyRing{T}, id::libSingular.ideal) where T <: Nemo.RingElem
+function Ideal(R::PolyRing{T}, id::libSingular.ideal_ptr) where T <: Nemo.RingElem
    S = elem_type(R)
    return sideal{S}(R, id)
 end
 
-function (R::PolyRing{T})(id::libSingular.ideal) where T <: Nemo.RingElem
+function (R::PolyRing{T})(id::libSingular.ideal_ptr) where T <: Nemo.RingElem
     return Ideal(R,id)
 end
 

@@ -4,10 +4,12 @@
 #
 ###############################################################################
 
+using CxxWrap
+
 const IntegersID = Dict{Symbol, Ring}()
 
 mutable struct Integers <: Ring
-   ptr::libSingular.coeffs
+   ptr::libSingular.coeffs_ptr
    refcount::Int
 
    function Integers()
@@ -31,7 +33,7 @@ function _Integers_clear_fn(cf::Integers)
 end
 
 mutable struct n_Z <: Nemo.RingElem
-    ptr::libSingular.number
+    ptr::libSingular.number_ptr
 
     function n_Z()
         c = ZZ.ptr
@@ -49,7 +51,7 @@ mutable struct n_Z <: Nemo.RingElem
         return z
     end
 
-    function n_Z(n::libSingular.number)
+    function n_Z(n::libSingular.number_ptr)
         z = new(n)
         parent(z).refcount += 1
         finalizer(_n_Z_clear_fn, z)
@@ -73,7 +75,7 @@ end
 const RationalsID = Dict{Symbol, Field}()
 
 mutable struct Rationals <: Field
-   ptr::libSingular.coeffs
+   ptr::libSingular.coeffs_ptr
    refcount::Int
 
    function Rationals()
@@ -98,7 +100,7 @@ function _Rationals_clear_fn(cf::Rationals)
 end
 
 mutable struct n_Q <: Nemo.FieldElem
-    ptr::libSingular.number
+    ptr::libSingular.number_ptr
 
     function n_Q()
         c = QQ.ptr
@@ -123,7 +125,7 @@ mutable struct n_Q <: Nemo.FieldElem
         return z
     end
 
-    function n_Q(n::libSingular.number)
+    function n_Q(n::libSingular.number_ptr)
         z = new(n)
         parent(z).refcount += 1
         finalizer(_n_Q_clear_fn, z)
@@ -153,7 +155,7 @@ end
 const N_ZnRingID = Dict{Int, Ring}()
 
 mutable struct N_ZnRing <: Ring
-   ptr::libSingular.coeffs
+   ptr::libSingular.coeffs_ptr
    from_n_Z::Ptr{Nothing}
    to_n_Z::Ptr{Nothing}
    refcount::Int
@@ -181,7 +183,7 @@ function _N_ZnRing_clear_fn(cf::N_ZnRing)
 end
 
 mutable struct n_Zn <: Nemo.RingElem
-    ptr::libSingular.number
+    ptr::libSingular.number_ptr
     parent::N_ZnRing
 
     function n_Zn(c::N_ZnRing)
@@ -198,7 +200,7 @@ mutable struct n_Zn <: Nemo.RingElem
         return z
     end
 
-    function n_Zn(c::N_ZnRing, n::libSingular.number)
+    function n_Zn(c::N_ZnRing, n::libSingular.number_ptr)
     	z = new(n)
         c.refcount += 1
         finalizer(_n_Zn_clear_fn, z)
@@ -225,7 +227,7 @@ end
 const N_ZpFieldID = Dict{Int, Field}()
 
 mutable struct N_ZpField <: Field
-   ptr::libSingular.coeffs
+   ptr::libSingular.coeffs_ptr
    from_n_Z::Ptr{Nothing}
    to_n_Z::Ptr{Nothing}
    refcount::Int
@@ -253,7 +255,7 @@ function _N_ZpField_clear_fn(cf::N_ZpField)
 end
 
 mutable struct n_Zp <: Nemo.FieldElem
-    ptr::libSingular.number
+    ptr::libSingular.number_ptr
     parent::N_ZpField
 
     function n_Zp(c::N_ZpField)
@@ -270,7 +272,7 @@ mutable struct n_Zp <: Nemo.FieldElem
         return z
     end
 
-    function n_Zp(c::N_ZpField, n::libSingular.number)
+    function n_Zp(c::N_ZpField, n::libSingular.number_ptr)
     	z = new(n)
         c.refcount += 1
         finalizer(_n_Zp_clear_fn, z)
@@ -302,7 +304,7 @@ end
 const N_GFieldID = Dict{Tuple{Int, Int, Symbol}, Field}()
 
 mutable struct N_GField <: Field
-   ptr::libSingular.coeffs
+   ptr::libSingular.coeffs_ptr
    deg::Int
    from_n_Z::Ptr{Nothing}
    to_n_Z::Ptr{Nothing}
@@ -334,7 +336,7 @@ function _N_GField_clear_fn(cf::N_GField)
 end
 
 mutable struct n_GF <: Nemo.FieldElem
-    ptr::libSingular.number
+    ptr::libSingular.number_ptr
     parent::N_GField
 
     function n_GF(c::N_GField)
@@ -351,7 +353,7 @@ mutable struct n_GF <: Nemo.FieldElem
         return z
     end
 
-    function n_GF(c::N_GField, n::libSingular.number)
+    function n_GF(c::N_GField, n::libSingular.number_ptr)
     	z = new(n)
         c.refcount += 1
         finalizer(_n_GF_clear_fn, z)
@@ -375,7 +377,7 @@ end
 const N_FFieldID = Dict{Tuple{Field, Array{Symbol, 1}}, Field}()
 
 mutable struct N_FField <: Field
-   ptr::libSingular.coeffs
+   ptr::libSingular.coeffs_ptr
    base_ring::Field
    refcount::Int
 
@@ -402,7 +404,7 @@ function _N_FField_clear_fn(cf::N_FField)
 end
 
 mutable struct n_transExt <: Nemo.FieldElem
-    ptr::libSingular.number
+    ptr::libSingular.number_ptr
     parent::N_FField
 
     function n_transExt(c::N_FField)
@@ -419,7 +421,7 @@ mutable struct n_transExt <: Nemo.FieldElem
         return z
     end
 
-    function n_transExt(c::N_FField, n::libSingular.number)
+    function n_transExt(c::N_FField, n::libSingular.number_ptr)
     	z = new(n)
         c.refcount += 1
         finalizer(_n_transExt_clear_fn, z)
@@ -443,7 +445,7 @@ end
 const CoeffRingID = Dict{Nemo.Ring, Ring}()
 
 mutable struct CoefficientRing{T <: Nemo.RingElem} <: Ring
-   ptr::libSingular.coeffs
+   ptr::libSingular.coeffs_ptr
    base_ring::Nemo.Ring
 
    function CoefficientRing{T}(R::Nemo.Ring, cached::Bool=true) where T
@@ -462,7 +464,8 @@ mutable struct CoefficientRing{T <: Nemo.RingElem} <: Ring
 end
 
 mutable struct n_unknown{T <: Nemo.RingElem} <: Nemo.RingElem
-   ptr::libSingular.number
+   ptr::libSingular.number_ptr
    parent::CoefficientRing{T}
+
 end
 

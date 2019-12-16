@@ -8,7 +8,7 @@ const PolyRingID = Dict{Tuple{Union{Ring, Field}, Array{Symbol, 1},
          libSingular.rRingOrder_t, libSingular.rRingOrder_t, Int}, Nemo.MPolyRing}()
 
 mutable struct PolyRing{T <: Nemo.RingElem} <: Nemo.MPolyRing{T}
-   ptr::libSingular.ring
+   ptr::libSingular.ring_ptr
    base_ring::Union{Ring, Field}
    ord::Symbol
    refcount::Int
@@ -63,7 +63,7 @@ mutable struct PolyRing{T <: Nemo.RingElem} <: Nemo.MPolyRing{T}
    end
 end
 
-function (R::PolyRing{T})(r::libSingular.ring) where T
+function (R::PolyRing{T})(r::libSingular.ring_ptr) where T
     new_r = deepcopy(R)
     new_ptr = new_r.ptr
     new_r.ptr = r
@@ -78,7 +78,7 @@ function _PolyRing_clear_fn(R::PolyRing)
 end
 
 mutable struct spoly{T <: Nemo.RingElem} <: Nemo.MPolyElem{T}
-   ptr::libSingular.poly
+   ptr::libSingular.poly_ptr
    parent::PolyRing{T}
 
    function spoly{T}(R::PolyRing{T}) where T <: Nemo.RingElem
@@ -89,7 +89,7 @@ mutable struct spoly{T <: Nemo.RingElem} <: Nemo.MPolyElem{T}
       return z
    end
     
-   function spoly{T}(R::PolyRing{T}, p::libSingular.poly) where T <: Nemo.RingElem
+   function spoly{T}(R::PolyRing{T}, p::libSingular.poly_ptr) where T <: Nemo.RingElem
       z = new{T}(p, R)
       R.refcount += 1
       finalizer(_spoly_clear_fn, z)
@@ -105,7 +105,7 @@ mutable struct spoly{T <: Nemo.RingElem} <: Nemo.MPolyElem{T}
       return z
    end
     
-   function spoly{T}(R::PolyRing{T}, n::libSingular.number) where T <: Nemo.RingElem
+   function spoly{T}(R::PolyRing{T}, n::libSingular.number_ptr) where T <: Nemo.RingElem
       nn = libSingular.n_Copy(n, base_ring(R).ptr)
       p = libSingular.p_NSet(nn, R.ptr)
       z = new{T}(p, R)

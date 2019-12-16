@@ -1081,7 +1081,7 @@ function (R::PolyRing)(n::n_Z)
    return z
 end
 
-function (R::PolyRing)(n::libSingular.poly)
+function (R::PolyRing)(n::libSingular.poly_ptr)
    T = elem_type(base_ring(R))
    z = spoly{T}(R, n)
    z.parent = R
@@ -1104,7 +1104,7 @@ function (R::PolyRing)(p::spoly)
    return p
 end
 
-function(R::PolyRing)(n::libSingular.number)
+function(R::PolyRing)(n::libSingular.number_ptr)
     return R.base_ring(n)
 end
 

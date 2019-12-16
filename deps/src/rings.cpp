@@ -277,7 +277,7 @@ void singular_define_rings(jlcxx::Module & Singular)
         poly p_cp = p_Copy(p, r);
         return p_Subst(p_cp, i, q, r);
     });
-    Singular.method("maEvalAt", [](poly p, jlcxx::ArrayRef<void*> vals, ring r) {
+    Singular.method("maEvalAt", [](poly p, jlcxx::ArrayRef<snumber *> vals, ring r) {
        number * varr = (number *) omAlloc0(vals.size() * sizeof(number));
        for (int i = 0; i < vals.size(); i++)
           varr[i] = (number) vals[i];
