@@ -325,7 +325,7 @@ end
 
 (R::N_GField)(n::n_GF) = n
 
-function (R::N_GField)(n::libSingular.number)
+function (R::N_GField)(n::libSingular.number_ptr)
    z = n_GF(R, n) 
    z.parent = R
    return z

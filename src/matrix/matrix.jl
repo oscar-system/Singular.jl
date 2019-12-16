@@ -192,7 +192,7 @@ end
 #
 ###############################################################################
 
-function (S::MatrixSpace{T})(ptr::libSingular.matrix_ref) where T <: AbstractAlgebra.RingElem
+function (S::MatrixSpace{T})(ptr::libSingular.matrix_ptr) where T <: AbstractAlgebra.RingElem
    M = smatrix{T}(base_ring(S), ptr)
    (S.ncols != ncols(M) || S.nrows != nrows(M)) && error("Incompatible dimensions")
    return M

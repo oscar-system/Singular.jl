@@ -313,7 +313,7 @@ end
 
 (R::N_ZpField)(n::n_Zp) = n
 
-function (R::N_ZpField)(n::libSingular.number)
+function (R::N_ZpField)(n::libSingular.number_ptr)
    z = n_Zp(R, n) 
    z.parent = R
    return z

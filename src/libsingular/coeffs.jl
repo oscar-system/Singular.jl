@@ -1,11 +1,11 @@
 # initialise a number from an mpz
-function n_InitMPZ(b::BigInt, cf::coeffs)
+function n_InitMPZ(b::BigInt, cf::coeffs_ptr)
     bb = pointer_from_objref(b)
     return n_InitMPZ_internal(bb, cf)
 end
 
 # get an mpz from a number
-function n_GetMPZ(s::number_ref, r::coeffs)
+function n_GetMPZ(s::number_ptr, r::coeffs_ptr)
    res = BigInt(1)
    resp = pointer_from_objref(res)
    n_GetMPZ_internal(resp, s, r)
@@ -13,23 +13,23 @@ function n_GetMPZ(s::number_ref, r::coeffs)
 end
 
 # write a number to a Singular string
-function n_Write(n::number_ref, cf::coeffs, bShortOut::Bool = false)
+function n_Write(n::number_ptr, cf::coeffs_ptr, bShortOut::Bool = false)
    d = Int(bShortOut)
    n_Write_internal(n, cf, d);
 end
 
-function n_ExtGcd(a::number, b::number, s::Ptr{number_ref}, t::Ptr{number_ref}, cf:: coeffs)
+function n_ExtGcd(a::number_ptr, b::number_ptr, s::Ptr{number_ptr}, t::Ptr{number_ptr}, cf:: coeffs_ptr)
    sp = reinterpret(Ptr{Nothing}, s)
    tp = reinterpret(Ptr{Nothing}, t)
    return n_ExtGcd_internal(a, b, sp, tp, cf);
 end
 
-function n_QuotRem(a::number, b::number, p::Ptr{number}, cf::coeffs)
+function n_QuotRem(a::number_ptr, b::number_ptr, p::Ptr{number_ptr}, cf::coeffs_ptr)
    pp = reinterpret(Ptr{Nothing}, p)
    n_QuotRem_internal(a, b, pp, cf)
 end
 
-function n_ChineseRemainderSym(a::Array{number, 1}, b::Array{number, 1}, n::Cint, signed::Cint, cf::coeffs)
+function n_ChineseRemainderSym(a::Array{number_ptr, 1}, b::Array{number_ptr, 1}, n::Cint, signed::Cint, cf::coeffs_ptr)
    p1 = reinterpret(Ptr{Nothing}, pointer(a))
    p2 = reinterpret(Ptr{Nothing}, pointer(b))
    return n_ChineseRemainderSym_internal(p1, p2, n, signed, cf)
@@ -52,7 +52,7 @@ end
 #
 ###############################################################################
 
-function setindex!(ptr::Ptr{number}, n::number)
+function setindex!(ptr::Ptr{number_ptr}, n::number_ptr)
    pp = reinterpret(Ptr{Nothing}, ptr)
    setindex_internal(pp, n)
 end
@@ -72,7 +72,7 @@ end
 
 const nemoNumberID = Base.Dict{UInt, live_cache}()
 
-function julia(cf::coeffs)
+function julia(cf::coeffs_ptr)
    ptr = get_coeff_data(cf)
    return unsafe_pointer_to_objref(ptr)
 end

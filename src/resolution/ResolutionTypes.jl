@@ -19,12 +19,12 @@ mutable struct ResolutionSet{T <: Nemo.RingElem} <: Set
 end
 
 mutable struct sresolution{T <: Nemo.RingElem} <: Nemo.SetElem
-   ptr::libSingular.syStrategy_ref
+   ptr::libSingular.syStrategy_ptr
    minimal::Bool
    base_ring::PolyRing
 
    # really takes a Singular module, which has type ideal
-   function sresolution{T}(R::PolyRing, ptr::libSingular.syStrategy, minimal::Bool=false) where T
+   function sresolution{T}(R::PolyRing, ptr::libSingular.syStrategy_ptr, minimal::Bool=false) where T
       R.refcount += 1
       z = new(ptr, minimal, R)
       finalizer(_sresolution_clear_fn, z)
