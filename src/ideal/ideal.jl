@@ -539,6 +539,7 @@ end
 
 function Ideal(R::PolyRing{T}, ids::spoly{T}...) where T <: Nemo.RingElem
    S = elem_type(R)
+   length(ids) == 0 && return sideal{S}(R, R(0))
    return sideal{S}(R, ids...)
 end
 
