@@ -97,7 +97,7 @@ else # source build
    # http://www.shoup.net/ntl/
    cd(tmp)
    run(`tar -C "$tmp" -zxkvf $NTL_FILE`)
-   cd(joinpath(tmp, ntl, "src"))
+   cd(joinpath(tmp, "ntl-$NTL_VERSION", "src"))
    withenv("CPP_FLAGS"=>"-I$prefixpath/include", "LD_LIBRARY_PATH"=>"$prefixpath/lib:$nemovdir/lib", "LDFLAGS"=>LDFLAGS) do
       run(`./configure PREFIX=$prefixpath DEF_PREFIX=$nemovdir SHARED=on NTL_THREADS=off NTL_EXCEPTIONS=off NTL_GMP_LIP=on CXXFLAGS="-I$nemovdir/include"`)
       run(`make -j$cores`)
