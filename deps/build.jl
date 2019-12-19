@@ -58,6 +58,8 @@ if !issource_build
 
 else # source build
 
+   ENV["NEMO_SOURCE_BUILD"] != "1" && error("Source build of Nemo required")
+
    const pkgdir = realpath(joinpath(@__DIR__, ".."))
 
    const debug_build = false # N.B: debug builds are up to 50 times slower at runtime!
