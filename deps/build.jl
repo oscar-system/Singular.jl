@@ -189,7 +189,7 @@ else # source build
       end
       run(Cmd(string.(cmd)))
       withenv("LDFLAGS"=>LDFLAGS) do
-         run(`make -j$cores`)
+         run(`make -j$cores V=1`)
          run(`make install`)
       end
    end
