@@ -35,7 +35,7 @@ end
    I0 = Ideal(R)
    I1 = Ideal(R, x, y)
 
-   @test ngens(I0) == 0
+   @test ngens(I0) == 1
    @test ngens(I1) == 2
    @test x in gens(I1) && y in gens(I1)
 

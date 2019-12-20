@@ -157,7 +157,11 @@ function *(p::spoly{T}, M::smatrix{spoly{T}}) where T <: AbstractAlgebra.RingEle
    x = libSingular.mp_Copy(M.ptr, R.ptr)
    y = libSingular.p_Copy(p.ptr, R.ptr)
    ptr = libSingular.mp_MultP(x, y, R.ptr)
-   return smatrix{T}(R, ptr)
+   return smatrix{spoly{T}}(R, ptr)
+end
+
+function *(M::smatrix{spoly{T}}, p::spoly{T}) where T <: AbstractAlgebra.RingElem
+   return p*M
 end
 
 function *(i::Int, M::smatrix{T}) where T <: AbstractAlgebra.RingElem
