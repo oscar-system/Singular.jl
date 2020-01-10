@@ -9,7 +9,7 @@ function nemoFieldInit(i::Clong, cf::Ptr{Cvoid})
    R = unsafe_pointer_to_objref(data_ptr)
    return number(R(i))
 end
-   
+
 function nemoFieldDelete(ptr::Ptr{Ptr{Cvoid}}, cf::Ptr{Cvoid})
    n = unsafe_load(ptr)
    if n != C_NULL
@@ -176,7 +176,7 @@ end
 function nemoFieldSubringGcd(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    data_ptr = get_coeff_data_void(cf)
    R =unsafe_load(data_ptr)
-   if isa(R, FracField)
+   if isa(R, Nemo.FracField)
       n1 = numerator(julia(a))
       n2 = numerator(julia(b))
       return number(R(Nemo.gcd(n1, n2)))
@@ -208,7 +208,7 @@ end
 ###############################################################################
 
 function nemoFieldInitChar(cf::Ptr{Cvoid}, p::Ptr{Cvoid})
-    
+
     ring_struct = singular_coeff_ring_struct()
 
     ring_struct.has_simple_alloc = 0
