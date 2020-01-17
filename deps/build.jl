@@ -58,7 +58,7 @@ if !issource_build
 
 else # source build
 
-   ENV["NEMO_SOURCE_BUILD"] != "1" && error("Source build of Nemo required")
+   ("NEMO_SOURCE_BUILD" in keys(ENV) && ENV["NEMO_SOURCE_BUILD"] == "1") || error("Source build of Nemo required")
 
    const pkgdir = realpath(joinpath(@__DIR__, ".."))
 
