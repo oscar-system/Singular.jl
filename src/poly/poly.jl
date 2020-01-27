@@ -907,7 +907,7 @@ function jacobian_matrix(p::spoly)
 end
 
 @doc Markdown.doc"""
-   jacobian_matrix(A::Array{spoly, 1})
+   jacobian_matrix(A::Vector{spoly, 1})
 > Given an array $A$ of polynomials over the same base ring,
 > this function returns the Jacobian matrix of $A$.
 """
