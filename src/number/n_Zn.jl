@@ -325,7 +325,7 @@ end
 
 (R::N_ZnRing)(n::n_Zn) = n
 
-function (R::N_ZnRing)(n::libSingular.number)
+function (R::N_ZnRing)(n::libSingular.number_ptr)
    z = n_Zn(R, n) 
    z.parent = R
    return z

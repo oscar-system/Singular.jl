@@ -345,7 +345,7 @@ function (R::N_FField)(n::n_transExt)
    return n
 end
 
-function (R::N_FField)(n::libSingular.number)
+function (R::N_FField)(n::libSingular.number_ptr)
    z = n_transExt(R, n) 
    z.parent = R
    return z

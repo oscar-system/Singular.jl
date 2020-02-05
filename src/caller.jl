@@ -98,11 +98,11 @@ function get_ring(arg_list)
     return ring
 end
 
-function prepare_argument(x::Array{Int64,1})
+function prepare_argument(x::Array{Int64, 1})
     return Any[mapping_types_reversed[:INTVEC_CMD], libSingular.jl_array_to_intvec(x)], nothing
 end
 
-function prepare_argument(x::Array{Int64,2})
+function prepare_argument(x::Array{Int64, 2})
     return Any[mapping_types_reversed[:INTMAT_CMD], libSingular.jl_array_to_intmat(x)], nothing
 end
 
@@ -146,17 +146,17 @@ function prepare_argument(x::sresolution)
 end
 
 function prepare_argument(x::Any)
-    if x.ptr isa libSingular.number
+    if x.ptr isa libSingular.number_ptr
         ptr = x.ptr
         rng = parent(x)
         new_ptr = libSingular.n_Copy(ptr, rng.ptr)
         return Any[mapping_types_reversed[:NUMBER_CMD], new_ptr.cpp_object], nothing
-    elseif x.ptr isa libSingular.ip_smatrix
+    elseif x.ptr isa libSingular.matrix_ptr
         rng = parent(x)
         return Any[mapping_types_reversed[:MATRIX_CMD], libSingular.mpCopy(x.ptr, rng.ptr).cpp_object ], rng
     elseif x.ptr isa libSingular.__mpz_struct
         return Any[mapping_types_reversed[:BIGINT_CMD], x.ptr.cpp_object], nothing
-    elseif x.ptr isa libSingular.sip_smap
+    elseif x.ptr isa libSingular.map_ptr
         return Any[mapping_types_reversed[:MAP_CMD], x.ptr.cpp_object], nothing
     elseif x.ptr isa libSingular.bigintmat
         return Any[mapping_types_reversed[:BIGINTMAT_CMD], x.ptr.cpp_object], nothing

@@ -20,11 +20,11 @@ mutable struct FreeMod{T <: Nemo.RingElem} <: Module{T}
 end
 
 mutable struct svector{T <: Nemo.RingElem} <: Nemo.ModuleElem{T}
-   ptr::libSingular.poly # not really a polynomial
+   ptr::libSingular.poly_ptr # not really a polynomial
    rank::Int
    base_ring::PolyRing
 
-   function svector{T}(R::PolyRing, r::Int, p::libSingular.poly) where T
+   function svector{T}(R::PolyRing, r::Int, p::libSingular.poly_ptr) where T
       z = new(p, r, R)
       R.refcount += 1
       finalizer(_svector_clear_fn, z)
@@ -40,7 +40,7 @@ Val(:vector), it will interpret the poly pointer as a vector.
 This needs to be indicated due to the fact that Singulars
 vectors and polys are both stored in the poly data structure.
 """
-function (R::PolyRing{T})(m::libSingular.poly,::Val{:vector}) where T
+function (R::PolyRing{T})(m::libSingular.poly_ptr, ::Val{:vector}) where T
     return svector{T}(R, 1, m)
 end
 
@@ -71,7 +71,7 @@ mutable struct ModuleClass{T <: Nemo.RingElem} <: Set
 end
 
 mutable struct smodule{T <: Nemo.RingElem} <: Module{T}
-   ptr::libSingular.ideal # ideal and module types are the same in Singular
+   ptr::libSingular.ideal_ptr # ideal and module types are the same in Singular
    base_ring::PolyRing
    isGB::Bool
 
@@ -92,7 +92,7 @@ mutable struct smodule{T <: Nemo.RingElem} <: Module{T}
       return z
    end
 
-   function smodule{T}(R::PolyRing, m::libSingular.ideal) where T
+   function smodule{T}(R::PolyRing, m::libSingular.ideal_ptr) where T
       z = new(m, R, false)
       R.refcount += 1
       finalizer(_smodule_clear_fn, z)
@@ -108,7 +108,7 @@ Val(:module), it will interpret the ideal pointer as a module.
 This needs to be indicated due to the fact that Singular's
 modules and ideals are both stored in the ideal data structure.
 """
-function (R::PolyRing{T})(m::libSingular.ideal,::Val{:module}) where T
+function (R::PolyRing{T})(m::libSingular.ideal_ptr, ::Val{:module}) where T
     return smodule{T}(R,m)
 end
 
