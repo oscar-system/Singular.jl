@@ -13,14 +13,18 @@ addons:
            - libmpfr-dev
  
 language: julia
-sudo: false
 os:
   - linux
   - osx
+
+codecov: true
+coveralls: true
+
 julia:
   - 1.0
   - 1.1
   - 1.2
+  - 1.3
   - nightly
 matrix:
   allow_failures:
@@ -29,8 +33,8 @@ matrix:
 notifications:
   - email: false
 script:
-  - while sleep 30; do echo "still alive"; done &
-  - julia -e 'using Pkg; Pkg.build("Singular"); Pkg.test("Singular");'
+  - julia --color=yes -e 'using Pkg; if VERSION >= v"1.1.0"; Pkg.build(verbose=true); else Pkg.build(); end;'
+  - julia --color=yes -e 'using Pkg; Pkg.test();'
 
 env:
    global:
@@ -42,14 +46,6 @@ jobs:
        julia: 1.0
        os: linux
        script:
-         - while sleep 30; do echo "still alive"; done &
-         - julia --project=docs/ -e 'using Pkg; Pkg.add(PackageSpec(path=pwd())); Pkg.instantiate();'
-         - julia --project=docs/ docs/make.jl
+         - julia --color=yes --project=docs/ -e 'using Pkg; Pkg.add(PackageSpec(path=pwd())); Pkg.instantiate();'
+         - julia --color=yes --project=docs/ docs/make.jl
        after_success: skip
-
-after_success:
-  # push coverage results to Coveralls
-  - julia --color=yes -e 'using Pkg; cd(Pkg.dir("Singular")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())'
-  # push coverage results to Codecov
-  - julia --color=yes -e 'using Pkg; cd(Pkg.dir("Singular")); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'
-
