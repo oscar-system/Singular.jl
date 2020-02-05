@@ -205,9 +205,9 @@ cd(oldwdir)
 
 println("here")
 
-# jlcxx_cmake_dir = realpath(joinpath(dirname(pathof(CxxWrap)), "..", "deps", "usr", "lib", "cmake", "JlCxx"))
+jlcxx_cmake_dir = realpath(joinpath(dirname(pathof(CxxWrap)), "..", "deps", "usr", "lib", "cmake", "JlCxx"))
 
-jlcxx_cmake_dir = ENV["JLCXX_DIR"]
+#jlcxx_cmake_dir = ENV["JLCXX_DIR"]
 
 println("jlcxx_cmake_dir = $jlcxx_cmake_dir")
 
