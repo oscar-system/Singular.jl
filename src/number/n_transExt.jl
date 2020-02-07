@@ -19,13 +19,13 @@ base_ring(a::N_FField) = a.base_ring
 
 @doc Markdown.doc"""
     transcendence_degree(F::N_FField)
-> Return the trancendence degree of the given function field.
+> Return the transcendence degree of the given function field.
 """
 transcendence_degree(F::N_FField) = Int(libSingular.rPar(F.ptr))
 
 @doc Markdown.doc"""
     basis(F::N_FField)
-> Return the trancendence basis of the given function field.
+> Return the transcendence basis of the given function field.
 """
 function transcendence_basis(F::N_FField)
    n = transcendence_degree(F)
@@ -105,7 +105,7 @@ end
 @doc Markdown.doc"""
    n_transExt_to_spoly(x::n_transExt; parent::PolyRing)
 > Returns the numerator of $x$ as a polynomial in a polynomial
-> ring with the same number of variables, as the
+> ring with at least as many variables, as the
 > transcendence degree of $parent(x)$. If a ring $parent_ring$ is
 > given to the function, it will be the parent ring of the output.
 """
@@ -116,7 +116,7 @@ function n_transExt_to_spoly(x::n_transExt; cached = true,
    n = transcendence_degree(R)
    S = parent_ring
 
-   if B != base_ring(S) || n != nvars(S)
+   if B != base_ring(S) || n > nvars(S)
       error("Base rings do not match.")
    end
    return S(Singular.libSingular.transExt_to_poly(x.ptr, R.ptr, S.ptr))

@@ -36,7 +36,7 @@ The following constructors are available to create function fields and their ele
 Singular.FunctionField(::Field, ::Array{String, 1}; ::Bool)
 ```
 
-In case the user does not want to specify a transcendece basis the following 
+In case the user does not want to specify a transcendence basis the following
 constructor can be used.
 
 ```@docs

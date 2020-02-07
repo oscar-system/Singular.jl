@@ -697,7 +697,7 @@ end
 > Returns, by default, an array containing a maximal independet set of
 > $lead(I)$. $I$ has to be given by a Gröbner basis.
 > If the additional parameter "all" is set to true, an array containing
-> all maximal independent sets iof $lead(I)$ is returned.
+> all maximal independent sets of $lead(I)$ is returned.
 """
 function maximal_independent_set(I::sideal{S}; all::Bool = false) where S <: Union{spoly{T}, spoly{n_unknown{U}}} where {T <: Singular.FieldElem, U <: Nemo.FieldElem}
    I.isGB == false && error("I needs to be a Gröbner basis.")
