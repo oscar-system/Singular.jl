@@ -203,13 +203,7 @@ push!(Libdl.DL_LOAD_PATH, joinpath(prefixpath, "lib"))
 
 cd(oldwdir)
 
-println("here")
-
 jlcxx_cmake_dir = realpath(joinpath(dirname(pathof(CxxWrap)), "..", "deps", "usr", "lib", "cmake", "JlCxx"))
-
-#jlcxx_cmake_dir = ENV["JLCXX_DIR"]
-
-println("jlcxx_cmake_dir = $jlcxx_cmake_dir")
 
 julia_include = realpath(joinpath(Sys.BINDIR, "..", "include", "julia"))
 julia_lib = realpath(joinpath(Sys.BINDIR, "..", "lib"))
