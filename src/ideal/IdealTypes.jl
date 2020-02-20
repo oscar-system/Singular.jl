@@ -19,7 +19,7 @@ mutable struct IdealSet{T <: Nemo.RingElem} <: Set
 end
 
 mutable struct sideal{T <: Nemo.RingElem} <: Module{T}
-   ptr::libSingular.ideal
+   ptr::libSingular.ideal_ptr
    base_ring::PolyRing
    isGB::Bool
 
@@ -36,7 +36,7 @@ mutable struct sideal{T <: Nemo.RingElem} <: Module{T}
       return z
    end
 
-   function sideal{T}(R::PolyRing, id::libSingular.ideal) where T
+   function sideal{T}(R::PolyRing, id::libSingular.ideal_ptr) where T
       z = new(id, R, false)
       R.refcount += 1
       finalizer(_sideal_clear_fn, z)

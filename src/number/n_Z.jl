@@ -371,7 +371,7 @@ promote_rule(C::Type{n_Z}, ::Type{T}) where {T <: Integer} = n_Z
 
 (::Integers)(n::n_Z) = n
 
-(::Integers)(n::libSingular.number) = n_Z(n) 
+(::Integers)(n::libSingular.number_ptr) = n_Z(n) 
 
 function (R::Integers)(x::Nemo.fmpz)
    a = BigInt()

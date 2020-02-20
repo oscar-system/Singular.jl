@@ -1,5 +1,5 @@
-# Force Ubuntu 16.04 "Xenial" to get newer GCC, binutils etc.
-dist: xenial
+# Force Ubuntu 18.04 "Bionic" to get even newer GCC, binutils etc.
+dist: bionic
 
 addons:
     apt:

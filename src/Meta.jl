@@ -1,5 +1,5 @@
 #=
-   This file generates (at precompilation time) wrapper for all Singular library functions
+   This file generates (at precompilation time) wrappers for all Singular library functions
    All wrappers are given by LIBRARYNAME.functionname. We currently use all caps library names
    to avoid confusion between the LIBRARYNAME modules and other types, for example "Ideal" or "Poly".
 =#
@@ -32,7 +32,7 @@ output_manipulator_funcs = Dict(
    For each library `lib` a module `LIB` is created, which contains wrappers for all globally exposed
    functions of the library. Each library function `foo` can be called either as `foo(ring, args...)`,
    where `ring` is the ring the arguments belong to, or as `foo(args...)` if no ring is needed or the
-   ring con be determined from the input arguments. Furthermore, if applicaple, input and output manipulator
+   ring can be determined from the input arguments. Furthermore, if applicable, input and output manipulator
    functions are added to the call.
 =#
 for (name, funcs) in libraryfunctiondictionary
@@ -46,7 +46,7 @@ for (name, funcs) in libraryfunctiondictionary
             input_manipulator = get(get(input_manipulator_funcs, name, Dict()), symb, identity)
             output_manipulator = get(get(output_manipulator_funcs, name, Dict()), symb, identity)
             push!(func_calls, :($symb(args...) = $(output_manipulator)(low_level_caller($(name_string), $func_name, $(input_manipulator)(args)...)) ))
-            push!(func_calls, :($symb(ring::PolyRing,args...) = $(output_manipulator)(low_level_caller_rng($(name_string), $func_name, ring, $(input_manipulator)(args)...)) ))
+            push!(func_calls, :($symb(ring::PolyRing, args...) = $(output_manipulator)(low_level_caller_rng($(name_string), $func_name, ring, $(input_manipulator)(args)...)) ))
         end
     end
     eval(:(baremodule $name_caps

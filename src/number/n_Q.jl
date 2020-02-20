@@ -356,7 +356,7 @@ promote_rule(C::Type{n_Q}, ::Type{n_Q}) = n_Z
 
 (::Rationals)(n::n_Q) = n
 
-(::Rationals)(n::libSingular.number) = n_Q(n) 
+(::Rationals)(n::libSingular.number_ptr) = n_Q(n) 
 
 (Rational{BigInt})(x::Singular.n_Q) = convert(BigInt, numerator(x)) // convert(BigInt, denominator(x))
 

@@ -77,7 +77,8 @@ function betti(r::sresolution)
         ideal_list = libSingular.get_full_res(r.ptr)
    end 
    array = libSingular.syBetti_internal(ideal_list, length(r), r.base_ring.ptr)
-   return unsafe_wrap(Array, array[1], array[2:3]; own=true)
+   return unsafe_wrap(Array, array[1].cpp_object,
+	                    (array[2], array[3]); own=true)
 end
 
 ###############################################################################
@@ -136,12 +137,12 @@ end
 #
 ###############################################################################
 
-function (S::ResolutionSet{T})(ptr::libSingular.syStrategy, len::Int = 0) where T <: AbstractAlgebra.RingElem
+function (S::ResolutionSet{T})(ptr::libSingular.syStrategy_ptr, len::Int = 0) where T <: AbstractAlgebra.RingElem
    R = base_ring(S)
    return sresolution{T}(R, ptr)
 end
 
-function (R::PolyRing{T})(ptr::libSingular.syStrategy, ::Val{:resolution}) where T <: AbstractAlgebra.RingElement
+function (R::PolyRing{T})(ptr::libSingular.syStrategy_ptr, ::Val{:resolution}) where T <: AbstractAlgebra.RingElement
     return sresolution{T}(R, ptr, libSingular.get_minimal_res(ptr) != C_NULL )
 end
 
