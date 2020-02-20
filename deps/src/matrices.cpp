@@ -10,6 +10,7 @@ void singular_define_matrices(jlcxx::Module & Singular)
 
     Singular.method("id_Matrix2Module", &id_Matrix2Module);
 
+    Singular.set_override_module(jl_base_module);
     Singular.method("getindex", [](matrix M, int i, int j) {
         return (poly)MATELEM(M, i, j);
     });
@@ -17,6 +18,7 @@ void singular_define_matrices(jlcxx::Module & Singular)
     Singular.method("setindex", [](matrix M, poly p, int i, int j, ring R) {
         MATELEM(M, i, j) = p_Copy(p, R);
     });
+    Singular.unset_override_module();
 
     Singular.method("mp_Copy",
                     [](matrix M, ring R) { return mp_Copy(M, R); });

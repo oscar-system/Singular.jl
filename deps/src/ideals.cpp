@@ -112,8 +112,10 @@ void singular_define_ideals(jlcxx::Module & Singular)
     Singular.method("setindex_internal",
                     [](ideal r, poly n, int o) { return r->m[o] = n; });
 
+    Singular.set_override_module(jl_base_module);
     Singular.method("getindex",
                     [](ideal r, int o) { return (poly)(r->m[o]); });
+    Singular.unset_override_module();
 
     Singular.method("idIs0", &idIs0);
 
