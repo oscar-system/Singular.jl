@@ -28,6 +28,7 @@
 #include <polys/simpleideals.h>
 #include "polys/ext_fields/algext.h"
 #include "polys/ext_fields/transext.h"
+#include <kernel/fglm/fglm.h>
 #include <kernel/GBEngine/kstd1.h>
 #include <kernel/GBEngine/syz.h>
 #include <kernel/GBEngine/tgb.h>

@@ -245,6 +245,10 @@ std(::sideal; ::Bool)
 ```
 
 ```@docs
+fglm(::sideal; ::Symbol)
+```
+
+```@docs
 satstd{T <: AbstractAlgebra.RingElem}(::sideal{T}, ::sideal{T})
 ```
 
@@ -264,6 +268,10 @@ I = Ideal(R, (x*y + 1)*(2x^2*y^2 + x*y - 2) + 2x*y^2 + x, 2x*y + 1)
 J = Ideal(R, x)
 
 B = satstd(I, J)
+
+R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"], ordering = :lex)
+I = Ideal(R, y^3+x^2, x^2*y+x^2, x^3-x^2, z^4-x^2-y)
+J = fglm(I, :degrevlex)
 ```
 
 ### Reduction

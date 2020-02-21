@@ -1,5 +1,5 @@
-export sideal, IdealSet, syz, lead, normalize!, isconstant, iszerodim, fres,
-       dimension, highcorner, jet, kbase, minimal_generating_set,
+export sideal, IdealSet, syz, lead, normalize!, isconstant, iszerodim, fglm,
+       fres, dimension, highcorner, jet, kbase, minimal_generating_set,
        independent_sets, maximal_independent_set, ngens, sres, intersection,
        quotient, reduce, eliminate, kernel, equal, contains, isvar_generated,
        saturation, satstd, slimgb, std, vdim
@@ -382,6 +382,30 @@ function satstd(I::sideal{T}, J::sideal{T}) where T <: AbstractAlgebra.RingElem
    ptr = libSingular.id_Satstd(I.ptr, J.ptr, R.ptr)
    libSingular.idSkipZeroes(ptr)
    z = Ideal(R, ptr)
+   z.isGB = true
+   return z
+end
+
+@doc Markdown.doc"""
+    fglm(I::sideal, ::Symbol)
+> Compute a Groebner basis for the zero - dimensional ideal $I$ in the ring $R$ using the FGLM 
+> algorithm. All involved orderings have to be global.
+"""
+function fglm(I::sideal, ordering::Symbol)
+   Rdest = base_ring(I)
+   !has_global_ordering(Rdest) && error("Algorithm works only for global orderings")
+   n = nvars(Rdest)
+   Rsrc, = PolynomialRing(base_ring(Rdest), ["$i" for i in gens(Rdest)]; 
+        ordering = ordering)
+   !has_global_ordering(Rsrc) && error("Algorithm works only for global orderings")
+
+   #Compute reduced Groebner basis in Rsrc
+   phi = AlgebraHomomorphism(Rdest, Rsrc, [gen(Rsrc, i) for i in 1:n])
+   Isrc = std(phi(I), complete_reduction = true)
+   !iszerodim(Isrc) && error("Ideal needs to be zero-dimensional")
+   
+   ptr = libSingular.fglmzero(Isrc.ptr, Rsrc.ptr, Rdest.ptr)
+   z = Ideal(Rdest, ptr)
    z.isGB = true
    return z
 end

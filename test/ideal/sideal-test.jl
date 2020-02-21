@@ -197,6 +197,15 @@ end
    @test B.isGB == true
 end
 
+@testset "sideal.fglm..." begin
+   R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"], ordering = :lex)
+   I = Ideal(R, y^3+x^2, x^2*y+x^2, x^3-x^2, z^4-x^2-y)
+   J1 = std(I, complete_reduction = true)
+   J2 = fglm(I, :degrevlex)
+
+   @test gens(J1) == gens(J2)
+end
+
 @testset "sideal.reduction..." begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
