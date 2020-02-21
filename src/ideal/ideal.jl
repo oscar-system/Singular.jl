@@ -388,14 +388,14 @@ end
 
 @doc Markdown.doc"""
     fglm(I::sideal, ::Symbol)
-> Compute a Groebner basis for the zero - dimensional ideal $I$ in the ring $R$ using the FGLM 
+> Compute a Groebner basis for the zero - dimensional ideal $I$ in the ring $R$ using the FGLM
 > algorithm. All involved orderings have to be global.
 """
 function fglm(I::sideal, ordering::Symbol)
    Rdest = base_ring(I)
    !has_global_ordering(Rdest) && error("Algorithm works only for global orderings")
    n = nvars(Rdest)
-   Rsrc, = PolynomialRing(base_ring(Rdest), ["$i" for i in gens(Rdest)]; 
+   Rsrc, = PolynomialRing(base_ring(Rdest), ["$i" for i in gens(Rdest)];
         ordering = ordering)
    !has_global_ordering(Rsrc) && error("Algorithm works only for global orderings")
 
@@ -403,7 +403,7 @@ function fglm(I::sideal, ordering::Symbol)
    phi = AlgebraHomomorphism(Rdest, Rsrc, [gen(Rsrc, i) for i in 1:n])
    Isrc = std(phi(I), complete_reduction = true)
    !iszerodim(Isrc) && error("Ideal needs to be zero-dimensional")
-   
+
    ptr = libSingular.fglmzero(Isrc.ptr, Rsrc.ptr, Rdest.ptr)
    z = Ideal(Rdest, ptr)
    z.isGB = true
