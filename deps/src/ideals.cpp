@@ -284,4 +284,12 @@ void singular_define_ideals(jlcxx::Module & Singular)
 	rChangeCurrRing(origin);
 	return k;
     });
+    Singular.method("fglmzero", [](ideal Isrc, ring Rsrc, ring Rdest ) {
+        const ring origin = currRing;
+        rChangeCurrRing(Rdest);
+        ideal Idest = NULL;
+        bool c = fglmzero(Rsrc, Isrc, Rdest, Idest, FALSE, FALSE);
+	     rChangeCurrRing(origin);
+	     return Idest;
+    });
 }
