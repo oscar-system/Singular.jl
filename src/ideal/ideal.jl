@@ -726,9 +726,10 @@ end
 function maximal_independent_set(I::sideal{S}; all::Bool = false) where S <: Union{spoly{T}, spoly{n_unknown{U}}} where {T <: Singular.FieldElem, U <: Nemo.FieldElem}
    I.isGB == false && error("I needs to be a Gröbner basis.")
    R = base_ring(I)
+   Q = base_ring(R)
    d = dimension(I)
    if all == true
-      P = Array{Array{spoly, 1}, 1}()
+      P = Array{Array{spoly{elem_type(Q)}, 1}, 1}()
       res = independent_sets(I)
       for i in 1:length(res)
          if length(res[i]) == d
@@ -739,7 +740,7 @@ function maximal_independent_set(I::sideal{S}; all::Bool = false) where S <: Uni
    else
       a = Array{Int32, 1}()
       libSingular.scIndIndset(I.ptr, R.ptr, a, all)
-      P = Array{spoly, 1}()
+      P = Array{spoly{elem_type(Q)}, 1}()
       for j in findall(x->x == 1, a)
          push!(P, gen(R, j))
       end
