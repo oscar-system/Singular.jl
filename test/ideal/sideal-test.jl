@@ -333,5 +333,7 @@ end
    @test L1 == [x, y, u]
    @test L2 == [[x, y, u], [y, u, v], [x, u, w], [u, v, w]]
    @test L3 == [[x, y, u], [y, u, v], [x, u, w], [u, v, w], [y, w]]
+   @test typeof(L1) == Array{spoly{n_Q}, 1}
+   @test typeof(L2) == Array{Array{spoly{n_Q}, 1}, 1}
 end
 
