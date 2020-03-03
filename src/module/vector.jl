@@ -185,8 +185,8 @@ function Base.iterate(p::svector{spoly{T}}) where T <: Nemo.RingElem
    if ptr.cpp_object == C_NULL
       return nothing
    else
-      A = Array{Int}(undef, p.rank)
       R = base_ring(p)
+      A = Array{Int}(undef, nvars(R))
       c = libSingular.p_GetExpVLV(ptr, A, R.ptr)
       S = base_ring(R)
       a = S(libSingular.n_Copy(libSingular.pGetCoeff(ptr), S.ptr))
@@ -199,8 +199,8 @@ function Base.iterate(p::svector{spoly{T}}, state) where T <: Nemo.RingElem
    if state.cpp_object == C_NULL
       return nothing
    else
-      A = Array{Int}(undef, p.rank)
       R = base_ring(p)
+      A = Array{Int}(undef, nvars(R))
       c = libSingular.p_GetExpVLV(state, A, R.ptr)
       S = base_ring(R)
       a = S(libSingular.n_Copy(libSingular.pGetCoeff(state), S.ptr))
