@@ -176,6 +176,41 @@ end
 
 ###############################################################################
 #
+#   iterators
+#
+###############################################################################
+
+function Base.iterate(p::svector{spoly{T}}) where T <: Nemo.RingElem
+   ptr = p.ptr
+   if ptr.cpp_object == C_NULL
+      return nothing
+   else
+      A = Array{Int}(undef, p.rank)
+      R = base_ring(p)
+      c = libSingular.p_GetExpVLV(ptr, A, R.ptr)
+      S = base_ring(R)
+      a = S(libSingular.n_Copy(libSingular.pGetCoeff(ptr), S.ptr))
+      return (c, A, a), ptr
+   end
+end
+
+function Base.iterate(p::svector{spoly{T}}, state) where T <: Nemo.RingElem
+   state = libSingular.pNext(state)
+   if state.cpp_object == C_NULL
+      return nothing
+   else
+      A = Array{Int}(undef, p.rank)
+      R = base_ring(p)
+      c = libSingular.p_GetExpVLV(state, A, R.ptr)
+      S = base_ring(R)
+      a = S(libSingular.n_Copy(libSingular.pGetCoeff(state), S.ptr))
+      return (c, A, a), state
+   end
+end
+
+Base.IteratorSize(::svector{spoly{T}}) where {T} = Base.SizeUnknown()
+###############################################################################
+#
 #   Vector constructors
 #
 ###############################################################################
