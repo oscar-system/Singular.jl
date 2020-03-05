@@ -172,7 +172,7 @@ end
 
    M = lift(A,B)
 
-   @test M[1] == vector(R,R(1))
+   @test M[1] == vector(R,R(1),R(0))
 end
 
 @testset "smodule.eliminate..." begin
