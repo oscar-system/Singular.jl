@@ -184,6 +184,25 @@ void singular_define_ideals(jlcxx::Module & Singular)
         return res;
     });
 
+    Singular.method("id_Lift", [](ideal m, ideal sm, ring o) {
+        const ring origin = currRing;
+        rChangeCurrRing(o);
+	int vl=IDELEMS(m);
+	int ul=IDELEMS(sm);
+        ideal tmp = idLift(m, sm, NULL, FALSE, FALSE);
+        matrix res=id_Module2formatedMatrix(tmp,ul,vl,o);
+        rChangeCurrRing(origin);
+        return res;
+    });
+
+    Singular.method("id_Modulo", [](ideal a, ideal b, ring o) {
+        const ring origin = currRing;
+        rChangeCurrRing(o);
+        ideal res = idModulo(a, b, testHomog);
+        rChangeCurrRing(origin);
+        return res;
+    });
+
     Singular.method("id_Satstd", &id_Satstd);
 
     Singular.method("id_Array2Vector", [](void * p, int a, ring o) {
