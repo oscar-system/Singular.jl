@@ -1,4 +1,4 @@
-export jet, minimal_generating_set, ModuleClass, rank, smodule, slimgb. eliminate, modulo, lift
+export jet, minimal_generating_set, ModuleClass, rank, smodule, slimgb, eliminate, modulo, lift
 
 ###############################################################################
 #
