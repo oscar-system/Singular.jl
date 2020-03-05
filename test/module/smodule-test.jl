@@ -157,8 +157,8 @@ end
 
    @test ngens(M) == 2
 
-   @test M[1] == vector(R, 1, 0)
-   @test M[2] == vector(R, 0, x)
+   @test M[1] == vector(R, R(1), R(0))
+   @test M[2] == vector(R, R(0), x)
 end
 
 @testset "smodule.lift..." begin
@@ -172,8 +172,7 @@ end
 
    M = lift(A,B)
 
-   @test M[1,1] == spoly{R}(1)
-   @test M[2,1] == spoly{R}(0)
+   @test M[1] == vector(R,R(1))
 end
 
 @testset "smodule.eliminate..." begin
