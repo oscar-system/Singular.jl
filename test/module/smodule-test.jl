@@ -153,7 +153,7 @@ end
    A = Singular.Module(R, v1, v2)
    B = Singular.Module(R, v1)
 
-   M = modluo(A,B)
+   M = modulo(A,B)
 
    @test ngens(M) == 2
 
