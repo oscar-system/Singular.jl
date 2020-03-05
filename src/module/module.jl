@@ -280,6 +280,6 @@ end
 function modulo(A::smodule, B::smodule)
    R = base_ring(A)
    ptr = libSingular.id_Modulo(A.ptr, B.ptr, R.ptr)
-   return smodule{T}(R, ptr)
+   return smodule(R, ptr)
 end
 
