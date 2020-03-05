@@ -259,12 +259,12 @@ end
 @doc Markdown.doc"""
     lift(M::smodule, SM::smodule)
 > represents the generators of SM in terms of the generators of M
-> (Matrix(SM) = Matrix(M)*matrix(T))
+> (Matrix(SM) = Matrix(M)*matrix(result))
 """
 function lift(M::smodule, SM::smodule)
    R = base_ring(M)
    ptr = libSingular.id_Lift(M.ptr, SM.ptr, R.ptr)
-   return smatrix(R, ptr)
+   return Module(R, ptr)
 end
 
 ###############################################################################
@@ -280,6 +280,6 @@ end
 function modulo(A::smodule, B::smodule)
    R = base_ring(A)
    ptr = libSingular.id_Modulo(A.ptr, B.ptr, R.ptr)
-   return smodule(R, ptr)
+   return Module(R, ptr)
 end
 
