@@ -144,6 +144,50 @@ end
    @test Z[1] == vector(R, x, -y)
 end
 
+@testset "smodule.modulo..." begin
+   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+
+   v1 = vector(R, x)
+   v2 = vector(R, y)
+
+   A = Singular.Module(R, v1, v2)
+   B = Singular.Module(R, v1)
+
+   M = modulo(A,B)
+
+   @test ngens(M) == 2
+
+   @test M[1] == vector(R, R(1), R(0))
+   @test M[2] == vector(R, R(0), x)
+end
+
+@testset "smodule.lift..." begin
+   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+
+   v1 = vector(R, x)
+   v2 = vector(R, y)
+
+   A = Singular.Module(R, v1, v2)
+   B = Singular.Module(R, v1)
+
+   M = lift(A,B)
+
+   @test M[1] == vector(R,R(1),R(0))
+end
+
+@testset "smodule.eliminate..." begin
+   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+
+   v1 = vector(R, x)
+   v2 = vector(R, y)
+
+   A = Singular.Module(R, v1, v2)
+
+   M = eliminate(A,x)
+
+   @test M[1] == v2
+end
+
 @testset "smodule.sres..." begin
    R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"])
 

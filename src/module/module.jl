@@ -1,4 +1,4 @@
-export jet, minimal_generating_set, ModuleClass, rank, smodule, slimgb
+export jet, minimal_generating_set, ModuleClass, rank, smodule, slimgb, eliminate, modulo, lift
 
 ###############################################################################
 #
@@ -226,4 +226,60 @@ function minimal_generating_set(M::smodule)
 end
 
 
+###############################################################################
+#
+#   Eliminate
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    eliminate(M::smodule, polys::spoly...)
+> Given a list of polynomials which are variables, construct the
+> the intersection of M with the free module
+> where those variables have been eliminated.
+"""
+function eliminate(M::smodule, polys::spoly...)
+   R = base_ring(M)
+   p = one(R)
+   for i = 1:length(polys)
+      !isgen(polys[i]) && error("Not a variable")
+      parent(polys[i]) != R && error("Incompatible base rings")
+      p *= polys[i]
+   end
+   ptr = libSingular.id_Eliminate(M.ptr, p.ptr, R.ptr)
+   return Module(R, ptr)
+end
+
+###############################################################################
+#
+#   Lift
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    lift(M::smodule, SM::smodule)
+> represents the generators of SM in terms of the generators of M
+> (Matrix(SM) = Matrix(M)*matrix(result))
+"""
+function lift(M::smodule, SM::smodule)
+   R = base_ring(M)
+   ptr = libSingular.id_Lift(M.ptr, SM.ptr, R.ptr)
+   return Module(R, ptr)
+end
+
+###############################################################################
+#
+#   Modulo
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    modulo(A::smodule, B:smodule)
+> represents  A/(A intersect B) (isomorphic to (A+B)/B)
+"""
+function modulo(A::smodule, B::smodule)
+   R = base_ring(A)
+   ptr = libSingular.id_Modulo(A.ptr, B.ptr, R.ptr)
+   return Module(R, ptr)
+end
 
