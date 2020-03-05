@@ -261,10 +261,10 @@ end
 > represents the generators of SM in terms of the generators of M
 > (Matrix(SM) = Matrix(M)*matrix(T))
 """
-function lift(M::smodule{T}, SM::smodule{T})  where T <: Nemo.RingElem
+function lift(M::smodule, SM::smodule)
    R = base_ring(M)
    ptr = libSingular.id_Lift(M.ptr, SM.ptr, R.ptr)
-   return smatrix{T}(R, ptr)
+   return smatrix(R, ptr)
 end
 
 ###############################################################################
@@ -277,7 +277,7 @@ end
     modulo(A::smodule, B:smodule)
 > represents  A/(A intersect B) (isomorphic to (A+B)/B)
 """
-function modulo(A::smodule{T}, B::smodule{T})  where T <: Nemo.RingElem
+function modulo(A::smodule, B::smodule)
    R = base_ring(A)
    ptr = libSingular.id_Modulo(A.ptr, B.ptr, R.ptr)
    return smodule{T}(R, ptr)
