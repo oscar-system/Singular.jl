@@ -188,6 +188,7 @@ void singular_define_ideals(jlcxx::Module & Singular)
         const ring origin = currRing;
         rChangeCurrRing(o);
         ideal res = idLift(m, sm, NULL, FALSE, FALSE);
+	res->rank = IDELEMS(m);
         rChangeCurrRing(origin);
         return res;
     });
