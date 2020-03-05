@@ -37,4 +37,4 @@ function p_ExtGcd(a::poly_ptr, b::poly_ptr, res::Ptr{poly_ptr}, s::Ptr{poly_ptr}
     tp = reinterpret(Ptr{Nothing},t)
     rp = reinterpret(Ptr{Nothing},res)
     return p_ExtGcd_internal(a, b, rp, sp, tp, r)
- end
+end
