@@ -246,7 +246,7 @@ function eliminate(M::smodule, polys::spoly...)
       parent(polys[i]) != R && error("Incompatible base rings")
       p *= polys[i]
    end
-   ptr = libSingular.id_Eliminate(I.ptr, p.ptr, R.ptr)
+   ptr = libSingular.id_Eliminate(M.ptr, p.ptr, R.ptr)
    return Module(R, ptr)
 end
 
