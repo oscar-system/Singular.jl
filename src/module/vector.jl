@@ -82,6 +82,8 @@ function -(a::svector{T}) where T <: AbstractAlgebra.RingElem
    return svector{T}(R, a.rank, s)
 end
 
+iszero(p::svector) = p.ptr.cpp_object == C_NULL
+
 ###############################################################################
 #
 #   Arithmetic functions
