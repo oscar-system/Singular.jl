@@ -189,7 +189,7 @@ void singular_define_ideals(jlcxx::Module & Singular)
         rChangeCurrRing(o);
         ideal rest;
         ideal res = idLift(m, sm, &rest, FALSE, FALSE);
-        rest->rank = mod->rank;
+        rest->rank = m->rank;
         res->rank = IDELEMS(m);
         rChangeCurrRing(origin);
         return std::make_tuple(res, rest);
