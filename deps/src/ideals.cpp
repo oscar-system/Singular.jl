@@ -187,10 +187,12 @@ void singular_define_ideals(jlcxx::Module & Singular)
     Singular.method("id_Lift", [](ideal m, ideal sm, ring o) {
         const ring origin = currRing;
         rChangeCurrRing(o);
-        ideal res = idLift(m, sm, NULL, FALSE, FALSE);
-	res->rank = IDELEMS(m);
+        ideal rest;
+        ideal res = idLift(m, sm, &rest, FALSE, FALSE);
+        rest->rank = m->rank;
+        res->rank = IDELEMS(m);
         rChangeCurrRing(origin);
-        return res;
+        return std::make_tuple(res, rest);
     });
 
     Singular.method("id_Modulo", [](ideal a, ideal b, ring o) {
@@ -228,14 +230,14 @@ void singular_define_ideals(jlcxx::Module & Singular)
     Singular.method("id_vdim", [](ideal I, ring r) {
         const ring origin = currRing;
         rChangeCurrRing(r);
-	int n=scMult0Int(I, r->qideal);
-	rChangeCurrRing(origin);
-	return n;
+        int n=scMult0Int(I, r->qideal);
+        rChangeCurrRing(origin);
+        return n;
     });
 
     Singular.method("id_kbase", [](ideal I, ring r) {
         ideal res;
-	const ring origin = currRing;
+        const ring origin = currRing;
         rChangeCurrRing(r);
         res = scKBase(-1, I, r->qideal);
         rChangeCurrRing(origin);
@@ -255,19 +257,19 @@ void singular_define_ideals(jlcxx::Module & Singular)
         const ring origin = currRing;
         rChangeCurrRing(pr);
         ideal I = maMapIdeal(map_id, pr, im_id, im, reinterpret_cast<nMapFunc>(cf_map));
-	rChangeCurrRing(origin);
-	return I;
+        rChangeCurrRing(origin);
+        return I;
     });
     Singular.method("idMinBase", [](ideal I, ring r) {
         const ring origin = currRing;
         rChangeCurrRing(r);
         ideal J = idMinBase(I);
-	rChangeCurrRing(origin);
-	return J;
+        rChangeCurrRing(origin);
+        return J;
     });
     Singular.method("scIndIndset", [](ideal I, ring r, jlcxx::ArrayRef<int> a, bool all) {
         const ring origin = currRing;
-	rChangeCurrRing(r);
+        rChangeCurrRing(r);
         lists L = scIndIndset(I, all, r->qideal);
         int n = rVar(r);
         int m = lSize(L);
@@ -292,21 +294,21 @@ void singular_define_ideals(jlcxx::Module & Singular)
               a.push_back(content[j]);
            }
         }
-	rChangeCurrRing(origin);
+        rChangeCurrRing(origin);
     });
     Singular.method("scDimInt", [](ideal I, ring R) {
         const ring origin = currRing;
-	rChangeCurrRing(R);
+        rChangeCurrRing(R);
         int k = scDimInt(I, R->qideal);
-	rChangeCurrRing(origin);
-	return k;
+        rChangeCurrRing(origin);
+        return k;
     });
     Singular.method("fglmzero", [](ideal Isrc, ring Rsrc, ring Rdest ) {
         const ring origin = currRing;
         rChangeCurrRing(Rdest);
         ideal Idest = NULL;
         bool c = fglmzero(Rsrc, Isrc, Rdest, Idest, FALSE, FALSE);
-	     rChangeCurrRing(origin);
-	     return Idest;
+        rChangeCurrRing(origin);
+        return Idest;
     });
 }
