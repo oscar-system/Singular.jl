@@ -60,6 +60,22 @@ end
    @test -(-v) == v
 end
 
+@testset "svector.iszero..." begin
+   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+
+   v = vector(R, x, y, R(2))
+
+  @test iszero(v) == 0
+
+  v = vector(R, R(0), R(0))
+
+  @test iszero(v) == 1
+
+  v = vector(R, R(0))
+
+  @test iszero(v) == 1
+end
+
 @testset "svector.binary_ops..." begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
