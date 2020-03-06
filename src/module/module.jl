@@ -258,13 +258,15 @@ end
 
 @doc Markdown.doc"""
     lift(M::smodule, SM::smodule)
-> represents the generators of SM in terms of the generators of M
-> (Matrix(SM) = Matrix(M)*matrix(result))
+> represents the generators of SM in terms of the generators of M.
+> Returns result, rest
+> (Matrix(SM) = (Matrix(M)-Matrix(rest))*matrix(result))
+> If SM is in M, rest is the null module
 """
 function lift(M::smodule, SM::smodule)
    R = base_ring(M)
-   ptr = libSingular.id_Lift(M.ptr, SM.ptr, R.ptr)
-   return Module(R, ptr)
+   ptr,rest_ptr = libSingular.id_Lift(M.ptr, SM.ptr, R.ptr)
+   return Module(R, ptr),Module(R,rest_ptr)
 end
 
 ###############################################################################

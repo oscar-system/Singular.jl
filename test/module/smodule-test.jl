@@ -170,9 +170,10 @@ end
    A = Singular.Module(R, v1, v2)
    B = Singular.Module(R, v1)
 
-   M = lift(A,B)
+   M,r = lift(A,B)
 
    @test M[1] == vector(R,R(1),R(0))
+   @test iszero(r[1])
 end
 
 @testset "smodule.eliminate..." begin
