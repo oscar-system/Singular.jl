@@ -65,7 +65,7 @@ else # source build
    const debug_build = false # N.B: debug builds are up to 50 times slower at runtime!
 
    @show NTL_VERSION = "10.5.0"
-   @show SINGULAR_VERSION = "1d8f29959c005b422c8aa69512eee7c45c4bdab1"
+   @show SINGULAR_VERSION = "e7e39839d32320823bf9689c97c5071650497b8e"
    @show CDDLIB_VERSION = "094h"
 
    println("Removing old binaries ...")
