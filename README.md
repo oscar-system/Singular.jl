@@ -11,8 +11,7 @@ To build Singular.jl, start julia and then type:
 
 ```julia
 julia> using Pkg
-julia> Pkg.clone("https://github.com/oscar-system/Singular.jl")
-julia> Pkg.build("Singular")
+julia> Pkg.add("Singular")
 ```
 To use Singular.jl, start julia and then type:
 
