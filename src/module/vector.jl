@@ -161,6 +161,14 @@ function (S::FreeMod{T})(a::Array{T, 1}) where T <: AbstractAlgebra.RingElem
    return svector{T}(R, n, v)
 end
 
+function (S::FreeMod{T})() where T <: AbstractAlgebra.RingElem
+   R = base_ring(S) # polynomial ring
+   n = S.rank
+   z = zero(R)
+   return svector{T}(R, n, z.ptr)
+end
+
+
 ###############################################################################
 #
 #   Conversions
