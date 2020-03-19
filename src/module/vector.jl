@@ -161,6 +161,14 @@ function (S::FreeMod{T})(a::Array{T, 1}) where T <: AbstractAlgebra.RingElem
    return svector{T}(R, n, v)
 end
 
+function (S::FreeMod{T})() where T <: AbstractAlgebra.RingElem
+   R = base_ring(S) # polynomial ring
+   n = S.rank
+   z = zero(R)
+   return svector{T}(R, n, z.ptr)
+end
+
+
 ###############################################################################
 #
 #   Conversions
@@ -176,6 +184,41 @@ function Array(v::svector{spoly{T}}) where T <: Nemo.RingElem
    return [spoly{T}(R, p) for p in aa]
 end
 
+###############################################################################
+#
+#   iterators
+#
+###############################################################################
+
+function Base.iterate(p::svector{spoly{T}}) where T <: Nemo.RingElem
+   ptr = p.ptr
+   if ptr.cpp_object == C_NULL
+      return nothing
+   else
+      R = base_ring(p)
+      A = Array{Int}(undef, nvars(R))
+      c = libSingular.p_GetExpVLV(ptr, A, R.ptr)
+      S = base_ring(R)
+      a = S(libSingular.n_Copy(libSingular.pGetCoeff(ptr), S.ptr))
+      return (c, A, a), ptr
+   end
+end
+
+function Base.iterate(p::svector{spoly{T}}, state) where T <: Nemo.RingElem
+   state = libSingular.pNext(state)
+   if state.cpp_object == C_NULL
+      return nothing
+   else
+      R = base_ring(p)
+      A = Array{Int}(undef, nvars(R))
+      c = libSingular.p_GetExpVLV(state, A, R.ptr)
+      S = base_ring(R)
+      a = S(libSingular.n_Copy(libSingular.pGetCoeff(state), S.ptr))
+      return (c, A, a), state
+   end
+end
+
+Base.IteratorSize(::svector{spoly{T}}) where {T} = Base.SizeUnknown()
 ###############################################################################
 #
 #   Vector constructors

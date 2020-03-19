@@ -243,9 +243,21 @@ void singular_define_rings(jlcxx::Module & Singular)
                     [](spolyrec * p, long * ev, ip_sring * r) {
                         return p_GetExpVL(p, ev, r);
                     });
+    Singular.method("p_GetExpVLV_internal",
+                    [](spolyrec * p, long * ev, ip_sring * r) {
+                        return p_GetExpVLV(p, ev, r);
+                    });
     Singular.method("p_SetExpV_internal",
                     [](spolyrec * p, int * ev, ip_sring * r) {
                         return p_SetExpV(p, ev, r);
+                    });
+    Singular.method("p_SetExpVL_internal",
+                    [](spolyrec * p, long * ev, ip_sring * r) {
+                        return p_SetExpVL(p, ev, r);
+                    });
+    Singular.method("p_SetExpVLV_internal",
+                    [](spolyrec * p, long * ev, long c, ip_sring * r) {
+                        return p_SetExpVLV(p, ev, c, r);
                     });
     Singular.method("p_Reduce",
                     [](spolyrec * p, sip_sideal * G, ip_sring * R) {
