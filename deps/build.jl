@@ -24,7 +24,7 @@ if !issource_build
       "https://github.com/JuliaPackaging/Yggdrasil/releases/download/MPFR-v4.0.2-1/build_MPFR.v4.0.2.jl",
       "https://github.com/thofma/Flint2Builder/releases/download/ba0cee/build_libflint.v0.0.0-ba0ceed35136a2a43441ab9a9b2e7764e38548ea.jl",
       "https://github.com/thofma/NTLBuilder2/releases/download/v10.5.0-1/build_libntl.v10.5.0.jl",
-      "https://github.com/wbhart/SingularBuilder/releases/download/v0.0.6/build_libsingular.v0.0.6.jl",
+      "https://github.com/oscar-system/SingularBuilder/releases/download/v0.0.6/build_libsingular.v0.0.6.jl",
    ]
 
    const prefix = Prefix(get([a for a in ARGS if a != "--verbose"], 1, joinpath(@__DIR__, "usr")))
