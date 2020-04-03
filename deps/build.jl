@@ -3,6 +3,7 @@ using BinaryProvider
 import CxxWrap
 import Libdl
 import Nemo
+import CMake
 
 # Parse some basic command-line arguments
 const verbose = "--verbose" in ARGS
@@ -215,7 +216,7 @@ cd(cmake_build_path)
 
 print("Initializing cmake")
 
-run(`cmake -DJulia_EXECUTABLE=$julia_exec -DJlCxx_DIR=$jlcxx_cmake_dir -DJuliaIncludeDir=$julia_include -DJULIA_LIB_DIR=$julia_lib -Dnemo_includes=$nemovdir/include -Dsingular_includes=$prefixpath/include -Dsingular_libdir=$prefixpath/lib -DCMAKE_INSTALL_LIBDIR=$prefixpath/lib .`)
+run(`$(CMake.cmake) -DJulia_EXECUTABLE=$julia_exec -DJlCxx_DIR=$jlcxx_cmake_dir -DJuliaIncludeDir=$julia_include -DJULIA_LIB_DIR=$julia_lib -Dnemo_includes=$nemovdir/include -Dsingular_includes=$prefixpath/include -Dsingular_libdir=$prefixpath/lib -DCMAKE_INSTALL_LIBDIR=$prefixpath/lib .`)
 
 print("Running cmake")
 
