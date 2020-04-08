@@ -22,3 +22,9 @@ julia> using Singular
 Documentation is available here:
 
 [https://oscar-system.github.io/Singular.jl/latest/index.html](https://oscar-system.github.io/Singular.jl/latest/index.html)
+
+## Funding
+
+The development of this Julia package is supported by the Deutsche
+Forschungsgemeinschaft DFG within the
+[Collaborative Research Center TRR 195](https://www.computeralgebra.de/sfb/).
