@@ -2,7 +2,8 @@
 
 Singular.jl is a Julia interface to the Singular computer algebra system. It was
 written by Oleksandr Motsak, William Hart and other contributors, and is maintained by
-William Hart, Hans Schoenemann and Andreas Steenpas. It is part of the Oscar project.
+William Hart, Hans Schoenemann and Andreas Steenpas. It is part of the Oscar project which is
+funded by the DFG TRR 195 program.
 
 - [https://www.singular.uni-kl.de/](https://www.singular.uni-kl.de/) (Singular website)
 - [https://github.com/oscar-system/Singular.jl](https://github.com/oscar-system/Singular.jl) (Singular.jl source code)
