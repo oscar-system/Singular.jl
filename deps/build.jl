@@ -204,10 +204,8 @@ push!(Libdl.DL_LOAD_PATH, joinpath(prefixpath, "lib"))
 
 cd(oldwdir)
 
-jlcxx_cmake_dir = realpath(joinpath(dirname(pathof(CxxWrap)), "..", "deps", "usr", "lib", "cmake", "JlCxx"))
+libcxxwrap_prefix = CxxWrap.CxxWrapCore.prefix_path()
 
-julia_include = realpath(joinpath(Sys.BINDIR, "..", "include", "julia"))
-julia_lib = realpath(joinpath(Sys.BINDIR, "..", "lib"))
 julia_exec = joinpath(Sys.BINDIR, "julia")
 
 cmake_build_path = joinpath(@__DIR__, "src")
@@ -216,7 +214,7 @@ cd(cmake_build_path)
 
 print("Initializing cmake")
 
-run(`$(CMake.cmake) -DJulia_EXECUTABLE=$julia_exec -DJlCxx_DIR=$jlcxx_cmake_dir -DJuliaIncludeDir=$julia_include -DJULIA_LIB_DIR=$julia_lib -Dnemo_includes=$nemovdir/include -Dsingular_includes=$prefixpath/include -Dsingular_libdir=$prefixpath/lib -DCMAKE_INSTALL_LIBDIR=$prefixpath/lib .`)
+run(`$(CMake.cmake) -DJulia_EXECUTABLE=$julia_exec -DCMAKE_PREFIX_PATH=$libcxxwrap_prefix -Dsingular_includes=$prefixpath/include -Dsingular_libdir=$prefixpath/lib -DCMAKE_INSTALL_LIBDIR=$prefixpath/lib .`)
 
 print("Running cmake")
 
