@@ -34,8 +34,15 @@ jobs:
     - julia: nightly
   fast_finish: true
   include:
+    # test (one of) the oldest macOS configuration still supported by us
+    # (older ones have trouble compiling CxxWrap)
     - os: osx
       osx_image: xcode9.2 # latest version available for macOS 10.12 Sierra
+
+    # also test with latest macOS image and latest Julia
+    - julia: 1.4
+      os: osx
+      osx_image: xcode11.4
 
     - stage: "Documentation"
       name: "HTML"
