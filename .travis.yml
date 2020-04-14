@@ -34,9 +34,7 @@ env:
 
 jobs:
   allow_failures:
-    - julia: 1.4
     - julia: nightly
-    - os: osx
   fast_finish: true
   include:
     - stage: "Documentation"
