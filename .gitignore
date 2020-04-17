@@ -2,7 +2,6 @@
 *.jl.cov
 *.jl.mem
 /deps/build.log
-/deps/build*.jl
 /deps/deps.jl
 /deps/src/cmake_install.cmake
 /deps/src/CMakeCache.txt
