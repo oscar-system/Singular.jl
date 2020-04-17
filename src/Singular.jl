@@ -51,9 +51,12 @@ export ZZ, QQ, FiniteField, FunctionField, CoefficientRing, Fp
 ###############################################################################
 
 const pkgdir = realpath(joinpath(dirname(@__FILE__), ".."))
-const libsingular = joinpath(pkgdir, "deps", "usr", "lib", "libSingular")
-
-prefix = realpath(joinpath(pkgdir, "deps", "usr"))
+const prefix = joinpath(pkgdir, "deps", "usr")
+const libsingular = joinpath(prefix, "lib", "libSingular")
+const binSingular = joinpath(prefix, "bin", "Singular")
+if !isfile(binSingular)
+    error("""Singular.jl needs to be compiled; please run `using Pkg; Pkg.build("Polymake")`""")
+end
 
 mapping_types = nothing
 mapping_types_reversed = nothing
@@ -61,8 +64,6 @@ mapping_types_reversed = nothing
 function __init__()
 
    # Initialise Singular
-
-   binSingular = joinpath(prefix, "bin", "Singular")
    ENV["SINGULAR_EXECUTABLE"] = binSingular
    libSingular.siInit(binSingular)
    # set up Singular parents (we cannot do this before Singular is initialised)
