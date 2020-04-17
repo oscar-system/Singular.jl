@@ -10,6 +10,7 @@ module Singular
 import AbstractAlgebra
 using Markdown
 using Nemo
+using Pkg
 
 import Base: abs, checkbounds, convert, deepcopy, deepcopy_internal,
              denominator, div, divrem, exponent,
@@ -104,6 +105,41 @@ function __init__()
    mapping_types = Dict( i[1] => i[2] for i in libSingular.get_type_mapper() )
    mapping_types_reversed = Dict( j => i for (i, j) in mapping_types )
    casting_functions = create_casting_functions()
+
+   show_banner = isinteractive() &&
+                !any(x->x.name in ["Oscar"], keys(Base.package_locks))
+
+   if show_banner             
+     println("""Singular.jl, based on
+                     SINGULAR                                 /  
+ A Computer Algebra System for Polynomial Computations       /   
+                                                           0< $VERSION
+ by: W. Decker, G.-M. Greuel, G. Pfister, H. Schoenemann     \\   
+FB Mathematik der Universitaet, D-67653 Kaiserslautern        \\
+     """)
+   end
+end
+
+if VERSION >= v"1.4"
+  deps = Pkg.dependencies()
+  if haskey(deps, Base.UUID("bcd08a7b-43d2-5ff7-b6d4-c458787f915c"))
+    ver = Pkg.dependencies()[Base.UUID("bcd08a7b-43d2-5ff7-b6d4-c458787f915c")]
+    if occursin("/dev/", ver.source)
+      global VERSION_NUMBER = VersionNumber("$(ver.version)-dev")
+    else
+      global VERSION_NUMBER = VersionNumber("$(ver.version)")
+    end
+  else
+    global VERSION_NUMBER = "building"
+  end
+else
+  ver = Pkg.API.__installed(PKGMODE_MANIFEST)["Singular"]
+  dir = dirname(@__DIR__)
+  if occursin("/dev/", dir)
+    global VERSION_NUMBER = VersionNumber("$(ver)-dev")
+  else
+    global VERSION_NUMBER = VersionNumber("$(ver)")
+  end
 end
 
 ###############################################################################
