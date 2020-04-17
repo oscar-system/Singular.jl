@@ -204,7 +204,7 @@ push!(Libdl.DL_LOAD_PATH, joinpath(prefixpath, "lib"))
 
 cd(oldwdir)
 
-libcxxwrap_prefix = CxxWrap.CxxWrapCore.prefix_path()
+libcxxwrap_prefix = CxxWrap.prefix_path()
 
 julia_exec = joinpath(Sys.BINDIR, "julia")
 
