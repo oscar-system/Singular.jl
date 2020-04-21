@@ -73,8 +73,7 @@ void singular_define_rings(jlcxx::Module & Singular)
     Singular.method("rBitmask",
                     [](ip_sring * r) { return (unsigned int)r->bitmask; });
     Singular.method("rPar", [](coeffs cf){
-                    coeffs cf_ptr = nCopyCoeff(cf);
-                    return n_NumberOfParameters(cf_ptr);
+                    return n_NumberOfParameters(cf);
     });
     Singular.method("p_Delete", [](spolyrec * p, ip_sring * r) {
         return p_Delete(&p, r);
@@ -188,6 +187,7 @@ void singular_define_rings(jlcxx::Module & Singular)
        rChangeCurrRing(r);
        res = kNF(I, NULL, p, 0, KSTD_NF_LAZY);
        rChangeCurrRing(origin);
+       l->m[0]=NULL;
        id_Delete(&I, r);
        if (res == NULL)
           return true;
@@ -220,20 +220,22 @@ void singular_define_rings(jlcxx::Module & Singular)
 			  a.push_back(content[i]);
 			}
 			rChangeCurrRing(origin);
+			delete v;
 		        return I;
     });
     Singular.method("singclap_factorize",
                     [](spolyrec * p, jlcxx::ArrayRef<int> a, ip_sring * r) {
-                        const ring origin = currRing;
-		        rChangeCurrRing(r);
+		    	const ring origin = currRing;
+			rChangeCurrRing(r);
 			intvec * v = NULL;
-			ideal I = singclap_factorize(pCopy(p), &v, 0, currRing);
+			ideal I = singclap_factorize(p_Copy(p,r), &v, 0, r);
 			int * content = v->ivGetVec();
 			for(int i=0; i<v->length(); i++)
 			{
 			  a.push_back(content[i]);
 			}
 			rChangeCurrRing(origin);
+			delete v;
 		        return I;
     });
     Singular.method("p_Content", [](spolyrec * p, ip_sring * r) {
