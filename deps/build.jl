@@ -204,22 +204,28 @@ push!(Libdl.DL_LOAD_PATH, joinpath(prefixpath, "lib"))
 
 cd(oldwdir)
 
-libcxxwrap_prefix = CxxWrap.prefix_path()
+@show libcxxwrap_prefix = CxxWrap.prefix_path()
+@show julia_exec = joinpath(Sys.BINDIR, "julia")
 
-julia_exec = joinpath(Sys.BINDIR, "julia")
+cmake_src_path = joinpath(@__DIR__, "src")
+cmake_build_path = joinpath(@__DIR__, "build")
 
-cmake_build_path = joinpath(@__DIR__, "src")
-
+rm(cmake_build_path, recursive = true, force = true)
+mkpath(cmake_build_path)
 cd(cmake_build_path)
 
-print("Initializing cmake")
+println("Initializing cmake")
+run(`$(CMake.cmake)
+    -DJulia_EXECUTABLE=$julia_exec
+    -DCMAKE_PREFIX_PATH=$libcxxwrap_prefix
+    -Dsingular_includes=$prefixpath/include
+    -Dsingular_libdir=$prefixpath/lib
+    -DCMAKE_INSTALL_LIBDIR=$prefixpath/lib
+    $cmake_src_path`)
 
-run(`$(CMake.cmake) -DJulia_EXECUTABLE=$julia_exec -DCMAKE_PREFIX_PATH=$libcxxwrap_prefix -Dsingular_includes=$prefixpath/include -Dsingular_libdir=$prefixpath/lib -DCMAKE_INSTALL_LIBDIR=$prefixpath/lib .`)
-
-print("Running cmake")
-
-run(`make VERBOSE=1`)
-run(`make install`)
+println("Running cmake")
+run(`$(CMake.cmake) --build .`)
+run(`$(CMake.cmake) --install .`)
 
 include("parselibs.jl")
 
