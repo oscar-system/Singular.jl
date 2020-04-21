@@ -187,7 +187,7 @@ void singular_define_rings(jlcxx::Module & Singular)
        rChangeCurrRing(r);
        res = kNF(I, NULL, p, 0, KSTD_NF_LAZY);
        rChangeCurrRing(origin);
-       l->m[0]=NULL;
+       I->m[0] = NULL;
        id_Delete(&I, r);
        if (res == NULL)
           return true;
