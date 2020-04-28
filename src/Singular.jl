@@ -111,11 +111,13 @@ function __init__()
                 !any(x->x.name in ["Oscar"], keys(Base.package_locks))
 
    singular_version_nr=Singular.libSingular.version()
+   ver = digits(singular_version_nr, base = 10)
+   svn = VersionNumber("$(ver[1]).$(ver[2]).$(ver[3])-$(ver[4])")
    if show_banner             
      println("""Singular.jl, based on
                      SINGULAR                                 /  
- A Computer Algebra System for Polynomial Computations       /   
-                                                           0< $singular_version_nr
+ A Computer Algebra System for Polynomial Computations       /  Singular.jl: $VERSION_NUMBER 
+                                                           0<   Singular   : $svn
  by: W. Decker, G.-M. Greuel, G. Pfister, H. Schoenemann     \\   
 FB Mathematik der Universitaet, D-67653 Kaiserslautern        \\
      """)
