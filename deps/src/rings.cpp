@@ -43,6 +43,35 @@ auto rDefault_long_helper(coeffs                        cf,
     return r;
 }
 
+auto rDefault_Weyl_helper(coeffs                   cf,
+                     jlcxx::ArrayRef<uint8_t *>    vars,
+                     jlcxx::ArrayRef<rRingOrder_t> ord,
+                     int *                         blk0,
+                     int *                         blk1,
+                     unsigned long                 bitmask)
+{
+    auto r = rDefault_long_helper(cf, vars, ord, blk0, blk1, bitmask);
+    poly p=p_One(r);
+    nc_CallPlural(NULL,NULL,p,p,r,true,false,true,r);
+    p_Delete(&p,r);
+    return r;
+}
+
+auto rDefault_Exterior_helper(coeffs               cf,
+                     jlcxx::ArrayRef<uint8_t *>    vars,
+                     jlcxx::ArrayRef<rRingOrder_t> ord,
+                     int *                         blk0,
+                     int *                         blk1,
+                     unsigned long                 bitmask)
+{
+    auto r = rDefault_long_helper(cf, vars, ord, blk0, blk1, bitmask);
+    poly p=p_One(r);
+    p=p_Neg(p,r);
+    nc_CallPlural(NULL,NULL,p,NULL,r,true,false,true,r);
+    p_Delete(&p,r);
+    return r;
+}
+
 void singular_define_rings(jlcxx::Module & Singular)
 {
     Singular.method("toPolyRef", [](void * ptr) {
@@ -50,6 +79,8 @@ void singular_define_rings(jlcxx::Module & Singular)
     });
     Singular.method("rDefault_helper", &rDefault_helper);
     Singular.method("rDefault_long_helper", &rDefault_long_helper);
+    Singular.method("rDefault_Weyl_helper", &rDefault_Weyl_helper);
+    Singular.method("rDefault_Exterior_helper", &rDefault_Exterior_helper);
     Singular.method("rDelete", &rDelete);
     Singular.method("rString", [](ip_sring * r) {
         auto s = rString(r);

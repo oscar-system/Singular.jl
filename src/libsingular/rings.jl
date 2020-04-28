@@ -6,6 +6,22 @@ function rDefault(cf::coeffs_ptr, vars::Array{T,1}, ord::Array{rRingOrder_t, 1},
    return r
 end
 
+function rWeyl(cf::coeffs_ptr, vars::Array{T,1}, ord::Array{rRingOrder_t, 1},
+   blk0::Array{Cint, 1}, blk1::Array{Cint, 1}, bitmask::Culong) where {T}
+   blk0ptr = pointer(blk0)
+   blk1ptr = pointer(blk1)
+   r = rDefault_Weyl_helper(cf, vars, ord, blk0ptr, blk1ptr, bitmask);
+   return r
+end
+
+function rExterior(cf::coeffs_ptr, vars::Array{T,1}, ord::Array{rRingOrder_t, 1},
+   blk0::Array{Cint, 1}, blk1::Array{Cint, 1}, bitmask::Culong) where {T}
+   blk0ptr = pointer(blk0)
+   blk1ptr = pointer(blk1)
+   r = rDefault_Exterior_helper(cf, vars, ord, blk0ptr, blk1ptr, bitmask);
+   return r
+end
+
 function p_GetExpVL(p::poly_ptr, ev::Array{Clong, 1}, r::ring_ptr)
    ptr = pointer(ev)
    p_GetExpVL_internal(p, ptr, r)
