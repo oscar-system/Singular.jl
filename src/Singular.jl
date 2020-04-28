@@ -110,11 +110,12 @@ function __init__()
    show_banner = isinteractive() &&
                 !any(x->x.name in ["Oscar"], keys(Base.package_locks))
 
+   singular_version_nr=Singular.libSingular.version()
    if show_banner             
      println("""Singular.jl, based on
                      SINGULAR                                 /  
  A Computer Algebra System for Polynomial Computations       /   
-                                                           0< $VERSION
+                                                           0< $singular_version_nr
  by: W. Decker, G.-M. Greuel, G. Pfister, H. Schoenemann     \\   
 FB Mathematik der Universitaet, D-67653 Kaiserslautern        \\
      """)

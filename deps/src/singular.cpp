@@ -72,6 +72,9 @@ JLCXX_MODULE define_julia_module(jlcxx::Module & Singular)
     Singular.method("versionString", []() {
         return const_cast<const char *>(versionString());
     });
+    Singular.method("version", []() {
+        return SINGULAR_VERSION;
+    });
 
     singular_define_coeffs(Singular);
     singular_define_rings(Singular);
