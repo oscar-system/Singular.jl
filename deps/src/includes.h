@@ -1,6 +1,8 @@
 #ifndef MAIN_INCLUDE_FILE
 #define MAIN_INCLUDE_FILE
 
+#include "xcode_jlcxx_workaround.h"
+
 #include <string>
 #include <cstring>
 #include <iostream>

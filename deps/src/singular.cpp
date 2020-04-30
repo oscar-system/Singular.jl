@@ -1,4 +1,3 @@
-#include "jlcxx/jlcxx.hpp"
 #include "includes.h"
 #include "coeffs.h"
 #include "rings.h"

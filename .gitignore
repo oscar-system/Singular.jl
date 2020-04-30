@@ -3,6 +3,7 @@
 *.jl.mem
 /deps/build.log
 /deps/build*.jl
+/deps/build/
 /deps/deps.jl
 /deps/src/cmake_install.cmake
 /deps/src/CMakeCache.txt
@@ -11,7 +12,8 @@
 /deps/src/lib/
 /deps/src/Makefile
 /deps/usr/
-/docs/build
+/deps/xcodetypeinfo/build/
+/docs/build/
 /local/*
 /Manifest.toml
 /src/libraryfuncdictionary.jl

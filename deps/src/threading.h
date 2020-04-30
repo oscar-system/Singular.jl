@@ -1,3 +1,5 @@
+#include "xcode_jlcxx_workaround.h"
+
 #include <mutex>
 
 #ifdef THREADSAFE_SINGULAR
