@@ -1,8 +1,4 @@
-#include "jlcxx/jlcxx.hpp"
-#include "includes.h"
 #include "coeff_rings.h"
-
-#include <iostream>
 
 typedef struct __singular_coeff_ring_struct {
       int64_t has_simple_alloc;

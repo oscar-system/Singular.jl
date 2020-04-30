@@ -15,7 +15,7 @@ message(STATUS "Found JlCxx at ${JlCxx_location}")
 include_directories(${singular_includes})
 include_directories(${singular_includes}/singular)
 
-SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g" )
+SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g ${extra_cppflags}" )
 SET( CMAKE_SHARED_LINKER_FLAGS  "${CMAKE_SHARED_LINKER_FLAGS} -L${singular_libdir} -Wl,-rpath,${singular_libdir}" )
 
 
