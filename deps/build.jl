@@ -199,6 +199,36 @@ else # source build
    cd(wdir)
 end
 
+# add shell scripts that startup another julia for some lib4ti2 programs
+# singular and libsingular are supposed to at least look in
+#  $prefixpath/lib/singular/MOD
+
+mkpath("$prefixpath/lib/singular/MOD")
+
+open("$prefixpath/lib/singular/MOD/graver.sh", "w") do io
+    write(io, "julia -e 'import lib4ti2_jll\n")
+    write(io, "lib4ti2_jll.zsolve() do x\n")
+    write(io, "p=run(ignorestatus(`\$x -G $ARGS`))\n")
+    write(io, "exit(p.exitcode)\n")
+    write(io, "end' -- \"\$@\"")
+end
+
+open("$prefixpath/lib/singular/MOD/hilbert.sh", "w") do io
+    write(io, "julia -e 'import lib4ti2_jll\n")
+    write(io, "lib4ti2_jll.zsolve() do x\n")
+    write(io, "p=run(ignorestatus(`\$x -H $ARGS`))\n")
+    write(io, "exit(p.exitcode)\n")
+    write(io, "end' -- \"\$@\"")
+end
+
+open("$prefixpath/lib/singular/MOD/markov.sh", "w") do io
+    write(io, "julia -e 'import lib4ti2_jll\n")
+    write(io, "lib4ti2_jll.zsolve() do x\n")
+    write(io, "p=run(ignorestatus(`\$x markov $ARGS`))\n")
+    write(io, "exit(p.exitcode)\n")
+    write(io, "end' -- \"\$@\"")
+end
+
 push!(Libdl.DL_LOAD_PATH, joinpath(prefixpath, "lib"))
 
 @show libcxxwrap_prefix = CxxWrap.prefix_path()
