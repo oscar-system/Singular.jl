@@ -11,6 +11,7 @@ import AbstractAlgebra
 using Markdown
 using Nemo
 using Pkg
+using lib4ti2_jll
 
 import Base: abs, checkbounds, convert, deepcopy, deepcopy_internal,
              denominator, div, divrem, exponent,
