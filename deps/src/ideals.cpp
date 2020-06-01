@@ -72,6 +72,39 @@ auto id_Slimgb_helper(ideal a, ring b, bool complete_reduction = false)
         id = idInit(0, a->rank);
     return id;
 }
+auto id_StdHilb_helper(ideal a, ring b, jlcxx::ArrayRef<int> h, bool complete_reduction = false)
+{
+    int sz = h.size();
+    intvec * hilb = new intvec(sz);
+    int * hi = hilb->ivGetVec();
+    for (int i=0; i< sz; i++) {
+      hi[i] = h[i];
+    }
+
+    unsigned int crbit;
+    if (complete_reduction)
+        crbit = Sy_bit(OPT_REDSB);
+    else
+        crbit = 0;
+    ideal id = NULL;
+    if (!idIs0(a)) {
+        intvec *     n = NULL;
+        tHomog       h = testHomog;
+        const ring   origin = currRing;
+        unsigned int save_opt = si_opt_1;
+        si_opt_1 |= crbit;
+        rChangeCurrRing(b);
+        id = kStd(a, b->qideal, h, &n, hilb );
+        si_opt_1 = save_opt;
+        rChangeCurrRing(origin);
+        if (n != NULL)
+            delete n;
+    }
+    else
+        id = idInit(0, a->rank);
+    return id;
+}
+
 
 auto id_Std_helper(ideal a, ring b, bool complete_reduction = false)
 {
@@ -175,6 +208,7 @@ void singular_define_ideals(jlcxx::Module & Singular)
     Singular.method("id_Slimgb", &id_Slimgb_helper);
 
     Singular.method("id_Std", &id_Std_helper);
+    Singular.method("id_StdHilb", &id_StdHilb_helper);
 
     Singular.method("id_Eliminate", [](ideal m, poly p, ring o) {
         const ring origin = currRing;
@@ -308,5 +342,16 @@ void singular_define_ideals(jlcxx::Module & Singular)
         bool c = fglmzero(Rsrc, Isrc, Rdest, Idest, FALSE, FALSE);
         rChangeCurrRing(origin);
         return Idest;
+    });
+    Singular.method("scHilb", [](ideal I, ring r, jlcxx::ArrayRef<int> a) {
+        const ring origin = currRing;
+        rChangeCurrRing(r);
+        intvec *v=hFirstSeries(I,NULL,r->qideal);
+        int * content = v->ivGetVec();
+        for(int j = 0; j < v->length(); j++)
+        {
+          a.push_back(content[j]);
+        }
+        rChangeCurrRing(origin);
     });
 }
