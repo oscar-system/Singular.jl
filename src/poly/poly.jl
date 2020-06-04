@@ -339,7 +339,11 @@ end
 
 function show(io::IO, R::PolyRing)
    s = libSingular.rString(R.ptr)
-   print(io, "Singular Polynomial Ring ", s)
+   if libSingular.rIsQuotientRing(R.ptr)
+     print(io, "Singular Polynomial Quotient Ring ", s)
+   else
+     print(io, "Singular Polynomial Ring ", s)
+   end
 end
 
 function show(io::IO, a::spoly)
