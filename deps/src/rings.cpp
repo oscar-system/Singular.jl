@@ -70,6 +70,11 @@ void singular_define_rings(jlcxx::Module & Singular)
 
     return r->qideal != NULL;
     });
+    Singular.method("rQuotientRing", [](ideal i, ring r) {
+        ring Q = rCopy(r);
+        Q->qideal = id_Copy(i, r);
+        return Q;
+    });
     Singular.method("rBitmask",
                     [](ip_sring * r) { return (unsigned int)r->bitmask; });
     Singular.method("rPar", [](coeffs cf){
