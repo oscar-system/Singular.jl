@@ -194,7 +194,7 @@ include("LibSingular.jl")
 
 include("Number.jl")
 
-include("Poly.jl")
+include("PolyAlg.jl")
 
 include("Module.jl")
 
