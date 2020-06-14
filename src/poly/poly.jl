@@ -27,7 +27,7 @@ export ordering_lp, ordering_rp, ordering_dp, ordering_Dp, ordering_wp, ordering
 #
 ###############################################################################
 
-parent(p::spoly) = p.parent
+parent(p::polyalg) = p.parent
 
 base_ring(R::PolyRing{T}) where T <: Nemo.RingElem = R.base_ring::parent_type(T)
 
@@ -289,7 +289,7 @@ end
 #
 ###############################################################################
 
-function Base.iterate(x::Nemo.Generic.MPolyCoeffs{spoly{T}}) where T <: Nemo.RingElem
+function Base.iterate(x::Nemo.Generic.MPolyCoeffs{polyalg{T}}) where T <: Nemo.RingElem
    p = x.poly
    ptr = p.ptr
    if ptr.cpp_object == C_NULL
@@ -300,7 +300,7 @@ function Base.iterate(x::Nemo.Generic.MPolyCoeffs{spoly{T}}) where T <: Nemo.Rin
    end
 end
 
-function Base.iterate(x::Nemo.Generic.MPolyCoeffs{spoly{T}}, state) where T <: Nemo.RingElem
+function Base.iterate(x::Nemo.Generic.MPolyCoeffs{polyalg{T}}, state) where T <: Nemo.RingElem
    state = libSingular.pNext(state)
    if state.cpp_object == C_NULL
       return nothing
@@ -310,7 +310,7 @@ function Base.iterate(x::Nemo.Generic.MPolyCoeffs{spoly{T}}, state) where T <: N
    end
 end
 
-function Base.iterate(x::Nemo.Generic.MPolyExponentVectors{spoly{T}}) where T <: Nemo.RingElem
+function Base.iterate(x::Nemo.Generic.MPolyExponentVectors{polyalg{T}}) where T <: Nemo.RingElem
    p = x.poly
    ptr = p.ptr
    if ptr.cpp_object == C_NULL
@@ -323,7 +323,7 @@ function Base.iterate(x::Nemo.Generic.MPolyExponentVectors{spoly{T}}) where T <:
    end
 end
 
-function Base.iterate(x::Nemo.Generic.MPolyExponentVectors{spoly{T}}, state) where T <: Nemo.RingElem
+function Base.iterate(x::Nemo.Generic.MPolyExponentVectors{polyalg{T}}, state) where T <: Nemo.RingElem
    state = libSingular.pNext(state)
    if state.cpp_object == C_NULL
       return nothing
@@ -335,7 +335,7 @@ function Base.iterate(x::Nemo.Generic.MPolyExponentVectors{spoly{T}}, state) whe
    end
 end
 
-function Base.iterate(x::Nemo.Generic.MPolyTerms{spoly{T}}) where T <: Nemo.RingElem
+function Base.iterate(x::Nemo.Generic.MPolyTerms{polyalg{T}}) where T <: Nemo.RingElem
    p = x.poly
    ptr = p.ptr
    if ptr.cpp_object == C_NULL
@@ -346,7 +346,7 @@ function Base.iterate(x::Nemo.Generic.MPolyTerms{spoly{T}}) where T <: Nemo.Ring
    end
 end
 
-function Base.iterate(x::Nemo.Generic.MPolyTerms{spoly{T}}, state) where T <: Nemo.RingElem
+function Base.iterate(x::Nemo.Generic.MPolyTerms{polyalg{T}}, state) where T <: Nemo.RingElem
    state = libSingular.pNext(state)
    if state.cpp_object == C_NULL
       return nothing
@@ -356,7 +356,7 @@ function Base.iterate(x::Nemo.Generic.MPolyTerms{spoly{T}}, state) where T <: Ne
    end
 end
 
-function Base.iterate(x::Nemo.Generic.MPolyMonomials{spoly{T}}) where T <: Nemo.RingElem
+function Base.iterate(x::Nemo.Generic.MPolyMonomials{polyalg{T}}) where T <: Nemo.RingElem
    p = x.poly
    ptr = p.ptr
    if ptr.cpp_object == C_NULL
@@ -374,7 +374,7 @@ function Base.iterate(x::Nemo.Generic.MPolyMonomials{spoly{T}}) where T <: Nemo.
    end
 end
 
-function Base.iterate(x::Nemo.Generic.MPolyMonomials{spoly{T}}, state) where T <: Nemo.RingElem
+function Base.iterate(x::Nemo.Generic.MPolyMonomials{polyalg{T}}, state) where T <: Nemo.RingElem
    state = libSingular.pNext(state)
    if state.cpp_object == C_NULL
       return nothing
@@ -407,7 +407,7 @@ function show(io::IO, R::PolyRing)
    end
 end
 
-function Base.show(io::IO, a::spoly)
+function Base.show(io::IO, a::polyalg)
    print(io, AbstractAlgebra.obj_to_string(a, context = io))
 end
 
@@ -1145,7 +1145,7 @@ function MPolyBuildCtx(R::PolyRing)
    GC.@preserve t return MPolyBuildCtx(R, t.ptr)
 end
 
-function push_term!(M::MPolyBuildCtx{spoly{S}, U}, c::S, expv::Vector{Int}) where {U, S <: Nemo.RingElem}
+function push_term!(M::MPolyBuildCtx{polyalg{S}, U}, c::S, expv::Vector{Int}) where {U, S <: Nemo.RingElem}
    if c == 0
       return
    end
@@ -1171,7 +1171,7 @@ function push_term!(M::MPolyBuildCtx{spoly{S}, U}, c::S, expv::Vector{Int}) wher
    end
 end
 
-function finish(M::MPolyBuildCtx{spoly{S}, U}) where {S, U}
+function finish(M::MPolyBuildCtx{polyalg{S}, U}) where {S, U}
    p = sort_terms!(M.poly)
    return p
 end

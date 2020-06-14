@@ -54,7 +54,7 @@ mutable struct WeylAlgebra{T <: Nemo.RingElem} <: AbstractAlgebra.NCRing
          ord[1] = ordering
          ord[2] = ordering2
          ord[3] = ringorder_no
-         ptr = libSingular.rDefaultWeyl(r, v, ord, blk0, blk1, bitmask)
+         ptr = libSingular.rWeyl(r, v, ord, blk0, blk1, bitmask)
          @assert degree_bound_adjusted == Int(libSingular.rBitmask(ptr))
          d = WeylAlgebraID[R, s, ordering, ordering2, degree_bound_adjusted] =
                new(ptr, R, ord_sym, 1)
