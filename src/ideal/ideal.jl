@@ -91,7 +91,7 @@ which $I$ is an ideal. The ideal must be over a polynomial ring
 over a field, and a Groebner basis.
 """
 function dimension(I::sideal{S}) where S <: Union{spoly{T}, spoly{n_unknown{U}}} where {T <: Singular.FieldElem, U <: Nemo.FieldElem}
-   I.isGB == false && error("I needs to be a GrÃ¶bner basis.")
+   I.isGB == false && error("I needs to be a Gröbner basis.")
    R = base_ring(I)
    GC.@preserve I R return Int(libSingular.scDimInt(I.ptr, R.ptr))
 end
@@ -400,9 +400,9 @@ end
 Given an ideal $I$ this function computes a Groebner basis for it.
 Compared to `std`, `slimgb` uses different strategies for choosing
 a reducer.
->
+
 If the optional parameter `complete_reduction` is set to `true` the
-function computes a reduced GrÃ¶bner basis for $I$.
+function computes a reduced Gröbner basis for $I$.
 """
 function slimgb(I::sideal; complete_reduction::Bool=false)
    R = base_ring(I)
@@ -836,10 +836,10 @@ end
     independent_sets(I::sideal{S}) where S <: Union{spoly{T}, spoly{n_unknown{U}}} where {T <: Singular.FieldElem, U <: Nemo.FieldElem}
 
 Returns all non-extendable independent sets of $lead(I)$. $I$ has to be given
-by a GrÃ¶bner basis.
+by a Gröbner basis.
 """
 function independent_sets(I::sideal{S}) where S <: Union{spoly{T}, spoly{n_unknown{U}}} where {T <: Singular.FieldElem, U <: Nemo.FieldElem}
-   I.isGB == false && error("I needs to be a GrÃ¶bner basis.")
+   I.isGB == false && error("I needs to be a Gröbner basis.")
    R = base_ring(I)
    n = nvars(R)
    a = Array{Int32, 1}()
@@ -861,12 +861,12 @@ end
     maximal_independent_set(I::sideal{S}; all::Bool = false) where S <: Union{spoly{T}, spoly{n_unknown{U}}} where {T <: Singular.FieldElem, U <: Nemo.FieldElem}
 
 Returns, by default, an array containing a maximal independet set of
-$lead(I)$. $I$ has to be given by a GrÃ¶bner basis.
+$lead(I)$. $I$ has to be given by a Gröbner basis.
 If the additional parameter "all" is set to true, an array containing
 all maximal independent sets of $lead(I)$ is returned.
 """
 function maximal_independent_set(I::sideal{S}; all::Bool = false) where S <: Union{spoly{T}, spoly{n_unknown{U}}} where {T <: Singular.FieldElem, U <: Nemo.FieldElem}
-   I.isGB == false && error("I needs to be a GrÃ¶bner basis.")
+   I.isGB == false && error("I needs to be a Gröbner basis.")
    R = base_ring(I)
    Q = base_ring(R)
    d = dimension(I)
@@ -889,3 +889,78 @@ function maximal_independent_set(I::sideal{S}; all::Bool = false) where S <: Uni
       return P
    end
 end
+
+###############################################################################
+#
+#   Ideal constructors
+#
+###############################################################################
+
+function Ideal(R::PolyRing{T}, ids::spoly{T}...) where T <: Nemo.RingElem
+   S = elem_type(R)
+   length(ids) == 0 && return sideal{S}(R, R(0))
+   return sideal{S}(R, ids...)
+end
+
+function Ideal(R::PolyRing{T}, ids::Array{spoly{T}, 1}) where T <: Nemo.RingElem
+   S = elem_type(R)
+   return sideal{S}(R, ids...)
+end
+
+function Ideal(R::PolyRing{T}, id::libSingular.ideal_ptr) where T <: Nemo.RingElem
+   S = elem_type(R)
+   return sideal{S}(R, id)
+end
+
+function (R::PolyRing{T})(id::libSingular.ideal_ptr) where T <: Nemo.RingElem
+    return Ideal(R,id)
+end
+
+# maximal ideal in degree d
+function MaximalIdeal(R::PolyRing{T}, d::Int) where T <: Nemo.RingElem
+   (d > typemax(Cint) || d < 0) && throw(DomainError())
+   S = elem_type(R)
+   ptr = libSingular.id_MaxIdeal(Cint(d), R.ptr)
+   return sideal{S}(R, ptr)
+end
+
+function Ideal(R::WeylAlgebra{T}, ids::pweyl{T}...) where T <: Nemo.RingElem
+   S = elem_type(R)
+   length(ids) == 0 && return sideal{S}(R, R(0))
+   return sideal{S}(R, ids...)
+end
+
+function Ideal(R::WeylAlgebra{T}, ids::Array{pweyl{T}, 1}) where T <: Nemo.RingElem
+   S = elem_type(R)
+   return sideal{S}(R, ids...)
+end
+
+function Ideal(R::WeylAlgebra{T}, id::libSingular.ideal_ptr) where T <: Nemo.RingElem
+   S = elem_type(R)
+   return sideal{S}(R, id)
+end
+
+function (R::WeylAlgebra{T})(id::libSingular.ideal_ptr) where T <: Nemo.RingElem
+   return Ideal(R,id)
+end
+
+function Ideal(R::ExteriorAlgebra{T}, ids::pexterior{T}...) where T <: Nemo.RingElem
+   S = elem_type(R)
+   length(ids) == 0 && return sideal{S}(R, R(0))
+   return sideal{S}(R, ids...)
+end
+
+function Ideal(R::ExteriorAlgebra{T}, ids::Array{pexterior{T}, 1}) where T <: Nemo.RingElem
+   S = elem_type(R)
+   return sideal{S}(R, ids...)
+end
+
+function Ideal(R::ExteriorAlgebra{T}, id::libSingular.ideal_ptr) where T <: Nemo.RingElem
+   S = elem_type(R)
+   return sideal{S}(R, id)
+end
+
+function (R::ExteriorAlgebra{T})(id::libSingular.ideal_ptr) where T <: Nemo.RingElem
+   return Ideal(R,id)
+end
+
