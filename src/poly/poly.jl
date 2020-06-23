@@ -265,11 +265,11 @@ function deepcopy_internal(p::spoly, dict::IdDict)
    return R(p2)
 end
 
-function check_parent(a::spoly{T}, b::spoly{T}) where T <: Nemo.RingElem
+function check_parent(a::polyalg{T}, b::polyalg{T}) where T <: Nemo.RingElem
    parent(a) != parent(b) && error("Incompatible parent objects")
 end
 
-function canonical_unit(a::spoly{T}) where T <: Nemo.RingElem
+function canonical_unit(a::polyalg{T}) where T <: Nemo.RingElem
   return iszero(a) ? one(base_ring(a)) : canonical_unit(leading_coefficient(a))
 end
 
