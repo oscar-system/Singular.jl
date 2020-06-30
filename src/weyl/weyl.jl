@@ -216,9 +216,10 @@ end
 #
 ###############################################################################
 
-function WeylAlgebra(R::Union{Ring, Field}, s::Array{String, 1};
+function WeylAlgebra(R::Union{Ring, Field}, s1::Array{String, 1};
       cached::Bool = true, ordering::Symbol = :degrevlex,
       ordering2::Symbol = :comp1min, degree_bound::Int = 0)
+   s = vcat(s1, ["d"*sym for sym in s1])
    U = [Symbol(v) for v in s]
    T = elem_type(R)
    parent_obj = WeylAlgebra{T}(R, U, ordering, cached, sym2ringorder[ordering],
@@ -226,9 +227,35 @@ function WeylAlgebra(R::Union{Ring, Field}, s::Array{String, 1};
    return tuple(parent_obj, gens(parent_obj))
 end
 
-function WeylAlgebra(R::Nemo.Ring, s::Array{String, 1}; cached::Bool = true,
+function WeylAlgebra(R::Union{Ring, Field}, s2::Array{String, 2};
+      cached::Bool = true, ordering::Symbol = :degrevlex,
+      ordering2::Symbol = :comp1min, degree_bound::Int = 0)
+   size(s2)[1] != 2 && error("Array of symbols should have two rows")
+   s = vcat(s2[1, :], s2[2, :])
+   U = [Symbol(v) for v in s]
+   T = elem_type(R)
+   parent_obj = WeylAlgebra{T}(R, U, ordering, cached, sym2ringorder[ordering],
+         sym2ringorder[ordering2], degree_bound)
+   return tuple(parent_obj, gens(parent_obj))
+end
+
+function WeylAlgebra(R::Nemo.Ring, s1::Array{String, 1}; cached::Bool = true,
       ordering::Symbol = :degrevlex, ordering2::Symbol = :comp1min,
       degree_bound::Int = 0)
+   s = vcat(s1, ["d"*sym for sym in s1])
+   S = CoefficientRing(R)
+   U = [Symbol(v) for v in s]
+   T = elem_type(S)
+   parent_obj = WeylAlgebra{T}(S, U, ordering, cached, sym2ringorder[ordering],
+         sym2ringorder[ordering2], degree_bound)
+   return tuple(parent_obj, gens(parent_obj))
+end
+
+function WeylAlgebra(R::Nemo.Ring, s2::Array{String, 2}; cached::Bool = true,
+      ordering::Symbol = :degrevlex, ordering2::Symbol = :comp1min,
+      degree_bound::Int = 0)
+   size(s2)[1] != 2 && error("Array of symbols should have two rows")
+   s = vcat(s2[1, :], s2[2, :])
    S = CoefficientRing(R)
    U = [Symbol(v) for v in s]
    T = elem_type(S)
