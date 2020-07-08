@@ -1099,6 +1099,13 @@ function (R::PolyRing{T})(n::T) where T <: Nemo.RingElem
    return z
 end
 
+function (R::Singular.PolyRing{T})(n::T) where T<:Singular.n_unknown
+   parent(n) != base_ring(R) && error("Unable to coerce into polynomial ring")
+   z = spoly{T}(R, n.ptr)
+   z.parent = R
+   return z
+end
+
 function (R::PolyRing{S})(n::T) where {S <: Nemo.RingElem, T <: Nemo.RingElem}
    return R(base_ring(R)(n))
 end
