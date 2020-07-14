@@ -63,7 +63,7 @@ end
 
 function fqInpNeg(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    cf_ptr = get_coeff_data_void(cf)
-   ccall((:fq_neg, :libflint), Cvoid,
+   ccall((:fq_neg, libflint), Cvoid,
 	 (Ptr{Nemo.fq}, Ptr{Nemo.fq}, Ptr{Nemo.FqFiniteField}),
 	   a, a, cf_ptr)
    return a

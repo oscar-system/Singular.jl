@@ -375,7 +375,7 @@ promote_rule(C::Type{n_Z}, ::Type{T}) where {T <: Integer} = n_Z
 
 function (R::Integers)(x::Nemo.fmpz)
    a = BigInt()
-   ccall((:flint_mpz_init_set_readonly, :libflint), Nothing,
+   ccall((:flint_mpz_init_set_readonly, libflint), Nothing,
          (Ptr{BigInt}, Ptr{fmpz}), Ref(a), Ref(x))
    return R(libSingular.n_InitMPZ(a, R.ptr))   
 end

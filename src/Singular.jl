@@ -55,6 +55,10 @@ const pkgdir = realpath(joinpath(dirname(@__FILE__), ".."))
 const prefix = joinpath(pkgdir, "deps", "usr")
 const libsingular = joinpath(prefix, "lib", "libSingular")
 const binSingular = joinpath(prefix, "bin", "Singular")
+
+const libflint = Nemo.libflint
+const libantic = Nemo.libantic
+
 if !isfile(binSingular)
     error("""Singular.jl needs to be compiled; please run `using Pkg; Pkg.build("Singular")`""")
 end

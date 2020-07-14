@@ -61,7 +61,7 @@ function fmpqNeg(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
 end
 
 function fmpqInpNeg(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
-    ccall((:fmpq_neg, :libflint), Cvoid, (Ptr{Nemo.fmpq}, Ptr{Nemo.fmpq}), a, a)
+    ccall((:fmpq_neg, libflint), Cvoid, (Ptr{Nemo.fmpq}, Ptr{Nemo.fmpq}), a, a)
     return a
 end
 
