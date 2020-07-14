@@ -3,6 +3,8 @@ module libSingular
 import Libdl
 using CxxWrap
 
+import ..Singular: libflint, libantic
+
 const libsingularwrap_path = joinpath(@__DIR__, "..", "deps", "usr",
                 "lib", "libsingularwrap." * Libdl.dlext)
 if !isfile(libsingularwrap_path)

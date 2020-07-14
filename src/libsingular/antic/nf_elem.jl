@@ -63,7 +63,7 @@ end
 
 function nf_elemInpNeg(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    cf_ptr = get_coeff_data_void(cf)
-   ccall((:nf_elem_neg, :libantic), Cvoid,
+   ccall((:nf_elem_neg, libantic), Cvoid,
 	 (Ptr{Nemo.nf_elem}, Ptr{Nemo.nf_elem}, Ptr{Nemo.AnticNumberField}),
 	   a, a, cf_ptr)
    return a
