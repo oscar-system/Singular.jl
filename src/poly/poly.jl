@@ -1011,6 +1011,10 @@ function promote_rule(::Type{spoly{T}}, ::Type{U}) where {T <: Nemo.RingElem, U 
    promote_rule(T, U) == T ? spoly{T} : Union{}
 end
 
+function promote_rule(::Type{spoly{T}}, ::Type{T}) where {T <: Nemo.RingElem}
+   return spoly{T}
+end
+
 ###############################################################################
 #
 #   Build context

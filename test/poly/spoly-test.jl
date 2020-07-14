@@ -138,6 +138,9 @@ end
    @test Singular.substitute_variable(p, 2, q) == 2*x
    @test Singular.permute_variables(q, [2, 1], R) == y
 
+   @test x * QQ(2) == QQ(2) * x
+   @test x * 2 == 2 * x
+
    for i = 1:nvars(R)
       @test gen(R, i) == gens(R)[i]
    end
@@ -153,6 +156,7 @@ end
    @test lc(3x^2 + 2x + 1) == 3
    @test lm(3x^2 + 2x + 1) == x^2
    @test lt(3x^2 + 2x + 1) == 3x^2
+
 end
 
 @testset "spoly.change_base_ring..." begin
