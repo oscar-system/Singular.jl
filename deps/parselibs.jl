@@ -1,4 +1,6 @@
-function execute(cmd::Cmd)
+function execute(libparse, path)
+  res = libparse() do exe
+    cmd = `$exe $path`
     out = Pipe()
     err = Pipe()
   
@@ -6,17 +8,18 @@ function execute(cmd::Cmd)
     close(out.in)
     close(err.in)
   
-    (stdout = String(read(out)), 
-      stderr = String(read(err)),  
-      code = process.exitcode)
+    return (stdout = String(read(out)), 
+            stderr = String(read(err)),  
+            code = process.exitcode)
+  end
 end
 
-libparsepath = abspath(joinpath(@__DIR__, "usr", "bin", "libparse"))
+libparsepath = abspath(joinpath(prefixpath, "bin", "libparse"))
 
 if haskey(ENV, "SINGULAR_LIBRARY_DIR")
     library_dir = ENV["SINGULAR_LIBRARY_DIR"]
 else
-    library_dir = abspath(joinpath(@__DIR__, "usr", "share", "singular", "LIB"))
+    library_dir = abspath(joinpath(prefixpath, "share", "singular", "LIB"))
 end
 
 filenames = filter(x -> endswith(x, ".lib"), readdir(library_dir))
@@ -31,12 +34,12 @@ output_filename = abspath(joinpath(@__DIR__, "..", "src", "libraryfuncdictionary
   All other columns (containing info such as line numbers, library name, etc)
   are ignored.
 =#
-cd(abspath(joinpath(@__DIR__, "usr", "bin"))) do
+cd(abspath(joinpath(prefixpath, "bin"))) do
     open(output_filename, "w") do outputfile
         println(outputfile, "libraryfunctiondictionary = Dict(")
         for i in filenames
             full_path = joinpath(library_dir, i)
-            libs = execute(`$libparsepath $full_path`)
+            libs = execute(Singular_jll.libparse, full_path)
             if libs.stderr != ""
                 error("from libparse: $(libs.stderr)")
             end

@@ -12,6 +12,7 @@ using Markdown
 using Nemo
 using Pkg
 using lib4ti2_jll
+using Singular_jll
 
 import Base: abs, checkbounds, convert, deepcopy, deepcopy_internal,
              denominator, div, divrem, exponent,
@@ -52,9 +53,9 @@ export ZZ, QQ, FiniteField, FunctionField, CoefficientRing, Fp
 ###############################################################################
 
 const pkgdir = realpath(joinpath(dirname(@__FILE__), ".."))
-const prefix = joinpath(pkgdir, "deps", "usr")
-const libsingular = joinpath(prefix, "lib", "libSingular")
-const binSingular = joinpath(prefix, "bin", "Singular")
+
+const libsingular = Singular_jll.libsingular
+const binSingular = Singular_jll.Singular_path
 
 const libflint = Nemo.libflint
 const libantic = Nemo.libantic
