@@ -15,8 +15,8 @@ message(STATUS "Found JlCxx at ${JlCxx_location}")
 include_directories(${singular_includes})
 include_directories(${singular_includes}/singular)
 
-SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g ${extra_cppflags}" )
-SET( CMAKE_SHARED_LINKER_FLAGS  "${CMAKE_SHARED_LINKER_FLAGS} -L${singular_libdir} -Wl,-rpath,${singular_libdir}" )
+SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g ${extra_cppflags} -I${gmp_dir}/include -I${mpfr_dir}/include" )
+SET( CMAKE_SHARED_LINKER_FLAGS  "${CMAKE_SHARED_LINKER_FLAGS} -v -L${singular_libdir} -L${gmp_dir}/lib -L${mpfr_dir}/lib -Wl,-rpath,${singular_libdir} -Wl,-rpath,${gmp_dir}/lib -Wl,-rpath,${mpfr_dir}/lib" )
 
 
 add_library(singularwrap SHARED singular.cpp rings.cpp coeffs.cpp ideals.cpp matrices.cpp caller.cpp coeff_rings.cpp threading.cpp)
