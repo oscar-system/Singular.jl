@@ -283,6 +283,18 @@ module Sync
 
 end
 
+macro sync(expr)
+    quote
+        try
+            Sync._lock()
+            $(esc(expr))
+        finally
+            Sync._unlock()
+        end
+    end
+end
+
+
 @static if false
     eval(:(module WrapExample
         display(x::Int) = println("Int: $x")
