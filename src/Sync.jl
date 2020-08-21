@@ -1,4 +1,21 @@
+# This module provides an automatic wrapping mechanism for Singular
+# that supports mutual exclusion in multi-threaded code.
+#
+# In order to use it, simply substitute calls to
+#
+#       Singular.f(...)
+#
+# with calls to:
+#
+#       Singular.Sync.f(...)
+#
+# Future versions may offer automatic locking for Singular by default
+# in multi-threaded programs.
+
 module Sync
+
+    # import the normal modules in use by Singular so that forwarded
+    # definitions have access to the necessary types defined by them.
 
     using Singular
     using AbstractAlgebra
@@ -13,6 +30,9 @@ module Sync
     import Base: reduce
 
     const _mutex = ReentrantLock()
+    const _reserved = Set([
+        :eval, :include, :__init__,
+    ])
 
     function _lock()
         Base.lock(_mutex)
@@ -217,11 +237,17 @@ module Sync
         end
     end
 
+    function _forward_value(mod :: Module, name :: Symbol)
+        if !(Base.isbindingresolved(Sync, name))
+            code = :( const $(name) = $(mod).$(name) )
+            Sync.eval(code)
+        end
+    end
+
     function _wrap_module(mod :: Module)
-        reserved = Set([:eval, :include, :__init__])
 
         function find_def(name)
-            if '#' in string(name) || name in reserved
+            if '#' in string(name) || name in _reserved
                 return nothing
             end
             try
@@ -232,23 +258,27 @@ module Sync
         end
 
 
-        # num_errors = 0
+        errors = []
+        unwrapped = Set{Symbol}()
         for name in names(mod; all = true)
             def = find_def(name)
             if def isa Function
                 try
                     _wrap_methods(mod, def)
                 catch
+                    _forward_value(mod, name)
+                    push!(errors, name)
                     # debugging code
-                    println("error wrapping $name[$method_num]")
-                    for (exception, backtrace) in Base.catch_stack()
-                        # showerror(stdout, exception, backtrace)
-                        # println()
-                    end
+                    # println("error wrapping $name[$method_num]")
+                    # for (exception, backtrace) in Base.catch_stack()
+                    #     showerror(stdout, exception, backtrace)
+                    #     println()
+                    # end
                 end
+            elseif def !== nothing
+              _forward_value(mod, name)
             end
         end
-        # println("error count: $(num_errors)")
     end
 
 end
@@ -258,7 +288,6 @@ end
         display(x::Int) = println("Int: $x")
         display(x::String) = println("String: $x")
         export display
-        # f(x::T, Y::U) where {T, U} = 0
         display2(;alpha = 1, kw...) = println("kw: alpha = $(alpha); $(kw)")
         display3(x::T) where {T <: Int} = println("varargs: $(x)")
         display4(x...) where Q = println(x)
