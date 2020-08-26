@@ -3,14 +3,9 @@ module libSingular
 import Libdl
 using CxxWrap
 
-import ..Singular: libflint, libantic
+import ..Singular: libflint, libantic, libsingular_julia
 
-const libsingularwrap_path = joinpath(@__DIR__, "..", "deps", "usr",
-                "lib", "libsingularwrap." * Libdl.dlext)
-if !isfile(libsingularwrap_path)
-    error("""Singular.jl needs to be compiled; please run `using Pkg; Pkg.build("Singular")`""")
-end
-@wrapmodule(realpath(libsingularwrap_path))
+@wrapmodule(libsingular_julia)
 
 function __init__()
    @initcxx
