@@ -13,6 +13,7 @@ using Nemo
 using Pkg
 using lib4ti2_jll
 using Singular_jll
+using libsingular_julia_jll
 
 import Base: abs, checkbounds, convert, deepcopy, deepcopy_internal,
              denominator, div, divrem, exponent,
@@ -57,12 +58,10 @@ const pkgdir = realpath(joinpath(dirname(@__FILE__), ".."))
 const libsingular = Singular_jll.libsingular
 const binSingular = Singular_jll.Singular_path
 
+const libsingula_julia = libsingular_julia_jll.libsingular_julia
+
 const libflint = Nemo.libflint
 const libantic = Nemo.libantic
-
-if !isfile(binSingular)
-    error("""Singular.jl needs to be compiled; please run `using Pkg; Pkg.build("Singular")`""")
-end
 
 mapping_types = nothing
 mapping_types_reversed = nothing
