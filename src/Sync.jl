@@ -283,7 +283,7 @@ module Sync
 
 end
 
-macro sync(expr)
+macro synchronize(expr)
     quote
         try
             Sync._lock()
