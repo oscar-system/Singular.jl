@@ -4,7 +4,6 @@ using Singular_jll
 
 import CxxWrap
 import Libdl
-import CMake
 
 using GMP_jll
 using MPFR_jll
