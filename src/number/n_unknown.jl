@@ -20,14 +20,14 @@ end
 
 function canonical_unit(a::n_unknown)
    R = parent(a)
-   n = libSingular.julia(a.ptr)
-   return R(libSingular.number(canonical_unit(n)))
+   n = libSingular.julia(Singular.libSingular.cast_number_to_void(a.ptr))
+   return R(canonical_unit(n))
 end
 
 function deepcopy_internal(a::n_unknown, dict::IdDict)
    R = parent(a)
-   n = libSingular.julia(a.ptr)
-   return R(libSingular.number(deepcopy(n)))
+   n = libSingular.julia(Singular.libSingular.cast_number_to_void(a.ptr))
+   return R(deepcopy(n))
 end
 
 function one(R::CoefficientRing)
@@ -39,7 +39,7 @@ function zero(R::CoefficientRing)
 end
 
 function hash(a::n_unknown, h::UInt)
-   n = libSingular.julia(a.ptr)
+   n = libSingular.julia(Singular.libSingular.cast_number_to_void(a.ptr))
    return xor(hash(n, h), 0x664e59de562461fe%UInt)
 end
 
@@ -56,12 +56,19 @@ end
 
 function show(io::IO, a::n_unknown)
    libSingular.StringSetS("")
-
    libSingular.n_Write(a.ptr, parent(a).ptr, false)
-
    m = libSingular.StringEndS()
-
    print(io, m)
+end
+
+function AbstractAlgebra.expressify(a::n_unknown; context = nothing)
+   n = libSingular.julia(Singular.libSingular.cast_number_to_void(a.ptr))
+   return AbstractAlgebra.expressify(n; context = context)
+end
+
+function AbstractAlgebra.needs_parentheses(a::n_unknown)
+   n = libSingular.julia(Singular.libSingular.cast_number_to_void(a.ptr))
+   return AbstractAlgebra.needs_parentheses(n)
 end
 
 ###############################################################################
