@@ -142,6 +142,8 @@ end
    @test hash((x+a*y)^2) == hash(x^2+2*a*x*y+(a+4)*y^2)
 
    @test deepcopy(f1c[1]) == f1c[1]
+
+   @test AbstractAlgebra.expressify((x+a*y)^2) isa Expr
 end
 
 @testset "Nemo.fq..." begin

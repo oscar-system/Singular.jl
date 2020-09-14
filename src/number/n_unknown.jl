@@ -66,11 +66,6 @@ function AbstractAlgebra.expressify(a::n_unknown; context = nothing)
    return AbstractAlgebra.expressify(n; context = context)
 end
 
-function AbstractAlgebra.needs_parentheses(a::n_unknown)
-   n = libSingular.julia(Singular.libSingular.cast_number_to_void(a.ptr))
-   return AbstractAlgebra.needs_parentheses(n)
-end
-
 ###############################################################################
 #
 #   Unary operators
