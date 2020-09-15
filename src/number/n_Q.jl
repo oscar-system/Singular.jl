@@ -1,4 +1,5 @@
-export n_Q, Rationals, reconstruct, isone, iszero, isunit, divexact
+export n_Q, Rationals, reconstruct, isone, iszero, isunit, divexact,
+       canonical_unit
 
 ###############################################################################
 #

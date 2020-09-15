@@ -41,12 +41,13 @@ end
 
 function fq_nmodWrite(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n = julia(a)::Nemo.fq_nmod
-   if Nemo.needs_parentheses(n)
-      str = "("*string(n)*")"
-   else
-      str = string(n)
-   end
-   libSingular.StringAppendS(str);
+   # parenthesize wrt * since this is probably a coeff. TODO move this to AA
+   prec = AbstractAlgebra.prec_inf_Times
+   obj = AbstractAlgebra.canonicalize(AbstractAlgebra.expressify(n))
+   S = AbstractAlgebra.printer([])
+   AbstractAlgebra.printExpr(S, obj, prec, prec)
+   str = AbstractAlgebra.getstring(S)
+   libSingular.StringAppendS(str)
    nothing
 end
 
