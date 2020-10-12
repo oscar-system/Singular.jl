@@ -357,14 +357,8 @@ promote_rule(C::Type{n_Q}, ::Type{n_Q}) = n_Z
 
 (::Rationals)(n::n_Q) = n
 
-(::Rationals)(n::libSingular.number_ptr) = n_Q(n) 
+(::Rationals)(n::libSingular.number_ptr) = n_Q(n)
 
 (Rational{BigInt})(x::Singular.n_Q) = convert(BigInt, numerator(x)) // convert(BigInt, denominator(x))
 
-function (R::Rationals)(x::Nemo.fmpz)
-   a = BigInt()
-   ccall((:flint_mpz_init_set_readonly, libflint), Nothing,
-         (Ptr{BigInt}, Ptr{fmpz}), Ref(a), Ref(x))
-   return R(libSingular.n_InitMPZ(a, R.ptr))   
-end
-
+(R::Rationals)(x::Nemo.fmpz) = convert_from_fmpz(R, x)

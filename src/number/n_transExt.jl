@@ -146,7 +146,7 @@ function show(io::IO, n::n_transExt)
    libSingular.n_Write(n.ptr, parent(n).ptr, false)
 
    m = libSingular.StringEndS()
-   
+
    print(io, m)
 end
 
@@ -160,10 +160,10 @@ show_minus_one(::Type{n_transExt}) = false
 #
 ###############################################################################
 
-function -(x::n_transExt) 
+function -(x::n_transExt)
     C = parent(x)
     ptr = libSingular.n_Neg(x.ptr, C.ptr)
-    return C(ptr) 
+    return C(ptr)
 end
 
 ###############################################################################
@@ -329,7 +329,7 @@ function (R::N_FField)()
 end
 
 function (R::N_FField)(x::Integer)
-   z = R(libSingular.n_InitMPZ(BigInt(x), R.ptr)) 
+   z = R(libSingular.n_InitMPZ(BigInt(x), R.ptr))
    z.parent = R
    return z
 end
@@ -346,17 +346,14 @@ function (R::N_FField)(n::n_transExt)
 end
 
 function (R::N_FField)(n::libSingular.number_ptr)
-   z = n_transExt(R, n) 
+   z = n_transExt(R, n)
    z.parent = R
    return z
 end
 
 function (R::N_FField)(x::Nemo.fmpz)
-   a = BigInt()
-   ccall((:flint_mpz_init_set_readonly, libflint), Nothing,
-         (Ptr{BigInt}, Ptr{fmpz}), Ref(a), Ref(x))
-   z = R(libSingular.n_InitMPZ(a, R.ptr))
-      z.parent = R
+   z = convert_from_fmpz(R, x)
+   z.parent = R
    return z
 end
 
@@ -388,4 +385,3 @@ function FunctionField(F::Singular.Field, n::Int; cached::Bool=true)
    S = ["a$i" for i in 1:n]
    return FunctionField(F, S)
 end
-

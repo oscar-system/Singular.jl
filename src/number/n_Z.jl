@@ -373,9 +373,11 @@ promote_rule(C::Type{n_Z}, ::Type{T}) where {T <: Integer} = n_Z
 
 (::Integers)(n::libSingular.number_ptr) = n_Z(n)
 
-function (R::Integers)(x::Nemo.fmpz)
+(R::Integers)(x::Nemo.fmpz) = convert_from_fmpz(R, x)
+
+function convert_from_fmpz(R, x::Nemo.fmpz)
    if Nemo._fmpz_is_small(x)
-      n_Z(x.d)
+      R(x.d)
    else
       mpz_facade = unsafe_load(Ptr{BigInt}(x.d << 2))
       R(libSingular.n_InitMPZ(mpz_facade, R.ptr))
