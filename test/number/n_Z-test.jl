@@ -170,6 +170,9 @@ end
       end
       @test convert(Int128, N) == n
       @test Int128(N) == n
+      @test ZZ(Nemo.fmpz(N)) == N
+      @test ZZ(Nemo.ZZ(N)) == N
+      @test ZZ(convert(Nemo.fmpz, N)) == N
       if n >= 0
          @test convert(UInt128, N) == n
          @test UInt128(N) == n

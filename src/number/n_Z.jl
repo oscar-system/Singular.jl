@@ -360,13 +360,16 @@ end
 
 promote_rule(C::Type{n_Z}, ::Type{T}) where {T <: Integer} = n_Z
 
-
 BigInt(n::n_Z) = libSingular.n_GetMPZ(n.ptr, parent(n).ptr)
 Integer(n::n_Z) = BigInt(n)
 (::Type{T})(n::n_Z) where {T <: Integer} = T(BigInt(n))
 
 convert(::Type{T}, n::n_Z) where {T <: Integer} = T(n)
 
+# fmpz
+Nemo.fmpz(n::n_Z) = Nemo.fmpz(BigInt(n))
+convert(::Type{Nemo.fmpz}, n::n_Z) = Nemo.fmpz(n)
+(::FlintIntegerRing)(n::n_Z) = Nemo.fmpz(n)
 
 ###############################################################################
 #
