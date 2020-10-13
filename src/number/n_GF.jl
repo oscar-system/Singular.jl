@@ -53,6 +53,8 @@ one(R::N_GField) = R(1)
 
 zero(R::N_GField) = R(0)
 
+gen(R::N_GField) = R(libSingular.n_Param(Cint(1), R.ptr))
+
 function isone(n::n_GF)
    c = parent(n)
    return libSingular.n_IsOne(n.ptr, c.ptr)
@@ -359,6 +361,5 @@ function FiniteField(p::Int, n::Int, S::String; cached=true)
    n*log(p) >= 20*log(2) && throw(DomainError())
    p^n >= 2^16 && throw(DomainError())
    par = N_GField(p, n, Symbol(S))
-   return par, par(libSingular.n_Param(Cint(1), par.ptr))
+   return par, gen(par)
 end
-
