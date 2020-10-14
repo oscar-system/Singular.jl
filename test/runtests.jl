@@ -1,5 +1,10 @@
 using Singular
 
+using Random: Random, MersenneTwister
+const rng = MersenneTwister()
+
+using RandomExtensions: make
+
 import AbstractAlgebra
 import Nemo
 

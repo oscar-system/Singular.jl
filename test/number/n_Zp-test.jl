@@ -133,3 +133,24 @@ end
    @test g == -x^4+2*x^3-x+1
 end
 
+@testset "n_Zp.rand..." begin
+   F = Fp(7)
+   @test rand(F) isa n_Zp
+   @test parent(rand(F)) == F
+   m = make(F, [1, 3])
+   for x in (rand(rng, F, [1, 3]),
+             rand(F, [1, 3]),
+             rand(rng, m),
+             rand(m))
+
+      @test parent(x) == F
+      @test x in [F(1), F(3)]
+   end
+   @test rand(m, 3) isa Vector{n_Zp}
+   @test rand(F, 3) isa Vector{n_Zp}
+   seed = rand(UInt128)
+   Random.seed!(rng, seed)
+   x = rand(rng, m)
+   Random.seed!(rng, seed)
+   @test x == rand(rng, m)
+end
