@@ -96,6 +96,12 @@ end
    @test 2 == ZZ(2)
    @test isequal(ZZ(2), 2)
    @test isequal(2, ZZ(2))
+
+   # fmpz
+   @test ZZ(3) == Nemo.fmpz(3)
+   @test Nemo.fmpz(3) == ZZ(3)
+   @test ZZ(3)^42 == Nemo.fmpz(3)^42
+   @test Nemo.fmpz(3)^42 == ZZ(3)^42
 end
 
 @testset "n_Z.powering..." begin
