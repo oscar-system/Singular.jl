@@ -27,6 +27,11 @@
 
    f = ZZ(Nemo.ZZ(123))
 
+   # should not crash
+   for i=1:100
+      f = ZZ(Nemo.ZZ(3)^(2*i)-1)
+   end
+
    @test isa(f, n_Z)
 end
 
@@ -38,7 +43,7 @@ end
    @test isone(one(ZZ))
    @test iszero(zero(ZZ))
    @test isunit(ZZ(1)) && isunit(ZZ(-1))
-   @test !isunit(ZZ(2)) && !isunit(ZZ(0)) 
+   @test !isunit(ZZ(2)) && !isunit(ZZ(0))
 
    @test numerator(ZZ(2)) == 2
    @test denominator(ZZ(2)) == 1

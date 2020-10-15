@@ -374,13 +374,17 @@ promote_rule(C::Type{n_Z}, ::Type{T}) where {T <: Integer} = n_Z
 
 (::Integers)(n::n_Z) = n
 
-(::Integers)(n::libSingular.number_ptr) = n_Z(n) 
+(::Integers)(n::libSingular.number_ptr) = n_Z(n)
 
-function (R::Integers)(x::Nemo.fmpz)
-   a = BigInt()
-   ccall((:flint_mpz_init_set_readonly, libflint), Nothing,
-         (Ptr{BigInt}, Ptr{fmpz}), Ref(a), Ref(x))
-   return R(libSingular.n_InitMPZ(a, R.ptr))   
+(R::Integers)(x::Nemo.fmpz) = convert_from_fmpz(R, x)
+
+function convert_from_fmpz(R, x::Nemo.fmpz)
+   if Nemo._fmpz_is_small(x)
+      R(x.d)
+   else
+      mpz_facade = unsafe_load(Ptr{BigInt}(x.d << 2))
+      R(libSingular.n_InitMPZ(mpz_facade, R.ptr))
+   end
 end
 
 function convert(::Type{BigInt}, n::n_Z)

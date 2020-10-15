@@ -326,17 +326,14 @@ end
 (R::N_ZnRing)(n::n_Zn) = n
 
 function (R::N_ZnRing)(n::libSingular.number_ptr)
-   z = n_Zn(R, n) 
+   z = n_Zn(R, n)
    z.parent = R
    return z
 end
 
 function (R::N_ZnRing)(x::Nemo.fmpz)
-   a = BigInt()
-   ccall((:flint_mpz_init_set_readonly, libflint), Nothing,
-         (Ptr{BigInt}, Ptr{fmpz}), Ref(a), Ref(x))
-   z = R(libSingular.n_InitMPZ(a, R.ptr))
-      z.parent = R
+   z = convert_from_fmpz(R, x)
+   z.parent = R
    return z
 end
 

@@ -314,17 +314,14 @@ end
 (R::N_ZpField)(n::n_Zp) = n
 
 function (R::N_ZpField)(n::libSingular.number_ptr)
-   z = n_Zp(R, n) 
+   z = n_Zp(R, n)
    z.parent = R
    return z
 end
 
 function (R::N_ZpField)(x::Nemo.fmpz)
-   a = BigInt()
-   ccall((:flint_mpz_init_set_readonly, libflint), Nothing,
-         (Ptr{BigInt}, Ptr{fmpz}), Ref(a), Ref(x))
-   z = R(libSingular.n_InitMPZ(a, R.ptr))
-      z.parent = R
+   z = convert_from_fmpz(R, x)
+   z.parent = R
    return z
 end
 
