@@ -161,6 +161,46 @@ end
 
 @testset "n_Z.conversions..." begin
    for n in [-1, 0, 1, -BigInt(2)^65, BigInt(2)^65]
-      @test convert(BigInt, Singular.ZZ(n)) == n
+      N = ZZ(n)
+      @test convert(BigInt, N) == n
+      @test BigInt(N) == n
+      for z = (convert(Integer, N), Integer(N))
+         @test z isa BigInt
+         @test z == n
+      end
+      @test convert(Int128, N) == n
+      @test Int128(N) == n
+      @test ZZ(Nemo.fmpz(N)) == N
+      @test ZZ(Nemo.ZZ(N)) == N
+      @test ZZ(convert(Nemo.fmpz, N)) == N
+      if n >= 0
+         @test convert(UInt128, N) == n
+         @test UInt128(N) == n
+      else
+         @test_throws InexactError convert(UInt128, N)
+      end
+      if log2(abs(n)) < 63
+         @test convert(Int64, N) == n
+         @test Int64(N) == n
+         @test convert(Int, N) == n
+         @test Int(N) == n
+         if n >= 0
+            @test convert(UInt64, N) == n
+            @test convert(UInt, N) == n
+            @test UInt64(N) == n
+            @test UInt(N) == n
+         end
+      else
+         @test_throws InexactError convert(Int64, N)
+         @test_throws InexactError convert(UInt64, N)
+      end
+
+      b = BigInt(N)
+      # check no aliasing
+      @test b !== BigInt(N)
+      b.size = 0
+      if n != 0
+         @test N != 0
+      end
    end
 end

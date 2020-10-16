@@ -122,10 +122,10 @@ show_minus_one(::Type{n_Z}) = false
 #
 ###############################################################################
 
-function -(x::n_Z) 
+function -(x::n_Z)
     C = parent(x)
     ptr = libSingular.n_Neg(x.ptr, C.ptr)
-    return C(ptr) 
+    return C(ptr)
 end
 
 ###############################################################################
@@ -360,6 +360,17 @@ end
 
 promote_rule(C::Type{n_Z}, ::Type{T}) where {T <: Integer} = n_Z
 
+BigInt(n::n_Z) = libSingular.n_GetMPZ(n.ptr, parent(n).ptr)
+Integer(n::n_Z) = BigInt(n)
+(::Type{T})(n::n_Z) where {T <: Integer} = T(BigInt(n))
+
+convert(::Type{T}, n::n_Z) where {T <: Integer} = T(n)
+
+# fmpz
+Nemo.fmpz(n::n_Z) = Nemo.fmpz(BigInt(n))
+convert(::Type{Nemo.fmpz}, n::n_Z) = Nemo.fmpz(n)
+(::FlintIntegerRing)(n::n_Z) = Nemo.fmpz(n)
+
 ###############################################################################
 #
 #   Parent call functions
@@ -368,7 +379,7 @@ promote_rule(C::Type{n_Z}, ::Type{T}) where {T <: Integer} = n_Z
 
 (::Integers)() = n_Z()
 
-(R::Integers)(x::Integer) = R(libSingular.n_InitMPZ(BigInt(x), R.ptr)) 
+(R::Integers)(x::Integer) = R(libSingular.n_InitMPZ(BigInt(x), R.ptr))
 
 (::Integers)(n::Int) = n_Z(n)
 
@@ -386,8 +397,3 @@ function convert_from_fmpz(R, x::Nemo.fmpz)
       R(libSingular.n_InitMPZ(mpz_facade, R.ptr))
    end
 end
-
-function convert(::Type{BigInt}, n::n_Z)
-  return libSingular.n_GetMPZ(n.ptr, parent(n).ptr)
-end
-
