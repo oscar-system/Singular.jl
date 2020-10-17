@@ -279,6 +279,8 @@ end
 
 # define rand(::GaloisField)
 
+Random.gentype(::Type{N_ZpField}) = elem_type(N_ZpField)
+
 Random.Sampler(::Type{RNG}, R::N_ZpField, n::Random.Repetition) where {RNG<:AbstractRNG} =
    Random.SamplerSimple(R, Random.Sampler(RNG, Int(0):Int(characteristic(R)) - 1, n))
 
