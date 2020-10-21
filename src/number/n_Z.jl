@@ -373,6 +373,23 @@ convert(::Type{Nemo.fmpz}, n::n_Z) = Nemo.fmpz(n)
 
 ###############################################################################
 #
+#   Random generation
+#
+###############################################################################
+
+RandomExtensions.maketype(R::Integers, _) = n_Z
+
+# define rand(make(ZZ, n:m))
+rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make2{n_Z, Integers,
+                                                  <:AbstractArray{<:Integer}}}) =
+   sp[][1](rand(rng, sp[][2]))
+
+rand(rng::AbstractRNG, R::Integers, n) = R(rand(rng, n))
+
+rand(R::Integers, n) = rand(Random.GLOBAL_RNG, R, n)
+
+###############################################################################
+#
 #   Parent call functions
 #
 ###############################################################################
