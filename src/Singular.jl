@@ -26,6 +26,10 @@ import LinearAlgebra: normalize!, rank
 
 import Statistics: std
 
+using Random: Random, AbstractRNG, SamplerTrivial
+import Random: rand
+using RandomExtensions: RandomExtensions, make, Make2
+
 import Nemo: add!, addeq!, base_ring, canonical_unit,
              change_base_ring, characteristic, check_parent, codomain,
              coeff, coeffs, compose, contains, content, crt,

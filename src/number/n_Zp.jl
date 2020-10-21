@@ -270,6 +270,37 @@ function zero!(x::n_Zp)
    return x
 end
 
+
+###############################################################################
+#
+#   Random functions
+#
+###############################################################################
+
+# define rand(::GaloisField)
+
+Random.gentype(::Type{N_ZpField}) = elem_type(N_ZpField)
+
+Random.Sampler(::Type{RNG}, R::N_ZpField, n::Random.Repetition) where {RNG<:AbstractRNG} =
+   Random.SamplerSimple(R, Random.Sampler(RNG, Int(0):Int(characteristic(R)) - 1, n))
+
+rand(rng::AbstractRNG, R::Random.SamplerSimple{N_ZpField}) = R[](rand(rng, R.data))
+
+# define rand(make(::N_ZpField, dist))
+
+RandomExtensions.maketype(R::N_ZpField, _) = elem_type(R) # n_Zp
+
+rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make2{n_Zp,N_ZpField}}) =
+   sp[][1](rand(rng, sp[][2]))
+
+# define rand(::N_ZpField, integer_array)
+# we restrict to array so that the `rand` method producing arrays (e.g. rand(R, 3)) works
+
+rand(rng::AbstractRNG, R::N_ZpField, b::AbstractArray{<:Integer}) = rand(rng, make(R, b))
+
+rand(R::N_ZpField, b::AbstractArray{<:Integer}) = rand(Random.GLOBAL_RNG, R, b)
+
+
 ###############################################################################
 #
 #   Conversions and promotions
