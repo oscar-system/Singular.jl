@@ -333,6 +333,15 @@ promote_rule(C::Type{n_Q}, ::Type{Nemo.fmpz}) = n_Q
 
 promote_rule(C::Type{n_Q}, ::Type{n_Q}) = n_Z
 
+Rational{T}(x::n_Q) where {T} = convert(T, numerator(x)) // convert(T, denominator(x))
+Rational(x::n_Q) = Integer(numerator(x)) // Integer(denominator(x))
+
+convert(::Type{T}, x::n_Q) where {T <: Rational} = T(x)
+
+Nemo.fmpq(x::n_Q) = fmpq(fmpz(numerator(x)), fmpz(denominator(x)))
+convert(::Type{fmpq}, x::n_Q) = fmpq(x)
+(::FlintRationalField)(x::n_Q) = fmpq(x)
+
 ###############################################################################
 #
 #   Parent call functions
@@ -341,24 +350,24 @@ promote_rule(C::Type{n_Q}, ::Type{n_Q}) = n_Z
 
 (::Rationals)() = n_Q()
 
-(::Rationals)(n::Int) = n_Q(n)
-
 (::Rationals)(n::Int, m::Int) = n_Q(n) // n_Q(m)
-
-(::Rationals)(x::Rational{Int}) = n_Q(numerator(x)) // n_Q(denominator(x))
-
-(R::Rationals)(x::Rational{BigInt}) = R(numerator(x)) // R(denominator(x))
-
-(R::Rationals)(x::Integer) = R(libSingular.n_InitMPZ(BigInt(x), R.ptr)) 
-
-(R::Rationals)(x::Rational) = R(libSingular.n_InitMPZ(BigInt(numerator(x)), R.ptr)) // R(libSingular.n_InitMPZ(BigInt(denominator(x)), R.ptr))
-
-(::Rationals)(n::n_Z) = n_Q(n)
-
-(::Rationals)(n::n_Q) = n
 
 (::Rationals)(n::libSingular.number_ptr) = n_Q(n)
 
-(Rational{BigInt})(x::Singular.n_Q) = convert(BigInt, numerator(x)) // convert(BigInt, denominator(x))
+# from integers
 
-(R::Rationals)(x::Nemo.fmpz) = convert_from_fmpz(R, x)
+(::Rationals)(n::Int) = n_Q(n)
+
+(R::Rationals)(x::Integer) = R(libSingular.n_InitMPZ(BigInt(x), R.ptr))
+
+(::Rationals)(n::n_Z) = n_Q(n)
+
+(R::Rationals)(x::fmpz) = convert_from_fmpz(R, x)
+
+# from rationals
+
+(::Rationals)(x::Rational{Int}) = n_Q(numerator(x)) // n_Q(denominator(x))
+
+(R::Rationals)(x::Union{Rational,fmpq}) = R(numerator(x)) // R(denominator(x))
+
+(::Rationals)(n::n_Q) = n
