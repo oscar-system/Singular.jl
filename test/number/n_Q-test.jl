@@ -37,15 +37,30 @@
 
    @test isa(h, n_Q)
 
+   h2 = QQ(Nemo.ZZ(2), 3)
+
+   @test isa(h2, n_Q)
+   @test h2 == 2//3
+
+   h3 = QQ(ZZ(2), ZZ(3))
+
+   @test isa(h3, n_Q)
+   @test h3 == 2//3
+
    i = QQ(1//2)
 
    @test isa(i, n_Q)
    @test i == QQ(1) // QQ(2)
-   
+
    j = QQ(BigInt(1)//BigInt(2))
 
    @test isa(j, n_Q)
    @test j == QQ(1) // QQ(2)
+
+   k = QQ(Nemo.QQ(2, 3))
+
+   @test isa(k, n_Q)
+   @test k == QQ(2) // QQ(3)
 end
 
 @testset "n_Q.printing..." begin
@@ -154,5 +169,15 @@ end
 @testset "n_Q.conversions..." begin
    @test Singular.QQ(1//2) == Singular.QQ(1) // Singular.QQ(2)
    @test AbstractAlgebra.QQ(Singular.QQ(1) // Singular.QQ(2)) == 1//2
-end
 
+   s = Singular.QQ(1//2)
+   @test 1//2 == Rational{BigInt}(s) isa Rational{BigInt}
+   @test 1//2 == Rational(s) isa Rational{BigInt}
+   @test 1//2 == convert(Rational, s) isa Rational{BigInt}
+   @test 1//2 == Rational{Int}(s) isa Rational{Int}
+   @test 1//2 == convert(Rational{Int}, s) isa Rational{Int}
+
+   @test 1//2 == Nemo.QQ(s) isa Nemo.fmpq
+   @test 1//2 == Nemo.fmpq(s) isa Nemo.fmpq
+   @test 1//2 == convert(Nemo.fmpq, s) isa Nemo.fmpq
+end
