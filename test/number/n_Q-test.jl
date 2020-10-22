@@ -37,6 +37,16 @@
 
    @test isa(h, n_Q)
 
+   h2 = QQ(Nemo.ZZ(2), 3)
+
+   @test isa(h2, n_Q)
+   @test h2 == 2//3
+
+   h3 = QQ(ZZ(2), ZZ(3))
+
+   @test isa(h3, n_Q)
+   @test h3 == 2//3
+
    i = QQ(1//2)
 
    @test isa(i, n_Q)

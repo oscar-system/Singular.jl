@@ -350,7 +350,7 @@ convert(::Type{fmpq}, x::n_Q) = fmpq(x)
 
 (::Rationals)() = n_Q()
 
-(::Rationals)(n::Int, m::Int) = n_Q(n) // n_Q(m)
+(R::Rationals)(n::Union{Integer,fmpz,n_Z}, m::Union{Integer,fmpz,n_Z}) = R(n) // R(m)
 
 (::Rationals)(n::libSingular.number_ptr) = n_Q(n)
 
