@@ -204,3 +204,21 @@ end
       end
    end
 end
+
+@testset "n_Z.rand..." begin
+   @test rand(ZZ, 1:9) isa n_Z
+   Random.seed!(rng, 0)
+   t = rand(rng, ZZ, 1:9)
+   s = rand(rng, ZZ(1):ZZ(9))
+   r = rand(rng, make(ZZ, 1:9))
+   @test t isa n_Z
+   @test s isa n_Z
+   @test r isa n_Z
+   Random.seed!(rng, 0)
+   @test t == rand(rng, ZZ, 1:9)
+   @test s == rand(rng, ZZ(1):ZZ(9))
+   @test r == rand(rng, make(ZZ, 1:9))
+
+   rs = rand(make(ZZ, 1:9), 2, 3)
+   @test rs isa Matrix{n_Z}
+end
