@@ -15,6 +15,8 @@
    @test typeof(S) <: AbstractAlgebra.Set
    @test typeof(M) <: AbstractAlgebra.SetElem
 
+   @test S(M) === M
+
    N = std(I)
    V = Singular.Matrix(N)
 
@@ -29,6 +31,10 @@
    @test iszero(Z)
    @test isa(Z2, smatrix)
    @test iszero(Z2)
+
+   Rx, _ = PolynomialRing(QQ, ["x"])
+   Z = zero_matrix(Rx, 2, 3)
+   @test_throws ArgumentError S(Z)
 end
 
 @testset "smatrix.manipulation..." begin
