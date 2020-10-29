@@ -21,8 +21,10 @@ base_ring(a::N_GField) = Union{}
 > Return the characteristic of the field.
 """
 function characteristic(R::N_GField)
-   return ZZ(libSingular.n_GetChar(R.ptr))
+   return ZZ(_characteristic(R))
 end
+
+_characteristic(R::N_GField) = Int(libSingular.n_GetChar(R.ptr))
 
 @doc Markdown.doc"""
     degree(R::N_GField)
@@ -282,6 +284,29 @@ function zero!(x::n_GF)
    x.ptr = ptr
    return x
 end
+
+###############################################################################
+#
+#   Random functions
+#
+###############################################################################
+
+Random.Sampler(::Type{RNG}, K::N_GField, n::Random.Repetition) where {RNG<:AbstractRNG} =
+   SamplerSimple(K, Random.Sampler(RNG, 0:_characteristic(K) - 1, Val(Inf)))
+
+function rand(rng::AbstractRNG, Ksp::SamplerSimple{N_GField})
+   K = Ksp[]
+   r = degree(K)
+   alpha = gen(K)
+   res = zero(K)
+   for i = 0 : (r-1)
+      c = rand(rng, Ksp.data)
+      res += c * alpha^i
+   end
+   return res
+end
+
+Random.gentype(::Type{N_GField}) = elem_type(N_GField)
 
 ###############################################################################
 #
