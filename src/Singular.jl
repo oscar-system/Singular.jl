@@ -30,6 +30,8 @@ using Random: Random, AbstractRNG, SamplerTrivial, SamplerSimple
 import Random: rand
 using RandomExtensions: RandomExtensions, make, Make2
 
+import AbstractAlgebra: AbstractAlgebra, diagonal_matrix, zero_matrix
+
 import Nemo: add!, addeq!, base_ring, canonical_unit,
              change_base_ring, characteristic, check_parent, codomain,
              coeff, coeffs, compose, contains, content, crt,

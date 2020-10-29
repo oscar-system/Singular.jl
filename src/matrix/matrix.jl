@@ -205,6 +205,8 @@ end
       a :
       throw(ArgumentError("unable to coerce matrix"))
 
+(S::MatrixSpace)(n::Integer) = diagonal_matrix(S.base_ring(n), S.nrows, S.ncols)
+
 ###############################################################################
 #
 #   Matrix constructors
