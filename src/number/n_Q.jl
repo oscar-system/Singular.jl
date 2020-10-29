@@ -344,6 +344,32 @@ convert(::Type{fmpq}, x::n_Q) = fmpq(x)
 
 ###############################################################################
 #
+#   Random generation
+#
+###############################################################################
+
+RandomExtensions.maketype(R::Rationals, _) = n_Q
+
+# define rand(make(QQ, n:m))
+function rand(rng::AbstractRNG,
+              sp::SamplerTrivial{<:Make2{n_Q, Rationals,
+                                         <:AbstractArray{<:Integer}}})
+   R, v = sp[][1:end]
+   Z = base_ring(R)
+   n = rand(rng, v)
+   local d
+   while true
+      d = rand(rng, v)
+      iszero(d) || return R(n, d)
+   end
+end
+
+rand(rng::AbstractRNG, R::Rationals, n) = R(rand(rng, n))
+
+rand(R::Rationals, n) = rand(Random.GLOBAL_RNG, R, n)
+
+###############################################################################
+#
 #   Parent call functions
 #
 ###############################################################################

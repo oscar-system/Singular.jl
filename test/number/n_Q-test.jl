@@ -181,3 +181,21 @@ end
    @test 1//2 == Nemo.fmpq(s) isa Nemo.fmpq
    @test 1//2 == convert(Nemo.fmpq, s) isa Nemo.fmpq
 end
+
+@testset "n_Q.rand..." begin
+   for x in (rand(QQ, 1:9), rand(rng, QQ, 1:9),
+             rand(make(QQ, 1:9)))
+      @test x isa n_Q
+      @test numerator(x) <= 9
+      @test denominator(x) <= 9
+   end
+   Random.seed!(rng, 0)
+   M = rand(rng, make(QQ, 1:9), 2, 3)
+   @test M isa Matrix{n_Q}
+   foreach(M) do x
+      @test numerator(x) <= 9
+      @test denominator(x) <= 9
+   end
+   Random.seed!(rng, 0)
+   @test M == rand(rng, make(QQ, 1:9), 2, 3)
+end
