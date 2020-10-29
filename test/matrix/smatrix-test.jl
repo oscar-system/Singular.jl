@@ -19,12 +19,16 @@
    V = Singular.Matrix(N)
 
    Z = zero_matrix(R, 2 ,3)
+   Z2 = S()
    E = identity_matrix(R, 3)
 
    @test isa(E, smatrix)
    @test isa(M, smatrix)
    @test isa(V, smatrix)
    @test isa(Z, smatrix)
+   @test iszero(Z)
+   @test isa(Z2, smatrix)
+   @test iszero(Z2)
 end
 
 @testset "smatrix.manipulation..." begin
@@ -81,4 +85,3 @@ end
    @test M1 == M1
    @test M1 == deepcopy(M1)
 end
-

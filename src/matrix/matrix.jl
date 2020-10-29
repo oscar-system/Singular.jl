@@ -198,6 +198,8 @@ function (S::MatrixSpace{T})(ptr::libSingular.matrix_ptr) where T <: AbstractAlg
    return M
 end
 
+(S::MatrixSpace)() = zero_matrix(S.base_ring, S.nrows, S.ncols)
+
 ###############################################################################
 #
 #   Matrix constructors
