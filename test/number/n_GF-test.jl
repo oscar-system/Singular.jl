@@ -150,3 +150,26 @@ end
    @test g == x^16*y^4+x^9*y^3+x^5*y^2+x^23*y+x^20
 end
 
+@testset "n_GF.rand..." begin
+   R, x = FiniteField(17, 3, "x")
+
+   @inferred rand(R)
+   @test rand(R) isa n_GF
+   @test rand(R, 2) isa Vector{n_GF}
+   @test rand(R, 2, 3) isa Matrix{n_GF}
+
+   Random.seed!(rng, 0)
+   t = rand(rng, R)
+   @test t isa n_GF
+   s2 = rand(rng, R, 2)
+   @test s2 isa Vector{n_GF}
+   @test length(s2) == 2
+   s3 = rand(rng, R, 2, 3)
+   @test s3 isa Matrix{n_GF}
+   @test size(s3) == (2, 3)
+
+   Random.seed!(rng, 0)
+   @test t == rand(rng, R)
+   @test s2 == rand(rng, R, 2)
+   @test s3 == rand(rng, R, 2, 3)
+end
