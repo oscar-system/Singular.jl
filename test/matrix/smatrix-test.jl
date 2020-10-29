@@ -32,6 +32,11 @@
    @test isa(Z2, smatrix)
    @test iszero(Z2)
 
+   D = S(3) # TODO: test more interesting matrix dimensions
+   @test D isa smatrix
+   @test D[1, 1] == 3
+   @test D[1, 2] == 0
+
    Rx, _ = PolynomialRing(QQ, ["x"])
    Z = zero_matrix(Rx, 2, 3)
    @test_throws ArgumentError S(Z)
