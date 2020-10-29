@@ -200,6 +200,11 @@ end
 
 (S::MatrixSpace)() = zero_matrix(S.base_ring, S.nrows, S.ncols)
 
+(S::MatrixSpace)(a::smatrix) =
+   S.base_ring == a.base_ring && S.nrows == nrows(a) && S.ncols == ncols(a) ?
+      a :
+      throw(ArgumentError("unable to coerce matrix"))
+
 ###############################################################################
 #
 #   Matrix constructors
