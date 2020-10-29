@@ -51,7 +51,9 @@ end
    @test isone(one(R))
    @test iszero(zero(R))
    @test isunit(R(1)) && isunit(R(2))
-   @test !isunit(R(0)) 
+   @test !isunit(R(0))
+
+   @test gen(R) == x
 
    @test characteristic(R) == 5
    @test degree(R) == 2
