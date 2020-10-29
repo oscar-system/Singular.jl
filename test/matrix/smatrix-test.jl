@@ -37,9 +37,15 @@
    @test D[1, 1] == 3
    @test D[1, 2] == 0
 
+   D = S(x+y)
+   @test D isa smatrix
+   @test D[1, 1] == x+y
+   @test D[1, 2] == 0
+
    Rx, _ = PolynomialRing(QQ, ["x"])
    Z = zero_matrix(Rx, 2, 3)
    @test_throws ArgumentError S(Z)
+   @test_throws Exception S(Z[1, 1])
 end
 
 @testset "smatrix.manipulation..." begin
