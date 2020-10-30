@@ -253,7 +253,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-   jet(x::svector{spoly{T}}, n::Int)
+    jet(x::svector{spoly{T}}, n::Int)
 > Given a vector $x$ this function truncates each entry of $x$ up to degree $n$.
 """
 function jet(x::svector{spoly{T}}, n::Int) where T <: AbstractAlgebra.RingElem

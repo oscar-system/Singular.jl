@@ -820,7 +820,7 @@ function (R::PolyRing)(p::AbstractAlgebra.Generic.MPoly{T}) where T <: Nemo.Ring
 end
 
 @doc Markdown.doc"""
-   (R::AbstractAlgebra.Generic.MPolyRing{T}){T <: Nemo.RingElem}(p::Singular.spoly{Singular.n_unknown{T}})
+    (R::AbstractAlgebra.Generic.MPolyRing{T}){T <: Nemo.RingElem}(p::Singular.spoly{Singular.n_unknown{T}})
 > Return an AbstractAlgebra polynomial in the ring $R$ with the same
 > coefficients and exponents as $p$.
 """

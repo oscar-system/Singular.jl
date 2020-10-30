@@ -17,7 +17,7 @@ base_ring(a::n_GF) = Union{}
 base_ring(a::N_GField) = Union{}
 
 @doc Markdown.doc"""
-   characteristic(R::N_GField)
+    characteristic(R::N_GField)
 > Return the characteristic of the field.
 """
 function characteristic(R::N_GField)

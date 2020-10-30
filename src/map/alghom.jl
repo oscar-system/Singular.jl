@@ -58,7 +58,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-   compose(f::AbstractAlgebra.Map(Singular.SAlgHom),
+    compose(f::AbstractAlgebra.Map(Singular.SAlgHom),
                          g::AbstractAlgebra.Map(Singular.SAlgHom))
 > Returns an algebra homomorphism $h: domain(f) --> codomain(g)$,
 > where $h = g(f)$.

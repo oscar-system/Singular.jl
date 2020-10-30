@@ -112,7 +112,7 @@ function std(I::smodule; complete_reduction::Bool=false)
 end
 
 @doc Markdown.doc"""
-   slimgb(I::smodule; complete_reduction::Bool=false)
+    slimgb(I::smodule; complete_reduction::Bool=false)
 > Given a module $I$ this function computes a Groebner basis for it.
 > Compared to `std`, `slimgb` uses different strategies for choosing
 > a reducer.

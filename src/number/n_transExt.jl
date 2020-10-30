@@ -33,7 +33,7 @@ function transcendence_basis(F::N_FField)
 end
 
 @doc Markdown.doc"""
-   characteristic(R::N_FField)
+    characteristic(R::N_FField)
 > Return the characteristic of the field.
 """
 function characteristic(R::N_FField)

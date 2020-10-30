@@ -333,7 +333,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-   slimgb(I::sideal; complete_reduction::Bool=false)
+    slimgb(I::sideal; complete_reduction::Bool=false)
 > Given an ideal $I$ this function computes a Groebner basis for it.
 > Compared to `std`, `slimgb` uses different strategies for choosing
 > a reducer.
