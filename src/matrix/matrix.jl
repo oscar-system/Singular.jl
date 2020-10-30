@@ -9,13 +9,13 @@ export identity_matrix, MatrixSpace, nrows, ncols, smatrix, zero_matrix
 @doc Markdown.doc"""
     nrows(M::smatrix)
 
-> Return the number of rows of $M$.
+Return the number of rows of $M$.
 """
 nrows(M::smatrix) = Int(libSingular.nrows(M.ptr))
 
 @doc Markdown.doc"""
    nrows(M::smatrix)
-> Return the number of colums of $M$.
+Return the number of colums of $M$.
 """
 ncols(M::smatrix) = Int(libSingular.ncols(M.ptr))
 
@@ -35,7 +35,7 @@ parent_type(::Type{smatrix{T}}) where T <: AbstractAlgebra.RingElem = MatrixSpac
 
 @doc Markdown.doc"""
    getindex(M::smatrix{T}, i::Int, j::Int) where T <: AbstractAlgebra.RingElem
-> Given a matrix $M = (m_{ij})_{i, j}$, return the entry $m_{ij}$.
+Given a matrix $M = (m_{ij})_{i, j}$, return the entry $m_{ij}$.
 """
 function getindex(M::smatrix{T}, i::Int, j::Int) where T <: AbstractAlgebra.RingElem
    (i > nrows(M) || j > ncols(M)) && error("Incompatible dimensions")
@@ -46,7 +46,7 @@ end
 
 @doc Markdown.doc"""
    setindex!(M::smatrix, p::spoly i::Int, j::Int)
-> Given a matrix $M = (m_{ij})_{i, j}$, set the entry $m_{ij}$ to the value $p$.
+Given a matrix $M = (m_{ij})_{i, j}$, set the entry $m_{ij}$ to the value $p$.
 """
 function setindex!(M::smatrix, p::spoly, i::Int, j::Int)
    (i > nrows(M) || j > ncols(M)) && error("Incompatible dimensions")
@@ -68,7 +68,7 @@ end
 
 @doc Markdown.doc"""
    transpose(M::smatrix{T}) where T <: AbstractAlgebra.RingElem
-> Given a matrix $M=(m_{ij})_{i, j}$, return the matrix $M^T=(m_{ji})_{j, i}$.
+Given a matrix $M=(m_{ij})_{i, j}$, return the matrix $M^T=(m_{ji})_{j, i}$.
 """
 function transpose(M::smatrix{T}) where T <: AbstractAlgebra.RingElem
    R = base_ring(M)
@@ -224,7 +224,7 @@ end
 
 @doc Markdown.doc"""
    identity_matrix(R::PolyRing, n::Int)
-> Returns the $n \times n$ identity matrix over $R.$
+Returns the $n \times n$ identity matrix over $R.$
 """
 function identity_matrix(R::PolyRing, n::Int)
    p = R(1)
@@ -233,7 +233,7 @@ end
 
 @doc Markdown.doc"""
    zero_matrix(R::PolyRing, r::Int, c::Int)
-> Returns the $r \times c$ zero matrix over $R.$
+Returns the $r \times c$ zero matrix over $R.$
 """
 function zero_matrix(R::PolyRing, r::Int, c::Int)
    return smatrix{elem_type(R)}(R, libSingular.mpNew(r, c))

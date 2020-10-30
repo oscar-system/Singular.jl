@@ -29,32 +29,32 @@ parent_type(::Type{spoly{T}}) where T <: Nemo.RingElem = PolyRing{T}
 @doc Markdown.doc"""
     nvars(R::PolyRing)
 
-> Return the number of variables in the given polynomial ring.
+Return the number of variables in the given polynomial ring.
 """
 nvars(R::PolyRing) = Int(libSingular.rVar(R.ptr))
 
 @doc Markdown.doc"""
     has_global_ordering(R::PolyRing)
 
-> Return `true` if the given ring has a global ordering, i.e. if $1 < x$ for
-> each variable $x$ in the ring. This include `:lex`, `:deglex` and `:degrevlex`
-> orderings.
+Return `true` if the given ring has a global ordering, i.e. if $1 < x$ for
+each variable $x$ in the ring. This include `:lex`, `:deglex` and `:degrevlex`
+orderings.
 """
 has_global_ordering(R::PolyRing) = Bool(libSingular.rHasGlobalOrdering(R.ptr))
 
 @doc Markdown.doc"""
     has_mixed_ordering(R::PolyRing)
 
-> Return `true` if the given ring has a mixed ordering, i.e. if $1 < x_i$ for
-> a variable $x_i$ and $1>x_j$ for another variable $x_j$.
+Return `true` if the given ring has a mixed ordering, i.e. if $1 < x_i$ for
+a variable $x_i$ and $1>x_j$ for another variable $x_j$.
 """
 has_mixed_ordering(R::PolyRing) = Bool(libSingular.rHasMixedOrdering(R.ptr))
 
 @doc Markdown.doc"""
     has_local_ordering(R::PolyRing)
 
-> Return `true` if the given ring has a local ordering, i.e. if $1 > x$ for
-> all variables $x$.
+Return `true` if the given ring has a local ordering, i.e. if $1 > x$ for
+all variables $x$.
 """
 function has_local_ordering(R::PolyRing) 
    return !has_global_ordering(R) && !has_mixed_ordering(R)
@@ -63,16 +63,16 @@ end
 @doc Markdown.doc"""
     isquotient_ring(R::PolyRing)
 
-> Return `true` if the given ring is the quotient of a polynomial ring with
-> a non - zero ideal.
+Return `true` if the given ring is the quotient of a polynomial ring with
+a non - zero ideal.
 """
 isquotient_ring(R::PolyRing) = Bool(Singular.libSingular.rIsQuotientRing(R.ptr))
 
 @doc Markdown.doc"""
     characteristic(R::PolyRing)
 
-> Return the characteristic of the polynomial ring, i.e. the characteristic of the
-> coefficient ring.
+Return the characteristic of the polynomial ring, i.e. the characteristic of the
+coefficient ring.
 """
 characteristic(R::PolyRing) = Int(libSingular.rChar(R.ptr))
 
@@ -88,7 +88,7 @@ end
 @doc Markdown.doc"""
     symbols(R::PolyRing)
 
-> Return symbols for the generators of the polynomial ring $R$.
+Return symbols for the generators of the polynomial ring $R$.
 """
 function symbols(R::PolyRing)
    io = IOBuffer();
@@ -105,10 +105,10 @@ ordering(R::PolyRing) = R.ord
 @doc Markdown.doc"""
     degree_bound(R::PolyRing)
 
-> Return the internal degree bound in each variable, enforced by Singular. This is the
-> largest positive value any degree can have before an overflow will occur. This
-> internal bound may be higher than the bound requested by the user via the
-> `degree_bound` parameter of the `PolynomialRing` constructor.
+Return the internal degree bound in each variable, enforced by Singular. This is the
+largest positive value any degree can have before an overflow will occur. This
+internal bound may be higher than the bound requested by the user via the
+`degree_bound` parameter of the `PolynomialRing` constructor.
 """
 function degree_bound(R::PolyRing)
    return Int(libSingular.rBitmask(R.ptr))
@@ -171,7 +171,7 @@ length(p::spoly) = Int(libSingular.pLength(p.ptr))
 @doc Markdown.doc"""
     total_degree(p::spoly)
 
-> Return the total degree (largest sum of exponents of any monomial) of $p$.
+Return the total degree (largest sum of exponents of any monomial) of $p$.
 """
 function total_degree(p::spoly)
    R = parent(p)
@@ -181,7 +181,7 @@ end
 @doc Markdown.doc"""
     order(p::spoly)
 
-> Returns the order of $p$.
+Returns the order of $p$.
 """
 function order(p::spoly)
    if p.ptr.cpp_object == C_NULL
@@ -204,9 +204,9 @@ end
 @doc Markdown.doc"""
     lead_exponent(p::spoly)
 
-> Return the exponent vector of the leading term of the given polynomial. The return
-> value is a Julia 1-dimensional array giving the exponent for each variable of the
-> leading term.
+Return the exponent vector of the leading term of the given polynomial. The return
+value is a Julia 1-dimensional array giving the exponent for each variable of the
+leading term.
 """
 function lead_exponent(p::spoly)
    R = parent(p)
@@ -588,8 +588,8 @@ end
 @doc Markdown.doc"""
     primpart(x::spoly)
 
-> Return the primitive part of the polynomial, i.e. the polynomial divided by the GCD
-> of its coefficients.
+Return the primitive part of the polynomial, i.e. the polynomial divided by the GCD
+of its coefficients.
 """
 function primpart(x::spoly)
    R = parent(x)
@@ -601,7 +601,7 @@ end
 @doc Markdown.doc"""
     content(x::spoly)
 
-> Return the content of the polynomial, i.e. the GCD of its coefficients.
+Return the content of the polynomial, i.e. the GCD of its coefficients.
 """
 function content(x::spoly)
    R = base_ring(x)
@@ -704,7 +704,7 @@ end
 @doc Markdown.doc"""
     factor_squarefree(x::spoly)
 
-> Returns a squarefree factorization of $x$.
+Returns a squarefree factorization of $x$.
 """
 function factor_squarefree(x::spoly)
   R = parent(x)
@@ -733,7 +733,7 @@ end
 @doc Markdown.doc"""
     factor(x::spoly)
 
-> Returns the factorization of $x$.
+Returns the factorization of $x$.
 """
 function factor(x::spoly)
   R = parent(x)
@@ -768,8 +768,8 @@ end
 @doc Markdown.doc"""
     substitute_variable(p::spoly,i::Int64,q::spoly)
 
-> Substitutes the `i`-th variable of the polynomial `p` with the polynomial `q`.
-> Returns a new polynomial.
+Substitutes the `i`-th variable of the polynomial `p` with the polynomial `q`.
+Returns a new polynomial.
 """
 function substitute_variable(p::spoly, i::Int64, q::spoly)
     R = parent(p)
@@ -780,8 +780,8 @@ end
 @doc Markdown.doc"""
     permute_variables(p::spoly, perm::Array{Int64,1}, new_ring::PolyRing)
 
-> Permutes the indeterminates of `p` according to `perm` to the indeterminates
-> of the ring `new_ring`.
+Permutes the indeterminates of `p` according to `perm` to the indeterminates
+of the ring `new_ring`.
 """
 function permute_variables(p::spoly, perm::Array{Int64,1}, new_ring::PolyRing)
     old_ring = parent(p)
@@ -804,7 +804,7 @@ end
     AsEquivalentSingularPolynomialRing(R::AbstractAlgebra.Generic.MPolyRing{T}; cached::Bool = true,
       ordering::Symbol = :degrevlex, ordering2::Symbol = :comp1min,
       degree_bound::Int = 0)  where {T <: RingElem}
-> Return a Singular (multivariate) polynomial ring over the base ring of $R$ in variables having the same names as those of R.
+Return a Singular (multivariate) polynomial ring over the base ring of $R$ in variables having the same names as those of R.
 """
 function AsEquivalentSingularPolynomialRing(R::AbstractAlgebra.Generic.MPolyRing{T}; cached::Bool = true,
       ordering::Symbol = :degrevlex, ordering2::Symbol = :comp1min,
@@ -815,7 +815,7 @@ end
 @doc Markdown.doc"""
     AsEquivalentAbstractAlgebraPolynomialRing(R::Singular.PolyRing{Singular.n_unknown{T}}; ordering::Symbol = :degrevlex)  where {T <: RingElem}
 
-> Return an AbstractAlgebra (multivariate) polynomial ring over the base ring of $R$ in variables having the same names as those of R.
+Return an AbstractAlgebra (multivariate) polynomial ring over the base ring of $R$ in variables having the same names as those of R.
 """
 function AsEquivalentAbstractAlgebraPolynomialRing(R::Singular.PolyRing{Singular.n_unknown{T}}; ordering::Symbol = :degrevlex)  where {T <: RingElem}
    return AbstractAlgebra.Generic.PolynomialRing(base_ring(R).base_ring,
@@ -826,7 +826,7 @@ end
 @doc Markdown.doc"""
     (R::PolyRing){T <: RingElem}(p::AbstractAlgebra.Generic.MPoly{T})
 
-> Return a Singular polynomial in $R$ with the same coefficients and exponents as $p$.
+Return a Singular polynomial in $R$ with the same coefficients and exponents as $p$.
 """
 function (R::PolyRing)(p::AbstractAlgebra.Generic.MPoly{T}) where T <: Nemo.RingElem
    S = base_ring(R)
@@ -841,8 +841,8 @@ end
 @doc Markdown.doc"""
     (R::AbstractAlgebra.Generic.MPolyRing{T}){T <: Nemo.RingElem}(p::Singular.spoly{Singular.n_unknown{T}})
 
-> Return an AbstractAlgebra polynomial in the ring $R$ with the same
-> coefficients and exponents as $p$.
+Return an AbstractAlgebra polynomial in the ring $R$ with the same
+coefficients and exponents as $p$.
 """
 function (R::AbstractAlgebra.Generic.MPolyRing{T})(p::Singular.spoly{Singular.n_unknown{T}}) where T <: Nemo.RingElem
    B = MPolyBuildCtx(R)
@@ -861,7 +861,7 @@ end
 
 @doc Markdown.doc"""
    jet(x::spoly, n::Int)
-> Given a polynomial $x$ this function truncates $x$ up to degree $n$.
+Given a polynomial $x$ this function truncates $x$ up to degree $n$.
 """
 function jet(x::spoly, n::Int)
    p = deepcopy(x)
@@ -871,8 +871,8 @@ end
 
 @doc Markdown.doc"""
    derivative(x::spoly, n::Int)
-> Given a polynomial $x$ this function returns the derivative of $x$
-> with respect to the variable with number $n$.
+Given a polynomial $x$ this function returns the derivative of $x$
+with respect to the variable with number $n$.
 """
 function derivative(x::spoly, n::Int)
    R = parent(x)
@@ -887,8 +887,8 @@ end
 
 @doc Markdown.doc"""
    derivative(x::spoly, v::spoly)
-> Given a polynomial $x$ this function returns the derivative of $x$
-> with respect to the variable $v$.
+Given a polynomial $x$ this function returns the derivative of $x$
+with respect to the variable $v$.
 """
 function derivative(x::spoly, v::spoly)
    R = parent(x)
@@ -903,7 +903,7 @@ end
 
 @doc Markdown.doc"""
    jacobian_ideal(x::spoly)
-> Given a polynomial $x$ this function returns the Jacobian ideal of $x$.
+Given a polynomial $x$ this function returns the Jacobian ideal of $x$.
 """
 function jacobian_ideal(p::spoly)
    R = parent(p)
@@ -918,7 +918,7 @@ end
 
 @doc Markdown.doc"""
    jacobian_matrix(x::spoly)
-> Given a polynomial $x$ this function returns the Jacobian matrix of $x$.
+Given a polynomial $x$ this function returns the Jacobian matrix of $x$.
 """
 function jacobian_matrix(p::spoly)
    R = parent(p)
@@ -932,8 +932,8 @@ end
 
 @doc Markdown.doc"""
    jacobian_matrix(A::Vector{spoly, 1})
-> Given an array $A$ of polynomials over the same base ring,
-> this function returns the Jacobian matrix of $A$.
+Given an array $A$ of polynomials over the same base ring,
+this function returns the Jacobian matrix of $A$.
 """
 function jacobian_matrix(A::Vector{spoly{T}}) where T <: Nemo.RingElem
    m = length(A)

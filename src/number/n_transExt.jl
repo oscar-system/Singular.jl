@@ -20,14 +20,14 @@ base_ring(a::N_FField) = a.base_ring
 @doc Markdown.doc"""
     transcendence_degree(F::N_FField)
 
-> Return the transcendence degree of the given function field.
+Return the transcendence degree of the given function field.
 """
 transcendence_degree(F::N_FField) = Int(libSingular.rPar(F.ptr))
 
 @doc Markdown.doc"""
     basis(F::N_FField)
 
-> Return the transcendence basis of the given function field.
+Return the transcendence basis of the given function field.
 """
 function transcendence_basis(F::N_FField)
    n = transcendence_degree(F)
@@ -37,7 +37,7 @@ end
 @doc Markdown.doc"""
     characteristic(R::N_FField)
 
-> Return the characteristic of the field.
+Return the characteristic of the field.
 """
 function characteristic(R::N_FField)
    return ZZ(libSingular.n_GetChar(R.ptr))
@@ -68,7 +68,7 @@ zero(R::N_FField) = R(0)
 @doc Markdown.doc"""
     numerator(n::n_transExt)
 
-> Return the numerator of the given fraction.
+Return the numerator of the given fraction.
 """
 function numerator(n::n_transExt)
    F = parent(n)
@@ -78,7 +78,7 @@ end
 @doc Markdown.doc"""
     denominator(n::n_transExt)
 
-> Return the denominator of the given fraction.
+Return the denominator of the given fraction.
 """
 function denominator(n::n_transExt)
    F = parent(n)
@@ -97,7 +97,7 @@ end
 
 @doc Markdown.doc"""
    isunit(n::n_transExt)
-> Return `true` if $n$ is a unit in the field, i.e. nonzero.
+Return `true` if $n$ is a unit in the field, i.e. nonzero.
 """
 isunit(n::n_transExt) = !iszero(n)
 
@@ -109,10 +109,10 @@ end
 
 @doc Markdown.doc"""
    n_transExt_to_spoly(x::n_transExt; parent::PolyRing)
-> Returns the numerator of $x$ as a polynomial in a polynomial
-> ring with at least as many variables, as the
-> transcendence degree of $parent(x)$. If a ring $parent_ring$ is
-> given to the function, it will be the parent ring of the output.
+Returns the numerator of $x$ as a polynomial in a polynomial
+ring with at least as many variables, as the
+transcendence degree of $parent(x)$. If a ring $parent_ring$ is
+given to the function, it will be the parent ring of the output.
 """
 function n_transExt_to_spoly(x::n_transExt; cached = true,
      parent_ring::AbstractAlgebra.MPolyRing = _tExt_to_poly(parent(x), cached))
@@ -371,8 +371,8 @@ end
 @doc Markdown.doc"""
     FunctionField(F::Singular.Field, S::Array{String, 1})
 
-> Returns a tuple $K, a$ consisting of a function field $K$ over the field $F$
-> with transcendence basis stored in the array $S$.
+Returns a tuple $K, a$ consisting of a function field $K$ over the field $F$
+with transcendence basis stored in the array $S$.
 """
 function FunctionField(F::Singular.Field, S::Array{String, 1}; cached::Bool=true)
    typeof(F) == N_GField && error("Finite field extensions of Fp not supported.")
@@ -385,8 +385,8 @@ end
 @doc Markdown.doc"""
     FunctionField(F::Singular.Field, n::Int)
 
-> Returns a tuple $K, a$ consisting of a function field $K$ over the field $F$
-> with transcendence degree $n$ and transcendence basis $a1, ..., an$.
+Returns a tuple $K, a$ consisting of a function field $K$ over the field $F$
+with transcendence degree $n$ and transcendence basis $a1, ..., an$.
 """
 function FunctionField(F::Singular.Field, n::Int; cached::Bool=true)
    S = ["a$i" for i in 1:n]

@@ -19,7 +19,7 @@ base_ring(a::N_ZnRing) = ZZ
 @doc Markdown.doc"""
     characteristic(R::N_ZnRing)
 
-> Return the characteristic $n$ of the ring.
+Return the characteristic $n$ of the ring.
 """
 function characteristic(R::N_ZnRing)
    return ZZ(libSingular.n_GetChar(R.ptr))
@@ -67,7 +67,7 @@ end
 @doc Markdown.doc"""
     isunit(n::n_Zn)
 
-> Return `true` if the given value is a unit in the integers modulo $n$.
+Return `true` if the given value is a unit in the integers modulo $n$.
 """
 isunit(n::n_Zn) = gcd(n, parent(n)(characteristic(parent(n)))) == 1
 

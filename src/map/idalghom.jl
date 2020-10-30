@@ -90,7 +90,7 @@ end
 @doc Markdown.doc"""
     preimage(f::AbstractAlgebra.Map(SIdAlgHom), I::sideal)
 
-> Returns the preimage of the ideal $I$ under the identity algebra homomorphism.
+Returns the preimage of the ideal $I$ under the identity algebra homomorphism.
 """
 function preimage(f::Map(SIdAlgHom), I::sideal)
 
@@ -103,7 +103,7 @@ end
 
 @doc Markdown.doc"""
    kernel(f::AbstractAlgebra.Map(SIdAlgHom))
-> Returns the kernel of the identity algebra homomorphism.
+Returns the kernel of the identity algebra homomorphism.
 """
 function kernel(f::Map(SIdAlgHom))
    return Ideal(f.domain, )
@@ -117,8 +117,8 @@ end
 
 @doc Markdown.doc"""
    Identity_Algebra_Homomorphism(R::PolyRing)
-> Constructs the canonical identity algebra homomorphism $id: D --> D$,
-> where the $i$-th variable of $D$ is mapped to itself.
+Constructs the canonical identity algebra homomorphism $id: D --> D$,
+where the $i$-th variable of $D$ is mapped to itself.
 """
 IdentityAlgebraHomomorphism(R::PolyRing)  = SIdAlgHom{typeof(R.base_ring)}(R)
 
