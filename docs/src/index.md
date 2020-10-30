@@ -30,8 +30,7 @@ At the Julia prompt simply type
 
 ```
 julia> using Pkg
-julia> Pkg.clone("https://github.com/oscar-system/Singular.jl")
-julia> Pkg.build("Singular")
+julia> Pkg.add("Singular")
 ```
 
 Here is an example of using Singular.jl
