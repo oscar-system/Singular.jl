@@ -30,16 +30,18 @@ using Random: Random, AbstractRNG, SamplerTrivial, SamplerSimple
 import Random: rand
 using RandomExtensions: RandomExtensions, make, Make2
 
-import AbstractAlgebra: AbstractAlgebra, diagonal_matrix, zero_matrix
+import AbstractAlgebra: AbstractAlgebra, diagonal_matrix, factor,
+                        identity_matrix, kernel, lead, ncols, ngens, nrows, order,
+                        preimage, zero_matrix
 
 import Nemo: add!, addeq!, base_ring, canonical_unit,
              change_base_ring, characteristic, check_parent, codomain,
              coeff, coeffs, compose, contains, content, crt,
              deflate, deflation, degree, degrees, derivative, divexact,
-             divides, domain, elem_type, evaluate, exponent_vectors, finish,
-             gcdinv, gen, gens, get_field, intersect, isconstant,
+             divides, domain, elem_type, evaluate, exponent_vectors, factor_squarefree,
+             finish, gcdinv, gen, gens, get_field, intersect, isconstant,
              isgen, ismonomial, inflate, isnegative, isone,
-             isterm, isunit, iszero, lc, lt, lm, monomials,
+             isterm, isunit, iszero, lift, lc, lt, lm, monomials,
              MPolyBuildCtx, mul!, needs_parentheses,
              nvars, ordering, parent_type,
              parent, primpart, promote_rule, push_term!,
@@ -124,12 +126,12 @@ function __init__()
    singular_version_nr=Singular.libSingular.version()
    ver = digits(singular_version_nr, base = 10)
    svn = VersionNumber("$(ver[1]).$(ver[2]).$(ver[3])-$(ver[4])")
-   if show_banner             
+   if show_banner
      println("""Singular.jl, based on
-                     SINGULAR                                 /  
- A Computer Algebra System for Polynomial Computations       /  Singular.jl: $VERSION_NUMBER 
+                     SINGULAR                                 /
+ A Computer Algebra System for Polynomial Computations       /  Singular.jl: $VERSION_NUMBER
                                                            0<   Singular   : $svn
- by: W. Decker, G.-M. Greuel, G. Pfister, H. Schoenemann     \\   
+ by: W. Decker, G.-M. Greuel, G. Pfister, H. Schoenemann     \\
 FB Mathematik der Universitaet, D-67653 Kaiserslautern        \\
      """)
    end
