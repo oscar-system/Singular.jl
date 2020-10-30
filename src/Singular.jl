@@ -3,7 +3,7 @@
 
   For documentation see https://oscar-system.github.io/Singular.jl/latest/index.html
 
-  For more information about Singular see http://www.singular.uni-kl.de/
+  For more information about Singular see https://www.singular.uni-kl.de/
 """
 module Singular
 
