@@ -25,14 +25,14 @@ all the parent object types belong to the abstract type `Ring`.
 Singular.jl integers modulo $n$ implement the Ring and Residue Ring interfaces of
 AbstractAlgebra.jl.
 
-[https://nemocas.github.io/AbstractAlgebra.jl/rings.html](https://nemocas.github.io/AbstractAlgebra.jl/rings.html)
+<https://nemocas.github.io/AbstractAlgebra.jl/rings.html>
 
-[https://nemocas.github.io/AbstractAlgebra.jl/residue_rings.html](https://nemocas.github.io/AbstractAlgebra.jl/residue_rings.html)
+<https://nemocas.github.io/AbstractAlgebra.jl/residue_rings.html>
 
 Parts of the Euclidean Ring interface may also be implemented, though Singular will
 report an error if division is meaningless (even after cancelling zero divisors).
 
-[https://nemocas.github.io/AbstractAlgebra.jl/euclidean.html](https://nemocas.github.io/AbstractAlgebra.jl/euclidean.html)
+<https://nemocas.github.io/AbstractAlgebra.jl/euclidean.html>
 
 Below, we describe the functionality that is specific to the Singular integers mod $n$
 ring and not already listed at the given links.

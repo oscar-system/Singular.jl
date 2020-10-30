@@ -16,7 +16,7 @@ to, the data for which is given by the polynomial ring $R$ over which the matric
 defined, and the number of rows and columns of the matrices in the space.
 
 The types of matrices and associated parent objects are given in the following table
-according to the library provding them.
+according to the library providing them.
 
  Library        | Element type    | Parent type
 ----------------|-----------------|--------------------------

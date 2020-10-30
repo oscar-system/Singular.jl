@@ -15,7 +15,7 @@ to, the data for which is given by the polynomial ring $R$ over which the module
 resolution are defined.
 
 The types of resolutions and associated parent objects are given in the following table
-according to the library provding them.
+according to the library providing them.
 
  Library        | Element type     | Parent type
 ----------------|------------------|--------------------------

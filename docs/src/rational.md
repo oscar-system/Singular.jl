@@ -15,9 +15,9 @@ the unique field of rationals in Singular.
 The rationals in Singular.jl implement the Field interface defined by AbstractAlgebra.jl.
 They also implement the Fraction Field interface.
 
-[https://nemocas.github.io/AbstractAlgebra.jl/fields.html](https://nemocas.github.io/AbstractAlgebra.jl/fields.html)
+<https://nemocas.github.io/AbstractAlgebra.jl/fields.html>
 
-[https://nemocas.github.io/AbstractAlgebra.jl/fraction_fields.html](https://nemocas.github.io/AbstractAlgebra.jl/fraction_fields.html)
+<https://nemocas.github.io/AbstractAlgebra.jl/fraction_fields.html>
 
 We describe here only the extra functionality provided by Singular that is not already
 described in those interfaces.

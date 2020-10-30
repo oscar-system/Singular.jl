@@ -24,7 +24,7 @@ all the parent object types belong to the abstract type `Field`.
 
 Singular.jl finite fields implement the Field interface of AbstractAlgebra.jl.
 
-[https://nemocas.github.io/AbstractAlgebra.jl/fields.html](https://nemocas.github.io/AbstractAlgebra.jl/fields.html)
+<https://nemocas.github.io/AbstractAlgebra.jl/fields.html>
 
 Below, we describe the functionality that is specific to Singular finite field and not
 already listed at the given link.

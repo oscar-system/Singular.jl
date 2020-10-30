@@ -25,9 +25,9 @@ all the parent object types belong to the abstract type `Field`.
 Singular.jl integers modulo $p$ implement the Field and Residue Ring interfaces of
 AbstractAlgebra.jl.
 
-[https://nemocas.github.io/AbstractAlgebra.jl/fields.html](https://nemocas.github.io/AbstractAlgebra.jl/fields.html)
+<https://nemocas.github.io/AbstractAlgebra.jl/fields.html>
 
-[https://nemocas.github.io/AbstractAlgebra.jl/residue_rings.html](https://nemocas.github.io/AbstractAlgebra.jl/residue_rings.html)
+<https://nemocas.github.io/AbstractAlgebra.jl/residue_rings.html>
 
 Below, we describe the functionality that is specific to the Singular integers mod $p$
 field and not already listed at the given links.
@@ -43,7 +43,7 @@ Fp(p::Int; cached=true)
 
 Construct the field of integers modulo $p$. By default, the field is cached, so that
 all fields of integers modulo $p$ have the same parent object. If this is not the
-desired behaviour, the `cached` paramater can be set to `false`. If $p$ is not a prime
+desired behaviour, the `cached` parameter can be set to `false`. If $p$ is not a prime
 or $p$ is not in the range $(0, 2^{29})$, an exception is raised.
 
 Given a field $R$ of integers modulo $p$, we also have the following coercions in

@@ -12,7 +12,7 @@ The Singular.jl type for a vector is `svector{T}`. For the most part, these exis
 help interact with the `smodule{T}` type provided by Singular.
 
 The types of vectors and associated parent objects are given in the following table
-according to the library provding them.
+according to the library providing them.
 
  Library        | Element type    | Parent type
 ----------------|-----------------|--------------------------
