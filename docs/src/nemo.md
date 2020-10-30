@@ -38,15 +38,14 @@ Specialised efficient wrappers exist for certain Nemo coefficient ring types.
 Singular.jl foreign ring types implement the Ring interface and possibly the Field
 interface of AbstractAlgebra.jl.
 
-[https://nemocas.github.io/AbstractAlgebra.jl/rings.html](https://nemocas.github.io/AbstractAlgebra.jl/rings.html)
+<https://nemocas.github.io/AbstractAlgebra.jl/rings.html>
 
-[https://nemocas.github.io/AbstractAlgebra.jl/fields.html](https://nemocas.github.io/Abstr
-actAlgebra.jl/fields.html)
+<https://nemocas.github.io/AbstractAlgebra.jl/fields.html>
 
 Parts of the Euclidean Ring interface may also be implemented, though Singular will
 report an error if division is meaningless (even after cancelling zero divisors).
 
-[https://nemocas.github.io/AbstractAlgebra.jl/euclidean.html](https://nemocas.github.io/AbstractAlgebra.jl/euclidean.html)
+<https://nemocas.github.io/AbstractAlgebra.jl/euclidean.html>
 
 Below, we describe the functionality that is specific to the Singular foreign ring
 interface that is not already listed at the given links.

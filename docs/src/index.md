@@ -5,9 +5,9 @@ written by Oleksandr Motsak, William Hart and other contributors, and is maintai
 William Hart, Hans Schoenemann and Andreas Steenpas. It is part of the Oscar project which is
 funded by the DFG TRR 195 program.
 
-- [https://www.singular.uni-kl.de/](https://www.singular.uni-kl.de/) (Singular website)
-- [https://github.com/oscar-system/Singular.jl](https://github.com/oscar-system/Singular.jl) (Singular.jl source code)
-- [http://oscar-system.github.io/Singular.jl/](http://oscar-system.github.io/Singular.jl/) (Singular.jl online documentation)
+- <https://www.singular.uni-kl.de/> (Singular website)
+- <https://github.com/oscar-system/Singular.jl> (Singular.jl source code)
+- <https://oscar-system.github.io/Singular.jl/> (Singular.jl online documentation)
 
 The features of Singular so far include:
 
@@ -23,7 +23,7 @@ The features of Singular so far include:
 ## Installation
 
 To use Singular.jl we require Julia 1.3 or higher. Please see
-[http://julialang.org/downloads](http://julialang.org/downloads/) for instructions on
+<https://julialang.org/downloads/> for instructions on
 how to obtain julia for your system.
 
 At the Julia prompt simply type

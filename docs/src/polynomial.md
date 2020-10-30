@@ -30,7 +30,7 @@ all the polynomial ring parent object types belong to the abstract type `MPolyRi
 Singular.jl polynomials implement the Multivariate Polynomial Ring interface of
 AbstractAlgebra.jl.
 
-[https://nemocas.github.io/AbstractAlgebra.jl/mpolynomial_rings.html](https://nemocas.github.io/AbstractAlgebra.jl/mpolynomial_rings.html)
+<https://nemocas.github.io/AbstractAlgebra.jl/mpolynomial_rings.html>
 
 In particular, Singular polynomials are sparse distributed, but do not have random
 access. Instead, they implement iterator access to terms. This is due to their storage
@@ -39,7 +39,7 @@ in a linked list, for efficient implementation of Groebner basis algorithms.
 Some polynomial rings may also implement part of the Euclidean Ring interface, where
 this is appropriate.
 
-[https://nemocas.github.io/AbstractAlgebra.jl/euclidean.html](https://nemocas.github.io/AbstractAlgebra.jl/euclidean.html)
+<https://nemocas.github.io/AbstractAlgebra.jl/euclidean.html>
 
 Below, we describe the functionality that is specific to the Singular multivariate
 polynomials that is not documented in the general multivariate interface.
@@ -106,8 +106,7 @@ but this can be extremely inefficient. For this purpose, Singular polynomials
 support construction using a build context, as described in the AbstractAlgebra
 documentation:
 
-[https://nemocas.github.io/AbstractAlgebra.jl/mpolynomial_rings.html](https://nemocas.git
-hub.io/AbstractAlgebra.jl/mpolynomial_rings.html)
+<https://nemocas.github.io/AbstractAlgebra.jl/mpolynomial_rings.html>
 
 **Examples**
 
