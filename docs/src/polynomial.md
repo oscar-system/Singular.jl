@@ -41,7 +41,7 @@ this is appropriate.
 
 [https://nemocas.github.io/AbstractAlgebra.jl/euclidean.html](https://nemocas.github.io/AbstractAlgebra.jl/euclidean.html)
 
-Below, we describe the functionality that is specific to the Singular multivariate 
+Below, we describe the functionality that is specific to the Singular multivariate
 polynomials that is not documented in the general multivariate interface.
 
 ### Constructors
@@ -59,7 +59,7 @@ must be a list of strings corresponding to how the variables will be printed. By
 there will only be one Singular polynomial ring in the system for each combination of
 coefficient ring, list of variable names, ordering and degree bound. This is
 accomplished by making use of a global cache. If this is not the desired behaviour,
-`false` can be passed to the optional argument `cached`. 
+`false` can be passed to the optional argument `cached`.
 
 Two orderings can be specified, one for term ordering of the polynomials, and another
 for ordering of module components. They can occur in either order, the first taking
@@ -208,7 +208,7 @@ c = characteristic(R)
 L = degree_bound(R)
 exps = lead_exponent(x1*x2 + 3x1*x2^2 + x3 + 2)
 deg = total_degree(x1*x2 + 3x1*x2^2 + x3 + 2)
-ord = order(x1*x2 + 3x1*x2^2 + x3 + 2) 
+ord = order(x1*x2 + 3x1*x2^2 + x3 + 2)
 ```
 
 ### Differential functions
@@ -286,7 +286,7 @@ c = content(f)
 
 ### Multivariate Factorisation
 
-For the Singular base fields `QQ` and `Fp` a function to compute a 
+For the Singular base fields `QQ` and `Fp` a function to compute a
 squarefree factorization is available.
 
 ```@docs
@@ -325,8 +325,8 @@ It is possible to change the coefficient ring of a given polynomial $p$ via
 the function 'change_base_ring'.
 
 ```@docs
-Singular.change_base_ring(C::Union{Ring, Field} p::spoly)
-` ``
+Singular.change_base_ring(C::Union{Ring, Field}, p::spoly)
+```
 
 **Examples**
 
