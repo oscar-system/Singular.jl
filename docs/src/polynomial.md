@@ -213,7 +213,7 @@ ord = order(x1*x2 + 3x1*x2^2 + x3 + 2)
 ### Differential functions
 
 Working over any coefficient ring, basic functionality involving
-differential operations is avaiable.
+differential operations is available.
 
 ```@docs
 Singular.jet(::spoly, ::Int)
@@ -339,7 +339,7 @@ change_base_ring(QQ, p)
 
 It also possible to work with Nemo rings, if a type conversion for the
 Singular coefficients is implemented. One has to cast the Nemo ring via
-'CoefficientRing' to a suitabel Singular type.
+'CoefficientRing' to a suitable Singular type.
 
 **Examples**
 
