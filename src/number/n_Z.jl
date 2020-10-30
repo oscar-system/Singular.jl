@@ -46,12 +46,14 @@ end
 
 @doc Markdown.doc"""
     isunit(n::n_Z)
+
 > Return `true` if $n$ is $\pm 1$.
 """
 isunit(n::n_Z) = n == 1 || n == -1
 
 @doc Markdown.doc"""
     numerator(n::n_Z)
+
 > Return the numerator of $n$ (which is $n$ itself).
 """
 function numerator(n::n_Z)
@@ -62,6 +64,7 @@ end
 
 @doc Markdown.doc"""
     denominator(n::n_Z)
+
 > Return the denominator of $n$ (which will always be $1$).
 """
 function denominator(n::n_Z)
@@ -70,6 +73,7 @@ end
 
 @doc Markdown.doc"""
     abs(n::n_Z)
+
 > Return the absolute value of $n$.
 """
 function abs(n::n_Z)

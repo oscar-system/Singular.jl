@@ -18,6 +18,7 @@ base_ring(a::N_ZpField) = Union{}
 
 @doc Markdown.doc"""
     characteristic(R::N_ZpField)
+
 > Return the characteristic of the field.
 """
 function characteristic(R::N_ZpField)
@@ -56,6 +57,7 @@ end
 
 @doc Markdown.doc"""
     isunit(n::n_Zp)
+
 > Return `true` if $n$ is a unit in the field, i.e. nonzero.
 """
 isunit(n::n_Zp) = !iszero(n)

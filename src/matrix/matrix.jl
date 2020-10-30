@@ -8,6 +8,7 @@ export identity_matrix, MatrixSpace, nrows, ncols, smatrix, zero_matrix
 
 @doc Markdown.doc"""
     nrows(M::smatrix)
+
 > Return the number of rows of $M$.
 """
 nrows(M::smatrix) = Int(libSingular.nrows(M.ptr))

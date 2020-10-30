@@ -18,6 +18,7 @@ base_ring(a::N_GField) = Union{}
 
 @doc Markdown.doc"""
     characteristic(R::N_GField)
+
 > Return the characteristic of the field.
 """
 function characteristic(R::N_GField)
@@ -28,6 +29,7 @@ _characteristic(R::N_GField) = Int(libSingular.n_GetChar(R.ptr))
 
 @doc Markdown.doc"""
     degree(R::N_GField)
+
 > Return the degree of the field as an extension of $\mathbb{F}_p$.
 """
 function degree(R::N_GField)
@@ -372,6 +374,7 @@ end
 
 @doc Markdown.doc"""
     FiniteField(p::Int, n::Int, S::String; cached=true)
+
 > Returns a tuple `K, a` consisting of a finite field `K` of characteristic $p$
 > and degree $n$, and its generator `a`. The string used to print the
 > generator is given by `S`. If the finite field is not listed in the Conway

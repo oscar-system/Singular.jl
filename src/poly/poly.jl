@@ -28,12 +28,14 @@ parent_type(::Type{spoly{T}}) where T <: Nemo.RingElem = PolyRing{T}
 
 @doc Markdown.doc"""
     nvars(R::PolyRing)
+
 > Return the number of variables in the given polynomial ring.
 """
 nvars(R::PolyRing) = Int(libSingular.rVar(R.ptr))
 
 @doc Markdown.doc"""
     has_global_ordering(R::PolyRing)
+
 > Return `true` if the given ring has a global ordering, i.e. if $1 < x$ for
 > each variable $x$ in the ring. This include `:lex`, `:deglex` and `:degrevlex`
 > orderings.
@@ -42,6 +44,7 @@ has_global_ordering(R::PolyRing) = Bool(libSingular.rHasGlobalOrdering(R.ptr))
 
 @doc Markdown.doc"""
     has_mixed_ordering(R::PolyRing)
+
 > Return `true` if the given ring has a mixed ordering, i.e. if $1 < x_i$ for
 > a variable $x_i$ and $1>x_j$ for another variable $x_j$.
 """
@@ -49,6 +52,7 @@ has_mixed_ordering(R::PolyRing) = Bool(libSingular.rHasMixedOrdering(R.ptr))
 
 @doc Markdown.doc"""
     has_local_ordering(R::PolyRing)
+
 > Return `true` if the given ring has a local ordering, i.e. if $1 > x$ for
 > all variables $x$.
 """
@@ -58,6 +62,7 @@ end
 
 @doc Markdown.doc"""
     isquotient_ring(R::PolyRing)
+
 > Return `true` if the given ring is the quotient of a polynomial ring with
 > a non - zero ideal.
 """
@@ -65,6 +70,7 @@ isquotient_ring(R::PolyRing) = Bool(Singular.libSingular.rIsQuotientRing(R.ptr))
 
 @doc Markdown.doc"""
     characteristic(R::PolyRing)
+
 > Return the characteristic of the polynomial ring, i.e. the characteristic of the
 > coefficient ring.
 """
@@ -81,6 +87,7 @@ end
 
 @doc Markdown.doc"""
     symbols(R::PolyRing)
+
 > Return symbols for the generators of the polynomial ring $R$.
 """
 function symbols(R::PolyRing)
@@ -97,6 +104,7 @@ ordering(R::PolyRing) = R.ord
 
 @doc Markdown.doc"""
     degree_bound(R::PolyRing)
+
 > Return the internal degree bound in each variable, enforced by Singular. This is the
 > largest positive value any degree can have before an overflow will occur. This
 > internal bound may be higher than the bound requested by the user via the
@@ -162,6 +170,7 @@ length(p::spoly) = Int(libSingular.pLength(p.ptr))
 
 @doc Markdown.doc"""
     total_degree(p::spoly)
+
 > Return the total degree (largest sum of exponents of any monomial) of $p$.
 """
 function total_degree(p::spoly)
@@ -171,6 +180,7 @@ end
 
 @doc Markdown.doc"""
     order(p::spoly)
+
 > Returns the order of $p$.
 """
 function order(p::spoly)
@@ -193,6 +203,7 @@ end
 
 @doc Markdown.doc"""
     lead_exponent(p::spoly)
+
 > Return the exponent vector of the leading term of the given polynomial. The return
 > value is a Julia 1-dimensional array giving the exponent for each variable of the
 > leading term.
@@ -576,6 +587,7 @@ end
 
 @doc Markdown.doc"""
     primpart(x::spoly)
+
 > Return the primitive part of the polynomial, i.e. the polynomial divided by the GCD
 > of its coefficients.
 """
@@ -588,6 +600,7 @@ end
 
 @doc Markdown.doc"""
     content(x::spoly)
+
 > Return the content of the polynomial, i.e. the GCD of its coefficients.
 """
 function content(x::spoly)
@@ -690,6 +703,7 @@ end
 
 @doc Markdown.doc"""
     factor_squarefree(x::spoly)
+
 > Returns a squarefree factorization of $x$.
 """
 function factor_squarefree(x::spoly)
@@ -718,6 +732,7 @@ end
 
 @doc Markdown.doc"""
     factor(x::spoly)
+
 > Returns the factorization of $x$.
 """
 function factor(x::spoly)
@@ -752,6 +767,7 @@ end
 
 @doc Markdown.doc"""
     substitute_variable(p::spoly,i::Int64,q::spoly)
+
 > Substitutes the `i`-th variable of the polynomial `p` with the polynomial `q`.
 > Returns a new polynomial.
 """
@@ -763,6 +779,7 @@ end
 
 @doc Markdown.doc"""
     permute_variables(p::spoly, perm::Array{Int64,1}, new_ring::PolyRing)
+
 > Permutes the indeterminates of `p` according to `perm` to the indeterminates
 > of the ring `new_ring`.
 """
@@ -797,6 +814,7 @@ end
 
 @doc Markdown.doc"""
     AsEquivalentAbstractAlgebraPolynomialRing(R::Singular.PolyRing{Singular.n_unknown{T}}; ordering::Symbol = :degrevlex)  where {T <: RingElem}
+
 > Return an AbstractAlgebra (multivariate) polynomial ring over the base ring of $R$ in variables having the same names as those of R.
 """
 function AsEquivalentAbstractAlgebraPolynomialRing(R::Singular.PolyRing{Singular.n_unknown{T}}; ordering::Symbol = :degrevlex)  where {T <: RingElem}
@@ -807,6 +825,7 @@ end
 
 @doc Markdown.doc"""
     (R::PolyRing){T <: RingElem}(p::AbstractAlgebra.Generic.MPoly{T})
+
 > Return a Singular polynomial in $R$ with the same coefficients and exponents as $p$.
 """
 function (R::PolyRing)(p::AbstractAlgebra.Generic.MPoly{T}) where T <: Nemo.RingElem
@@ -821,6 +840,7 @@ end
 
 @doc Markdown.doc"""
     (R::AbstractAlgebra.Generic.MPolyRing{T}){T <: Nemo.RingElem}(p::Singular.spoly{Singular.n_unknown{T}})
+
 > Return an AbstractAlgebra polynomial in the ring $R$ with the same
 > coefficients and exponents as $p$.
 """

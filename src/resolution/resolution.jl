@@ -37,6 +37,7 @@ end
 
 @doc Markdown.doc"""
     length(r::sresolution)
+
 > Return the length of the resolution. This is what is mathematically meant by the
 > length of a resolution. Over a field, this should be at most the number of variables
 > in the polynomial ring.
@@ -66,6 +67,7 @@ end
 
 @doc Markdown.doc"""
     betti(r::sresolution)
+
 > Return the Betti numbers, i.e. the ranks of the free modules in the given
 > free resolution. These are returned as a Julia array of `Int`s. Note that the
 > output of this command is useful only in the graded case.
@@ -89,6 +91,7 @@ end
 
 @doc Markdown.doc"""
     minres{T <: AbstractAlgebra.RingElem}(r::sresolution{T})
+
 > Return a minimal free resolution, given any free resolution. In the graded
 > case, there exists a uniquely determined minimal resolution. If the supplied
 > resolution is already minimal, it may be returned without making a copy.
@@ -154,6 +157,7 @@ end
 
 @doc Markdown.doc"""
     Resolution(C::Array{smodule{T}, 1}) where T <: AbstractAlgebra.RingElem
+
 > Create a new resolution whose maps are given by the elements of an array C of
 > modules. Note that it is not checked that the maps are actually composable
 > and that their pairwise composition is the zero map, that is, that the

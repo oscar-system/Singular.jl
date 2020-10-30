@@ -89,6 +89,7 @@ end
 
 @doc Markdown.doc"""
     preimage(f::AbstractAlgebra.Map(SIdAlgHom), I::sideal)
+
 > Returns the preimage of the ideal $I$ under the identity algebra homomorphism.
 """
 function preimage(f::Map(SIdAlgHom), I::sideal)

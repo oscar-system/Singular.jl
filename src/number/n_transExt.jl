@@ -19,12 +19,14 @@ base_ring(a::N_FField) = a.base_ring
 
 @doc Markdown.doc"""
     transcendence_degree(F::N_FField)
+
 > Return the transcendence degree of the given function field.
 """
 transcendence_degree(F::N_FField) = Int(libSingular.rPar(F.ptr))
 
 @doc Markdown.doc"""
     basis(F::N_FField)
+
 > Return the transcendence basis of the given function field.
 """
 function transcendence_basis(F::N_FField)
@@ -34,6 +36,7 @@ end
 
 @doc Markdown.doc"""
     characteristic(R::N_FField)
+
 > Return the characteristic of the field.
 """
 function characteristic(R::N_FField)
@@ -64,6 +67,7 @@ zero(R::N_FField) = R(0)
 
 @doc Markdown.doc"""
     numerator(n::n_transExt)
+
 > Return the numerator of the given fraction.
 """
 function numerator(n::n_transExt)
@@ -73,6 +77,7 @@ end
 
 @doc Markdown.doc"""
     denominator(n::n_transExt)
+
 > Return the denominator of the given fraction.
 """
 function denominator(n::n_transExt)
@@ -365,6 +370,7 @@ end
 
 @doc Markdown.doc"""
     FunctionField(F::Singular.Field, S::Array{String, 1})
+
 > Returns a tuple $K, a$ consisting of a function field $K$ over the field $F$
 > with transcendence basis stored in the array $S$.
 """
@@ -378,6 +384,7 @@ end
 
 @doc Markdown.doc"""
     FunctionField(F::Singular.Field, n::Int)
+
 > Returns a tuple $K, a$ consisting of a function field $K$ over the field $F$
 > with transcendence degree $n$ and transcendence basis $a1, ..., an$.
 """
