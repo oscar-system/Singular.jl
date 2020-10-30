@@ -58,10 +58,10 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-   compose(f::AbstractAlgebra.Map(Singular.SAlgHom),
+    compose(f::AbstractAlgebra.Map(Singular.SAlgHom),
                          g::AbstractAlgebra.Map(Singular.SAlgHom))
-> Returns an algebra homomorphism $h: domain(f) --> codomain(g)$,
-> where $h = g(f)$.
+Returns an algebra homomorphism $h: domain(f) --> codomain(g)$,
+where $h = g(f)$.
 """
 function compose(f::Map(SAlgHom), g::Map(SAlgHom))
    check_composable(f, g)
@@ -95,7 +95,7 @@ end
 
 @doc Markdown.doc"""
    preimage(f::AbstractAlgebra.Map(SAlgHom), I::sideal)
-> Returns the preimage of the ideal $I$ under the algebra homomorphism $f$.
+Returns the preimage of the ideal $I$ under the algebra homomorphism $f$.
 """
 function preimage(f::Map(SAlgHom), I::sideal)
 
@@ -115,7 +115,7 @@ end
 
 @doc Markdown.doc"""
    kernel(f::AbstractAlgebra.Map(SAlgHom))
-> Returns the kernel of the algebra homomorphism $f$.
+Returns the kernel of the algebra homomorphism $f$.
 """
 function kernel(f::Map(SAlgHom))
    return preimage(f, Ideal(f.codomain, ))
@@ -129,9 +129,9 @@ end
 
 @doc Markdown.doc"""
    Algebra_Homomorphism(D::PolyRing, C::PolyRing, V::Vector)
-> Constructs an algebra homomorphism $f: D --> C$, where the $i$-th variable of
-> $D$ is mapped to the $i$-th entry of $V$. $D$ and $C$ must be polynomial
-> rings over the same base ring.
+Constructs an algebra homomorphism $f: D --> C$, where the $i$-th variable of
+$D$ is mapped to the $i$-th entry of $V$. $D$ and $C$ must be polynomial
+rings over the same base ring.
 """
 function AlgebraHomomorphism(D::PolyRing, C::PolyRing, V::Vector)
 

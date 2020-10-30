@@ -53,7 +53,8 @@ isunit(n::n_Q) = !iszero(n)
 
 @doc Markdown.doc"""
     numerator(n::n_Q)
-> Return the numerator of the given fraction.
+
+Return the numerator of the given fraction.
 """
 function numerator(n::n_Q)
    p = libSingular.n_GetNumerator(n.ptr, parent(n).ptr)
@@ -64,7 +65,8 @@ end
 
 @doc Markdown.doc"""
     denominator(n::n_Q)
-> Return the denominator of the given fraction.
+
+Return the denominator of the given fraction.
 """
 function denominator(n::n_Q)
    p = libSingular.n_GetDenom(n.ptr, parent(n).ptr)
@@ -75,7 +77,8 @@ end
 
 @doc Markdown.doc"""
     abs(n::n_Q)
-> Return the absolute value of the given fraction.
+
+Return the absolute value of the given fraction.
 """
 function abs(n::n_Q)
    if libSingular.n_GreaterZero(n.ptr, parent(n).ptr) || iszero(n)
@@ -277,8 +280,9 @@ end
 
 @doc Markdown.doc"""
     reconstruct(x::n_Z, y::n_Z)
-> Given $x$ modulo $y$, find $r/s$ such that $x \equiv r/s \pmod{y}$ for values
-> $r$ and $s$ satisfying the bound $y > 2(|r| + 1)(s + 1)$.
+
+Given $x$ modulo $y$, find $r/s$ such that $x \equiv r/s \pmod{y}$ for values
+$r$ and $s$ satisfying the bound $y > 2(|r| + 1)(s + 1)$.
 """
 function reconstruct(x::n_Z, y::n_Z)
    p = libSingular.n_Farey(x.ptr, y.ptr, QQ.ptr)

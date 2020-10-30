@@ -17,8 +17,9 @@ base_ring(a::n_GF) = Union{}
 base_ring(a::N_GField) = Union{}
 
 @doc Markdown.doc"""
-   characteristic(R::N_GField)
-> Return the characteristic of the field.
+    characteristic(R::N_GField)
+
+Return the characteristic of the field.
 """
 function characteristic(R::N_GField)
    return ZZ(_characteristic(R))
@@ -28,7 +29,8 @@ _characteristic(R::N_GField) = Int(libSingular.n_GetChar(R.ptr))
 
 @doc Markdown.doc"""
     degree(R::N_GField)
-> Return the degree of the field as an extension of $\mathbb{F}_p$.
+
+Return the degree of the field as an extension of $\mathbb{F}_p$.
 """
 function degree(R::N_GField)
    return R.deg
@@ -69,7 +71,7 @@ end
 
 @doc Markdown.doc"""
    isunit(n::n_GF)
-> Return `true` if $n$ is a unit in the field, i.e. nonzero.
+Return `true` if $n$ is a unit in the field, i.e. nonzero.
 """
 isunit(n::n_GF) = !iszero(n)
 
@@ -372,13 +374,14 @@ end
 
 @doc Markdown.doc"""
     FiniteField(p::Int, n::Int, S::String; cached=true)
-> Returns a tuple `K, a` consisting of a finite field `K` of characteristic $p$
-> and degree $n$, and its generator `a`. The string used to print the
-> generator is given by `S`. If the finite field is not listed in the Conway
-> tables included in Singular, an error will be raised. By default, finite
-> fields are cached globally, so that there is only one finite field in the
-> system with given characteristic, degree and string. If this is not the
-> desired behaviour, one can pass `false` for the optional `cached` parameter.
+
+Returns a tuple `K, a` consisting of a finite field `K` of characteristic $p$
+and degree $n$, and its generator `a`. The string used to print the
+generator is given by `S`. If the finite field is not listed in the Conway
+tables included in Singular, an error will be raised. By default, finite
+fields are cached globally, so that there is only one finite field in the
+system with given characteristic, degree and string. If this is not the
+desired behaviour, one can pass `false` for the optional `cached` parameter.
 """
 function FiniteField(p::Int, n::Int, S::String; cached=true)
    n >= 16 || p >= 2^8 && throw(DomainError())
