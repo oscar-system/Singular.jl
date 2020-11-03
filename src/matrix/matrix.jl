@@ -55,6 +55,11 @@ function setindex!(M::smatrix, p::spoly, i::Int, j::Int)
    libSingular.setindex(M.ptr, p.ptr, Cint(i), Cint(j), R.ptr)
 end
 
+"""
+    iszero(M::smatrix)
+
+Return whether the supplied matrix `M` is the zero matrix.
+"""
 function iszero(M::smatrix)
    for i = 1:nrows(M)
       for j = 1:ncols(M)
@@ -94,7 +99,7 @@ end
 
 ###############################################################################
 #
-#   String I/O 
+#   String I/O
 #
 ###############################################################################
 
