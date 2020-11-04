@@ -102,3 +102,20 @@ end
    @test M1 == M1
    @test M1 == deepcopy(M1)
 end
+
+@testset "smatrix.rand..." begin
+   F = Fp(7)
+   R, _ = PolynomialRing(F, ["x"])
+   m = identity_matrix(R, 3)
+   M = parent(m)
+
+   f = rand(M, 1:2, 1:2)
+   @test parent(f) == M
+
+   R, _ = PolynomialRing(ZZ, ["x"])
+   m = identity_matrix(R, 3)
+   M = parent(m)
+
+   f = rand(M, 1:2, 1:2, 1:2)
+   @test parent(f) == M
+end
