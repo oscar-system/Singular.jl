@@ -1,6 +1,6 @@
 # Singular
 
-[![Build Status](https://travis-ci.com/oscar-system/Singular.jl.svg?branch=master)](https://travis-ci.com/oscar-system/Singular.jl)
+[![Build Status](https://github.com/oscar-system/Singular.jl/workflows/Run%20tests/badge.svg)](https://github.com/oscar-system/Singular.jl/actions?query=workflow%3A%22Run+tests%22)
 [![Coverage Status](https://coveralls.io/repos/github/oscar-system/Singular.jl/badge.svg)](https://coveralls.io/github/oscar-system/Singular.jl)
 [![codecov.io](https://codecov.io/github/oscar-system/Singular.jl/coverage.svg?branch=master)](https://codecov.io/gh/oscar-system/Singular.jl)
 
