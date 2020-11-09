@@ -1,6 +1,6 @@
-export spoly, PolyRing, change_base_ring, coeff, coeffs, coeffs_expos,
+export spoly, PolyRing, change_base_ring, coeff, coeffs,
        content, deflation, deflate, degree, degrees, degree_bound,
-       derivative, div, divides, direm, evaluate, exponent, exponent!,
+       derivative, div, divides, evaluate, exponent,
        exponent_vectors, factor, factor_squarefree, finish, gen,
        has_global_ordering, has_mixed_ordering, has_local_ordering,
        inflate, isgen,
@@ -56,7 +56,7 @@ has_mixed_ordering(R::PolyRing) = Bool(libSingular.rHasMixedOrdering(R.ptr))
 Return `true` if the given ring has a local ordering, i.e. if $1 > x$ for
 all variables $x$.
 """
-function has_local_ordering(R::PolyRing) 
+function has_local_ordering(R::PolyRing)
    return !has_global_ordering(R) && !has_mixed_ordering(R)
 end
 
@@ -194,7 +194,7 @@ function order(p::spoly)
    ord = Singular.libSingular.pLDeg(hptr, R.ptr)
    xptr = libSingular.pNext(p.ptr)
    while xptr.cpp_object != C_NULL
-      hptr = Singular.libSingular.p_Head(xptr, R.ptr) 
+      hptr = Singular.libSingular.p_Head(xptr, R.ptr)
       ord = min(ord, Singular.libSingular.pLDeg(hptr, R.ptr))
       xptr = libSingular.pNext(xptr)
    end
@@ -1189,4 +1189,3 @@ macro PolynomialRing(R, s, n)
    v1 = Expr(:block, exp1, v..., S)
    return esc(v1)
 end
-
