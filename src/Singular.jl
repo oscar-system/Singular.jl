@@ -165,6 +165,8 @@ end
 #
 ###############################################################################
 
+include("setup.jl")
+
 include("AbstractTypes.jl")
 
 include("LibSingular.jl")
