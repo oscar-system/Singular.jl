@@ -47,27 +47,26 @@ chmod("$prefixpath/lib/singular/MOD/hilbert", 0o777)
 chmod("$prefixpath/lib/singular/MOD/markov", 0o777)
 
 
+
+"""
+    execute(cmd)
+
+Run a command object. Returns a named tuple containing the stdout and stderr
+as well as the exit code of the command.
+"""
+function execute(cmd::Base.Cmd)
+    out = IOBuffer()
+    err = IOBuffer()
+    process = run(pipeline(ignorestatus(cmd), stdout=out, stderr=err))
+    return (stdout = String(take!(out)),
+            stderr = String(take!(err)),
+            code = process.exitcode)
+end
+
 #
 # regenerate src/libraryfuncdictionary.jl by parsing the list
 # of library functions exported by Singular
 #
-
-function execute(libparse, path)
-  res = libparse() do exe
-    cmd = `$exe $path`
-    out = Pipe()
-    err = Pipe()
-  
-    process = run(pipeline(ignorestatus(cmd), stdout = out, stderr = err))
-    close(out.in)
-    close(err.in)
-  
-    return (stdout = String(read(out)), 
-            stderr = String(read(err)),  
-            code = process.exitcode)
-  end
-end
-
 function regenerate_libraryfuncdictionary(prefixpath)
 
     libparsepath = abspath(joinpath(prefixpath, "bin", "libparse"))
@@ -97,7 +96,9 @@ function regenerate_libraryfuncdictionary(prefixpath)
             println(outputfile, "libraryfunctiondictionary = Dict(")
             for i in filenames
                 full_path = joinpath(library_dir, i)
-                libs = execute(Singular_jll.libparse, full_path)
+                libs = Singular_jll.libparse() do exe
+                    execute(`$exe $full_path`)
+                end
                 if libs.stderr != ""
                     error("from libparse: $(libs.stderr)")
                 end
