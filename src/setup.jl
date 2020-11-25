@@ -69,16 +69,8 @@ end
 #
 function regenerate_libraryfuncdictionary(prefixpath)
 
-    libparsepath = abspath(joinpath(prefixpath, "bin", "libparse"))
-
-    if haskey(ENV, "SINGULAR_LIBRARY_DIR")
-        library_dir = ENV["SINGULAR_LIBRARY_DIR"]
-    else
-        library_dir = abspath(joinpath(prefixpath, "share", "singular", "LIB"))
-    end
-
+    library_dir = get(ENV, "SINGULAR_LIBRARY_DIR", abspath(joinpath(prefixpath, "share", "singular", "LIB")))
     filenames = filter(x -> endswith(x, ".lib"), readdir(library_dir))
-
     output_filename = abspath(joinpath(@__DIR__, "libraryfuncdictionary.jl"))
 
     @info "Regenerating $(output_filename)"
