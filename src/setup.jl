@@ -1,51 +1,56 @@
 module Setup
 
 using Singular_jll
-
-prefixpath = Singular_jll.artifact_dir
+using lib4ti2_jll
 
 # add shell scripts that startup another julia for some lib4ti2 programs
-# singular and libsingular are supposed to at least look in
-#  $prefixpath/lib/singular/MOD
+function regenerate_4ti2_wrapper(binpath, wrapperpath)
+    mkpath("$wrapperpath")
 
-# FIXME: This is a HACK as we modify the JLL directory; better would be to
-# create a custom location for these files (e.g. via a MutableArtifact or via
-# Scratch.jl), then add that to the PATH env var so that Singular can find
-# them
+    if Sys.iswindows()
+        LIBPATH_env = "PATH"
+    elseif Sys.isapple()
+        LIBPATH_env = "DYLD_FALLBACK_LIBRARY_PATH"
+    else
+        LIBPATH_env = "LD_LIBRARY_PATH"
+    end
 
-mkpath("$prefixpath/lib/singular/MOD")
+    function force_symlink(p::AbstractString, np::AbstractString)
+        rm(np; force = true)
+        symlink(p, np)
+    end
 
-write("$prefixpath/lib/singular/MOD/graver", """
-#!/bin/sh
-julia --startup-file=no -O0 -e 'import lib4ti2_jll
-lib4ti2_jll.zsolve() do x
-  p=run(ignorestatus(`\$x -G \$ARGS`))
-  exit(p.exitcode)
-end' -- "\$@"
-""")
+    for tool in ("4ti2gmp", "4ti2int32", "4ti2int64", "zsolve")
+        force_symlink(joinpath(binpath, tool), joinpath(wrapperpath, tool))
+    end
 
-write("$prefixpath/lib/singular/MOD/hilbert", """
-#!/bin/sh
-julia --startup-file=no -O0 -e 'import lib4ti2_jll
-lib4ti2_jll.zsolve() do x
-  p=run(ignorestatus(`\$x -H \$ARGS`))
-  exit(p.exitcode)
-end' -- "\$@"
-""")
+    for tool in ("graver", "hilbert", "markov")
+        toolpath = joinpath(wrapperpath, tool)
+        write(toolpath, """
+        #!/bin/sh
+        export $(LIBPATH_env)="$(lib4ti2_jll.LIBPATH[])"
+        . $(binpath)/$(tool) "\$@"
+        """)
+        chmod(toolpath, 0o777)
+    end
+end
 
-write("$prefixpath/lib/singular/MOD/markov", """
-#!/bin/sh
-julia --startup-file=no -O0 -e 'import lib4ti2_jll
-lib4ti2_jll.exe4ti2gmp() do x
-  p=run(ignorestatus(`\$x markov \$ARGS`))
-  exit(p.exitcode)
-end' -- "\$@"
-""")
+#
+# put the wrapper inside this package, but use different wrappers for each
+# minor Julia version as those may get different versions of the various JLLs
+#
+# TODO/FIXME: don't write into the package directory; instead use a scratch space
+# obtained via <https://github.com/JuliaPackaging/Scratch.jl> -- however, that
+# requires Julia >= 1.5; so we can't use it until we drop support for Julia 1.3 & 1.4.
+#
+const wrapperpath = abspath(joinpath(@__DIR__, "..", "bin", "v$(VERSION.major).$(VERSION.minor)"))
+@info "Regenerating 4ti2 wrappers in $(wrapperpath)"
+regenerate_4ti2_wrapper(joinpath(lib4ti2_jll.find_artifact_dir(), "bin"), wrapperpath)
 
-chmod("$prefixpath/lib/singular/MOD/graver", 0o777)
-chmod("$prefixpath/lib/singular/MOD/hilbert", 0o777)
-chmod("$prefixpath/lib/singular/MOD/markov", 0o777)
-
+# make sure Singular can find the wrappers
+function __init__()
+    ENV["PATH"] = wrapperpath * ":" * ENV["PATH"]
+end
 
 
 """
