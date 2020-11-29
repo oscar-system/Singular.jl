@@ -52,22 +52,6 @@ function __init__()
     ENV["PATH"] = wrapperpath * ":" * ENV["PATH"]
 end
 
-
-"""
-    execute(cmd)
-
-Run a command object. Returns a named tuple containing the stdout and stderr
-as well as the exit code of the command.
-"""
-function execute(cmd::Base.Cmd)
-    out = IOBuffer()
-    err = IOBuffer()
-    process = run(pipeline(ignorestatus(cmd), stdout=out, stderr=err))
-    return (stdout = String(take!(out)),
-            stderr = String(take!(err)),
-            code = process.exitcode)
-end
-
 #
 # regenerate src/libraryfuncdictionary.jl by parsing the list
 # of library functions exported by Singular
@@ -93,13 +77,10 @@ function regenerate_libraryfuncdictionary(prefixpath)
             println(outputfile, "libraryfunctiondictionary = Dict(")
             for i in filenames
                 full_path = joinpath(library_dir, i)
-                libs = Singular_jll.libparse() do exe
-                    execute(`$exe $full_path`)
+                output = Singular_jll.libparse() do exe
+                    read(`$exe $full_path`, String)
                 end
-                if libs.stderr != ""
-                    error("from libparse: $(libs.stderr)")
-                end
-                libs_splitted = split(libs.stdout,"\n")[4:end - 1]
+                libs_splitted = split(output,"\n")[4:end - 1]
                 libs_splitted = [split(i, " ", keepempty = false) for i in libs_splitted]
                 println(outputfile, ":$(i[1:end - 4]) => [")
                 for j in libs_splitted
