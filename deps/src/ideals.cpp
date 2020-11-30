@@ -227,6 +227,16 @@ void singular_define_ideals(jlcxx::Module & Singular)
         return std::make_tuple(res, rest);
     });
 
+    Singular.method("id_LiftStd", [](ideal m, ring o) {
+        const ring origin = currRing;
+        rChangeCurrRing(o);
+        matrix ma=mpInit(1,1);
+        ideal syz=idInit(1,1);
+        ideal res = idLift(m, &ma, testHomog, &syz);
+        rChangeCurrRing(origin);
+        return std::make_tuple(res, ma, syz);
+    });
+
     Singular.method("id_Modulo", [](ideal a, ideal b, ring o) {
         const ring origin = currRing;
         rChangeCurrRing(o);
