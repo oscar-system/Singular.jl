@@ -230,9 +230,9 @@ void singular_define_ideals(jlcxx::Module & Singular)
     Singular.method("id_LiftStd", [](ideal m, ring o) {
         const ring origin = currRing;
         rChangeCurrRing(o);
-        matrix ma=mpInit(1,1);
+        matrix ma=mpNew(1,1);
         ideal syz=idInit(1,1);
-        ideal res = idLift(m, &ma, testHomog, &syz);
+        ideal res = idLiftStd(m, &ma, testHomog, &syz);
         rChangeCurrRing(origin);
         return std::make_tuple(res, ma, syz);
     });
