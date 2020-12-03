@@ -294,7 +294,7 @@ Returns G,T,S
 function lift_std(M::smodule)
    R = base_ring(M)
    ptr,T_ptr,S_ptr = libSingular.id_LiftStd(M.ptr, R.ptr)
-   return Module(R, ptr),smatrix(R, T_ptr),Module(R,S_ptr)
+   return Module(R, ptr),Matrix(R, T_ptr),Module(R,S_ptr)
 end
 
 ###############################################################################
