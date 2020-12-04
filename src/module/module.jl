@@ -280,6 +280,25 @@ end
 
 ###############################################################################
 #
+#   LiftStd
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    lift_std(M::smodule)
+
+computes the Groebner base G of M, the transformation matrix T and the syzygies of M.
+Returns G,T,S
+(Matrix(G) = (Matrix(T)*Matrix(M), 0=Matrix(S)*Matrix(M))
+"""
+function lift_std(M::smodule)
+   R = base_ring(M)
+   ptr,T_ptr,S_ptr = libSingular.id_LiftStd(M.ptr, R.ptr)
+   return Module(R, ptr), smatrix{elem_type(R)}(R, T_ptr), Module(R,S_ptr)
+end
+
+###############################################################################
+#
 #   Modulo
 #
 ###############################################################################
