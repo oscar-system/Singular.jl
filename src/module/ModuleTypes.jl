@@ -92,6 +92,13 @@ mutable struct smodule{T <: Nemo.RingElem} <: Module{T}
       return z
    end
 
+   #otherwise, the finalizer is called twice..., once
+   #on the ideal directly, and once via the module
+   function smodule{T}(R::PolyRing, ids::spoly...) where T
+     id = sideal{T}(R, ids..., set_finalizer = false)
+     return smodule{T}(R, id.ptr)
+   end
+
    function smodule{T}(R::PolyRing, m::libSingular.ideal_ptr) where T
       z = new(m, R, false)
       R.refcount += 1
