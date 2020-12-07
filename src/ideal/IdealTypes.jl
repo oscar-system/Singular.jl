@@ -23,15 +23,12 @@ mutable struct sideal{T <: Nemo.RingElem} <: Module{T}
    base_ring::PolyRing
    isGB::Bool
 
-   #set_finalizer needs to be false when creating the module generated
-   #by the elements, see the ModuleTypes file
-   #otherwise, the loop needs to be copied into the other file
-   function sideal{T}(R::PolyRing, ids::spoly...; set_finalizer::Bool = true) where T
+   function sideal{T}(R::PolyRing, ids::spoly...) where T
       n = length(ids)
       id = libSingular.idInit(Cint(n),1)
       z = new(id, R, false)
       R.refcount += 1
-      set_finalizer && finalizer(_sideal_clear_fn, z)
+      finalizer(_sideal_clear_fn, z)
       for i = 1:n
          p = libSingular.p_Copy(ids[i].ptr, R.ptr)
          libSingular.setindex_internal(id, p, Cint(i - 1))
