@@ -289,7 +289,7 @@ end
 
 computes the Groebner base G of M, the transformation matrix T and the syzygies of M.
 Returns G,T,S
-(Matrix(G) = (Matrix(T)*Matrix(M), 0=Matrix(S)*Matrix(M))
+(Matrix(G) = Matrix(M) * T, 0=Matrix(M)*Matrix(S))
 """
 function lift_std_syz(M::smodule; complete_reduction::Bool = false)
    R = base_ring(M)
@@ -301,7 +301,7 @@ end
     lift_std(M::smodule)
 
 computes the Groebner base G of M and the transformation matrix T such that
-(Matrix(G) = (Matrix(T)*Matrix(M))
+(Matrix(G) = Matrix(M) * T)
 """
 function lift_std(M::smodule; complete_reduction::Bool = false)
    R = base_ring(M)

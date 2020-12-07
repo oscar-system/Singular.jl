@@ -532,7 +532,7 @@ end
 
 computes the Groebner base G of I, the transformation matrix T and the syzygies of M.
 Returns G,T,S
-(Matrix(G) = (Matrix(T)*Matrix(I), 0=Matrix(S)*Matrix(M))
+(Matrix(G) = Matrix(I) * T, 0=Matrix(M)*Matrix(S))
 """
 function lift_std_syz(M::sideal; complete_reduction::Bool = false)
    R = base_ring(M)
@@ -544,7 +544,7 @@ end
     lift_std(I::sideal)
 
 computes the Groebner base G of I and the transformation matrix T such that
-(Matrix(G) = (Matrix(T)*Matrix(I))
+(Matrix(G) = Matrix(I) * T)
 """
 function lift_std(M::sideal; complete_reduction::Bool = false)
    R = base_ring(M)
