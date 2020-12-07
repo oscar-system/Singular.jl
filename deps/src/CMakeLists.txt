@@ -37,10 +37,10 @@ set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib;${JlCxx_location}")
 message(STATUS "Found JlCxx at ${JlCxx_location}")
 
 include_directories(${CMAKE_INSTALL_PREFIX})
-include_directories(${CMAKE_INSTALL_PREFIX}/singular)
+include_directories(${Singular_PREFIX}/include/singular)
 
-SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g ${extra_cppflags} -I${CMAKE_INSTALL_PREFIX}/include -I${CMAKE_INSTALL_PREFIX}/include/singular" )
-SET( CMAKE_SHARED_LINKER_FLAGS  "${CMAKE_SHARED_LINKER_FLAGS} -v -L${CMAKE_INSTALL_PREFIX}/lib -Wl,-rpath,${CMAKE_INSTALL_PREFIX}/lib" )
+SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g ${extra_cppflags} -I${CMAKE_INSTALL_PREFIX}/include -I${Singular_PREFIX}/include/ " )
+SET( CMAKE_SHARED_LINKER_FLAGS  "${CMAKE_SHARED_LINKER_FLAGS} -v -L${CMAKE_INSTALL_PREFIX}/lib -Wl,-rpath,${CMAKE_INSTALL_PREFIX}/lib -L${Singular_PREFIX}/lib -Wl,-rpath,${Singular_PREFIX}/lib" )
 
 
 add_library(${JLSINGULAR_TARGET} SHARED singular.cpp rings.cpp coeffs.cpp ideals.cpp matrices.cpp caller.cpp coeff_rings.cpp threading.cpp)
