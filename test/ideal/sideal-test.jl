@@ -337,3 +337,32 @@ end
    @test typeof(L2) == Array{Array{spoly{n_Q}, 1}, 1}
 end
 
+@testset "sideal.lift_std..." begin
+   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+
+   I = Ideal(R, x, y)
+   G, T = Singular.lift_std(I)
+   @test G[1] == y
+   @test G[2] == x
+   @test T[1,1] == 0
+   @test T[2,2] == 0
+   @test T[2,1] == 1
+   @test T[1,2] == 1
+
+   G, T = Singular.lift_std(I, complete_reduction = true)
+   @test G[1] == y
+   @test G[2] == x
+   @test T[1,1] == 0
+   @test T[2,2] == 0
+   @test T[2,1] == 1
+   @test T[1,2] == 1
+
+   G, T, S = Singular.lift_std_syz(I)
+   mG = Singular.Matrix(G)
+   mI = Singular.Matrix(I)
+   mS = Singular.Matrix(S)
+   @test iszero(mI*mS)
+   # @test mI*T == mG
+   # should be true, but there are additional (invisible) zeros in G 
+   # causing a dimension mismatch
+end
