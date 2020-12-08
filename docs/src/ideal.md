@@ -252,6 +252,14 @@ fglm(::sideal, ::Symbol)
 satstd{T <: AbstractAlgebra.RingElem}(::sideal{T}, ::sideal{T})
 ```
 
+```@docs
+lift_std(::sideal; ::Bool)
+```
+
+```@docs
+lift_std_syz(::sideal; ::Bool)
+```
+
 **Examples**
 
 ```julia
