@@ -227,12 +227,38 @@ void singular_define_ideals(jlcxx::Module & Singular)
         return std::make_tuple(res, rest);
     });
 
-    Singular.method("id_LiftStd", [](ideal m, ring o) {
+    Singular.method("id_LiftStd", [](ideal m, ring o, bool complete_reduction = false) {
+        const ring origin = currRing;
+        rChangeCurrRing(o);
+        matrix ma=mpNew(1,1);
+        unsigned int crbit;
+        if (complete_reduction)
+            crbit = Sy_bit(OPT_REDSB);
+        else
+            crbit = 0;
+        unsigned int save_opt = si_opt_1;
+        si_opt_1 |= crbit;
+        ideal res = idLiftStd(m, &ma, testHomog, NULL);
+        si_opt_1 = save_opt;
+        rChangeCurrRing(origin);
+        return std::make_tuple(res, ma);
+    });
+
+    Singular.method("id_LiftStdSyz", [](ideal m, ring o, bool complete_reduction = false) {
         const ring origin = currRing;
         rChangeCurrRing(o);
         matrix ma=mpNew(1,1);
         ideal syz=idInit(1,1);
+        unsigned int crbit;
+        if (complete_reduction)
+            crbit = Sy_bit(OPT_REDSB);
+        else
+            crbit = 0;
+        unsigned int save_opt = si_opt_1;
+        si_opt_1 |= crbit;
         ideal res = idLiftStd(m, &ma, testHomog, &syz);
+        si_opt_1 = save_opt;
+
         rChangeCurrRing(origin);
         return std::make_tuple(res, ma, syz);
     });
