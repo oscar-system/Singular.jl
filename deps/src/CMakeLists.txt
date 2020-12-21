@@ -24,8 +24,6 @@ if(CMAKE_COMPILER_IS_GNUCC AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 9.0
   SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wno-conversion" )
 endif()
 
-SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -g -std=c++14" )
-
 # to avoid lib64 dirs as binarybuilder uses lib everywhere
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 set(CMAKE_INSTALL_LIBDIR "lib")
@@ -39,8 +37,8 @@ message(STATUS "Found JlCxx at ${JlCxx_location}")
 include_directories(${CMAKE_INSTALL_PREFIX})
 include_directories(${Singular_PREFIX}/include/singular)
 
-SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g ${extra_cppflags} -I${CMAKE_INSTALL_PREFIX}/include -I${Singular_PREFIX}/include/ " )
-SET( CMAKE_SHARED_LINKER_FLAGS  "${CMAKE_SHARED_LINKER_FLAGS} -v -L${CMAKE_INSTALL_PREFIX}/lib -Wl,-rpath,${CMAKE_INSTALL_PREFIX}/lib -L${Singular_PREFIX}/lib -Wl,-rpath,${Singular_PREFIX}/lib" )
+SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g ${extra_cppflags} -I${CMAKE_INSTALL_PREFIX}/include -I${Singular_PREFIX}/include/" )
+SET( CMAKE_SHARED_LINKER_FLAGS  "${CMAKE_SHARED_LINKER_FLAGS} -v ${extra_ldflags} -L${CMAKE_INSTALL_PREFIX}/lib -Wl,-rpath,${CMAKE_INSTALL_PREFIX}/lib -L${Singular_PREFIX}/lib -Wl,-rpath,${Singular_PREFIX}/lib" )
 
 
 add_library(${JLSINGULAR_TARGET} SHARED singular.cpp rings.cpp coeffs.cpp ideals.cpp matrices.cpp caller.cpp coeff_rings.cpp threading.cpp)

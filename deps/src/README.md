@@ -27,7 +27,7 @@ Put the following into `~/.julia/artifacts/Overrides.toml` to replace the `libsi
 
 ```toml
 [ae4fbd8f-ecdb-54f8-bbce-35570499b30e]
-libingular_julia = "/home/user/prefix/for/libsingular-julia"
+libsingular_julia = "/home/user/prefix/for/libsingular-julia"
 ```
 
 Overrides for `Singular` and `libcxxwrap-julia` with the directories used during the build need to be added as well, e.g.:

@@ -1,13 +1,22 @@
-#cmake -DJulia_EXECUTABLE=/home/bla/Downloads/julia-1.5.3/bin/julia -DSingular_PREFIX=/home/bla/.julia/dev/Singular/deps/usr/ -DCMAKE_INSTALL_PREFIX=/tmp -DJlCxx_DIR=/home/bla/.julia/artifacts/860a8b2216bd059600ed7c44cdaa3bb81b23ff1c/lib/cmake/JlCxx -DCMAKE_BUILD_TYPE=Release -S libsingular-julia -B /tmp/build
+import Singular_jll, CxxWrap
 
-import Singular, CxxWrap
+# TODO: use ARGS to specify custom build dir?
+builddir = "build"
+installdir = abspath("install")
+JlCxx_DIR = joinpath(CxxWrap.prefix_path(), "lib", "cmake", "JlCxx")
 
-Julia_EXECUTABLE = joinpath(Sys.BINDIR, Base.julia_exename())
-Singular_PREFIX = joinpath(dirname(pathof(Singular)), "..", "deps", "usr")
-JlCxx_DIR = joinpath(CxxWrap.CxxWrapCore.libcxxwrap_julia_jll.artifact_dir, "lib", "cmake", "JlCxx")
+rm(builddir; force=true, recursive=true)
 
-cm = `cmake -DJulia_EXECUTABLE=$(Julia_EXECUTABLE) -DSingular_PREFIX=$(Singular_PREFIX) -DCMAKE_INSTALL_PREFIX=/tmp -DJlCxx_DIR=$(JlCxx_DIR) -DCMAKE_BUILD_TYPE=Release -S libsingular-julia -B /tmp/build`
+run(`cmake
+    -DJulia_EXECUTABLE=$(joinpath(Sys.BINDIR, Base.julia_exename()))
+    -Dextra_cppflags=-I$(Singular_jll.GMP_jll.artifact_dir)/include
+    -Dextra_ldflags=-L$(Singular_jll.GMP_jll.artifact_dir)/lib
+    -DSingular_PREFIX=$(Singular_jll.artifact_dir)
+    -DCMAKE_INSTALL_PREFIX=$(installdir)
+    -DJlCxx_DIR=$(JlCxx_DIR)
+    -DCMAKE_BUILD_TYPE=Release
+    -S .
+    -B $(builddir)
+`)
 
-run(cm)
-
-run(`cmake --build /tmp/build --config Release --target install`)
+run(`cmake --build $(builddir) --config Release --target install -- -j$(Sys.CPU_THREADS)`)
