@@ -98,7 +98,7 @@ Singular.n_transExt_to_spoly(::n_transExt)
 
 ```julia
 F1, (a, b, c) = FunctionField(QQ, ["a", "b", "c"])
-x = F(5)*a
+x = F1(5)*a
 y = a^2 *b+a*b+b^2
 
 isunit(x)
