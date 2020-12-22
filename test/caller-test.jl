@@ -14,23 +14,23 @@
 
     R, (x,y,z) = PolynomialRing(Singular.QQ, ["x", "y", "z"])
     
-    i1 = Singular.LibPoly.cyclic(R, 3)
+    i1 = Singular.LibPolylib.cyclic(R, 3)
     i2 = Ideal( R, x+y+z, x*y+x*z+y*z, x*y*z-1 )
     @test equal(i1, i2)
 
     vec = FreeModule(R,2)([x,y])
     mod = Singular.Module(R, vec)
-    i1 = Singular.LibPoly.mod2id(R,mod,[1,2])
+    i1 = Singular.LibPolylib.mod2id(R,mod,[1,2])
     i2 = Ideal(R, x^2, x*y, y^2, x^2 )
     @test equal(i1, i2)
 
     i1 = Ideal(R, x, y)
     i2 = Ideal(R, x^2, x*y, y^2, x, y)
-    mod = Singular.LibPoly.id2mod(R, i1, [1,2])
-    i1 = Singular.LibPoly.mod2id(R, mod, [1,2])
+    mod = Singular.LibPolylib.id2mod(R, i1, [1,2])
+    i1 = Singular.LibPolylib.mod2id(R, mod, [1,2])
     @test equal(i1,i2)
-    @test Singular.LibPoly.content(R,vec) == 1
-    @test Singular.LibPoly.lcm(R,x) == x
+    @test Singular.LibPolylib.content(R,vec) == 1
+    @test Singular.LibPolylib.lcm(R,x) == x
 
     i1 = Ideal(R, x*z, y*z, x^3-y^3)
     @test Singular.LibStandard.res(R,i1,0) isa Singular.sresolution
