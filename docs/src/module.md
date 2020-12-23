@@ -108,6 +108,13 @@ d = ngens(M)
 std(::smodule; ::Bool)
 ```
 
+```@docs
+lift_std(::smodule; ::Bool)
+```
+
+```@docs
+lift_std_syz(::smodule; ::Bool)
+```
 **Examples**
 
 ```julia

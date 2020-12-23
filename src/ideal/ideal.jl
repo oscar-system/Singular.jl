@@ -523,6 +523,37 @@ end
 
 ###############################################################################
 #
+#   LiftStd
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    lift_std_syz(I::sdeal)
+
+computes the Groebner base G of I, the transformation matrix T and the syzygies of M.
+Returns G,T,S
+(Matrix(G) = Matrix(I) * T, 0=Matrix(M)*Matrix(S))
+"""
+function lift_std_syz(M::sideal; complete_reduction::Bool = false)
+   R = base_ring(M)
+   ptr,T_ptr,S_ptr = libSingular.id_LiftStdSyz(M.ptr, R.ptr, complete_reduction)
+   return Ideal(R, ptr), smatrix{elem_type(R)}(R, T_ptr), Module(R,S_ptr)
+end
+
+@doc Markdown.doc"""
+    lift_std(I::sideal)
+
+computes the Groebner base G of I and the transformation matrix T such that
+(Matrix(G) = Matrix(I) * T)
+"""
+function lift_std(M::sideal; complete_reduction::Bool = false)
+   R = base_ring(M)
+   ptr,T_ptr = libSingular.id_LiftStd(M.ptr, R.ptr, complete_reduction)
+   return Ideal(R, ptr), smatrix{elem_type(R)}(R, T_ptr)
+end
+
+###############################################################################
+#
 #   Resolutions
 #
 ###############################################################################
