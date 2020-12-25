@@ -40,6 +40,8 @@ end
    R = ResidueRing(ZZ, 5)
 
    @test string(R(3)) == "3"
+
+   @test sprint(show, "text/plain", (R(3))) == "3"
 end
 
 @testset "n_Zn.manipulation..." begin

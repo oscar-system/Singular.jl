@@ -40,6 +40,8 @@ end
    R = Fp(5)
 
    @test string(R(3)) == "-2"
+
+   @test sprint(show, "text/plain", R(3)) == "-2"
 end
 
 @testset "n_Zp.manipulation..." begin

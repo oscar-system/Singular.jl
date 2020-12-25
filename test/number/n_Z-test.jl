@@ -37,6 +37,7 @@ end
 
 @testset "n_Z.printing..." begin
    @test string(ZZ(123)) == "123"
+   @test sprint(show, "text/plain", (ZZ(123))) == "123"
 end
 
 @testset "n_Z.manipulation..." begin

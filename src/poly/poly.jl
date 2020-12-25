@@ -362,6 +362,12 @@ function show(io::IO, a::spoly)
    print(io, s)
 end
 
+# TODO: Remove this once we can properly expressify elements of type n_GF
+function show(io::IO, ::MIME"text/plain", a::spoly{n_GF})
+   s = libSingular.p_String(a.ptr, parent(a).ptr)
+   print(io, s)
+end
+
 show_minus_one(::Type{spoly{T}}) where T <: Nemo.RingElem = show_minus_one(T)
 
 needs_parentheses(x::spoly) = length(x) > 1
