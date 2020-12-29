@@ -98,6 +98,16 @@ mutable struct smodule{T <: Nemo.RingElem} <: Module{T}
       finalizer(_smodule_clear_fn, z)
       return z
    end
+
+   function smodule{T}(R::PolyRing, m::libSingular.matrix_ptr) where T
+      ptr = libSingular.mp_Copy(m, R.ptr)
+      ptr = libSingular.id_Matrix2Module(ptr, R.ptr)
+      z = new(ptr, R)
+      R.refcount += 1
+      finalizer(_smodule_clear_fn, z)
+      return z
+   end
+
 end
 
 """
