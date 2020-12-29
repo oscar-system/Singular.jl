@@ -227,6 +227,12 @@ function Matrix(I::sideal{T}) where T <: Nemo.RingElem
    return smatrix{T}(base_ring(I), I.ptr)
 end
 
+function Module(vecs::smatrix{spoly{T}}) where T <: Nemo.RingElem
+   R = base_ring(vecs)
+   S = elem_type(R)
+   return smodule{S}(R, vecs.ptr)
+end;
+
 @doc Markdown.doc"""
    identity_matrix(R::PolyRing, n::Int)
 Returns the $n \times n$ identity matrix over $R.$

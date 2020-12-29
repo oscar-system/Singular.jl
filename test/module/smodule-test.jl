@@ -208,6 +208,8 @@ end
    M2 = Singular.Matrix(F[2])
    M3 = Singular.Matrix(F[3])
 
+   @test Singular.Matrix(Singular.Module(M1)) == M1
+
    @test iszero(M1*M2)
    @test iszero(M2*M3)
 
