@@ -125,7 +125,10 @@ function __init__()
 
    singular_version_nr=Singular.libSingular.version()
    ver = digits(singular_version_nr, base = 10)
-   svn = VersionNumber("$(ver[1]).$(ver[2]).$(ver[3])-$(ver[4])")
+   svn = "$(ver[4]).$(ver[3]).$(ver[2])"
+   if ver[1] > 0
+     svn *= "p$(ver[1])"
+   end
    if show_banner
      println("""Singular.jl, based on
                      SINGULAR                                 /
