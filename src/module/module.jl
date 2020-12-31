@@ -58,6 +58,10 @@ function deepcopy_internal(I::smodule, dict::IdDict)
    return Module(R, ptr)
 end
 
+function check_parent(I::smodule{T}, J::smodule{T}) where T <: Nemo.RingElem
+   base_ring(I) != base_ring(J) && error("Incompatible modules")
+end
+
 function hash(M::smodule, h::UInt)
    v = 0x403fd5a7748e75c9%UInt
    for i in 1:ngens(M)
@@ -132,6 +136,26 @@ function slimgb(I::smodule; complete_reduction::Bool=false)
    z = Module(R, ptr)
    z.isGB = true
    return z
+end
+
+###############################################################################
+#
+#   Reduction
+#
+###############################################################################
+
+@doc Markdown.doc"""
+   reduce(M::smodule, G::smodule)
+Return a submodule whose generators are the generators of $M$ reduced by the
+submodule $G$. The submodule $G$ is required to be given by a Groebner basis. The returned
+submodule will have the same number of generators as $M$, even if they are zero.
+"""
+function reduce(M::smodule, G::smodule)
+   check_parent(M, G)
+   R = base_ring(M)
+   !G.isGB && error("Not a Groebner basis")
+   ptr = libSingular.p_Reduce(M.ptr, G.ptr, R.ptr)
+   return Module(R, ptr)
 end
 
 ###############################################################################

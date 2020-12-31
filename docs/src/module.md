@@ -2,6 +2,13 @@
 CurrentModule = Singular
 ```
 
+```@meta
+DocTestSetup = quote
+  using Singular
+  using Singular: PolynomialRing, vector, std, reduce
+end
+```
+
 # Finitely generated modules
 
 Singular.jl allows the creation of submodules of a free module over a Singular polynomial
@@ -127,6 +134,53 @@ v3 = x*v1 + y*v2 + vector(R, x, y + 1, y^2)
 M = Singular.Module(R, v1, v2, v3)
 
 G = std(M; complete_reduction=true)
+```
+
+### Reduction
+
+```@docs
+reduce(::smodule, ::smodule)
+```
+
+**Examples**
+
+```jldoctest
+julia> R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"])
+(Singular Polynomial Ring (QQ),(x,y,z),(dp(3),C), spoly{n_Q}[x, y, z])
+
+julia> v1 = vector(R, R(0), z, -y)
+-y*gen(3)+z*gen(2)
+
+julia> v2 = vector(R, -z, R(0), x)
+x*gen(3)-z*gen(1)
+
+julia> v3 = vector(R, y, x, R(0))
+x*gen(2)+y*gen(1)
+
+julia> v = y*v1+x*v2+z*v3
+x^2*gen(3)-y^2*gen(3)+x*z*gen(2)-x*z*gen(1)+y*z*gen(2)+y*z*gen(1)
+
+julia> M = Singular.Module(R, v1, v2, v3)
+Singular Module over Singular Polynomial Ring (QQ),(x,y,z),(dp(3),C), with Generators:
+-y*gen(3)+z*gen(2)
+x*gen(3)-z*gen(1)
+x*gen(2)+y*gen(1)
+
+julia> B = std(M; complete_reduction=true)
+Singular Module over Singular Polynomial Ring (QQ),(x,y,z),(dp(3),C), with Generators:
+y*gen(3)-z*gen(2)
+x*gen(2)+y*gen(1)
+x*gen(3)-z*gen(1)
+y*z*gen(1)
+
+julia> V = Singular.Module(R, v)
+Singular Module over Singular Polynomial Ring (QQ),(x,y,z),(dp(3),C), with Generators:
+x^2*gen(3)-y^2*gen(3)+x*z*gen(2)-x*z*gen(1)+y*z*gen(2)+y*z*gen(1)
+
+julia> reduce(V,B)
+Singular Module over Singular Polynomial Ring (QQ),(x,y,z),(dp(3),C), with Generators:
+0
+
 ```
 
 ### Syzygies
