@@ -369,15 +369,14 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    FunctionField(F::Singular.Field, S::Array{String, 1})
+    FunctionField(F::Singular.Field, S::Vector{String})
 
 Returns a tuple $K, a$ consisting of a function field $K$ over the field $F$
 with transcendence basis stored in the array $S$.
 """
-function FunctionField(F::Singular.Field, S::Array{String, 1}; cached::Bool=true)
+function FunctionField(F::Singular.Field, S::Vector{String}; cached::Bool=true)
    typeof(F) == N_GField && error("Finite field extensions of Fp not supported.")
-   l = length(S)
-   isempty(l) && throw(DomainError())
+   isempty(S) && throw(ArgumentError("array must be non-empty"))
    R = N_FField(F, Symbol.(S))
    return tuple(R, transcendence_basis(R))
 end
