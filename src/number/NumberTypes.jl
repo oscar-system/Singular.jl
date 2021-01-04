@@ -35,22 +35,6 @@ end
 mutable struct n_Z <: Nemo.RingElem
     ptr::libSingular.number_ptr
 
-    function n_Z()
-        c = ZZ.ptr
-        z = new(libSingular.n_Init(0, c))
-        parent(z).refcount += 1
-        finalizer(_n_Z_clear_fn, z)
-        return z
-    end
-
-    function n_Z(n::Int)
-        c = ZZ.ptr
-        z = new(libSingular.n_Init(n, c))
-        parent(z).refcount += 1
-        finalizer(_n_Z_clear_fn, z)
-        return z
-    end
-
     function n_Z(n::libSingular.number_ptr)
         z = new(n)
         parent(z).refcount += 1
@@ -58,6 +42,8 @@ mutable struct n_Z <: Nemo.RingElem
         return z
     end
 end
+
+n_Z(n::Int = 0) = n_Z(libSingular.n_Init(n, ZZ.ptr))
 
 function _n_Z_clear_fn(n::n_Z)
    R = parent(n)
@@ -102,29 +88,6 @@ end
 mutable struct n_Q <: Nemo.FieldElem
     ptr::libSingular.number_ptr
 
-    function n_Q()
-        c = QQ.ptr
-        z = new(libSingular.n_Init(0, c))
-        parent(z).refcount += 1
-        finalizer(_n_Q_clear_fn, z)
-        return z
-    end
-
-    function n_Q(n::Int)
-        c = QQ.ptr
-        z = new(libSingular.n_Init(n, c))
-        parent(z).refcount += 1
-        finalizer(_n_Q_clear_fn, z)
-        return z
-    end
-
-    function n_Q(n::n_Z)
-        z = new(libSingular.nApplyMapFunc(n_Z_2_n_Q, n.ptr, ZZ.ptr, QQ.ptr))
-        parent(z).refcount += 1
-        finalizer(_n_Q_clear_fn, z)
-        return z
-    end
-
     function n_Q(n::libSingular.number_ptr)
         z = new(n)
         parent(z).refcount += 1
@@ -132,6 +95,9 @@ mutable struct n_Q <: Nemo.FieldElem
         return z
     end
 end
+
+n_Q(n::Int = 0) = n_Q(libSingular.n_Init(n, QQ.ptr))
+n_Q(n::n_Z) = n_Q(libSingular.nApplyMapFunc(n_Z_2_n_Q, n.ptr, ZZ.ptr, QQ.ptr))
 
 function _n_Q_clear_fn(n::n_Q)
    R = parent(n)
@@ -186,20 +152,6 @@ mutable struct n_Zn <: Nemo.RingElem
     ptr::libSingular.number_ptr
     parent::N_ZnRing
 
-    function n_Zn(c::N_ZnRing)
-    	z = new(libSingular.n_Init(0, c.ptr))
-        c.refcount += 1
-        finalizer(_n_Zn_clear_fn, z)
-        return z
-    end
-
-    function n_Zn(c::N_ZnRing, n::Int)
-    	z = new(libSingular.n_Init(n, c.ptr))
-        c.refcount += 1
-        finalizer(_n_Zn_clear_fn, z)
-        return z
-    end
-
     function n_Zn(c::N_ZnRing, n::libSingular.number_ptr)
     	z = new(n)
         c.refcount += 1
@@ -207,6 +159,8 @@ mutable struct n_Zn <: Nemo.RingElem
         return z
     end
 end
+
+n_Zn(c::N_ZnRing, n::Int = 0) = n_Zn(c, libSingular.n_Init(n, c.ptr))
 
 function _n_Zn_clear_fn(n::n_Zn)
    R = parent(n)
@@ -258,20 +212,6 @@ mutable struct n_Zp <: Nemo.FieldElem
     ptr::libSingular.number_ptr
     parent::N_ZpField
 
-    function n_Zp(c::N_ZpField)
-    	z = new(libSingular.n_Init(0, c.ptr))
-        c.refcount += 1
-        finalizer(_n_Zp_clear_fn, z)
-        return z
-    end
-
-    function n_Zp(c::N_ZpField, n::Int)
-    	z = new(libSingular.n_Init(n, c.ptr))
-        c.refcount += 1
-        finalizer(_n_Zp_clear_fn, z)
-        return z
-    end
-
     function n_Zp(c::N_ZpField, n::libSingular.number_ptr)
     	z = new(n)
         c.refcount += 1
@@ -279,6 +219,8 @@ mutable struct n_Zp <: Nemo.FieldElem
         return z
     end
 end
+
+n_Zp(c::N_ZpField, n::Int = 0) = n_Zp(c, libSingular.n_Init(n, c.ptr))
 
 function _n_Zp_clear_fn(n::n_Zp)
    R = parent(n)
@@ -339,20 +281,6 @@ mutable struct n_GF <: Nemo.FieldElem
     ptr::libSingular.number_ptr
     parent::N_GField
 
-    function n_GF(c::N_GField)
-    	z = new(libSingular.n_Init(0, c.ptr))
-        c.refcount += 1
-        finalizer(_n_GF_clear_fn, z)
-        return z
-    end
-
-    function n_GF(c::N_GField, n::Int)
-    	z = new(libSingular.n_Init(n, c.ptr))
-        c.refcount += 1
-        finalizer(_n_GF_clear_fn, z)
-        return z
-    end
-
     function n_GF(c::N_GField, n::libSingular.number_ptr)
     	z = new(n)
         c.refcount += 1
@@ -360,6 +288,8 @@ mutable struct n_GF <: Nemo.FieldElem
         return z
     end
 end
+
+n_GF(c::N_GField, n::Int = 0) = n_GF(c, libSingular.n_Init(n, c.ptr))
 
 function _n_GF_clear_fn(n::n_GF)
    R = parent(n)
@@ -407,20 +337,6 @@ mutable struct n_transExt <: Nemo.FieldElem
     ptr::libSingular.number_ptr
     parent::N_FField
 
-    function n_transExt(c::N_FField)
-    	z = new(libSingular.n_Init(0, c.ptr))
-        c.refcount += 1
-        finalizer(_n_transExt_clear_fn, z)
-        return z
-    end
-
-    function n_transExt(c::N_FField, n::Int)
-    	z = new(libSingular.n_Init(n, c.ptr))
-        c.refcount += 1
-        finalizer(_n_transExt_clear_fn, z)
-        return z
-    end
-
     function n_transExt(c::N_FField, n::libSingular.number_ptr)
     	z = new(n)
         c.refcount += 1
@@ -428,6 +344,8 @@ mutable struct n_transExt <: Nemo.FieldElem
         return z
     end
 end
+
+n_transExt(c::N_FField, n::Int = 0) = n_transExt(c, libSingular.n_Init(n, c.ptr))
 
 function _n_transExt_clear_fn(n::n_transExt)
    R = parent(n)
