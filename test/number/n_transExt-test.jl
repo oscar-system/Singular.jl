@@ -98,7 +98,10 @@ end
 @testset "n_transExt.powering..." begin
    F, (a, b, c) = FunctionField(Fp(3), ["a", "b", "c"])
 
-   @test (a*b*c + 1)^3 == a^3*b^3*c^3 + 1
+   x = a*b*c + 1
+   @test x^3 == a^3*b^3*c^3 + 1
+
+   @test_throws DomainError x^-rand(1:99)
 end
 
 @testset "n_transExt.exact_division..." begin

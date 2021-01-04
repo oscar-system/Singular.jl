@@ -243,7 +243,8 @@ end
 
 # free module of rank n
 function FreeModule(R::PolyRing{T}, n::Int) where T <: Nemo.RingElem
-   (n > typemax(Cint) || n < 0) && throw(DomainError())
+   (n > typemax(Cint) || n < 0) &&
+      throw(DomainError(n, "rank must be non-negative and <= $(typemax(Cint))"))
    S = elem_type(R)
    return FreeMod{S}(R, n)
 end

@@ -233,7 +233,7 @@ isequal(x::n_transExt, y::n_transExt) = (x == y)
 ###############################################################################
 
 function ^(x::n_transExt, y::Int)
-    y < 0 && throw(DomainError())
+    y < 0 && throw(DomainError(y, "exponent must be non-negative"))
     if isone(x)
        return x
     elseif y == 0

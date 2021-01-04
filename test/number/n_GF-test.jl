@@ -37,6 +37,10 @@
    @test isa(f, n_GF)
 
    @test isa(x, n_GF)
+
+   @test_throws DomainError FiniteField(257, 1, "a")
+   @test_throws DomainError FiniteField(2, 16, "a")
+   @test_throws DomainError FiniteField(2, 64, "a") # errors even if 2^64 == 0
 end
 
 @testset "n_GF.printing..." begin
@@ -130,6 +134,7 @@ end
    R, x = FiniteField(5, 2, "x")
 
    @test (x + 1)^2 == x^20
+   @test_throws DomainError x^-rand(1:99)
 end
 
 @testset "n_GF.exact_division..." begin

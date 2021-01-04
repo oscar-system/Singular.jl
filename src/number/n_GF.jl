@@ -130,10 +130,10 @@ show_minus_one(::Type{n_GF}) = false
 #
 ###############################################################################
 
-function -(x::n_GF) 
+function -(x::n_GF)
     C = parent(x)
     ptr = libSingular.n_Neg(x.ptr, C.ptr)
-    return C(ptr) 
+    return C(ptr)
 end
 
 ###############################################################################
@@ -224,7 +224,7 @@ isequal(x::n_GF, y::n_GF) = (x == y)
 ###############################################################################
 
 function ^(x::n_GF, y::Int)
-    y < 0 && throw(DomainError())
+    y < 0 && throw(DomainError(y, "exponent must be non-negative"))
     if isone(x)
        return x
     elseif y == 0
@@ -348,7 +348,7 @@ function (R::N_GField)()
 end
 
 function (R::N_GField)(x::Integer)
-   z = R(libSingular.n_InitMPZ(BigInt(x), R.ptr)) 
+   z = R(libSingular.n_InitMPZ(BigInt(x), R.ptr))
    z.parent = R
    return z
 end
@@ -399,10 +399,10 @@ system with given characteristic, degree and string. If this is not the
 desired behaviour, one can pass `false` for the optional `cached` parameter.
 """
 function FiniteField(p::Int, n::Int, S::String; cached=true)
-   n >= 16 || p >= 2^8 && throw(DomainError())
-   !Nemo.isprime(Nemo.fmpz(p)) && throw(DomainError())
-   n*log(p) >= 20*log(2) && throw(DomainError())
-   p^n >= 2^16 && throw(DomainError())
+   p >= 2^8 && throw(DomainError(p, "p must be < 256"))
+   !Nemo.isprime(Nemo.fmpz(p)) && throw(DomainError(p, "p must be prime"))
+   (n*log(p) >= 20*log(2) || p^n >= 2^16) &&
+      throw(DomainError("p^n must be < 2^16"))
    par = N_GField(p, n, Symbol(S))
    return par, gen(par)
 end

@@ -34,6 +34,8 @@
    f = R(Nemo.ZZ(123))
 
    @test isa(f, n_Zn)
+
+   @test_throws DomainError ResidueRing(ZZ, -rand(1:99))
 end
 
 @testset "n_Zn.printing..." begin
@@ -115,6 +117,7 @@ end
    R = ResidueRing(ZZ, 5)
 
    @test R(2)^10 == R(4)
+   @test_throws DomainError R(2)^-rand(1:99)
 end
 
 @testset "n_Zn.exact_division..." begin
@@ -152,4 +155,3 @@ end
 
    @test g == -x^4+2*x^3-x+1
 end
-

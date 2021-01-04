@@ -20,6 +20,11 @@
    @test typeof(v1) <: AbstractAlgebra.ModuleElem
 
    @test isa(v1, svector)
+
+   @test_throws DomainError FreeModule(R, -rand(1:99))
+   if sizeof(Cint) < sizeof(Int)
+      @test_throws DomainError FreeModule(R, typemax(Int))
+   end
 end
 
 @testset "svector.jet..." begin
