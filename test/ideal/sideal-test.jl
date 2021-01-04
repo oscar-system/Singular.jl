@@ -27,6 +27,11 @@
    @test isa(I4, sideal)
    @test isa(I5, sideal)
    @test isa(I6, sideal)
+
+   @test_throws DomainError MaximalIdeal(R, -rand(1:99))
+   if sizeof(Cint) < sizeof(Int)
+      @test_throws DomainError MaximalIdeal(R, typemax(Int))
+   end
 end
 
 @testset "sideal.manipulation..." begin
@@ -86,6 +91,11 @@ end
    for i = 1:5
       @test equal(S, I^i)
       S *= I
+   end
+
+   @test_throws DomainError I^(-rand(1:99))
+   if sizeof(Cint) < sizeof(Int)
+      @test_throws DomainError I^typemax(Int)
    end
 end
 
@@ -363,6 +373,6 @@ end
    mS = Singular.Matrix(S)
    @test iszero(mI*mS)
    # @test mI*T == mG
-   # should be true, but there are additional (invisible) zeros in G 
+   # should be true, but there are additional (invisible) zeros in G
    # causing a dimension mismatch
 end

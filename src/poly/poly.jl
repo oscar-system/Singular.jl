@@ -415,18 +415,19 @@ end
 ###############################################################################
 
 function ^(x::spoly, y::Int)
-    y > typemax(Cint) || y < typemin(Cint) && throw(DomainError())
-    R = parent(x)
-    if isone(x)
-       return deepcopy(x)
-    elseif y == 0
-       return one(R)
-    elseif y == 1
-       return deepcopy(x)
-    end
-    x1 = libSingular.p_Copy(x.ptr, R.ptr)
-    p = libSingular.p_Power(x1, Cint(y), R.ptr)
-    return R(p)
+   0 <= y <= typemax(Cint) ||
+      throw(DomainError(y, "exponent must be non-negative and <= $(typemax(Cint))"))
+   R = parent(x)
+   if isone(x)
+      return deepcopy(x)
+   elseif y == 0
+      return one(R)
+   elseif y == 1
+      return deepcopy(x)
+   end
+   x1 = libSingular.p_Copy(x.ptr, R.ptr)
+   p = libSingular.p_Power(x1, Cint(y), R.ptr)
+   return R(p)
 end
 
 ###############################################################################

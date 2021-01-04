@@ -198,7 +198,8 @@ end
 ###############################################################################
 
 function ^(I::sideal, n::Int)
-   (n > typemax(Cint) || n < 0) && throw(DomainError())
+   (n > typemax(Cint) || n < 0) &&
+      throw(DomainError(n, "exponent must be non-negative and <= $(typemax(Cint))"))
    R = base_ring(I)
    ptr = libSingular.id_Power(I.ptr, Cint(n), R.ptr)
    return Ideal(R, ptr)
@@ -635,7 +636,8 @@ end
 
 # maximal ideal in degree d
 function MaximalIdeal(R::PolyRing{T}, d::Int) where T <: Nemo.RingElem
-   (d > typemax(Cint) || d < 0) && throw(DomainError())
+   (d > typemax(Cint) || d < 0) &&
+      throw(DomainError(d, "degree must be non-negative and <= $(typemax(Cint))"))
    S = elem_type(R)
    ptr = libSingular.id_MaxIdeal(Cint(d), R.ptr)
    return sideal{S}(R, ptr)
@@ -770,7 +772,7 @@ function independent_sets(I::sideal{S}) where S <: Union{spoly{T}, spoly{n_unkno
 end
 
 @doc Markdown.doc"""
-    maximal_independent_set(I::sideal{S}; all::Bool = false) where S <: Union{spoly{T}, spoly{n_unknown{U}}} where {T <: Singular.FieldElem, U <: Nemo.FieldElem} 
+    maximal_independent_set(I::sideal{S}; all::Bool = false) where S <: Union{spoly{T}, spoly{n_unknown{U}}} where {T <: Singular.FieldElem, U <: Nemo.FieldElem}
 
 Returns, by default, an array containing a maximal independet set of
 $lead(I)$. $I$ has to be given by a Gröbner basis.

@@ -50,7 +50,7 @@ end
    @test isone(one(R))
    @test iszero(zero(R))
    @test isunit(R(1)) && isunit(R(2))
-   @test !isunit(R(0)) 
+   @test !isunit(R(0))
 
    @test characteristic(R) == 5
 
@@ -108,6 +108,7 @@ end
    R = Fp(5)
 
    @test R(2)^10 == R(4)
+   @test_throws DomainError R(2)^-rand(1:99)
 end
 
 @testset "n_Zp.exact_division..." begin

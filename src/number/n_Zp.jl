@@ -122,10 +122,10 @@ show_minus_one(::Type{n_Zp}) = false
 #
 ###############################################################################
 
-function -(x::n_Zp) 
+function -(x::n_Zp)
     C = parent(x)
     ptr = libSingular.n_Neg(x.ptr, C.ptr)
-    return C(ptr) 
+    return C(ptr)
 end
 
 ###############################################################################
@@ -215,7 +215,7 @@ isequal(x::n_Zp, y::n_Zp) = (x == y)
 ###############################################################################
 
 function ^(x::n_Zp, y::Int)
-    y < 0 && throw(DomainError())
+    y < 0 && throw(DomainError(y, "exponent must be non-negative"))
     if isone(x)
        return x
     elseif y == 0
@@ -347,7 +347,7 @@ function (R::N_ZpField)()
 end
 
 function (R::N_ZpField)(x::Integer)
-   z = R(libSingular.n_InitMPZ(BigInt(x), R.ptr)) 
+   z = R(libSingular.n_InitMPZ(BigInt(x), R.ptr))
    z.parent = R
    return z
 end

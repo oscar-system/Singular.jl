@@ -120,10 +120,10 @@ show_minus_one(::Type{n_Zn}) = true
 #
 ###############################################################################
 
-function -(x::n_Zn) 
+function -(x::n_Zn)
     C = parent(x)
     ptr = libSingular.n_Neg(x.ptr, C.ptr)
-    return C(ptr) 
+    return C(ptr)
 end
 
 ###############################################################################
@@ -213,7 +213,7 @@ isequal(x::n_Zn, y::n_Zn) = (x == y)
 ###############################################################################
 
 function ^(x::n_Zn, y::Int)
-    y < 0 && throw(DomainError())
+    y < 0 && throw(DomainError(y, "exponent must be non-negative"))
     if isone(x)
        return x
     elseif y == 0
@@ -319,7 +319,7 @@ function (R::N_ZnRing)()
 end
 
 function (R::N_ZnRing)(x::Integer)
-   z = R(libSingular.n_InitMPZ(BigInt(x), R.ptr)) 
+   z = R(libSingular.n_InitMPZ(BigInt(x), R.ptr))
    z.parent = R
    return z
 end
@@ -359,7 +359,7 @@ end
 
 function ResidueRing(R::Integers, a::Int; cached=true)
    a == 0 && throw(DivideError())
-   a < 0 && throw(DomainError())
+   a < 0 && throw(DomainError(a, "modulus must be non-negative"))
 
    return N_ZnRing(a)
 end

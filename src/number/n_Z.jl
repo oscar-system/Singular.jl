@@ -222,7 +222,7 @@ isless(x::Integer, y::n_Z) = isless(parent(y)(x), y)
 ###############################################################################
 
 function ^(x::n_Z, y::Int)
-    y < 0 && throw(DomainError())
+    y < 0 && throw(DomainError(y, "exponent must be non-negative"))
     if isone(x)
        return x
     elseif y == 0

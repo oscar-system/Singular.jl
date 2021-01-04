@@ -112,6 +112,7 @@ end
 
 @testset "n_Z.powering..." begin
    @test ZZ(2)^10 == 1024
+   @test_throws DomainError ZZ(2)^-rand(1:99)
 end
 
 @testset "n_Z.exact_division..." begin

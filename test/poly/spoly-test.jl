@@ -248,6 +248,11 @@ end
    @test a^0 == 1
    @test a^1 == x^2 + 3x + 1
    @test a^3 == x^6+9*x^5+30*x^4+45*x^3+30*x^2+9*x+1
+
+   @test_throws DomainError a^(-rand(1:99))
+   if sizeof(Cint) < sizeof(Int)
+      @test_throws DomainError a^typemax(Int)
+   end
 end
 
 @testset "spoly.exact_division..." begin
@@ -481,4 +486,3 @@ end
    @test hash(x,zero(UInt)) == hash(x+y-y,zero(UInt))
    @test hash(x,one(UInt)) == hash(x+y-y,one(UInt))
 end
-
