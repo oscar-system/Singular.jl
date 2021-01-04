@@ -89,6 +89,18 @@ function show(io::IO, c::N_ZnRing)
    print(io, "Residue Ring of Integer Ring modulo ", characteristic(c))
 end
 
+function Base.show(io::IO, ::MIME"text/plain", a::n_Zn)
+  print(io, AbstractAlgebra.obj_to_string(a, context = io))
+end
+
+function AbstractAlgebra.expressify(n::n_Zn; context = nothing)::Any
+  x = BigInt()
+  GC.@preserve n begin
+    ccall((:__gmpz_set, :libgmp), Cvoid, (Ref{BigInt},  Ptr{Any}), x, n.ptr.cpp_object)
+  end
+  return AbstractAlgebra.expressify(x, context = context)
+end
+
 function show(io::IO, n::n_Zn)
    libSingular.StringSetS("")
    libSingular.n_Write(n.ptr, parent(n).ptr, false)

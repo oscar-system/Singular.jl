@@ -87,6 +87,22 @@ end
    R, (x, ) = PolynomialRing(ZZ, ["x", ])
 
    @test length(string(3x^2 + 2x + 1)) > 3
+   @test length(sprint(show, "text/plain", 3x^2 + 2x + 1)) > 3
+
+   R, (x, ) = PolynomialRing(QQ, ["x", ])
+
+   @test length(string(3x^2 + 2x + 1)) > 3
+   @test length(sprint(show, "text/plain", 3x^2 + 2x + 1)) > 3
+
+   R, (x, ) = PolynomialRing(Fp(5), ["x", ])
+
+   @test length(string(3x^2 + 2x + 1)) > 3
+   @test length(sprint(show, "text/plain", 3x^2 + 2x + 1)) > 3
+
+   R, (x, ) = PolynomialRing(ResidueRing(ZZ, 5), ["x", ])
+
+   @test length(string(3x^2 + 2x + 1)) > 3
+   @test length(sprint(show, "text/plain", 3x^2 + 2x + 1)) > 3
 end
 
 @testset "spoly.manipulation..." begin

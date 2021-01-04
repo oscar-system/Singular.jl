@@ -106,6 +106,10 @@ function show(io::IO, c::Rationals)
    print(io, "Rational Field")
 end
 
+function AbstractAlgebra.expressify(n::n_Q; context = nothing)::Any
+  return AbstractAlgebra.expressify(Rational{BigInt}(n), context = context)
+end
+
 function show(io::IO, n::n_Q)
     libSingular.StringSetS("")
 

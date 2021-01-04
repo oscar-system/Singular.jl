@@ -65,6 +65,7 @@ end
 
 @testset "n_Q.printing..." begin
    @test string(QQ(123)) == "123"
+   @test sprint(show, "text/plain", (QQ(123))) == "123"
 end
 
 @testset "n_Q.manipulation..." begin
