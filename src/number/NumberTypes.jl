@@ -309,6 +309,7 @@ mutable struct N_GField <: Field
    from_n_Z::Ptr{Nothing}
    to_n_Z::Ptr{Nothing}
    refcount::Int
+   S::Symbol
 
    function N_GField(p::Int, n::Int, S::Symbol) 
       if haskey(N_GFieldID, (p, n, S))
@@ -318,7 +319,7 @@ mutable struct N_GField <: Field
          GC.@preserve gfinfo begin
          ptr = libSingular.nInitChar(libSingular.n_GF, pointer_from_objref(gfinfo))
          d = new(ptr, n, libSingular.n_SetMap(ZZ.ptr, ptr), 
-              libSingular.n_SetMap(ptr, ZZ.ptr), 1)
+              libSingular.n_SetMap(ptr, ZZ.ptr), 1, S)
          end
          N_GFieldID[p, n, S] = d
          finalizer(_N_GField_clear_fn, d)

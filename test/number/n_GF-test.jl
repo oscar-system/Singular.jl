@@ -42,7 +42,20 @@ end
 @testset "n_GF.printing..." begin
    R, x = FiniteField(5, 2, "x")
 
-   @test string(3x + 2) == "x^11"
+   @test string(zero(R)) == "0"
+   @test string(one(R)) == "1"
+   @test string(x) == "x"
+   @test string(x^2) == "x^2"
+   @test string(x^11) == "x^11"
+
+   @test sprint(show, "text/plain", zero(R)) == "0"
+   @test sprint(show, "text/plain", one(R)) == "1"
+   @test sprint(show, "text/plain", x) == "x"
+   @test sprint(show, "text/plain", x^2) == "x^2"
+   @test sprint(show, "text/plain", x^11) == "x^11"
+
+   @test !Singular.AbstractAlgebra.isnegative(x)
+   @test !Singular.AbstractAlgebra.needs_parentheses(x)
 end
 
 @testset "n_GF.manipulation..." begin

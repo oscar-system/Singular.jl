@@ -81,7 +81,6 @@ function show(io::IO, c::N_ZpField)
 end
 
 function Base.show(io::IO, ::MIME"text/plain", a::n_Zp)
-  println("here")
   print(io, AbstractAlgebra.obj_to_string(a, context = io))
 end
 
