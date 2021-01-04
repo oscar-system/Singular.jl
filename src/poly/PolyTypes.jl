@@ -64,10 +64,10 @@ mutable struct PolyRing{T <: Nemo.RingElem} <: Nemo.MPolyRing{T}
 end
 
 function (R::PolyRing{T})(r::libSingular.ring_ptr) where T
-    new_r = deepcopy(R)
-    new_ptr = new_r.ptr
-    new_r.ptr = r
-    return new_r
+   new_r = deepcopy(R)
+   new_ptr = new_r.ptr
+   new_r.ptr = r
+   return new_r
 end
 
 function _PolyRing_clear_fn(R::PolyRing)
@@ -81,64 +81,47 @@ mutable struct spoly{T <: Nemo.RingElem} <: Nemo.MPolyElem{T}
    ptr::libSingular.poly_ptr
    parent::PolyRing{T}
 
-   function spoly{T}(R::PolyRing{T}) where T <: Nemo.RingElem
-      p = libSingular.p_ISet(0, R.ptr)
-      z = new{T}(p, R)
-      R.refcount += 1
-      finalizer(_spoly_clear_fn, z)
-      return z
-   end
-    
    function spoly{T}(R::PolyRing{T}, p::libSingular.poly_ptr) where T <: Nemo.RingElem
       z = new{T}(p, R)
       R.refcount += 1
       finalizer(_spoly_clear_fn, z)
       return z
    end
-    
-   function spoly{T}(R::PolyRing{T}, p::T) where T <: Nemo.RingElem
-      n = libSingular.n_Copy(p.ptr, parent(p).ptr)
-      r = libSingular.p_NSet(n, R.ptr)
-      z = new{T}(r, R)
-      R.refcount += 1
-      finalizer(_spoly_clear_fn, z)
-      return z
-   end
-    
-   function spoly{T}(R::PolyRing{T}, n::libSingular.number_ptr) where T <: Nemo.RingElem
-      nn = libSingular.n_Copy(n, base_ring(R).ptr)
-      p = libSingular.p_NSet(nn, R.ptr)
-      z = new{T}(p, R)
-      R.refcount += 1
-      finalizer(_spoly_clear_fn, z)
-      return z
-   end
-
-   function spoly{T}(R::PolyRing{T}, n::Ptr{Cvoid}) where T <: Nemo.RingElem
-      p = libSingular.p_NSet(n, R.ptr)
-      z = new(p, R)
-      R.refcount += 1
-      finalizer(_spoly_clear_fn, z)
-      return z
-   end
-
-   function spoly{T}(R::PolyRing{T}, b::Int) where T <: Nemo.RingElem
-      p = libSingular.p_ISet(b, R.ptr)
-      z = new{T}(p, R)
-      R.refcount += 1
-      finalizer(_spoly_clear_fn, z)
-      return z
-   end
-
-   function spoly{T}(R::PolyRing{T}, b::BigInt) where T <: Nemo.RingElem
-      n = libSingular.n_InitMPZ(b, R.base_ring.ptr)
-      p = libSingular.p_NSet(n, R.ptr)
-      z = new{T}(p, R)
-      R.refcount += 1
-      finalizer(_spoly_clear_fn, z)
-      return z
-   end
 end
+
+function spoly{T}(R::PolyRing{T}) where T <: Nemo.RingElem
+   p = libSingular.p_ISet(0, R.ptr)
+   return spoly{T}(R, p)
+end
+
+function spoly{T}(R::PolyRing{T}, p::T) where T <: Nemo.RingElem
+   n = libSingular.n_Copy(p.ptr, parent(p).ptr)
+   r = libSingular.p_NSet(n, R.ptr)
+   return spoly{T}(R, r)
+end
+
+function spoly{T}(R::PolyRing{T}, n::libSingular.number_ptr) where T <: Nemo.RingElem
+   nn = libSingular.n_Copy(n, base_ring(R).ptr)
+   p = libSingular.p_NSet(nn, R.ptr)
+   return spoly{T}(R, p)
+end
+
+function spoly{T}(R::PolyRing{T}, n::Ptr{Cvoid}) where T <: Nemo.RingElem
+   p = libSingular.p_NSet(n, R.ptr)
+   return spoly{T}(R, p)
+end
+
+function spoly{T}(R::PolyRing{T}, b::Int) where T <: Nemo.RingElem
+   p = libSingular.p_ISet(b, R.ptr)
+   return spoly{T}(R, p)
+end
+
+function spoly{T}(R::PolyRing{T}, b::BigInt) where T <: Nemo.RingElem
+   n = libSingular.n_InitMPZ(b, R.base_ring.ptr)
+   p = libSingular.p_NSet(n, R.ptr)
+   return spoly{T}(R, p)
+end
+
 
 function _spoly_clear_fn(p::spoly)
    R = parent(p)
