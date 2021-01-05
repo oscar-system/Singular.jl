@@ -43,7 +43,7 @@ end
 # obtained via <https://github.com/JuliaPackaging/Scratch.jl> -- however, that
 # requires Julia >= 1.5; so we can't use it until we drop support for Julia 1.3 & 1.4.
 #
-const wrapperpath = abspath(joinpath(@__DIR__, "..", "bin", "v$(VERSION.major).$(VERSION.minor)"))
+const wrapperpath = abspath(@__DIR__, "..", "bin", "v$(VERSION.major).$(VERSION.minor)")
 @info "Regenerating 4ti2 wrappers in $(wrapperpath)"
 regenerate_4ti2_wrapper(joinpath(lib4ti2_jll.find_artifact_dir(), "bin"), wrapperpath)
 
@@ -58,9 +58,9 @@ end
 #
 function regenerate_libraryfuncdictionary(prefixpath)
 
-    library_dir = get(ENV, "SINGULAR_LIBRARY_DIR", abspath(joinpath(prefixpath, "share", "singular", "LIB")))
+    library_dir = get(ENV, "SINGULAR_LIBRARY_DIR", abspath(prefixpath, "share", "singular", "LIB"))
     filenames = filter(x -> endswith(x, ".lib"), readdir(library_dir))
-    output_filename = abspath(joinpath(@__DIR__, "libraryfuncdictionary.jl"))
+    output_filename = abspath(@__DIR__, "libraryfuncdictionary.jl")
 
     @info "Regenerating $(output_filename)"
 
@@ -72,7 +72,7 @@ function regenerate_libraryfuncdictionary(prefixpath)
       All other columns (containing info such as line numbers, library name, etc)
       are ignored.
     =#
-    cd(abspath(joinpath(prefixpath, "bin"))) do
+    cd(abspath(prefixpath, "bin")) do
         open(output_filename, "w") do outputfile
             println(outputfile, "libraryfunctiondictionary = Dict(")
             for i in filenames
