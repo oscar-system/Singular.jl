@@ -61,8 +61,6 @@ export ZZ, QQ, FiniteField, FunctionField, CoefficientRing, Fp
 #
 ###############################################################################
 
-const pkgdir = realpath(joinpath(dirname(@__FILE__), ".."))
-
 const libsingular = Singular_jll.libsingular
 const binSingular = Singular_jll.Singular_path
 
@@ -140,27 +138,14 @@ FB Mathematik der Universitaet, D-67653 Kaiserslautern        \\
    end
 end
 
-if VERSION >= v"1.4"
-  deps = Pkg.dependencies()
-  if haskey(deps, Base.UUID("bcd08a7b-43d2-5ff7-b6d4-c458787f915c"))
-    ver = Pkg.dependencies()[Base.UUID("bcd08a7b-43d2-5ff7-b6d4-c458787f915c")]
-    if occursin("/dev/", ver.source)
-      global VERSION_NUMBER = VersionNumber("$(ver.version)-dev")
-    else
-      global VERSION_NUMBER = VersionNumber("$(ver.version)")
-    end
-  else
-    global VERSION_NUMBER = "building"
-  end
-else
-  ver = Pkg.API.__installed(PKGMODE_MANIFEST)["Singular"]
-  dir = dirname(@__DIR__)
-  if occursin("/dev/", dir)
-    global VERSION_NUMBER = VersionNumber("$(ver)-dev")
-  else
-    global VERSION_NUMBER = VersionNumber("$(ver)")
-  end
+# pkgdir was added in Julia 1.4
+if VERSION < v"1.4"
+   pkgdir(m::Core.Module) = abspath(Base.pathof(Base.moduleroot(m)), "..", "..")
 end
+pkgproject(m::Core.Module) = Pkg.Operations.read_project(Pkg.Types.projectfile_path(pkgdir(m)))
+pkgversion(m::Core.Module) = pkgproject(m).version
+const VERSION_NUMBER = pkgversion(@__MODULE__)
+
 
 ###############################################################################
 #
