@@ -54,3 +54,15 @@ function p_ExtGcd(a::poly_ptr, b::poly_ptr, res::Ptr{poly_ptr}, s::Ptr{poly_ptr}
     rp = reinterpret(Ptr{Nothing},res)
     return p_ExtGcd_internal(a, b, rp, sp, tp, r)
 end
+
+function ring_ordering_as_symbol(r::ring_ptr)
+   if Bool(rRing_ord_pure_dp(r))
+      return :degrevlex
+   elseif Bool(rRing_ord_pure_Dp(r))
+      return :deglex
+   elseif Bool(rRing_ord_pure_lp(r))
+      return :lex
+   else
+      return :unknown
+   end
+end
