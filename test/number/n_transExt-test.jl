@@ -32,6 +32,9 @@
    @test isa(f, n_transExt)
 
    @test_throws ArgumentError FunctionField(QQ, String[])
+   @test_throws ArgumentError FunctionField(QQ, ["", "b"])
+   @test_throws ArgumentError FunctionField(QQ, ["a", ""])
+   @test_throws ArgumentError FunctionField(QQ, [""])
 end
 
 @testset "n_transExt.printing..." begin
