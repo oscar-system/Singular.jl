@@ -35,6 +35,7 @@
    @test_throws ArgumentError FunctionField(QQ, ["", "b"])
    @test_throws ArgumentError FunctionField(QQ, ["a", ""])
    @test_throws ArgumentError FunctionField(QQ, [""])
+   @test_throws ArgumentError FunctionField(QQ, ["a", "b", "a"])
 end
 
 @testset "n_transExt.printing..." begin

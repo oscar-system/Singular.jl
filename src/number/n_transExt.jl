@@ -378,6 +378,7 @@ function FunctionField(F::Singular.Field, S::Vector{String}; cached::Bool=true)
    typeof(F) == N_GField && error("Finite field extensions of Fp not supported.")
    isempty(S) && throw(ArgumentError("array must be non-empty"))
    any(isempty, S) && throw(ArgumentError("strings in array must be non-empty"))
+   allunique(S) || throw(ArgumentError("strings in array must be pairwise different"))
    R = N_FField(F, Symbol.(S))
    return tuple(R, transcendence_basis(R))
 end
