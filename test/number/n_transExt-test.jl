@@ -30,6 +30,12 @@
    f = F(Nemo.ZZ(123))
 
    @test isa(f, n_transExt)
+
+   @test_throws ArgumentError FunctionField(QQ, String[])
+   @test_throws ArgumentError FunctionField(QQ, ["", "b"])
+   @test_throws ArgumentError FunctionField(QQ, ["a", ""])
+   @test_throws ArgumentError FunctionField(QQ, [""])
+   @test_throws ArgumentError FunctionField(QQ, ["a", "b", "a"])
 end
 
 @testset "n_transExt.printing..." begin
@@ -126,4 +132,3 @@ end
    @test g == (2*a^10-2*b^5*c^5+1)*x^5+(a^10+1)
 
 end
-
