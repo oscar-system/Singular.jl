@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   PolyRing/spoly 
+#   PolyRing/spoly
 #
 ###############################################################################
 
@@ -35,7 +35,7 @@ mutable struct PolyRing{T <: Nemo.RingElem} <: Nemo.MPolyRing{T}
       else
          v = [pointer(Base.Vector{UInt8}(string(str)*"\0")) for str in s]
          r = libSingular.nCopyCoeff(R.ptr)
-         
+
          blk0 = unsafe_wrap(Array, Ptr{Cint}(libSingular.omAlloc0(Csize_t(3*sizeof(Cint)))), 3; own=false)
          blk1 = unsafe_wrap(Array, Ptr{Cint}(libSingular.omAlloc0(Csize_t(3*sizeof(Cint)))), 3; own=false)
          if (ordering == ringorder_c || ordering == ringorder_C)

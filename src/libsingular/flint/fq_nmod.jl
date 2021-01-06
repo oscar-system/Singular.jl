@@ -9,7 +9,7 @@ function fq_nmodInit(i::Clong, cf::Ptr{Cvoid})
    R = julia(cf_ptr)::Nemo.FqNmodFiniteField
    return number(R(Int(i)))
 end
-   
+
 function fq_nmodDelete(ptr::Ptr{Ptr{Cvoid}}, cf::Ptr{Cvoid})
    ptr_new = unsafe_load(ptr)
    number_pop!(nemoNumberID, Ptr{Cvoid}(ptr_new))

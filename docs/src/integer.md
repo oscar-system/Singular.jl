@@ -89,7 +89,7 @@ return of the quotient and $r$ representing return of the remainder.
 
 Function                    | Return | Rounding
 ----------------------------|--------|------------------------
-`divrem(a::n_Z, b::n_Z)`    | q, r   | towards zero 
+`divrem(a::n_Z, b::n_Z)`    | q, r   | towards zero
 `rem(a::n_Z, b::n_Z)`       | r      | towards zero
 `mod(a::n_Z, b::n_Z)`       | r      | down
 

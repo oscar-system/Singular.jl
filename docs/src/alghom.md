@@ -9,12 +9,12 @@ over Nemo/Singular coefficient rings.
 
 The default algebra homomorphism type in Singular.jl is the Singular `SAlgHom` type.
 
-Additionally, a special type for the identity homomorphism has been implemented. 
-The type in Singular.jl for the latter is `SIdAlgHom`. 
+Additionally, a special type for the identity homomorphism has been implemented.
+The type in Singular.jl for the latter is `SIdAlgHom`.
 
 All algebra homomorphism types belong directly to the abstract type `AbstractAlgebraHomomorphism{T}`.
 
-## Algebra Homomorphism functionality 
+## Algebra Homomorphism functionality
 
 ### Constructors
 
@@ -46,26 +46,26 @@ f = AlgebraHomomorphism(R, S, V)
 
 ### Operating on objects
 
-It is possible to act on polynomials and ideals via algebra homomorphisms. 
+It is possible to act on polynomials and ideals via algebra homomorphisms.
 
 **Examples**
 
 ```
 R, (x, y, z, w) = PolynomialRing(Nemo.ZZ, ["x", "y", "z", "w"];
                              ordering=:negdegrevlex)
-   
+
 S, (a, b, c) = PolynomialRing(Nemo.ZZ, ["a", "b", "c"];
                              ordering=:degrevlex)
-   
+
 V = [a, a + b^2, b - c, c + b]
-   
+
 f = AlgebraHomomorphism(R, S, V)
-   
+
 id  = IdentityAlgebraHomomorphism(S)
 
-   
+
 J = Ideal(R, [x, y^3])
-   
+
 p = x + y^3 + z*w
 
 K = f(J)
@@ -133,14 +133,14 @@ kernel(f::SAlgHom)
 ```
 R, (x, y, z, w) = PolynomialRing(QQ, ["x", "y", "z", "w"];
                              ordering=:negdegrevlex)
-   
+
 S, (a, b, c) = PolynomialRing(QQ, ["a", "b", "c"];
                              ordering=:degrevlex)
-   
+
 I = Ideal(S, [a, a + b^2, b - c, c + b])
-   
+
 f = SAlgebraHomomorphism(R, S, gens(I))
-   
+
 idS  = IdentityAlgebraHomomorphism(S)
 
 P1 = preimage(f, I)

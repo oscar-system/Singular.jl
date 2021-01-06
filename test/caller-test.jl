@@ -13,7 +13,7 @@
     @test 1 == Singular.LibSets.isEqualInt(R, [1 2; 3 4], [1 2; 3 4])
 
     R, (x,y,z) = PolynomialRing(Singular.QQ, ["x", "y", "z"])
-    
+
     i1 = Singular.LibPolylib.cyclic(R, 3)
     i2 = Ideal( R, x+y+z, x*y+x*z+y*z, x*y*z-1 )
     @test equal(i1, i2)

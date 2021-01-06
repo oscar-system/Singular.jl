@@ -13,7 +13,7 @@ end
 
 Singular.jl allows the creation of submodules of a free module over a Singular polynomial
 ring, given by a finite generating set. These are internally stored as a list of elements
-of a free module over a polynomial ring $R$. This list of generators can also 
+of a free module over a polynomial ring $R$. This list of generators can also
 have the property of being a Groebner basis.
 
 The default finitely generated module type in Singular.jl is the Singular `smodule` type.
@@ -54,7 +54,7 @@ creating modules.
 Module{T <: Nemo.RingElem}(R::PolyRing{T}, vecs::svector{spoly{T}}...)
 ```
 
-Construct the module over the polynomial ring $R$ whose generators are given 
+Construct the module over the polynomial ring $R$ whose generators are given
 by the given parameter list of vectors (of length $n$), each component of which is a
 polynomial. These vectors represent elements of the free module $R^n$.
 
@@ -266,6 +266,6 @@ v2 = vector(R, y - x, y - y^2)
 v3 = v1 + v2
 
 M = Singular.Module(R, v1, v2, v3)
-   
+
 min = minimal_generating_set(M)
 ```

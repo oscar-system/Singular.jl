@@ -39,7 +39,7 @@ function p_SetExpV(p::poly_ptr, ev::Array{Cint, 1}, r::ring_ptr)
 end
 
 function p_SetExpVL(p::poly_ptr, ev::Array{Clong, 1}, r::ring_ptr)
-   ptr = pointer(ev) 
+   ptr = pointer(ev)
    p_SetExpVL_internal(p, ptr, r)
 end
 

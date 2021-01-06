@@ -9,7 +9,7 @@ function nf_elemInit(i::Clong, cf::Ptr{Cvoid})
    R = julia(cf_ptr)::Nemo.AnticNumberField
    return number(R(Int(i)))
 end
-   
+
 function nf_elemDelete(ptr::Ptr{Ptr{Cvoid}}, cf::Ptr{Cvoid})
    ptr_new = unsafe_load(ptr)
    number_pop!(nemoNumberID, Ptr{Cvoid}(ptr_new))

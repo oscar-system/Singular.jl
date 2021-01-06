@@ -126,12 +126,12 @@ mutable struct N_ZnRing <: Ring
    to_n_Z::Ptr{Nothing}
    refcount::Int
 
-   function N_ZnRing(n::Int) 
+   function N_ZnRing(n::Int)
       if haskey(N_ZnRingID, n)
          d = N_ZnRingID[n]::N_ZnRing
       else
          ptr = libSingular.nInitChar(libSingular.n_Zn, pointer_from_objref(ZnmInfo(BigInt(n), UInt(1))))
-         d = new(ptr, libSingular.n_SetMap(ZZ.ptr, ptr), 
+         d = new(ptr, libSingular.n_SetMap(ZZ.ptr, ptr),
               libSingular.n_SetMap(ptr, ZZ.ptr), 1)
          N_ZnRingID[n] = d
          finalizer(_N_ZnRing_clear_fn, d)
@@ -186,12 +186,12 @@ mutable struct N_ZpField <: Field
    to_n_Z::Ptr{Nothing}
    refcount::Int
 
-   function N_ZpField(n::Int) 
+   function N_ZpField(n::Int)
       if haskey(N_ZpFieldID, n)
          d = N_ZpFieldID[n]::N_ZpField
       else
          ptr = libSingular.nInitChar(libSingular.n_Zp, Ptr{Nothing}(n))
-         d = new(ptr, libSingular.n_SetMap(ZZ.ptr, ptr), 
+         d = new(ptr, libSingular.n_SetMap(ZZ.ptr, ptr),
               libSingular.n_SetMap(ptr, ZZ.ptr), 1)
          N_ZpFieldID[n] = d
          finalizer(_N_ZpField_clear_fn, d)
@@ -253,14 +253,14 @@ mutable struct N_GField <: Field
    refcount::Int
    S::Symbol
 
-   function N_GField(p::Int, n::Int, S::Symbol) 
+   function N_GField(p::Int, n::Int, S::Symbol)
       if haskey(N_GFieldID, (p, n, S))
          d = N_GFieldID[p, n, S]::N_GField
       else
          gfinfo = GFInfo(Cint(p), Cint(n), pointer(Base.Vector{UInt8}(string(S)*"\0")))
          GC.@preserve gfinfo begin
          ptr = libSingular.nInitChar(libSingular.n_GF, pointer_from_objref(gfinfo))
-         d = new(ptr, n, libSingular.n_SetMap(ZZ.ptr, ptr), 
+         d = new(ptr, n, libSingular.n_SetMap(ZZ.ptr, ptr),
               libSingular.n_SetMap(ptr, ZZ.ptr), 1, S)
          end
          N_GFieldID[p, n, S] = d
@@ -370,7 +370,7 @@ mutable struct CoefficientRing{T <: Nemo.RingElem} <: Ring
    function CoefficientRing{T}(R::Nemo.Ring, cached::Bool=true) where T
       if haskey(CoeffRingID, R)
          return CoeffRingID[R]::CoefficientRing{T}
-      else 
+      else
          c = libSingular.register(R)
          ptr = pointer_from_objref(R)
          z = new(libSingular.nInitChar(c, ptr), R)

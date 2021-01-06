@@ -9,7 +9,7 @@ function nemoRingInit(i::Clong, cf::Ptr{Cvoid})
    R = unsafe_pointer_to_objref(data_ptr)
    return number(R(i))
 end
-   
+
 function nemoRingDelete(ptr::Ptr{Ptr{Cvoid}}, cf::Ptr{Cvoid})
    n = unsafe_load(ptr)
    if n != C_NULL
@@ -211,7 +211,7 @@ end
 ###############################################################################
 
 function nemoRingInitChar(cf::Ptr{Cvoid}, p::Ptr{Cvoid})
-    
+
     ring_struct = singular_coeff_ring_struct()
 
     ring_struct.has_simple_alloc = 0

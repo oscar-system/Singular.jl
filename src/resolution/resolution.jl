@@ -77,7 +77,7 @@ function betti(r::sresolution)
         ideal_list = libSingular.get_minimal_res(r.ptr)
    else
         ideal_list = libSingular.get_full_res(r.ptr)
-   end 
+   end
    array = libSingular.syBetti_internal(ideal_list, length(r), r.base_ring.ptr)
    return unsafe_wrap(Array, array[1].cpp_object,
 	                    (array[2], array[3]); own=true)

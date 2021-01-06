@@ -114,9 +114,9 @@ function show(io::IO, n::n_Q)
     libSingular.StringSetS("")
 
     libSingular.n_Write(n.ptr, parent(n).ptr, false)
- 
+
     m = libSingular.StringEndS()
- 
+
     print(io,m)
 end
 
@@ -133,10 +133,10 @@ show_minus_one(::Type{n_Q}) = false
 #
 ###############################################################################
 
-function -(x::n_Q) 
+function -(x::n_Q)
     C = parent(x)
     ptr = libSingular.n_Neg(x.ptr, C.ptr)
-    return C(ptr) 
+    return C(ptr)
 end
 
 ###############################################################################
