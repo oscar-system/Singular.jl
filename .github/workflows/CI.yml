@@ -1,7 +1,8 @@
 name: Run tests
 
-on: [push, pull_request]
-
+on:
+  - push
+  - pull_request
 
 jobs:
   test:
@@ -23,6 +24,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          # For Codecov, we must also fetch the parent of the HEAD commit to
+          # be able to properly deal with PRs / merges
+          fetch-depth: 2
       - name: "Set up Julia"
         uses: julia-actions/setup-julia@v1
         with:
@@ -43,11 +48,23 @@ jobs:
         uses: julia-actions/julia-buildpkg@latest
       - name: "Run tests"
         uses: julia-actions/julia-runtest@latest
-      - uses: julia-actions/julia-processcoverage@v1
-      - uses: codecov/codecov-action@v1
-        with:
-          file: lcov.info
-      - name: Coveralls Parallel
+      - name: "Run doctests"
+        if: ${{ matrix.julia-version == '1.5' }}
+        run: |
+          julia --project=docs --color=yes --code-coverage -e '
+            using Pkg
+            Pkg.develop(PackageSpec(path=pwd()))
+            Pkg.instantiate()
+            using Documenter: doctest
+            using Singular
+            doctest(Singular)'
+      - name: "Process code coverage"
+        uses: julia-actions/julia-processcoverage@v1
+      - name: "Upload coverage data to Codecov"
+        continue-on-error: true
+        uses: codecov/codecov-action@v1
+      - name: "Upload coverage data to Coveralls"
+        continue-on-error: true
         uses: coverallsapp/github-action@master
         with:
           path-to-lcov: lcov.info
@@ -59,11 +76,11 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     steps:
-    - name: Coveralls Finished
-      uses: coverallsapp/github-action@master
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        parallel-finished: true
+      - name: "Finish Coveralls coverage upload"
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          parallel-finished: true
 
   docs:
     name: Documentation
