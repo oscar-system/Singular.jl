@@ -18,7 +18,7 @@ export spoly, PolyRing, change_base_ring, coeff, coeffs,
 
 parent(p::spoly) = p.parent
 
-base_ring(R::PolyRing{T}) where T <: Nemo.RingElem = R.base_ring
+base_ring(R::PolyRing{T}) where T <: Nemo.RingElem = R.base_ring::parent_type(T)
 
 base_ring(p::spoly) = base_ring(parent(p))
 
