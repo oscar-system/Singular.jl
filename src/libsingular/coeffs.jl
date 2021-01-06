@@ -134,7 +134,8 @@ function number_pop!(D::Base.Dict{UInt, live_cache}, ptr::Ptr{Cvoid})
     else
         push!(undeletable_list, ptr)
     end
-    iptr = reinterpret(UInt, ptr) >> 24                                                      if haskey(D, iptr)
+    iptr = reinterpret(UInt, ptr) >> 24
+    if haskey(D, iptr)
         val = D[iptr]
         val.num -= 1
         my_actual_counter.deleted += 1
