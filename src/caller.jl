@@ -15,7 +15,8 @@ end
       4. If the pointer type if ambigious (module, ideal), an additional argument that
          needs to be passed to the ring to construct the right object.
 =#
-casting_functions_pre = Dict(:NUMBER_CMD     => (libSingular.NUMBER_CMD_CASTER,     true, ()),
+casting_functions_pre = Dict(
+    :NUMBER_CMD     => (libSingular.NUMBER_CMD_CASTER,     true, ()),
     :RING_CMD       => (libSingular.RING_CMD_CASTER,       false, ()),
     :POLY_CMD       => (libSingular.POLY_CMD_CASTER,       true, ()),
     :IDEAL_CMD      => (libSingular.IDEAL_CMD_CASTER,      true, ()),
@@ -29,24 +30,17 @@ casting_functions_pre = Dict(:NUMBER_CMD     => (libSingular.NUMBER_CMD_CASTER, 
     :BIGINT_CMD     => (libSingular.BIGINT_CMD_CASTER,     false, ()),
     :BIGINTMAT_CMD  => (libSingular.BIGINTMAT_CMD_CASTER,  false, ()),
     :MAP_CMD        => (libSingular.MAP_CMD_CASTER,        false, ()),
-    :RESOLUTION_CMD => (libSingular.RESOLUTION_CMD_CASTER, true, (:resolution,)))
+    :RESOLUTION_CMD => (libSingular.RESOLUTION_CMD_CASTER, true, (:resolution,)),
+    )
 
 casting_functions = nothing
 
 function create_casting_functions()
-    pair_array = Any[]
-    for (sym, func) in casting_functions_pre
-        push!(pair_array, mapping_types_reversed[sym] => func)
-    end
-    return Dict(pair_array...)
+    return Dict(mapping_types_reversed[sym] => func for (sym, func) in casting_functions_pre)
 end
 
 function convert_ring_content(value_list, rng)
-    return_dict = Dict{Symbol, Any}()
-    for i in value_list
-        return_dict[i[2]] = convert_return_value([false, i[3], i[1]], rng)
-    end
-    return return_dict
+    return Dict(i[2] => convert_return_value([false, i[3], i[1]], rng) for i in value_list)
 end
 
 # Converts a single return value back to Julia, i.e.,
@@ -55,15 +49,16 @@ function convert_return_value(single_value, rng = nothing)
     if single_value[1]
         error("received list instead of single value")
     end
-    cast = casting_functions[single_value[3]][1](single_value[2])
+    cast_desc = casting_functions[single_value[3]]
+    cast = cast_desc[1](single_value[2])
     if cast isa Array{Any}
         return recursive_translate(cast, rng)
     elseif cast isa libSingular.ring
         new_ring = rng(cast)
         return [new_ring, convert_ring_content(libSingular.get_ring_content(cast), new_ring)]
-    elseif casting_functions[single_value[3]][2]
-        if length(casting_functions[single_value[3]][3]) > 0
-            cast = rng(cast, Val(casting_functions[single_value[3]][3][1]))
+    elseif cast_desc[2]
+        if length(cast_desc[3]) > 0
+            cast = rng(cast, Val(cast_desc[3][1]))
         else
             cast = rng(cast)
         end

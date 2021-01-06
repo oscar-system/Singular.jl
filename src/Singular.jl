@@ -71,7 +71,6 @@ const libsingula_julia = libsingular_julia_jll.libsingular_julia
 const libflint = Nemo.libflint
 const libantic = Nemo.libantic
 
-mapping_types = nothing
 mapping_types_reversed = nothing
 
 function __init__()
@@ -115,9 +114,8 @@ function __init__()
      :comp1max => ringorder_c,
      :comp1min => ringorder_C
    )
-   global mapping_types, mapping_types_reversed, casting_functions
-   mapping_types = Dict( i[1] => i[2] for i in libSingular.get_type_mapper() )
-   mapping_types_reversed = Dict( j => i for (i, j) in mapping_types )
+   global mapping_types_reversed, casting_functions
+   mapping_types_reversed = Dict( i[2] => i[1] for i in libSingular.get_type_mapper() )
    casting_functions = create_casting_functions()
 
    show_banner = isinteractive() &&
