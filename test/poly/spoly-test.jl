@@ -103,6 +103,9 @@ end
 
    @test length(string(3x^2 + 2x + 1)) > 3
    @test length(sprint(show, "text/plain", 3x^2 + 2x + 1)) > 3
+
+   R, (x, ) = PolynomialRing(FiniteField(5, 3, "a")[1], ["x", ])
+   @test string(x) == "x"
 end
 
 @testset "spoly.manipulation..." begin

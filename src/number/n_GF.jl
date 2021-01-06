@@ -93,19 +93,34 @@ function show(io::IO, c::N_GField)
    print(io, "Finite Field of Characteristic ", characteristic(c), " and degree ", degree(c))
 end
 
+function Base.show(io::IO, ::MIME"text/plain", a::n_GF)
+  print(io, AbstractAlgebra.obj_to_string(a, context = io))
+end
+
+function AbstractAlgebra.expressify(a::n_GF; context = nothing)::Any
+  F = parent(a)
+  i = reinterpret(Int, a.ptr.cpp_object)
+  if 1 < i < characteristic(F)^degree(F)
+    return Expr(:call, :^, F.S, i)
+  elseif i == 1
+    return F.S
+  elseif i == 0
+    return 1
+  else
+    return 0
+  end
+end
+
 function show(io::IO, n::n_GF)
    libSingular.StringSetS("")
-
    libSingular.n_Write(n.ptr, parent(n).ptr, false)
-
    m = libSingular.StringEndS()
-   
    print(io, m)
 end
 
 needs_parentheses(x::n_GF) = false
 
-isnegative(x::n_GF) = x == -1
+isnegative(x::n_GF) = false
 
 show_minus_one(::Type{n_GF}) = false
 
