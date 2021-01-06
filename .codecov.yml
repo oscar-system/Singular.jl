@@ -1,1 +1,11 @@
 comment: false
+
+coverage:
+  precision: 2
+  round: down
+  range: "70...100"
+
+  status:
+    project: yes
+    patch: no
+    changes: no
