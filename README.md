@@ -1,5 +1,7 @@
 # Singular
 
+[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://oscar-system.github.io/Singular.jl/stable)
+[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://oscar-system.github.io/Singular.jl/dev)
 [![Build Status](https://github.com/oscar-system/Singular.jl/workflows/Run%20tests/badge.svg)](https://github.com/oscar-system/Singular.jl/actions?query=workflow%3A%22Run+tests%22)
 [![Coverage Status](https://coveralls.io/repos/github/oscar-system/Singular.jl/badge.svg)](https://coveralls.io/github/oscar-system/Singular.jl)
 [![codecov.io](https://codecov.io/github/oscar-system/Singular.jl/coverage.svg?branch=master)](https://codecov.io/gh/oscar-system/Singular.jl)
