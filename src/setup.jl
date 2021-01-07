@@ -72,24 +72,27 @@ function regenerate_libraryfuncdictionary(prefixpath)
       All other columns (containing info such as line numbers, library name, etc)
       are ignored.
     =#
+    io = IOBuffer()
     cd(abspath(prefixpath, "bin")) do
-        open(output_filename, "w") do outputfile
-            println(outputfile, "libraryfunctiondictionary = Dict(")
-            for i in filenames
-                full_path = joinpath(library_dir, i)
-                output = Singular_jll.libparse() do exe
-                    read(`$exe $full_path`, String)
-                end
-                libs_splitted = split(output,"\n")[4:end - 1]
-                libs_splitted = [split(i, " ", keepempty = false) for i in libs_splitted]
-                println(outputfile, ":$(i[1:end - 4]) => [")
-                for j in libs_splitted
-                    println(outputfile, """[ "$(j[1])", "$(j[3])" ],""")
-                end
-                println(outputfile, "],\n")
-            end
-            println(outputfile, ")\n")
-        end
+       println(io, "libraryfunctiondictionary = Dict(")
+       for libfile in filenames
+           full_path = joinpath(library_dir, libfile)
+           output = Singular_jll.libparse() do exe
+               read(`$exe $full_path`, String)
+           end
+           libs_splitted = split(output,"\n")[4:end - 1]
+           libs_splitted = [split(i, " ", keepempty = false) for i in libs_splitted]
+           println(io, ":$(libfile[1:end - 4]) => [")
+           for j in libs_splitted
+               println(io, """[ "$(j[1])", "$(j[3])" ],""")
+           end
+           println(io, "],\n")
+       end
+       println(io, ")\n")
+    end
+    data = String(take!(io))
+    if !isfile(output_filename) || read(output_filename, String) != data
+       write(output_filename, data)
     end
 end
 
