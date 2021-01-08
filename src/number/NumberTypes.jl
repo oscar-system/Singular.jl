@@ -101,7 +101,7 @@ n_Q(n::n_Z) = n_Q(libSingular.nApplyMapFunc(n_Z_2_n_Q, n.ptr, ZZ.ptr, QQ.ptr))
 
 function _n_Q_clear_fn(n::n_Q)
    R = parent(n)
-   libSingular.n_Delete_Q(n.ptr, parent(n).ptr)
+   libSingular.n_Delete(n.ptr, parent(n).ptr)
    _Rationals_clear_fn(R)
    nothing
 end
