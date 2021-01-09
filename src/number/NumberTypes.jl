@@ -153,7 +153,7 @@ mutable struct n_Zn <: Nemo.RingElem
     parent::N_ZnRing
 
     function n_Zn(c::N_ZnRing, n::libSingular.number_ptr)
-    	z = new(n)
+        z = new(n, c)
         c.refcount += 1
         finalizer(_n_Zn_clear_fn, z)
         return z
@@ -213,7 +213,7 @@ mutable struct n_Zp <: Nemo.FieldElem
     parent::N_ZpField
 
     function n_Zp(c::N_ZpField, n::libSingular.number_ptr)
-    	z = new(n)
+        z = new(n, c)
         c.refcount += 1
         finalizer(_n_Zp_clear_fn, z)
         return z
@@ -283,7 +283,7 @@ mutable struct n_GF <: Nemo.FieldElem
     parent::N_GField
 
     function n_GF(c::N_GField, n::libSingular.number_ptr)
-    	z = new(n)
+        z = new(n, c)
         c.refcount += 1
         finalizer(_n_GF_clear_fn, z)
         return z
@@ -339,7 +339,7 @@ mutable struct n_transExt <: Nemo.FieldElem
     parent::N_FField
 
     function n_transExt(c::N_FField, n::libSingular.number_ptr)
-    	z = new(n)
+        z = new(n, c)
         c.refcount += 1
         finalizer(_n_transExt_clear_fn, z)
         return z

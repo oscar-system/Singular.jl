@@ -1082,53 +1082,39 @@ end
 
 function (R::PolyRing)()
    T = elem_type(base_ring(R))
-   z = spoly{T}(R)
-   z.parent = R
-   return z
+   return spoly{T}(R)
 end
 
 function (R::PolyRing)(n::Int)
    T = elem_type(base_ring(R))
-   z = spoly{T}(R, n)
-   z.parent = R
-   return z
+   return spoly{T}(R, n)
 end
 
 function (R::PolyRing)(n::Integer)
    T = elem_type(base_ring(R))
-   z = spoly{T}(R, BigInt(n))
-   z.parent = R
-   return z
+   return spoly{T}(R, BigInt(n))
 end
 
 function (R::PolyRing)(n::n_Z)
    n = base_ring(R)(n)
    ptr = libSingular.n_Copy(n.ptr, parent(n).ptr)
    T = elem_type(base_ring(R))
-   z = spoly{T}(R, ptr)
-   z.parent = R
-   return z
+   return spoly{T}(R, ptr)
 end
 
 function (R::PolyRing)(n::libSingular.poly_ptr)
    T = elem_type(base_ring(R))
-   z = spoly{T}(R, n)
-   z.parent = R
-   return z
+   return spoly{T}(R, n)
 end
 
 function (R::PolyRing{T})(n::T) where T <: Nemo.RingElem
    parent(n) != base_ring(R) && error("Unable to coerce into polynomial ring")
-   z = spoly{T}(R, n.ptr)
-   z.parent = R
-   return z
+   return spoly{T}(R, n.ptr)
 end
 
 function (R::Singular.PolyRing{T})(n::T) where T<:Singular.n_unknown
    parent(n) != base_ring(R) && error("Unable to coerce into polynomial ring")
-   z = spoly{T}(R, n.ptr)
-   z.parent = R
-   return z
+   return spoly{T}(R, n.ptr)
 end
 
 function (R::PolyRing{S})(n::T) where {S <: Nemo.RingElem, T <: Nemo.RingElem}

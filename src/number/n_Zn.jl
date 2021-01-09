@@ -312,44 +312,23 @@ promote_rule(C::Type{n_Zn}, ::Type{n_Z}) = n_Zn
 #
 ###############################################################################
 
-function (R::N_ZnRing)()
-   z = n_Zn(R)
-   z.parent = R
-   return z
-end
+(R::N_ZnRing)() = n_Zn(R)
 
-function (R::N_ZnRing)(x::Integer)
-   z = R(libSingular.n_InitMPZ(BigInt(x), R.ptr))
-   z.parent = R
-   return z
-end
+(R::N_ZnRing)(x::Integer) = R(libSingular.n_InitMPZ(BigInt(x), R.ptr))
 
-function (R::N_ZnRing)(n::Int)
-   z = n_Zn(R, n)
-   z.parent = R
-   return z
-end
+(R::N_ZnRing)(n::Int) = n_Zn(R, n)
 
 function (R::N_ZnRing)(n::n_Z)
    m = libSingular.nApplyMapFunc(R.from_n_Z, n.ptr, parent(n).ptr, R.ptr)
    z = n_Zn(R, m)
-   z.parent = R
    return z
 end
 
 (R::N_ZnRing)(n::n_Zn) = n
 
-function (R::N_ZnRing)(n::libSingular.number_ptr)
-   z = n_Zn(R, n)
-   z.parent = R
-   return z
-end
+(R::N_ZnRing)(n::libSingular.number_ptr) = n_Zn(R, n)
 
-function (R::N_ZnRing)(x::Nemo.fmpz)
-   z = convert_from_fmpz(R, x)
-   z.parent = R
-   return z
-end
+(R::N_ZnRing)(x::Nemo.fmpz) = convert_from_fmpz(R, x)
 
 ###############################################################################
 #
