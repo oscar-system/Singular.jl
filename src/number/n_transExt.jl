@@ -327,40 +327,20 @@ promote_rule(C::Type{n_transExt}, ::Type{n_Z}) = n_transExt
 #
 ###############################################################################
 
-function (R::N_FField)()
-   z = n_transExt(R)
-   z.parent = R
-   return z
-end
+(R::N_FField)() = n_transExt(R)
 
-function (R::N_FField)(x::Integer)
-   z = R(libSingular.n_InitMPZ(BigInt(x), R.ptr))
-   z.parent = R
-   return z
-end
+(R::N_FField)(x::Integer) = R(libSingular.n_InitMPZ(BigInt(x), R.ptr))
 
-function (R::N_FField)(n::Int)
-   z = n_transExt(R, n)
-   z.parent = R
-   return z
-end
+(R::N_FField)(n::Int) = n_transExt(R, n)
 
 function (R::N_FField)(n::n_transExt)
    R != parent(n) && error("Parent ring does not match.")
    return n
 end
 
-function (R::N_FField)(n::libSingular.number_ptr)
-   z = n_transExt(R, n)
-   z.parent = R
-   return z
-end
+(R::N_FField)(n::libSingular.number_ptr) = n_transExt(R, n)
 
-function (R::N_FField)(x::Nemo.fmpz)
-   z = convert_from_fmpz(R, x)
-   z.parent = R
-   return z
-end
+(R::N_FField)(x::Nemo.fmpz) = convert_from_fmpz(R, x)
 
 ###############################################################################
 #
