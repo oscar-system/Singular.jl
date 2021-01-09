@@ -81,12 +81,6 @@ void singular_define_coeffs(jlcxx::Module & Singular)
         }
     });
 
-    Singular.method("n_Delete_Q", [](snumber * n, coeffs cf) {
-        if (n != NULL) {
-            n_Delete(&n, cf);
-        }
-    });
-
     Singular.method("n_Write_internal",
                     [](snumber * x, coeffs cf, const int d) {
                         return n_Write(x, cf, d);
