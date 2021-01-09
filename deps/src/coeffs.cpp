@@ -170,15 +170,14 @@ void singular_define_coeffs(jlcxx::Module & Singular)
     });
 
     Singular.method("n_InpAdd", [](snumber * x, snumber * y, const coeffs n) {
-        snumber * xx = x;
-        n_InpAdd(xx, y, n);
-        return xx;
+        n_InpAdd(x, y, n);
+        return x;
     });
 
-    Singular.method("n_InpMult",
-                    [](snumber * x, snumber * y, const coeffs n) {
-                        return n_InpMult(x, y, n);
-                    });
+    Singular.method("n_InpMult", [](snumber * x, snumber * y, const coeffs n) {
+        n_InpMult(x, y, n);
+        return x;
+    });
 
     Singular.method("n_QuotRem_internal", [](snumber * x, snumber * y,
                                              void * p, const coeffs n) {
