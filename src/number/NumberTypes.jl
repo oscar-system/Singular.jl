@@ -387,4 +387,3 @@ mutable struct n_unknown{T <: Nemo.RingElem} <: Nemo.RingElem
    parent::CoefficientRing{T}
 
 end
-

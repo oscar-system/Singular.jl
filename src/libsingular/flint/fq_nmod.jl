@@ -41,13 +41,7 @@ end
 
 function fq_nmodWrite(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n = julia(a)::Nemo.fq_nmod
-   # parenthesize wrt * since this is probably a coeff. TODO move this to AA
-   prec = AbstractAlgebra.prec_inf_Times
-   obj = AbstractAlgebra.canonicalize(AbstractAlgebra.expressify(n))
-   S = AbstractAlgebra.printer([])
-   AbstractAlgebra.printExpr(S, obj, prec, prec)
-   str = AbstractAlgebra.getstring(S)
-   libSingular.StringAppendS(str)
+   libSingular.StringAppendS(libSingular.stringify_wrt_times(n))
    nothing
 end
 

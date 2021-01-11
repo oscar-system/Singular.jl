@@ -39,14 +39,9 @@ function fmpzCoeffWrite(cf::Ptr{Cvoid}, d::Cint)
 end
 
 function fmpzWrite(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
-    n = julia(a)::Nemo.fmpz
-    if Nemo.needs_parentheses(n)
-        str = "("*string(n)*")"
-    else
-        str = string(n)
-    end
-    libSingular.StringAppendS(str);
-    nothing
+   n = julia(a)::Nemo.fmpz
+   libSingular.StringAppendS(libSingular.stringify_wrt_times(n))
+   nothing
 end
 
 ###############################################################################

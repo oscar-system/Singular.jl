@@ -108,11 +108,7 @@ function show(io::IO, n::n_Zn)
    print(io, m)
 end
 
-needs_parentheses(x::n_Zn) = false
-
 isnegative(x::n_Zn) = false
-
-show_minus_one(::Type{n_Zn}) = true
 
 ###############################################################################
 #

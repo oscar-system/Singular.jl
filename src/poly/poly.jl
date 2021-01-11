@@ -91,6 +91,8 @@ end
 Return symbols for the generators of the polynomial ring $R$.
 """
 function symbols(R::PolyRing)
+   # TODO calling show to get the symbols is a bad idea
+   # wrap this from singular: char* rRingVar(short i, const ring r)
    io = IOBuffer();
    symbols = Array{Symbol,1}(undef, 0)
    for g in gens(R)
@@ -361,10 +363,6 @@ function show(io::IO, a::spoly)
    s = libSingular.p_String(a.ptr, parent(a).ptr)
    print(io, s)
 end
-
-show_minus_one(::Type{spoly{T}}) where T <: Nemo.RingElem = show_minus_one(T)
-
-needs_parentheses(x::spoly) = length(x) > 1
 
 isnegative(x::spoly) = isconstant(x) && !iszero(x) && isnegative(coeff(x, 0))
 

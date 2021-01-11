@@ -145,19 +145,30 @@ function show(io::IO, F::N_FField)
    print(io, "Function Field over ", base_ring(F), " with transcendence basis ", transcendence_basis(F))
 end
 
-function show(io::IO, n::n_transExt)
+function AbstractAlgebra.expressify(n::n_transExt; context = nothing)::Any
+   # TODO this easy method might not be the best
    libSingular.StringSetS("")
-
    libSingular.n_Write(n.ptr, parent(n).ptr, false)
-
-   m = libSingular.StringEndS()
-
-   print(io, m)
+   s = libSingular.StringEndS()
+   e = Meta.parse(s)
+   if !isa(e, Expr)
+      return e
+   elseif e.head == :incomplete
+      return s
+   elseif e.head == :call && length(e.args) == 3 && e.args[1] == :/
+      e.args[1] = ://
+      return e
+   else
+      return e
+   end
 end
 
-needs_parentheses(x::n_transExt) = false
-
-show_minus_one(::Type{n_transExt}) = false
+function show(io::IO, n::n_transExt)
+   libSingular.StringSetS("")
+   libSingular.n_Write(n.ptr, parent(n).ptr, false)
+   m = libSingular.StringEndS()
+   print(io, m)
+end
 
 ###############################################################################
 #
