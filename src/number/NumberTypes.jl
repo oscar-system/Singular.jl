@@ -1,5 +1,27 @@
 ###############################################################################
 #
+#   Finalizers
+#
+###############################################################################
+
+function _Ring_finalizer(cf)
+   cf.refcount -= 1
+   if cf.refcount == 0
+      libSingular.nKillChar(cf.ptr)
+   end
+   nothing
+end
+
+function _Elem_finalizer(n)
+   R = parent(n)
+   libSingular.n_Delete(n.ptr, R.ptr)
+   _Ring_finalizer(R)
+   nothing
+end
+
+
+###############################################################################
+#
 #   Integers/n_Z
 #
 ###############################################################################
@@ -19,16 +41,9 @@ mutable struct Integers <: Ring
          ptr = libSingular.nInitChar(libSingular.n_Z, Ptr{Nothing}(0))
          d = new(ptr, 0)
          IntegersID[:ZZ] = d
-         finalizer(_Integers_clear_fn, d)
+         finalizer(_Ring_finalizer, d)
       end
       return d
-   end
-end
-
-function _Integers_clear_fn(cf::Integers)
-   cf.refcount -= 1
-   if cf.refcount == 0
-      libSingular.nKillChar(cf.ptr)
    end
 end
 
@@ -38,19 +53,13 @@ mutable struct n_Z <: Nemo.RingElem
     function n_Z(n::libSingular.number_ptr)
         z = new(n)
         parent(z).refcount += 1
-        finalizer(_n_Z_clear_fn, z)
+        finalizer(_Elem_finalizer, z)
         return z
     end
 end
 
 n_Z(n::Int = 0) = n_Z(libSingular.n_Init(n, ZZ.ptr))
 
-function _n_Z_clear_fn(n::n_Z)
-   R = parent(n)
-   libSingular.n_Delete(n.ptr, parent(n).ptr)
-   _Integers_clear_fn(R)
-   nothing
-end
 
 ###############################################################################
 #
@@ -71,18 +80,10 @@ mutable struct Rationals <: Field
          ptr = libSingular.nInitChar(libSingular.n_Q, Ptr{Nothing}(0))
          d = new(ptr, 0)
          RationalsID[:QQ] = d
-         finalizer(_Rationals_clear_fn, d)
+         finalizer(_Ring_finalizer, d)
       end
       return d
    end
-end
-
-function _Rationals_clear_fn(cf::Rationals)
-   cf.refcount -= 1
-   if cf.refcount == 0
-      libSingular.nKillChar(cf.ptr)
-   end
-   nothing
 end
 
 mutable struct n_Q <: Nemo.FieldElem
@@ -91,20 +92,13 @@ mutable struct n_Q <: Nemo.FieldElem
     function n_Q(n::libSingular.number_ptr)
         z = new(n)
         parent(z).refcount += 1
-        finalizer(_n_Q_clear_fn, z)
+        finalizer(_Elem_finalizer, z)
         return z
     end
 end
 
 n_Q(n::Int = 0) = n_Q(libSingular.n_Init(n, QQ.ptr))
 n_Q(n::n_Z) = n_Q(libSingular.nApplyMapFunc(n_Z_2_n_Q, n.ptr, ZZ.ptr, QQ.ptr))
-
-function _n_Q_clear_fn(n::n_Q)
-   R = parent(n)
-   libSingular.n_Delete(n.ptr, parent(n).ptr)
-   _Rationals_clear_fn(R)
-   nothing
-end
 
 
 ###############################################################################
@@ -134,19 +128,12 @@ mutable struct N_ZnRing <: Ring
          d = new(ptr, libSingular.n_SetMap(ZZ.ptr, ptr),
               libSingular.n_SetMap(ptr, ZZ.ptr), 1)
          N_ZnRingID[n] = d
-         finalizer(_N_ZnRing_clear_fn, d)
+         finalizer(_Ring_finalizer, d)
       end
       return d
    end
 end
 
-function _N_ZnRing_clear_fn(cf::N_ZnRing)
-   cf.refcount -= 1
-   if cf.refcount == 0
-      libSingular.nKillChar(cf.ptr)
-   end
-   nothing
-end
 
 mutable struct n_Zn <: Nemo.RingElem
     ptr::libSingular.number_ptr
@@ -155,20 +142,12 @@ mutable struct n_Zn <: Nemo.RingElem
     function n_Zn(c::N_ZnRing, n::libSingular.number_ptr)
         z = new(n, c)
         c.refcount += 1
-        finalizer(_n_Zn_clear_fn, z)
+        finalizer(_Elem_finalizer, z)
         return z
     end
 end
 
 n_Zn(c::N_ZnRing, n::Int = 0) = n_Zn(c, libSingular.n_Init(n, c.ptr))
-
-function _n_Zn_clear_fn(n::n_Zn)
-   R = parent(n)
-   libSingular.n_Delete(n.ptr, parent(n).ptr)
-   _N_ZnRing_clear_fn(R)
-   nothing
-end
-
 
 
 
@@ -194,18 +173,10 @@ mutable struct N_ZpField <: Field
          d = new(ptr, libSingular.n_SetMap(ZZ.ptr, ptr),
               libSingular.n_SetMap(ptr, ZZ.ptr), 1)
          N_ZpFieldID[n] = d
-         finalizer(_N_ZpField_clear_fn, d)
+         finalizer(_Ring_finalizer, d)
       end
       return d
    end
-end
-
-function _N_ZpField_clear_fn(cf::N_ZpField)
-   cf.refcount -= 1
-   if cf.refcount == 0
-      libSingular.nKillChar(cf.ptr)
-   end
-   nothing
 end
 
 mutable struct n_Zp <: Nemo.FieldElem
@@ -215,20 +186,12 @@ mutable struct n_Zp <: Nemo.FieldElem
     function n_Zp(c::N_ZpField, n::libSingular.number_ptr)
         z = new(n, c)
         c.refcount += 1
-        finalizer(_n_Zp_clear_fn, z)
+        finalizer(_Elem_finalizer, z)
         return z
     end
 end
 
 n_Zp(c::N_ZpField, n::Int = 0) = n_Zp(c, libSingular.n_Init(n, c.ptr))
-
-function _n_Zp_clear_fn(n::n_Zp)
-   R = parent(n)
-   libSingular.n_Delete(n.ptr, parent(n).ptr)
-   _N_ZpField_clear_fn(R)
-   nothing
-end
-
 
 
 ###############################################################################
@@ -264,18 +227,10 @@ mutable struct N_GField <: Field
               libSingular.n_SetMap(ptr, ZZ.ptr), 1, S)
          end
          N_GFieldID[p, n, S] = d
-         finalizer(_N_GField_clear_fn, d)
+         finalizer(_Ring_finalizer, d)
       end
       return d
    end
-end
-
-function _N_GField_clear_fn(cf::N_GField)
-   cf.refcount -= 1
-   if cf.refcount == 0
-      libSingular.nKillChar(cf.ptr)
-   end
-   nothing
 end
 
 mutable struct n_GF <: Nemo.FieldElem
@@ -285,19 +240,13 @@ mutable struct n_GF <: Nemo.FieldElem
     function n_GF(c::N_GField, n::libSingular.number_ptr)
         z = new(n, c)
         c.refcount += 1
-        finalizer(_n_GF_clear_fn, z)
+        finalizer(_Elem_finalizer, z)
         return z
     end
 end
 
 n_GF(c::N_GField, n::Int = 0) = n_GF(c, libSingular.n_Init(n, c.ptr))
 
-function _n_GF_clear_fn(n::n_GF)
-   R = parent(n)
-   libSingular.n_Delete(n.ptr, parent(n).ptr)
-   _N_GField_clear_fn(R)
-   nothing
-end
 
 ###############################################################################
 #
@@ -321,16 +270,9 @@ mutable struct N_FField <: Field
          ptr = libSingular.transExt_helper(cf, v)
          d = new(ptr, F, 1)
          N_FFieldID[F, S] = d
-         finalizer(_N_FField_clear_fn, d)
+         finalizer(_Ring_finalizer, d)
       end
       return d
-   end
-end
-
-function _N_FField_clear_fn(cf::N_FField)
-   cf.refcount -= 1
-   if cf.refcount == 0
-      libSingular.nKillChar(cf.ptr)
    end
 end
 
@@ -341,19 +283,13 @@ mutable struct n_transExt <: Nemo.FieldElem
     function n_transExt(c::N_FField, n::libSingular.number_ptr)
         z = new(n, c)
         c.refcount += 1
-        finalizer(_n_transExt_clear_fn, z)
+        finalizer(_Elem_finalizer, z)
         return z
     end
 end
 
 n_transExt(c::N_FField, n::Int = 0) = n_transExt(c, libSingular.n_Init(n, c.ptr))
 
-function _n_transExt_clear_fn(n::n_transExt)
-   R = parent(n)
-   libSingular.n_Delete(n.ptr, parent(n).ptr)
-   _N_FField_clear_fn(R)
-   nothing
-end
 
 ###############################################################################
 #
