@@ -339,7 +339,7 @@ promote_rule(C::Type{n_Q}, ::Type{T}) where {T <: Integer} = n_Q
 
 promote_rule(C::Type{n_Q}, ::Type{Nemo.fmpz}) = n_Q
 
-promote_rule(C::Type{n_Q}, ::Type{n_Q}) = n_Z
+promote_rule(C::Type{n_Q}, ::Type{n_Z}) = n_Q
 
 Rational{T}(x::n_Q) where {T} = convert(T, numerator(x)) // convert(T, denominator(x))
 Rational(x::n_Q) = Integer(numerator(x)) // Integer(denominator(x))
