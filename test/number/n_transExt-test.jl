@@ -22,14 +22,22 @@
    c = F(BigInt(3))
 
    @test isa(c, n_transExt)
+   @test b == c
 
    f = F(c)
 
    @test isa(f, n_transExt)
+   @test b == f
 
-   f = F(Nemo.ZZ(123))
+   f = F(ZZ(3))
 
    @test isa(f, n_transExt)
+   @test b == f
+
+   f = F(Nemo.ZZ(3))
+
+   @test isa(f, n_transExt)
+   @test b == f
 
    @test_throws ArgumentError FunctionField(QQ, String[])
    @test_throws ArgumentError FunctionField(QQ, ["", "b"])

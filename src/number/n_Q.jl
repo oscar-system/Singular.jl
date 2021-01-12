@@ -383,13 +383,7 @@ rand(R::Rationals, n) = rand(Random.GLOBAL_RNG, R, n)
 
 # from integers
 
-(::Rationals)(n::Int) = n_Q(n)
-
-(R::Rationals)(x::Integer) = R(libSingular.n_InitMPZ(BigInt(x), R.ptr))
-
-(::Rationals)(n::n_Z) = n_Q(n)
-
-(R::Rationals)(x::fmpz) = convert_from_fmpz(R, x)
+(::Rationals)(n::IntegerLikeTypes) = n_Q(n)
 
 # from rationals
 

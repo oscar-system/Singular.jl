@@ -58,7 +58,11 @@ mutable struct n_Z <: Nemo.RingElem
     end
 end
 
-n_Z(n::Int = 0) = n_Z(libSingular.n_Init(n, ZZ.ptr))
+n_Z(n::Integer = 0) = n_Z(libSingular.number_ptr(n, ZZ.ptr))
+n_Z(n::Nemo.fmpz) = n_Z(libSingular.number_ptr(n, ZZ.ptr))
+
+
+const IntegerLikeTypes = Union{Integer, n_Z, Nemo.fmpz}
 
 
 ###############################################################################
@@ -97,7 +101,8 @@ mutable struct n_Q <: Nemo.FieldElem
     end
 end
 
-n_Q(n::Int = 0) = n_Q(libSingular.n_Init(n, QQ.ptr))
+n_Q(n::Integer = 0) = n_Q(libSingular.number_ptr(n, QQ.ptr))
+n_Q(n::Nemo.fmpz) = n_Q(libSingular.number_ptr(n, QQ.ptr))
 n_Q(n::n_Z) = n_Q(libSingular.nApplyMapFunc(n_Z_2_n_Q, n.ptr, ZZ.ptr, QQ.ptr))
 
 
@@ -147,8 +152,9 @@ mutable struct n_Zn <: Nemo.RingElem
     end
 end
 
-n_Zn(c::N_ZnRing, n::Int = 0) = n_Zn(c, libSingular.n_Init(n, c.ptr))
-
+n_Zn(c::N_ZnRing, n::Integer = 0) = n_Zn(c, libSingular.number_ptr(n, c.ptr))
+n_Zn(c::N_ZnRing, n::Nemo.fmpz) = n_Zn(c, libSingular.number_ptr(n, c.ptr))
+n_Zn(c::N_ZnRing, n::n_Z) = n_Zn(c, libSingular.nApplyMapFunc(c.from_n_Z, n.ptr, ZZ.ptr, c.ptr))
 
 
 ###############################################################################
@@ -191,7 +197,9 @@ mutable struct n_Zp <: Nemo.FieldElem
     end
 end
 
-n_Zp(c::N_ZpField, n::Int = 0) = n_Zp(c, libSingular.n_Init(n, c.ptr))
+n_Zp(c::N_ZpField, n::Integer = 0) = n_Zp(c, libSingular.number_ptr(n, c.ptr))
+n_Zp(c::N_ZpField, n::Nemo.fmpz) = n_Zp(c, libSingular.number_ptr(n, c.ptr))
+n_Zp(c::N_ZpField, n::n_Z) = n_Zp(c, libSingular.nApplyMapFunc(c.from_n_Z, n.ptr, ZZ.ptr, c.ptr))
 
 
 ###############################################################################
@@ -245,7 +253,16 @@ mutable struct n_GF <: Nemo.FieldElem
     end
 end
 
-n_GF(c::N_GField, n::Int = 0) = n_GF(c, libSingular.n_Init(n, c.ptr))
+n_GF(c::N_GField, n::Integer = 0) = n_GF(c, libSingular.number_ptr(n, c.ptr))
+n_GF(c::N_GField, n::Nemo.fmpz) = n_GF(c, libSingular.number_ptr(n, c.ptr))
+function n_GF(c::N_GField, n::n_Z)
+   # FIXME: the following is broken because Singular 4.2.0 does not implement
+   # a map from n_Z to n_GF, hence from_n_Z is NULL. This is corrected in the
+   # development version of Singular, but for now, just perform the conversion
+   # by first converting to BigInt
+   #return n_GF(c, libSingular.nApplyMapFunc(c.from_n_Z, n.ptr, ZZ.ptr, c.ptr))
+   return n_GF(c, BigInt(n))
+end
 
 
 ###############################################################################
@@ -288,7 +305,9 @@ mutable struct n_transExt <: Nemo.FieldElem
     end
 end
 
-n_transExt(c::N_FField, n::Int = 0) = n_transExt(c, libSingular.n_Init(n, c.ptr))
+n_transExt(c::N_FField, n::Integer = 0) = n_transExt(c, libSingular.number_ptr(n, c.ptr))
+n_transExt(c::N_FField, n::Nemo.fmpz) = n_transExt(c, libSingular.number_ptr(n, c.ptr))
+n_transExt(c::N_FField, n::n_Z) = n_transExt(c, BigInt(n))
 
 
 ###############################################################################
