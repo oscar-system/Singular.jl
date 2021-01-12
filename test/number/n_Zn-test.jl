@@ -6,7 +6,7 @@
    @test parent_type(n_Zn) == N_ZnRing
    @test base_ring(R) == ZZ
 
-   typeof(R) <: Nemo.Ring
+   @test typeof(R) <: Nemo.Ring
 
    a = R()
 

@@ -5,8 +5,9 @@
    @test elem_type(N_GField) == n_GF
    @test parent_type(n_GF) == N_GField
    @test base_ring(R) == Union{}
+   @test isa(x, n_GF)
 
-   typeof(R) <: Nemo.Field
+   @test typeof(R) <: Nemo.Field
 
    a = R()
 
@@ -35,8 +36,6 @@
    f = R(Nemo.ZZ(123))
 
    @test isa(f, n_GF)
-
-   @test isa(x, n_GF)
 
    @test_throws DomainError FiniteField(257, 1, "a")
    @test_throws DomainError FiniteField(2, 16, "a")
