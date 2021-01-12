@@ -108,13 +108,9 @@ function show(io::IO, n::n_Zp)
    print(io, m)
 end
 
-needs_parentheses(x::n_Zp) = false
-
 function isnegative(x::n_Zp)
    return x > parent(x)(div(characteristic(parent(x)), ZZ(2)))
 end
-
-show_minus_one(::Type{n_Zp}) = false
 
 ###############################################################################
 #

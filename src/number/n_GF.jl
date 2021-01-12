@@ -118,11 +118,7 @@ function show(io::IO, n::n_GF)
    print(io, m)
 end
 
-needs_parentheses(x::n_GF) = false
-
 isnegative(x::n_GF) = false
-
-show_minus_one(::Type{n_GF}) = false
 
 ###############################################################################
 #

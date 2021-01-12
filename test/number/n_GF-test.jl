@@ -57,9 +57,6 @@ end
    @test sprint(show, "text/plain", x) == "x"
    @test sprint(show, "text/plain", x^2) == "x^2"
    @test sprint(show, "text/plain", x^11) == "x^11"
-
-   @test !Singular.AbstractAlgebra.isnegative(x)
-   @test !Singular.AbstractAlgebra.needs_parentheses(x)
 end
 
 @testset "n_GF.manipulation..." begin

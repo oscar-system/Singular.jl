@@ -41,12 +41,7 @@ end
 
 function nf_elemWrite(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n = julia(a)::Nemo.nf_elem
-   if Nemo.needs_parentheses(n)
-      str = "("*string(n)*")"
-   else
-      str = string(n)
-   end
-   libSingular.StringAppendS(str);
+   libSingular.StringAppendS(libSingular.stringify_wrt_times(n))
    nothing
 end
 

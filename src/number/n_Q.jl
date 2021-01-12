@@ -112,20 +112,13 @@ end
 
 function show(io::IO, n::n_Q)
     libSingular.StringSetS("")
-
     libSingular.n_Write(n.ptr, parent(n).ptr, false)
-
     m = libSingular.StringEndS()
-
     print(io,m)
 end
 
-needs_parentheses(x::n_Q) = false
-
 isnegative(x::n_Q) = !libSingular.n_GreaterZero(x.ptr, parent(x).ptr) &&
                       !iszero(x)
-
-show_minus_one(::Type{n_Q}) = false
 
 ###############################################################################
 #

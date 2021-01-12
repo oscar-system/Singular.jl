@@ -42,10 +42,9 @@ import Nemo: add!, addeq!, base_ring, canonical_unit,
              finish, gcdinv, gen, gens, get_field, intersect, isconstant,
              isgen, ismonomial, inflate, isnegative, isone,
              isterm, isunit, iszero, lift, lc, lt, lm, monomials,
-             MPolyBuildCtx, mul!, needs_parentheses,
-             nvars, ordering, parent_type,
+             MPolyBuildCtx, mul!, nvars, ordering, parent_type,
              parent, primpart, promote_rule, push_term!,
-             reconstruct, remove, set_field!, show_minus_one, sort_terms!,
+             reconstruct, remove, set_field!, sort_terms!,
              symbols, terms, total_degree, valuation,
              var_index, vars, zero!, ResidueRing
 
