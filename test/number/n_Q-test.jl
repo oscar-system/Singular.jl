@@ -4,7 +4,7 @@
    @test parent_type(n_Q) == Rationals
    @test base_ring(QQ) == ZZ
 
-   typeof(QQ) <: Nemo.Field
+   @test typeof(QQ) <: Nemo.Field
 
    a = QQ()
 
