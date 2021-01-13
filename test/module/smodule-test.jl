@@ -15,8 +15,8 @@
    @test base_ring(S) == R
    @test base_ring(M) == R
 
-   @test typeof(S) <: AbstractAlgebra.Set
-   @test typeof(M) <: AbstractAlgebra.Module
+   @test S isa AbstractAlgebra.Set
+   @test M isa AbstractAlgebra.Module
 
    @test isa(M, smodule)
 end

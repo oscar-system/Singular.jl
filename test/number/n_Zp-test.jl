@@ -6,7 +6,7 @@
    @test parent_type(n_Zp) == N_ZpField
    @test base_ring(R) == Union{}
 
-   @test typeof(R) <: Nemo.Field
+   @test R isa Nemo.Field
 
    a = R()
 

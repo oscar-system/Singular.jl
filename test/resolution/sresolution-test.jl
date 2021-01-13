@@ -12,8 +12,8 @@
    @test base_ring(S) == R
    @test base_ring(F) == R
 
-   @test typeof(S) <: AbstractAlgebra.Set
-   @test typeof(F) <: AbstractAlgebra.SetElem
+   @test S isa AbstractAlgebra.Set
+   @test F isa AbstractAlgebra.SetElem
 
    @test isa(F, sresolution)
 end

@@ -4,7 +4,7 @@
    @test parent_type(n_Z) == Integers
    @test base_ring(ZZ) == Union{}
 
-   @test typeof(ZZ) <: Nemo.Ring
+   @test ZZ isa Nemo.Ring
 
    a = ZZ()
 

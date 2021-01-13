@@ -6,7 +6,7 @@
    @test parent_type(spoly{n_Z}) == PolyRing{n_Z}
    @test base_ring(R) == ZZ
 
-   typeof(R) <: Nemo.Ring
+   @test R isa Nemo.Ring
 
    a = R()
 
