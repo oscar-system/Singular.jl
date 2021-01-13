@@ -11,8 +11,8 @@
    @test base_ring(S) == R
    @test base_ring(I) == R
 
-   @test typeof(S) <: AbstractAlgebra.Set
-   @test typeof(I) <: AbstractAlgebra.Module
+   @test S isa AbstractAlgebra.Set
+   @test I isa AbstractAlgebra.Module
 
    I1 = Ideal(R)
    I2 = Ideal(R, x + y)

@@ -6,7 +6,7 @@
    @test parent_type(n_transExt) == N_FField
    @test base_ring(F) == QQ
 
-   @test typeof(F) <: Singular.Field
+   @test F isa Singular.Field
 
    a = F()
 

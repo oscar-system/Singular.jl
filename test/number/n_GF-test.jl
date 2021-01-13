@@ -7,7 +7,7 @@
    @test base_ring(R) == Union{}
    @test isa(x, n_GF)
 
-   @test typeof(R) <: Nemo.Field
+   @test R isa Nemo.Field
 
    a = R()
 

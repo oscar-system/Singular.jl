@@ -15,9 +15,9 @@
    @test base_ring(S1) == R
    @test base_ring(v1) == R
 
-   @test typeof(S1) <: Singular.Module
-   @test typeof(S1) <: AbstractAlgebra.Module
-   @test typeof(v1) <: AbstractAlgebra.ModuleElem
+   @test S1 isa Singular.Module
+   @test S1 isa AbstractAlgebra.Module
+   @test v1 isa AbstractAlgebra.ModuleElem
 
    @test isa(v1, svector)
 
