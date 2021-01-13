@@ -39,6 +39,25 @@ void singular_define_coeffs(jlcxx::Module & Singular)
     /* get the characteristic of a coefficient domain */
     Singular.method("n_GetChar", [](coeffs n) { return n_GetChar(n); });
 
+    /* only used to get the order of a N_GField */
+    Singular.method("nfCharQ", [](coeffs n) {return n->m_nfCharQ;});
+
+    Singular.method("nCoeff_is_Zp", [](coeffs n) {
+        return bool(nCoeff_is_Zp(n));
+    });
+
+    Singular.method("nCoeff_is_Q", [](coeffs n) {
+       return bool(nCoeff_is_Q(n));
+    });
+
+    Singular.method("nCoeff_is_GF", [](coeffs n) {
+        return bool(nCoeff_is_GF(n));
+    });
+
+    Singular.method("nCoeff_is_transExt", [](coeffs n) {
+        return bool(nCoeff_is_transExt(n));
+    });
+
     /* make a copy of a coefficient domain (actually just increments a
      * reference count) */
     Singular.method("nCopyCoeff", &nCopyCoeff);
@@ -203,6 +222,14 @@ void singular_define_coeffs(jlcxx::Module & Singular)
 
     Singular.method("n_Param",
                     [](int x, const coeffs n) { return n_Param(x, n); });
+
+    Singular.method("n_NumberOfParameters", [](coeffs r) {
+           return n_NumberOfParameters(r);
+    });
+
+    Singular.method("n_ParameterName", [](int i, coeffs r) {
+           return std::string(n_ParameterNames(r)[i]);
+    });
 
     Singular.method("StringSetS_internal",
                     [](std::string m) { return StringSetS(m.c_str()); });

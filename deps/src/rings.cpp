@@ -91,15 +91,21 @@ void singular_define_rings(jlcxx::Module & Singular)
     Singular.method("rChar", &rChar);
     Singular.method("rGetVar", &rGetVar);
     Singular.method("rVar", &rVar);
+    Singular.method("rRingVar", [](short i, const ring r) {
+        return std::string(rRingVar(i, r));
+    });
     Singular.method("rGetExpSize", [](unsigned long bitmask, int N) {
         int bits;
         return static_cast<unsigned int>(rGetExpSize(bitmask, bits, N));
     });
+    Singular.method("rCoeffPtr", [](ring r){return r->cf;});
     Singular.method("rHasGlobalOrdering", &rHasGlobalOrdering);
     Singular.method("rHasMixedOrdering", &rHasMixedOrdering);
+    Singular.method("rRing_ord_pure_dp", &rRing_ord_pure_dp);
+    Singular.method("rRing_ord_pure_Dp", &rRing_ord_pure_Dp);
+    Singular.method("rRing_ord_pure_lp", &rRing_ord_pure_lp);
     Singular.method("rIsQuotientRing", [](ring r) {
-
-    return r->qideal != NULL;
+        return r->qideal != NULL;
     });
     Singular.method("rQuotientRing", [](ideal i, ring r) {
         ring Q = rCopy(r);
