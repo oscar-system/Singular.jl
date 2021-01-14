@@ -1132,6 +1132,7 @@ function (R::Singular.PolyRing{T})(n::T) where T<:Singular.n_unknown
 end
 
 function (R::PolyRing)(f::T) where T <: Nemo.MPolyElem
+  parent(f) == R && return f
   B = base_ring(R)
   g = MPolyBuildCtx(R)
   for (c, e) = zip(Nemo.coeffs(f), Nemo.exponent_vectors(f))
