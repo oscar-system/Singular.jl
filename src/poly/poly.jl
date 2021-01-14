@@ -1134,7 +1134,7 @@ end
 function (R::PolyRing)(f::T) where T <: Nemo.MPolyElem
   B = base_ring(R)
   g = MPolyBuildCtx(R)
-  for (c, e) = Base.Iterators.zip(Nemo.coeffs(f), Nemo.exponent_vectors(f))
+  for (c, e) = zip(Nemo.coeffs(f), Nemo.exponent_vectors(f))
     push_term!(g, B(c), e)
   end
   return finish(g)
