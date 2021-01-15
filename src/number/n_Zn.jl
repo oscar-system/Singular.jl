@@ -308,23 +308,11 @@ promote_rule(C::Type{n_Zn}, ::Type{n_Z}) = n_Zn
 #
 ###############################################################################
 
-(R::N_ZnRing)() = n_Zn(R)
-
-(R::N_ZnRing)(x::Integer) = R(libSingular.n_InitMPZ(BigInt(x), R.ptr))
-
-(R::N_ZnRing)(n::Int) = n_Zn(R, n)
-
-function (R::N_ZnRing)(n::n_Z)
-   m = libSingular.nApplyMapFunc(R.from_n_Z, n.ptr, parent(n).ptr, R.ptr)
-   z = n_Zn(R, m)
-   return z
-end
+(R::N_ZnRing)(n::IntegerLikeTypes = 0) = n_Zn(R, n)
 
 (R::N_ZnRing)(n::n_Zn) = n
 
 (R::N_ZnRing)(n::libSingular.number_ptr) = n_Zn(R, n)
-
-(R::N_ZnRing)(x::Nemo.fmpz) = convert_from_fmpz(R, x)
 
 ###############################################################################
 #

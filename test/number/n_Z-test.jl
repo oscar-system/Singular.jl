@@ -13,19 +13,23 @@
 
    @test isa(a, n_Z)
 
-   b = ZZ(123)
+   b = ZZ(3)
 
    @test isa(b, n_Z)
 
-   c = ZZ(BigInt(123))
+   c = ZZ(BigInt(3))
 
    @test isa(c, n_Z)
+   @test b == c
 
    d = ZZ(c)
 
    @test isa(d, n_Z)
+   @test b == d
 
-   f = ZZ(Nemo.ZZ(123))
+   f = ZZ(Nemo.ZZ(3))
+
+   @test b == f
 
    # should not crash
    for i=1:100

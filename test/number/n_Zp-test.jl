@@ -22,18 +22,22 @@
    c = R(BigInt(3))
 
    @test isa(c, n_Zp)
+   @test b == c
 
    d = R(ZZ(3))
 
    @test isa(d, n_Zp);
+   @test b == d
 
    f = R(c)
 
    @test isa(f, n_Zp)
+   @test b == f
 
-   f = R(Nemo.ZZ(123))
+   f = R(Nemo.ZZ(3))
 
    @test isa(f, n_Zp)
+   @test b == f
 end
 
 @testset "n_Zp.printing..." begin

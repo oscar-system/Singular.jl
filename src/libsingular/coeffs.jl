@@ -187,3 +187,23 @@ include("flint/fq_nmod.jl")
 include("antic/nf_elem.jl")
 include("nemo/Rings.jl")
 include("nemo/Fields.jl")
+
+
+issmallinttype(::Type) = false
+issmallinttype(::Type{T}) where {T<:Integer} = Base.hastypemax(T) && typemin(Int) <= typemin(T) && typemax(Int) >= typemax(T)
+
+function number_ptr(n::Integer, c::coeffs_ptr)
+   if issmallinttype(typeof(n))
+      n_Init(n, c)
+   else
+      n_InitMPZ(BigInt(n), c)
+   end
+end
+
+function number_ptr(x::Nemo.fmpz, c::coeffs_ptr)
+   if Nemo._fmpz_is_small(x)
+      n_Init(x.d, c)
+   else
+      GC.@preserve x n_InitMPZ(Nemo._as_bigint(x), c)
+   end
+end

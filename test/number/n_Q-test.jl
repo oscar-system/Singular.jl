@@ -20,18 +20,22 @@
    c = QQ(BigInt(123))
 
    @test isa(c, n_Q)
+   @test b == c
 
    d = QQ(c)
 
    @test isa(d, n_Q)
+   @test b == d
 
    f = QQ(Nemo.ZZ(123))
 
    @test isa(f, n_Q)
+   @test b == f
 
    g = QQ(ZZ(123))
 
    @test isa(g, n_Q)
+   @test b == g
 
    h = QQ(1, 2)
 

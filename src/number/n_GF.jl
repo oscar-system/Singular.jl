@@ -337,23 +337,11 @@ promote_rule(C::Type{n_GF}, ::Type{n_Z}) = n_GF
 #
 ###############################################################################
 
-(R::N_GField)() = n_GF(R)
-
-(R::N_GField)(x::Integer) = R(libSingular.n_InitMPZ(BigInt(x), R.ptr))
-
-(R::N_GField)(n::Int) = n_GF(R, n)
-
-# not currently implemented
-# function (R::N_GField)(n::n_Z)
-#    m = libSingular.nApplyMapFunc(R.from_n_Z, n.ptr, parent(n).ptr, R.ptr)
-#    return n_GF(R, m)
-# end
+(R::N_GField)(n::IntegerLikeTypes = 0) = n_GF(R, n)
 
 (R::N_GField)(n::n_GF) = n
 
 (R::N_GField)(n::libSingular.number_ptr) = n_GF(R, n)
-
-(R::N_GField)(x::Nemo.fmpz) = convert_from_fmpz(R, x)
 
 ###############################################################################
 #

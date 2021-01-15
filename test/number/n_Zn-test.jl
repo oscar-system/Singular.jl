@@ -22,18 +22,22 @@
    c = R(BigInt(3))
 
    @test isa(c, n_Zn)
+   @test b == c
 
    d = R(ZZ(3))
 
    @test isa(d, n_Zn);
+   @test b == d
 
    f = R(c)
 
    @test isa(f, n_Zn)
+   @test b == f
 
-   f = R(Nemo.ZZ(123))
+   f = R(Nemo.ZZ(3))
 
    @test isa(f, n_Zn)
+   @test b == f
 
    @test_throws DomainError ResidueRing(ZZ, -rand(1:99))
 end

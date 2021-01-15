@@ -394,23 +394,8 @@ rand(R::Integers, n) = rand(Random.GLOBAL_RNG, R, n)
 #
 ###############################################################################
 
-(::Integers)() = n_Z()
-
-(R::Integers)(x::Integer) = R(libSingular.n_InitMPZ(BigInt(x), R.ptr))
-
-(::Integers)(n::Int) = n_Z(n)
+(::Integers)(n::IntegerLikeTypes = 0) = n_Z(n)
 
 (::Integers)(n::n_Z) = n
 
 (::Integers)(n::libSingular.number_ptr) = n_Z(n)
-
-(R::Integers)(x::Nemo.fmpz) = convert_from_fmpz(R, x)
-
-function convert_from_fmpz(R, x::Nemo.fmpz)
-   if Nemo._fmpz_is_small(x)
-      R(x.d)
-   else
-      mpz_facade = unsafe_load(Ptr{BigInt}(x.d << 2))
-      R(libSingular.n_InitMPZ(mpz_facade, R.ptr))
-   end
-end
