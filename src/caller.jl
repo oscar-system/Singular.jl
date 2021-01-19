@@ -166,6 +166,21 @@ function prepare_argument(x::sideal)
     return Any[mapping_types_reversed[:IDEAL_CMD], libSingular.copy_idealptr_to_void(x.ptr, rng.ptr)], rng
 end
 
+function prepare_argument(x::Array{Any, 1}, rng::PolyRing)
+    args = Array{Any, 1}()
+    types = Array{Int, 1}()
+    for i in x
+       if typeof(i) == Array{Any, 1}
+          p = prepare_argument(i, rng)
+       else
+          p = prepare_argument(i)
+       end
+       push!(args, p[1][2])
+       push!(types, p[1][1])
+    end
+    return Any[mapping_types_reversed[:LIST_CMD], libSingular.jl_sideal_array_to_void(args,types, rng.ptr)], rng
+end
+
 function prepare_argument(x::smodule)
     rng = parent(x).base_ring
     return Any[mapping_types_reversed[:MODUL_CMD], libSingular.copy_idealptr_to_void(x.ptr, rng.ptr)], rng
@@ -198,7 +213,14 @@ end
 
 function low_level_caller_rng(lib::String, name::String, ring, args...)
     libSingular.load_library(lib)
-    arguments = [prepare_argument(i) for i in args]
+    arguments = Array{Any, 1}()
+    for i in args
+       if typeof(i) == Array{Any, 1} 
+          push!(arguments, prepare_argument(i, ring))
+       else
+          push!(arguments, prepare_argument(i))
+       end
+    end
     arguments = Any[i for (i, j) in arguments]
     return_value = libSingular.call_singular_library_procedure(name, ring.ptr, arguments)
     return convert_return_list(return_value, ring)
