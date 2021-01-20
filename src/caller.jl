@@ -178,7 +178,7 @@ function prepare_argument(x::Array{Any, 1}, rng::PolyRing)
        push!(args, p[1][2])
        push!(types, p[1][1])
     end
-    return Any[mapping_types_reversed[:LIST_CMD], libSingular.jl_sideal_array_to_void(args,types, rng.ptr)], rng
+    return Any[mapping_types_reversed[:LIST_CMD], libSingular.jl_array_to_void(args,types, rng.ptr)], rng
 end
 
 function prepare_argument(x::smodule)
