@@ -69,8 +69,23 @@ const libflint = Nemo.libflint
 const libantic = Nemo.libantic
 
 mapping_types_reversed = nothing
+#
+# More helpful error message for users on Windows.
+windows_error() = error("""
+
+    This package unfortunately does not run natively under Windows.
+    Please install Julia using Windows subsystem for Linux and try again.
+    See also https://oscar.computeralgebra.de/install/.
+    """)
+
+if Sys.iswindows()
+  windows_error()
+end
 
 function __init__()
+   if Sys.iswindows()
+      windows_error()
+   end
 
    # Initialise Singular
    ENV["SINGULAR_EXECUTABLE"] = binSingular
