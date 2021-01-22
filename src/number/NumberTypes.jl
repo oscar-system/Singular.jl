@@ -197,8 +197,16 @@ mutable struct n_Zp <: Nemo.FieldElem
     end
 end
 
-n_Zp(c::N_ZpField, n::Integer = 0) = n_Zp(c, libSingular.number_ptr(n, c.ptr))
-n_Zp(c::N_ZpField, n::Nemo.fmpz) = n_Zp(c, libSingular.number_ptr(n, c.ptr))
+# FIXME: in Singular 4.2.0 the n_Zp constructors are broken for big integer
+# arguments, where they return incorrect results for e.g. big(3)^80); as a
+# workaround, we convert first to n_Z. This will be fixed in a future Singular
+# release.
+#n_Zp(c::N_ZpField, n::Integer = 0) = n_Zp(c, libSingular.number_ptr(n, c.ptr))
+#n_Zp(c::N_ZpField, n::Nemo.fmpz) = n_Zp(c, libSingular.number_ptr(n, c.ptr))
+n_Zp(c::N_ZpField, n::Int = 0) = n_Zp(c, libSingular.number_ptr(n, c.ptr))
+n_Zp(c::N_ZpField, n::Integer) = n_Zp(c, n_Z(n))
+n_Zp(c::N_ZpField, n::Nemo.fmpz) = n_Zp(c, n_Z(n))
+
 n_Zp(c::N_ZpField, n::n_Z) = n_Zp(c, libSingular.nApplyMapFunc(c.from_n_Z, n.ptr, ZZ.ptr, c.ptr))
 
 
