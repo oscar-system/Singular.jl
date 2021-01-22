@@ -1,41 +1,6 @@
 @testset "n_Q.constructors..." begin
-   @test elem_type(QQ) == n_Q
-   @test elem_type(Rationals) == n_Q
-   @test parent_type(n_Q) == Rationals
-   @test base_ring(QQ) == ZZ
 
    @test QQ isa Nemo.Field
-
-   a = QQ()
-
-   @test base_ring(a) == ZZ
-   @test parent(a) == QQ
-
-   @test isa(a, n_Q)
-
-   b = QQ(123)
-
-   @test isa(b, n_Q)
-
-   c = QQ(BigInt(123))
-
-   @test isa(c, n_Q)
-   @test b == c
-
-   d = QQ(c)
-
-   @test isa(d, n_Q)
-   @test b == d
-
-   f = QQ(Nemo.ZZ(123))
-
-   @test isa(f, n_Q)
-   @test b == f
-
-   g = QQ(ZZ(123))
-
-   @test isa(g, n_Q)
-   @test b == g
 
    h = QQ(1, 2)
 

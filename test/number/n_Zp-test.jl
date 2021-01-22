@@ -1,43 +1,7 @@
 @testset "n_Zp.constructors..." begin
    R = Fp(7)
 
-   @test elem_type(R) == n_Zp
-   @test elem_type(N_ZpField) == n_Zp
-   @test parent_type(n_Zp) == N_ZpField
-   @test base_ring(R) == Union{}
-
    @test R isa Nemo.Field
-
-   a = R()
-
-   @test base_ring(a) == Union{}
-   @test parent(a) == R
-
-   @test isa(a, n_Zp)
-
-   b = R(3)
-
-   @test isa(b, n_Zp)
-
-   c = R(BigInt(3))
-
-   @test isa(c, n_Zp)
-   @test b == c
-
-   d = R(ZZ(3))
-
-   @test isa(d, n_Zp);
-   @test b == d
-
-   f = R(c)
-
-   @test isa(f, n_Zp)
-   @test b == f
-
-   f = R(Nemo.ZZ(3))
-
-   @test isa(f, n_Zp)
-   @test b == f
 end
 
 @testset "n_Zp.printing..." begin

@@ -1,43 +1,7 @@
 @testset "n_transExt.constructors..." begin
    F, (a, b, c) = FunctionField(QQ, ["a", "b", "c"])
 
-   @test elem_type(F) == n_transExt
-   @test elem_type(N_FField) == n_transExt
-   @test parent_type(n_transExt) == N_FField
-   @test base_ring(F) == QQ
-
    @test F isa Singular.Field
-
-   a = F()
-
-   @test base_ring(a) == Union{}
-   @test parent(a) == F
-
-   @test isa(a, n_transExt)
-
-   b = F(3)
-
-   @test isa(b, n_transExt)
-
-   c = F(BigInt(3))
-
-   @test isa(c, n_transExt)
-   @test b == c
-
-   f = F(c)
-
-   @test isa(f, n_transExt)
-   @test b == f
-
-   f = F(ZZ(3))
-
-   @test isa(f, n_transExt)
-   @test b == f
-
-   f = F(Nemo.ZZ(3))
-
-   @test isa(f, n_transExt)
-   @test b == f
 
    @test_throws ArgumentError FunctionField(QQ, String[])
    @test_throws ArgumentError FunctionField(QQ, ["", "b"])
