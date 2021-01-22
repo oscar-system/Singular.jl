@@ -1,44 +1,9 @@
 @testset "n_GF.constructors..." begin
    R, x = FiniteField(7, 2, "x")
 
-   @test elem_type(R) == n_GF
-   @test elem_type(N_GField) == n_GF
-   @test parent_type(n_GF) == N_GField
-   @test base_ring(R) == Union{}
    @test isa(x, n_GF)
 
    @test R isa Nemo.Field
-
-   a = R()
-
-   @test base_ring(a) == Union{}
-   @test parent(a) == R
-
-   @test isa(a, n_GF)
-
-   b = R(3)
-
-   @test isa(b, n_GF)
-
-   c = R(BigInt(3))
-
-   @test isa(c, n_GF)
-   @test b == c
-
-   d = R(ZZ(3))
-
-   @test isa(d, n_GF)
-   @test b == d
-
-   f = R(c)
-
-   @test isa(f, n_GF)
-   @test b == f
-
-   f = R(Nemo.ZZ(3))
-
-   @test isa(f, n_GF)
-   @test b == f
 
    @test_throws DomainError FiniteField(257, 1, "a")
    @test_throws DomainError FiniteField(2, 16, "a")

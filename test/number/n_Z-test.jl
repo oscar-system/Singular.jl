@@ -1,42 +1,12 @@
 @testset "n_Z.constructors..." begin
-   @test elem_type(ZZ) == n_Z
-   @test elem_type(Integers) == n_Z
-   @test parent_type(n_Z) == Integers
-   @test base_ring(ZZ) == Union{}
 
    @test ZZ isa Nemo.Ring
-
-   a = ZZ()
-
-   @test base_ring(a) == Union{}
-   @test parent(a) == ZZ
-
-   @test isa(a, n_Z)
-
-   b = ZZ(3)
-
-   @test isa(b, n_Z)
-
-   c = ZZ(BigInt(3))
-
-   @test isa(c, n_Z)
-   @test b == c
-
-   d = ZZ(c)
-
-   @test isa(d, n_Z)
-   @test b == d
-
-   f = ZZ(Nemo.ZZ(3))
-
-   @test b == f
 
    # should not crash
    for i=1:100
       f = ZZ(Nemo.ZZ(3)^(2*i)-1)
    end
 
-   @test isa(f, n_Z)
 end
 
 @testset "n_Z.printing..." begin

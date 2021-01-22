@@ -1,44 +1,6 @@
 @testset "n_Zn.constructors..." begin
    R = ResidueRing(ZZ, 7)
 
-   @test elem_type(R) == n_Zn
-   @test elem_type(N_ZnRing) == n_Zn
-   @test parent_type(n_Zn) == N_ZnRing
-   @test base_ring(R) == ZZ
-
-   @test R isa Nemo.Ring
-
-   a = R()
-
-   @test base_ring(a) == ZZ
-   @test parent(a) == R
-
-   @test isa(a, n_Zn)
-
-   b = R(3)
-
-   @test isa(b, n_Zn)
-
-   c = R(BigInt(3))
-
-   @test isa(c, n_Zn)
-   @test b == c
-
-   d = R(ZZ(3))
-
-   @test isa(d, n_Zn);
-   @test b == d
-
-   f = R(c)
-
-   @test isa(f, n_Zn)
-   @test b == f
-
-   f = R(Nemo.ZZ(3))
-
-   @test isa(f, n_Zn)
-   @test b == f
-
    @test_throws DomainError ResidueRing(ZZ, -rand(1:99))
 end
 
