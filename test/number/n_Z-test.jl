@@ -50,6 +50,8 @@ end
    @test isunit(ZZ(1)) && isunit(ZZ(-1))
    @test !isunit(ZZ(2)) && !isunit(ZZ(0))
 
+   @test characteristic(ZZ) == 0
+
    @test numerator(ZZ(2)) == 2
    @test denominator(ZZ(2)) == 1
    @test denominator(ZZ()) == 1

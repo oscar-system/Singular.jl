@@ -78,6 +78,8 @@ end
    @test isunit(QQ(1)) && isunit(QQ(2))
    @test !isunit(QQ(0))
 
+   @test characteristic(QQ) == 0
+
    @test numerator(QQ(2)) == 2
    @test denominator(QQ(2)) == 1
    @test denominator(QQ()) == 1
