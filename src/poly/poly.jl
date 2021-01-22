@@ -68,12 +68,6 @@ a non - zero ideal.
 """
 isquotient_ring(R::PolyRing) = Bool(Singular.libSingular.rIsQuotientRing(R.ptr))
 
-@doc Markdown.doc"""
-    characteristic(R::PolyRing)
-
-Return the characteristic of the polynomial ring, i.e. the characteristic of the
-coefficient ring.
-"""
 characteristic(R::PolyRing) = Int(libSingular.rChar(R.ptr))
 
 function gens(R::PolyRing)
