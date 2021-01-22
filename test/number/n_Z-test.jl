@@ -45,15 +45,6 @@ end
    @test a*b == 6
 end
 
-@testset "n_Z.adhoc_binary..." begin
-   @test ZZ(2) + 3 == 5
-   @test 2 + ZZ(3) == 5
-   @test ZZ(2) - 3 == -1
-   @test 2 - ZZ(3) == -1
-   @test 2*ZZ(3) == 6
-   @test ZZ(2)*3 == 6
-end
-
 @testset "n_Z.comparison..." begin
    @test ZZ(2) < ZZ(3)
    @test ZZ(2) <= ZZ(3)

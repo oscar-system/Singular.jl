@@ -328,6 +328,8 @@ rand(R::N_ZpField, b::AbstractArray{<:Integer}) = rand(Random.GLOBAL_RNG, R, b)
 
 promote_rule(C::Type{n_Zp}, ::Type{T}) where {T <: Integer} = n_Zp
 
+promote_rule(C::Type{n_Zp}, ::Type{Nemo.fmpz}) = n_Zp
+
 promote_rule(C::Type{n_Zp}, ::Type{n_Z}) = n_Zp
 
 ###############################################################################

@@ -63,17 +63,6 @@ end
    @test a*b == x^19
 end
 
-@testset "n_GF.adhoc_binary..." begin
-   R, x = FiniteField(5, 2, "x")
-
-   @test R(2) + 3 == R(0)
-   @test 2 + R(3) == R(0)
-   @test R(2) - 3 == R(4)
-   @test 2 - R(3) == R(4)
-   @test 2*R(3) == R(1)
-   @test R(2)*3 == R(1)
-end
-
 @testset "n_GF.comparison..." begin
    R, x = FiniteField(5, 2, "x")
 

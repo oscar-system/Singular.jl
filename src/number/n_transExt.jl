@@ -330,6 +330,8 @@ end
 
 promote_rule(C::Type{n_transExt}, ::Type{T}) where T <: Integer = n_transExt
 
+promote_rule(C::Type{n_transExt}, ::Type{Nemo.fmpz}) = n_transExt
+
 promote_rule(C::Type{n_transExt}, ::Type{n_Z}) = n_transExt
 
 ###############################################################################
