@@ -150,36 +150,6 @@ end
 
 ###############################################################################
 #
-#   Ad hoc arithmetic functions
-#
-###############################################################################
-
-+(x::n_Zp, y::Integer) = x + parent(x)(y)
-
-+(x::Integer, y::n_Zp) = parent(y)(x) + y
-
--(x::n_Zp, y::Integer) = x - parent(x)(y)
-
--(x::Integer, y::n_Zp) = parent(y)(x) - y
-
-*(x::n_Zp, y::Integer) = x*parent(x)(y)
-
-*(x::Integer, y::n_Zp) = parent(y)(x)*y
-
-+(x::n_Zp, y::n_Z) = x + parent(x)(y)
-
-+(x::n_Z, y::n_Zp) = parent(y)(x) + y
-
--(x::n_Zp, y::n_Z) = x - parent(x)(y)
-
--(x::n_Z, y::n_Zp) = parent(y)(x) - y
-
-*(x::n_Zp, y::n_Z) = x*parent(x)(y)
-
-*(x::n_Z, y::n_Zp) = parent(y)(x)*y
-
-###############################################################################
-#
 #   Comparison
 #
 ###############################################################################

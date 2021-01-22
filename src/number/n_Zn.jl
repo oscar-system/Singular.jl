@@ -148,36 +148,6 @@ end
 
 ###############################################################################
 #
-#   Ad hoc arithmetic functions
-#
-###############################################################################
-
-+(x::n_Zn, y::Integer) = x + parent(x)(y)
-
-+(x::Integer, y::n_Zn) = parent(y)(x) + y
-
--(x::n_Zn, y::Integer) = x - parent(x)(y)
-
--(x::Integer, y::n_Zn) = parent(y)(x) - y
-
-*(x::n_Zn, y::Integer) = x*parent(x)(y)
-
-*(x::Integer, y::n_Zn) = parent(y)(x)*y
-
-+(x::n_Zn, y::n_Z) = x + parent(x)(y)
-
-+(x::n_Z, y::n_Zn) = parent(y)(x) + y
-
--(x::n_Zn, y::n_Z) = x - parent(x)(y)
-
--(x::n_Z, y::n_Zn) = parent(y)(x) - y
-
-*(x::n_Zn, y::n_Z) = x*parent(x)(y)
-
-*(x::n_Z, y::n_Zn) = parent(y)(x)*y
-
-###############################################################################
-#
 #   Comparison
 #
 ###############################################################################
