@@ -300,6 +300,8 @@ end
 
 promote_rule(C::Type{n_Zn}, ::Type{T}) where {T <: Integer} = n_Zn
 
+promote_rule(C::Type{n_Zn}, ::Type{Nemo.fmpz}) = n_Zn
+
 promote_rule(C::Type{n_Zn}, ::Type{n_Z}) = n_Zn
 
 ###############################################################################

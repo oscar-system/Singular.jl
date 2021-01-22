@@ -329,6 +329,8 @@ Random.gentype(::Type{N_GField}) = elem_type(N_GField)
 
 promote_rule(C::Type{n_GF}, ::Type{T}) where T <: Integer = n_GF
 
+promote_rule(C::Type{n_GF}, ::Type{Nemo.fmpz}) = n_GF
+
 promote_rule(C::Type{n_GF}, ::Type{n_Z}) = n_GF
 
 ###############################################################################

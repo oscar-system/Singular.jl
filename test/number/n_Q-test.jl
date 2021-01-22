@@ -68,15 +68,6 @@ end
    @test a*b == 6
 end
 
-@testset "n_Q.adhoc_binary..." begin
-   @test QQ(2) + 3 == 5
-   @test 2 + QQ(3) == 5
-   @test QQ(2) - 3 == -1
-   @test 2 - QQ(3) == -1
-   @test 2*QQ(3) == 6
-   @test QQ(2)*3 == 6
-end
-
 @testset "n_Q.comparison..." begin
    @test QQ(2) < QQ(3)
    @test QQ(2) <= QQ(3)

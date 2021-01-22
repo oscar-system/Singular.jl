@@ -45,17 +45,6 @@ end
    @test a*b == R(1)
 end
 
-@testset "n_Zp.adhoc_binary..." begin
-   R = Fp(5)
-
-   @test R(2) + 3 == R(0)
-   @test 2 + R(3) == R(0)
-   @test R(2) - 3 == R(4)
-   @test 2 - R(3) == R(4)
-   @test 2*R(3) == R(1)
-   @test R(2)*3 == R(1)
-end
-
 @testset "n_Zp.comparison..." begin
    R = Fp(5)
 
