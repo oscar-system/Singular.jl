@@ -141,11 +141,11 @@ function __init__()
    end
    if show_banner
      println("""Singular.jl, based on
-                     SINGULAR                                 /
- A Computer Algebra System for Polynomial Computations       /  Singular.jl: $VERSION_NUMBER
-                                                           0<   Singular   : $svn
- by: W. Decker, G.-M. Greuel, G. Pfister, H. Schoenemann     \\
-FB Mathematik der Universitaet, D-67653 Kaiserslautern        \\
+                     SINGULAR                               /
+ A Computer Algebra System for Polynomial Computations     /  Singular.jl: $VERSION_NUMBER
+                                                         0<   Singular   : $svn
+ by: W. Decker, G.-M. Greuel, G. Pfister, H. Schoenemann   \\
+FB Mathematik der Universitaet, D-67653 Kaiserslautern      \\
      """)
    end
 end
