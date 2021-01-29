@@ -101,8 +101,6 @@ function show(io::IO, n::n_Zn)
    print(io, m)
 end
 
-isnegative(x::n_Zn) = false
-
 ###############################################################################
 #
 #   Unary functions
