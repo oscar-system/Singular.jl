@@ -101,10 +101,6 @@ function show(io::IO, n::n_Zp)
    print(io, m)
 end
 
-function isnegative(x::n_Zp)
-   return x > parent(x)(div(characteristic(parent(x)), ZZ(2)))
-end
-
 ###############################################################################
 #
 #   Unary functions

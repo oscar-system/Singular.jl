@@ -111,8 +111,6 @@ function show(io::IO, n::n_GF)
    print(io, m)
 end
 
-isnegative(x::n_GF) = false
-
 ###############################################################################
 #
 #   Unary functions
