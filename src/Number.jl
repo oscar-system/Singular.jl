@@ -12,6 +12,8 @@ include("number/n_GF.jl")
 
 include("number/n_transExt.jl")
 
+include("number/n_algExt.jl")
+
 include("number/n_unknown.jl")
 
 include("number/n_unknownsingularcoefficient.jl")

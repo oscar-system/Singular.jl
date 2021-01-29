@@ -319,6 +319,41 @@ n_transExt(c::N_FField, n::n_Z) = n_transExt(c, BigInt(n))
 
 ###############################################################################
 #
+#   SingularAlgebraicExtensionField/n_algExt
+#
+###############################################################################
+
+mutable struct N_AlgExtField <: Field
+   ptr::libSingular.coeffs_ptr
+   base_ring::Field
+   refcount::Int
+
+   function N_AlgExtField(F::N_FField, minpoly::n_transExt)
+      ptr = libSingular.transExt_SetMinpoly(F.ptr, minpoly.ptr)
+      d = new(ptr, F.base_ring, 1)
+      finalizer(_Ring_finalizer, d)
+   end
+end
+
+mutable struct n_algExt <: Nemo.FieldElem
+    ptr::libSingular.number_ptr
+    parent::N_AlgExtField
+
+    function n_algExt(c::N_AlgExtField, n::libSingular.number_ptr)
+        z = new(n, c)
+        c.refcount += 1
+        finalizer(_Elem_finalizer, z)
+        return z
+    end
+end
+
+n_algExt(c::N_AlgExtField, n::Integer = 0) = n_algExt(c, libSingular.number_ptr(n, c.ptr))
+n_algExt(c::N_AlgExtField, n::Nemo.fmpz) = n_algExt(c, libSingular.number_ptr(n, c.ptr))
+n_algExt(c::N_AlgExtField, n::n_Z) = n_algExt(c, BigInt(n))
+
+
+###############################################################################
+#
 #   SingularCoefficientRing/n_unknown
 #
 ###############################################################################
