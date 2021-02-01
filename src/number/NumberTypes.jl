@@ -325,12 +325,13 @@ n_transExt(c::N_FField, n::n_Z) = n_transExt(c, BigInt(n))
 
 mutable struct N_AlgExtField <: Field
    ptr::libSingular.coeffs_ptr
-   base_ring::Field
+   minpoly::n_transExt
    refcount::Int
 
    function N_AlgExtField(F::N_FField, minpoly::n_transExt)
+      transcendence_degree(F) == 1 || error("Only algebraic extensions in one variable are supported.")
       ptr = libSingular.transExt_SetMinpoly(F.ptr, minpoly.ptr)
-      d = new(ptr, F.base_ring, 1)
+      d = new(ptr, minpoly, 1)
       finalizer(_Ring_finalizer, d)
    end
 end
