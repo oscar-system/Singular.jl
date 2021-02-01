@@ -1,18 +1,17 @@
 @testset "n_algExt.constructors..." begin
    F, (a,) = FunctionField(QQ, ["a"])
-   F = ResidueField(F, a^2 + 1)
+   F, a = AlgebraicExtensionField(F, a^2 + 1)
 
    @test F isa Singular.Field
 
    F, (a, b) = FunctionField(QQ, ["a", "b"])
 
-   @test_throws ArgumentError ResidueField(F, a^2 + b)
+   @test_throws ArgumentError AlgebraicExtensionField(F, a^2 + b)
 end
 
 @testset "n_algExt.printing..." begin
    F, (a,) = FunctionField(QQ, ["a"])
-   F = ResidueField(F, a^2 + 1)
-   a = gen(F)
+   F, a = AlgebraicExtensionField(F, a^2 + 1)
 
    @test string(a+1) == "(a+1)"
 
@@ -30,7 +29,7 @@ end
 
 @testset "n_algExt.manipulation..." begin
    F, (a,) = FunctionField(Fp(7), ["a"])
-   K = ResidueField(F, a^2 + 1)
+   K, _ = AlgebraicExtensionField(F, a^2 + 1)
 
    @test isone(one(K))
    @test iszero(zero(K))
@@ -45,8 +44,7 @@ end
 
 @testset "n_algExt.unary_ops..." begin
    F, (a,) = FunctionField(Fp(7), ["a"])
-   F = ResidueField(F, a^2 + 1)
-   a = gen(F)
+   F, a = AlgebraicExtensionField(F, a^2 + 1)
 
    @test -F(3) == F(4)
    @test -F() == F()
@@ -55,8 +53,7 @@ end
 
 @testset "n_algExt.binary_ops..." begin
    F, (a,) = FunctionField(QQ, ["a"])
-   F = ResidueField(F, a^2 + 1)
-   a = gen(F)
+   F, a = AlgebraicExtensionField(F, a^2 + 1)
 
    x = 2*a + 2
    y = 3*a + 2
@@ -68,8 +65,7 @@ end
 
 @testset "n_algExt.comparison..." begin
    F, (a,) = FunctionField(Fp(7), ["a"])
-   F = ResidueField(F, a^2 + 1)
-   a = gen(F)
+   F, a = AlgebraicExtensionField(F, a^2 + 1)
 
    x = -2*a - 3
 
@@ -79,8 +75,7 @@ end
 
 @testset "n_transExt.powering..." begin
    F, (a,) = FunctionField(Fp(7), ["a"])
-   F = ResidueField(F, a^2 + 1)
-   a = gen(F)
+   F, a = AlgebraicExtensionField(F, a^2 + 1)
 
    @test (a + 1)^3 == 2*a - 2
    @test -4*(a + 1)^-3 == a + 1
@@ -90,8 +85,7 @@ end
 
 @testset "n_transExt.exact_division..." begin
    F, (a,) = FunctionField(QQ, ["a"])
-   F = ResidueField(F, a^2 + 1)
-   a = gen(F)
+   F, a = AlgebraicExtensionField(F, a^2 + 1)
 
    x = a^2 - 1
    y = a + 1
@@ -102,8 +96,7 @@ end
 
 @testset "n_transExt.gcd_lcm..." begin
    F, (a,) = FunctionField(Fp(7), ["a"])
-   F = ResidueField(F, a^2 + 1)
-   a = gen(F)
+   F, a = AlgebraicExtensionField(F, a^2 + 1)
 
    x = a^2 - 1
    y = a + 1

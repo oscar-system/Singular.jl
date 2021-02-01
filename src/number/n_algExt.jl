@@ -1,4 +1,4 @@
-export n_algExt, N_AlgExtField, ResidueField, modulus
+export n_algExt, N_AlgExtField, AlgebraicExtensionField, modulus
 
 ###############################################################################
 #
@@ -93,8 +93,8 @@ canonical_unit(x::n_algExt) = x
 ###############################################################################
 
 function show(io::IO, F::N_AlgExtField)
-   print(IOContext(io, :compact => true),
-         "Residue field of ", parent(modulus(F)), " modulo ", modulus(F))
+   print(IOContext(io, :compact => true), "Algebraic Extension of ",
+         base_ring(F), " with defining equation ", modulus(F))
 end
 
 function AbstractAlgebra.expressify(n::n_algExt; context = nothing)::Any
@@ -315,14 +315,14 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    ResidueField(F::Singular.N_FField, a::n_transExt)
+    AlgebraicExtensionField(F::Singular.N_FField, a::n_transExt)
 
-Return the residue field F/(a).
+Given a function field F = R(x) in one variable and a defining polynomial a
+in R[x], return a tuple consisting of the new field R[x]/(a) and x.
 """
-function ResidueField(F::Singular.N_FField, a::n_transExt)
-   # Well, this is a nightmare: We can only construct the ResidueField in the
-   # univariate case, but AA can at least theoretically deal with all cases.
-   # So maybe it is better to not use ResidueField here?
+function AlgebraicExtensionField(F::Singular.N_FField, a::n_transExt)
+   parent(a) == F || error("Parents must coincide")
    transcendence_degree(F) == 1 || throw(ArgumentError("Only algebraic extensions in one variable are supported."))
-   return N_AlgExtField(F, a)
+   r = N_AlgExtField(F, a)
+   return (r, gen(r))
 end
