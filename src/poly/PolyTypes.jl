@@ -13,6 +13,13 @@ mutable struct PolyRing{T <: Nemo.RingElem} <: Nemo.MPolyRing{T}
    ord::Symbol
    refcount::Int
 
+   # take ownership of a ring ptr
+   function PolyRing{T}(r::libSingular.ring_ptr, b, o::Symbol) where T
+      d = new(r, b, o, 1)
+      finalizer(_PolyRing_clear_fn, d)
+      return d
+   end
+
    function PolyRing{T}(R::Union{Ring, Field}, s::Array{Symbol, 1},
          ord_sym::Symbol, cached::Bool = true,
          ordering::libSingular.rRingOrder_t = ringorder_dp,
@@ -61,13 +68,6 @@ mutable struct PolyRing{T <: Nemo.RingElem} <: Nemo.MPolyRing{T}
          return d
       end
    end
-end
-
-function (R::PolyRing{T})(r::libSingular.ring_ptr) where T
-   new_r = deepcopy(R)
-   new_ptr = new_r.ptr
-   new_r.ptr = r
-   return new_r
 end
 
 function _PolyRing_clear_fn(R::PolyRing)

@@ -19,7 +19,6 @@ function _Elem_finalizer(n)
    nothing
 end
 
-
 ###############################################################################
 #
 #   Integers/n_Z
@@ -350,3 +349,34 @@ mutable struct n_unknown{T <: Nemo.RingElem} <: Nemo.RingElem
    parent::CoefficientRing{T}
 
 end
+
+###############################################################################
+#
+#   N_UnknownSingularCoefficientRing
+#   singular coefficient rings with no identifiable julia object
+#
+###############################################################################
+
+mutable struct N_UnknownSingularCoefficientRing <: Ring
+   ptr::libSingular.coeffs_ptr
+   refcount::Int
+
+   # take ownership of the pointer
+   function N_UnknownSingularCoefficientRing(ptr::libSingular.coeffs_ptr)
+      a = new(ptr, 1)
+      finalizer(_Ring_finalizer, a)
+      return a
+   end
+end
+
+mutable struct n_unknownsingularcoefficient <: Nemo.RingElem
+   ptr::libSingular.number_ptr
+   parent::N_UnknownSingularCoefficientRing
+
+   function n_unknownsingularcoefficient(R::N_UnknownSingularCoefficientRing, n::libSingular.number_ptr)
+      a = new(n, R)
+      finalizer(_Elem_finalizer, a)
+      return a
+   end
+end
+

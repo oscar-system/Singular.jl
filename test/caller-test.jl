@@ -88,3 +88,53 @@
     @test 0 == reduce(x1*x2^2*x5*x6^2*x7^2*x9 - 1, id)
     @test 0 == reduce(x1*x2*x3*x4*x5*x6*x7*x8*x9 - 1, id)
 end
+
+@testset "caller.LibSolve" begin
+   R, (x,) = PolynomialRing(Singular.QQ, ["s"])
+   l = Singular.LibSolve.solve(Ideal(R, [x^5+1]))
+   S = l[1]
+   @test isa(S, Singular.PolyRing{Singular.n_unknownsingularcoefficient})
+   for y in l[2][:SOL]
+      @test isa(y^5+1, Singular.n_unknownsingularcoefficient)
+   end
+end
+
+@testset "caller.LibNormal..." begin
+   R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"])
+   I = Ideal(R, z-x^4, z-y^6)
+   l = Singular.LibNormal.normal(I)
+   S = l[1][1][1]
+   @test isa(S, Singular.PolyRing{n_Q})
+   @test base_ring(gens(l[1][1][2][:norid])[1]*gens(S)[1]) == QQ
+
+   F, a = FiniteField(5, 3, "b")
+   R, (x, y, z) = PolynomialRing(F, ["x", "y", "z"])
+   I = Ideal(R, a*z-x^4, z-y^6)
+   l = Singular.LibNormal.normal(I)
+   S = l[1][1][1]
+   @test isa(S, Singular.PolyRing{n_GF})
+   @test base_ring(gens(l[1][1][2][:norid])[1]*gens(S)[1]*a) == F
+
+   R, (x, y, z) = PolynomialRing(Fp(17), ["x", "y", "z"])
+   I = Ideal(R, z-x^4, z-y^6)
+   l = Singular.LibNormal.normal(I)
+   S = l[1][1][1]
+   @test isa(S, Singular.PolyRing{n_Zp})
+   @test base_ring(gens(l[1][1][2][:norid])[1]*gens(S)[1]) == Fp(17)
+
+   F, (a, b, c) = FunctionField(Fp(17), ["a", "b", "c"])
+   R, (x, y, z) = PolynomialRing(F, ["x", "y", "z"])
+   I = Ideal(R, a*z-x^4, b*c*z-y^6)
+   l = Singular.LibNormal.normal(I)
+   S = l[1][1][1]
+   @test isa(S, Singular.PolyRing{n_transExt})
+   @test base_ring(gens(l[1][1][2][:norid])[1]*gens(S)[1]*a) == F
+
+   F, (a, b, c) = FunctionField(QQ, ["a", "b", "c"])
+   R, (x, y, z) = PolynomialRing(F, ["x", "y", "z"])
+   I = Ideal(R, a*z-x^4, b*c*z-y^6)
+   l = Singular.LibNormal.normal(I)
+   S = l[1][1][1]
+   @test isa(S, Singular.PolyRing{n_transExt})
+   @test base_ring(gens(l[1][1][2][:norid])[1]*gens(S)[1]*a) == F
+end

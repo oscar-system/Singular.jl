@@ -43,6 +43,32 @@ function convert_ring_content(value_list, rng)
     return Dict(i[2] => convert_return_value([false, i[3], i[1]], rng) for i in value_list)
 end
 
+function create_ring_from_singular_ring(r::libSingular.ring_ptr)
+   ordering = libSingular.ring_ordering_as_symbol(r)
+   c = libSingular.rCoeffPtr(r)
+   if libSingular.nCoeff_is_Q(c)
+      return PolyRing{n_Q}(r, QQ, ordering)
+   elseif libSingular.nCoeff_is_Zp(c)
+      p = Int(libSingular.n_GetChar(c))
+      return PolyRing{n_Zp}(r, N_ZpField(p), ordering)
+   elseif libSingular.nCoeff_is_GF(c)
+      p = Int(libSingular.n_GetChar(c))
+      q = Int(libSingular.nfCharQ(c))
+      d = round(Int, log(p, q))
+      s = Symbol(libSingular.n_ParameterName(0, c))
+      return PolyRing{n_GF}(r, N_GField(p, d, s), ordering)
+   elseif libSingular.nCoeff_is_transExt(c)
+      p = Int(libSingular.n_GetChar(c))
+      S = [Symbol(libSingular.n_ParameterName(i-1, c)) for i in 1:
+                                           libSingular.n_NumberOfParameters(c)]
+      F = N_FField(iszero(p) ? QQ : N_ZpField(p), S)
+      return PolyRing{n_transExt}(r, F, ordering)
+   else
+      basering = N_UnknownSingularCoefficientRing(libSingular.nCopyCoeff(c))
+      return PolyRing{n_unknownsingularcoefficient}(r, basering, ordering)
+   end
+end
+
 # Converts a single return value back to Julia, i.e.,
 # a single lvar, not a linked list of such.
 function convert_return_value(single_value, rng = nothing)
@@ -53,8 +79,8 @@ function convert_return_value(single_value, rng = nothing)
     cast = cast_desc[1](single_value[2])
     if cast isa Array{Any}
         return recursive_translate(cast, rng)
-    elseif cast isa libSingular.ring
-        new_ring = rng(cast)
+    elseif cast isa CxxWrap.CxxWrapCore.CxxPtr{Singular.libSingular.ring}
+        new_ring = create_ring_from_singular_ring(cast)
         return [new_ring, convert_ring_content(libSingular.get_ring_content(cast), new_ring)]
     elseif cast_desc[2]
         if length(cast_desc[3]) > 0
