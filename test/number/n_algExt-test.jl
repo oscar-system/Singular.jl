@@ -73,7 +73,7 @@ end
    @test isequal(x, x)
 end
 
-@testset "n_transExt.powering..." begin
+@testset "n_algExt.powering..." begin
    F, (a,) = FunctionField(Fp(7), ["a"])
    F, a = AlgebraicExtensionField(F, a^2 + 1)
 
@@ -83,7 +83,7 @@ end
    @test_throws DivideError (a - a)^-2
 end
 
-@testset "n_transExt.exact_division..." begin
+@testset "n_algExt.exact_division..." begin
    F, (a,) = FunctionField(QQ, ["a"])
    F, a = AlgebraicExtensionField(F, a^2 + 1)
 
@@ -94,7 +94,7 @@ end
    @test divexact(x, y) == a - 1
 end
 
-@testset "n_transExt.gcd_lcm..." begin
+@testset "n_algExt.gcd_lcm..." begin
    F, (a,) = FunctionField(Fp(7), ["a"])
    F, a = AlgebraicExtensionField(F, a^2 + 1)
 
@@ -103,4 +103,24 @@ end
 
    @test gcd(x, y) == F(1)
    @test gcd(F(0), F(0)) == F(0)
+end
+
+@testset "n_algExt.recognition" begin
+
+   F, (a,) = FunctionField(QQ,["a"])
+   K, a = AlgebraicExtensionField(F, a^2 + 1)
+   R, (x, y, z) = PolynomialRing(K, ["x", "y", "z"])
+   S = Singular.create_ring_from_singular_ring(Singular.libSingular.rCopy(R.ptr))
+
+   @test isa(S, Singular.PolyRing{n_algExt})
+
+   (x, y, z) = gens(S)
+   a = gen(base_ring(S))
+
+   @test isa(a*x + y, spoly{n_algExt})
+   @test iszero((a*x)^2 + x^2)
+
+   @test base_ring(S) == K
+   @test base_ring(a*x) == K
+   @test parent(a) == K
 end

@@ -136,5 +136,30 @@ end
    l = Singular.LibNormal.normal(I)
    S = l[1][1][1]
    @test isa(S, Singular.PolyRing{n_transExt})
+   @test base_ring(gens(l[1][1][2][:norid])[1]) == F
    @test base_ring(gens(l[1][1][2][:norid])[1]*gens(S)[1]*a) == F
+
+   F, (Fa,) = FunctionField(QQ, ["a"])
+   K, a = AlgebraicExtensionField(F, Fa^2 + 1)
+   R, (x, y, z) = PolynomialRing(K, ["x", "y", "z"])
+   I = Ideal(R, a*z-x^4, z-y^6)
+   l = Singular.LibNormal.normal(I)
+   S = l[1][1][1]
+   # the correct tests for when the possible bug is fixed
+   #@test isa(S, Singular.PolyRing{n_algExt})
+   #@test base_ring(gens(l[1][1][2][:norid])[1]*gens(S)[1]*a) == K
+   @test isa(S, Singular.PolyRing{n_transExt})
+   @test base_ring(gens(l[1][1][2][:norid])[1]*gens(S)[1]*Fa) == F
+
+   F, (Fa,) = FunctionField(Fp(7), ["a"])
+   K, a = AlgebraicExtensionField(F, Fa^2 + 1)
+   R, (x, y, z) = PolynomialRing(K, ["x", "y", "z"])
+   I = Ideal(R, a*z-x^4, z-y^6)
+   l = Singular.LibNormal.normal(I)
+   S = l[1][1][1]
+   # the correct tests for when the possible bug is fixed
+   #@test isa(S, Singular.PolyRing{n_algExt})
+   #@test base_ring(gens(l[1][1][2][:norid])[1]*gens(S)[1]*a) == K
+   @test isa(S, Singular.PolyRing{n_transExt})
+   @test base_ring(gens(l[1][1][2][:norid])[1]*gens(S)[1]*Fa) == F
 end

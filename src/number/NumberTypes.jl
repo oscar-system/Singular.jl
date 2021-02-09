@@ -285,6 +285,12 @@ mutable struct N_FField <: Field
    base_ring::Field
    refcount::Int
 
+   function N_FField(ptr::libSingular.coeffs_ptr, F::Field)
+      d = new(ptr, F, 1)
+      finalizer(_Ring_finalizer, d)
+      return d
+   end
+
    function N_FField(F::Field, S::Array{Symbol, 1})
       if haskey(N_FFieldID, (F, S))
          d = N_FFieldID[F, S]::N_FField
@@ -292,9 +298,8 @@ mutable struct N_FField <: Field
          v = [pointer(Base.Vector{UInt8}(string(str)*"\0")) for str in S]
          cf = libSingular.nCopyCoeff(F.ptr)
          ptr = libSingular.transExt_helper(cf, v)
-         d = new(ptr, F, 1)
+         d = N_FField(ptr, F)
          N_FFieldID[F, S] = d
-         finalizer(_Ring_finalizer, d)
       end
       return d
    end
@@ -323,16 +328,45 @@ n_transExt(c::N_FField, n::n_Z) = n_transExt(c, BigInt(n))
 #
 ###############################################################################
 
+const N_AlgExtFieldID = Dict{Tuple{N_FField, n_transExt}, Field}()
+const N_AlgExtFieldIDptr = Dict{libSingular.coeffs_ptr, Field}()
+
+
 mutable struct N_AlgExtField <: Field
    ptr::libSingular.coeffs_ptr
    minpoly::n_transExt
    refcount::Int
 
+   # take ownership of a coeffs_ptr
+   function N_AlgExtField(ptr::libSingular.coeffs_ptr, minpoly::n_transExt)
+      if libSingular.nCoeff_is_algExt(ptr)
+         if haskey(N_AlgExtFieldIDptr, ptr)
+            libSingular.nKillChar(ptr)
+            return N_AlgExtFieldIDptr[ptr]::N_AlgExtField
+         else
+            d = new(ptr, minpoly, 1)
+            finalizer(_Ring_finalizer, d)
+            N_AlgExtFieldIDptr[ptr] = d
+            return d
+         end
+      else
+         libSingular.nKillChar(ptr)
+         throw(ArgumentError("bad construction of algebraic extension field"))
+      end
+   end
+
+   # constructor for R[x]/minpoly from R(x) and minpoly in R(x) 
    function N_AlgExtField(F::N_FField, minpoly::n_transExt)
-      transcendence_degree(F) == 1 || error("Only algebraic extensions in one variable are supported.")
-      ptr = libSingular.transExt_SetMinpoly(F.ptr, minpoly.ptr)
-      d = new(ptr, minpoly, 1)
-      finalizer(_Ring_finalizer, d)
+      parent(minpoly) == F || error("minpoly parent mismatch")
+      transcendence_degree(F) == 1 || error("Only algebraic extensions in one variable are supported")
+      if haskey(N_FFieldID, (F, minpoly))
+         d = N_AlgExtFieldIDptr[F, minpoly]::N_AlgExtField
+      else
+         ptr = libSingular.transExt_SetMinpoly(F.ptr, minpoly.ptr)
+         d = N_AlgExtField(ptr, minpoly)
+         N_AlgExtFieldID[F, minpoly] = d
+      end
+      return d
    end
 end
 
