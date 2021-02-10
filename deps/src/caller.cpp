@@ -160,6 +160,21 @@ void * jl_array_to_intmat(jl_value_t * array_val)
     return reinterpret_cast<void *>(result);
 }
 
+lists jl_array_to_list_helper(jl_value_t * args_val, jl_value_t * types_val)
+{
+    jl_array_t * args = reinterpret_cast<jl_array_t *>(args_val);
+    jl_array_t * types = reinterpret_cast<jl_array_t *>(types_val);
+    int          size = jl_array_len(args);
+    lists      result = (lists)omAllocBin(slists_bin);
+    result->Init(size);
+
+    for (int i = 0; i < size; i++) {
+       result->m[i].rtyp = static_cast<int>(jl_unbox_int64(jl_arrayref(types, i)));
+       result->m[i].data = jl_unbox_voidpointer(jl_arrayref(args, i));
+    }
+    return result;
+}
+
 static void * get_ring_ref(ring r)
 {
     // Since a call to a Singular library function destroys its arguments,
@@ -374,6 +389,15 @@ void singular_define_caller(jlcxx::Module & Singular)
     Singular.method("jl_array_to_intvec", &jl_array_to_intvec);
     Singular.method("jl_array_to_intmat", &jl_array_to_intmat);
     Singular.method("copy_string_to_void", &copy_string_to_void);
+    Singular.method("jl_array_to_void", [] (jl_value_t * args_val,
+                                                   jl_value_t * types_val,
+                                                   ring R) {
+        auto origin = currRing;
+        rChangeCurrRing(R);
+        lists l = jl_array_to_list_helper(args_val, types_val);
+        rChangeCurrRing(origin);
+        return (void *) l;
+    });
 
     Singular.method("create_syStrategy_data", &create_syStrategy_data);
 
