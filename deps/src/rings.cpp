@@ -107,6 +107,9 @@ void singular_define_rings(jlcxx::Module & Singular)
     Singular.method("rIsQuotientRing", [](ring r) {
         return r->qideal != NULL;
     });
+    Singular.method("rCopy", [](ring r) {
+        return rCopy(r);
+    });
     Singular.method("rQuotientRing", [](ideal i, ring r) {
         ring Q = rCopy(r);
         Q->qideal = id_Copy(i, r);
