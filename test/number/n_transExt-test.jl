@@ -1,7 +1,14 @@
 @testset "n_transExt.constructors..." begin
-   F, (a, b, c) = FunctionField(QQ, ["a", "b", "c"])
+   F, _ = FunctionField(QQ, ["a", "b", "c"])
+   F1, _ = FunctionField(QQ, ["a", "b", "c"])
+   F2, _ = FunctionField(QQ, ["a", "b", "c"], cached = false)
 
    @test F isa Singular.Field
+   @test F1 isa Singular.Field
+   @test F2 isa Singular.Field
+   @test F == F1
+   @test F != F2
+   @test F1 != F2
 
    @test_throws ArgumentError FunctionField(QQ, String[])
    @test_throws ArgumentError FunctionField(QQ, ["", "b"])

@@ -124,6 +124,12 @@ function n_transExt_to_spoly(x::n_transExt; cached = true,
    if B != base_ring(S) || n > nvars(S)
       error("Base rings do not match.")
    end
+
+   # TODO: fix libSingular.transExt_to_poly - it is broken for zero x
+   if iszero(x)
+      return zero(S)
+   end
+
    return S(Singular.libSingular.transExt_to_poly(x.ptr, R.ptr, S.ptr))
 end
 
@@ -231,7 +237,8 @@ end
 ###############################################################################
 
 function ==(x::n_transExt, y::n_transExt)
-    return libSingular.n_Equal(x.ptr, y.ptr, parent(x).ptr)
+    c = parent(x)
+    return c == parent(y) && libSingular.n_Equal(x.ptr, y.ptr, c.ptr)
 end
 
 
@@ -362,11 +369,12 @@ Returns a tuple $K, a$ consisting of a function field $K$ over the field $F$
 with transcendence basis stored in the array $S$.
 """
 function FunctionField(F::Singular.Field, S::Vector{String}; cached::Bool=true)
-   typeof(F) == N_GField && error("Finite field extensions of Fp not supported.")
+   isa(F, Rationals) || isa(F, N_ZpField) ||
+             error("Only transcendental extensions of Q and Fp are supported.")
    isempty(S) && throw(ArgumentError("array must be non-empty"))
    any(isempty, S) && throw(ArgumentError("strings in array must be non-empty"))
    allunique(S) || throw(ArgumentError("strings in array must be pairwise different"))
-   R = N_FField(F, Symbol.(S))
+   R = N_FField(F, Symbol.(S), cached)
    return tuple(R, transcendence_basis(R))
 end
 
@@ -378,5 +386,5 @@ with transcendence degree $n$ and transcendence basis $a1, ..., an$.
 """
 function FunctionField(F::Singular.Field, n::Int; cached::Bool=true)
    S = ["a$i" for i in 1:n]
-   return FunctionField(F, S)
+   return FunctionField(F, S, cached)
 end

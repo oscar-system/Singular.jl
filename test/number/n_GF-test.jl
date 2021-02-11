@@ -1,9 +1,16 @@
 @testset "n_GF.constructors..." begin
-   R, x = FiniteField(7, 2, "x")
+   F, x = FiniteField(7, 2, "x")
+   F1, x = FiniteField(7, 2, "x")
+   F2, x = FiniteField(7, 2, "x", cached = false)
 
    @test isa(x, n_GF)
 
-   @test R isa Nemo.Field
+   @test F isa Singular.Field
+   @test F1 isa Singular.Field
+   @test F2 isa Singular.Field
+   @test F == F1
+   @test F != F2
+   @test F1 != F2
 
    @test_throws DomainError FiniteField(257, 1, "a")
    @test_throws DomainError FiniteField(2, 16, "a")
