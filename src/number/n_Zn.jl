@@ -317,5 +317,5 @@ function ResidueRing(R::Integers, a::Int; cached=true)
    a == 0 && throw(DivideError())
    a < 0 && throw(DomainError(a, "modulus must be non-negative"))
 
-   return N_ZnRing(a)
+   return N_ZnRing(a, cached)
 end

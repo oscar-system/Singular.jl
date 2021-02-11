@@ -358,6 +358,6 @@ function FiniteField(p::Int, n::Int, S::String; cached=true)
    !Nemo.isprime(Nemo.fmpz(p)) && throw(DomainError(p, "p must be prime"))
    (n*log(p) >= 20*log(2) || p^n >= 2^16) &&
       throw(DomainError("p^n must be < 2^16"))
-   par = N_GField(p, n, Symbol(S))
+   par = N_GField(p, n, Symbol(S), cached)
    return par, gen(par)
 end

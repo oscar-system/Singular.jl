@@ -1,5 +1,14 @@
 @testset "n_Zn.constructors..." begin
-   R = ResidueRing(ZZ, 7)
+   F = ResidueRing(ZZ, 8)
+   F1 = ResidueRing(ZZ, 8)
+   F2 = ResidueRing(ZZ, 8, cached = false)
+
+   @test F isa Singular.Ring
+   @test F1 isa Singular.Ring
+   @test F2 isa Singular.Ring
+   @test F == F1
+   @test F != F2
+   @test F1 != F2
 
    @test_throws DomainError ResidueRing(ZZ, -rand(1:99))
 end

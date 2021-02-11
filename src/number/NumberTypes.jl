@@ -124,14 +124,18 @@ mutable struct N_ZnRing <: Ring
    to_n_Z::Ptr{Nothing}
    refcount::Int
 
-   function N_ZnRing(n::Int)
-      if haskey(N_ZnRingID, n)
+   function N_ZnRing(n::Int, cached::Bool = true)
+      if cached && haskey(N_ZnRingID, n)
          d = N_ZnRingID[n]::N_ZnRing
       else
-         ptr = libSingular.nInitChar(libSingular.n_Zn, pointer_from_objref(ZnmInfo(BigInt(n), UInt(1))))
-         d = new(ptr, libSingular.n_SetMap(ZZ.ptr, ptr),
-              libSingular.n_SetMap(ptr, ZZ.ptr), 1)
-         N_ZnRingID[n] = d
+         info = ZnmInfo(BigInt(n), UInt(1))
+         GC.@preserve info begin
+            ptr = libSingular.nInitChar(libSingular.n_Zn, pointer_from_objref(info))
+            d = new(ptr, libSingular.n_SetMap(ZZ.ptr, ptr), libSingular.n_SetMap(ptr, ZZ.ptr), 1)
+         end
+         if cached
+            N_ZnRingID[n] = d
+         end
          finalizer(_Ring_finalizer, d)
       end
       return d
@@ -170,14 +174,16 @@ mutable struct N_ZpField <: Field
    to_n_Z::Ptr{Nothing}
    refcount::Int
 
-   function N_ZpField(n::Int)
-      if haskey(N_ZpFieldID, n)
+   function N_ZpField(n::Int, cached::Bool = true)
+      if cached && haskey(N_ZpFieldID, n)
          d = N_ZpFieldID[n]::N_ZpField
       else
          ptr = libSingular.nInitChar(libSingular.n_Zp, Ptr{Nothing}(n))
          d = new(ptr, libSingular.n_SetMap(ZZ.ptr, ptr),
               libSingular.n_SetMap(ptr, ZZ.ptr), 1)
-         N_ZpFieldID[n] = d
+         if cached
+            N_ZpFieldID[n] = d
+         end
          finalizer(_Ring_finalizer, d)
       end
       return d
@@ -231,8 +237,8 @@ mutable struct N_GField <: Field
    refcount::Int
    S::Symbol
 
-   function N_GField(p::Int, n::Int, S::Symbol)
-      if haskey(N_GFieldID, (p, n, S))
+   function N_GField(p::Int, n::Int, S::Symbol, cached::Bool = true)
+      if cached && haskey(N_GFieldID, (p, n, S))
          d = N_GFieldID[p, n, S]::N_GField
       else
          gfinfo = GFInfo(Cint(p), Cint(n), pointer(Base.Vector{UInt8}(string(S)*"\0")))
@@ -241,8 +247,10 @@ mutable struct N_GField <: Field
          d = new(ptr, n, libSingular.n_SetMap(ZZ.ptr, ptr),
               libSingular.n_SetMap(ptr, ZZ.ptr), 1, S)
          end
-         N_GFieldID[p, n, S] = d
          finalizer(_Ring_finalizer, d)
+         if cached
+            N_GFieldID[p, n, S] = d
+         end
       end
       return d
    end
@@ -285,21 +293,18 @@ mutable struct N_FField <: Field
    base_ring::Field
    refcount::Int
 
-   function N_FField(ptr::libSingular.coeffs_ptr, F::Field)
-      d = new(ptr, F, 1)
-      finalizer(_Ring_finalizer, d)
-      return d
-   end
-
-   function N_FField(F::Field, S::Array{Symbol, 1})
-      if haskey(N_FFieldID, (F, S))
+   function N_FField(F::Field, S::Array{Symbol, 1}, cached::Bool = true)
+      if cached && haskey(N_FFieldID, (F, S))
          d = N_FFieldID[F, S]::N_FField
       else
          v = [pointer(Base.Vector{UInt8}(string(str)*"\0")) for str in S]
          cf = libSingular.nCopyCoeff(F.ptr)
          ptr = libSingular.transExt_helper(cf, v)
-         d = N_FField(ptr, F)
-         N_FFieldID[F, S] = d
+         d = new(ptr, F, 1)
+         finalizer(_Ring_finalizer, d)
+         if cached
+            N_FFieldID[F, S] = d
+         end
       end
       return d
    end
@@ -338,15 +343,18 @@ mutable struct N_AlgExtField <: Field
    refcount::Int
 
    # take ownership of a coeffs_ptr
-   function N_AlgExtField(ptr::libSingular.coeffs_ptr, minpoly::n_transExt)
+   function N_AlgExtField(ptr::libSingular.coeffs_ptr, minpoly::n_transExt,
+                                                          cached::Bool = true)
       if libSingular.nCoeff_is_algExt(ptr)
-         if haskey(N_AlgExtFieldIDptr, ptr)
+         if cached && haskey(N_AlgExtFieldIDptr, ptr)
             libSingular.nKillChar(ptr)
             return N_AlgExtFieldIDptr[ptr]::N_AlgExtField
          else
             d = new(ptr, minpoly, 1)
             finalizer(_Ring_finalizer, d)
-            N_AlgExtFieldIDptr[ptr] = d
+            if cached
+               N_AlgExtFieldIDptr[ptr] = d
+            end
             return d
          end
       else
@@ -356,15 +364,17 @@ mutable struct N_AlgExtField <: Field
    end
 
    # constructor for R[x]/minpoly from R(x) and minpoly in R(x) 
-   function N_AlgExtField(F::N_FField, minpoly::n_transExt)
+   function N_AlgExtField(F::N_FField, minpoly::n_transExt, cached::Bool = true)
       parent(minpoly) == F || error("minpoly parent mismatch")
       transcendence_degree(F) == 1 || error("Only algebraic extensions in one variable are supported")
-      if haskey(N_FFieldID, (F, minpoly))
-         d = N_AlgExtFieldIDptr[F, minpoly]::N_AlgExtField
+      if cached && haskey(N_AlgExtFieldID, (F, minpoly))
+         d = N_AlgExtFieldID[F, minpoly]::N_AlgExtField
       else
          ptr = libSingular.transExt_SetMinpoly(F.ptr, minpoly.ptr)
-         d = N_AlgExtField(ptr, minpoly)
-         N_AlgExtFieldID[F, minpoly] = d
+         d = N_AlgExtField(ptr, minpoly, cached)
+         if cached
+            N_AlgExtFieldID[F, minpoly] = d
+         end
       end
       return d
    end

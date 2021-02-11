@@ -1,7 +1,14 @@
 @testset "n_Zp.constructors..." begin
-   R = Fp(7)
+   F = Fp(7)
+   F1 = Fp(7)
+   F2 = Fp(7, cached = false)
 
-   @test R isa Nemo.Field
+   @test F isa Singular.Field
+   @test F1 isa Singular.Field
+   @test F2 isa Singular.Field
+   @test F == F1
+   @test F != F2
+   @test F1 != F2
 end
 
 @testset "n_Zp.printing..." begin

@@ -345,7 +345,7 @@ function Fp(a::Int; cached=true)
    a > 2^29 && throw(DomainError(a, "prime must be <= 2^29"))
    !Nemo.isprime(Nemo.fmpz(a)) && throw(DomainError(a, "characteristic must be prime"))
 
-   return N_ZpField(a)
+   return N_ZpField(a, cached)
 end
 
 function Base.Int(a::n_Zp)

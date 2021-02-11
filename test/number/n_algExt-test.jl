@@ -1,8 +1,17 @@
 @testset "n_algExt.constructors..." begin
    F, (a,) = FunctionField(QQ, ["a"])
-   F, a = AlgebraicExtensionField(F, a^2 + 1)
+   K, _ = AlgebraicExtensionField(F, a^2 + 1)
+   K1, _ = AlgebraicExtensionField(F, a^2 + 1)
+   K2, _ = AlgebraicExtensionField(F, a^2 + 1, cached = false)
 
-   @test F isa Singular.Field
+   @test K isa Singular.Field
+   @test K1 isa Singular.Field
+   @test K2 isa Singular.Field
+   @test K == K1
+   @test K != K2
+   @test K1 != K2
+
+   @test_throws ArgumentError AlgebraicExtensionField(F, zero(F))
 
    F, (a, b) = FunctionField(QQ, ["a", "b"])
 

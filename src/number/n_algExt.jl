@@ -320,9 +320,10 @@ end
 Given a function field F = R(x) in one variable and a defining polynomial a
 in R[x], return a tuple consisting of the new field R[x]/(a) and x.
 """
-function AlgebraicExtensionField(F::Singular.N_FField, a::n_transExt)
+function AlgebraicExtensionField(F::Singular.N_FField, a::n_transExt;
+                                                                 cached = true)
    parent(a) == F || error("Parents must coincide")
    transcendence_degree(F) == 1 || throw(ArgumentError("Only algebraic extensions in one variable are supported."))
-   r = N_AlgExtField(F, a)
+   r = N_AlgExtField(F, a, cached)
    return (r, gen(r))
 end
