@@ -49,6 +49,14 @@ end
    @test modulus(K) == a^2 + 1
 
    @test deepcopy(K(2)) == K(2)
+
+   a = gen(K)
+   d = Dict{elem_type(K), Int}()
+   d[a] = 1
+   d[a + 1] = 2
+   d[a] = 3
+   @test d[a + 1] == 2
+   @test d[a] == 3
 end
 
 @testset "n_algExt.unary_ops..." begin

@@ -39,8 +39,13 @@ function deepcopy_internal(a::n_algExt, dict::IdDict)
 end
 
 function hash(a::n_algExt, h::UInt)
-   error("hash not implemented")
-   return 0x24f9836cd67edfd9%UInt
+   chash = hash(characteristic(parent(a)), h)
+   # TODO: for when we have algExt_to_transExt:
+   #K = parent(a)
+   #F = parent(modulus(K))
+   #phash = hash(F(libSingular.algExt_to_transExt(a.ptr, K.ptr, F.ptr)))
+   phash = 0
+   return xor(xor(chash, phash), 0x2c42e12d0c837511%UInt)
 end
 
 function check_parent(x::n_algExt, y::n_algExt)
@@ -318,7 +323,7 @@ end
     AlgebraicExtensionField(F::Singular.N_FField, a::n_transExt)
 
 Given a function field F = R(x) in one variable and a defining polynomial a
-in R[x], return a tuple consisting of the new field R[x]/(a) and x.
+in R[x], return a tuple consisting of the new field R[x]/(a) and the class of x.
 """
 function AlgebraicExtensionField(F::Singular.N_FField, a::n_transExt;
                                                                  cached = true)
