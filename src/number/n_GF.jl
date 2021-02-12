@@ -149,36 +149,6 @@ end
 
 ###############################################################################
 #
-#   Ad hoc arithmetic functions
-#
-###############################################################################
-
-+(x::n_GF, y::Integer) = x + parent(x)(y)
-
-+(x::Integer, y::n_GF) = parent(y)(x) + y
-
--(x::n_GF, y::Integer) = x - parent(x)(y)
-
--(x::Integer, y::n_GF) = parent(y)(x) - y
-
-*(x::n_GF, y::Integer) = x*parent(x)(y)
-
-*(x::Integer, y::n_GF) = parent(y)(x)*y
-
-+(x::n_GF, y::n_Z) = x + parent(x)(y)
-
-+(x::n_Z, y::n_GF) = parent(y)(x) + y
-
--(x::n_GF, y::n_Z) = x - parent(x)(y)
-
--(x::n_Z, y::n_GF) = parent(y)(x) - y
-
-*(x::n_GF, y::n_Z) = x*parent(x)(y)
-
-*(x::n_Z, y::n_GF) = parent(y)(x)*y
-
-###############################################################################
-#
 #   Comparison
 #
 ###############################################################################
@@ -186,7 +156,6 @@ end
 function ==(x::n_GF, y::n_GF)
     return libSingular.n_Equal(x.ptr, y.ptr, parent(x).ptr)
 end
-
 
 isequal(x::n_GF, y::n_GF) = (x == y)
 

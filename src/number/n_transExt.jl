@@ -214,24 +214,6 @@ end
 
 ###############################################################################
 #
-#   Ad hoc arithmetic functions
-#
-###############################################################################
-
-+(x::n_transExt, y::Integer) = x + parent(x)(y)
-
-+(x::Integer, y::n_transExt) = parent(y)(x) + y
-
--(x::n_transExt, y::Integer) = x - parent(x)(y)
-
--(x::Integer, y::n_transExt) = parent(y)(x) - y
-
-*(x::n_transExt, y::Integer) = x*parent(x)(y)
-
-*(x::Integer, y::n_transExt) = parent(y)(x)*y
-
-###############################################################################
-#
 #   Comparison
 #
 ###############################################################################
@@ -240,7 +222,6 @@ function ==(x::n_transExt, y::n_transExt)
     c = parent(x)
     return c == parent(y) && libSingular.n_Equal(x.ptr, y.ptr, c.ptr)
 end
-
 
 isequal(x::n_transExt, y::n_transExt) = (x == y)
 
