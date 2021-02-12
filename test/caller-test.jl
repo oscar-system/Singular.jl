@@ -162,6 +162,7 @@ end
    #@test base_ring(gens(l[1][1][2][:norid])[1]*gens(S)[1]*a) == K
    @test isa(S, Singular.PolyRing{n_transExt})
    @test base_ring(gens(l[1][1][2][:norid])[1]*gens(S)[1]*Fa) == F
+end
 
 @testset "caller.lists..." begin
     r, (x, y) = PolynomialRing(QQ, ["x", "y"])
