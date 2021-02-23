@@ -1,4 +1,4 @@
-@testset "svector.constructors..." begin
+@testset "svector.constructors" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    v1 = vector(R, x + 1, x*y + 1, y)
@@ -27,7 +27,7 @@
    end
 end
 
-@testset "svector.jet..." begin
+@testset "svector.jet" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    a = vector(R, x^5 + 1, 2x^3 + 3y^2, x^2)
@@ -39,7 +39,7 @@ end
    @test b == c
 end
 
-@testset "svector.manipulation..." begin
+@testset "svector.manipulation" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    M = FreeModule(R, 3)
@@ -57,7 +57,7 @@ end
    @test deepcopy(v) == v
 end
 
-@testset "svector.unary_ops..." begin
+@testset "svector.unary_ops" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    v = vector(R, x, y, R(2))
@@ -65,7 +65,7 @@ end
    @test -(-v) == v
 end
 
-@testset "svector.iszero..." begin
+@testset "svector.iszero" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    v = vector(R, x, y, R(2))
@@ -81,7 +81,7 @@ end
   @test iszero(v) == 1
 end
 
-@testset "svector.binary_ops..." begin
+@testset "svector.binary_ops" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    v1 = vector(R, x, y, R(2))
@@ -91,7 +91,7 @@ end
    @test v1 + v2 - v2 == v1
 end
 
-@testset "svector.adhoc_binary..." begin
+@testset "svector.adhoc_binary" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    v1 = vector(R, x, y, R(2))
@@ -102,7 +102,7 @@ end
    @test x*(v1 + v2) == v1*x + v2*x
 end
 
-@testset "svector.comparison..." begin
+@testset "svector.comparison" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    v1 = vector(R, x, y, R(2))
@@ -112,7 +112,7 @@ end
    @test v1 == deepcopy(v1)
 end
 
-@testset "svector.conversion..." begin
+@testset "svector.conversion" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    v1 = vector(R, x, y, R(2))

@@ -1,4 +1,4 @@
-@testset "n_algExt.constructors..." begin
+@testset "n_algExt.constructors" begin
    F, (a,) = FunctionField(QQ, ["a"])
    K, _ = AlgebraicExtensionField(F, a^2 + 1)
    K1, _ = AlgebraicExtensionField(F, a^2 + 1)
@@ -18,7 +18,7 @@
    @test_throws ArgumentError AlgebraicExtensionField(F, a^2 + b)
 end
 
-@testset "n_algExt.printing..." begin
+@testset "n_algExt.printing" begin
    F, (a,) = FunctionField(QQ, ["a"])
    F, a = AlgebraicExtensionField(F, a^2 + 1)
 
@@ -36,7 +36,7 @@ end
    @test sprint(show, "text/plain", q) == "(a + 1)*x^2"
 end
 
-@testset "n_algExt.manipulation..." begin
+@testset "n_algExt.manipulation" begin
    F, (a,) = FunctionField(Fp(7), ["a"])
    K, _ = AlgebraicExtensionField(F, a^2 + 1)
 
@@ -59,7 +59,7 @@ end
    @test d[a] == 3
 end
 
-@testset "n_algExt.unary_ops..." begin
+@testset "n_algExt.unary_ops" begin
    F, (a,) = FunctionField(Fp(7), ["a"])
    F, a = AlgebraicExtensionField(F, a^2 + 1)
 
@@ -68,7 +68,7 @@ end
    @test a^3 == -a
 end
 
-@testset "n_algExt.binary_ops..." begin
+@testset "n_algExt.binary_ops" begin
    F, (a,) = FunctionField(QQ, ["a"])
    F, a = AlgebraicExtensionField(F, a^2 + 1)
 
@@ -80,7 +80,7 @@ end
    @test x*y == 10*a - 2
 end
 
-@testset "n_algExt.comparison..." begin
+@testset "n_algExt.comparison" begin
    F, (a,) = FunctionField(Fp(7), ["a"])
    F, a = AlgebraicExtensionField(F, a^2 + 1)
 
@@ -90,7 +90,7 @@ end
    @test isequal(x, x)
 end
 
-@testset "n_algExt.powering..." begin
+@testset "n_algExt.powering" begin
    F, (a,) = FunctionField(Fp(7), ["a"])
    F, a = AlgebraicExtensionField(F, a^2 + 1)
 
@@ -100,7 +100,7 @@ end
    @test_throws DivideError (a - a)^-2
 end
 
-@testset "n_algExt.exact_division..." begin
+@testset "n_algExt.exact_division" begin
    F, (a,) = FunctionField(QQ, ["a"])
    F, a = AlgebraicExtensionField(F, a^2 + 1)
 
@@ -111,7 +111,7 @@ end
    @test divexact(x, y) == a - 1
 end
 
-@testset "n_algExt.gcd_lcm..." begin
+@testset "n_algExt.gcd_lcm" begin
    F, (a,) = FunctionField(Fp(7), ["a"])
    F, a = AlgebraicExtensionField(F, a^2 + 1)
 

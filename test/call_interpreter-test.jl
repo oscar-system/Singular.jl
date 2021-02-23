@@ -1,4 +1,4 @@
-@testset "call.Interpreter..." begin
+@testset "call.Interpreter" begin
     Singular.libSingular.call_interpreter("ring r;")
     result = Singular.libSingular.call_interpreter("r;")
     @test result[1] == false

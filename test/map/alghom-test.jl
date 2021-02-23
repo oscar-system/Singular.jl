@@ -1,4 +1,4 @@
-@testset "alghom.constructors..." begin
+@testset "alghom.constructors" begin
    L = Singular.FiniteField(3, 2, String("a"))
    R, (x, y, z, w) = Singular.PolynomialRing(L[1], ["x", "y", "z", "w"];
                              ordering=:negdegrevlex)
@@ -15,7 +15,7 @@
 
 end
 
-@testset "alghom.apply..." begin
+@testset "alghom.apply" begin
    R, (x, y, z, w) = Singular.PolynomialRing(Singular.Fp(3), ["x", "y", "z", "w"];
                              ordering=:negdegrevlex)
    S, (a, b, c) = Singular.PolynomialRing(Singular.Fp(3), ["a", "b", "c"];
@@ -36,7 +36,7 @@ end
    @test id(f(p)) == f(p)
 end
 
-@testset "alghom.compose..." begin
+@testset "alghom.compose" begin
    R, (x, y, z, w) = Singular.PolynomialRing(Singular.QQ, ["x", "y", "z", "w"];
                              ordering=:negdegrevlex)
    S, (a, b, c) = Singular.PolynomialRing(Singular.QQ, ["a", "b", "c"];
@@ -63,7 +63,7 @@ end
    @test h4.domain == R && isequal(h4.image, gens(MaximalIdeal(R, 1)))
 end
 
-@testset "alghom.preimage..." begin
+@testset "alghom.preimage" begin
    R, (x, y, z, w) = Singular.PolynomialRing(Singular.QQ, ["x", "y", "z", "w"];
                              ordering=:negdegrevlex)
    S, (a, b, c) = Singular.PolynomialRing(Singular.QQ, ["a", "b", "c"];

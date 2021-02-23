@@ -1,4 +1,4 @@
-@testset "n_Zn.constructors..." begin
+@testset "n_Zn.constructors" begin
    F = ResidueRing(ZZ, 8)
    F1 = ResidueRing(ZZ, 8)
    F2 = ResidueRing(ZZ, 8, cached = false)
@@ -13,7 +13,7 @@
    @test_throws DomainError ResidueRing(ZZ, -rand(1:99))
 end
 
-@testset "n_Zn.printing..." begin
+@testset "n_Zn.printing" begin
    R = ResidueRing(ZZ, 5)
 
    @test string(R(3)) == "3"
@@ -21,7 +21,7 @@ end
    @test sprint(show, "text/plain", (R(3))) == "3"
 end
 
-@testset "n_Zn.manipulation..." begin
+@testset "n_Zn.manipulation" begin
    R = ResidueRing(ZZ, 6)
 
    @test isone(one(R))
@@ -34,14 +34,14 @@ end
    @test deepcopy(R(2)) == R(2)
 end
 
-@testset "n_Zn.unary_ops..." begin
+@testset "n_Zn.unary_ops" begin
    R = ResidueRing(ZZ, 5)
 
    @test -R(3) == R(2)
    @test -R() == R()
 end
 
-@testset "n_Zn.binary_ops..." begin
+@testset "n_Zn.binary_ops" begin
    R = ResidueRing(ZZ, 5)
 
    a = R(2)
@@ -52,14 +52,14 @@ end
    @test a*b == R(1)
 end
 
-@testset "n_Zn.comparison..." begin
+@testset "n_Zn.comparison" begin
    R = ResidueRing(ZZ, 5)
 
    @test R(2) == R(2)
    @test isequal(R(2), R(2))
 end
 
-@testset "n_Zn.ad_hoc_comparison..." begin
+@testset "n_Zn.ad_hoc_comparison" begin
    R = ResidueRing(ZZ, 5)
 
    @test R(2) == 2
@@ -71,27 +71,27 @@ end
    @test ZZ(2) == R(2)
 end
 
-@testset "n_Zn.powering..." begin
+@testset "n_Zn.powering" begin
    R = ResidueRing(ZZ, 5)
 
    @test R(2)^10 == R(4)
    @test_throws DomainError R(2)^-rand(1:99)
 end
 
-@testset "n_Zn.exact_division..." begin
+@testset "n_Zn.exact_division" begin
    R = ResidueRing(ZZ, 5)
 
    @test divexact(R(2), R(3)) == R(4)
 end
 
-@testset "n_Zn.gcd_lcm..." begin
+@testset "n_Zn.gcd_lcm" begin
    R = ResidueRing(ZZ, 5)
 
    @test gcd(R(2), R(3)) == R(1)
    @test gcd(R(0), R(0)) == R(0)
 end
 
-@testset "n_Zn.extended_gcd..." begin
+@testset "n_Zn.extended_gcd" begin
    R = ResidueRing(ZZ, 6)
 
    g, s, t = gcdx(R(2), R(4))
@@ -103,7 +103,7 @@ end
    @test g == R(1)*s + R(5)*t
 end
 
-@testset "n_Zn.Polynomials..." begin
+@testset "n_Zn.Polynomials" begin
    R = ResidueRing(ZZ, 5)
    S, x = Nemo.PolynomialRing(R, "x")
 

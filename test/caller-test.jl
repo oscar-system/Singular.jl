@@ -1,4 +1,4 @@
-@testset "caller.Lib..." begin
+@testset "caller.Lib" begin
     R, (x, y) = PolynomialRing(Singular.ZZ, ["x", "y"])
     @test Singular.LibSets.isEqualInt(R, Singular.ZZ(1), Singular.ZZ(1)) == 1
 
@@ -99,7 +99,7 @@ end
    end
 end
 
-@testset "caller.LibNormal..." begin
+@testset "caller.LibNormal" begin
    R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"])
    I = Ideal(R, z-x^4, z-y^6)
    l = Singular.LibNormal.normal(I)
@@ -164,7 +164,7 @@ end
    @test base_ring(gens(l[1][1][2][:norid])[1]*gens(S)[1]*Fa) == F
 end
 
-@testset "caller.lists..." begin
+@testset "caller.lists" begin
     r, (x, y) = PolynomialRing(QQ, ["x", "y"])
     f = y^2*(y-1)^3-x^5
     A1 = Any[Any[Ideal(r, [x,y-1]), 1],2]

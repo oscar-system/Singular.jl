@@ -1,4 +1,4 @@
-@testset "PolyRing.degree_bound..." begin
+@testset "PolyRing.degree_bound" begin
    R1, = PolynomialRing(QQ, ["x", ])
    @test degree_bound(R1) == 65535
 
@@ -26,7 +26,7 @@
    end
 end
 
-@testset "PolyRing.ordering..." begin
+@testset "PolyRing.ordering" begin
    R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"])
    I = Ideal(R, x+z, y+z)
    I.isGB = true

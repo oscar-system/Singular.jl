@@ -1,4 +1,4 @@
-@testset "n_transExt.constructors..." begin
+@testset "n_transExt.constructors" begin
    F, _ = FunctionField(QQ, ["a", "b", "c"])
    F1, _ = FunctionField(QQ, ["a", "b", "c"])
    F2, _ = FunctionField(QQ, ["a", "b", "c"], cached = false)
@@ -17,7 +17,7 @@
    @test_throws ArgumentError FunctionField(QQ, ["a", "b", "a"])
 end
 
-@testset "n_transExt.printing..." begin
+@testset "n_transExt.printing" begin
    F, (a, b, c) = FunctionField(QQ, ["a", "b", "c"])
 
    @test string(3*a*b + 2*c) == "(3*a*b+2*c)"
@@ -34,7 +34,7 @@ end
    @test sprint(show, "text/plain", q) == "(a*c + b)//c*x^2"
 end
 
-@testset "n_transExt.manipulation..." begin
+@testset "n_transExt.manipulation" begin
    F, (a, b, c) = FunctionField(Fp(5), ["a", "b", "c"])
    x = (a*b+c^2) // (a+b)
 
@@ -56,7 +56,7 @@ end
    @test n_transExt_to_spoly(x, parent_ring = R) == p
 end
 
-@testset "n_transExt.unary_ops..." begin
+@testset "n_transExt.unary_ops" begin
    F, (a, b, c) = FunctionField(Fp(5), ["a", "b", "c"])
    x = 3*a + b
 
@@ -65,7 +65,7 @@ end
    @test -x == 2*a - b
 end
 
-@testset "n_transExt.binary_ops..." begin
+@testset "n_transExt.binary_ops" begin
    F, (a, b, c) = FunctionField(Fp(5), ["a", "b", "c"])
 
    x = 2*a + 2*c
@@ -76,7 +76,7 @@ end
    @test x*y == a*b - a*c + b*c - c^2
 end
 
-@testset "n_transExt.comparison..." begin
+@testset "n_transExt.comparison" begin
    F, (a, b, c) = FunctionField(Fp(5), ["a", "b", "c"])
 
    x = a^2*b*c + b^2*c + 5*a
@@ -85,7 +85,7 @@ end
    @test isequal(x, x)
 end
 
-@testset "n_transExt.powering..." begin
+@testset "n_transExt.powering" begin
    F, (a, b, c) = FunctionField(Fp(3), ["a", "b", "c"])
 
    x = a*b*c + 1
@@ -94,7 +94,7 @@ end
    @test_throws DomainError x^-rand(1:99)
 end
 
-@testset "n_transExt.exact_division..." begin
+@testset "n_transExt.exact_division" begin
    F, (a, b, c) = FunctionField(Fp(5), ["a", "b", "c"])
 
    x = a^2 - 1
@@ -104,7 +104,7 @@ end
    @test divexact(x, y) == a-1
 end
 
-@testset "n_transExt.gcd_lcm..." begin
+@testset "n_transExt.gcd_lcm" begin
    F, (a, b, c) = FunctionField(Fp(5), ["a", "b", "c"])
 
    x = a^2 - 1
@@ -114,7 +114,7 @@ end
    @test gcd(F(0), F(0)) == F(0)
 end
 
-@testset "n_transExt.Polynomials..." begin
+@testset "n_transExt.Polynomials" begin
    F, (a, b, c) = FunctionField(Fp(5), ["a", "b", "c"])
    R, (x, ) = PolynomialRing(F, ["x"])
 
