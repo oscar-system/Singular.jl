@@ -1,4 +1,4 @@
-@testset "smodule.constructors..." begin
+@testset "smodule.constructors" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    v1 = vector(R, x + 1, x*y + 1, y)
@@ -21,7 +21,7 @@
    @test isa(M, smodule)
 end
 
-@testset "smodule.jet..." begin
+@testset "smodule.jet" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    v1 = vector(R, x + 1, x*y + 1, y)
@@ -40,7 +40,7 @@ end
    @test P[2] == N[2]
 end
 
-@testset "smodule.local..." begin
+@testset "smodule.local" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"], ordering=:negdegrevlex)
 
    v1 = vector(R, x, y^2)
@@ -56,7 +56,7 @@ end
    @test MM[1] == w1 && MM[2] == w2
 end
 
-@testset "smodule.manipulation..." begin
+@testset "smodule.manipulation" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    v1 = vector(R, x + 1, x*y + 1, y)
@@ -79,7 +79,7 @@ end
    @test N[2] == v2
 end
 
-#= @testset "smodule.slimgb..." begin
+#= @testset "smodule.slimgb" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    v1 = vector(R, x + 1, x*y + 1, y)
@@ -104,7 +104,7 @@ end
    @test G2.isGB == true
 end =#
 
-@testset "smodule.std..." begin
+@testset "smodule.std" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    v1 = vector(R, x + 1, x*y + 1, y)
@@ -129,7 +129,7 @@ end =#
    @test G2.isGB == true
 end
 
-@testset "smodule.syz..." begin
+@testset "smodule.syz" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    v1 = vector(R, (x + 1)*y, (x*y + 1)*y, y)
@@ -144,7 +144,7 @@ end
    @test Z[1] == vector(R, x, -y)
 end
 
-@testset "smodule.modulo..." begin
+@testset "smodule.modulo" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    v1 = vector(R, x)
@@ -161,7 +161,7 @@ end
    @test M[2] == vector(R, R(0), x)
 end
 
-@testset "smodule.lift..." begin
+@testset "smodule.lift" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    v1 = vector(R, x)
@@ -176,7 +176,7 @@ end
    @test iszero(r[1])
 end
 
-@testset "smodule.eliminate..." begin
+@testset "smodule.eliminate" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    v1 = vector(R, x)
@@ -189,7 +189,7 @@ end
    @test M[1] == v2
 end
 
-@testset "smodule.sres..." begin
+@testset "smodule.sres" begin
    R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"])
 
    I = Singular.Ideal(R, y*z + z^2, y^2 + x*z, x*y + z^2, z^3, x*z^2, x^2*z)

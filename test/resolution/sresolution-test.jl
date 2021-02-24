@@ -1,4 +1,4 @@
-@testset "sresolution.constructors..." begin
+@testset "sresolution.constructors" begin
    R, (w, x, y, z) = PolynomialRing(QQ, ["w", "x", "y", "z"])
 
    I = Ideal(R, w^2 - x*z, w*x - y*z, x^2 - w*y, x*y - z^2, y^2 - w*z)
@@ -18,7 +18,7 @@
    @test isa(F, sresolution)
 end
 
-@testset "sresolution.manipulation..." begin
+@testset "sresolution.manipulation" begin
    R, (w, x, y, z) = PolynomialRing(QQ, ["w", "x", "y", "z"])
 
    I = Ideal(R, w^2 - x*z, w*x - y*z, x^2 - w*y, x*y - z^2, y^2 - w*z)
@@ -48,7 +48,7 @@ end
    @test parent(F) === parent(G)
 end
 
-@testset "sresolution.betti..." begin
+@testset "sresolution.betti" begin
    R, (w, x, y, z) = PolynomialRing(QQ, ["w", "x", "y", "z"])
 
    I = Ideal(R, w^2 - x*z, w*x - y*z, x^2 - w*y, x*y - z^2, y^2 - w*z)
@@ -64,7 +64,7 @@ end
    @test B[3, 1] == 0 && B[3, 2] == 0 && B[3, 3] == 0 && B[3, 4] == 1
 end
 
-@testset "sresolution.minres..." begin
+@testset "sresolution.minres" begin
    R, (w, x, y, z) = PolynomialRing(QQ, ["w", "x", "y", "z"])
 
    I = Ideal(R, w^2 - x*z, w*x - y*z, x^2 - w*y, x*y - z^2, y^2 - w*z)

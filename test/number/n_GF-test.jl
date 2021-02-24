@@ -1,4 +1,4 @@
-@testset "n_GF.constructors..." begin
+@testset "n_GF.constructors" begin
    F, x = FiniteField(7, 2, "x")
    F1, x = FiniteField(7, 2, "x")
    F2, x = FiniteField(7, 2, "x", cached = false)
@@ -17,7 +17,7 @@
    @test_throws DomainError FiniteField(2, 64, "a") # errors even if 2^64 == 0
 end
 
-@testset "n_GF.printing..." begin
+@testset "n_GF.printing" begin
    R, x = FiniteField(5, 2, "x")
 
    @test string(zero(R)) == "0"
@@ -33,7 +33,7 @@ end
    @test sprint(show, "text/plain", x^11) == "x^11"
 end
 
-@testset "n_GF.manipulation..." begin
+@testset "n_GF.manipulation" begin
    R, x = FiniteField(5, 2, "x")
 
    @test isone(one(R))
@@ -49,7 +49,7 @@ end
    @test deepcopy(R(2)) == R(2)
 end
 
-@testset "n_GF.unary_ops..." begin
+@testset "n_GF.unary_ops" begin
    R, x = FiniteField(5, 2, "x")
 
    a = 3x + 1
@@ -59,7 +59,7 @@ end
    @test -a == 2x - 1
 end
 
-@testset "n_GF.binary_ops..." begin
+@testset "n_GF.binary_ops" begin
    R, x = FiniteField(5, 2, "x")
 
    a = 2x + 1
@@ -70,7 +70,7 @@ end
    @test a*b == x^19
 end
 
-@testset "n_GF.comparison..." begin
+@testset "n_GF.comparison" begin
    R, x = FiniteField(5, 2, "x")
 
    a = 2x + 3
@@ -79,7 +79,7 @@ end
    @test isequal(a, a)
 end
 
-@testset "n_GF.ad_hoc_comparison..." begin
+@testset "n_GF.ad_hoc_comparison" begin
    R, x = FiniteField(5, 2, "x")
 
    @test R(2) == 2
@@ -90,14 +90,14 @@ end
    @test isequal(2, R(2))
 end
 
-@testset "n_GF.powering..." begin
+@testset "n_GF.powering" begin
    R, x = FiniteField(5, 2, "x")
 
    @test (x + 1)^2 == x^20
    @test_throws DomainError x^-rand(1:99)
 end
 
-@testset "n_GF.exact_division..." begin
+@testset "n_GF.exact_division" begin
    R, x = FiniteField(5, 2, "x")
 
    a = x + 1
@@ -107,7 +107,7 @@ end
    @test divexact(a, b) == x^14
 end
 
-@testset "n_GF.gcd_lcm..." begin
+@testset "n_GF.gcd_lcm" begin
    R, x = FiniteField(5, 2, "x")
 
    a = 2x + 1
@@ -117,7 +117,7 @@ end
    @test gcd(R(0), R(0)) == R(0)
 end
 
-@testset "n_GF.Polynomials..." begin
+@testset "n_GF.Polynomials" begin
    R, x = FiniteField(5, 2, "x")
    S, y = Nemo.PolynomialRing(R, "y")
 
@@ -128,7 +128,7 @@ end
    @test g == x^16*y^4+x^9*y^3+x^5*y^2+x^23*y+x^20
 end
 
-@testset "n_GF.rand..." begin
+@testset "n_GF.rand" begin
    R, x = FiniteField(17, 3, "x")
 
    @inferred rand(R)

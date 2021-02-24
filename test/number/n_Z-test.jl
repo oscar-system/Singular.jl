@@ -1,4 +1,4 @@
-@testset "n_Z.constructors..." begin
+@testset "n_Z.constructors" begin
 
    @test ZZ isa Nemo.Ring
 
@@ -9,12 +9,12 @@
 
 end
 
-@testset "n_Z.printing..." begin
+@testset "n_Z.printing" begin
    @test string(ZZ(123)) == "123"
    @test sprint(show, "text/plain", (ZZ(123))) == "123"
 end
 
-@testset "n_Z.manipulation..." begin
+@testset "n_Z.manipulation" begin
    @test isone(one(ZZ))
    @test iszero(zero(ZZ))
    @test isunit(ZZ(1)) && isunit(ZZ(-1))
@@ -33,12 +33,12 @@ end
    @test deepcopy(ZZ(2)) == ZZ(2)
 end
 
-@testset "n_Z.unary_ops..." begin
+@testset "n_Z.unary_ops" begin
    @test -ZZ(123) == -123
    @test -ZZ() == 0
 end
 
-@testset "n_Z.binary_ops..." begin
+@testset "n_Z.binary_ops" begin
    a = ZZ(2)
    b = ZZ(3)
 
@@ -47,7 +47,7 @@ end
    @test a*b == 6
 end
 
-@testset "n_Z.comparison..." begin
+@testset "n_Z.comparison" begin
    @test ZZ(2) < ZZ(3)
    @test ZZ(2) <= ZZ(3)
    @test ZZ(3) > ZZ(2)
@@ -56,7 +56,7 @@ end
    @test isequal(ZZ(2), ZZ(2))
 end
 
-@testset "n_Z.ad_hoc_comparison..." begin
+@testset "n_Z.ad_hoc_comparison" begin
    @test ZZ(2) < 3
    @test ZZ(2) <= 3
    @test 2 < ZZ(3)
@@ -77,16 +77,16 @@ end
    @test Nemo.fmpz(3)^42 == ZZ(3)^42
 end
 
-@testset "n_Z.powering..." begin
+@testset "n_Z.powering" begin
    @test ZZ(2)^10 == 1024
    @test_throws DomainError ZZ(2)^-rand(1:99)
 end
 
-@testset "n_Z.exact_division..." begin
+@testset "n_Z.exact_division" begin
    @test divexact(ZZ(12), ZZ(2)) == 6
 end
 
-@testset "n_Z.euclidean_division..." begin
+@testset "n_Z.euclidean_division" begin
    @test div(ZZ(7), ZZ(3)) == 2
    @test rem(ZZ(4), ZZ(3)) == 1
    @test mod(ZZ(7), ZZ(3)) == 1
@@ -98,7 +98,7 @@ end
    @test mod(ZZ(-2), ZZ(-3)) == 1
 end
 
-@testset "n_Z.gcd_lcm..." begin
+@testset "n_Z.gcd_lcm" begin
    @test gcd(ZZ(6), ZZ(12)) == 6
    @test gcd(ZZ(-6), ZZ(12)) == 6
    @test gcd(ZZ(6), ZZ(-12)) == 6
@@ -107,18 +107,18 @@ end
    @test lcm(ZZ(4), ZZ(6)) == 12
 end
 
-@testset "n_Z.extended_gcd..." begin
+@testset "n_Z.extended_gcd" begin
    g, s, t = gcdx(ZZ(4), ZZ(6))
 
    @test s*ZZ(4) + t*ZZ(6) == g
 end
 
-@testset "n_Z.chinese_remainder..." begin
+@testset "n_Z.chinese_remainder" begin
 #    @test crt(ZZ(2), ZZ(3), ZZ(3), ZZ(7), true) == -4
 #    @test crt(ZZ(2), ZZ(3), ZZ(3), ZZ(7), false) == 17
 end
 
-@testset "n_Z.Polynomials..." begin
+@testset "n_Z.Polynomials" begin
    R, x = Nemo.PolynomialRing(ZZ, "x")
 
    f = 1 + 2x + 3x^2
@@ -128,7 +128,7 @@ end
    @test g == 9*x^4+12*x^3+10*x^2+4*x+1
 end
 
-@testset "n_Z.conversions..." begin
+@testset "n_Z.conversions" begin
    for n in [-1, 0, 1, -BigInt(2)^65, BigInt(2)^65]
       N = ZZ(n)
       @test convert(BigInt, N) == n
@@ -174,7 +174,7 @@ end
    end
 end
 
-@testset "n_Z.rand..." begin
+@testset "n_Z.rand" begin
    @test rand(ZZ, 1:9) isa n_Z
    Random.seed!(rng, 0)
    t = rand(rng, ZZ, 1:9)

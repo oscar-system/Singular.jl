@@ -1,4 +1,4 @@
-@testset "smatrix.constructors..." begin
+@testset "smatrix.constructors" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    I = Ideal(R, x, y)
@@ -48,7 +48,7 @@
    @test_throws Exception S(Z[1, 1])
 end
 
-@testset "smatrix.manipulation..." begin
+@testset "smatrix.manipulation" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    I = Ideal(R, x, y)
@@ -73,7 +73,7 @@ end
    @test deepcopy(M) == M
 end
 
-@testset "smatrix.binary_ops..." begin
+@testset "smatrix.binary_ops" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    I1 = Ideal(R, x, y)
@@ -89,7 +89,7 @@ end
    @test M3*(M1 + M2) == M3*M1 + M3*M2
 end
 
-@testset "smatrix.comparison..." begin
+@testset "smatrix.comparison" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    I1 = Ideal(R, x, y)

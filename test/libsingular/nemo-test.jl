@@ -1,4 +1,4 @@
-@testset "Nemo.fmpq..." begin
+@testset "Nemo.fmpq" begin
    R, (x, y) = PolynomialRing(Nemo.QQ, ["x", "y"])
 
    f1 = 3x*y + x^2 + 2y
@@ -47,7 +47,7 @@
    @test canonical_unit(f1c[1]) != 0
 end
 
-@testset "Nemo.fmpz..." begin
+@testset "Nemo.fmpz" begin
    R, (x, y) = PolynomialRing(Nemo.ZZ, ["x", "y"])
 
    f1 = 3x*y + x^2 + 2y
@@ -93,7 +93,7 @@ end
    @test deepcopy(f1c[1]) == f1c[1]
 end
 
-@testset "Nemo.fq_nmod..." begin
+@testset "Nemo.fq_nmod" begin
    F, a = Nemo.FiniteField(7, 2, "a")
 
    R, (x, y) = PolynomialRing(F, ["x", "y"])
@@ -146,7 +146,7 @@ end
    @test AbstractAlgebra.expressify((x+a*y)^2) isa Expr
 end
 
-@testset "Nemo.fq..." begin
+@testset "Nemo.fq" begin
    F, a = Nemo.FiniteField(Nemo.ZZ(7), 2, "a")
 
    R, (x, y) = PolynomialRing(F, ["x", "y"])
@@ -197,7 +197,7 @@ end
    @test deepcopy(f1c[1]) == f1c[1]
 end
 
-@testset "Nemo.nf_elem..." begin
+@testset "Nemo.nf_elem" begin
    U, z = Nemo.PolynomialRing(Nemo.QQ, "z")
    K, a = Nemo.NumberField(z^3 + 3z + 1, "a")
 
@@ -249,7 +249,7 @@ end
    @test deepcopy(f1c[1]) == f1c[1]
 end
 
-@testset "Nemo.NemoField..." begin
+@testset "Nemo.NemoField" begin
    U = Nemo.Generic.FractionField(Nemo.ZZ)
 
    R, (x, y) = PolynomialRing(U, ["x", "y"])
@@ -296,7 +296,7 @@ end
    @test deepcopy(f1c[1]) == f1c[1]
 end
 
-@testset "Nemo.NemoRing..." begin
+@testset "Nemo.NemoRing" begin
    U, z = Nemo.PolynomialRing(Nemo.ZZ, "z")
 
    R, (x, y) = PolynomialRing(U, ["x", "y"])

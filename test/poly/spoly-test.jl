@@ -1,4 +1,4 @@
-@testset "spoly.constructors..." begin
+@testset "spoly.constructors" begin
    R, (x, ) = PolynomialRing(ZZ, ["x", ])
 
    @test elem_type(R) == spoly{n_Z}
@@ -83,7 +83,7 @@
    @test f == 2*x^3*y^2+2*x*y^2+x*y
 end
 
-@testset "spoly.printing..." begin
+@testset "spoly.printing" begin
    R, (x, ) = PolynomialRing(ZZ, ["x", ])
 
    @test length(string(3x^2 + 2x + 1)) > 3
@@ -108,7 +108,7 @@ end
    @test string(x) == "x"
 end
 
-@testset "spoly.manipulation..." begin
+@testset "spoly.manipulation" begin
    R, (x, ) = PolynomialRing(ZZ, ["x", ])
 
    @test isone(one(R))
@@ -178,7 +178,7 @@ end
 
 end
 
-@testset "spoly.change_base_ring..." begin
+@testset "spoly.change_base_ring" begin
    R1, (x, ) = PolynomialRing(ZZ, ["x", ])
 
    a1 = x^2 + 3x + 1
@@ -203,7 +203,7 @@ end
    @test a4 == a6
 end
 
-@testset "spoly.multivariate_coeff..." begin
+@testset "spoly.multivariate_coeff" begin
    R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 
    f = 2x^2*y^2 + 3x*y^2 - x^2*y + 4x*y - 5y + 1
@@ -212,7 +212,7 @@ end
    @test coeff(f, [y], [1]) == -x^2 + 4x - 5
 end
 
-@testset "spoly.unary_ops..." begin
+@testset "spoly.unary_ops" begin
    R, (x, ) = PolynomialRing(ZZ, ["x", ])
 
    a = x^2 + 3x + 1
@@ -220,7 +220,7 @@ end
    @test -a == -x^2 - 3x - 1
 end
 
-@testset "spoly.binary_ops..." begin
+@testset "spoly.binary_ops" begin
    R, (x, ) = PolynomialRing(ZZ, ["x", ])
 
    a = x^2 + 3x + 1
@@ -231,7 +231,7 @@ end
    @test a*b == 2*x^3+10*x^2+14*x+4
 end
 
-@testset "spoly.comparison..." begin
+@testset "spoly.comparison" begin
    R, (x, ) = PolynomialRing(ZZ, ["x", ])
 
    a = x^2 + 3x + 1
@@ -240,7 +240,7 @@ end
    @test a != x
 end
 
-@testset "spoly.powering..." begin
+@testset "spoly.powering" begin
    R, (x, ) = PolynomialRing(ZZ, ["x", ])
 
    a = x^2 + 3x + 1
@@ -255,7 +255,7 @@ end
    end
 end
 
-@testset "spoly.exact_division..." begin
+@testset "spoly.exact_division" begin
    R, (x, ) = PolynomialRing(ZZ, ["x", ])
 
    a = x^2 + 3x + 1
@@ -264,7 +264,7 @@ end
    @test divexact(a*b, a) == b
 end
 
-@testset "spoly.adhoc_exact_division..." begin
+@testset "spoly.adhoc_exact_division" begin
    R, (x, ) = PolynomialRing(ZZ, ["x", ])
 
    a = x^2 + 3x + 1
@@ -285,7 +285,7 @@ end
    @test divexact(2a, BigInt(2)//3) == 3a
 end
 
-@testset "spoly.euclidean_division..." begin
+@testset "spoly.euclidean_division" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    a = x^2*y^2 + 3x + 1
@@ -298,7 +298,7 @@ end
    @test q2 == q
 end
 
-@testset "spoly.divides..." begin
+@testset "spoly.divides" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    a = x^2 + 3x + 1
@@ -315,7 +315,7 @@ end
    @test valuation(a*b^3, b) == 3
 end
 
-@testset "spoly.gcd_lcm..." begin
+@testset "spoly.gcd_lcm" begin
    R, (x, ) = PolynomialRing(ZZ, ["x", ])
    a = x^2 + 3x + 1
    b = 2x + 4
@@ -330,7 +330,7 @@ end
    @test content(2*a) == 2
 end
 
-@testset "spoly.extended_gcd..." begin
+@testset "spoly.extended_gcd" begin
    R, (x, ) = PolynomialRing(QQ, ["x", ])
 
    a = x^2 + 3x + 1
@@ -341,7 +341,7 @@ end
    @test s*a + t*b == g
 end
 
-@testset "spoly.evaluate..." begin
+@testset "spoly.evaluate" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    f = x^2*y + 2x + 1
@@ -354,7 +354,7 @@ end
    @test f(2, 3) == 17
 end
 
-@testset "spoly.inflation_deflation..." begin
+@testset "spoly.inflation_deflation" begin
    R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 
    f = x^7*y^7 + 3x^4*y^4 + 2x*y
@@ -362,7 +362,7 @@ end
    @test inflate(deflate(f, deflation(f)...), deflation(f)...) == f
 end
 
-@testset "spoly.Polynomials..." begin
+@testset "spoly.Polynomials" begin
    R, (x, ) = PolynomialRing(ZZ, ["x", ])
 
    S, y = Nemo.PolynomialRing(R, "y")
@@ -374,7 +374,7 @@ end
    @test g == (9*x^4+12*x^3+10*x^2+4*x+1)*y^2+(12*x^3+26*x^2+16*x+6)*y+(4*x^2+12*x+9)
 end
 
-@testset "spoly.convert_MPoly_to_SingularPoly..." begin
+@testset "spoly.convert_MPoly_to_SingularPoly" begin
    for num_vars = 2:10
       var_names = ["x$j" for j in 1:num_vars]
       ord = AbstractAlgebra.rand_ordering()
@@ -411,7 +411,7 @@ end
    @test S(f) == a^2+b^3+c^5
 end
 
-@testset "spoly.test_spoly_differential..." begin
+@testset "spoly.test_spoly_differential" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    f = x^3 + y^6
@@ -447,7 +447,7 @@ end
    @test jf == x^3
 end
 
-@testset "spoly.test_spoly_factor..." begin
+@testset "spoly.test_spoly_factor" begin
    R1 , (x, y, z, w) = Singular.PolynomialRing(Singular.QQ,
    ["x", "y", "z", "w"]; ordering=:negdegrevlex)
    f1 = 113*(2*y^7 + w^2)^3*(1 + x)^2*(x + y*z)^2
@@ -488,7 +488,7 @@ end
    end
 end
 
-@testset "spoly.hash..." begin
+@testset "spoly.hash" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    @test hash(x) == hash(x+y-y)

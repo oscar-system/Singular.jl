@@ -1,4 +1,4 @@
-@testset "sideal.constructors..." begin
+@testset "sideal.constructors" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    I = Ideal(R, x, y)
@@ -34,7 +34,7 @@
    end
 end
 
-@testset "sideal.manipulation..." begin
+@testset "sideal.manipulation" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    I0 = Ideal(R)
@@ -67,7 +67,7 @@ end
    @test !isvar_generated(Ideal(R, x + y))
 end
 
-@testset "sideal.binary_ops..." begin
+@testset "sideal.binary_ops" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    I1 = Ideal(R, x)
@@ -79,7 +79,7 @@ end
    @test equal(I1*I2, I4)
 end
 
-@testset "sideal.powering..." begin
+@testset "sideal.powering" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    I = Ideal(R, x^2, x*y + 1)
@@ -99,14 +99,14 @@ end
    end
 end
 
-@testset "sideal.containment..." begin
+@testset "sideal.containment" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    @test contains(Ideal(R, x, y), Ideal(R, x))
    @test !contains(Ideal(R, x), Ideal(R, x, y))
 end
 
-@testset "sideal.comparison..." begin
+@testset "sideal.comparison" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    @test equal(Ideal(R, x, y, x - y), Ideal(R, x, y, x + y))
@@ -115,13 +115,13 @@ end
    @test isequal(Ideal(R, x, y), Ideal(R, x, y))
 end
 
-@testset "sideal.leading_terms..." begin
+@testset "sideal.leading_terms" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    @test equal(lead(Ideal(R, x^2 + x*y + 1, 2y^2 + 3, R(7))), Ideal(R, x^2, 2y^2, R(7)))
 end
 
-@testset "sideal.local..." begin
+@testset "sideal.local" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"], ordering=:negdegrevlex)
 
    I = Ideal(R, y, x^2, (1 + y^3) * (x^2 - y))
@@ -130,7 +130,7 @@ end
    @test equal(I, Ideal(R, x^2, y))
 end
 
-@testset "sideal.intersection..." begin
+@testset "sideal.intersection" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    I1 = Ideal(R, x^2 + x*y + 1, 2y^2 + 3, R(7))
@@ -142,7 +142,7 @@ end
    @test contains(I2, I)
 end
 
-@testset "sideal.quotient..." begin
+@testset "sideal.quotient" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    I = Ideal(R, x^2 + x*y + 1, 2y^2 + 3)
@@ -155,7 +155,7 @@ end
    @test equal(A, B)
 end
 
-@testset "sideal.saturation..." begin
+@testset "sideal.saturation" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    I = Ideal(R, (x^2 + x*y + 1)*(2y^2+1)^3, (2y^2 + 3)*(2y^2+1)^2)
@@ -169,7 +169,7 @@ end
    @test equal(satstd(I, J), std(saturation(I, J)))
 end
 
-@testset "sideal.slimgb..." begin
+@testset "sideal.slimgb" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    I = Ideal(R, x^2 + x*y + 1, 2y^2 + 3)
@@ -188,7 +188,7 @@ end
    @test B.isGB == true
 end
 
-@testset "sideal.std..." begin
+@testset "sideal.std" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    I = Ideal(R, x^2 + x*y + 1, 2y^2 + 3)
@@ -207,7 +207,7 @@ end
    @test B.isGB == true
 end
 
-@testset "sideal.fglm..." begin
+@testset "sideal.fglm" begin
    R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"], ordering = :lex)
    I = Ideal(R, y^3+x^2, x^2*y+x^2, x^3-x^2, z^4-x^2-y)
    J1 = std(I, complete_reduction = true)
@@ -216,7 +216,7 @@ end
    @test gens(J1) == gens(J2)
 end
 
-@testset "sideal.reduction..." begin
+@testset "sideal.reduction" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    f = x^2*y + 2y + 1
@@ -232,7 +232,7 @@ end
    @test reduce(h, J) == x + 1
 end
 
-@testset "sideal.free_resolution..." begin
+@testset "sideal.free_resolution" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    I = Ideal(R, x^2*y + 2y + 1, y^2 + 1)
@@ -255,7 +255,7 @@ end
    @test iszero(M2*N2)
 end
 
-@testset "sideal.syzygy..." begin
+@testset "sideal.syzygy" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    I = Ideal(R, x^2*y + 2y + 1, y^2 + 1)
@@ -269,7 +269,7 @@ end
    @test iszero(M*N)
 end
 
-@testset "sideal.kernel..." begin
+@testset "sideal.kernel" begin
    # twisted cubic
    P1, (t_0, t_1) = PolynomialRing(QQ, ["t_0", "t_1"])
    P3, (x, y, z, w) = PolynomialRing(QQ, ["x", "y", "z", "w"])
@@ -278,7 +278,7 @@ end
    @test ngens(J) == 3 && J[1] == z^2-y*w && J[2] == y*z-x*w && J[3] == y^2-x*z
 end
 
-@testset "sideal.eliminate..." begin
+@testset "sideal.eliminate" begin
    R, (x, y, t) = PolynomialRing(QQ, ["x", "y", "t"])
 
    I = Ideal(R, x - t^2, y - t^3)
@@ -292,7 +292,7 @@ end
    @test equal(K, Ideal(R))
 end
 
-@testset "sideal.jet..." begin
+@testset "sideal.jet" begin
    R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"])
 
    I = Ideal(R, x^5 - y^2, y^3 - x^6 + z^3)
@@ -302,7 +302,7 @@ end
    @test equal(J, Ideal(R, - y^2, y^3 + z^3))
 end
 
-@testset "sideal.zerodim..." begin
+@testset "sideal.zerodim" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"]; ordering=:negdegrevlex)
 
    I = Ideal(R, 3*x^2 + y^3, x*y^2)
@@ -327,7 +327,7 @@ end
    @test f == y^4
 end
 
-@testset "sideal.independent_set..." begin
+@testset "sideal.independent_set" begin
    R, (x, y, u, v, w) = PolynomialRing(QQ, ["x", "y", "u", "v", "w"])
 
    I = Ideal(R, x*y*w, y*v*w, u*y*w, x*v)
@@ -347,7 +347,7 @@ end
    @test typeof(L2) == Array{Array{spoly{n_Q}, 1}, 1}
 end
 
-@testset "sideal.lift_std..." begin
+@testset "sideal.lift_std" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    I = Ideal(R, x, y)
