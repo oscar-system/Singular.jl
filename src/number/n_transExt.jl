@@ -169,11 +169,8 @@ function AbstractAlgebra.expressify(n::n_transExt; context = nothing)::Any
    end
 end
 
-function show(io::IO, n::n_transExt)
-   libSingular.StringSetS("")
-   libSingular.n_Write(n.ptr, parent(n).ptr, false)
-   m = libSingular.StringEndS()
-   print(io, m)
+function Base.show(io::IO, a::n_transExt)
+   print(io, AbstractAlgebra.obj_to_string(a, context = io))
 end
 
 ###############################################################################

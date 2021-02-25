@@ -20,18 +20,21 @@ end
 @testset "n_transExt.printing" begin
    F, (a, b, c) = FunctionField(QQ, ["a", "b", "c"])
 
-   @test string(3*a*b + 2*c) == "(3*a*b+2*c)"
+   t = 3*a*b + 2*c
+
+   @test sprint(show, "text/plain", t) ==
+         string(t) == "3*a*b + 2*c"
 
    R, (x, y, z) = PolynomialRing(F, ["x", "y", "z"])
 
    p = (3*a*b+2*c)*x+(c^2)*y+b*z
    q = (a+b//c)*x^2
-   # singular's printing
-   @test string(p) == "(3*a*b+2*c)*x+(c^2)*y+(b)*z"
-   @test string(q) == "(a*c+b)/(c)*x^2"
-   # AA's printing
-   @test sprint(show, "text/plain", p) == "(3*a*b + 2*c)*x + c^2*y + b*z"
-   @test sprint(show, "text/plain", q) == "(a*c + b)//c*x^2"
+
+   @test sprint(show, "text/plain", p) ==
+         string(p) == "(3*a*b + 2*c)*x + c^2*y + b*z"
+
+   @test sprint(show, "text/plain", q) ==
+         string(q) == "(a*c + b)//c*x^2"
 end
 
 @testset "n_transExt.manipulation" begin
