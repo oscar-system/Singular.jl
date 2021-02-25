@@ -22,19 +22,19 @@ end
    F, (a,) = FunctionField(QQ, ["a"])
    F, a = AlgebraicExtensionField(F, a^2 + 1)
 
-   @test sprint(show, "text/plain", a+1) ==
-         string(a+1) == "a + 1"
+   @test sprint(show, "text/plain", a+1) == "a + 1"
+   @test string(a+1) == "a + 1"
 
    R, (x, y, z) = PolynomialRing(F, ["x", "y", "z"])
 
    p = (3*a+2)*x+(2*a^2)*y+a*z
    q = (a+1)*x^2
 
-   @test sprint(show, "text/plain", p) ==
-         string(p) == "(3*a + 2)*x - 2*y + a*z"
+   @test sprint(show, "text/plain", p) == "(3*a + 2)*x - 2*y + a*z"
+   @test string(p) == "(3*a + 2)*x - 2*y + a*z"
 
-   @test sprint(show, "text/plain", q) ==
-         string(q) ==  "(a + 1)*x^2"
+   @test sprint(show, "text/plain", q) == "(a + 1)*x^2"
+   @test string(q) ==  "(a + 1)*x^2"
 end
 
 @testset "n_algExt.manipulation" begin
