@@ -145,11 +145,8 @@ end
    I = Ideal(R, a*z-x^4, z-y^6)
    l = Singular.LibNormal.normal(I)
    S = l[1][1][1]
-   # the correct tests for when the possible bug is fixed
-   #@test isa(S, Singular.PolyRing{n_algExt})
-   #@test base_ring(gens(l[1][1][2][:norid])[1]*gens(S)[1]*a) == K
-   @test isa(S, Singular.PolyRing{n_transExt})
-   @test base_ring(gens(l[1][1][2][:norid])[1]*gens(S)[1]*Fa) == F
+   @test isa(S, Singular.PolyRing{n_algExt})
+   @test base_ring(gens(l[1][1][2][:norid])[1]*gens(S)[1]*a) == K
 
    F, (Fa,) = FunctionField(Fp(7), ["a"])
    K, a = AlgebraicExtensionField(F, Fa^2 + 1)
@@ -157,11 +154,8 @@ end
    I = Ideal(R, a*z-x^4, z-y^6)
    l = Singular.LibNormal.normal(I)
    S = l[1][1][1]
-   # the correct tests for when the possible bug is fixed
-   #@test isa(S, Singular.PolyRing{n_algExt})
-   #@test base_ring(gens(l[1][1][2][:norid])[1]*gens(S)[1]*a) == K
-   @test isa(S, Singular.PolyRing{n_transExt})
-   @test base_ring(gens(l[1][1][2][:norid])[1]*gens(S)[1]*Fa) == F
+   @test isa(S, Singular.PolyRing{n_algExt})
+   @test base_ring(gens(l[1][1][2][:norid])[1]*gens(S)[1]*a) == K
 end
 
 @testset "caller.lists" begin
