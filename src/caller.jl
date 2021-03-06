@@ -69,7 +69,7 @@ function create_ring_from_singular_ring(r::libSingular.ring_ptr)
       p = Int(libSingular.n_GetChar(c))
       @assert libSingular.n_NumberOfParameters(c) == 1
       S = [Symbol(libSingular.n_ParameterName(0, c))]
-      F = N_FField(iszero(p) ? QQ : N_ZpField(pf), S)
+      F = N_FField(iszero(p) ? QQ : N_ZpField(p), S)
       # now create the extension
       minpoly = F(libSingular.algExt_GetMinpoly(c, F.ptr))
       K = N_AlgExtField(libSingular.nCopyCoeff(c), minpoly)
