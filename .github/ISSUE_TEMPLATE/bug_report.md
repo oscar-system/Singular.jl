@@ -20,7 +20,8 @@ Steps to reproduce the behavior:
 A clear and concise description of what you expected to happen.
 
 **Information about your setup:**
-Please include the exact output of the Julia command `versioninfo()` as well as `import Pkg; Pkg.status(mode=PKGMODE_MANIFEST)`.
+Please include the exact output of the Julia command `versioninfo()`
+as well as `using Pkg; Pkg.status(mode=PKGMODE_MANIFEST)`.
 
 **Additional context**
 Add any other context about the problem here.
