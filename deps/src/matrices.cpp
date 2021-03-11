@@ -46,6 +46,8 @@ void singular_define_matrices(jlcxx::Module & Singular)
         return mp_InitP(n, n, p_Copy(p, R), R);
     });
 
+    Singular.method("irrCharSeries", &singclap_irrCharSeries);
+
     Singular.method("iiStringMatrix", [](matrix I, int d, ring o) {
         auto str_ptr = iiStringMatrix(I, d, o);
         std::string s(iiStringMatrix(I, d, o));
