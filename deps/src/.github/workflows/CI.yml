@@ -1,0 +1,42 @@
+name: Run tests
+
+# Trigger the workflow on push or pull request
+on: [push, pull_request]
+
+jobs:
+  test:
+    # Don't run this twice on PRs for branches pushed to the same repository
+    if: ${{ !(github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) }}
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        julia-version:
+          - '1.3'
+          - '1.4'
+          - '1.5'
+          - '1.6-nightly'
+          - 'nightly'
+        os:
+          - ubuntu-latest
+          - macOS-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: "Set up Julia"
+        uses: julia-actions/setup-julia@v1
+        with:
+          version: ${{ matrix.julia-version }}
+      - name: "Install dependencies"
+        run: |
+               if [ "$RUNNER_OS" == "Linux" ]; then
+                    sudo apt install cmake
+               elif [ "$RUNNER_OS" == "macOS" ]; then
+                    brew install cmake libgmp-dev
+               else
+                    echo "$RUNNER_OS not supported"
+                    exit 1
+               fi
+      - run: julia -e 'using Pkg ; Pkg.add(["Singular_jll", "CxxWrap"])'
+      - run: julia build.jl
