@@ -75,6 +75,68 @@ JLCXX_MODULE define_julia_module(jlcxx::Module & Singular)
         return SINGULAR_VERSION;
     });
 
+#define SETTER(A, B)                                    \
+    else if (opt == #B)                                 \
+        A = value ? (A | Sy_bit(B)) : (A & ~Sy_bit(B));
+
+    Singular.method("set_option", [](std::string opt, bool value) {
+        if (false);
+        SETTER(si_opt_2, V_QUIET)
+        SETTER(si_opt_2, V_QRING)
+        SETTER(si_opt_2, V_SHOW_MEM)
+        SETTER(si_opt_2, V_YACC)
+        SETTER(si_opt_2, V_REDEFINE)
+        SETTER(si_opt_2, V_LOAD_LIB)
+        SETTER(si_opt_2, V_DEBUG_LIB)
+        SETTER(si_opt_2, V_LOAD_PROC)
+        SETTER(si_opt_2, V_DEF_RES)
+        SETTER(si_opt_2, V_SHOW_USE)
+        SETTER(si_opt_2, V_IMAP)
+        SETTER(si_opt_2, V_PROMPT)
+        SETTER(si_opt_2, V_NSB)
+        SETTER(si_opt_2, V_CONTENTSB)
+        SETTER(si_opt_2, V_CANCELUNIT)
+        SETTER(si_opt_2, V_MODPSOLVSB)
+        SETTER(si_opt_2, V_UPTORADICAL)
+        SETTER(si_opt_2, V_FINDMONOM)
+        SETTER(si_opt_2, V_COEFSTRAT)
+        SETTER(si_opt_2, V_IDLIFT)
+        SETTER(si_opt_2, V_LENGTH)
+        SETTER(si_opt_2, V_ALLWARN)
+        SETTER(si_opt_2, V_INTERSECT_ELIM)
+        SETTER(si_opt_2, V_INTERSECT_SYZ)
+        SETTER(si_opt_2, V_DEG_STOP)
+
+        SETTER(si_opt_1, OPT_PROT)
+        SETTER(si_opt_1, OPT_REDSB)
+        SETTER(si_opt_1, OPT_NOT_BUCKETS)
+        SETTER(si_opt_1, OPT_NOT_SUGAR)
+        SETTER(si_opt_1, OPT_INTERRUPT)
+        SETTER(si_opt_1, OPT_SUGARCRIT)
+        SETTER(si_opt_1, OPT_DEBUG)
+        SETTER(si_opt_1, OPT_REDTHROUGH)
+        SETTER(si_opt_1, OPT_NO_SYZ_MINIM)
+        SETTER(si_opt_1, OPT_RETURN_SB)
+        SETTER(si_opt_1, OPT_FASTHC)
+        SETTER(si_opt_1, OPT_OLDSTD)
+        SETTER(si_opt_1, OPT_STAIRCASEBOUND)
+        SETTER(si_opt_1, OPT_MULTBOUND)
+        SETTER(si_opt_1, OPT_DEGBOUND)
+        SETTER(si_opt_1, OPT_REDTAIL)
+        SETTER(si_opt_1, OPT_INTSTRATEGY)
+        SETTER(si_opt_1, OPT_FINDET)
+        SETTER(si_opt_1, OPT_INFREDTAIL)
+        SETTER(si_opt_1, OPT_SB_1)
+        SETTER(si_opt_1, OPT_NOTREGULARITY)
+        SETTER(si_opt_1, OPT_WEIGHTM)
+    });
+
+#undef SETTER
+
+    Singular.method("set_printlevel", [](int level) {
+        printlevel = level;
+    });
+
     singular_define_coeffs(Singular);
     singular_define_rings(Singular);
     singular_define_ideals(Singular);
