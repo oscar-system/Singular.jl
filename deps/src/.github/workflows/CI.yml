@@ -41,4 +41,7 @@ jobs:
                     exit 1
                fi
       - run: julia -e 'using Pkg ; Pkg.add(["Singular_jll", "CxxWrap", "CMake"])'
-      - run: julia build.jl
+      # TODO: install development version of Singular instead of master...
+      - run: julia -e 'using Pkg ; Pkg.add(PackageSpec(url="https://github.com/oscar-system/Singular.jl", rev="master"))'
+      - run: julia run.jl -e 'using Pkg ; Pkg.test("Singular")'
+      # TODO: could collect coverage data and upload it to Codecov
