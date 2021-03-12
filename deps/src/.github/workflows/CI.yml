@@ -33,7 +33,7 @@ jobs:
                if [ "$RUNNER_OS" == "Linux" ]; then
                     sudo apt install cmake
                elif [ "$RUNNER_OS" == "macOS" ]; then
-                    brew install cmake libgmp-dev
+                    brew install cmake gmp
                else
                     echo "$RUNNER_OS not supported"
                     exit 1
