@@ -31,12 +31,13 @@ jobs:
       - name: "Install dependencies"
         run: |
                if [ "$RUNNER_OS" == "Linux" ]; then
-                    sudo apt install cmake
+                    :
                elif [ "$RUNNER_OS" == "macOS" ]; then
-                    brew install cmake gmp
+                    # In Julia >= 1.6, GMP_jll does not include the GMP headers anymore...
+                    brew install gmp
                else
                     echo "$RUNNER_OS not supported"
                     exit 1
                fi
-      - run: julia -e 'using Pkg ; Pkg.add(["Singular_jll", "CxxWrap"])'
+      - run: julia -e 'using Pkg ; Pkg.add(["Singular_jll", "CxxWrap", "CMake"])'
       - run: julia build.jl

@@ -1,4 +1,4 @@
-import Singular_jll, CxxWrap
+import Singular_jll, CxxWrap, CMake
 
 # TODO: use ARGS to specify custom build dir?
 builddir = "build"
@@ -7,7 +7,7 @@ JlCxx_DIR = joinpath(CxxWrap.prefix_path(), "lib", "cmake", "JlCxx")
 
 rm(builddir; force=true, recursive=true)
 
-run(`cmake
+run(`$(CMake.cmake)
     -DJulia_EXECUTABLE=$(joinpath(Sys.BINDIR, Base.julia_exename()))
     -Dextra_cppflags=-I$(Singular_jll.GMP_jll.artifact_dir)/include
     -Dextra_ldflags=-L$(Singular_jll.GMP_jll.artifact_dir)/lib
@@ -19,4 +19,4 @@ run(`cmake
     -B $(builddir)
 `)
 
-run(`cmake --build $(builddir) --config Release --target install -- -j$(Sys.CPU_THREADS)`)
+run(`$(CMake.cmake) --build $(builddir) --config Release --target install -- -j$(Sys.CPU_THREADS)`)
