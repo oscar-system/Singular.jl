@@ -169,9 +169,11 @@ end
 function stringify_wrt_times(n)
    prec = AbstractAlgebra.prec_inf_Times
    obj = AbstractAlgebra.canonicalize(AbstractAlgebra.expressify(n))
-   S = AbstractAlgebra.printer([])
-   AbstractAlgebra.printExpr(S, obj, prec, prec)
-   str = AbstractAlgebra.getstring(S)
+   io = IOBuffer()
+   S = AbstractAlgebra.printer(io)
+   AbstractAlgebra.print_obj(S, MIME("text/plain"), obj, prec, prec)
+   AbstractAlgebra.finish(S)
+   return String(take!(io))
 end
 
 ###############################################################################
