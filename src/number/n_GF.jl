@@ -50,7 +50,14 @@ one(R::N_GField) = R(1)
 
 zero(R::N_GField) = R(0)
 
-gen(R::N_GField) = R(libSingular.n_Param(Cint(1), R.ptr))
+function gen(R::N_GField)
+   if degree(R) == 1
+      # NOTE: degree 1 special case
+      return zero(R)
+   else
+      return R(libSingular.n_Param(Cint(1), R.ptr))
+   end
+end
 
 function isone(n::n_GF)
    c = parent(n)
@@ -62,10 +69,6 @@ function iszero(n::n_GF)
    return libSingular.n_IsZero(n.ptr, c.ptr)
 end
 
-@doc Markdown.doc"""
-   isunit(n::n_GF)
-Return `true` if $n$ is a unit in the field, i.e. nonzero.
-"""
 isunit(n::n_GF) = !iszero(n)
 
 ###############################################################################
@@ -93,7 +96,11 @@ end
 function AbstractAlgebra.expressify(a::n_GF; context = nothing)::Any
   F = parent(a)
   i = reinterpret(Int, a.ptr.cpp_object)
-  if 1 < i < characteristic(F)^degree(F)
+  p = Int(characteristic(parent(a)))
+  if degree(F) == 1
+    # NOTE: degree 1 special case
+    return i > p - i ? i - p : i
+  elseif 1 < i < p^degree(F)
     return Expr(:call, :^, F.S, i)
   elseif i == 1
     return F.S
