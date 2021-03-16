@@ -241,12 +241,29 @@ mutable struct N_GField <: Field
       if cached && haskey(N_GFieldID, (p, n, S))
          d = N_GFieldID[p, n, S]::N_GField
       else
-         gfinfo = GFInfo(Cint(p), Cint(n), pointer(Base.Vector{UInt8}(string(S)*"\0")))
-         GC.@preserve gfinfo begin
-         ptr = libSingular.nInitChar(libSingular.n_GF, pointer_from_objref(gfinfo))
-         d = new(ptr, n, libSingular.n_SetMap(ZZ.ptr, ptr),
-              libSingular.n_SetMap(ptr, ZZ.ptr), 1, S)
+         # NOTE: degree 1 special case
+         # A N_GField with n = 1 - when passed through Singular and to
+         # create_ring_from_singular_ring - will be recognized as a N_ZpField.
+         # This could cause some identity issue since we have the non identity
+         # N_GField(p, 1, ) != N_ZpField(p). There are two solutions:
+         #  (1) accept this and discourage use of N_GField(p, 1, )
+         #  (2) Get singular to return distinct pointers for these two fields
+         # In any case, Singular as of Singular_jll v402.0.104+0 is still buggy
+         # in its treatment of N_GField(p, 1, ). Namely, if the n == 1
+         # special treatment is removed here, the last test in caller.LibNormal
+         # fails because Singular returns the wrong coefficient field. This
+         # has nothing to do per se with the identity issue, it is a separate
+         # Singular bug.
+         if n == 1
+            ptr = libSingular.nInitChar(libSingular.n_Zp, Ptr{Nothing}(p))
+         else
+            gfinfo = GFInfo(Cint(p), Cint(n), pointer(Base.Vector{UInt8}(string(S)*"\0")))
+            GC.@preserve gfinfo begin
+               ptr = libSingular.nInitChar(libSingular.n_GF, pointer_from_objref(gfinfo))
+            end
          end
+         d = new(ptr, n, libSingular.n_SetMap(ZZ.ptr, ptr),
+                         libSingular.n_SetMap(ptr, ZZ.ptr), 1, S)
          finalizer(_Ring_finalizer, d)
          if cached
             N_GFieldID[p, n, S] = d
