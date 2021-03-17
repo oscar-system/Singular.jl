@@ -5,7 +5,7 @@
    f2 = y^2 + 1
    f3 = x^2 + 2x + 1
 
-   f1c = [c for c in coeffs(f1)]
+   f1c = [c for c in coefficients(f1)]
    @test isa(f1c[1], Singular.n_unknown{Nemo.fmpq})
 
    @test f1 + 2 == 2 + f1
@@ -54,11 +54,11 @@ end
    f2 = y^2 + 1
    f3 = x^2 + 2x + 1
 
-   f1c = [c for c in coeffs(f1)]
+   f1c = [c for c in coefficients(f1)]
 
    @test isa(f1c[1], Singular.n_unknown{Nemo.fmpz})
 
-   @test string(first(coeffs(f3))) == "1"
+   @test string(first(coefficients(f3))) == "1"
 
    @test f1 + 2 == 2 + f1
    @test f1 - 2 == -(2 - f1)
@@ -102,7 +102,7 @@ end
    f2 = y^2 + 1
    f3 = x^2 + 2x + 1
 
-   f1c = [c for c in coeffs(f1)]
+   f1c = [c for c in coefficients(f1)]
    @test isa(f1c[1], Singular.n_unknown{Nemo.fq_nmod})
 
    @test f1 + 2 == 2 + f1
@@ -155,7 +155,7 @@ end
    f2 = y^2 + 1
    f3 = x^2 + 2x + 1
 
-   f1c = [c for c in coeffs(f1)]
+   f1c = [c for c in coefficients(f1)]
    @test isa(f1c[1], Singular.n_unknown{Nemo.fq})
 
    @test f1 + 2 == 2 + f1
@@ -207,7 +207,7 @@ end
    f2 = y^2 + 1
    f3 = x^2 + 2x + 1
 
-   f1c = [c for c in coeffs(f1)]
+   f1c = [c for c in coefficients(f1)]
    @test isa(f1c[1], Singular.n_unknown{Nemo.nf_elem})
 
    @test f1 + 2 == 2 + f1
@@ -258,7 +258,7 @@ end
    f2 = y^2 + 1
    f3 = x^2 + 2x + 1
 
-   f1c = [c for c in coeffs(f1)]
+   f1c = [c for c in coefficients(f1)]
    @test isa(f1c[1], Singular.n_unknown{AbstractAlgebra.Generic.Frac{Nemo.fmpz}})
 
    @test f1 + 2 == 2 + f1
@@ -305,7 +305,7 @@ end
    f2 = y^2 + 1
    f3 = x^2 + 2x + 1
 
-   f1c = [c for c in coeffs(f1)]
+   f1c = [c for c in coefficients(f1)]
    @test isa(f1c[1], Singular.n_unknown{Nemo.fmpz_poly})
 
    @test f1 + 2 == 2 + f1
