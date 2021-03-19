@@ -29,17 +29,6 @@ jobs:
         uses: julia-actions/setup-julia@v1
         with:
           version: ${{ matrix.julia-version }}
-      - name: "Install dependencies"
-        run: |
-               if [ "$RUNNER_OS" == "Linux" ]; then
-                    :
-               elif [ "$RUNNER_OS" == "macOS" ]; then
-                    # In Julia >= 1.6, GMP_jll does not include the GMP headers anymore...
-                    brew install gmp
-               else
-                    echo "$RUNNER_OS not supported"
-                    exit 1
-               fi
       - run: julia -e 'using Pkg ; Pkg.add(["Singular_jll", "CxxWrap", "CMake"])'
       # TODO: install development version of Singular instead of master...
       - run: julia -e 'using Pkg ; Pkg.add(PackageSpec(url="https://github.com/oscar-system/Singular.jl", rev="master"))'
