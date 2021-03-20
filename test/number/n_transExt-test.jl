@@ -35,6 +35,12 @@ end
 
    @test sprint(show, "text/plain", q) == "(a*c + b)//c*x^2"
    @test string(q) == "(a*c + b)//c*x^2"
+
+   @test sprint(show, "text/plain", R(3)) == "3"
+   @test string(R(3)) == "3"
+
+   @test sprint(show, "text/plain", R(big(3)^80)) == string(big(3)^80)
+   @test string(R(big(3)^80)) == string(big(3)^80)
 end
 
 @testset "n_transExt.manipulation" begin

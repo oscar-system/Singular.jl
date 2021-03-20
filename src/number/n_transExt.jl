@@ -43,6 +43,10 @@ function characteristic(R::N_FField)
    return ZZ(libSingular.n_GetChar(R.ptr))
 end
 
+function symbols(R::N_FField)
+   return R.S
+end
+
 function deepcopy_internal(a::n_transExt, dict::IdDict)
    return parent(a)(libSingular.n_Copy(a.ptr, parent(a).ptr))
 end
@@ -101,9 +105,9 @@ Return `true` if $n$ is a unit in the field, i.e. nonzero.
 """
 isunit(n::n_transExt) = !iszero(n)
 
-function _tExt_to_poly(R, cached)
+function _tExt_to_poly(R::N_FField, cached)
    n = transcendence_degree(R)
-   P, = PolynomialRing(base_ring(R), ["a$i" for i in 1:n], cached = cached)
+   P, = PolynomialRing(base_ring(R), map(string, symbols(R)), cached = cached)
    return P
 end
 
@@ -151,21 +155,15 @@ function show(io::IO, F::N_FField)
    print(io, "Function Field over ", base_ring(F), " with transcendence basis ", transcendence_basis(F))
 end
 
-function AbstractAlgebra.expressify(n::n_transExt; context = nothing)::Any
-   # TODO this easy method might not be the best
-   libSingular.StringSetS("")
-   libSingular.n_Write(n.ptr, parent(n).ptr, false)
-   s = libSingular.StringEndS()
-   e = Meta.parse(s)
-   if !isa(e, Expr)
-      return e
-   elseif e.head == :incomplete
-      return s
-   elseif e.head == :call && length(e.args) == 3 && e.args[1] == :/
-      e.args[1] = ://
-      return e
+function AbstractAlgebra.expressify(a::n_transExt; context = nothing)::Any
+   n = numerator(a)
+   n = AbstractAlgebra.expressify(n_transExt_to_spoly(n), context = context)
+   d = denominator(a)
+   if isone(d)
+      return n
    else
-      return e
+      d = AbstractAlgebra.expressify(n_transExt_to_spoly(d), context = context)
+      return Expr(:call, ://, n, d)
    end
 end
 

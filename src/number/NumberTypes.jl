@@ -309,6 +309,7 @@ mutable struct N_FField <: Field
    ptr::libSingular.coeffs_ptr
    base_ring::Field
    refcount::Int
+   S::Array{Symbol, 1}
 
    function N_FField(F::Field, S::Array{Symbol, 1}, cached::Bool = true)
       if cached && haskey(N_FFieldID, (F, S))
@@ -317,7 +318,7 @@ mutable struct N_FField <: Field
          v = [pointer(Base.Vector{UInt8}(string(str)*"\0")) for str in S]
          cf = libSingular.nCopyCoeff(F.ptr)
          ptr = libSingular.transExt_helper(cf, v)
-         d = new(ptr, F, 1)
+         d = new(ptr, F, 1, S)
          finalizer(_Ring_finalizer, d)
          if cached
             N_FFieldID[F, S] = d
