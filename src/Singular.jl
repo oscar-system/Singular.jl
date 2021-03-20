@@ -36,7 +36,7 @@ import AbstractAlgebra: AbstractAlgebra, diagonal_matrix, factor,
 
 import Nemo: add!, addeq!, base_ring, canonical_unit,
              change_base_ring, characteristic, check_parent, codomain,
-             coeff, coeffs, compose, contains, content, crt,
+             coeff, coefficients, compose, contains, content, crt,
              deflate, deflation, degree, degrees, derivative, divexact,
              divides, domain, elem_type, evaluate, exponent_vectors, factor_squarefree,
              finish, gcdinv, gen, gens, get_field, intersect, isconstant,
