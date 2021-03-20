@@ -1,11 +1,12 @@
-export spoly, PolyRing, change_base_ring, coeff, coeffs,
+export spoly, PolyRing, change_base_ring, coeff, coefficients,
        content, deflation, deflate, degree, degrees, degree_bound,
        derivative, div, divides, evaluate, exponent,
        exponent_vectors, factor, factor_squarefree, finish, gen,
        has_global_ordering, has_mixed_ordering, has_local_ordering,
        inflate, isgen,
        ismonomial, isquotient_ring, isterm, jacobian_ideal, jacobian_matrix,
-       jet, lc, lt, lm, lead_exponent, monomials, MPolyBuildCtx,
+       jet, leading_coefficient, leading_term, leading_monomial, lead_exponent,
+       monomials, MPolyBuildCtx,
        nvars, order, ordering, @PolynomialRing, primpart,
        push_term!, remove, sort_terms!, symbols, terms, total_degree,
        valuation, var_index, vars
@@ -220,7 +221,7 @@ end
 function Base.hash(p::spoly{T}, h::UInt) where T <: Nemo.RingElem
    v = 0x37eec82e994ab710%UInt
    v = xor(hash(collect(exponent_vectors(p)), h), v)
-   for c in coeffs(p)
+   for c in coefficients(p)
       v = xor(hash(c, h), v)
       v = (v << 1) | (v >> (sizeof(Int)*8 - 1))
    end
@@ -590,7 +591,7 @@ Return the content of the polynomial, i.e. the GCD of its coefficients.
 function content(x::spoly)
    R = base_ring(x)
    d = R()
-   for c in coeffs(x)
+   for c in coefficients(x)
       d = gcd(d, c)
       if isone(d)
          break
@@ -664,7 +665,7 @@ f values")
          c = c*zero(parent(vals[j]))
       end
    end
-   cvzip = zip(coeffs(a), exponent_vectors(a))
+   cvzip = zip(coefficients(a), exponent_vectors(a))
    for (c, v) in cvzip
       t = c
       for j = 1:length(vals)
@@ -815,7 +816,7 @@ Return a Singular polynomial in $R$ with the same coefficients and exponents as 
 function (R::PolyRing)(p::AbstractAlgebra.Generic.MPoly{T}) where T <: Nemo.RingElem
    S = base_ring(R)
    B = MPolyBuildCtx(R)
-   cvzip = zip(coeffs(p), exponent_vectors(p))
+   cvzip = zip(coefficients(p), exponent_vectors(p))
    for (c, v) in cvzip
       push_term!(B, S(c), v)
    end
@@ -830,7 +831,7 @@ coefficients and exponents as $p$.
 """
 function (R::AbstractAlgebra.Generic.MPolyRing{T})(p::Singular.spoly{Singular.n_unknown{T}}) where T <: Nemo.RingElem
    B = MPolyBuildCtx(R)
-   cvzip = zip(coeffs(p), exponent_vectors(p))
+   cvzip = zip(coefficients(p), exponent_vectors(p))
    for (c, v) in cvzip
       push_term!(B, libSingular.julia(libSingular.cast_number_to_void(c.ptr)), v)
    end
@@ -1104,7 +1105,7 @@ function (R::PolyRing)(f::T) where T <: Nemo.MPolyElem
   parent(f) == R && return f
   B = base_ring(R)
   g = MPolyBuildCtx(R)
-  for (c, e) = zip(Nemo.coeffs(f), Nemo.exponent_vectors(f))
+  for (c, e) = zip(Nemo.coefficients(f), Nemo.exponent_vectors(f))
     push_term!(g, B(c), e)
   end
   return finish(g)
