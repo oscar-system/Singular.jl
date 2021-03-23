@@ -1,14 +1,18 @@
 # initialise a number from an mpz
 function n_InitMPZ(b::BigInt, cf::coeffs_ptr)
-    bb = pointer_from_objref(b)
-    return n_InitMPZ_internal(bb, cf)
+   GC.@preserve b begin
+      bb = pointer_from_objref(b)
+      return n_InitMPZ_internal(bb, cf)
+   end
 end
 
 # get an mpz from a number
 function n_GetMPZ(s::number_ptr, r::coeffs_ptr)
    res = BigInt(1)
-   resp = pointer_from_objref(res)
-   n_GetMPZ_internal(resp, s, r)
+   GC.@preserve res begin
+      resp = pointer_from_objref(res)
+      n_GetMPZ_internal(resp, s, r)
+   end
    return res
 end
 
