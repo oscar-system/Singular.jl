@@ -107,9 +107,7 @@ void singular_define_rings(jlcxx::Module & Singular)
     Singular.method("rIsQuotientRing", [](ring r) {
         return r->qideal != NULL;
     });
-    Singular.method("rCopy", [](ring r) {
-        return rCopy(r);
-    });
+    Singular.method("rCopy", rCopy);
     Singular.method("rQuotientRing", [](ideal i, ring r) {
         ring Q = rCopy(r);
         Q->qideal = id_Copy(i, r);
@@ -125,12 +123,9 @@ void singular_define_rings(jlcxx::Module & Singular)
     });
     Singular.method("p_Copy",
                     [](spolyrec * p, ip_sring * r) { return p_Copy(p, r); });
-    Singular.method("p_IsOne",
-                    [](spolyrec * p, ip_sring * r) { return p_IsOne(p, r); });
-    Singular.method("p_One", [](ip_sring * r) { return p_One(r); });
-    Singular.method("p_IsUnit", [](spolyrec * p, ip_sring * r) {
-        return p_IsUnit(p, r);
-    });
+    Singular.method("p_IsOne", p_IsOne);
+    Singular.method("p_One", p_One);
+    Singular.method("p_IsUnit", p_IsUnit);
     Singular.method("p_GetExp", [](spolyrec * p, int i, ip_sring * r) {
         return p_GetExp(p, i, r);
     });
@@ -143,14 +138,12 @@ void singular_define_rings(jlcxx::Module & Singular)
         omFree(s_ptr);
         return s;
     });
-    Singular.method("p_ISet",
-                    [](long i, ip_sring * r) { return p_ISet(i, r); });
-    Singular.method("p_NSet",
-                    [](snumber * p, ip_sring * r) { return p_NSet(p, r); });
+    Singular.method("p_ISet", p_ISet);
+    Singular.method("p_NSet", p_NSet);
     Singular.method("p_NSet",
                     [](void * p, ip_sring * r) { return p_NSet(reinterpret_cast<snumber*>(p), r); }
     );
-    Singular.method("pLength", [](spolyrec * p) { return pLength(p); });
+    Singular.method("pLength", pLength);
     Singular.method("SetpNext",
                     [](spolyrec * p, spolyrec * q) { p->next = q; });
     Singular.method("pNext", [](spolyrec * a) {
@@ -168,12 +161,9 @@ void singular_define_rings(jlcxx::Module & Singular)
         pNext(a) = m; });
     Singular.method("p_SortMerge", [](spolyrec * a, ip_sring * r) {
         return p_SortMerge(a, r); });
-    Singular.method("p_SortAdd", [](spolyrec * a, ip_sring * r) {
-        return p_SortAdd(a, r); });
-    Singular.method("p_Setm", [](spolyrec * a, ip_sring * r) {
-        p_Setm(a, r); });
-    Singular.method("p_Neg",
-                    [](spolyrec * p, ip_sring * r) { return p_Neg(p, r); });
+    Singular.method("p_SortAdd", p_SortAdd);
+    Singular.method("p_Setm", p_Setm);
+    Singular.method("p_Neg", p_Neg);
     Singular.method("pGetCoeff", [](spolyrec * p) { return pGetCoeff(p); });
     Singular.method("pSetCoeff", [](spolyrec * p, long c, ip_sring * r) {
         number n = n_Init(c, r);
@@ -197,33 +187,21 @@ void singular_define_rings(jlcxx::Module & Singular)
     Singular.method("p_Add_q", [](spolyrec * p, spolyrec * q, ip_sring * r) {
         return p_Add_q(p, q, r);
     });
-    Singular.method("p_Sub", [](spolyrec * p, spolyrec * q, ip_sring * r) {
-        return p_Sub(p, q, r);
-    });
-    Singular.method("p_Mult_q", [](spolyrec * p, spolyrec * q, ip_sring * r) {
-        return p_Mult_q(p, q, r);
-    });
-    Singular.method("pp_Mult_qq", [](spolyrec * p, spolyrec * q, ip_sring * r) {
-        return pp_Mult_qq(p, q, r);
-    });
-    Singular.method("p_Power", [](spolyrec * p, int q, ip_sring * r) {
-        return p_Power(p, q, r);
-    });
+    Singular.method("p_Sub", p_Sub);
+    Singular.method("p_Mult_q", p_Mult_q);
+    Singular.method("pp_Mult_qq", pp_Mult_qq);
+    Singular.method("p_Power", p_Power);
     Singular.method("p_EqualPolys",
                     [](spolyrec * p, spolyrec * q, ip_sring * r) {
                         return p_EqualPolys(p, q, r);
                     });
-    Singular.method("p_Divide", [](spolyrec * p, spolyrec * q, ip_sring * r) {
-        return p_Divide(p, q, r);
-    });
+    Singular.method("p_Divide", p_Divide);
     Singular.method("p_DivRem", [](spolyrec * a, spolyrec * b, ip_sring * r) {
        poly rest;
        poly q = p_DivRem(a, b, rest, r);
        return std::make_tuple(reinterpret_cast<void *>(q), reinterpret_cast<void *>(rest));
     });
-    Singular.method("p_Div_nn", [](spolyrec * p, snumber * n, ip_sring * r) {
-        return p_Div_nn(p, n, r);
-    });
+    Singular.method("p_Div_nn", p_Div_nn);
     Singular.method("p_IsDivisibleBy", [](spolyrec * p, spolyrec * q, ip_sring * r) {
        poly res;
        ideal I = idInit(1, 1);
@@ -242,10 +220,7 @@ void singular_define_rings(jlcxx::Module & Singular)
           return false;
        }
     });
-    Singular.method("singclap_gcd",
-                    [](spolyrec * p, spolyrec * q, ip_sring * r) {
-                        return singclap_gcd(p, q, r);
-                    });
+    Singular.method("singclap_gcd", singclap_gcd);
     Singular.method("p_ExtGcd_internal", [](spolyrec * a, spolyrec * b,
                                             void * res, void * s, void * t,
                                             ip_sring * r) {
@@ -283,29 +258,12 @@ void singular_define_rings(jlcxx::Module & Singular)
 			delete v;
 		        return I;
     });
-    Singular.method("p_Content", [](spolyrec * p, ip_sring * r) {
-                        return p_Content(p, r);
-    });
-    Singular.method("p_GetExpVL_internal",
-                    [](spolyrec * p, int64 * ev, ip_sring * r) {
-                        return p_GetExpVL(p, ev, r);
-                    });
-    Singular.method("p_GetExpVLV_internal",
-                    [](spolyrec * p, int64 * ev, ip_sring * r) {
-                        return p_GetExpVLV(p, ev, r);
-                    });
-    Singular.method("p_SetExpV_internal",
-                    [](spolyrec * p, int * ev, ip_sring * r) {
-                        return p_SetExpV(p, ev, r);
-                    });
-    Singular.method("p_SetExpVL_internal",
-                    [](spolyrec * p, int64 * ev, ip_sring * r) {
-                        return p_SetExpVL(p, ev, r);
-                    });
-    Singular.method("p_SetExpVLV_internal",
-                    [](spolyrec * p, int64 * ev, int64 c, ip_sring * r) {
-                        return p_SetExpVLV(p, ev, c, r);
-                    });
+    Singular.method("p_Content", p_Content);
+    Singular.method("p_GetExpVL_internal", p_GetExpVL);
+    Singular.method("p_GetExpVLV_internal", p_GetExpVLV);
+    Singular.method("p_SetExpV_internal", p_SetExpV);
+    Singular.method("p_SetExpVL_internal", p_SetExpVL);
+    Singular.method("p_SetExpVLV_internal", p_SetExpVLV);
     Singular.method("p_Reduce",
                     [](spolyrec * p, sip_sideal * G, ip_sring * R) {
                         const ring origin = currRing;
