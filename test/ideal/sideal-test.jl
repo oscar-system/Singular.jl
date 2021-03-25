@@ -161,12 +161,14 @@ end
    I = Ideal(R, (x^2 + x*y + 1)*(2y^2+1)^3, (2y^2 + 3)*(2y^2+1)^2)
    J = Ideal(R, 2y^2 + 1)
 
-   @test equal(saturation(I, J), Ideal(R, 2y^2 + 3, x^2 + x*y + 1))
+   S,k = saturation(I, J)
+   @test equal(S, Ideal(R, 2y^2 + 3, x^2 + x*y + 1))
 
    I = Ideal(R, (x*y + 1)*(2x^2*y^2 + x*y - 2) + 2x*y^2 + x, 2x*y + 1)
    J = Ideal(R, x)
 
-   @test equal(satstd(I, J), std(saturation(I, J)))
+   S,k = saturation(I, J)
+   @test equal(satstd(I, J), std(S))
 end
 
 @testset "sideal.slimgb" begin
