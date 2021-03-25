@@ -1,5 +1,6 @@
 export spoly, PolyRing, change_base_ring, coeff, coefficients,
-       content, deflation, deflate, degree, degrees, degree_bound,
+       constant_coefficient, content, deflation, deflate,
+       degree, degrees, degree_bound,
        derivative, div, divides, evaluate, exponent,
        exponent_vectors, factor, factor_squarefree, finish, gen,
        has_global_ordering, has_mixed_ordering, has_local_ordering,
