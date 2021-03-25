@@ -8,7 +8,7 @@ export spoly, PolyRing, change_base_ring, coeff, coefficients,
        jet, leading_coefficient, leading_term, leading_monomial, lead_exponent,
        monomials, MPolyBuildCtx,
        nvars, order, ordering, @PolynomialRing, primpart,
-       push_term!, remove, sort_terms!, symbols, terms, total_degree,
+       push_term!, remove, sort_terms!, symbols, tail, terms, total_degree,
        valuation, var_index, vars
 
 ###############################################################################
