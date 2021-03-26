@@ -38,7 +38,8 @@ import Nemo: add!, addeq!, base_ring, canonical_unit,
              change_base_ring, characteristic, check_parent, codomain,
              coeff, coefficients, compose, contains, content, crt,
              deflate, deflation, degree, degrees, derivative, divexact,
-             divides, domain, elem_type, evaluate, exponent_vectors, factor_squarefree,
+             divides, domain, elem_type, evaluate, exponent_vectors,
+             factor_squarefree,
              finish, gcdinv, gen, gens, get_field, intersect, isconstant,
              isgen, ismonomial, inflate, isnegative, isone,
              isterm, isunit, iszero, lift, leading_coefficient,
@@ -46,7 +47,7 @@ import Nemo: add!, addeq!, base_ring, canonical_unit,
              MPolyBuildCtx, mul!, nvars, ordering, parent_type,
              parent, primpart, promote_rule, push_term!,
              reconstruct, remove, set_field!, sort_terms!,
-             symbols, terms, total_degree, valuation,
+             symbols, terms, total_degree, trailing_coefficient, valuation,
              var_index, vars, zero!, ResidueRing
 
 export base_ring, elem_type, parent_type, parent
