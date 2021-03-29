@@ -92,6 +92,14 @@ function __init__()
    # Initialise Singular
    ENV["SINGULAR_EXECUTABLE"] = binSingular
    libSingular.siInit(binSingular)
+
+   # don't tell the user about each library that singular loads
+   libSingular.set_option("V_LOAD_LIB", false)
+   # don't tell the user when a library redefines a singular variable
+   libSingular.set_option("V_REDEFINE", false)
+   # silence printlevel-based printing
+   libSingular.set_printlevel(-100)
+
    # set up Singular parents (we cannot do this before Singular is initialised)
 
    global ZZ = Integers()

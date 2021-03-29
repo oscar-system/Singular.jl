@@ -91,7 +91,7 @@ end
 
 @testset "caller.LibSolve" begin
    R, (x,) = PolynomialRing(Singular.QQ, ["s"])
-   l = Singular.LibSolve.solve(Ideal(R, [x^5+1]))
+   l = Singular.LibSolve.solve(Ideal(R, [x^5+1]), "nodisplay")
    S = l[1]
    @test isa(S, Singular.PolyRing{Singular.n_unknownsingularcoefficient})
    for y in l[2][:SOL]
