@@ -141,7 +141,8 @@ function __init__()
    casting_functions = create_casting_functions()
 
    show_banner = isinteractive() &&
-                !any(x->x.name in ["Oscar"], keys(Base.package_locks))
+                !any(x->x.name in ["Oscar"], keys(Base.package_locks)) &&
+                get(ENV, "SINGULAR_PRINT_BANNER", "true") != "false"
 
    singular_version_nr=Singular.libSingular.version()
    ver = digits(singular_version_nr, base = 10)
