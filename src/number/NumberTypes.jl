@@ -432,8 +432,10 @@ mutable struct CoefficientRing{T <: Nemo.RingElem} <: Ring
          return CoeffRingID[R]::CoefficientRing{T}
       else
          c = libSingular.register(R)
-         ptr = pointer_from_objref(R)
-         z = new(libSingular.nInitChar(c, ptr), R)
+         GC.@preserve R begin
+            ptr = pointer_from_objref(R)
+            z = new(libSingular.nInitChar(c, ptr), R)
+         end
          if cached
            CoeffRingID[R] = z
          end
