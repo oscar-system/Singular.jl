@@ -695,7 +695,7 @@ Returns a squarefree factorization of $x$.
 function factor_squarefree(x::spoly)
   R = parent(x)
   br_type = typeof(base_ring(R))
-  bool = (br_type <: Union{Rationals, Integers, N_FField, N_ZpField})
+  bool = (br_type <: Union{Rationals, N_FField, N_ZpField, N_AlgExtField})
 
   # Check if base ring is valid
   if !bool
@@ -724,7 +724,7 @@ Returns the factorization of $x$.
 function factor(x::spoly)
   R = parent(x)
   br_type = typeof(base_ring(R))
-  bool = (br_type <: Union{Rationals, Integers, N_FField, N_ZpField})
+  bool = (br_type <: Union{Rationals, Integers, N_FField, N_ZpField, N_AlgExtField})
 
   # Check if base ring is valid
   if !bool
