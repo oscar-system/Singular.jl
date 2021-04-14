@@ -194,8 +194,10 @@ function nemoRingInt(ptr::Ptr{Ptr{Cvoid}}, cf::Ptr{Cvoid})
 end
 
 function nemoRingMPZ(b::BigInt, ptr::Ptr{Ptr{Cvoid}}, cf::Ptr{Cvoid})
-   bptr = pointer_from_objref(b)
-   mpz_init_set_si_internal(reinterpret(Ptr{Cvoid}, bptr), 0)
+   GC.@preserve b begin
+      bptr = pointer_from_objref(b)
+      mpz_init_set_si_internal(reinterpret(Ptr{Cvoid}, bptr), 0)
+   end
    nothing
 end
 

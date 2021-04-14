@@ -96,6 +96,8 @@ function number_pop!(D::Base.Dict{UInt, live_cache}, ptr::Ptr{Cvoid})
     end
 end
 
+# the caller does not necessarily hold a reference to j, but julia must keep
+# j alive because it is going into nemoNumberID
 function number(j::T) where {T <: Nemo.RingElem}
     ptr = pointer_from_objref(j)
     iptr = reinterpret(UInt, ptr) >> 24

@@ -189,10 +189,12 @@ function fmpzMPZ(b::BigInt, ptr::Ptr{Ptr{Cvoid}}, cf::Ptr{Cvoid})
     ptr_load = unsafe_load(ptr)
     n = julia(unsafe_load(ptr))::Nemo.fmpz
     z = convert(BigInt, n)
-    bptr = reinterpret(Ptr{Cvoid}, pointer_from_objref(b))
-    zptr = reinterpret(Ptr{Cvoid}, pointer_from_objref(z))
-    number_pop!(nemoNumberID, ptr_load)
-    mpz_init_set_internal(bptr, zptr)
+    GC.@preserve b z begin
+        bptr = reinterpret(Ptr{Cvoid}, pointer_from_objref(b))
+        zptr = reinterpret(Ptr{Cvoid}, pointer_from_objref(z))
+        number_pop!(nemoNumberID, ptr_load)
+        mpz_init_set_internal(bptr, zptr)
+    end
     nothing
 end
 
