@@ -202,4 +202,6 @@ include("Meta.jl")
 
 include("Map.jl")
 
+include("MessyHacks.jl")
+
 end # module
