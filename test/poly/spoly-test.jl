@@ -453,44 +453,49 @@ end
 end
 
 @testset "spoly.test_spoly_factor" begin
-   R1 , (x, y, z, w) = Singular.PolynomialRing(Singular.QQ,
-   ["x", "y", "z", "w"]; ordering=:negdegrevlex)
+   # everything works for QQ, Fp, and extensions of these by a minpoly
+   # factor_squarefree strangely does not work for ZZ
+
+   R, (x, y, z, w) = PolynomialRing(QQ, ["x", "y", "z", "w"]; ordering=:negdegrevlex)
    f1 = 113*(2*y^7 + w^2)^3*(1 + x)^2*(x + y*z)^2
 
-   R2 , (x, y, z, w) = Singular.PolynomialRing(Singular.ZZ,
-   ["x", "y", "z", "w"]; ordering=:negdegrevlex)
+   R, (x, y, z, w) = PolynomialRing(ZZ, ["x", "y", "z", "w"]; ordering=:negdegrevlex)
    f2 = 123*(57*y^3 + w^5)^3*(x^2 + x+1)^2*(x + y*z)^2
 
-   R3 , (x, y, z, w) = Singular.PolynomialRing(Singular.Fp(3),
-   ["x", "y", "z", "w"]; ordering=:negdegrevlex)
+   R, (x, y, z, w) = PolynomialRing(Fp(3), ["x", "y", "z", "w"]; ordering=:negdegrevlex)
    f3 = 7*(y^3 + w^3)*(1 + x)^2*(x + y*z)^2
 
-   # FIXME: factoring f2 and f3 broke when we switched to using Singular_jll;
-   # for f2, a wrong result is returned: the factor 123 is omitted
-   # for f3, we get a segfault due to some missing feature:
-   #  julia> factor(f3)
-   #  multivariate factorization depends on NTL(missing)
-   #  signal (6): Abort trap: 6
-   for f in [f1]
-   #for f in [f1, f2, f3]
-      #Test factor
-      F = factor(f)
-      g = F.unit
-      for p in keys(F.fac)
-         g = g*p^F[p]
-      end
-     @test f == g
+   Qa, (a,) = FunctionField(QQ, ["a"])
+   K, a = AlgebraicExtensionField(Qa, a^2 + 1)
+   R, (x, y, z) = PolynomialRing(K, ["x", "y", "z"])
+   f4 = (x^4 + y^4*z^4)*(1 + x + a*y + a^2*z)^2
 
-     #Test factor_squarefree over QQ and Fp
-      if typeof(f.parent) != PolyRing{n_Z}
+   F7a, (a,) = FunctionField(Fp(7), ["a"])
+   K, a = AlgebraicExtensionField(F7a, a^2 + 1)
+   R, (x, y, z) = PolynomialRing(K, ["x", "y", "z"])
+   f5 = (x^4 + y^4*z^4)*(1 + x + a*y + a^2*z)^2
+
+   for f in [f1, f2, f3, f4, f5]
+      F = factor(f)
+      @test f == F.unit*prod(p^e for (p, e) in F)
+
+      if typeof(f.parent) == PolyRing{n_Z}
+         @test_throws Exception factor_squarefree(f)
+      else
          F = factor_squarefree(f)
-         g = F.unit
-         for p in keys(F.fac)
-            g = g*p^F[p]
-         end
-         @test f == g
+         @test f == F.unit*prod(p^e for (p, e) in F)
       end
    end
+
+   # nothing works for Fq when constructed with the Zech log representation
+   # as the kernel lacks the conversion functions
+
+   Fq, a = FiniteField(19, 3, "a")
+   R, (x, y, z) = PolynomialRing(Fq, ["x", "y", "z"])
+   f = x^3*y^3*z^3 - a^3
+
+   @test_throws Exception factor(f)
+   @test_throws Exception factor_squarefree(f)
 end
 
 @testset "spoly.hash" begin
