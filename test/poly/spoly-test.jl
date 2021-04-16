@@ -172,7 +172,12 @@ end
    @test degrees(x^2*y^3) == [2, 3]
    @test vars(x^2 + 3x + 1) == [x]
    @test var_index(x) == 1 && var_index(y) == 2
+   @test tail(3x^2*y + 2x*y + y + 7) == 2x*y + y + 7
+   @test tail(R(1)) == 0
+   @test tail(R()) == 0
    @test leading_coefficient(3x^2 + 2x + 1) == 3
+   @test constant_coefficient(x^2*y + 2x + 3) == 3
+   @test constant_coefficient(x^2 + y) == 0
    @test leading_monomial(3x^2 + 2x + 1) == x^2
    @test leading_term(3x^2 + 2x + 1) == 3x^2
    @test trailing_coefficient(3x^2*y + 2x + 7y + 9) == 9

@@ -1,5 +1,6 @@
 export spoly, PolyRing, change_base_ring, coeff, coefficients,
-       content, deflation, deflate, degree, degrees, degree_bound,
+       constant_coefficient, content, deflation, deflate,
+       degree, degrees, degree_bound,
        derivative, div, divides, evaluate, exponent,
        exponent_vectors, factor, factor_squarefree, finish, gen,
        has_global_ordering, has_mixed_ordering, has_local_ordering,
@@ -8,7 +9,7 @@ export spoly, PolyRing, change_base_ring, coeff, coefficients,
        jet, leading_coefficient, leading_term, leading_monomial, lead_exponent,
        monomials, MPolyBuildCtx,
        nvars, order, ordering, @PolynomialRing, primpart,
-       push_term!, remove, sort_terms!, symbols, terms, total_degree,
+       push_term!, remove, sort_terms!, symbols, tail, terms, total_degree,
        trailing_coefficient,
        valuation, var_index, vars
 

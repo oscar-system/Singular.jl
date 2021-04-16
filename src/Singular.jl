@@ -36,7 +36,8 @@ import AbstractAlgebra: AbstractAlgebra, diagonal_matrix, factor,
 
 import Nemo: add!, addeq!, base_ring, canonical_unit,
              change_base_ring, characteristic, check_parent, codomain,
-             coeff, coefficients, compose, contains, content, crt,
+             coeff, coefficients, compose, constant_coefficient,
+             contains, content, crt,
              deflate, deflation, degree, degrees, derivative, divexact,
              divides, domain, elem_type, evaluate, exponent_vectors,
              factor_squarefree,
@@ -47,7 +48,7 @@ import Nemo: add!, addeq!, base_ring, canonical_unit,
              MPolyBuildCtx, mul!, nvars, ordering, parent_type,
              parent, primpart, promote_rule, push_term!,
              reconstruct, remove, set_field!, sort_terms!,
-             symbols, terms, total_degree, trailing_coefficient, valuation,
+             symbols, tail, terms, total_degree, trailing_coefficient, valuation,
              var_index, vars, zero!, ResidueRing
 
 export base_ring, elem_type, parent_type, parent
@@ -92,6 +93,14 @@ function __init__()
    # Initialise Singular
    ENV["SINGULAR_EXECUTABLE"] = binSingular
    libSingular.siInit(binSingular)
+
+   # don't tell the user about each library that singular loads
+   libSingular.set_option("V_LOAD_LIB", false)
+   # don't tell the user when a library redefines a singular variable
+   libSingular.set_option("V_REDEFINE", false)
+   # silence printlevel-based printing
+   libSingular.set_printlevel(-100)
+
    # set up Singular parents (we cannot do this before Singular is initialised)
 
    global ZZ = Integers()
@@ -133,7 +142,8 @@ function __init__()
    casting_functions = create_casting_functions()
 
    show_banner = isinteractive() &&
-                !any(x->x.name in ["Oscar"], keys(Base.package_locks))
+                !any(x->x.name in ["Oscar"], keys(Base.package_locks)) &&
+                get(ENV, "SINGULAR_PRINT_BANNER", "true") != "false"
 
    singular_version_nr=Singular.libSingular.version()
    ver = digits(singular_version_nr, base = 10)
