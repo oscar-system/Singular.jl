@@ -10,6 +10,7 @@ export spoly, PolyRing, change_base_ring, coeff, coefficients,
        monomials, MPolyBuildCtx,
        nvars, order, ordering, @PolynomialRing, primpart,
        push_term!, remove, sort_terms!, symbols, tail, terms, total_degree,
+       trailing_coefficient,
        valuation, var_index, vars
 
 ###############################################################################
