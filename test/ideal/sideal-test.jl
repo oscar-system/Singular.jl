@@ -77,6 +77,11 @@ end
 
    @test equal(I1 + I2, I3)
    @test equal(I1*I2, I4)
+
+   @test equal(I3*x, Ideal(R, x^2, y*x))
+   @test equal(y*I3, Ideal(R, y^2, y*x))
+   @test equal(I3*2, I3)
+   @test equal(2*I3, I3)
 end
 
 @testset "sideal.powering" begin
