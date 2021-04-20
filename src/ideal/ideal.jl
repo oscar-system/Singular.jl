@@ -323,6 +323,21 @@ function intersection(I::sideal{T}, J::sideal{T}) where T <: Nemo.RingElem
    return Ideal(R, ptr)
 end
 
+function intersection(I::sideal{T}, Js::sideal{T}...) where T <: Nemo.RingElem
+   R = base_ring(I)
+   GC.@preserve I Js begin
+      CC = Ptr{Nothing}[I.ptr.cpp_object]
+      for J in Js
+         push!(CC, J.ptr.cpp_object)
+      end
+      GC.@preserve CC begin
+         C_ptr = reinterpret(Ptr{Nothing}, pointer(CC))
+         ptr = libSingular.id_MultSect(C_ptr, length(CC), R.ptr)
+      end
+      return Ideal(R, ptr)
+   end
+end
+
 ###############################################################################
 #
 #   Quotient
