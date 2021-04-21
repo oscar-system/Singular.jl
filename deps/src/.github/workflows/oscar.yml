@@ -78,6 +78,7 @@ jobs:
                    meta = job_meta_env(\"MATRIX_CONTEXT\");
                    oscar_develop(job_pkgs(meta);
                                  dir=\"oscar-dev\",
+                                 merge=true,
                                  active_repo=\"${GITHUB_REPOSITORY}\");
                    github_env_runtests(meta;
                                        varname=\"oscar_run_tests\",
