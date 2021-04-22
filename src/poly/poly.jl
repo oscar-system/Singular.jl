@@ -7,7 +7,7 @@ export spoly, PolyRing, change_base_ring, coeff, coefficients,
        inflate, isgen,
        ismonomial, isquotient_ring, isterm, jacobian_ideal, jacobian_matrix,
        jet, leading_coefficient, leading_term, leading_monomial, lead_exponent,
-       monomials, MPolyBuildCtx,
+       leading_exponent_vector, monomials, MPolyBuildCtx,
        nvars, order, ordering, @PolynomialRing, primpart,
        push_term!, remove, sort_terms!, symbols, tail, terms, total_degree,
        trailing_coefficient,
@@ -193,18 +193,23 @@ function order(p::spoly)
 end
 
 @doc Markdown.doc"""
-    lead_exponent(p::spoly)
+    leading_exponent_vector(p::spoly)
 
 Return the exponent vector of the leading term of the given polynomial. The return
 value is a Julia 1-dimensional array giving the exponent for each variable of the
 leading term.
 """
-function lead_exponent(p::spoly)
+function leading_exponent_vector(p::spoly)
    R = parent(p)
    n = nvars(R)
    A = Array{Int}(undef, n)
    libSingular.p_GetExpVL(p.ptr, A, R.ptr)
    return A
+end
+
+function lead_exponent(p::spoly)
+   @warn "please use leading_exponent_vector instead of lead_exponent"
+   return leading_exponent_vector(p)
 end
 
 function leading_coefficient(p::spoly)

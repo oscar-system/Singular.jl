@@ -185,7 +185,7 @@ degree_bound(R::PolyRing)
 ```
 
 ```@docs
-lead_exponent(p::spoly)
+leading_exponent_vector(p::spoly)
 ```
 
 ```@docs
@@ -205,7 +205,7 @@ n = ngens(R)
 has_global_ordering(R) == true
 c = characteristic(R)
 L = degree_bound(R)
-exps = lead_exponent(x1*x2 + 3x1*x2^2 + x3 + 2)
+exps = leading_exponent_vector(x1*x2 + 3x1*x2^2 + x3 + 2)
 deg = total_degree(x1*x2 + 3x1*x2^2 + x3 + 2)
 ord = order(x1*x2 + 3x1*x2^2 + x3 + 2)
 ```

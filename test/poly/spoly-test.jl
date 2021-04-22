@@ -126,7 +126,7 @@ end
    @test total_degree(x^2 + 2x + 1) == 2
    @test order(x^2 + 2x + 1) == 0
 
-   @test lead_exponent(x^3 + 2x + 1) == [3]
+   @test leading_exponent_vector(x^3 + 2x + 1) == [3]
 
    @test deepcopy(x + 2) == x + 2
 
