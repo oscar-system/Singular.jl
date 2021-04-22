@@ -207,6 +207,15 @@ function lead_exponent(p::spoly)
    return A
 end
 
+function leading_coefficient(p::spoly)
+   R = base_ring(p)
+   if p.ptr.cpp_object == C_NULL
+      return zero(R)
+   else
+      return R(libSingular.n_Copy(libSingular.pGetCoeff(p.ptr), R.ptr))
+   end
+end
+
 function deepcopy_internal(p::spoly, dict::IdDict)
    p2 = libSingular.p_Copy(p.ptr, parent(p).ptr)
    return parent(p)(p2)
@@ -217,7 +226,7 @@ function check_parent(a::spoly{T}, b::spoly{T}) where T <: Nemo.RingElem
 end
 
 function canonical_unit(a::spoly{T}) where T <: Nemo.RingElem
-  return a == 0 ? one(base_ring(a)) : canonical_unit(coeff(a, 0))
+  return iszero(a) ? one(base_ring(a)) : canonical_unit(leading_coefficient(a))
 end
 
 function Base.hash(p::spoly{T}, h::UInt) where T <: Nemo.RingElem
@@ -352,7 +361,7 @@ function Base.show(io::IO, a::spoly)
    print(io, AbstractAlgebra.obj_to_string(a, context = io))
 end
 
-isnegative(x::spoly) = isconstant(x) && !iszero(x) && isnegative(coeff(x, 0))
+isnegative(x::spoly) = isconstant(x) && !iszero(x) && isnegative(leading_coefficient(x))
 
 ###############################################################################
 #
