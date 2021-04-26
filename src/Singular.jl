@@ -118,10 +118,15 @@ function __init__()
    global ringorder_rp = libSingular.ringorder_rp
    global ringorder_dp = libSingular.ringorder_dp
    global ringorder_Dp = libSingular.ringorder_Dp
+   global ringorder_wp = libSingular.ringorder_wp
+   global ringorder_Wp = libSingular.ringorder_Wp
    global ringorder_ls = libSingular.ringorder_ls
    global ringorder_rs = libSingular.ringorder_rs
    global ringorder_ds = libSingular.ringorder_ds
    global ringorder_Ds = libSingular.ringorder_Ds
+   global ringorder_ws = libSingular.ringorder_ws
+   global ringorder_Ws = libSingular.ringorder_Ws
+   global ringorder_M  = libSingular.ringorder_M
    global ringorder_c  = libSingular.ringorder_c
    global ringorder_C  = libSingular.ringorder_C
 
