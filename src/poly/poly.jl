@@ -1313,7 +1313,7 @@ Ws_order(v::Vector{Int}) = _local_weighted_ordering(Singular.ringorder_Ws, v)
 function M_order(m::Matrix{Int}, checked::Bool = true)
    (nr, nc) = size(m)
    nr > 0 && nr == nc || "weight matrix must be square"
-   !checked || !iszero(Singular.Nemo.det(Singular.Nemo.matrix(Singular.Nemo.ZZ, m))) || "weight matrix must nonsingular"
+   !checked || !iszero(Singular.Nemo.det(Singular.Nemo.matrix(Singular.Nemo.ZZ, m))) || error("weight matrix must nonsingular")
    return sordering([sorder_block(Singular.ringorder_M, nr, vec(transpose(m)))])
 end
 
