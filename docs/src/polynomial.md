@@ -48,7 +48,7 @@ polynomials that is not documented in the general multivariate interface.
 
 ```julia
 PolynomialRing(R::Union{Ring, Field}, s::Array{String, 1};
-   cached::Bool = true, ordering::Symbol = :degrevlex,
+   cached::Bool = true, ordering = :degrevlex,
       ordering2::Symbol = :comp1min, degree_bound::Int = 0)
 ```
 
@@ -61,14 +61,18 @@ coefficient ring, list of variable names, ordering and degree bound. This is
 accomplished by making use of a global cache. If this is not the desired behaviour,
 `false` can be passed to the optional argument `cached`.
 
-Two orderings can be specified, one for term ordering of the polynomials, and another
+If the first ordering `ordering` is specified as a symbol, then
+two orderings can be specified, one for term ordering of the polynomials, and another
 for ordering of module components. They can occur in either order, the first taking
 precedence over the other, when the polynomials are used to represent module generators.
 If either is not specified, the indicated default is used.
+The options for polynomial term ordering are, `:lex`, `:deglex`, `:degrevlex`,
+`:neglex`, `:negdeglex` and `:negdegrevlex`, and the options for module component ordering
+are `comp1min` and `comp1max`.
 
-The options for polynomial term ordering are the symbols, `:lex`, `:deglex`, `:degrevlex`,
-`:neglex`, `:negdeglex` and `:negdegrevlex`, and the options for module component ordering are `comp1min` and
-`comp1max`.
+If the first ordering `ordering` is specifed as a non-symbol, the second ordering
+`ordering2` will be ignored. For specifying non-symbolic term orderings, please
+see the Term orderings section below.
 
 If one has an a priori bound on the degree in each variable of a polynomial (including
 for all intermediate computations in this ring), one can specify it using the
@@ -118,6 +122,83 @@ push_term!(C, ZZ(1), [1, 2])
 push_term!(C, ZZ(3), [1, 1])
 push_term!(C, -ZZ(1), [0, 1])
 f = finish(C)
+```
+
+### Term orderings
+
+A general term ordering can be constructed as a product of one or more of the
+following block orderings.
+
+```@docs
+ordering_lp(nvars::Int = 1)
+```
+
+```@docs
+ordering_rp(nvars::Int = 1)
+```
+
+```@docs
+ordering_dp(nvars::Int = 1)
+```
+
+```@docs
+ordering_Dp(nvars::Int = 1)
+```
+
+```@docs
+ordering_Wp(w::Vector{Int})
+```
+
+```@docs
+ordering_Wp(w::Vector{Int})
+```
+
+```@docs
+ordering_ls(nvars::Int = 1)
+```
+
+```@docs
+ordering_rs(nvars::Int = 1)
+```
+
+```@docs
+ordering_ds(nvars::Int = 1)
+```
+
+```@docs
+ordering_Ds(nvars::Int = 1)
+```
+
+```@docs
+ordering_ws(w::Vector{Int})
+```
+
+```@docs
+ordering_Ws(w::Vector{Int})
+```
+
+```@docs
+ordering_a(w::Vector{Int})
+```
+
+```@docs
+ordering_M(m::Matrix{Int}, checked::Bool = true)
+```
+
+```@docs
+ordering_C()
+```
+
+```@docs
+ordering_c()
+```
+
+**Examples**
+
+```julia
+PolynomialRing(QQ, "x".*string.(1:8), ordering = ordering_M([1 2; 3 5])*ordering_lp(3)*ordering_wp([1, 2, 3]))
+
+PolynomialRing(QQ, "x".*string.(1:5), ordering = ordering_dp(3)*ordering_dp())
 ```
 
 ### Polynomial ring macros
