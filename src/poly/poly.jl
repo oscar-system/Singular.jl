@@ -5,17 +5,20 @@ export spoly, PolyRing, change_base_ring, coeff, coefficients,
        exponent_vectors, factor, factor_squarefree, finish, gen,
        has_global_ordering, has_mixed_ordering, has_local_ordering,
        inflate, isgen,
-       ismonomial, isquotient_ring, isterm, jacobian_ideal, jacobian_matrix,
-       jet, leading_coefficient, leading_term, leading_monomial, lead_exponent,
-       leading_exponent_vector, monomials, MPolyBuildCtx,
-       nvars, order, ordering, @PolynomialRing, primpart,
-       push_term!, remove, sort_terms!, symbols, tail, terms, total_degree,
-       trailing_coefficient,
+       ismonomial, isordering_symbolic, isquotient_ring, isterm,
+       jacobian_ideal, jacobian_matrix, jet,
+       leading_coefficient, leading_exponent_vector, leading_term,
+       leading_monomial, lead_exponent,
+       monomials, MPolyBuildCtx,
+       nvars, order, ordering, ordering_as_symbol,
+       @PolynomialRing, primpart, push_term!,
+       remove, sort_terms!, symbols,
+       tail, terms, total_degree, trailing_coefficient,
        valuation, var_index, vars
 
-export lp_order, rp_order, dp_order, Dp_order, wp_order, Wp_order,
-       ls_order, rs_order, ds_order, Ds_order, ws_order, Ws_order,
-       M_order
+export ordering_lp, ordering_rp, ordering_dp, ordering_Dp, ordering_wp, ordering_Wp,
+       ordering_ls, ordering_rs, ordering_ds, ordering_Ds, ordering_ws, ordering_Ws,
+       ordering_a, ordering_M, ordering_c, ordering_C, ordering_s, ordering_S
 
 
 ###############################################################################
@@ -107,6 +110,20 @@ function symbols(R::PolyRing)
 end
 
 ordering(R::PolyRing) = R.ord
+
+@doc Markdown.doc"""
+    isordering_symbolic(R::PolyRing)
+
+Return `true` if the ordering of `R` can be represented as a symbol.
+"""
+isordering_symbolic(R::PolyRing) = isordering_symbolic(R.ord)
+
+@doc Markdown.doc"""
+    ordering_as_symbol(R::PolyRing)
+
+Assuming the ordering of `R` can be represented as a symbol, return that symbol.
+"""
+ordering_as_symbol(R::PolyRing) = ordering_as_symbol(R.ord)
 
 @doc Markdown.doc"""
     degree_bound(R::PolyRing)
@@ -1224,46 +1241,47 @@ end
 #
 ###############################################################################
 
-function _expressify_basic_ordering(h::Symbol, n::Int)
-   if n > 0
-      return Expr(:call, h, n)
-   else
-      return Expr(:call, h)
-   end
-end
-
-function Singular.AbstractAlgebra.expressify(a::sordering; context = nothing)
+function AbstractAlgebra.expressify(a::sordering; context = nothing)
    prod = Expr(:call, :cdot)
    for i in a.data
-      if i.order == Singular.ringorder_lp
-         this = _expressify_basic_ordering(:lp_order, i.blocksize)
-      elseif i.order == Singular.ringorder_rp
-         this = _expressify_basic_ordering(:rp_order, i.blocksize)
-      elseif i.order == Singular.ringorder_dp
-         this = _expressify_basic_ordering(:dp_order, i.blocksize)
-      elseif i.order == Singular.ringorder_Dp
-         this = _expressify_basic_ordering(:Dp_order, i.blocksize)
-      elseif i.order == Singular.ringorder_wp
-         this = Expr(:call, :wp_order, string(i.weights))
-      elseif i.order == Singular.ringorder_Wp
-         this = Expr(:call, :Wp_order, string(i.weights))
-      elseif i.order == Singular.ringorder_ls
-         this = _expressify_basic_ordering(:ls_order, i.blocksize)
-      elseif i.order == Singular.ringorder_rs
-         this = _expressify_basic_ordering(:rs_order, i.blocksize)
-      elseif i.order == Singular.ringorder_ds
-         this = _expressify_basic_ordering(:ds_order, i.blocksize)
-      elseif i.order == Singular.ringorder_Ds
-         this = _expressify_basic_ordering(:Ds_order, i.blocksize)
-      elseif i.order == Singular.ringorder_ws
-         this = Expr(:call, :ws_order, string(i.weights))
-      elseif i.order == Singular.ringorder_Ws
-         this = Expr(:call, :Ws_order, string(i.weights))
-      elseif i.order == Singular.ringorder_M         
-         this = Expr(:call, :M_order, string(transpose(reshape(i.weights, (i.blocksize, i.blocksize)))))
+      if i.order == ringorder_lp
+         this = Expr(:call, :ordering_lp, i.size)
+      elseif i.order == ringorder_rp
+         this = Expr(:call, :ordering_rp, i.size)
+      elseif i.order == ringorder_dp
+         this = Expr(:call, :ordering_dp, i.size)
+      elseif i.order == ringorder_Dp
+         this = Expr(:call, :ordering_Dp, i.size)
+      elseif i.order == ringorder_wp
+         this = Expr(:call, :ordering_wp, string(i.weights))
+      elseif i.order == ringorder_Wp
+         this = Expr(:call, :ordering_Wp, string(i.weights))
+      elseif i.order == ringorder_ls
+         this = Expr(:call, :ordering_ls, i.size)
+      elseif i.order == ringorder_rs
+         this = Expr(:call, :ordering_rs, i.size)
+      elseif i.order == ringorder_ds
+         this = Expr(:call, :ordering_ds, i.size)
+      elseif i.order == ringorder_Ds
+         this = Expr(:call, :ordering_Ds, i.size)
+      elseif i.order == ringorder_ws
+         this = Expr(:call, :ordering_ws, string(i.weights))
+      elseif i.order == ringorder_Ws
+         this = Expr(:call, :ordering_Ws, string(i.weights))
+      elseif i.order == ringorder_a
+         this = Expr(:call, :ordering_a, string(i.weights))
+      elseif i.order == ringorder_M         
+         this = Expr(:call, :ordering_M, string(transpose(reshape(i.weights, (i.size, i.size)))))
+      elseif i.order == ringorder_C
+         this = Expr(:call, :ordering_C)
+      elseif i.order == ringorder_c
+         this = Expr(:call, :ordering_c)
+      elseif i.order == ringorder_S
+         this = Expr(:call, :ordering_S)
+      elseif i.order == ringorder_s
+         this = Expr(:call, :ordering_s, i.size)
       else
-         @assert false
-         this = Expr(:call, :?)
+         this = Expr(:call, :ordering_unknown)
       end
       push!(prod.args, this)
    end
@@ -1278,96 +1296,197 @@ function Base.show(io::IO, a::sordering)
    Singular.AbstractAlgebra.show_via_expressify(io, a)
 end
 
-function _basic_ordering(t::Singular.libSingular.rRingOrder_t, nvars::Int)
-   nvars >= 0 || error("block size must be nonnegative")
-   return sordering([sorder_block(t, nvars, Int[])])
+function _is_basic_ordering(t::libSingular.rRingOrder_t)
+    return t == ringorder_lp || t == ringorder_ls ||
+           t == ringorder_rp || t == ringorder_rs ||
+           t == ringorder_dp || t == ringorder_ds ||
+           t == ringorder_Dp || t == ringorder_Ds
 end
 
-function _global_weighted_ordering(t::Singular.libSingular.rRingOrder_t, v::Vector{Int})
+function _is_weighted_ordering(t::libSingular.rRingOrder_t)
+    return t == ringorder_wp || t == ringorder_ws ||
+           t == ringorder_Wp || t == ringorder_Ws 
+end
+
+function _basic_ordering(t::libSingular.rRingOrder_t, size::Int)
+   size >= 0 || error("block size must be nonnegative")
+   return sordering([sorder_block(t, size, Int[])])
+end
+
+function _global_weighted_ordering(t::libSingular.rRingOrder_t, v::Vector{Int})
    len = length(v)
    len > 0 || error("weight vector must be non-empty")
    all(x->x>0, v) || error("all weights must be positive") 
    return sordering([sorder_block(t, len, v)])
 end
 
-function _local_weighted_ordering(t::Singular.libSingular.rRingOrder_t, v::Vector{Int})
+function _local_weighted_ordering(t::libSingular.rRingOrder_t, v::Vector{Int})
    len = length(v)
    len > 0 || error("weight vector must be non-empty")
-   v[1] != 0 || error("first weight must be nonzero") 
+   v[1] != 0 || error("first weight must be nonzero")
    return sordering([sorder_block(t, len, v)])
 end
 
-lp_order(nvars::Int = 0) = _basic_ordering(Singular.ringorder_lp, nvars)
-rp_order(nvars::Int = 0) = _basic_ordering(Singular.ringorder_rp, nvars)
-dp_order(nvars::Int = 0) = _basic_ordering(Singular.ringorder_dp, nvars)
-Dp_order(nvars::Int = 0) = _basic_ordering(Singular.ringorder_Dp, nvars)
-wp_order(v::Vector{Int}) = _global_weighted_ordering(Singular.ringorder_wp, v)
-Wp_order(v::Vector{Int}) = _global_weighted_ordering(Singular.ringorder_Wp, v)
-ls_order(nvars::Int = 0) = _basic_ordering(Singular.ringorder_ls, nvars)
-rs_order(nvars::Int = 0) = _basic_ordering(Singular.ringorder_rs, nvars)
-ds_order(nvars::Int = 0) = _basic_ordering(Singular.ringorder_ds, nvars)
-Ds_order(nvars::Int = 0) = _basic_ordering(Singular.ringorder_Ds, nvars)
-ws_order(v::Vector{Int}) = _local_weighted_ordering(Singular.ringorder_ws, v)
-Ws_order(v::Vector{Int}) = _local_weighted_ordering(Singular.ringorder_Ws, v)
+ordering_lp(nvars::Int = 1) = _basic_ordering(Singular.ringorder_lp, nvars)
+ordering_rp(nvars::Int = 1) = _basic_ordering(Singular.ringorder_rp, nvars)
+ordering_dp(nvars::Int = 1) = _basic_ordering(Singular.ringorder_dp, nvars)
+ordering_Dp(nvars::Int = 1) = _basic_ordering(Singular.ringorder_Dp, nvars)
+ordering_wp(v::Vector{Int}) = _global_weighted_ordering(Singular.ringorder_wp, v)
+ordering_Wp(v::Vector{Int}) = _global_weighted_ordering(Singular.ringorder_Wp, v)
+ordering_ls(nvars::Int = 1) = _basic_ordering(Singular.ringorder_ls, nvars)
+ordering_rs(nvars::Int = 1) = _basic_ordering(Singular.ringorder_rs, nvars)
+ordering_ds(nvars::Int = 1) = _basic_ordering(Singular.ringorder_ds, nvars)
+ordering_Ds(nvars::Int = 1) = _basic_ordering(Singular.ringorder_Ds, nvars)
+ordering_ws(v::Vector{Int}) = _local_weighted_ordering(Singular.ringorder_ws, v)
+ordering_Ws(v::Vector{Int}) = _local_weighted_ordering(Singular.ringorder_Ws, v)
 
-function M_order(m::Matrix{Int}, checked::Bool = true)
+ordering_a(v::Vector{Int}) = sordering([sorder_block(ringorder_a, 0, v)])
+
+function ordering_M(m::Matrix{Int}, checked::Bool = true)
    (nr, nc) = size(m)
-   nr > 0 && nr == nc || "weight matrix must be square"
-   !checked || !iszero(Singular.Nemo.det(Singular.Nemo.matrix(Singular.Nemo.ZZ, m))) || error("weight matrix must nonsingular")
-   return sordering([sorder_block(Singular.ringorder_M, nr, vec(transpose(m)))])
+   nr > 0 && nr == nc || error("weight matrix must be square")
+   !checked || !iszero(Nemo.det(Nemo.matrix(Nemo.ZZ, m))) || error("weight matrix must nonsingular")
+   return sordering([sorder_block(ringorder_M, nr, vec(transpose(m)))])
 end
+
+# these three can take a dummy int in singular, but they do nothing with it?
+ordering_C(dummy::Int = 0) = _basic_ordering(Singular.ringorder_C, 0)
+ordering_c(dummy::Int = 0) = _basic_ordering(Singular.ringorder_c, 0)
+ordering_S(dummy::Int = 0) = _basic_ordering(Singular.ringorder_S, 0)
+ordering_s(syz_comp::Int = 0) = sordering([sorder_block(Singular.ringorder_s, syz_comp, Int[])])
 
 function Base.:*(a::sordering, b::sordering)
    return sordering(vcat(a.data, b.data))
 end
 
+function Base.:(==)(a::sordering, b::sordering)
+   if length(a.data) != length(b.data)
+      return false
+   end
+   for i in 1:length(a.data)
+      if a.data[i].order != b.data[i].order
+         return false
+      elseif a.data[i].size != b.data[i].size
+         return false
+      elseif a.data[i].weights != b.data[i].weights
+         return false
+      end
+   end
+   return true
+end
+
+isordering_a_symbol(a::sordering) = isordering_a_symbol_with_symbol(a)[1]
+ordering_as_symbol(a::sordering) = isordering_a_symbol_with_symbol(a)[2]
+
+function isordering_a_symbol_with_symbol(a::sordering)
+   if length(a.data) != 1 && length(a.data) != 2
+      return (false, :unknown)
+   end
+
+   if length(a.data) == 2 && a.data[2].order != ringorder_C
+      return (false, :unknown)
+   end
+
+   o = a.data[1].order
+   if o == ringorder_lp
+      return (true, :lex)
+   elseif o == ringorder_rp
+      return (true, :revlex)
+   elseif o == ringorder_ls
+      return (true, :neglex)
+   elseif o == ringorder_rs
+      return (true, :negrevlex)
+   elseif o == ringorder_dp
+      return (true, :degrevlex)
+   elseif o == ringorder_Dp
+      return (true, :deglex)
+   elseif o == ringorder_ds
+      return (true, :negdegrevlex)
+   elseif o == ringorder_Ds
+      return (true, :negdeglex)
+   elseif o == ringorder_Ds
+      return (true, :negdeglex)
+   elseif o == ringorder_Ds
+      return (true, :negdeglex)
+   elseif o == ringorder_wp
+      return (true, :weightedrevlex)
+   elseif o == ringorder_Wp
+      return (true, :weightedlex)
+   elseif o == ringorder_ws
+      return (false, :negweightedrevlex)
+   elseif o == ringorder_Ws
+      return (false, :negweightedlex)
+   elseif o == ringorder_a
+      return (false, :extraweight)
+   elseif o == ringorder_M
+      return (false, :matrix)
+   elseif o == ringorder_c
+      return (false, :comp1max)
+   elseif o == ringorder_C
+      return (false, :comp1min)
+   else
+      return (false, :unknown)
+   end
+end
+
 function serialize_ordering(nvars::Int, ord::sordering)
    b = Cint[length(ord.data)]
-   offset = 0
-   c_count = 0
-   l = 0;
-   for i in ord.data
-      l += 1
-      if i.order == Singular.ringorder_c || i.order == Singular.ringorder_C
-         if c_count == 0
-            push!(b, Singular.libSingular.ringorder_to_int(i.order))
+   lastvar = 0
+   cC_count = 0
+   for l in 1:length(ord.data)
+      i = ord.data[l]
+      if i.order == ringorder_c || i.order == ringorder_C
+         cC_count += 1
+         if cC_count == 1
+            push!(b, libSingular.ringorder_to_int(i.order))
             push!(b, 0)
             push!(b, 0)
             push!(b, 0)
          else
             error("more than one ordering c/C specified")
          end
+      elseif i.order == ringorder_s || i.order == ringorder_S
+         push!(b, libSingular.ringorder_to_int(i.order))
+         push!(b, i.size) # blk0 and
+         push!(b, i.size) # blk1 set to syz_comp for ringorder_s
+         push!(b, 0)
+      elseif i.order == ringorder_a
+         push!(b, libSingular.ringorder_to_int(i.order))
+         push!(b, lastvar + 1)
+         push!(b, min(lastvar + length(i.weights), nvars))
+         push!(b, length(i.weights))   # might be more weights than needed
+         for j in i.weights
+            push!(b, j)
+         end         
       else
-         blocksize = i.blocksize
-         if i.order == Singular.ringorder_wp || i.order == Singular.ringorder_ws ||
-            i.order == Singular.ringorder_Wp || i.order == Singular.ringorder_Ws
-            @assert blocksize > 0 && length(i.weights) == blocksize
-         elseif i.order == Singular.ringorder_M
-            @assert blocksize > 0 && length(i.weights) == blocksize*blocksize
-         elseif i.order == Singular.ringorder_lp || i.order == Singular.ringorder_ls ||
-                i.order == Singular.ringorder_rp || i.order == Singular.ringorder_rs ||
-                i.order == Singular.ringorder_dp || i.order == Singular.ringorder_ds ||
-                i.order == Singular.ringorder_Dp || i.order == Singular.ringorder_Ds
+         blksize = i.size
+         if _is_weighted_ordering(i.order)
+            @assert blksize > 0 && length(i.weights) == blksize
+         elseif i.order == ringorder_M
+            @assert blksize > 0 && length(i.weights) == blksize*blksize
+         elseif _is_basic_ordering(i.order)
             @assert length(i.weights) == 0
-            # dp() does one variable
-            if blocksize < 1
-               blocksize = 1
-            end
-            # unless it is at the end, in which case it consumes all remaining variables 
-            if l == length(ord.data)
-               if nvars - offset >= blocksize
-                  blocksize = nvars - offset
-               else
-                  error("mismatch of number of vars (", nvars, ") and ordering")
+            @assert blksize >= 0
+            # consume all remaining variables when succeeded by only C,c,S,s,IS
+            at_end = true
+            for ll in l+1:length(ord.data)
+               o = ord.data[ll].order
+               if o != ringorder_C && o != ringorder_c && o != ringorder_S &&
+                                      o != ringorder_s && o != ringorder_IS
+                  at_end = false
+                  break
                end
             end
+            if at_end
+               blksize = max(blksize, nvars - lastvar)
+            end
          else
-            error("unknown ordering specified")
+            error("unknown ordering $(i.order)")
          end
-         push!(b, Singular.libSingular.ringorder_to_int(i.order))
-         push!(b, offset + 1)
-         offset += blocksize
-         push!(b, offset)
+         push!(b, libSingular.ringorder_to_int(i.order))
+         push!(b, lastvar + 1)
+         lastvar += blksize
+         push!(b, lastvar)
          push!(b, length(i.weights))
          for j in i.weights
             push!(b, j)
@@ -1375,14 +1494,14 @@ function serialize_ordering(nvars::Int, ord::sordering)
       end
    end
 
-   if nvars != offset
-      error("mismatch of number of vars (", nvars, ") and ordering (", offset, " vars)")
+   if nvars != lastvar
+      error("mismatch of number of variables (", nvars, ") and ordering (", lastvar, ")")
    end
 
    # add order C if none exists
-   if c_count == 0
+   if cC_count == 0
       b[1] += 1
-      push!(b, Singular.libSingular.ringorder_to_int(Singular.ringorder_C))
+      push!(b, libSingular.ringorder_to_int(ringorder_C))
       push!(b, 0)
       push!(b, 0)
       push!(b, 0)
@@ -1391,36 +1510,79 @@ function serialize_ordering(nvars::Int, ord::sordering)
    return b
 end
 
+function deserialize_ordering(b::Vector{Cint})
+   off = 0
+   nblocks = b[off+=1]
+   data = sorder_block[]
+   for i in 1:nblocks
+      o = libSingular.ringorder_from_int(b[off+=1])
+      blk0 = b[off+=1]
+      blk1 = b[off+=1]
+      nweights = b[off+=1]
+      weights = Int.(b[(off+1):(off+nweights)])
+      off += nweights
+      blksize = blk1 - blk0 + 1
+      if _is_basic_ordering(o)
+         @assert nweights == 0
+         push!(data, sorder_block(o, blksize, Int[]))
+      elseif _is_weighted_ordering(o) || o == ringorder_M || o == ringorder_a
+         @assert nweights > 0
+         @assert nweights == (o == ringorder_M ? blksize*blksize : blksize)
+         push!(data, sorder_block(o, blksize, weights))
+      elseif o == ringorder_C || o == ringorder_c || o == ringorder_S
+         @assert nweights == 0
+         push!(data, sorder_block(o, 0, Int[]))
+      elseif o == ringorder_s
+         push!(data, sorder_block(o, blk0, Int[]))         
+      else
+         error("unknown ordering $(i.order)")
+      end
+    end
+    return sordering(data)
+end
+
+
 ###############################################################################
 #
 #   PolynomialRing constructor
 #
 ###############################################################################
 
-# keyword arguments do not participate in dispatch, hence this nonsense
-function PolynomialRing(R::Union{Ring, Field}, s::Array{String, 1};
-                        ordering = :degrevlex, ordering2::Symbol = :comp1min,
-                        cached::Bool = true, degree_bound::Int = 0)
+function _PolynomialRing(R, s::Array{String, 1}, ordering, ordering2, cached, degree_bound)
    S = [Symbol(v) for v in s]
    T = elem_type(R)
    if isa(ordering, Symbol)
-      parent_obj = PolyRing{T}(R, S, ordering, cached, sym2ringorder[ordering],
-                               sym2ringorder[ordering2], degree_bound)
+      ord1 = sym2ringorder[ordering]
+      ord2 = sym2ringorder[ordering2]
+      if (Int(ord1 == ringorder_c || ord1 == ringorder_C) +
+          Int(ord2 == ringorder_c || ord2 == ringorder_C) != 1)
+         error("ordering from symbol requires exactly one module ordering")
+      end
+      fancy_ordering = sordering([sorder_block(ord1, 0, Int[])])
+      if ord2 != ringorder_C
+         push!(fancy_ordering.data, sorder_block(ord2, 0, Int[]))
+      end
+   elseif isa(ordering, sordering)
+      fancy_ordering = ordering
    else
-      parent_obj = PolyRing{T}(R, S, ordering, cached, degree_bound)      
+      error("ordering must be a Symbol or an sordering")
    end
+   parent_obj = PolyRing{T}(R, S, fancy_ordering, cached, degree_bound)
    return tuple(parent_obj, gens(parent_obj))
 end
 
+# keyword arguments do not participate in dispatch
+function PolynomialRing(R::Union{Ring, Field}, s::Array{String, 1};
+                        ordering = :degrevlex, ordering2::Symbol = :comp1min,
+                        cached::Bool = true, degree_bound::Int = 0)
+   return _PolynomialRing(R, s, ordering, ordering2, cached, degree_bound)
+end
+
 function PolynomialRing(R::Nemo.Ring, s::Array{String, 1}; cached::Bool = true,
-      ordering::Symbol = :degrevlex, ordering2::Symbol = :comp1min,
+      ordering = :degrevlex, ordering2::Symbol = :comp1min,
       degree_bound::Int = 0)
-   S = CoefficientRing(R)
-   U = [Symbol(v) for v in s]
-   T = elem_type(S)
-   parent_obj = PolyRing{T}(S, U, ordering, cached, sym2ringorder[ordering],
-         sym2ringorder[ordering2], degree_bound)
-   return tuple(parent_obj, gens(parent_obj))
+   R = CoefficientRing(R)
+   return _PolynomialRing(R, s, ordering, ordering2, cached, degree_bound)
 end
 
 macro PolynomialRing(R, s, n, o)

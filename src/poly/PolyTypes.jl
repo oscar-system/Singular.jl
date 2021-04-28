@@ -4,10 +4,12 @@
 #
 ###############################################################################
 
+# instead of many types for each block type, we have one type with possibly
+# meaningless entries
 struct sorder_block
    order::Singular.libSingular.rRingOrder_t
-   blocksize::Int
-   weights::Array{Int,1}
+   size::Int               # per-order meaning.
+   weights::Array{Int,1}   # per-order meaning. empty for dp, Dp, ...
 end
 
 struct sordering
@@ -20,89 +22,44 @@ end
 #
 ###############################################################################
 
-const PolyRingID = Dict{Tuple{Union{Ring, Field}, Array{Symbol, 1},
-         libSingular.rRingOrder_t, libSingular.rRingOrder_t, Int}, Nemo.MPolyRing}()
+# the lookup is based on the serialized version of the ordering + nvars
+# rationale: dp(0) and dp(2) look different until they meet a ring with nvars
+const PolyRingID = Dict{Tuple{Union{Ring, Field}, Vector{Symbol},
+                        Vector{Cint}, Int}, Nemo.MPolyRing}()
 
 mutable struct PolyRing{T <: Nemo.RingElem} <: Nemo.MPolyRing{T}
    ptr::libSingular.ring_ptr
    base_ring::Union{Ring, Field}
-   ord::Union{Symbol, sordering}
+   ord::sordering
    refcount::Int
 
    # take ownership of a ring ptr
-   function PolyRing{T}(r::libSingular.ring_ptr, b, o::Symbol) where T
-      d = new(r, b, o, 1)
+   function PolyRing{T}(r::libSingular.ring_ptr, R) where T
+      ord = Cint[]
+      libSingular.rOrdering_helper(ord, r)
+      d = new(r, R, deserialize_ordering(ord), 1)
       finalizer(_PolyRing_clear_fn, d)
       return d
-   end
-
-   # TODO these two constructors are a bit messy
-   function PolyRing{T}(R::Union{Ring, Field}, s::Array{Symbol, 1},
-         ord_sym::Symbol, cached::Bool = true,
-         ordering::libSingular.rRingOrder_t = ringorder_dp,
-         ordering2::libSingular.rRingOrder_t = ringorder_C,
-         degree_bound::Int = 0) where T
-      # check ordering: accept exactly one of ringorder_c, ringorder_C
-      if (((ordering == ringorder_c || ordering == ringorder_C)
-               && (ordering2 == ringorder_c || ordering2 == ringorder_C))
-            || ((ordering != ringorder_c && ordering != ringorder_C)
-               && (ordering2 != ringorder_c && ordering2 != ringorder_C)))
-         error("wrong ordering")
-      end
-      bitmask = Culong(degree_bound)
-      n_vars = Cint(length(s))
-      # internally in libSingular, degree_bound is set to
-      degree_bound_adjusted = Int(libSingular.rGetExpSize(bitmask, n_vars))
-      if haskey(PolyRingID, (R, s, ordering, ordering2, degree_bound_adjusted))
-         return PolyRingID[R, s, ordering, ordering2,
-               degree_bound_adjusted]::PolyRing{T}
-      else
-         v = [pointer(Base.Vector{UInt8}(string(str)*"\0")) for str in s]
-         r = libSingular.nCopyCoeff(R.ptr)
-
-         blk0 = unsafe_wrap(Array, Ptr{Cint}(libSingular.omAlloc0(Csize_t(3*sizeof(Cint)))), 3; own=false)
-         blk1 = unsafe_wrap(Array, Ptr{Cint}(libSingular.omAlloc0(Csize_t(3*sizeof(Cint)))), 3; own=false)
-         if (ordering == ringorder_c || ordering == ringorder_C)
-            blk0[1] = Cint(0)
-            blk1[1] = Cint(0)
-            blk0[2] = Cint(1)
-            blk1[2] = Cint(length(v))
-         else
-            blk0[1] = Cint(1)
-            blk1[1] = Cint(length(v))
-            blk0[2] = Cint(0)
-            blk1[2] = Cint(0)
-         end
-         ord = Array{libSingular.rRingOrder_t, 1}(undef, 3)
-         ord[1] = ordering
-         ord[2] = ordering2
-         ord[3] = ringorder_no
-         ptr = libSingular.rDefault(r, v, ord, blk0, blk1, bitmask)
-         @assert degree_bound_adjusted == Int(libSingular.rBitmask(ptr))
-         d = PolyRingID[R, s, ordering, ordering2, degree_bound_adjusted] =
-               new(ptr, R, ord_sym, 1)
-         finalizer(_PolyRing_clear_fn, d)
-         return d
-      end
    end
 
    function PolyRing{T}(R::Union{Ring, Field}, s::Array{Symbol, 1},
                         ord::sordering, cached::Bool = true,
                         degree_bound::Int = 0) where T
-
       bitmask = Culong(degree_bound)
       nvars = length(s)
       # internally in libSingular, degree_bound is set to
-      degree_bound_adjusted = Int(libSingular.rGetExpSize(bitmask, Cint(nvars)))
-         
-      v = [pointer(Base.Vector{UInt8}(string(str)*"\0")) for str in s]
-      r = libSingular.nCopyCoeff(R.ptr)
+      deg_bound_fix = Int(libSingular.rGetExpSize(bitmask, Cint(nvars)))
       sord = serialize_ordering(nvars, ord)
-      ptr = libSingular.rDefault_wvhdl_helper(r, v, sord, bitmask)
-      @assert degree_bound_adjusted == Int(libSingular.rBitmask(ptr))
-      d = new(ptr, R, ord, 1)
-      finalizer(_PolyRing_clear_fn, d)
-      return d
+      if haskey(PolyRingID, (R, s, sord, deg_bound_fix))
+         return PolyRingID[R, s, sord, deg_bound_fix]::PolyRing{T}
+      else
+         v = [pointer(Base.Vector{UInt8}(string(str)*"\0")) for str in s]
+         r = libSingular.nCopyCoeff(R.ptr)
+         ptr = libSingular.rDefault_wvhdl_helper(r, v, sord, bitmask)
+         @assert deg_bound_fix == Int(libSingular.rBitmask(ptr))
+         PolyRingID[R, s, sord, deg_bound_fix] = d = PolyRing{T}(ptr, R)
+         return d
+      end
    end
 end
 

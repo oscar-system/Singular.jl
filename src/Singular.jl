@@ -126,9 +126,13 @@ function __init__()
    global ringorder_Ds = libSingular.ringorder_Ds
    global ringorder_ws = libSingular.ringorder_ws
    global ringorder_Ws = libSingular.ringorder_Ws
+   global ringorder_a  = libSingular.ringorder_a
    global ringorder_M  = libSingular.ringorder_M
    global ringorder_c  = libSingular.ringorder_c
    global ringorder_C  = libSingular.ringorder_C
+   global ringorder_s  = libSingular.ringorder_s
+   global ringorder_S  = libSingular.ringorder_S
+   global ringorder_IS = libSingular.ringorder_IS
 
    global sym2ringorder = Dict{Symbol, libSingular.rRingOrder_t}(
      :lex => ringorder_lp,
