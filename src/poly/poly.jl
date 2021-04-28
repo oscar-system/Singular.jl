@@ -1327,21 +1327,122 @@ function _local_weighted_ordering(t::libSingular.rRingOrder_t, v::Vector{Int})
    return sordering([sorder_block(t, len, v)])
 end
 
+@doc Markdown.doc"""
+    ordering_lp(nvars::Int = 1)
+
+Represents a block of at least `nvars` variables with the
+lexicographical ordering (:lex).
+"""
 ordering_lp(nvars::Int = 1) = _basic_ordering(Singular.ringorder_lp, nvars)
+
+@doc Markdown.doc"""
+    ordering_rp(nvars::Int = 1)
+
+Represents a block of at least `nvars` variables with the
+reverse lexicographical ordering (:revlex).
+"""
 ordering_rp(nvars::Int = 1) = _basic_ordering(Singular.ringorder_rp, nvars)
+
+@doc Markdown.doc"""
+    ordering_dp(nvars::Int = 1)
+
+Represents a block of at least `nvars` variables with the
+degree reverse lexicographical ordering (:degrevlex).
+"""
 ordering_dp(nvars::Int = 1) = _basic_ordering(Singular.ringorder_dp, nvars)
+
+@doc Markdown.doc"""
+    ordering_Dp(nvars::Int = 1)
+
+Represents a block of at least `nvars` variables with the
+degree lexicographical ordering (:deglex).
+"""
 ordering_Dp(nvars::Int = 1) = _basic_ordering(Singular.ringorder_Dp, nvars)
-ordering_wp(v::Vector{Int}) = _global_weighted_ordering(Singular.ringorder_wp, v)
-ordering_Wp(v::Vector{Int}) = _global_weighted_ordering(Singular.ringorder_Wp, v)
+
+@doc Markdown.doc"""
+    ordering_wp(w::Vector{Int})
+
+Represents a block of variables with the
+weighted reverse lexicographical ordering.
+The weight vector `w` is expected to consist of positive integers only.
+"""
+ordering_wp(w::Vector{Int}) = _global_weighted_ordering(Singular.ringorder_wp, w)
+
+@doc Markdown.doc"""
+    ordering_Wp(w::Vector{Int})
+
+Represents a block of variables with the
+weighted lexicographical ordering.
+The weight vector is expected to consist of positive integers only.
+"""
+ordering_Wp(w::Vector{Int}) = _global_weighted_ordering(Singular.ringorder_Wp, w)
+
+@doc Markdown.doc"""
+    ordering_ls(nvars::Int = 1)
+
+Represents a block of at least `nvars` variables with the
+negative lexicographical ordering (:neglex).
+"""
 ordering_ls(nvars::Int = 1) = _basic_ordering(Singular.ringorder_ls, nvars)
+
+@doc Markdown.doc"""
+    ordering_rs(nvars::Int = 1)
+
+Represents a block of at least `nvars` variables with the
+negative reverse lexicographical ordering (:negrevlex).
+"""
 ordering_rs(nvars::Int = 1) = _basic_ordering(Singular.ringorder_rs, nvars)
+
+@doc Markdown.doc"""
+    ordering_ds(nvars::Int = 1)
+
+Represents a block of at least `nvars` variables with the
+negative degree reverse lexicographical ordering (:negdegrevlex).
+"""
 ordering_ds(nvars::Int = 1) = _basic_ordering(Singular.ringorder_ds, nvars)
+
+@doc Markdown.doc"""
+    ordering_Ds(nvars::Int = 1)
+
+Represents a block of at least `nvars` variables with the
+negative degree reverse lexicographical ordering (:negdeglex).
+"""
 ordering_Ds(nvars::Int = 1) = _basic_ordering(Singular.ringorder_Ds, nvars)
-ordering_ws(v::Vector{Int}) = _local_weighted_ordering(Singular.ringorder_ws, v)
-ordering_Ws(v::Vector{Int}) = _local_weighted_ordering(Singular.ringorder_Ws, v)
 
-ordering_a(v::Vector{Int}) = sordering([sorder_block(ringorder_a, 0, v)])
+@doc Markdown.doc"""
+    ordering_ws(w::Vector{Int})
 
+Represents a block of variables with the
+general weighted reverse lexicographical ordering.
+The weight vector `w` is expected to have a nonzero first entry.
+"""
+ordering_ws(w::Vector{Int}) = _local_weighted_ordering(Singular.ringorder_ws, w)
+
+@doc Markdown.doc"""
+    ordering_Ws(w::Vector{Int})
+
+Represents a block of variables with the
+general weighted lexicographical ordering.
+The weight vector `w` is expected to have a nonzero first entry.
+"""
+ordering_Ws(w::Vector{Int}) = _local_weighted_ordering(Singular.ringorder_Ws, w)
+
+@doc Markdown.doc"""
+    ordering_a(w::Vector{Int})
+
+Represents an extra weight vector that may precede any monomial ordering.
+An extra weight vector does not define a monomial ordering by itself: it can
+only be used in combination with other orderings to insert an extra line of
+weights into the ordering matrix.
+"""
+ordering_a(w::Vector{Int}) = sordering([sorder_block(ringorder_a, 0, w)])
+
+@doc Markdown.doc"""
+    ordering_M(m::Matrix{Int}, checked::Bool = true)
+
+Represents a block of variables with a general matrix ordering.
+The matrix `m` is expected to be invertible, and this is checked by default.
+"""
 function ordering_M(m::Matrix{Int}, checked::Bool = true)
    (nr, nc) = size(m)
    nr > 0 && nr == nc || error("weight matrix must be square")
@@ -1350,43 +1451,50 @@ function ordering_M(m::Matrix{Int}, checked::Bool = true)
 end
 
 # these three can take a dummy int in singular, but they do nothing with it?
+
+@doc Markdown.doc"""
+    ordering_C()
+
+Represents an ascending ordering on vector components `gen(1) < gen(2) < ...`.
+All monomial block orderings preceding the component ordering have higher
+precedence, and all succeeding monomial block orderings have lower precedence.
+It is not necessary to specify this ordering explicitly since it appended
+automatically to an ordering lacking a component specification.
+"""
 ordering_C(dummy::Int = 0) = _basic_ordering(Singular.ringorder_C, 0)
+
+@doc Markdown.doc"""
+    ordering_c()
+
+Represents a decending ordering on vector components `gen(1) > gen(2) > ...`.
+All monomial block orderings preceding the component ordering have higher
+precedence, and all succeeding monomial block orderings have lower precedence.
+"""
 ordering_c(dummy::Int = 0) = _basic_ordering(Singular.ringorder_c, 0)
+
 ordering_S(dummy::Int = 0) = _basic_ordering(Singular.ringorder_S, 0)
 ordering_s(syz_comp::Int = 0) = sordering([sorder_block(Singular.ringorder_s, syz_comp, Int[])])
 
+@doc Markdown.doc"""
+    *(a::sordering, b::sordering)
+
+Return the concatenation two orderings. Some simplification may take place,
+i.e. ordering_lp(2)*ordering_lp(3) may return ordering_lp(5)
+"""
 function Base.:*(a::sordering, b::sordering)
    return sordering(vcat(a.data, b.data))
 end
 
-function Base.:(==)(a::sordering, b::sordering)
-   if length(a.data) != length(b.data)
-      return false
-   end
-   for i in 1:length(a.data)
-      if a.data[i].order != b.data[i].order
-         return false
-      elseif a.data[i].size != b.data[i].size
-         return false
-      elseif a.data[i].weights != b.data[i].weights
-         return false
-      end
-   end
-   return true
-end
+isordering_symbolic(a::sordering) = isordering_symbolic_with_symbol(a)[1]
+ordering_as_symbol(a::sordering) = isordering_symbolic_with_symbol(a)[2]
 
-isordering_a_symbol(a::sordering) = isordering_a_symbol_with_symbol(a)[1]
-ordering_as_symbol(a::sordering) = isordering_a_symbol_with_symbol(a)[2]
-
-function isordering_a_symbol_with_symbol(a::sordering)
+function isordering_symbolic_with_symbol(a::sordering)
    if length(a.data) != 1 && length(a.data) != 2
       return (false, :unknown)
    end
-
    if length(a.data) == 2 && a.data[2].order != ringorder_C
       return (false, :unknown)
    end
-
    o = a.data[1].order
    if o == ringorder_lp
       return (true, :lex)
@@ -1413,9 +1521,9 @@ function isordering_a_symbol_with_symbol(a::sordering)
    elseif o == ringorder_Wp
       return (true, :weightedlex)
    elseif o == ringorder_ws
-      return (false, :negweightedrevlex)
+      return (false, :genweightedrevlex)
    elseif o == ringorder_Ws
-      return (false, :negweightedlex)
+      return (false, :genweightedlex)
    elseif o == ringorder_a
       return (false, :extraweight)
    elseif o == ringorder_M
@@ -1426,6 +1534,14 @@ function isordering_a_symbol_with_symbol(a::sordering)
       return (false, :comp1min)
    else
       return (false, :unknown)
+   end
+end
+
+function Base.iterate(a::sordering, state = 1)
+   if state > length(a.data)
+      return nothing
+   else
+      return sordering([a.data[state]]), state + 1
    end
 end
 
@@ -1453,10 +1569,11 @@ function serialize_ordering(nvars::Int, ord::sordering)
       elseif i.order == ringorder_a
          push!(b, libSingular.ringorder_to_int(i.order))
          push!(b, lastvar + 1)
-         push!(b, min(lastvar + length(i.weights), nvars))
-         push!(b, length(i.weights))   # might be more weights than needed
-         for j in i.weights
-            push!(b, j)
+         nweights = min(length(i.weights), nvars - lastvar)
+         push!(b, lastvar + nweights)
+         push!(b, length(i.weights))
+         for j in 1:nweights
+            push!(b, i.weights[j])
          end         
       else
          blksize = i.size
