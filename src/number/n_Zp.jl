@@ -19,7 +19,7 @@ base_ring(a::N_ZpField) = Union{}
 characteristic(R::N_ZpField) = ZZ(libSingular.n_GetChar(R.ptr))
 
 function deepcopy_internal(a::n_Zp, dict::IdDict)
-   return parent(a)(libSingular.n_Copy(a.ptr, parent(a).ptr))
+   GC.@preserve a return parent(a)(libSingular.n_Copy(a.ptr, parent(a).ptr))
 end
 
 function hash(a::n_Zp, h::UInt)
@@ -40,12 +40,12 @@ zero(R::N_ZpField) = R(0)
 
 function isone(n::n_Zp)
    c = parent(n)
-   return libSingular.n_IsOne(n.ptr, c.ptr)
+   GC.@preserve n c return libSingular.n_IsOne(n.ptr, c.ptr)
 end
 
 function iszero(n::n_Zp)
    c = parent(n)
-   return libSingular.n_IsZero(n.ptr, c.ptr)
+   GC.@preserve n return libSingular.n_IsZero(n.ptr, c.ptr)
 end
 
 @doc Markdown.doc"""
@@ -96,9 +96,8 @@ end
 
 function show(io::IO, n::n_Zp)
    libSingular.StringSetS("")
-   libSingular.n_Write(n.ptr, parent(n).ptr, false)
-   m = libSingular.StringEndS()
-   print(io, m)
+   GC.@preserve n libSingular.n_Write(n.ptr, parent(n).ptr, false)
+   print(io, libSingular.StringEndS())
 end
 
 ###############################################################################
@@ -108,9 +107,9 @@ end
 ###############################################################################
 
 function -(x::n_Zp)
-    C = parent(x)
-    ptr = libSingular.n_Neg(x.ptr, C.ptr)
-    return C(ptr)
+   c = parent(x)
+   GC.@preserve x c p = libSingular.n_Neg(x.ptr, c.ptr)
+   return c(p)
 end
 
 ###############################################################################
@@ -121,19 +120,19 @@ end
 
 function +(x::n_Zp, y::n_Zp)
    c = parent(x)
-   p = libSingular.n_Add(x.ptr, y.ptr, c.ptr)
+   GC.@preserve x y c p = libSingular.n_Add(x.ptr, y.ptr, c.ptr)
    return c(p)
 end
 
 function -(x::n_Zp, y::n_Zp)
    c = parent(x)
-   p = libSingular.n_Sub(x.ptr, y.ptr, c.ptr)
+   GC.@preserve x y c p = libSingular.n_Sub(x.ptr, y.ptr, c.ptr)
    return c(p)
 end
 
 function *(x::n_Zp, y::n_Zp)
    c = parent(x)
-   p = libSingular.n_Mult(x.ptr, y.ptr, c.ptr)
+   GC.@preserve x y c p = libSingular.n_Mult(x.ptr, y.ptr, c.ptr)
    return c(p)
 end
 
@@ -144,7 +143,7 @@ end
 ###############################################################################
 
 function ==(x::n_Zp, y::n_Zp)
-    return libSingular.n_Equal(x.ptr, y.ptr, parent(x).ptr)
+   GC.@preserve x y return libSingular.n_Equal(x.ptr, y.ptr, parent(x).ptr)
 end
 
 isequal(x::n_Zp, y::n_Zp) = (x == y)
@@ -170,17 +169,17 @@ isequal(x::n_Zp, y::n_Zp) = (x == y)
 ###############################################################################
 
 function ^(x::n_Zp, y::Int)
-    y < 0 && throw(DomainError(y, "exponent must be non-negative"))
-    if isone(x)
-       return x
-    elseif y == 0
-       return one(parent(x))
-    elseif y == 1
-       return x
-    else
-       p = libSingular.n_Power(x.ptr, y, parent(x).ptr)
-       return parent(x)(p)
-    end
+   y < 0 && throw(DomainError(y, "exponent must be non-negative"))
+   if isone(x)
+      return x
+   elseif y == 0
+      return one(parent(x))
+   elseif y == 1
+      return x
+   else
+      GC.@preserve x y p = libSingular.n_Power(x.ptr, y, parent(x).ptr)
+      return parent(x)(p)
+   end
 end
 
 ###############################################################################
@@ -191,13 +190,13 @@ end
 
 function inv(x::n_Zp)
    c = parent(x)
-   p = libSingular.n_Invers(x.ptr, c.ptr)
+   GC.@preserve x c p = libSingular.n_Invers(x.ptr, c.ptr)
    return c(p)
 end
 
 function divexact(x::n_Zp, y::n_Zp)
    c = parent(x)
-   p = libSingular.n_Div(x.ptr, y.ptr, c.ptr)
+   GC.@preserve x y c p = libSingular.n_Div(x.ptr, y.ptr, c.ptr)
    return c(p)
 end
 
@@ -211,9 +210,9 @@ function gcd(x::n_Zp, y::n_Zp)
    if x == 0 && y == 0
       return zero(parent(x))
    end
-   par = parent(x)
-   p = libSingular.n_Gcd(x.ptr, y.ptr, par.ptr)
-   return par(p)
+   c = parent(x)
+   GC.@preserve x y c p = libSingular.n_Gcd(x.ptr, y.ptr, c.ptr)
+   return c(p)
 end
 
 ###############################################################################
@@ -223,29 +222,35 @@ end
 ###############################################################################
 
 function addeq!(x::n_Zp, y::n_Zp)
-   x.ptr = libSingular.n_InpAdd(x.ptr, y.ptr, parent(x).ptr)
+   GC.@preserve x y x.ptr = libSingular.n_InpAdd(x.ptr, y.ptr, parent(x).ptr)
    return x
 end
 
 function mul!(x::n_Zp, y::n_Zp, z::n_Zp)
+GC.@preserve x y z begin
    ptr = libSingular.n_Mult(y.ptr, z.ptr, parent(x).ptr)
    libSingular.n_Delete(x.ptr, parent(x).ptr)
    x.ptr = ptr
    return x
 end
+end
 
 function add!(x::n_Zp, y::n_Zp, z::n_Zp)
+GC.@preserve x y z begin
    ptr = libSingular.n_Add(y.ptr, z.ptr, parent(x).ptr)
    libSingular.n_Delete(x.ptr, parent(x).ptr)
    x.ptr = ptr
    return x
 end
+end
 
 function zero!(x::n_Zp)
+GC.@preserve x begin
    ptr = libSingular.n_Init(0, parent(x).ptr)
    libSingular.n_Delete(x.ptr, parent(x).ptr)
    x.ptr = ptr
    return x
+end
 end
 
 
@@ -319,5 +324,5 @@ function Fp(a::Int; cached=true)
 end
 
 function Base.Int(a::n_Zp)
-  return reinterpret(Int, a.ptr.cpp_object)
+   GC.@preserve a return reinterpret(Int, a.ptr.cpp_object)
 end

@@ -31,7 +31,7 @@ Return the transcendence basis of the given function field.
 """
 function transcendence_basis(F::N_FField)
    n = transcendence_degree(F)
-   return [F(libSingular.n_Param(Cint(i), F.ptr)) for i = 1:n]
+   GC.@preserve F return [F(libSingular.n_Param(Cint(i), F.ptr)) for i = 1:n]
 end
 
 @doc Markdown.doc"""
@@ -40,7 +40,7 @@ end
 Return the characteristic of the field.
 """
 function characteristic(R::N_FField)
-   return ZZ(libSingular.n_GetChar(R.ptr))
+   GC.@preserve R return ZZ(libSingular.n_GetChar(R.ptr))
 end
 
 function symbols(R::N_FField)
@@ -48,7 +48,7 @@ function symbols(R::N_FField)
 end
 
 function deepcopy_internal(a::n_transExt, dict::IdDict)
-   return parent(a)(libSingular.n_Copy(a.ptr, parent(a).ptr))
+   GC.@preserve a return parent(a)(libSingular.n_Copy(a.ptr, parent(a).ptr))
 end
 
 function hash(a::n_transExt, h::UInt)
@@ -75,8 +75,8 @@ zero(R::N_FField) = R(0)
 Return the numerator of the given fraction.
 """
 function numerator(n::n_transExt)
-   F = parent(n)
-   return F(libSingular.n_GetNumerator(n.ptr, F.ptr))
+   c = parent(n)
+   GC.@preserve n c return c(libSingular.n_GetNumerator(n.ptr, c.ptr))
 end
 
 @doc Markdown.doc"""
@@ -85,18 +85,18 @@ end
 Return the denominator of the given fraction.
 """
 function denominator(n::n_transExt)
-   F = parent(n)
-   return F(libSingular.n_GetDenom(n.ptr, F.ptr))
+   c = parent(n)
+   GC.@preserve n c return c(libSingular.n_GetDenom(n.ptr, c.ptr))
 end
 
 function isone(n::n_transExt)
    c = parent(n)
-   return libSingular.n_IsOne(n.ptr, c.ptr)
+   GC.@preserve n c return libSingular.n_IsOne(n.ptr, c.ptr)
 end
 
 function iszero(n::n_transExt)
    c = parent(n)
-   return libSingular.n_IsZero(n.ptr, c.ptr)
+   GC.@preserve n c return libSingular.n_IsZero(n.ptr, c.ptr)
 end
 
 @doc Markdown.doc"""
@@ -134,7 +134,7 @@ function n_transExt_to_spoly(x::n_transExt; cached = true,
       return zero(S)
    end
 
-   return S(Singular.libSingular.transExt_to_poly(x.ptr, R.ptr, S.ptr))
+   GC.@preserve x R S return S(Singular.libSingular.transExt_to_poly(x.ptr, R.ptr, S.ptr))
 end
 
 ###############################################################################
@@ -178,9 +178,9 @@ end
 ###############################################################################
 
 function -(x::n_transExt)
-    C = parent(x)
-    ptr = libSingular.n_Neg(x.ptr, C.ptr)
-    return C(ptr)
+   c = parent(x)
+   GC.@preserve x c p = libSingular.n_Neg(x.ptr, c.ptr)
+   return c(p)
 end
 
 ###############################################################################
@@ -191,19 +191,19 @@ end
 
 function +(x::n_transExt, y::n_transExt)
    c = parent(x)
-   p = libSingular.n_Add(x.ptr, y.ptr, c.ptr)
+   GC.@preserve x y c p = libSingular.n_Add(x.ptr, y.ptr, c.ptr)
    return c(p)
 end
 
 function -(x::n_transExt, y::n_transExt)
    c = parent(x)
-   p = libSingular.n_Sub(x.ptr, y.ptr, c.ptr)
+   GC.@preserve x y c p = libSingular.n_Sub(x.ptr, y.ptr, c.ptr)
    return c(p)
 end
 
 function *(x::n_transExt, y::n_transExt)
    c = parent(x)
-   p = libSingular.n_Mult(x.ptr, y.ptr, c.ptr)
+   GC.@preserve x y c p = libSingular.n_Mult(x.ptr, y.ptr, c.ptr)
    return c(p)
 end
 
@@ -214,8 +214,8 @@ end
 ###############################################################################
 
 function ==(x::n_transExt, y::n_transExt)
-    c = parent(x)
-    return c == parent(y) && libSingular.n_Equal(x.ptr, y.ptr, c.ptr)
+   c = parent(x)
+   GC.@preserve x y c return c == parent(y) && libSingular.n_Equal(x.ptr, y.ptr, c.ptr)
 end
 
 isequal(x::n_transExt, y::n_transExt) = (x == y)
@@ -227,17 +227,17 @@ isequal(x::n_transExt, y::n_transExt) = (x == y)
 ###############################################################################
 
 function ^(x::n_transExt, y::Int)
-    y < 0 && throw(DomainError(y, "exponent must be non-negative"))
-    if isone(x)
-       return x
-    elseif y == 0
-       return one(parent(x))
-    elseif y == 1
-       return x
-    else
-       p = libSingular.n_Power(x.ptr, y, parent(x).ptr)
-       return parent(x)(p)
-    end
+   y < 0 && throw(DomainError(y, "exponent must be non-negative"))
+   if isone(x)
+      return x
+   elseif y == 0
+      return one(parent(x))
+   elseif y == 1
+      return x
+   else
+      GC.@preserve x y p = libSingular.n_Power(x.ptr, y, parent(x).ptr)
+      return parent(x)(p)
+   end
 end
 
 ###############################################################################
@@ -248,13 +248,13 @@ end
 
 function inv(x::n_transExt)
    c = parent(x)
-   p = libSingular.n_Invers(x.ptr, c.ptr)
+   GC.@preserve x c p = libSingular.n_Invers(x.ptr, c.ptr)
    return c(p)
 end
 
 function divexact(x::n_transExt, y::n_transExt)
    c = parent(x)
-   p = libSingular.n_Div(x.ptr, y.ptr, c.ptr)
+   GC.@preserve x y c p = libSingular.n_Div(x.ptr, y.ptr, c.ptr)
    return c(p)
 end
 
@@ -268,9 +268,9 @@ function gcd(x::n_transExt, y::n_transExt)
    if x == 0 && y == 0
       return zero(parent(x))
    end
-   par = parent(x)
-   p = libSingular.n_Gcd(x.ptr, y.ptr, par.ptr)
-   return par(p)
+   c = parent(x)
+   GC.@preserve x y c p = libSingular.n_Gcd(x.ptr, y.ptr, c.ptr)
+   return c(p)
 end
 
 ###############################################################################
@@ -280,29 +280,35 @@ end
 ###############################################################################
 
 function addeq!(x::n_transExt, y::n_transExt)
-   x.ptr = libSingular.n_InpAdd(x.ptr, y.ptr, parent(x).ptr)
+   GC.@preserve x y x.ptr = libSingular.n_InpAdd(x.ptr, y.ptr, parent(x).ptr)
    return x
 end
 
 function mul!(x::n_transExt, y::n_transExt, z::n_transExt)
+GC.@preserve x y z begin
    ptr = libSingular.n_Mult(y.ptr, z.ptr, parent(x).ptr)
    libSingular.n_Delete(x.ptr, parent(x).ptr)
    x.ptr = ptr
    return x
 end
+end
 
 function add!(x::n_transExt, y::n_transExt, z::n_transExt)
+GC.@preserve x y z begin
    ptr = libSingular.n_Add(y.ptr, z.ptr, parent(x).ptr)
    libSingular.n_Delete(x.ptr, parent(x).ptr)
    x.ptr = ptr
    return x
 end
+end
 
 function zero!(x::n_transExt)
+GC.@preserve x begin
    ptr = libSingular.n_Init(0, parent(x).ptr)
    libSingular.n_Delete(x.ptr, parent(x).ptr)
    x.ptr = ptr
    return x
+end
 end
 
 ###############################################################################
