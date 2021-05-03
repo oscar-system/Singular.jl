@@ -40,8 +40,10 @@ Given a matrix $M = (m_{ij})_{i, j}$, return the entry $m_{ij}$.
 function getindex(M::smatrix{T}, i::Int, j::Int) where T <: AbstractAlgebra.RingElem
    (i > nrows(M) || j > ncols(M)) && error("Incompatible dimensions")
    R = base_ring(M)
-   ptr = libSingular.getindex(M.ptr, Cint(i), Cint(j))
-   return R(libSingular.p_Copy(ptr, R.ptr))
+   GC.@preserve M R begin
+      ptr = libSingular.getindex(M.ptr, Cint(i), Cint(j))
+      return R(libSingular.p_Copy(ptr, R.ptr))
+   end
 end
 
 @doc Markdown.doc"""
@@ -52,7 +54,7 @@ function setindex!(M::smatrix, p::spoly, i::Int, j::Int)
    (i > nrows(M) || j > ncols(M)) && error("Incompatible dimensions")
    R = base_ring(M)
    R != parent(p) && error(" Base rings do not match.")
-   libSingular.setindex(M.ptr, p.ptr, Cint(i), Cint(j), R.ptr)
+   GC.@preserve M p R libSingular.setindex(M.ptr, p.ptr, Cint(i), Cint(j), R.ptr)
 end
 
 """
@@ -77,13 +79,13 @@ Given a matrix $M=(m_{ij})_{i, j}$, return the matrix $M^T=(m_{ji})_{j, i}$.
 """
 function transpose(M::smatrix{T}) where T <: AbstractAlgebra.RingElem
    R = base_ring(M)
-   ptr = libSingular.mp_Transp(M.ptr, R.ptr)
+   ptr = GC.@preserve M R libSingular.mp_Transp(M.ptr, R.ptr)
    return smatrix{T}(R, ptr)
 end
 
 function deepcopy_internal(M::smatrix, dict::IdDict)
    R = base_ring(M)
-   ptr = libSingular.mp_Copy(M.ptr, R.ptr)
+   ptr = GC.@preserve M R libSingular.mp_Copy(M.ptr, R.ptr)
    return parent(M)(ptr)
 end
 
@@ -136,7 +138,7 @@ function +(M::smatrix{T}, N::smatrix{T}) where T <: AbstractAlgebra.RingElem
    R != base_ring(N) && error("Matrices are not over the same ring")
    (nrows(M) != nrows(N)) && error("Incompatible dimensions")
    (ncols(M) != ncols(N)) && error("Incompatible dimensions")
-   ptr = libSingular.mp_Add(M.ptr, N.ptr, R.ptr)
+   ptr = GC.@preserve M N R libSingular.mp_Add(M.ptr, N.ptr, R.ptr)
    return smatrix{T}(R, ptr)
 end
 
@@ -145,7 +147,7 @@ function -(M::smatrix{T}, N::smatrix{T}) where T <: AbstractAlgebra.RingElem
    R != base_ring(N) && error("Matrices are not over the same ring")
    (nrows(M) != nrows(N)) && error("Incompatible dimensions")
    (ncols(M) != ncols(N)) && error("Incompatible dimensions")
-   ptr = libSingular.mp_Sub(M.ptr, N.ptr, R.ptr)
+   ptr = GC.@preserve M N R libSingular.mp_Sub(M.ptr, N.ptr, R.ptr)
    return smatrix{T}(R, ptr)
 end
 
@@ -153,17 +155,19 @@ function *(M::smatrix{T}, N::smatrix{T}) where T <: AbstractAlgebra.RingElem
    R = base_ring(M)
    R != base_ring(N) && error("Matrices are not over the same ring")
    (ncols(M) != nrows(N)) && error("Incompatible dimensions")
-   ptr = libSingular.mp_Mult(M.ptr, N.ptr, R.ptr)
+   ptr = GC.@preserve M N R libSingular.mp_Mult(M.ptr, N.ptr, R.ptr)
    return smatrix{T}(R, ptr)
 end
 
 function *(p::spoly{T}, M::smatrix{spoly{T}}) where T <: AbstractAlgebra.RingElem
    R = base_ring(M)
    R != parent(p) && error("Base rings do not match.")
-   x = libSingular.mp_Copy(M.ptr, R.ptr)
-   y = libSingular.p_Copy(p.ptr, R.ptr)
-   ptr = libSingular.mp_MultP(x, y, R.ptr)
-   return smatrix{spoly{T}}(R, ptr)
+   GC.@preserve M R begin
+      x = libSingular.mp_Copy(M.ptr, R.ptr)
+      y = libSingular.p_Copy(p.ptr, R.ptr)
+      ptr = libSingular.mp_MultP(x, y, R.ptr)
+      return smatrix{spoly{T}}(R, ptr)
+   end
 end
 
 function *(M::smatrix{spoly{T}}, p::spoly{T}) where T <: AbstractAlgebra.RingElem
@@ -189,7 +193,7 @@ function ==(M::smatrix{T}, N::smatrix{T}) where T <: AbstractAlgebra.RingElem
    R != base_ring(N) && error("Matrices are not over the same ring")
    (nrows(M) != nrows(N)) && error("Incompatible dimensions")
    (ncols(M) != ncols(N)) && error("Incompatible dimensions")
-   return Bool(libSingular.mp_Equal(M.ptr, N.ptr, R.ptr))
+   GC.@preserve M N R return Bool(libSingular.mp_Equal(M.ptr, N.ptr, R.ptr))
 end
 
 ###############################################################################
@@ -220,18 +224,18 @@ end
 ###############################################################################
 
 function Matrix(I::smodule{T}) where T <: Nemo.RingElem
-   return smatrix{T}(base_ring(I), I.ptr)
+   GC.@preserve I return smatrix{T}(base_ring(I), I.ptr)
 end
 
 function Matrix(I::sideal{T}) where T <: Nemo.RingElem
-   return smatrix{T}(base_ring(I), I.ptr)
+   GC.@preserve I return smatrix{T}(base_ring(I), I.ptr)
 end
 
 function Module(vecs::smatrix{spoly{T}}) where T <: Nemo.RingElem
    R = base_ring(vecs)
    S = elem_type(R)
-   return smodule{S}(R, vecs.ptr)
-end;
+   GC.@preserve vecs return smodule{S}(R, vecs.ptr)
+end
 
 @doc Markdown.doc"""
    identity_matrix(R::PolyRing, n::Int)
@@ -239,7 +243,7 @@ Returns the $n \times n$ identity matrix over $R.$
 """
 function identity_matrix(R::PolyRing, n::Int)
    p = R(1)
-   return smatrix{elem_type(R)}(R, libSingular.mp_InitP(n, p.ptr, R.ptr))
+   GC.@preserve p R return smatrix{elem_type(R)}(R, libSingular.mp_InitP(n, p.ptr, R.ptr))
 end
 
 @doc Markdown.doc"""

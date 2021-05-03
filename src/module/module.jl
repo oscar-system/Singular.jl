@@ -32,7 +32,7 @@ ngens(I::smodule) = I.ptr == C_NULL ? 0 : Int(libSingular.ngens(I.ptr))
 
 Return the rank $n$ of the ambient space $R^n$ of which this module is a submodule.
 """
-rank(I::smodule) = Int(libSingular.rank(I.ptr))
+rank(I::smodule) = Int(GC.@preserve I libSingular.rank(I.ptr))
 
 function checkbounds(I::smodule, i::Int)
    (i > ngens(I) || i < 1) && throw(BoundsError(I, i))
@@ -41,8 +41,10 @@ end
 function getindex(I::smodule{T}, i::Int) where T <: AbstractAlgebra.RingElem
    checkbounds(I, i)
    R = base_ring(I)
-   p = libSingular.getindex(I.ptr, Cint(i - 1))
-   return svector{T}(R, rank(I), libSingular.p_Copy(p, R.ptr))
+   GC.@preserve I R begin
+      p = libSingular.getindex(I.ptr, Cint(i - 1))
+      return svector{T}(R, rank(I), libSingular.p_Copy(p, R.ptr))
+   end
 end
 
 @doc Markdown.doc"""
@@ -54,7 +56,7 @@ iszero(p::smodule) = Bool(libSingular.idIs0(p.ptr))
 
 function deepcopy_internal(I::smodule, dict::IdDict)
    R = base_ring(I)
-   ptr = libSingular.id_Copy(I.ptr, R.ptr)
+   ptr = GC.@preserve I R libSingular.id_Copy(I.ptr, R.ptr)
    return Module(R, ptr)
 end
 
@@ -112,7 +114,7 @@ the Singular integers.
 """
 function std(I::smodule; complete_reduction::Bool=false)
    R = base_ring(I)
-   ptr = libSingular.id_Std(I.ptr, R.ptr, complete_reduction)
+   ptr = GC.@preserve I R libSingular.id_Std(I.ptr, R.ptr, complete_reduction)
    libSingular.idSkipZeroes(ptr)
    z = Module(R, ptr)
    z.isGB = true
@@ -131,7 +133,7 @@ function computes a reduced Gröbner basis for $I$.
 """
 function slimgb(I::smodule; complete_reduction::Bool=false)
    R = base_ring(I)
-   ptr = libSingular.id_Slimgb(I.ptr, R.ptr, complete_reduction)
+   ptr = GC.@preserve I R libSingular.id_Slimgb(I.ptr, R.ptr, complete_reduction)
    libSingular.idSkipZeroes(ptr)
    z = Module(R, ptr)
    z.isGB = true
@@ -154,7 +156,7 @@ function reduce(M::smodule, G::smodule)
    check_parent(M, G)
    R = base_ring(M)
    !G.isGB && error("Not a Groebner basis")
-   ptr = libSingular.p_Reduce(M.ptr, G.ptr, R.ptr)
+   ptr = GC.@preserve M G R libSingular.p_Reduce(M.ptr, G.ptr, R.ptr)
    return Module(R, ptr)
 end
 
@@ -173,7 +175,7 @@ generators in $M$.
 """
 function syz(M::smodule)
    R = base_ring(M)
-   ptr = libSingular.id_Syzygies(M.ptr, R.ptr)
+   ptr = GC.@preserve M R libSingular.id_Syzygies(M.ptr, R.ptr)
    libSingular.idSkipZeroes(ptr)
    return Module(R, ptr)
 end
@@ -198,7 +200,7 @@ function sres(I::smodule{T}, max_length::Int) where T <: Nemo.RingElem
         max_length = nvars(R)
         # TODO: consider qrings
    end
-   r, minimal = libSingular.id_sres(I.ptr, Cint(max_length + 1), R.ptr)
+   r, minimal = GC.@preserve I R libSingular.id_sres(I.ptr, Cint(max_length + 1), R.ptr)
    return sresolution{T}(R, r, Bool(minimal))
 end
 
@@ -231,7 +233,7 @@ up to degree $n$.
 """
 function jet(M::smodule, n::Int)
       R = base_ring(M)
-      ptr = libSingular.id_Jet(M.ptr, Cint(n), R.ptr)
+      ptr = GC.@preserve M R libSingular.id_Jet(M.ptr, Cint(n), R.ptr)
       libSingular.idSkipZeroes(ptr)
       return Module(R, ptr)
 end
@@ -252,7 +254,7 @@ function minimal_generating_set(M::smodule)
    if has_global_ordering(R) || has_mixed_ordering(R)
       error("Ring needs local ordering.")
    end
-   N = Singular.Module(R, Singular.libSingular.idMinBase(M.ptr, R.ptr))
+   N = GC.@preserve M R Singular.Module(R, Singular.libSingular.idMinBase(M.ptr, R.ptr))
    return [N[i] for i in 1:ngens(N)]
 end
 
@@ -278,7 +280,7 @@ function eliminate(M::smodule, polys::spoly...)
       parent(polys[i]) != R && error("Incompatible base rings")
       p *= polys[i]
    end
-   ptr = libSingular.id_Eliminate(M.ptr, p.ptr, R.ptr)
+   ptr = GC.@preserve M p R libSingular.id_Eliminate(M.ptr, p.ptr, R.ptr)
    return Module(R, ptr)
 end
 
@@ -298,7 +300,7 @@ If SM is in M, rest is the null module
 """
 function lift(M::smodule, SM::smodule)
    R = base_ring(M)
-   ptr,rest_ptr = libSingular.id_Lift(M.ptr, SM.ptr, R.ptr)
+   ptr,rest_ptr = GC.@preserve M SM R libSingular.id_Lift(M.ptr, SM.ptr, R.ptr)
    return Module(R, ptr),Module(R,rest_ptr)
 end
 
@@ -317,7 +319,7 @@ Returns G,T,S
 """
 function lift_std_syz(M::smodule; complete_reduction::Bool = false)
    R = base_ring(M)
-   ptr,T_ptr,S_ptr = libSingular.id_LiftStdSyz(M.ptr, R.ptr, complete_reduction)
+   ptr,T_ptr,S_ptr = GC.@preserve M R libSingular.id_LiftStdSyz(M.ptr, R.ptr, complete_reduction)
    return Module(R, ptr), smatrix{elem_type(R)}(R, T_ptr), Module(R,S_ptr)
 end
 
@@ -329,7 +331,7 @@ computes the Groebner base G of M and the transformation matrix T such that
 """
 function lift_std(M::smodule; complete_reduction::Bool = false)
    R = base_ring(M)
-   ptr,T_ptr = libSingular.id_LiftStd(M.ptr, R.ptr, complete_reduction)
+   ptr,T_ptr = GC.@preserve M R libSingular.id_LiftStd(M.ptr, R.ptr, complete_reduction)
    return Module(R, ptr), smatrix{elem_type(R)}(R, T_ptr)
 end
 
@@ -346,7 +348,7 @@ represents  A/(A intersect B) (isomorphic to (A+B)/B)
 """
 function modulo(A::smodule, B::smodule)
    R = base_ring(A)
-   ptr = libSingular.id_Modulo(A.ptr, B.ptr, R.ptr)
+   ptr = GC.@preserve A B R libSingular.id_Modulo(A.ptr, B.ptr, R.ptr)
    return Module(R, ptr)
 end
 

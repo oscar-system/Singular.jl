@@ -28,11 +28,13 @@ end
 function getindex(r::sresolution, i::Int)
    checkbounds(r, i)
    R = base_ring(r)
-   ptr = libSingular.getindex_internal(r.ptr, i - 1, r.minimal )
-   if ptr.cpp_object != C_NULL
-      ptr = libSingular.id_Copy(ptr, R.ptr)
+   GC.@preserve r R begin
+      ptr = libSingular.getindex_internal(r.ptr, i - 1, r.minimal )
+      if ptr.cpp_object != C_NULL
+         ptr = libSingular.id_Copy(ptr, R.ptr)
+      end
+      return Module(R, ptr)
    end
-   return Module(R, ptr)
 end
 
 @doc Markdown.doc"""
@@ -46,7 +48,7 @@ length(r::sresolution) = libSingular.get_sySize(r.ptr) - 1
 
 function deepcopy_internal(r::sresolution, dict::IdDict)
    R = base_ring(r)
-   ptr = libSingular.res_Copy(r.ptr, R.ptr)
+   ptr = GC.@preserve r R libSingular.res_Copy(r.ptr, R.ptr)
    S = parent(r)
    return S(ptr)
 end
@@ -73,14 +75,16 @@ free resolution. These are returned as a Julia array of `Int`s. Note that the
 output of this command is useful only in the graded case.
 """
 function betti(r::sresolution)
-   if r.minimal
-        ideal_list = libSingular.get_minimal_res(r.ptr)
-   else
-        ideal_list = libSingular.get_full_res(r.ptr)
+   GC.@preserve r begin
+      if r.minimal
+           ideal_list = libSingular.get_minimal_res(r.ptr)
+      else
+           ideal_list = libSingular.get_full_res(r.ptr)
+      end
+      array = libSingular.syBetti_internal(ideal_list, length(r), r.base_ring.ptr)
+      return unsafe_wrap(Array, array[1].cpp_object,
+	                       (array[2], array[3]); own=true)
    end
-   array = libSingular.syBetti_internal(ideal_list, length(r), r.base_ring.ptr)
-   return unsafe_wrap(Array, array[1].cpp_object,
-	                    (array[2], array[3]); own=true)
 end
 
 ###############################################################################
@@ -101,7 +105,7 @@ function minres(r::sresolution{T}) where T <: AbstractAlgebra.RingElem
       return r
    end
    R = base_ring(r)
-   ptr = libSingular.syMinimize(r.ptr, R.ptr)
+   ptr = GC.@preserve r R libSingular.syMinimize(r.ptr, R.ptr)
    return sresolution{T}(R, ptr, true)
 end
 
@@ -117,20 +121,22 @@ function show(io::IO, R::ResolutionSet)
 end
 
 function show(io::IO, r::sresolution)
-   println(io, "Singular Resolution:")
-   len = length(r)
-   if len > 0
-      ptr = libSingular.getindex_internal(r.ptr, 0, r.minimal)
-      if ptr.cpp_object != C_NULL
-         print(io, "R^", libSingular.rank(ptr))
+   GC.@preserve r begin
+      println(io, "Singular Resolution:")
+      len = length(r)
+      if len > 0
+         ptr = libSingular.getindex_internal(r.ptr, 0, r.minimal)
+         if ptr.cpp_object != C_NULL
+            print(io, "R^", libSingular.rank(ptr))
+         end
       end
-   end
-   for i = 1:len
-      ptr = libSingular.getindex_internal(r.ptr, i - 1, r.minimal)
-      if ptr.cpp_object == C_NULL
-         break
+      for i = 1:len
+         ptr = libSingular.getindex_internal(r.ptr, i - 1, r.minimal)
+         if ptr.cpp_object == C_NULL
+            break
+         end
+         print(io, " <- R^", libSingular.ngens(ptr))
       end
-      print(io, " <- R^", libSingular.ngens(ptr))
    end
 end
 
@@ -169,7 +175,7 @@ function Resolution(C::Array{smodule{T}, 1}) where T <: AbstractAlgebra.RingElem
     R = base_ring(C[1])
     CC = (m -> m.ptr).(C)
     C_ptr = reinterpret(Ptr{Nothing}, pointer(CC))
-    ptr = libSingular.create_SyStrategy(C_ptr, len, R.ptr)
+    ptr = GC.@preserve R libSingular.create_SyStrategy(C_ptr, len, R.ptr)
     return sresolution{T}(R, ptr)
 end
 
