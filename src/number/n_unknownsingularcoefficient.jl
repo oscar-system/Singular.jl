@@ -18,7 +18,9 @@ function characteristic(R::N_UnknownSingularCoefficientRing)
    return ZZ(_characteristic(R))
 end
 
-_characteristic(R::N_UnknownSingularCoefficientRing) = Int(libSingular.n_GetChar(R.ptr))
+function _characteristic(R::N_UnknownSingularCoefficientRing)
+   GC.@preserve R Int(libSingular.n_GetChar(R.ptr))
+end
 
 function check_parent(a::n_unknownsingularcoefficient, b::n_unknownsingularcoefficient)
    parent(a) != parent(b) && error("Incompatible parents")
@@ -35,20 +37,31 @@ function canonical_unit(a::n_unknownsingularcoefficient)
 end
 
 function deepcopy_internal(a::n_unknownsingularcoefficient, dict::IdDict)
-   return parent(a)(libSingular.n_Copy(a.ptr, parent(a).ptr))
+   R = parent(a)
+   GC.@preserve a R return R(libSingular.n_Copy(a.ptr, R.ptr))
 end
 
-one(R::N_UnknownSingularCoefficientRing) = R(libSingular.n_Init(1, R.ptr))
+function one(R::N_UnknownSingularCoefficientRing)
+   GC.@preserve R return R(libSingular.n_Init(1, R.ptr))
+end
 
-zero(R::N_UnknownSingularCoefficientRing) = R(libSingular.n_Init(0, R.ptr))
+function zero(R::N_UnknownSingularCoefficientRing)
+   GC.@preserve R return R(libSingular.n_Init(0, R.ptr))
+end
 
 one(a::n_unknownsingularcoefficient) = one(parent(a))
 
 zero(a::n_unknownsingularcoefficient) = zero(parent(a))
 
-isone(a::n_unknownsingularcoefficient) = Bool(libSingular.n_IsOne(a.ptr, parent(a).ptr))
+function isone(a::n_unknownsingularcoefficient)
+   R = parent(a)
+   GC.@preserve a R return Bool(libSingular.n_IsOne(a.ptr, R.ptr))
+end
 
-iszero(a::n_unknownsingularcoefficient) = Bool(libSingular.n_IsZero(a.ptr, parent(a).ptr))
+function iszero(a::n_unknownsingularcoefficient)
+   R = parent(a)
+   GC.@preserve a R return Bool(libSingular.n_IsZero(a.ptr, R.ptr))
+end
 
 function hash(a::n_unknownsingularcoefficient, h::UInt)
    error("hash not implemented by singular")
@@ -63,7 +76,8 @@ end
 function AbstractAlgebra.expressify(a::n_unknownsingularcoefficient; context = nothing)::Any
    # TODO this easy method might not be the best
    libSingular.StringSetS("")
-   libSingular.n_Write(a.ptr, parent(a).ptr, false)
+   R = parent(a)
+   GC.@preserve a R libSingular.n_Write(a.ptr, R.ptr, false)
    s = libSingular.StringEndS()
    e = Meta.parse(s)
    if isa(e, Expr) && e.head == :incomplete
@@ -75,16 +89,16 @@ end
 
 function Base.show(io::IO, ::MIME"text/plain", a::n_unknownsingularcoefficient)
    libSingular.StringSetS("")
-   libSingular.n_Write(a.ptr, parent(a).ptr, false)
-   m = libSingular.StringEndS()
-   print(io, m)
+   R = parent(a)
+   GC.@preserve a R libSingular.n_Write(a.ptr, R.ptr, false)
+   print(io, libSingular.StringEndS())
 end
 
 function show(io::IO, a::n_unknownsingularcoefficient)
    libSingular.StringSetS("")
-   libSingular.n_Write(a.ptr, parent(a).ptr, false)
-   m = libSingular.StringEndS()
-   print(io, m)
+   R = parent(a)
+   GC.@preserve a R libSingular.n_Write(a.ptr, R.ptr, false)
+   print(io, libSingular.StringEndS())
 end
 
 ###############################################################################
@@ -95,7 +109,7 @@ end
 
 function -(a::n_unknownsingularcoefficient)
    R = parent(a)
-   n = libSingular.n_Neg(a.ptr, R.ptr)
+   n = GC.@preserve a b R libSingular.n_Neg(a.ptr, R.ptr)
    return R(n)
 end
 
@@ -108,21 +122,21 @@ end
 function +(a::n_unknownsingularcoefficient, b::n_unknownsingularcoefficient)
    check_parent(a, b)
    R = parent(a)
-   n = libSingular.n_Add(a.ptr, b.ptr, R.ptr)
+   n = GC.@preserve a b R libSingular.n_Add(a.ptr, b.ptr, R.ptr)
    return R(n)
 end
 
 function -(a::n_unknownsingularcoefficient, b::n_unknownsingularcoefficient)
    check_parent(a, b)
    R = parent(a)
-   n = libSingular.n_Sub(a.ptr, b.ptr, R.ptr)
+   n = GC.@preserve a b R libSingular.n_Sub(a.ptr, b.ptr, R.ptr)
    return R(n)
 end
 
 function *(a::n_unknownsingularcoefficient, b::n_unknownsingularcoefficient)
    check_parent(a, b)
    R = parent(a)
-   n = libSingular.n_Mult(a.ptr, b.ptr, R.ptr)
+   n = GC.@preserve a b R libSingular.n_Mult(a.ptr, b.ptr, R.ptr)
    return R(n)
 end
 
@@ -135,7 +149,7 @@ end
 function ==(a::n_unknownsingularcoefficient, b::n_unknownsingularcoefficient)
    check_parent(a, b)
    R = parent(a)
-   return libSingular.n_Equal(a.ptr, b.ptr, R.ptr)
+   GC.@preserve a b R return libSingular.n_Equal(a.ptr, b.ptr, R.ptr)
 end
 
 ###############################################################################
@@ -145,17 +159,18 @@ end
 ###############################################################################
 
 function ^(x::n_unknownsingularcoefficient, y::Int)
-    y < 0 && throw(DomainError(y, "exponent must be non-negative"))
-    if isone(x)
-       return x
-    elseif y == 0
-       return one(parent(x))
-    elseif y == 1
-       return x
-    else
-       p = libSingular.n_Power(x.ptr, y, parent(x).ptr)
-       return parent(x)(p)
-    end
+   y < 0 && throw(DomainError(y, "exponent must be non-negative"))
+   if isone(x)
+      return x
+   elseif y == 0
+      return one(parent(x))
+   elseif y == 1
+      return x
+   else
+      R = parent(x)
+      p = GC.@preserve x R libSingular.n_Power(x.ptr, y, R.ptr)
+      return R(p)
+   end
 end
 
 ###############################################################################
@@ -165,7 +180,7 @@ end
 ###############################################################################
 
 function (R::N_UnknownSingularCoefficientRing)(x::Integer)
-   return n_unknownsingularcoefficient(R, libSingular.n_InitMPZ(BigInt(x), R.ptr))
+   GC.@preserve R return n_unknownsingularcoefficient(R, libSingular.n_InitMPZ(BigInt(x), R.ptr))
 end
 
 function (R::N_UnknownSingularCoefficientRing)(n::libSingular.number_ptr)

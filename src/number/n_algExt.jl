@@ -22,7 +22,7 @@ base_ring(a::N_AlgExtField) = base_ring(a.minpoly)
 Return the generator the given algebraic extension.
 """
 function gen(F::N_AlgExtField)
-   return F(libSingular.n_Param(Cint(1), F.ptr))
+   GC.@preserve F return F(libSingular.n_Param(Cint(1), F.ptr))
 end
 
 @doc Markdown.doc"""
@@ -31,11 +31,12 @@ end
 Return the characteristic of the field.
 """
 function characteristic(R::N_AlgExtField)
-   return ZZ(libSingular.n_GetChar(R.ptr))
+   GC.@preserve R return ZZ(libSingular.n_GetChar(R.ptr))
 end
 
 function deepcopy_internal(a::n_algExt, dict::IdDict)
-   return parent(a)(libSingular.n_Copy(a.ptr, parent(a).ptr))
+   R = parent(a)
+   GC.@preserve a R return R(libSingular.n_Copy(a.ptr, R.ptr))
 end
 
 function hash(a::n_algExt, h::UInt)
@@ -65,12 +66,12 @@ zero(R::N_AlgExtField) = R(0)
 
 function isone(n::n_algExt)
    c = parent(n)
-   return libSingular.n_IsOne(n.ptr, c.ptr)
+   GC.@preserve n c return libSingular.n_IsOne(n.ptr, c.ptr)
 end
 
 function iszero(n::n_algExt)
    c = parent(n)
-   return libSingular.n_IsZero(n.ptr, c.ptr)
+   GC.@preserve n c return libSingular.n_IsZero(n.ptr, c.ptr)
 end
 
 @doc Markdown.doc"""
@@ -105,7 +106,7 @@ end
 function AbstractAlgebra.expressify(n::n_algExt; context = nothing)::Any
    # TODO this easy method might not be the best
    libSingular.StringSetS("")
-   libSingular.n_Write(n.ptr, parent(n).ptr, false)
+   GC.@preserve n libSingular.n_Write(n.ptr, parent(n).ptr, false)
    s = libSingular.StringEndS()
    e = Meta.parse(s)
    if !isa(e, Expr)
@@ -132,8 +133,8 @@ end
 
 function -(x::n_algExt)
     c = parent(x)
-    ptr = libSingular.n_Neg(x.ptr, c.ptr)
-    return c(ptr)
+    p = GC.@preserve x c libSingular.n_Neg(x.ptr, c.ptr)
+    return c(p)
 end
 
 ###############################################################################
@@ -145,21 +146,21 @@ end
 function +(x::n_algExt, y::n_algExt)
    check_parent(x, y)
    c = parent(x)
-   p = libSingular.n_Add(x.ptr, y.ptr, c.ptr)
+   p = GC.@preserve x y c libSingular.n_Add(x.ptr, y.ptr, c.ptr)
    return c(p)
 end
 
 function -(x::n_algExt, y::n_algExt)
    check_parent(x, y)
    c = parent(x)
-   p = libSingular.n_Sub(x.ptr, y.ptr, c.ptr)
+   p = GC.@preserve x y c libSingular.n_Sub(x.ptr, y.ptr, c.ptr)
    return c(p)
 end
 
 function *(x::n_algExt, y::n_algExt)
    check_parent(x, y)
    c = parent(x)
-   p = libSingular.n_Mult(x.ptr, y.ptr, c.ptr)
+   p = GC.@preserve x y c libSingular.n_Mult(x.ptr, y.ptr, c.ptr)
    return c(p)
 end
 
@@ -190,7 +191,7 @@ end
 function ==(x::n_algExt, y::n_algExt)
    check_parent(x, y)
    c = parent(x)
-   return libSingular.n_Equal(x.ptr, y.ptr, c.ptr)
+   GC.@preserve x y c return libSingular.n_Equal(x.ptr, y.ptr, c.ptr)
 end
 
 isequal(x::n_algExt, y::n_algExt) = (x == y)
@@ -211,7 +212,7 @@ function ^(x::n_algExt, y::Int)
    else
       y < 0 && iszero(x) && throw(DivideError())
       c = parent(x)
-      p = libSingular.n_Power(x.ptr, y, c.ptr)
+      p = GC.@preserve x y c libSingular.n_Power(x.ptr, y, c.ptr)
       return c(p)
    end
 end
@@ -224,14 +225,14 @@ end
 
 function inv(x::n_algExt)
    c = parent(x)
-   p = libSingular.n_Invers(x.ptr, c.ptr)
+   p = GC.@preserve x c libSingular.n_Invers(x.ptr, c.ptr)
    return c(p)
 end
 
 function divexact(x::n_algExt, y::n_algExt)
    check_parent(x, y)
    c = parent(x)
-   p = libSingular.n_Div(x.ptr, y.ptr, c.ptr)
+   p = GC.@preserve x y c libSingular.n_Div(x.ptr, y.ptr, c.ptr)
    return c(p)
 end
 
@@ -247,7 +248,7 @@ function gcd(x::n_algExt, y::n_algExt)
       return zero(parent(x))
    end
    c = parent(x)
-   p = libSingular.n_Gcd(x.ptr, y.ptr, c.ptr)
+   p = GC.@preserve x y c libSingular.n_Gcd(x.ptr, y.ptr, c.ptr)
    return c(p)
 end
 
@@ -258,29 +259,39 @@ end
 ###############################################################################
 
 function addeq!(x::n_algExt, y::n_algExt)
-   x.ptr = libSingular.n_InpAdd(x.ptr, y.ptr, parent(x).ptr)
+   R = parent(x)
+   x.ptr = GC.@preserve x y R libSingular.n_InpAdd(x.ptr, y.ptr, R.ptr)
    return x
 end
 
 function mul!(x::n_algExt, y::n_algExt, z::n_algExt)
-   ptr = libSingular.n_Mult(y.ptr, z.ptr, parent(x).ptr)
-   libSingular.n_Delete(x.ptr, parent(x).ptr)
-   x.ptr = ptr
-   return x
+   R = parent(x)
+   GC.@preserve x y z R begin
+      ptr = libSingular.n_Mult(y.ptr, z.ptr, R.ptr)
+      libSingular.n_Delete(x.ptr, R.ptr)
+      x.ptr = ptr
+      return x
+   end
 end
 
 function add!(x::n_algExt, y::n_algExt, z::n_algExt)
-   ptr = libSingular.n_Add(y.ptr, z.ptr, parent(x).ptr)
-   libSingular.n_Delete(x.ptr, parent(x).ptr)
-   x.ptr = ptr
-   return x
+   R = parent(x)
+   GC.@preserve x y z R begin
+      ptr = libSingular.n_Add(y.ptr, z.ptr, R.ptr)
+      libSingular.n_Delete(x.ptr, R.ptr)
+      x.ptr = ptr
+      return x
+   end
 end
 
 function zero!(x::n_algExt)
-   ptr = libSingular.n_Init(0, parent(x).ptr)
-   libSingular.n_Delete(x.ptr, parent(x).ptr)
-   x.ptr = ptr
-   return x
+   R = parent(x)
+   GC.@preserve x R begin
+      ptr = libSingular.n_Init(0, R.ptr)
+      libSingular.n_Delete(x.ptr, R.ptr)
+      x.ptr = ptr
+      return x
+   end
 end
 
 ###############################################################################

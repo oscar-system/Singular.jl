@@ -29,7 +29,7 @@ function map_ideal(f::Map(SAlgHom), I::sideal)
             algebra homomorphism.")
    end
 
-   return Ideal(f.codomain, libSingular.maMapIdeal(I.ptr, f.domain.ptr,
+   GC.@preserve I f return Ideal(f.codomain, libSingular.maMapIdeal(I.ptr, f.domain.ptr,
                 f.ptr, f.codomain.ptr, libSingular.ndCopyMap()))
 end
 
@@ -39,7 +39,7 @@ function map_poly(f::Map(SAlgHom), p::spoly)
       error("Polynomial is not in the domain of the
             algebra homomorphism.")
    end
-   return f.codomain(libSingular.maMapPoly(p.ptr, f.domain.ptr, f.ptr,
+   GC.@preserve p f return f.codomain(libSingular.maMapPoly(p.ptr, f.domain.ptr, f.ptr,
           f.codomain.ptr, libSingular.ndCopyMap()))
 end
 
@@ -71,14 +71,14 @@ function compose(f::Map(SAlgHom), g::Map(SAlgHom))
    R = g.domain
    S = g.codomain
 
-   ptr = libSingular.maMapIdeal(f.ptr, R.ptr, g.ptr, S.ptr,
+   GC.@preserve f R g S ptr = libSingular.maMapIdeal(f.ptr, R.ptr, g.ptr, S.ptr,
                                 libSingular.ndCopyMap())
 
    V = Array{spoly, 1}()
 
    for i in 1:n
       p = libSingular.getindex(ptr, Cint(i - 1))
-      push!(V, S(libSingular.p_Copy(p, S.ptr)))
+      GC.@preserve S push!(V, S(libSingular.p_Copy(p, S.ptr)))
    end
 
    return AlgebraHomomorphism(f.domain, g.codomain, V)
@@ -111,7 +111,7 @@ function preimage(f::Map(SAlgHom), I::sideal)
       error("Algorithm not implemented for local quotient rings.")
    end
 
-   return Ideal(f.domain, Singular.libSingular.maGetPreimage(f.codomain.ptr,
+   GC.@preserve f I return Ideal(f.domain, Singular.libSingular.maGetPreimage(f.codomain.ptr,
                         f.ptr, I.ptr, f.domain.ptr))
 end
 

@@ -27,7 +27,9 @@ parent_type(::Type{sideal{spoly{T}}}) where T <: Nemo.RingElem = IdealSet{spoly{
 
 Return the number of generators in the internal representation of the ideal $I$.
 """
-ngens(I::sideal) = Int(libSingular.ngens(I.ptr))
+function ngens(I::sideal)
+   GC.@preserve I return Int(libSingular.ngens(I.ptr))
+end
 
 @doc Markdown.doc"""
     gens(I::sideal)
@@ -47,20 +49,22 @@ end
 function setindex!(I::sideal{spoly{T}}, p::spoly{T}, i::Int) where T <: Nemo.RingElem
    checkbounds(I, i)
    R = base_ring(I)
-   p0 = libSingular.getindex(I.ptr, Cint(i - 1))
-   if p0 != C_NULL
-      libSingular.p_Delete(p0, R.ptr)
+   GC.@preserve I R p begin
+      p0 = libSingular.getindex(I.ptr, Cint(i - 1))
+      if p0 != C_NULL
+         libSingular.p_Delete(p0, R.ptr)
+      end
+      p1 = libSingular.p_Copy(p.ptr, R.ptr)
+      libSingular.setindex_internal(I.ptr, p1, Cint(i - 1))
+      nothing
    end
-   p1 = libSingular.p_Copy(p.ptr, R.ptr)
-   libSingular.setindex_internal(I.ptr, p1, Cint(i - 1))
-   nothing
 end
 
 function getindex(I::sideal, i::Int)
    checkbounds(I, i)
    R = base_ring(I)
-   p = libSingular.getindex(I.ptr, Cint(i - 1))
-   return R(libSingular.p_Copy(p, R.ptr))
+   GC.@preserve I p = libSingular.getindex(I.ptr, Cint(i - 1))
+   GC.@preserve R return R(libSingular.p_Copy(p, R.ptr))
 end
 
 @doc Markdown.doc"""
@@ -89,7 +93,7 @@ over a field, and a Groebner basis.
 function dimension(I::sideal{S}) where S <: Union{spoly{T}, spoly{n_unknown{U}}} where {T <: Singular.FieldElem, U <: Nemo.FieldElem}
    I.isGB == false && error("I needs to be a Gröbner basis.")
    R = base_ring(I)
-   return Int(libSingular.scDimInt(I.ptr, R.ptr))
+   GC.@preserve I R return Int(libSingular.scDimInt(I.ptr, R.ptr))
 end
 
 @doc Markdown.doc"""
@@ -124,13 +128,13 @@ coefficient ring were the rational numbers for example, the coefficients of the
 polynomials would be reduced to lowest terms.
 """
 function normalize!(I::sideal)
-   libSingular.id_Normalize(I.ptr, base_ring(I).ptr)
+   GC.@preserve I libSingular.id_Normalize(I.ptr, base_ring(I).ptr)
    nothing
 end
 
 function deepcopy_internal(I::sideal, dict::IdDict)
    R = base_ring(I)
-   ptr = libSingular.id_Copy(I.ptr, R.ptr)
+   ptr = GC.@preserve I R libSingular.id_Copy(I.ptr, R.ptr)
    return Ideal(R, ptr)
 end
 
@@ -180,14 +184,14 @@ end
 function (I::sideal{T} + J::sideal{T}) where T <: Nemo.RingElem
    check_parent(I, J)
    R = base_ring(I)
-   ptr = libSingular.id_Add(I.ptr, J.ptr, R.ptr)
+   ptr = GC.@preserve I J R libSingular.id_Add(I.ptr, J.ptr, R.ptr)
    return Ideal(R, ptr)
 end
 
 function (I::sideal{T} * J::sideal{T}) where T <: Nemo.RingElem
    check_parent(I, J)
    R = base_ring(I)
-   ptr = libSingular.id_Mult(I.ptr, J.ptr, R.ptr)
+   ptr = GC.@preserve I J R libSingular.id_Mult(I.ptr, J.ptr, R.ptr)
    return Ideal(R, ptr)
 end
 
@@ -201,7 +205,7 @@ function ^(I::sideal, n::Int)
    (n > typemax(Cint) || n < 0) &&
       throw(DomainError(n, "exponent must be non-negative and <= $(typemax(Cint))"))
    R = base_ring(I)
-   ptr = libSingular.id_Power(I.ptr, Cint(n), R.ptr)
+   ptr = GC.@preserve I R libSingular.id_Power(I.ptr, Cint(n), R.ptr)
    return Ideal(R, ptr)
 end
 
@@ -244,7 +248,7 @@ function isequal(I1::sideal{T}, I2::sideal{T}) where T <: AbstractAlgebra.RingEl
       return false
    end
    R = base_ring(I1)
-   return Bool(libSingular.id_IsEqual(I1.ptr, I2.ptr, R.ptr))
+   GC.@preserve I1 I2 R return Bool(libSingular.id_IsEqual(I1.ptr, I2.ptr, R.ptr))
 end
 
 @doc Markdown.doc"""
@@ -274,7 +278,7 @@ generating $I$.
 """
 function lead(I::sideal)
    R = base_ring(I)
-   ptr = libSingular.id_Head(I.ptr, R.ptr)
+   ptr = GC.@preserve I R libSingular.id_Head(I.ptr, R.ptr)
    return Ideal(R, ptr)
 end
 
@@ -292,7 +296,7 @@ Returns the intersection of the two given ideals.
 function intersection(I::sideal{T}, J::sideal{T}) where T <: Nemo.RingElem
    check_parent(I, J)
    R = base_ring(I)
-   ptr = libSingular.id_Intersection(I.ptr, J.ptr, R.ptr)
+   ptr = GC.@preserve I J R libSingular.id_Intersection(I.ptr, J.ptr, R.ptr)
    return Ideal(R, ptr)
 end
 
@@ -313,7 +317,7 @@ $\{r \in R \;|\; rJ \subseteq I\}$.
 function quotient(I::sideal{T}, J::sideal{T}) where T <: Nemo.RingElem
    check_parent(I, J)
    R = base_ring(I)
-   ptr = libSingular.id_Quotient(I.ptr, J.ptr, I.isGB, R.ptr)
+   ptr = GC.@preserve I J R libSingular.id_Quotient(I.ptr, J.ptr, I.isGB, R.ptr)
    return Ideal(R, ptr)
 end
 
@@ -362,7 +366,7 @@ function computes a reduced Gröbner basis for $I$.
 """
 function slimgb(I::sideal; complete_reduction::Bool=false)
    R = base_ring(I)
-   ptr = libSingular.id_Slimgb(I.ptr, R.ptr,complete_reduction)
+   ptr = GC.@preserve I R libSingular.id_Slimgb(I.ptr, R.ptr,complete_reduction)
    libSingular.idSkipZeroes(ptr)
    z = Ideal(R, ptr)
    z.isGB = true
@@ -380,7 +384,7 @@ a global ordering) then the Groebner basis is unique.
 """
 function std(I::sideal; complete_reduction::Bool=false)
    R = base_ring(I)
-   ptr = libSingular.id_Std(I.ptr, R.ptr, complete_reduction)
+   ptr = GC.@preserve I R libSingular.id_Std(I.ptr, R.ptr, complete_reduction)
    libSingular.idSkipZeroes(ptr)
    z = Ideal(R, ptr)
    z.isGB = true
@@ -399,7 +403,7 @@ function satstd(I::sideal{T}, J::sideal{T}) where T <: AbstractAlgebra.RingElem
    check_parent(I, J)
    !isvar_generated(J) && error("Second ideal must be generated by variables")
    R = base_ring(I)
-   ptr = libSingular.id_Satstd(I.ptr, J.ptr, R.ptr)
+   ptr = GC.@preserve I J R libSingular.id_Satstd(I.ptr, J.ptr, R.ptr)
    libSingular.idSkipZeroes(ptr)
    z = Ideal(R, ptr)
    z.isGB = true
@@ -425,7 +429,7 @@ function fglm(I::sideal, ordering::Symbol)
    Isrc = std(phi(I), complete_reduction = true)
    !iszerodim(Isrc) && error("Ideal needs to be zero-dimensional")
 
-   ptr = libSingular.fglmzero(Isrc.ptr, Rsrc.ptr, Rdest.ptr)
+   ptr = GC.@preserve Isrc Rsrc Rdest libSingular.fglmzero(Isrc.ptr, Rsrc.ptr, Rdest.ptr)
    z = Ideal(Rdest, ptr)
    z.isGB = true
    return z
@@ -447,7 +451,7 @@ function reduce(I::sideal, G::sideal)
    check_parent(I, G)
    R = base_ring(I)
    !G.isGB && error("Not a Groebner basis")
-   ptr = libSingular.p_Reduce(I.ptr, G.ptr, R.ptr)
+   ptr = GC.@preserve I G R libSingular.p_Reduce(I.ptr, G.ptr, R.ptr)
    return Ideal(R, ptr)
 end
 
@@ -462,7 +466,7 @@ function reduce(p::spoly, G::sideal)
    par = parent(p)
    R != par && error("Incompatible base rings")
    !G.isGB && error("Not a Groebner basis")
-   ptr = libSingular.p_Reduce(p.ptr, G.ptr, R.ptr)
+   ptr = GC.@preserve p G R libSingular.p_Reduce(p.ptr, G.ptr, R.ptr)
    return par(ptr)
 end
 
@@ -487,7 +491,7 @@ function eliminate(I::sideal, polys::spoly...)
       parent(polys[i]) != R && error("Incompatible base rings")
       p *= polys[i]
    end
-   ptr = libSingular.id_Eliminate(I.ptr, p.ptr, R.ptr)
+   ptr = GC.@preserve I p R libSingular.id_Eliminate(I.ptr, p.ptr, R.ptr)
    return Ideal(R, ptr)
 end
 
@@ -502,7 +506,7 @@ function kernel(source::PolyRing, map::sideal)
    #       jjPREIMAGE() in the Singular interpreter
    target = base_ring(map)
    zero_ideal = Ideal(target, )
-   ptr = libSingular.maGetPreimage(target.ptr, map.ptr, zero_ideal.ptr, source.ptr)
+   ptr = GC.@preserve target map zero_ideal source libSingular.maGetPreimage(target.ptr, map.ptr, zero_ideal.ptr, source.ptr)
    return Ideal(source, ptr)
 end
 
@@ -519,7 +523,7 @@ Compute the module of syzygies of the ideal.
 """
 function syz(I::sideal)
    R = base_ring(I)
-   ptr = libSingular.id_Syzygies(I.ptr, R.ptr)
+   ptr = GC.@preserve I R libSingular.id_Syzygies(I.ptr, R.ptr)
    libSingular.idSkipZeroes(ptr)
    return Module(R, ptr)
 end
@@ -539,7 +543,7 @@ Returns G,T,S
 """
 function lift_std_syz(M::sideal; complete_reduction::Bool = false)
    R = base_ring(M)
-   ptr,T_ptr,S_ptr = libSingular.id_LiftStdSyz(M.ptr, R.ptr, complete_reduction)
+   ptr,T_ptr,S_ptr = GC.@preserve M R libSingular.id_LiftStdSyz(M.ptr, R.ptr, complete_reduction)
    return Ideal(R, ptr), smatrix{elem_type(R)}(R, T_ptr), Module(R,S_ptr)
 end
 
@@ -551,7 +555,7 @@ computes the Groebner base G of I and the transformation matrix T such that
 """
 function lift_std(M::sideal; complete_reduction::Bool = false)
    R = base_ring(M)
-   ptr,T_ptr = libSingular.id_LiftStd(M.ptr, R.ptr, complete_reduction)
+   ptr,T_ptr = GC.@preserve M R libSingular.id_LiftStd(M.ptr, R.ptr, complete_reduction)
    return Ideal(R, ptr), smatrix{elem_type(R)}(R, T_ptr)
 end
 
@@ -587,7 +591,7 @@ function fres(id::Union{sideal{T}, smodule{T}}, max_length::Int, method::String 
          && method != "single module")
       error("wrong optional argument for fres")
    end
-   r, minimal = libSingular.id_fres(id.ptr, Cint(max_length + 1), method, R.ptr)
+   r, minimal = GC.@preserve id R libSingular.id_fres(id.ptr, Cint(max_length + 1), method, R.ptr)
    return sresolution{T}(R, r, Bool(minimal))
 end
 
@@ -606,7 +610,7 @@ function sres(I::sideal{T}, max_length::Int) where T <: Nemo.RingElem
         max_length = nvars(R)
         # TODO: consider qrings
    end
-   r, minimal = libSingular.id_sres(I.ptr, Cint(max_length + 1), R.ptr)
+   r, minimal = GC.@preserve I R libSingular.id_sres(I.ptr, Cint(max_length + 1), R.ptr)
    return sresolution{T}(R, r, Bool(minimal))
 end
 
@@ -641,7 +645,7 @@ function MaximalIdeal(R::PolyRing{T}, d::Int) where T <: Nemo.RingElem
    (d > typemax(Cint) || d < 0) &&
       throw(DomainError(d, "degree must be non-negative and <= $(typemax(Cint))"))
    S = elem_type(R)
-   ptr = libSingular.id_MaxIdeal(Cint(d), R.ptr)
+   ptr = GC.@preserve R libSingular.id_MaxIdeal(Cint(d), R.ptr)
    return sideal{S}(R, ptr)
 end
 
@@ -658,7 +662,9 @@ up to degree $n$.
 """
 function jet(I::sideal, n::Int)
    J = deepcopy(I)
-   J.ptr = libSingular.id_Jet(I.ptr, Cint(n), base_ring(I).ptr)
+   R = base_ring(I)
+   # TODO this stuff looks bad
+   J.ptr = GC.@preserve I R libSingular.id_Jet(I.ptr, Cint(n), R.ptr)
    return J
 end
 
@@ -681,7 +687,7 @@ function vdim(I::sideal)
    elseif iszerodim == false
       error("Ideal is not zero-dimensional")
    else
-      libSingular.id_vdim(I.ptr, base_ring(I).ptr)
+      GC.@preserve I return libSingular.id_vdim(I.ptr, base_ring(I).ptr)
    end
 end
 
@@ -699,7 +705,7 @@ function kbase(I::sideal)
       error("Ideal is not zero-dimensional")
    else
       K = deepcopy(I)
-      K.ptr = libSingular.id_kbase(I.ptr, base_ring(I).ptr)
+      K.ptr = GC.@preserve I libSingular.id_kbase(I.ptr, base_ring(I).ptr)
       return K
    end
 end
@@ -718,7 +724,8 @@ function highcorner(I::sideal)
       error("Ideal is not zero-dimensional")
    else
       K = deepcopy(I[1])
-      K.ptr = libSingular.id_highcorner(I.ptr, base_ring(I).ptr)
+      R = base_ring(I)
+      K.ptr = GC.@preserve I R libSingular.id_highcorner(I.ptr, R.ptr)
       return K
    end
 end
@@ -739,7 +746,7 @@ function minimal_generating_set(I::sideal)
    if has_global_ordering(R) || has_mixed_ordering(R)
       error("Ring needs local ordering.")
    end
-   return gens(Ideal(R, Singular.libSingular.idMinBase(I.ptr, R.ptr)))
+   GC.@preserve I R return gens(Ideal(R, Singular.libSingular.idMinBase(I.ptr, R.ptr)))
 end
 
 ###############################################################################
@@ -759,7 +766,7 @@ function independent_sets(I::sideal{S}) where S <: Union{spoly{T}, spoly{n_unkno
    R = base_ring(I)
    n = nvars(R)
    a = Array{Int32, 1}()
-   libSingular.scIndIndset(I.ptr, R.ptr, a, true)
+   GC.@preserve I R libSingular.scIndIndset(I.ptr, R.ptr, a, true)
    m = Int(div(length(a), n))
    a = Int.(transpose(reshape(a, n, m)))
    P = Array{Array{spoly, 1}, 1}()
@@ -797,7 +804,7 @@ function maximal_independent_set(I::sideal{S}; all::Bool = false) where S <: Uni
       return P
    else
       a = Array{Int32, 1}()
-      libSingular.scIndIndset(I.ptr, R.ptr, a, all)
+      GC.@preserve I R libSingular.scIndIndset(I.ptr, R.ptr, a, all)
       P = Array{spoly{elem_type(Q)}, 1}()
       for j in findall(x->x == 1, a)
          push!(P, gen(R, j))

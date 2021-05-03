@@ -49,12 +49,12 @@ zero(R::N_ZnRing) = R(0)
 
 function isone(n::n_Zn)
    c = parent(n)
-   return libSingular.n_IsOne(n.ptr, c.ptr)
+   GC.@preserve n c return libSingular.n_IsOne(n.ptr, c.ptr)
 end
 
 function iszero(n::n_Zn)
    c = parent(n)
-   return libSingular.n_IsZero(n.ptr, c.ptr)
+   GC.@preserve n c return libSingular.n_IsZero(n.ptr, c.ptr)
 end
 
 @doc Markdown.doc"""
@@ -83,22 +83,22 @@ function show(io::IO, c::N_ZnRing)
 end
 
 function Base.show(io::IO, ::MIME"text/plain", a::n_Zn)
-  print(io, AbstractAlgebra.obj_to_string(a, context = io))
+   print(io, AbstractAlgebra.obj_to_string(a, context = io))
 end
 
 function AbstractAlgebra.expressify(n::n_Zn; context = nothing)::Any
-  x = BigInt()
-  GC.@preserve n begin
-    ccall((:__gmpz_set, :libgmp), Cvoid, (Ref{BigInt},  Ptr{Any}), x, n.ptr.cpp_object)
-  end
-  return AbstractAlgebra.expressify(x, context = context)
+   x = BigInt()
+   GC.@preserve n begin
+      ccall((:__gmpz_set, :libgmp), Cvoid, (Ref{BigInt},  Ptr{Any}), x, n.ptr.cpp_object)
+   end
+   return AbstractAlgebra.expressify(x, context = context)
 end
 
 function show(io::IO, n::n_Zn)
    libSingular.StringSetS("")
-   libSingular.n_Write(n.ptr, parent(n).ptr, false)
-   m = libSingular.StringEndS()
-   print(io, m)
+   c = parent(n)
+   GC.@preserve n c libSingular.n_Write(n.ptr, c.ptr, false)
+   print(io, libSingular.StringEndS())
 end
 
 ###############################################################################
@@ -108,9 +108,9 @@ end
 ###############################################################################
 
 function -(x::n_Zn)
-    C = parent(x)
-    ptr = libSingular.n_Neg(x.ptr, C.ptr)
-    return C(ptr)
+   c = parent(x)
+   p = GC.@preserve x c libSingular.n_Neg(x.ptr, c.ptr)
+   return c(p)
 end
 
 ###############################################################################
@@ -121,19 +121,19 @@ end
 
 function +(x::n_Zn, y::n_Zn)
    c = parent(x)
-   p = libSingular.n_Add(x.ptr, y.ptr, c.ptr)
+   p = GC.@preserve x y c libSingular.n_Add(x.ptr, y.ptr, c.ptr)
    return c(p)
 end
 
 function -(x::n_Zn, y::n_Zn)
    c = parent(x)
-   p = libSingular.n_Sub(x.ptr, y.ptr, c.ptr)
+   p = GC.@preserve x y c libSingular.n_Sub(x.ptr, y.ptr, c.ptr)
    return c(p)
 end
 
 function *(x::n_Zn, y::n_Zn)
    c = parent(x)
-   p = libSingular.n_Mult(x.ptr, y.ptr, c.ptr)
+   p = GC.@preserve x y c libSingular.n_Mult(x.ptr, y.ptr, c.ptr)
    return c(p)
 end
 
@@ -144,7 +144,8 @@ end
 ###############################################################################
 
 function ==(x::n_Zn, y::n_Zn)
-    return libSingular.n_Equal(x.ptr, y.ptr, parent(x).ptr)
+   c = parent(x)
+   GC.@preserve x y c return libSingular.n_Equal(x.ptr, y.ptr, c.ptr)
 end
 
 isequal(x::n_Zn, y::n_Zn) = (x == y)
@@ -170,17 +171,18 @@ isequal(x::n_Zn, y::n_Zn) = (x == y)
 ###############################################################################
 
 function ^(x::n_Zn, y::Int)
-    y < 0 && throw(DomainError(y, "exponent must be non-negative"))
-    if isone(x)
-       return x
-    elseif y == 0
-       return one(parent(x))
-    elseif y == 1
-       return x
-    else
-       p = libSingular.n_Power(x.ptr, y, parent(x).ptr)
-       return parent(x)(p)
-    end
+   y < 0 && throw(DomainError(y, "exponent must be non-negative"))
+   if isone(x)
+      return x
+   elseif y == 0
+      return one(parent(x))
+   elseif y == 1
+      return x
+   else
+      c = parent(x)
+      p = GC.@preserve x y c libSingular.n_Power(x.ptr, y, c.ptr)
+      return c(p)
+   end
 end
 
 ###############################################################################
@@ -191,7 +193,7 @@ end
 
 function divexact(x::n_Zn, y::n_Zn)
    c = parent(x)
-   p = libSingular.n_ExactDiv(x.ptr, y.ptr, c.ptr)
+   p = GC.@preserve x y c libSingular.n_ExactDiv(x.ptr, y.ptr, c.ptr)
    return c(p)
 end
 
@@ -202,9 +204,9 @@ end
 ###############################################################################
 
 function gcd(x::n_Zn, y::n_Zn)
-   par = parent(x)
-   p = libSingular.n_Gcd(x.ptr, y.ptr, par.ptr)
-   return par(p)
+   c = parent(x)
+   p = GC.@preserve x y c libSingular.n_Gcd(x.ptr, y.ptr, c.ptr)
+   return c(p)
 end
 
 ###############################################################################
@@ -214,11 +216,11 @@ end
 ###############################################################################
 
 function gcdx(x::n_Zn, y::n_Zn)
-   par = parent(x)
-   s = [libSingular.n_Init(0, par.ptr)]
-   t = [libSingular.n_Init(0, par.ptr)]
-   g = libSingular.n_ExtGcd(x.ptr, y.ptr, pointer(s), pointer(t), par.ptr)
-   return par(g), par(s[]), par(t[])
+   c = parent(x)
+   s = GC.@preserve c [libSingular.n_Init(0, c.ptr)]
+   t = GC.@preserve c [libSingular.n_Init(0, c.ptr)]
+   g = GC.@preserve x y s t c libSingular.n_ExtGcd(x.ptr, y.ptr, pointer(s), pointer(t), c.ptr)
+   return c(g), c(s[]), c(t[])
 end
 
 ###############################################################################
@@ -228,29 +230,39 @@ end
 ###############################################################################
 
 function addeq!(x::n_Zn, y::n_Zn)
-   x.ptr = libSingular.n_InpAdd(x.ptr, y.ptr, parent(x).ptr)
+   c = parent(x)
+   x.ptr = GC.@preserve x y c libSingular.n_InpAdd(x.ptr, y.ptr, c.ptr)
    return x
 end
 
 function mul!(x::n_Zn, y::n_Zn, z::n_Zn)
-   ptr = libSingular.n_Mult(y.ptr, z.ptr, parent(x).ptr)
-   libSingular.n_Delete(x.ptr, parent(x).ptr)
-   x.ptr = ptr
-   return x
+   c = parent(x)
+   GC.@preserve x y z c begin
+      ptr = libSingular.n_Mult(y.ptr, z.ptr, c.ptr)
+      libSingular.n_Delete(x.ptr, c.ptr)
+      x.ptr = ptr
+      return x
+   end
 end
 
 function add!(x::n_Zn, y::n_Zn, z::n_Zn)
-   ptr = libSingular.n_Add(y.ptr, z.ptr, parent(x).ptr)
-   libSingular.n_Delete(x.ptr, parent(x).ptr)
-   x.ptr = ptr
-   return x
+   c = parent(x)
+   GC.@preserve x y z c begin
+      ptr = libSingular.n_Add(y.ptr, z.ptr, c.ptr)
+      libSingular.n_Delete(x.ptr, c.ptr)
+      x.ptr = ptr
+      return x
+   end
 end
 
 function zero!(x::n_Zn)
-   ptr = libSingular.n_Init(0, parent(x).ptr)
-   libSingular.n_Delete(x.ptr, parent(x).ptr)
-   x.ptr = ptr
-   return x
+   c = parent(x)
+   GC.@preserve x begin
+      ptr = libSingular.n_Init(0, c.ptr)
+      libSingular.n_Delete(x.ptr, c.ptr)
+      x.ptr = ptr
+      return x
+   end
 end
 
 ###############################################################################

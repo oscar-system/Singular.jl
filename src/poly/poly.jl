@@ -34,7 +34,9 @@ parent_type(::Type{spoly{T}}) where T <: Nemo.RingElem = PolyRing{T}
 
 Return the number of variables in the given polynomial ring.
 """
-nvars(R::PolyRing) = Int(libSingular.rVar(R.ptr))
+function nvars(R::PolyRing)
+   GC.@preserve R return Int(libSingular.rVar(R.ptr))
+end
 
 @doc Markdown.doc"""
     has_global_ordering(R::PolyRing)
@@ -43,7 +45,9 @@ Return `true` if the given ring has a global ordering, i.e. if $1 < x$ for
 each variable $x$ in the ring. This include `:lex`, `:deglex` and `:degrevlex`
 orderings.
 """
-has_global_ordering(R::PolyRing) = Bool(libSingular.rHasGlobalOrdering(R.ptr))
+function has_global_ordering(R::PolyRing)
+   GC.@preserve R return Bool(libSingular.rHasGlobalOrdering(R.ptr))
+end
 
 @doc Markdown.doc"""
     has_mixed_ordering(R::PolyRing)
@@ -51,7 +55,9 @@ has_global_ordering(R::PolyRing) = Bool(libSingular.rHasGlobalOrdering(R.ptr))
 Return `true` if the given ring has a mixed ordering, i.e. if $1 < x_i$ for
 a variable $x_i$ and $1>x_j$ for another variable $x_j$.
 """
-has_mixed_ordering(R::PolyRing) = Bool(libSingular.rHasMixedOrdering(R.ptr))
+function has_mixed_ordering(R::PolyRing)
+   GC.@preserve R return Bool(libSingular.rHasMixedOrdering(R.ptr))
+end
 
 @doc Markdown.doc"""
     has_local_ordering(R::PolyRing)
@@ -69,17 +75,21 @@ end
 Return `true` if the given ring is the quotient of a polynomial ring with
 a non - zero ideal.
 """
-isquotient_ring(R::PolyRing) = Bool(Singular.libSingular.rIsQuotientRing(R.ptr))
+function isquotient_ring(R::PolyRing)
+   GC.@preserve R return Bool(Singular.libSingular.rIsQuotientRing(R.ptr))
+end
 
-characteristic(R::PolyRing) = Int(libSingular.rChar(R.ptr))
+function characteristic(R::PolyRing)
+   GC.@preserve R return Int(libSingular.rChar(R.ptr))
+end
 
 function gens(R::PolyRing)
    n = nvars(R)
-   return [R(libSingular.rGetVar(Cint(i), R.ptr)) for i = 1:n]
+   GC.@preserve R return [R(libSingular.rGetVar(Cint(i), R.ptr)) for i = 1:n]
 end
 
 function gen(R::PolyRing, i::Int)
-   return R(libSingular.rGetVar(Cint(i), R.ptr))
+   GC.@preserve R return R(libSingular.rGetVar(Cint(i), R.ptr))
 end
 
 @doc Markdown.doc"""
@@ -88,7 +98,7 @@ end
 Return symbols for the generators of the polynomial ring $R$.
 """
 function symbols(R::PolyRing)
-   return [Symbol(libSingular.rRingVar(Cshort(i - 1), R.ptr)) for i in 1:nvars(R)]
+   GC.@preserve R return [Symbol(libSingular.rRingVar(Cshort(i - 1), R.ptr)) for i in 1:nvars(R)]
 end
 
 ordering(R::PolyRing) = R.ord
@@ -102,7 +112,7 @@ internal bound may be higher than the bound requested by the user via the
 `degree_bound` parameter of the `PolynomialRing` constructor.
 """
 function degree_bound(R::PolyRing)
-   return Int(libSingular.rBitmask(R.ptr))
+   GC.@preserve R return Int(libSingular.rBitmask(R.ptr))
 end
 
 zero(R::PolyRing) = R()
@@ -112,49 +122,56 @@ one(R::PolyRing) = R(1)
 iszero(p::spoly) = p.ptr.cpp_object == C_NULL
 
 function isone(p::spoly)
-   return Bool(libSingular.p_IsOne(p.ptr, parent(p).ptr))
+   GC.@preserve p return Bool(libSingular.p_IsOne(p.ptr, parent(p).ptr))
 end
 
 function isgen(p::spoly)
    R = parent(p)
-   if p.ptr.cpp_object == C_NULL || libSingular.pNext(p.ptr).cpp_object != C_NULL ||
-     !Bool(libSingular.n_IsOne(libSingular.pGetCoeff(p.ptr), base_ring(p).ptr))
-      return false
-   end
-    n = 0
-   for i = 1:nvars(R)
-      d = libSingular.p_GetExp(p.ptr, Cint(i), R.ptr)
-      if d > 1
+   GC.@preserve R p begin
+      if p.ptr.cpp_object == C_NULL || libSingular.pNext(p.ptr).cpp_object != C_NULL ||
+        !Bool(libSingular.n_IsOne(libSingular.pGetCoeff(p.ptr), base_ring(p).ptr))
          return false
-      elseif d == 1
-         if n == 1
-            return false
-         end
-         n = 1
       end
+       n = 0
+      for i = 1:nvars(R)
+         d = libSingular.p_GetExp(p.ptr, Cint(i), R.ptr)
+         if d > 1
+            return false
+         elseif d == 1
+            if n == 1
+               return false
+            end
+            n = 1
+         end
+      end
+      return n == 1
    end
-   return n == 1
 end
 
 function isconstant(p::spoly)
    R = parent(p)
-   if p.ptr.cpp_object == C_NULL
-      return true
-   end
-   if libSingular.pNext(p.ptr).cpp_object != C_NULL
-      return false
-   end
-   for i = 1:nvars(R)
-      if libSingular.p_GetExp(p.ptr, Cint(i), R.ptr) != 0
+   GC.@preserve R p begin
+      if p.ptr.cpp_object == C_NULL
+         return true
+      end
+      if libSingular.pNext(p.ptr).cpp_object != C_NULL
          return false
       end
+      for i = 1:nvars(R)
+         if libSingular.p_GetExp(p.ptr, Cint(i), R.ptr) != 0
+            return false
+         end
+      end
+      return true
    end
-   return true
 end
 
 function isunit(p::spoly)
-   return p.ptr.cpp_object != C_NULL && libSingular.pNext(p.ptr).cpp_object == C_NULL &&
-          Bool(libSingular.p_IsUnit(p.ptr, parent(p).ptr))
+   GC.@preserve p begin
+      return p.ptr.cpp_object != C_NULL &&
+             libSingular.pNext(p.ptr).cpp_object == C_NULL &&
+             Bool(libSingular.p_IsUnit(p.ptr, parent(p).ptr))
+   end
 end
 
 length(p::spoly) = Int(libSingular.pLength(p.ptr))
@@ -166,7 +183,7 @@ Return the total degree (largest sum of exponents of any monomial) of $p$.
 """
 function total_degree(p::spoly)
    R = parent(p)
-   libSingular.pLDeg(p.ptr, R.ptr)
+   GC.@preserve p R return libSingular.pLDeg(p.ptr, R.ptr)
 end
 
 @doc Markdown.doc"""
@@ -181,15 +198,17 @@ function order(p::spoly)
 
    R = parent(p)
    x = deepcopy(p)
-   hptr = Singular.libSingular.p_Head(x.ptr, R.ptr)
-   ord = Singular.libSingular.pLDeg(hptr, R.ptr)
-   xptr = libSingular.pNext(p.ptr)
-   while xptr.cpp_object != C_NULL
-      hptr = Singular.libSingular.p_Head(xptr, R.ptr)
-      ord = min(ord, Singular.libSingular.pLDeg(hptr, R.ptr))
-      xptr = libSingular.pNext(xptr)
+   GC.@preserve R x begin
+      hptr = Singular.libSingular.p_Head(x.ptr, R.ptr)
+      ord = Singular.libSingular.pLDeg(hptr, R.ptr)
+      xptr = libSingular.pNext(p.ptr)
+      while xptr.cpp_object != C_NULL
+         hptr = Singular.libSingular.p_Head(xptr, R.ptr)
+         ord = min(ord, Singular.libSingular.pLDeg(hptr, R.ptr))
+         xptr = libSingular.pNext(xptr)
+      end
+      return ord
    end
-   return ord
 end
 
 @doc Markdown.doc"""
@@ -203,13 +222,14 @@ function lead_exponent(p::spoly)
    R = parent(p)
    n = nvars(R)
    A = Array{Int}(undef, n)
-   libSingular.p_GetExpVL(p.ptr, A, R.ptr)
+   GC.@preserve p R libSingular.p_GetExpVL(p.ptr, A, R.ptr)
    return A
 end
 
 function deepcopy_internal(p::spoly, dict::IdDict)
-   p2 = libSingular.p_Copy(p.ptr, parent(p).ptr)
-   return parent(p)(p2)
+   R = parent(p)
+   p2 = GC.@preserve p R libSingular.p_Copy(p.ptr, R.ptr)
+   return R(p2)
 end
 
 function check_parent(a::spoly{T}, b::spoly{T}) where T <: Nemo.RingElem
@@ -243,7 +263,7 @@ function Base.iterate(x::Nemo.Generic.MPolyCoeffs{spoly{T}}) where T <: Nemo.Rin
       return nothing
    else
       R = base_ring(p)
-      return R(libSingular.n_Copy(libSingular.pGetCoeff(ptr), R.ptr)), ptr
+      GC.@preserve R return R(libSingular.n_Copy(libSingular.pGetCoeff(ptr), R.ptr)), ptr
    end
 end
 
@@ -253,7 +273,7 @@ function Base.iterate(x::Nemo.Generic.MPolyCoeffs{spoly{T}}, state) where T <: N
       return nothing
    else
       R = base_ring(x.poly)
-      return R(libSingular.n_Copy(libSingular.pGetCoeff(state), R.ptr)), state
+      GC.@preserve R return R(libSingular.n_Copy(libSingular.pGetCoeff(state), R.ptr)), state
    end
 end
 
@@ -265,7 +285,7 @@ function Base.iterate(x::Nemo.Generic.MPolyExponentVectors{spoly{T}}) where T <:
    else
       R = parent(p)
       A = Array{Int}(undef, nvars(R))
-      libSingular.p_GetExpVL(ptr, A, R.ptr)
+      GC.@preserve R libSingular.p_GetExpVL(ptr, A, R.ptr)
       return A, ptr
    end
 end
@@ -277,7 +297,7 @@ function Base.iterate(x::Nemo.Generic.MPolyExponentVectors{spoly{T}}, state) whe
    else
       R = parent(x.poly)
       A = Array{Int}(undef, nvars(R))
-      libSingular.p_GetExpVL(state, A, R.ptr)
+      GC.@preserve R libSingular.p_GetExpVL(state, A, R.ptr)
       return A, state
    end
 end
@@ -289,7 +309,7 @@ function Base.iterate(x::Nemo.Generic.MPolyTerms{spoly{T}}) where T <: Nemo.Ring
       return nothing
    else
       R = parent(p)
-      return R(libSingular.p_Head(ptr, R.ptr)), ptr
+      GC.@preserve R return R(libSingular.p_Head(ptr, R.ptr)), ptr
    end
 end
 
@@ -299,7 +319,7 @@ function Base.iterate(x::Nemo.Generic.MPolyTerms{spoly{T}}, state) where T <: Ne
       return nothing
    else
       R = parent(x.poly)
-      return R(libSingular.p_Head(state, R.ptr)), state
+      GC.@preserve R return R(libSingular.p_Head(state, R.ptr)), state
    end
 end
 
@@ -311,10 +331,13 @@ function Base.iterate(x::Nemo.Generic.MPolyMonomials{spoly{T}}) where T <: Nemo.
    else
       S = parent(p)
       R = base_ring(p)
-      mptr = libSingular.p_Head(ptr, S.ptr)
-      n = libSingular.n_Copy(one(R).ptr, R.ptr)
-      libSingular.p_SetCoeff0(mptr, n, S.ptr)
-      return S(mptr), ptr
+      t = one(R)
+      GC.@preserve t R S begin
+         mptr = libSingular.p_Head(ptr, S.ptr)
+         n = libSingular.n_Copy(t.ptr, R.ptr)
+         libSingular.p_SetCoeff0(mptr, n, S.ptr)
+         return S(mptr), ptr
+      end
    end
 end
 
@@ -326,10 +349,13 @@ function Base.iterate(x::Nemo.Generic.MPolyMonomials{spoly{T}}, state) where T <
       p = x.poly
       S = parent(p)
       R = base_ring(p)
-      mptr = libSingular.p_Head(state, S.ptr)
-      n = libSingular.n_Copy(one(R).ptr, R.ptr)
-      libSingular.p_SetCoeff0(mptr, n, S.ptr)
-      return S(mptr), state
+      t = one(R)
+      GC.@preserve t R S begin
+         mptr = libSingular.p_Head(state, S.ptr)
+         n = libSingular.n_Copy(t.ptr, R.ptr)
+         libSingular.p_SetCoeff0(mptr, n, S.ptr)
+         return S(mptr), state
+      end
    end
 end
 
@@ -361,9 +387,12 @@ isnegative(x::spoly) = isconstant(x) && !iszero(x) && isnegative(coeff(x, 0))
 ###############################################################################
 
 function -(a::spoly)
-   a1 = libSingular.p_Copy(a.ptr, parent(a).ptr)
-   s = libSingular.p_Neg(a1, parent(a).ptr)
-   return parent(a)(s)
+   R = parent(a)
+   GC.@preserve a R begin
+      a1 = libSingular.p_Copy(a.ptr, R.ptr)
+      s = libSingular.p_Neg(a1, R.ptr)
+      return R(s)
+   end
 end
 
 ###############################################################################
@@ -374,24 +403,31 @@ end
 
 function (a::spoly{T} + b::spoly{T}) where T <: Nemo.RingElem
    check_parent(a, b)
-   a1 = libSingular.p_Copy(a.ptr, parent(a).ptr)
-   b1 = libSingular.p_Copy(b.ptr, parent(a).ptr)
-   s = libSingular.p_Add_q(a1, b1, parent(a).ptr)
-   return parent(a)(s)
+   R = parent(a)
+   GC.@preserve a b R begin
+      a1 = libSingular.p_Copy(a.ptr, R.ptr)
+      b1 = libSingular.p_Copy(b.ptr, R.ptr)
+      s = libSingular.p_Add_q(a1, b1, R.ptr)
+      return R(s)
+   end
 end
 
 function (a::spoly{T} - b::spoly{T}) where T <: Nemo.RingElem
    check_parent(a, b)
-   a1 = libSingular.p_Copy(a.ptr, parent(a).ptr)
-   b1 = libSingular.p_Copy(b.ptr, parent(a).ptr)
-   s = libSingular.p_Sub(a1, b1, parent(a).ptr)
-   return parent(a)(s)
+   R = parent(a)
+   GC.@preserve a b R begin
+      a1 = libSingular.p_Copy(a.ptr, R.ptr)
+      b1 = libSingular.p_Copy(b.ptr, R.ptr)
+      s = libSingular.p_Sub(a1, b1, R.ptr)
+      return R(s)
+   end
 end
 
 function (a::spoly{T} * b::spoly{T}) where T <: Nemo.RingElem
    check_parent(a, b)
-   s = libSingular.pp_Mult_qq(a.ptr, b.ptr, parent(a).ptr)
-   return parent(a)(s)
+   R = parent(a)
+   s = GC.@preserve a b R libSingular.pp_Mult_qq(a.ptr, b.ptr, R.ptr)
+   return R(s)
 end
 
 ###############################################################################
@@ -411,9 +447,11 @@ function ^(x::spoly, y::Int)
    elseif y == 1
       return deepcopy(x)
    end
-   x1 = libSingular.p_Copy(x.ptr, R.ptr)
-   p = libSingular.p_Power(x1, Cint(y), R.ptr)
-   return R(p)
+   GC.@preserve x R begin
+      x1 = libSingular.p_Copy(x.ptr, R.ptr)
+      p = libSingular.p_Power(x1, Cint(y), R.ptr)
+      return R(p)
+   end
 end
 
 ###############################################################################
@@ -423,8 +461,8 @@ end
 ###############################################################################
 
 function (x::spoly{T} == y::spoly{T}) where T <: Nemo.RingElem
-    check_parent(x, y)
-    return Bool(libSingular.p_EqualPolys(x.ptr, y.ptr, parent(x).ptr))
+   check_parent(x, y)
+   GC.@preserve x y return Bool(libSingular.p_EqualPolys(x.ptr, y.ptr, parent(x).ptr))
 end
 
 ###############################################################################
@@ -436,10 +474,12 @@ end
 function divexact(x::spoly, y::spoly)
    check_parent(x, y)
    R = parent(x)
-   x1 = libSingular.p_Copy(x.ptr, R.ptr)
-   y1 = libSingular.p_Copy(y.ptr, R.ptr)
-   p = libSingular.p_Divide(x1, y1, R.ptr)
-   return R(p)
+   GC.@preserve x y R begin
+      x1 = libSingular.p_Copy(x.ptr, R.ptr)
+      y1 = libSingular.p_Copy(y.ptr, R.ptr)
+      p = libSingular.p_Divide(x1, y1, R.ptr)
+      return R(p)
+   end
 end
 
 ###############################################################################
@@ -451,35 +491,43 @@ end
 function divexact(x::spoly{T}, y::T) where T <: Nemo.RingElem
    R = parent(x)
    base_ring(x) != parent(y) && error("Incompatible rings")
-   x1 = libSingular.p_Copy(x.ptr, R.ptr)
-   p = libSingular.p_Div_nn(x1, y.ptr, R.ptr)
-   return R(p)
+   GC.@preserve x y R begin
+      x1 = libSingular.p_Copy(x.ptr, R.ptr)
+      p = libSingular.p_Div_nn(x1, y.ptr, R.ptr)
+      return R(p)
+   end
 end
 
 function divexact(x::spoly, y::n_Z)
    y1 = base_ring(x)(y)
    R = parent(x)
-   x1 = libSingular.p_Copy(x.ptr, R.ptr)
-   p = libSingular.p_Div_nn(x1, y1.ptr, R.ptr)
-   return R(p)
+   GC.@preserve x y1 R begin
+      x1 = libSingular.p_Copy(x.ptr, R.ptr)
+      p = libSingular.p_Div_nn(x1, y1.ptr, R.ptr)
+      return R(p)
+   end
 end
 
 function divexact(x::spoly, y::n_Q)
    y1 = base_ring(x)(y)
    R = parent(x)
-   x1 = libSingular.p_Copy(x.ptr, R.ptr)
-   p = libSingular.p_Div_nn(x1, y1.ptr, R.ptr)
-   return R(p)
+   GC.@preserve x y1 R begin
+      x1 = libSingular.p_Copy(x.ptr, R.ptr)
+      p = libSingular.p_Div_nn(x1, y1.ptr, R.ptr)
+      return R(p)
+   end
 end
 
 function divexact(x::spoly, y::Int)
    R = base_ring(x)
    S = parent(x)
-   y1 = libSingular.n_Init(y, R.ptr)
-   x1 = libSingular.p_Copy(x.ptr, S.ptr)
-   p = libSingular.p_Div_nn(x1, y1, S.ptr)
-   libSingular.n_Delete(y1, R.ptr)
-   return S(p)
+   GC.@preserve x R S begin
+      y1 = libSingular.n_Init(y, R.ptr)
+      x1 = libSingular.p_Copy(x.ptr, S.ptr)
+      p = libSingular.p_Div_nn(x1, y1, S.ptr)
+      libSingular.n_Delete(y1, R.ptr)
+      return S(p)
+   end
 end
 
 divexact(x::spoly, y::Integer) = divexact(x, base_ring(x)(y))
@@ -497,18 +545,20 @@ end
 function divides(x::spoly{T}, y::spoly{T}) where T <: Nemo.FieldElem
    check_parent(x, y)
    R = parent(x)
-   # First check divisibility in a cheap way
-   x2 = libSingular.p_Copy(x.ptr, R.ptr)
-   y2 = libSingular.p_Copy(y.ptr, R.ptr)
-   flag = libSingular.p_IsDivisibleBy(x2, y2, R.ptr)
-   if flag
-      # now compute exact quotient
+   GC.@preserve x y R begin
+      # First check divisibility in a cheap way
       x2 = libSingular.p_Copy(x.ptr, R.ptr)
       y2 = libSingular.p_Copy(y.ptr, R.ptr)
-      q = libSingular.p_Divide(x2, y2, R.ptr)
-      return true, R(q)
-   else
-      return false, R()
+      flag = libSingular.p_IsDivisibleBy(x2, y2, R.ptr)
+      if flag
+         # now compute exact quotient
+         x2 = libSingular.p_Copy(x.ptr, R.ptr)
+         y2 = libSingular.p_Copy(y.ptr, R.ptr)
+         q = libSingular.p_Divide(x2, y2, R.ptr)
+         return true, R(q)
+      else
+         return false, R()
+      end
    end
 end
 
@@ -521,21 +571,25 @@ end
 function divrem(x::spoly{T}, y::spoly{T}) where T <: Nemo.FieldElem
    check_parent(x, y)
    R = parent(x)
-   px = libSingular.p_Copy(x.ptr, R.ptr)
-   py = libSingular.p_Copy(y.ptr, R.ptr)
-   q, r = libSingular.p_DivRem(px, py, R.ptr)
-   qref = libSingular.toPolyRef(q)
-   rref = libSingular.toPolyRef(r)
-   return R(qref), R(rref)
+   GC.@preserve x y R begin
+      px = libSingular.p_Copy(x.ptr, R.ptr)
+      py = libSingular.p_Copy(y.ptr, R.ptr)
+      q, r = libSingular.p_DivRem(px, py, R.ptr)
+      qref = libSingular.toPolyRef(q)
+      rref = libSingular.toPolyRef(r)
+      return R(qref), R(rref)
+   end
 end
 
 function div(x::spoly{T}, y::spoly{T}) where T <: Nemo.FieldElem
    check_parent(x, y)
    R = parent(x)
-   px = libSingular.p_Copy(x.ptr, R.ptr)
-   py = libSingular.p_Copy(y.ptr, R.ptr)
-   q = libSingular.p_Divide(px, py, R.ptr)
-   return R(q)
+   GC.@preserve x y R begin
+      px = libSingular.p_Copy(x.ptr, R.ptr)
+      py = libSingular.p_Copy(y.ptr, R.ptr)
+      q = libSingular.p_Divide(px, py, R.ptr)
+      return R(q)
+   end
 end
 
 ###############################################################################
@@ -547,22 +601,26 @@ end
 function gcd(x::spoly{T}, y::spoly{T}) where T <: Nemo.RingElem
    check_parent(x, y)
    R = parent(x)
-   x1 = libSingular.p_Copy(x.ptr, R.ptr)
-   y1 = libSingular.p_Copy(y.ptr, R.ptr)
-   p = libSingular.singclap_gcd(x1, y1, R.ptr)
-   return R(p)
+   GC.@preserve x y R begin
+      x1 = libSingular.p_Copy(x.ptr, R.ptr)
+      y1 = libSingular.p_Copy(y.ptr, R.ptr)
+      p = libSingular.singclap_gcd(x1, y1, R.ptr)
+      return R(p)
+   end
 end
 
 function gcdx(x::spoly{T}, y::spoly{T}) where T <: Nemo.FieldElem
    check_parent(x, y)
    R = parent(x)
-   x1 = libSingular.p_Copy(x.ptr, R.ptr)
-   y1 = libSingular.p_Copy(y.ptr, R.ptr)
-   s = [libSingular.p_ISet(0,R.ptr)]
-   t = [libSingular.p_ISet(0,R.ptr)]
-   p = [libSingular.p_ISet(0,R.ptr)]
-   libSingular.p_ExtGcd(x1, y1, pointer(p), pointer(s), pointer(t), R.ptr)
-   return R(p[]), R(s[]), R(t[])
+   GC.@preserve x y R begin
+      x1 = libSingular.p_Copy(x.ptr, R.ptr)
+      y1 = libSingular.p_Copy(y.ptr, R.ptr)
+      s = [libSingular.p_ISet(0,R.ptr)]
+      t = [libSingular.p_ISet(0,R.ptr)]
+      p = [libSingular.p_ISet(0,R.ptr)]
+      libSingular.p_ExtGcd(x1, y1, pointer(p), pointer(s), pointer(t), R.ptr)
+      return R(p[]), R(s[]), R(t[])
+   end
 end
 
 function lcm(x::spoly{T}, y::spoly{T}) where T <: Nemo.RingElem
@@ -704,7 +762,7 @@ function factor_squarefree(x::spoly)
   end
 
   a = Array{Int32, 1}()
-  I = Ideal(R, libSingular.singclap_sqrfree(x.ptr, a, R.ptr))
+  I = GC.@preserve x R Ideal(R, libSingular.singclap_sqrfree(x.ptr, a, R.ptr))
   D = Dict{typeof(I[1]), Int64}()
   n = ngens(I)
   if n == 1
@@ -733,7 +791,7 @@ function factor(x::spoly)
   end
 
   a = Array{Int32, 1}()
-  I = Ideal(R, libSingular.singclap_factorize(x.ptr, a, R.ptr))
+  I = GC.@preserve x R Ideal(R, libSingular.singclap_factorize(x.ptr, a, R.ptr))
   D = Dict{typeof(I[1]), Int64}()
   n = ngens(I)
   if n == 1
@@ -761,7 +819,7 @@ Returns a new polynomial.
 function substitute_variable(p::spoly, i::Int64, q::spoly)
     R = parent(p)
     check_parent(p, q)
-    return R( libSingular.p_Subst(p.ptr,i, q.ptr, R.ptr) )
+    GC.@preserve p q R return R(libSingular.p_Subst(p.ptr,i, q.ptr, R.ptr))
 end
 
 @doc Markdown.doc"""
@@ -771,14 +829,19 @@ Permutes the indeterminates of `p` according to `perm` to the indeterminates
 of the ring `new_ring`.
 """
 function permute_variables(p::spoly, perm::Array{Int64,1}, new_ring::PolyRing)
-    old_ring = parent(p)
-    perm_64 = [0]
-    append!(perm_64,perm)
-    perm_32 = convert(Array{Int32,1},perm_64)
-    map_ptr = libSingular.n_SetMap(base_ring(old_ring).ptr, base_ring(new_ring).ptr)
-    poly_ptr = libSingular.p_PermPoly(p.ptr, perm_32, old_ring.ptr, new_ring.ptr, map_ptr, Ptr{Int32}(C_NULL))
-    poly = new_ring(poly_ptr)
-    return poly
+   old_ring = parent(p)
+   old_base = base_ring(old_ring)
+   new_base = base_ring(new_ring)
+   GC.@preserve p new_ring old_ring old_base new_base begin
+       perm_64 = [0]
+       append!(perm_64,perm)
+       perm_32 = convert(Array{Int32,1},perm_64)
+       map_ptr = libSingular.n_SetMap(old_base.ptr, new_base.ptr)
+       poly_ptr = libSingular.p_PermPoly(p.ptr, perm_32, old_ring.ptr,
+                                     new_ring.ptr, map_ptr, Ptr{Int32}(C_NULL))
+       poly = new_ring(poly_ptr)
+       return poly
+   end
 end
 
 ###############################################################################
@@ -835,7 +898,7 @@ function (R::AbstractAlgebra.Generic.MPolyRing{T})(p::Singular.spoly{Singular.n_
    B = MPolyBuildCtx(R)
    cvzip = zip(coefficients(p), exponent_vectors(p))
    for (c, v) in cvzip
-      push_term!(B, libSingular.julia(libSingular.cast_number_to_void(c.ptr)), v)
+      GC.@preserve c push_term!(B, libSingular.julia(libSingular.cast_number_to_void(c.ptr)), v)
    end
    return finish(B)
 end
@@ -852,7 +915,8 @@ Given a polynomial $x$ this function truncates $x$ up to degree $n$.
 """
 function jet(x::spoly, n::Int)
    p = deepcopy(x)
-   p.ptr = libSingular.p_Jet(x.ptr, Cint(n), parent(x).ptr)
+   R = parent(x)
+   p.ptr = GC.@preserve x R libSingular.p_Jet(x.ptr, Cint(n), R.ptr)
    return p
 end
 
@@ -867,7 +931,7 @@ function derivative(x::spoly, n::Int)
        error("Variable does not exist")
    else
        p = deepcopy(x)
-       p.ptr = libSingular.p_Diff(p.ptr, Cint(n), R.ptr)
+       p.ptr = GC.@preserve p R libSingular.p_Diff(p.ptr, Cint(n), R.ptr)
        return p
    end
 end
@@ -944,49 +1008,57 @@ end
 
 function sort_terms!(x::spoly)
    S = parent(x)
-   x.ptr = libSingular.p_SortMerge(x.ptr, S.ptr)
+   x.ptr = GC.@preserve x S libSingular.p_SortMerge(x.ptr, S.ptr)
    return x
 end
 
 function addeq!(x::spoly, y::spoly)
-    R = parent(x)
-    if y.ptr == C_NULL
-    elseif x.ptr == C_NULL
-       x.ptr = libSingular.p_Copy(y.ptr, R.ptr)
-    else
-       x.ptr = libSingular.p_Add_q(x.ptr, libSingular.p_Copy(y.ptr, R.ptr), R.ptr)
-    end
-    return x
+   R = parent(x)
+   GC.@preserve x y R begin
+       if y.ptr == C_NULL
+       elseif x.ptr == C_NULL
+          x.ptr = libSingular.p_Copy(y.ptr, R.ptr)
+       else
+          x.ptr = libSingular.p_Add_q(x.ptr, libSingular.p_Copy(y.ptr, R.ptr), R.ptr)
+       end
+       return x
+   end
 end
 
 function mul!(c::spoly, x::spoly, y::spoly)
    R = parent(x)
-   ptr = libSingular.pp_Mult_qq(x.ptr, y.ptr, R.ptr)
-   if c.ptr != C_NULL
-      libSingular.p_Delete(c.ptr, R.ptr)
+   GC.@preserve c x y R begin
+      ptr = libSingular.pp_Mult_qq(x.ptr, y.ptr, R.ptr)
+      if c.ptr != C_NULL
+         libSingular.p_Delete(c.ptr, R.ptr)
+      end
+      c.ptr = ptr
+      return c
    end
-   c.ptr = ptr
-   return c
 end
 
 function add!(c::spoly, x::spoly, y::spoly)
    R = parent(x)
-   x1 = libSingular.p_Copy(x.ptr, R.ptr)
-   y1 = libSingular.p_Copy(y.ptr, R.ptr)
-   ptr = libSingular.p_Add_q(x1, y1, R.ptr)
-   if c.ptr != C_NULL
-      libSingular.p_Delete(c.ptr, R.ptr)
+   GC.@preserve c x y R begin
+      x1 = libSingular.p_Copy(x.ptr, R.ptr)
+      y1 = libSingular.p_Copy(y.ptr, R.ptr)
+      ptr = libSingular.p_Add_q(x1, y1, R.ptr)
+      if c.ptr != C_NULL
+         libSingular.p_Delete(c.ptr, R.ptr)
+      end
+      c.ptr = ptr
+      return c
    end
-   c.ptr = ptr
-   return c
 end
 
 function zero!(x::spoly)
-   if x.ptr != C_NULL
-      libSingular.p_Delete(x.ptr, parent(x).ptr)
-      x.ptr = libSingular.p_ISet(0, parent(x).ptr)
+   GC.@preserve x begin
+      if x.ptr != C_NULL
+         libSingular.p_Delete(x.ptr, parent(x).ptr)
+         x.ptr = libSingular.p_ISet(0, parent(x).ptr)
+      end
+      return x
    end
-   return x
 end
 
 ###############################################################################
@@ -1029,7 +1101,8 @@ end
 ###############################################################################
 
 function MPolyBuildCtx(R::PolyRing)
-   return MPolyBuildCtx(R, R().ptr)
+   t = R()
+   GC.@preserve t return MPolyBuildCtx(R, t.ptr)
 end
 
 function push_term!(M::MPolyBuildCtx{spoly{S}, U}, c::S, expv::Vector{Int}) where {U, S <: Nemo.RingElem}
@@ -1037,22 +1110,25 @@ function push_term!(M::MPolyBuildCtx{spoly{S}, U}, c::S, expv::Vector{Int}) wher
       return
    end
    R = parent(M.poly)
-   nv = nvars(R)
-   nv != length(expv) && error("Incorrect number of exponents in push_term!")
-   p = M.poly
-   ptr = libSingular.p_Init(R.ptr)
-   libSingular.p_SetCoeff0(ptr, libSingular.n_Copy(c.ptr, base_ring(R).ptr), R.ptr)
-   for i = 1:nv
-      libSingular.p_SetExp(ptr, i, expv[i], R.ptr)
+   RR = base_ring(R)
+   GC.@preserve c R begin
+      nv = nvars(R)
+      nv != length(expv) && error("Incorrect number of exponents in push_term!")
+      p = M.poly
+      ptr = libSingular.p_Init(R.ptr)
+      libSingular.p_SetCoeff0(ptr, libSingular.n_Copy(c.ptr, RR.ptr), R.ptr)
+      for i = 1:nv
+         libSingular.p_SetExp(ptr, i, expv[i], R.ptr)
+      end
+      libSingular.p_Setm(ptr, R.ptr)
+      if iszero(p)
+         p.ptr = ptr
+      else
+         libSingular.p_SetNext(M.state, ptr)
+      end
+      M.state = ptr
+      return M.poly
    end
-   libSingular.p_Setm(ptr, R.ptr)
-   if iszero(p)
-      p.ptr = ptr
-   else
-      libSingular.p_SetNext(M.state, ptr)
-   end
-   M.state = ptr
-   return M.poly
 end
 
 function finish(M::MPolyBuildCtx{spoly{S}, U}) where {S, U}
@@ -1083,7 +1159,7 @@ end
 
 function (R::PolyRing)(n::n_Z)
    n = base_ring(R)(n)
-   ptr = libSingular.n_Copy(n.ptr, parent(n).ptr)
+   ptr = GC.@preserve n libSingular.n_Copy(n.ptr, parent(n).ptr)
    T = elem_type(base_ring(R))
    return spoly{T}(R, ptr)
 end
@@ -1095,12 +1171,12 @@ end
 
 function (R::PolyRing{T})(n::T) where T <: Nemo.RingElem
    parent(n) != base_ring(R) && error("Unable to coerce into polynomial ring")
-   return spoly{T}(R, n.ptr)
+   GC.@preserve n return spoly{T}(R, n.ptr)
 end
 
 function (R::Singular.PolyRing{T})(n::T) where T<:Singular.n_unknown
    parent(n) != base_ring(R) && error("Unable to coerce into polynomial ring")
-   return spoly{T}(R, n.ptr)
+   GC.@preserve n return spoly{T}(R, n.ptr)
 end
 
 function (R::PolyRing)(f::T) where T <: Nemo.MPolyElem
