@@ -30,11 +30,12 @@ function degree(R::N_GField)
 end
 
 function deepcopy_internal(a::n_GF, dict::IdDict)
-   return parent(a)(libSingular.n_Copy(a.ptr, parent(a).ptr))
+   c = parent(a)
+   GC.@preserve a c return c(libSingular.n_Copy(a.ptr, c.ptr))
 end
 
 function hash(a::n_GF, h::UInt)
-   GC.@preserve a i = reinterpret(Int, a.ptr.cpp_object)
+   i = GC.@preserve a reinterpret(Int, a.ptr.cpp_object)
    chash = hash(characteristic(parent(a)), h)
    ihash = hash(i, h)
    return xor(xor(chash, ihash), 0x2c42e12d0c837511%UInt)
@@ -113,7 +114,8 @@ end
 
 function show(io::IO, n::n_GF)
    libSingular.StringSetS("")
-   GC.@preserve n libSingular.n_Write(n.ptr, parent(n).ptr, false)
+   c = parent(n)
+   GC.@preserve n c libSingular.n_Write(n.ptr, c.ptr, false)
    print(io, libSingular.StringEndS())
 end
 
@@ -125,7 +127,7 @@ end
 
 function -(x::n_GF)
    c = parent(x)
-   GC.@preserve x c p = libSingular.n_Neg(x.ptr, c.ptr)
+   p = GC.@preserve x c libSingular.n_Neg(x.ptr, c.ptr)
    return c(p)
 end
 
@@ -137,19 +139,19 @@ end
 
 function +(x::n_GF, y::n_GF)
    c = parent(x)
-   GC.@preserve x y c p = libSingular.n_Add(x.ptr, y.ptr, c.ptr)
+   p = GC.@preserve x y c libSingular.n_Add(x.ptr, y.ptr, c.ptr)
    return c(p)
 end
 
 function -(x::n_GF, y::n_GF)
    c = parent(x)
-   GC.@preserve x y c p = libSingular.n_Sub(x.ptr, y.ptr, c.ptr)
+   p = GC.@preserve x y c libSingular.n_Sub(x.ptr, y.ptr, c.ptr)
    return c(p)
 end
 
 function *(x::n_GF, y::n_GF)
    c = parent(x)
-   GC.@preserve x y c p = libSingular.n_Mult(x.ptr, y.ptr, c.ptr)
+   p = GC.@preserve x y c libSingular.n_Mult(x.ptr, y.ptr, c.ptr)
    return c(p)
 end
 
@@ -160,7 +162,8 @@ end
 ###############################################################################
 
 function ==(x::n_GF, y::n_GF)
-   GC.@preserve x y return libSingular.n_Equal(x.ptr, y.ptr, parent(x).ptr)
+   c = parent(x)
+   GC.@preserve x y return libSingular.n_Equal(x.ptr, y.ptr, c.ptr)
 end
 
 isequal(x::n_GF, y::n_GF) = (x == y)
@@ -194,8 +197,9 @@ function ^(x::n_GF, y::Int)
    elseif y == 1
       return x
    else
-      GC.@preserve x y p = libSingular.n_Power(x.ptr, y, parent(x).ptr)
-      return parent(x)(p)
+      R = parent(x)
+      p = GC.@preserve x R libSingular.n_Power(x.ptr, y, R.ptr)
+      return R(p)
    end
 end
 
@@ -207,13 +211,13 @@ end
 
 function inv(x::n_GF)
    c = parent(x)
-   GC.@preserve x c p = libSingular.n_Invers(x.ptr, c.ptr)
+   p = GC.@preserve x c libSingular.n_Invers(x.ptr, c.ptr)
    return c(p)
 end
 
 function divexact(x::n_GF, y::n_GF)
    c = parent(x)
-   GC.@preserve x y c p = libSingular.n_Div(x.ptr, y.ptr, c.ptr)
+   p = GC.@preserve x y c libSingular.n_Div(x.ptr, y.ptr, c.ptr)
    return c(p)
 end
 
@@ -228,7 +232,7 @@ function gcd(x::n_GF, y::n_GF)
       return zero(parent(x))
    end
    c = parent(x)
-   GC.@preserve x y c p = libSingular.n_Gcd(x.ptr, y.ptr, c.ptr)
+   p = GC.@preserve x y c libSingular.n_Gcd(x.ptr, y.ptr, c.ptr)
    return c(p)
 end
 
@@ -239,35 +243,38 @@ end
 ###############################################################################
 
 function addeq!(x::n_GF, y::n_GF)
-   GC.@preserve x y x.ptr = libSingular.n_InpAdd(x.ptr, y.ptr, parent(x).ptr)
+   x.ptr = GC.@preserve x y libSingular.n_InpAdd(x.ptr, y.ptr, parent(x).ptr)
    return x
 end
 
 function mul!(x::n_GF, y::n_GF, z::n_GF)
-GC.@preserve x y z begin
-   ptr = libSingular.n_Mult(y.ptr, z.ptr, parent(x).ptr)
-   libSingular.n_Delete(x.ptr, parent(x).ptr)
-   x.ptr = ptr
-   return x
-end
+   c = parent(x)
+   GC.@preserve x y z begin
+      ptr = libSingular.n_Mult(y.ptr, z.ptr, c.ptr)
+      libSingular.n_Delete(x.ptr, c.ptr)
+      x.ptr = ptr
+      return x
+   end
 end
 
 function add!(x::n_GF, y::n_GF, z::n_GF)
-GC.@preserve x y z begin
-   ptr = libSingular.n_Add(y.ptr, z.ptr, parent(x).ptr)
-   libSingular.n_Delete(x.ptr, parent(x).ptr)
-   x.ptr = ptr
-   return x
-end
+   c = parent(x)
+   GC.@preserve x y z c begin
+      ptr = libSingular.n_Add(y.ptr, z.ptr, c.ptr)
+      libSingular.n_Delete(x.ptr, c.ptr)
+      x.ptr = ptr
+      return x
+   end
 end
 
 function zero!(x::n_GF)
-GC.@preserve x begin
-   ptr = libSingular.n_Init(0, parent(x).ptr)
-   libSingular.n_Delete(x.ptr, parent(x).ptr)
-   x.ptr = ptr
-   return x
-end
+   c = parent(x)
+   GC.@preserve x c begin
+      ptr = libSingular.n_Init(0, c.ptr)
+      libSingular.n_Delete(x.ptr, c.ptr)
+      x.ptr = ptr
+      return x
+   end
 end
 
 ###############################################################################

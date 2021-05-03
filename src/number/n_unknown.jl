@@ -20,13 +20,13 @@ end
 
 function canonical_unit(a::n_unknown)
    R = parent(a)
-   GC.@preserve a n = libSingular.julia(libSingular.cast_number_to_void(a.ptr))
+   n = GC.@preserve a libSingular.julia(libSingular.cast_number_to_void(a.ptr))
    return R(canonical_unit(n))
 end
 
 function deepcopy_internal(a::n_unknown, dict::IdDict)
    R = parent(a)
-   GC.@preserve a n = libSingular.julia(libSingular.cast_number_to_void(a.ptr))
+   n = GC.@preserve a libSingular.julia(libSingular.cast_number_to_void(a.ptr))
    return R(deepcopy(n))
 end
 
@@ -39,7 +39,7 @@ function zero(R::CoefficientRing)
 end
 
 function hash(a::n_unknown, h::UInt)
-   GC.@preserve a n = libSingular.julia(libSingular.cast_number_to_void(a.ptr))
+   n = GC.@preserve a libSingular.julia(libSingular.cast_number_to_void(a.ptr))
    return xor(hash(n, h), 0x664e59de562461fe%UInt)
 end
 
@@ -56,12 +56,13 @@ end
 
 function show(io::IO, a::n_unknown)
    libSingular.StringSetS("")
-   GC.@preserve a libSingular.n_Write(a.ptr, parent(a).ptr, false)
+   R = parent(a)
+   GC.@preserve a R libSingular.n_Write(a.ptr, R.ptr, false)
    print(io, libSingular.StringEndS())
 end
 
 function AbstractAlgebra.expressify(a::n_unknown; context = nothing)
-   GC.@preserve a n = libSingular.julia(libSingular.cast_number_to_void(a.ptr))
+   n = GC.@preserve a libSingular.julia(libSingular.cast_number_to_void(a.ptr))
    return AbstractAlgebra.expressify(n; context = context)
 end
 
@@ -73,7 +74,7 @@ end
 
 function -(a::n_unknown)
    R = parent(a)
-   GC.@preserve a R n = libSingular.n_Neg(a.ptr, R.ptr)
+   n = GC.@preserve a R libSingular.n_Neg(a.ptr, R.ptr)
    return R(n)
 end
 
@@ -86,21 +87,21 @@ end
 function +(a::n_unknown{T}, b::n_unknown{T}) where T <: Nemo.RingElem
    check_parent(a, b)
    R = parent(a)
-   GC.@preserve a b R n = libSingular.n_Add(a.ptr, b.ptr, R.ptr)
+   n = GC.@preserve a b R libSingular.n_Add(a.ptr, b.ptr, R.ptr)
    return R(n)
 end
 
 function -(a::n_unknown{T}, b::n_unknown{T}) where T <: Nemo.RingElem
    check_parent(a, b)
    R = parent(a)
-   GC.@preserve a b R n = libSingular.n_Sub(a.ptr, b.ptr, R.ptr)
+   n = GC.@preserve a b R libSingular.n_Sub(a.ptr, b.ptr, R.ptr)
    return R(n)
 end
 
 function *(a::n_unknown{T}, b::n_unknown{T}) where T <: Nemo.RingElem
    check_parent(a, b)
    R = parent(a)
-   GC.@preserve a b R n = libSingular.n_Mult(a.ptr, b.ptr, R.ptr)
+   n = GC.@preserve a b R libSingular.n_Mult(a.ptr, b.ptr, R.ptr)
    return R(n)
 end
 
@@ -124,7 +125,7 @@ end
 
 function inv(a::n_unknown{T}) where T <: Nemo.FieldElem
    R = parent(a)
-   GC.@preserve a R n = libSingular.n_Invers(a.ptr, R.ptr)
+   n = GC.@preserve a R libSingular.n_Invers(a.ptr, R.ptr)
    return R(n)
 end
 
@@ -137,7 +138,7 @@ end
 function divexact(a::n_unknown{T}, b::n_unknown{T}) where T <: Nemo.RingElem
    check_parent(a, b)
    R = parent(a)
-   GC.@preserve a b R n = libSingular.n_ExactDiv(a.ptr, b.ptr, R.ptr)
+   n = GC.@preserve a b R libSingular.n_ExactDiv(a.ptr, b.ptr, R.ptr)
    return R(n)
 end
 
@@ -150,7 +151,7 @@ end
 function gcd(a::n_unknown{T}, b::n_unknown{T}) where T <: Nemo.RingElem
    check_parent(a, b)
    R = parent(a)
-   GC.@preserve a b R n = libSingular.n_Gcd(a.ptr, b.ptr, R.ptr)
+   n = GC.@preserve a b R libSingular.n_Gcd(a.ptr, b.ptr, R.ptr)
    return R(n)
 end
 
@@ -165,7 +166,7 @@ function gcdx(a::n_unknown{T}, b::n_unknown{T}) where T <: Nemo.RingElem
    R = parent(a)
    s = [libSingular.n_Init(0, R.ptr)]
    t = [libSingular.n_Init(0, R.ptr)]
-   GC.@preserve a b s t n = libSingular.n_ExtGcd(a.ptr, b.ptr, pointer(s), pointer(t), R.ptr)
+   n = GC.@preserve a b s t libSingular.n_ExtGcd(a.ptr, b.ptr, pointer(s), pointer(t), R.ptr)
    return R(n), R(s[]), R(t[])
 end
 

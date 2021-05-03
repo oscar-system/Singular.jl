@@ -35,7 +35,8 @@ function characteristic(R::N_AlgExtField)
 end
 
 function deepcopy_internal(a::n_algExt, dict::IdDict)
-   GC.@preserve a return parent(a)(libSingular.n_Copy(a.ptr, parent(a).ptr))
+   R = parent(a)
+   GC.@preserve a R return R(libSingular.n_Copy(a.ptr, R.ptr))
 end
 
 function hash(a::n_algExt, h::UInt)
@@ -132,7 +133,7 @@ end
 
 function -(x::n_algExt)
     c = parent(x)
-    GC.@preserve x c p = libSingular.n_Neg(x.ptr, c.ptr)
+    p = GC.@preserve x c libSingular.n_Neg(x.ptr, c.ptr)
     return c(p)
 end
 
@@ -145,21 +146,21 @@ end
 function +(x::n_algExt, y::n_algExt)
    check_parent(x, y)
    c = parent(x)
-   GC.@preserve x y c p = libSingular.n_Add(x.ptr, y.ptr, c.ptr)
+   p = GC.@preserve x y c libSingular.n_Add(x.ptr, y.ptr, c.ptr)
    return c(p)
 end
 
 function -(x::n_algExt, y::n_algExt)
    check_parent(x, y)
    c = parent(x)
-   GC.@preserve x y c p = libSingular.n_Sub(x.ptr, y.ptr, c.ptr)
+   p = GC.@preserve x y c libSingular.n_Sub(x.ptr, y.ptr, c.ptr)
    return c(p)
 end
 
 function *(x::n_algExt, y::n_algExt)
    check_parent(x, y)
    c = parent(x)
-   GC.@preserve x y c p = libSingular.n_Mult(x.ptr, y.ptr, c.ptr)
+   p = GC.@preserve x y c libSingular.n_Mult(x.ptr, y.ptr, c.ptr)
    return c(p)
 end
 
@@ -211,7 +212,7 @@ function ^(x::n_algExt, y::Int)
    else
       y < 0 && iszero(x) && throw(DivideError())
       c = parent(x)
-      GC.@preserve x y c p = libSingular.n_Power(x.ptr, y, c.ptr)
+      p = GC.@preserve x y c libSingular.n_Power(x.ptr, y, c.ptr)
       return c(p)
    end
 end
@@ -224,14 +225,14 @@ end
 
 function inv(x::n_algExt)
    c = parent(x)
-   GC.@preserve x c p = libSingular.n_Invers(x.ptr, c.ptr)
+   p = GC.@preserve x c libSingular.n_Invers(x.ptr, c.ptr)
    return c(p)
 end
 
 function divexact(x::n_algExt, y::n_algExt)
    check_parent(x, y)
    c = parent(x)
-   GC.@preserve x y c p = libSingular.n_Div(x.ptr, y.ptr, c.ptr)
+   p = GC.@preserve x y c libSingular.n_Div(x.ptr, y.ptr, c.ptr)
    return c(p)
 end
 
@@ -247,7 +248,7 @@ function gcd(x::n_algExt, y::n_algExt)
       return zero(parent(x))
    end
    c = parent(x)
-   GC.@preserve x y c p = libSingular.n_Gcd(x.ptr, y.ptr, c.ptr)
+   p = GC.@preserve x y c libSingular.n_Gcd(x.ptr, y.ptr, c.ptr)
    return c(p)
 end
 
@@ -258,33 +259,39 @@ end
 ###############################################################################
 
 function addeq!(x::n_algExt, y::n_algExt)
-   GC.@preserve x y x.ptr = libSingular.n_InpAdd(x.ptr, y.ptr, parent(x).ptr)
+   R = parent(x)
+   x.ptr = GC.@preserve x y R libSingular.n_InpAdd(x.ptr, y.ptr, R.ptr)
    return x
 end
 
 function mul!(x::n_algExt, y::n_algExt, z::n_algExt)
-GC.@preserve x y z begin
-   ptr = libSingular.n_Mult(y.ptr, z.ptr, parent(x).ptr)
-   libSingular.n_Delete(x.ptr, parent(x).ptr)
-   x.ptr = ptr
-   return x
-end
+   R = parent(x)
+   GC.@preserve x y z R begin
+      ptr = libSingular.n_Mult(y.ptr, z.ptr, R.ptr)
+      libSingular.n_Delete(x.ptr, R.ptr)
+      x.ptr = ptr
+      return x
+   end
 end
 
 function add!(x::n_algExt, y::n_algExt, z::n_algExt)
-   ptr = libSingular.n_Add(y.ptr, z.ptr, parent(x).ptr)
-   libSingular.n_Delete(x.ptr, parent(x).ptr)
-   x.ptr = ptr
-   return x
+   R = parent(x)
+   GC.@preserve x y z R begin
+      ptr = libSingular.n_Add(y.ptr, z.ptr, R.ptr)
+      libSingular.n_Delete(x.ptr, R.ptr)
+      x.ptr = ptr
+      return x
+   end
 end
 
 function zero!(x::n_algExt)
-GC.@preserve x begin
-   ptr = libSingular.n_Init(0, parent(x).ptr)
-   libSingular.n_Delete(x.ptr, parent(x).ptr)
-   x.ptr = ptr
-   return x
-end
+   R = parent(x)
+   GC.@preserve x R begin
+      ptr = libSingular.n_Init(0, R.ptr)
+      libSingular.n_Delete(x.ptr, R.ptr)
+      x.ptr = ptr
+      return x
+   end
 end
 
 ###############################################################################

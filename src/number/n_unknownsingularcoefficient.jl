@@ -37,7 +37,8 @@ function canonical_unit(a::n_unknownsingularcoefficient)
 end
 
 function deepcopy_internal(a::n_unknownsingularcoefficient, dict::IdDict)
-   GC.@preserve a return parent(a)(libSingular.n_Copy(a.ptr, parent(a).ptr))
+   R = parent(a)
+   GC.@preserve a R return R(libSingular.n_Copy(a.ptr, R.ptr))
 end
 
 function one(R::N_UnknownSingularCoefficientRing)
@@ -53,11 +54,13 @@ one(a::n_unknownsingularcoefficient) = one(parent(a))
 zero(a::n_unknownsingularcoefficient) = zero(parent(a))
 
 function isone(a::n_unknownsingularcoefficient)
-   GC.@preserve a return Bool(libSingular.n_IsOne(a.ptr, parent(a).ptr))
+   R = parent(a)
+   GC.@preserve a R return Bool(libSingular.n_IsOne(a.ptr, R.ptr))
 end
 
 function iszero(a::n_unknownsingularcoefficient)
-   GC.@preserve a return Bool(libSingular.n_IsZero(a.ptr, parent(a).ptr))
+   R = parent(a)
+   GC.@preserve a R return Bool(libSingular.n_IsZero(a.ptr, R.ptr))
 end
 
 function hash(a::n_unknownsingularcoefficient, h::UInt)
@@ -73,7 +76,8 @@ end
 function AbstractAlgebra.expressify(a::n_unknownsingularcoefficient; context = nothing)::Any
    # TODO this easy method might not be the best
    libSingular.StringSetS("")
-   libSingular.n_Write(a.ptr, parent(a).ptr, false)
+   R = parent(a)
+   GC.@preserve a R libSingular.n_Write(a.ptr, R.ptr, false)
    s = libSingular.StringEndS()
    e = Meta.parse(s)
    if isa(e, Expr) && e.head == :incomplete
@@ -85,13 +89,15 @@ end
 
 function Base.show(io::IO, ::MIME"text/plain", a::n_unknownsingularcoefficient)
    libSingular.StringSetS("")
-   GC.@preserve a libSingular.n_Write(a.ptr, parent(a).ptr, false)
+   R = parent(a)
+   GC.@preserve a R libSingular.n_Write(a.ptr, R.ptr, false)
    print(io, libSingular.StringEndS())
 end
 
 function show(io::IO, a::n_unknownsingularcoefficient)
    libSingular.StringSetS("")
-   GC.@preserve a libSingular.n_Write(a.ptr, parent(a).ptr, false)
+   R = parent(a)
+   GC.@preserve a R libSingular.n_Write(a.ptr, R.ptr, false)
    print(io, libSingular.StringEndS())
 end
 
@@ -103,7 +109,7 @@ end
 
 function -(a::n_unknownsingularcoefficient)
    R = parent(a)
-   GC.@preserve a b R n = libSingular.n_Neg(a.ptr, R.ptr)
+   n = GC.@preserve a b R libSingular.n_Neg(a.ptr, R.ptr)
    return R(n)
 end
 
@@ -116,21 +122,21 @@ end
 function +(a::n_unknownsingularcoefficient, b::n_unknownsingularcoefficient)
    check_parent(a, b)
    R = parent(a)
-   GC.@preserve a b R n = libSingular.n_Add(a.ptr, b.ptr, R.ptr)
+   n = GC.@preserve a b R libSingular.n_Add(a.ptr, b.ptr, R.ptr)
    return R(n)
 end
 
 function -(a::n_unknownsingularcoefficient, b::n_unknownsingularcoefficient)
    check_parent(a, b)
    R = parent(a)
-   GC.@preserve a b R n = libSingular.n_Sub(a.ptr, b.ptr, R.ptr)
+   n = GC.@preserve a b R libSingular.n_Sub(a.ptr, b.ptr, R.ptr)
    return R(n)
 end
 
 function *(a::n_unknownsingularcoefficient, b::n_unknownsingularcoefficient)
    check_parent(a, b)
    R = parent(a)
-   GC.@preserve a b R n = libSingular.n_Mult(a.ptr, b.ptr, R.ptr)
+   n = GC.@preserve a b R libSingular.n_Mult(a.ptr, b.ptr, R.ptr)
    return R(n)
 end
 
@@ -161,8 +167,9 @@ function ^(x::n_unknownsingularcoefficient, y::Int)
    elseif y == 1
       return x
    else
-      GC.@preserve x y p = libSingular.n_Power(x.ptr, y, parent(x).ptr)
-      return parent(x)(p)
+      R = parent(x)
+      p = GC.@preserve x R libSingular.n_Power(x.ptr, y, R.ptr)
+      return R(p)
    end
 end
 
