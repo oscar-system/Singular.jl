@@ -207,10 +207,7 @@ function leading_exponent_vector(p::spoly)
    return A
 end
 
-function lead_exponent(p::spoly)
-   @warn "please use leading_exponent_vector instead of lead_exponent"
-   return leading_exponent_vector(p)
-end
+@deprecate lead_exponent(p::spoly) leading_exponent_vector(p)
 
 function leading_coefficient(p::spoly)
    R = base_ring(p)
