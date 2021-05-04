@@ -7,7 +7,7 @@ export spoly, PolyRing, change_base_ring, coeff, coefficients,
        inflate, isgen,
        ismonomial, isquotient_ring, isterm, jacobian_ideal, jacobian_matrix,
        jet, leading_coefficient, leading_term, leading_monomial, lead_exponent,
-       monomials, MPolyBuildCtx,
+       leading_exponent_vector, monomials, MPolyBuildCtx,
        nvars, order, ordering, @PolynomialRing, primpart,
        push_term!, remove, sort_terms!, symbols, tail, terms, total_degree,
        trailing_coefficient,
@@ -212,18 +212,29 @@ function order(p::spoly)
 end
 
 @doc Markdown.doc"""
-    lead_exponent(p::spoly)
+    leading_exponent_vector(p::spoly)
 
 Return the exponent vector of the leading term of the given polynomial. The return
 value is a Julia 1-dimensional array giving the exponent for each variable of the
 leading term.
 """
-function lead_exponent(p::spoly)
+function leading_exponent_vector(p::spoly)
    R = parent(p)
    n = nvars(R)
    A = Array{Int}(undef, n)
    GC.@preserve p R libSingular.p_GetExpVL(p.ptr, A, R.ptr)
    return A
+end
+
+@deprecate lead_exponent(p::spoly) leading_exponent_vector(p)
+
+function leading_coefficient(p::spoly)
+   R = base_ring(p)
+   if p.ptr.cpp_object == C_NULL
+      return zero(R)
+   else
+      return R(libSingular.n_Copy(libSingular.pGetCoeff(p.ptr), R.ptr))
+   end
 end
 
 function deepcopy_internal(p::spoly, dict::IdDict)
@@ -237,7 +248,7 @@ function check_parent(a::spoly{T}, b::spoly{T}) where T <: Nemo.RingElem
 end
 
 function canonical_unit(a::spoly{T}) where T <: Nemo.RingElem
-  return a == 0 ? one(base_ring(a)) : canonical_unit(coeff(a, 0))
+  return iszero(a) ? one(base_ring(a)) : canonical_unit(leading_coefficient(a))
 end
 
 function Base.hash(p::spoly{T}, h::UInt) where T <: Nemo.RingElem
@@ -378,7 +389,7 @@ function Base.show(io::IO, a::spoly)
    print(io, AbstractAlgebra.obj_to_string(a, context = io))
 end
 
-isnegative(x::spoly) = isconstant(x) && !iszero(x) && isnegative(coeff(x, 0))
+isnegative(x::spoly) = isconstant(x) && !iszero(x) && isnegative(leading_coefficient(x))
 
 ###############################################################################
 #

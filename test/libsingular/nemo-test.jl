@@ -9,6 +9,7 @@
    @test isa(f1c[1], Singular.n_unknown{Nemo.fmpq})
    @test isa(Nemo.QQ(f1c[1]), Nemo.fmpq)
    @test !isempty(string(f1c[1]))
+   @test leading_coefficient(f1) == f1c[1]
 
    @test f1 + 2 == 2 + f1
    @test f1 - 2 == -(2 - f1)
@@ -60,6 +61,7 @@ end
    @test isa(f1c[1], Singular.n_unknown{Nemo.fmpz})
    @test isa(Nemo.ZZ(f1c[1]), Nemo.fmpz)
    @test !isempty(string(f1c[1]))
+   @test leading_coefficient(f1) == f1c[1]
 
    @test string(first(coefficients(f3))) == "1"
 
@@ -109,6 +111,7 @@ end
    @test isa(f1c[1], Singular.n_unknown{Nemo.fq_nmod})
    @test isa(F(f1c[1]), Nemo.fq_nmod)
    @test !isempty(string(f1c[1]))
+   @test leading_coefficient(f1) == f1c[1]
 
    @test f1 + 2 == 2 + f1
    @test f1 - 2 == -(2 - f1)
@@ -164,6 +167,7 @@ end
    @test isa(f1c[1], Singular.n_unknown{Nemo.fq})
    @test isa(F(f1c[1]), Nemo.fq)
    @test !isempty(string(f1c[1]))
+   @test leading_coefficient(f1) == f1c[1]
 
    @test f1 + 2 == 2 + f1
    @test f1 - 2 == -(2 - f1)
@@ -218,6 +222,7 @@ end
    @test isa(f1c[1], Singular.n_unknown{Nemo.nf_elem})
    @test isa(K(f1c[1]), Nemo.nf_elem)
    @test !isempty(string(f1c[1]))
+   @test leading_coefficient(f1) == f1c[1]
 
    @test f1 + 2 == 2 + f1
    @test f1 - 2 == -(2 - f1)
@@ -271,6 +276,7 @@ end
    @test isa(f1c[1], Singular.n_unknown{AbstractAlgebra.Generic.Frac{Nemo.fmpz}})
    @test isa(U(f1c[1]), AbstractAlgebra.Generic.Frac{Nemo.fmpz})
    @test !isempty(string(f1c[1]))
+   @test leading_coefficient(f1) == f1c[1]
 
    @test f1 + 2 == 2 + f1
    @test f1 - 2 == -(2 - f1)
@@ -320,6 +326,7 @@ end
    @test isa(f1c[1], Singular.n_unknown{Nemo.fmpz_poly})
    @test isa(U(f1c[1]), Nemo.fmpz_poly)
    @test !isempty(string(f1c[1]))
+   @test leading_coefficient(f1) == f1c[1]
 
    @test f1 + 2 == 2 + f1
    @test f1 - 2 == -(2 - f1)

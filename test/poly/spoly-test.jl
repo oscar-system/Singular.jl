@@ -126,7 +126,7 @@ end
    @test total_degree(x^2 + 2x + 1) == 2
    @test order(x^2 + 2x + 1) == 0
 
-   @test lead_exponent(x^3 + 2x + 1) == [3]
+   @test leading_exponent_vector(x^3 + 2x + 1) == [3]
 
    @test deepcopy(x + 2) == x + 2
 
@@ -175,6 +175,7 @@ end
    @test tail(3x^2*y + 2x*y + y + 7) == 2x*y + y + 7
    @test tail(R(1)) == 0
    @test tail(R()) == 0
+   @test leading_coefficient(zero(R)) == 0
    @test leading_coefficient(3x^2 + 2x + 1) == 3
    @test constant_coefficient(x^2*y + 2x + 3) == 3
    @test constant_coefficient(x^2 + y) == 0
