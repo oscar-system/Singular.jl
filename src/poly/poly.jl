@@ -10,7 +10,7 @@ export spoly, PolyRing, change_base_ring, coeff, coefficients,
        leading_coefficient, leading_exponent_vector, leading_term,
        leading_monomial, lead_exponent,
        monomials, MPolyBuildCtx,
-       nvars, order, ordering, ordering_as_symbol,
+       nvars, order, ordering, ordering_as_symbol, ordering_size, ordering_weights,
        @PolynomialRing, primpart, push_term!,
        remove, sort_terms!, symbols,
        tail, terms, total_degree, trailing_coefficient,
@@ -496,6 +496,18 @@ end
 function (x::spoly{T} == y::spoly{T}) where T <: Nemo.RingElem
    check_parent(x, y)
    GC.@preserve x y return Bool(libSingular.p_EqualPolys(x.ptr, y.ptr, parent(x).ptr))
+end
+
+function Base.isless(x::spoly{T}, y::spoly{T}) where T <: Nemo.RingElem
+   check_parent(x, y)
+   R = parent(x)
+   GC.@preserve x y R return libSingular.p_Compare(x.ptr, y.ptr, R.ptr) < 0
+end
+
+function Base.isequal(x::spoly{T}, y::spoly{T}) where T <: Nemo.RingElem
+   check_parent(x, y)
+   R = parent(x)
+   GC.@preserve x y R return libSingular.p_Compare(x.ptr, y.ptr, R.ptr) == 0
 end
 
 ###############################################################################
@@ -1485,16 +1497,52 @@ function Base.:*(a::sordering, b::sordering)
    return sordering(vcat(a.data, b.data))
 end
 
+function _ispure_block(a::sordering)
+   if length(a.data) == 1
+      return true
+   elseif length(a.data) == 2
+      return a.data[2].order == ringorder_C
+   else
+      return false
+   end
+end
+
+@doc Markdown.doc"""
+    ordering_size(a::sordering)
+
+Return the size of the block of the ordering `a`, which must be a pure block.
+"""
+function ordering_size(a::sordering)
+   _ispure_block(a) || error("ordering must be a pure block")
+   return a.data[1].size
+end
+
+@doc Markdown.doc"""
+    ordering_weights(a::sordering)
+
+Return the weights of the ordering `a`, which must be a pure block.
+Note that for a block with an ordering specified by a matrix,
+`ordering_as_symbol(a)` will return `:matrix` and the return of
+`ordering_weights(a)` can be reshaped into a square matrix of dimension
+`ordering_size(a)`.
+"""
+function ordering_weights(a::sordering)
+   _ispure_block(a) || error("ordering must be a pure block")
+   return a.data[1].weights
+end
+
 isordering_symbolic(a::sordering) = isordering_symbolic_with_symbol(a)[1]
+
+@doc Markdown.doc"""
+    ordering_as_symbol(a::sordering)
+
+If the ordering `a` is a pure block, return a symbol representing its type.
+The symbol `:unknown` is returned if `a` is not a pure block.
+"""
 ordering_as_symbol(a::sordering) = isordering_symbolic_with_symbol(a)[2]
 
 function isordering_symbolic_with_symbol(a::sordering)
-   if length(a.data) != 1 && length(a.data) != 2
-      return (false, :unknown)
-   end
-   if length(a.data) == 2 && a.data[2].order != ringorder_C
-      return (false, :unknown)
-   end
+   _ispure_block(a) || return (false, :unknown)
    o = a.data[1].order
    if o == ringorder_lp
       return (true, :lex)
@@ -1521,9 +1569,9 @@ function isordering_symbolic_with_symbol(a::sordering)
    elseif o == ringorder_Wp
       return (true, :weightedlex)
    elseif o == ringorder_ws
-      return (false, :genweightedrevlex)
+      return (false, :negweightedrevlex)
    elseif o == ringorder_Ws
-      return (false, :genweightedlex)
+      return (false, :negweightedlex)
    elseif o == ringorder_a
       return (false, :extraweight)
    elseif o == ringorder_M
@@ -1535,6 +1583,14 @@ function isordering_symbolic_with_symbol(a::sordering)
    else
       return (false, :unknown)
    end
+end
+
+function Base.eltype(a::sordering)
+   return sordering
+end
+
+function Base.length(a::sordering)
+   return length(a.data)
 end
 
 function Base.iterate(a::sordering, state = 1)
