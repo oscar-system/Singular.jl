@@ -77,6 +77,13 @@ end
       end
    end
 
+   @test_throws ArgumentError ordering_wp(Int[])
+   @test_throws ArgumentError ordering_wp([-1, 2])
+   @test_throws ArgumentError ordering_ws(Int[])
+   @test_throws ArgumentError ordering_ws([0, 1])
+   @test_throws ArgumentError ordering_M([1 2; 3 6])
+   @test_throws ArgumentError ordering_M([1 2 3; 3 6 7])
+
    R, (x1, x2, x3, x4) = PolynomialRing(QQ, "x".*string.(1:4), ordering =
                                           ordering_M([1 2; 3 5])*ordering_dp())
    test_ordering(ordering(R), [:matrix, :degrevlex, :comp1min],
@@ -84,6 +91,19 @@ end
                               [Int[1, 2, 3, 5], Int[], Int[]])
    test_monomials([x1^3*x2^2*x4^3, x1^3*x2^2*x3^2, x1^3*x2^2, x1*x2^3, x1^3*x2,
       x1*x2^2, x1^2*x2*x3, x1^2*x2*x4, x2^2, x1*x2, x2, x1, x3, x4, one(R)])
+
+   t = [1 0 1 0; 0 1 0 -1; 1 0 0 1; 0 1 1 0]
+   t = ordering_M(Singular.Nemo.matrix(Singular.Nemo.ZZ, t))
+   R, (x1, x2, x3, x4) = PolynomialRing(QQ, "x".*string.(1:4), ordering = t)
+   test_ordering(ordering(R), [:matrix, :comp1min],
+                              [4, 0],
+                              [Int[1,0,1,0, 0,1,0,-1, 1,0,0,1, 0,1,1,0], Int[]])
+   test_monomials([x1^2*x2^2*x3^2, x1^2*x2*x3^2, x1^2*x3^2, x1^2*x3^2*x4,
+      x1*x2^2*x3^2, x1^2*x2*x3, x1*x3^2, x1*x3^2*x4, x1^2*x2^2, x2^2*x3^2*x4,
+      x1*x2*x3, x2*x3^2, x1*x2*x3*x4, x2*x3^2*x4, x1*x3, x3^2, x1*x3*x4,
+      x3^2*x4, x1^2*x4^2, x1*x3*x4^2, x3^2*x4^2, x1*x2^2, x2^2*x3, x2^2*x3*x4,
+      x1*x2, x2*x3, x1*x2*x4, x2*x3*x4, x1, x3, x1*x2*x4^2, x1*x4, x1*x4^2,
+      x2^2, x2^2*x4, x2, x2^2*x4^2, x2*x4, one(R), x2*x4^2, x4, x4^2])
 
 
    R, (x1, x2, x3, x4) = PolynomialRing(QQ, "x".*string.(1:4), ordering =

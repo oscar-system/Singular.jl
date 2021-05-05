@@ -1315,21 +1315,21 @@ function _is_weighted_ordering(t::libSingular.rRingOrder_t)
 end
 
 function _basic_ordering(t::libSingular.rRingOrder_t, size::Int)
-   size >= 0 || error("block size must be nonnegative")
+   size >= 0 || throw(ArgumentError("block size must be nonnegative"))
    return sordering([sorder_block(t, size, Int[])])
 end
 
 function _global_weighted_ordering(t::libSingular.rRingOrder_t, v::Vector{Int})
    len = length(v)
-   len > 0 || error("weight vector must be non-empty")
-   all(x->x>0, v) || error("all weights must be positive") 
+   len > 0 || throw(ArgumentError("weight vector must be non-empty"))
+   all(x->x>0, v) || throw(ArgumentError("all weights must be positive"))
    return sordering([sorder_block(t, len, v)])
 end
 
 function _local_weighted_ordering(t::libSingular.rRingOrder_t, v::Vector{Int})
    len = length(v)
-   len > 0 || error("weight vector must be non-empty")
-   v[1] != 0 || error("first weight must be nonzero")
+   len > 0 || throw(ArgumentError("weight vector must be non-empty"))
+   v[1] != 0 || throw(ArgumentError("first weight must be nonzero"))
    return sordering([sorder_block(t, len, v)])
 end
 
@@ -1444,19 +1444,24 @@ weights into the ordering matrix.
 ordering_a(w::Vector{Int}) = sordering([sorder_block(ringorder_a, 0, w)])
 
 @doc Markdown.doc"""
-    ordering_M(m::Matrix{Int}, checked::Bool = true)
+    ordering_M(m::Matrix{Int}; checked::Bool = true)
 
 Represents a block of variables with a general matrix ordering.
 The matrix `m` is expected to be invertible, and this is checked by default.
 """
-function ordering_M(m::Matrix{Int}, checked::Bool = true)
+function ordering_M(m::Matrix{Int}; checked::Bool = true)
    (nr, nc) = size(m)
-   nr > 0 && nr == nc || error("weight matrix must be square")
-   !checked || !iszero(Nemo.det(Nemo.matrix(Nemo.ZZ, m))) || error("weight matrix must nonsingular")
+   nr > 0 && nr == nc || throw(ArgumentError("weight matrix must be square"))
+   !checked || !iszero(Nemo.det(Nemo.matrix(Nemo.ZZ, m))) || throw(ArgumentError("weight matrix must nonsingular"))
    return sordering([sorder_block(ringorder_M, nr, vec(transpose(m)))])
 end
 
-# these three can take a dummy int in singular, but they do nothing with it?
+function ordering_M(m::fmpz_mat, checked::Bool = true)
+   !checked || !iszero(Nemo.det(m)) || throw(ArgumentError("weight matrix must nonsingular"))
+   return ordering_M(Int.(m), checked = false)
+end
+
+# C, c, and S can take a dummy int in singular, but they do nothing with it?
 
 @doc Markdown.doc"""
     ordering_C()
