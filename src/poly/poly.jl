@@ -1702,7 +1702,7 @@ function deserialize_ordering(b::Vector{Cint})
       elseif o == ringorder_s
          push!(data, sorder_block(o, blk0, Int[]))         
       else
-         error("unknown ordering $(i.order)")
+         error("unknown ordering $o")
       end
     end
     return sordering(data)
