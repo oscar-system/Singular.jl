@@ -504,12 +504,6 @@ function Base.isless(x::spoly{T}, y::spoly{T}) where T <: Nemo.RingElem
    GC.@preserve x y R return libSingular.p_Compare(x.ptr, y.ptr, R.ptr) < 0
 end
 
-function Base.isequal(x::spoly{T}, y::spoly{T}) where T <: Nemo.RingElem
-   check_parent(x, y)
-   R = parent(x)
-   GC.@preserve x y R return libSingular.p_Compare(x.ptr, y.ptr, R.ptr) == 0
-end
-
 ###############################################################################
 #
 #   Exact division
