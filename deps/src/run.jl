@@ -27,6 +27,7 @@ mktempdir() do tmpdepot
     # prepend our temporary depot to the depot list...
     withenv("JULIA_DEPOT_PATH"=>tmpdepot*":") do
         # ... and start Julia, by default with the same project environment
+        run(`$(Base.julia_cmd()) --project=$(Base.active_project()) -e "using Pkg; Pkg.instantiate(); using libsingular_julia_jll; println(\"using \"*libsingular_julia_jll.libsingular_julia);"`)
         run(`$(Base.julia_cmd()) --project=$(Base.active_project()) $(ARGS)`)
 
         # TODO: perform some additional steps here, e.g. perhaps
