@@ -598,8 +598,9 @@ function div(x::spoly{T}, y::spoly{T}) where T <: Nemo.FieldElem
    GC.@preserve x y R begin
       px = libSingular.p_Copy(x.ptr, R.ptr)
       py = libSingular.p_Copy(y.ptr, R.ptr)
-      q = libSingular.p_Divide(px, py, R.ptr)
-      return R(q)
+      q = R(libSingular.p_Divide(px, py, R.ptr))
+      libSingular.check_error()
+      return q
    end
 end
 
