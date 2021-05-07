@@ -661,11 +661,9 @@ Given an ideal $I$ this function truncates the generators of $I$
 up to degree $n$.
 """
 function jet(I::sideal, n::Int)
-   J = deepcopy(I)
    R = base_ring(I)
-   # TODO this stuff looks bad
-   J.ptr = GC.@preserve I R libSingular.id_Jet(I.ptr, Cint(n), R.ptr)
-   return J
+   ptr = GC.@preserve I R libSingular.id_Jet(I.ptr, Cint(n), R.ptr)
+   return Ideal(R, ptr)
 end
 
 ###############################################################################
@@ -704,9 +702,9 @@ function kbase(I::sideal)
    elseif iszerodim == false
       error("Ideal is not zero-dimensional")
    else
-      K = deepcopy(I)
-      K.ptr = GC.@preserve I libSingular.id_kbase(I.ptr, base_ring(I).ptr)
-      return K
+      R = base_ring(I)
+      ptr = GC.@preserve I R libSingular.id_kbase(I.ptr, R.ptr)
+      return Ideal(R, ptr)
    end
 end
 
@@ -723,10 +721,9 @@ function highcorner(I::sideal)
    elseif iszerodim==false
       error("Ideal is not zero-dimensional")
    else
-      K = deepcopy(I[1])
       R = base_ring(I)
-      K.ptr = GC.@preserve I R libSingular.id_highcorner(I.ptr, R.ptr)
-      return K
+      ptr = GC.@preserve I R libSingular.id_highcorner(I.ptr, R.ptr)
+      return R(ptr)
    end
 end
 
