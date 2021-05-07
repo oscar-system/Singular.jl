@@ -21,34 +21,34 @@ branches = [ "<matching>" ]
 [include]
   [include.matching]
   Singular = "<matching>"
-  julia-version = "~1.6.0-0"
+  julia-version = "1.6"
   os = "ubuntu-latest"
 
   [include.matchingmac]
   Singular = "<matching>"
-  julia-version = "~1.6.0-0"
+  julia-version = "1.6"
   os = "macos-latest"
 
   [include.oscar]
   Oscar = "<matching>"
   Singular = "<matching>"
-  julia-version = "~1.6.0-0"
+  julia-version = "1.6"
   os = "ubuntu-latest"
 
   [include.oscarmac]
   Oscar = "<matching>"
   Singular = "<matching>"
-  julia-version = "~1.6.0-0"
+  julia-version = "1.6"
   os = "macos-latest"
 
   [include.oscarstable]
   Oscar = "release"
   Singular = "release"
-  julia-version = "~1.6.0-0"
+  julia-version = "1.6"
   os = "ubuntu-latest"
 
   [include.oscarstablemac]
   Oscar = "release"
   Singular = "release"
-  julia-version = "~1.6.0-0"
+  julia-version = "1.6"
   os = "macos-latest"

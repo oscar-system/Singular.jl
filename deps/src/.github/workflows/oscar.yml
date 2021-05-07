@@ -12,6 +12,7 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     env:
       PR_NUMBER: ${{github.event.number}}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
     - uses: actions/checkout@v2.1.0
     - name: "Set up Julia"
@@ -47,6 +48,7 @@ jobs:
     continue-on-error: ${{ matrix.julia-version == 'nightly' }}
     env:
       PR_NUMBER: ${{github.event.number}}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     strategy:
       matrix: ${{fromJSON(needs.generatematrix.outputs.matrix)}}
       fail-fast: false

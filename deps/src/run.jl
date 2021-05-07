@@ -6,6 +6,8 @@
 @info "Install needed packages"
 using Pkg
 Pkg.add(["Singular_jll", "CxxWrap", "CMake", "libsingular_julia_jll"])
+using libsingular_julia_jll
+
 
 @info "Build libsingular-julia"
 include("build.jl")
@@ -26,6 +28,9 @@ mktempdir() do tmpdepot
 
     # prepend our temporary depot to the depot list...
     withenv("JULIA_DEPOT_PATH"=>tmpdepot*":") do
+        # we need to make sure that precompilation is run again with the override in place
+        # (just running Pkg.precompile() does not seem to suffice)
+        run(`touch $(pathof(libsingular_julia_jll))`)
         # ... and start Julia, by default with the same project environment
         run(`$(Base.julia_cmd()) --project=$(Base.active_project()) $(ARGS)`)
 
