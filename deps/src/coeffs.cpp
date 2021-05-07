@@ -15,15 +15,18 @@ auto transExt_helper(coeffs cf, jlcxx::ArrayRef<uint8_t *> param)
     return nInitChar(n_transExt, &extParam);
 }
 
-auto transExt_to_poly(number a, coeffs cf, ring r)
+poly transExt_to_poly(number a, coeffs cf, ring r)
 {
+    // zero is represented by nullptr
+    if (a == NULL || NUM((fraction)a) == NULL)
+        return NULL;
+
     assume(cf->extRing != NULL);
     ring ext = cf->extRing;
-    fraction f = (fraction)a;
     nMapFunc nMap = n_SetMap(ext->cf, r->cf);
     const ring origin = currRing;
     rChangeCurrRing(r);
-    poly p = p_PermPoly(f->numerator, NULL, ext, r, nMap, NULL);
+    poly p = p_PermPoly(NUM((fraction)a), NULL, ext, r, nMap, NULL);
     rChangeCurrRing(origin);
     return p;
 }
