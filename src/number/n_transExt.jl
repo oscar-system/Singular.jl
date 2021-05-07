@@ -130,12 +130,7 @@ function n_transExt_to_spoly(x::n_transExt; cached = true,
       error("Base rings do not match.")
    end
 
-   # TODO: fix libSingular.transExt_to_poly - it is broken for zero x
-   if iszero(x)
-      return zero(S)
-   end
-
-   GC.@preserve x R S return S(Singular.libSingular.transExt_to_poly(x.ptr, R.ptr, S.ptr))
+   GC.@preserve x R S return S(libSingular.transExt_to_poly(x.ptr, R.ptr, S.ptr))
 end
 
 ###############################################################################
