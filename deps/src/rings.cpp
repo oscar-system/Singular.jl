@@ -16,6 +16,97 @@ auto rDefault_helper(coeffs                       cf,
     return r;
 }
 
+/*
+    calling rDefault with a non-null wvhdl argument:
+    All ordering data should be passed in a serialized ord_data array. It is
+    then deserialized into the rDefault arguments.
+*/
+auto rDefault_wvhdl_helper(coeffs cf,
+                           jlcxx::ArrayRef<uint8_t *> vars,
+                           jlcxx::ArrayRef<int> ord_data,
+                           unsigned long bitmask)
+{
+    int nvars = vars.size();
+    char ** vars_ptr = new char *[nvars];
+
+    for (int i = 0; i < nvars; i++)
+        vars_ptr[i] = reinterpret_cast<char *>(vars[i]);
+
+    size_t j = 0;
+    int nord = ord_data[j++];
+
+    // rDefault is going to take ownership of all 4 of these pointers
+    rRingOrder_t * ord = (rRingOrder_t *) omAlloc0((nord + 1) * sizeof(rRingOrder_t));
+    int * blk0 = (int *) omAlloc0((nord + 1) * sizeof(int));
+    int * blk1 = (int *) omAlloc0((nord + 1) * sizeof(int));
+    int ** wvhdl = (int **) omAlloc0((nord + 1) * sizeof(int *));
+
+    for (int i = 0; i < nord; i++)
+    {
+        ord[i] = (rRingOrder_t) ord_data[j++];
+        blk0[i] = ord_data[j++];
+        blk1[i] = ord_data[j++];
+        int len = ord_data[j++];
+        if (len > 0)
+        {
+            wvhdl[i] = (int *) omAlloc0(len * sizeof(int));
+            for (int k = 0; k < len; k++)
+                wvhdl[i][k] = ord_data[j++];
+        }
+        else
+        {
+            wvhdl[i] = nullptr;
+        }
+    }
+
+    auto r = rDefault(cf, nvars, vars_ptr, nord, ord, blk0, blk1, wvhdl, bitmask);
+    delete[] vars_ptr;
+    r->ShortOut = 0;
+
+    return r;
+}
+
+/*
+    Serialize the ord, blk0, blk1, wvhdl data
+    call with ord_data.size() == 0 since ArrayRef doesn't support resize
+*/
+void rOrdering_helper(jlcxx::ArrayRef<int> ord_data, const ring r)
+{
+    int l;
+    size_t initial_size = ord_data.size();
+
+    ord_data.push_back(0);
+
+    for (l = 0; r->order[l]; l++)
+    {
+        rRingOrder_t ord = r->order[l];
+        ord_data.push_back(static_cast<int>(ord));
+        ord_data.push_back(r->block0[l]);
+        ord_data.push_back(r->block1[l]);
+        if (r->wvhdl[l] == nullptr)
+        {
+            ord_data.push_back(0);
+        }
+        else if (ord == ringorder_wp || ord == ringorder_Wp ||
+                ord == ringorder_ws || ord == ringorder_Ws ||
+                ord == ringorder_a || ord == ringorder_am || ord == ringorder_M)
+        {
+            int n = r->block1[l] - r->block0[l] + 1;
+            if (ord == ringorder_M)
+                n = n*n;
+            ord_data.push_back(n);
+            for (int i = 0; i < n; i++)
+                ord_data.push_back(r->wvhdl[l][i]);
+        }
+        else
+        {
+            ord_data.push_back(0);
+        }
+    }
+
+    ord_data[initial_size] = l;
+}
+
 auto rDefault_long_helper(coeffs                        cf,
                           jlcxx::ArrayRef<uint8_t *>    vars,
                           jlcxx::ArrayRef<rRingOrder_t> ord,
@@ -78,6 +169,8 @@ void singular_define_rings(jlcxx::Module & Singular)
        return reinterpret_cast<spolyrec*>(ptr);
     });
     Singular.method("rDefault_helper", &rDefault_helper);
+    Singular.method("rDefault_wvhdl_helper", &rDefault_wvhdl_helper);
+    Singular.method("rOrdering_helper", &rOrdering_helper); // inverse of rDefault_wvhdl_helper
     Singular.method("rDefault_long_helper", &rDefault_long_helper);
     Singular.method("rDefault_Weyl_helper", &rDefault_Weyl_helper);
     Singular.method("rDefault_Exterior_helper", &rDefault_Exterior_helper);
@@ -191,6 +284,7 @@ void singular_define_rings(jlcxx::Module & Singular)
     Singular.method("p_Mult_q", p_Mult_q);
     Singular.method("pp_Mult_qq", pp_Mult_qq);
     Singular.method("p_Power", p_Power);
+    Singular.method("p_Compare", p_Compare);
     Singular.method("p_EqualPolys",
                     [](spolyrec * p, spolyrec * q, ip_sring * r) {
                         return p_EqualPolys(p, q, r);

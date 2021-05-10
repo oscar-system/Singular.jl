@@ -78,12 +78,28 @@ JLCXX_MODULE define_julia_module(jlcxx::Module & Singular)
     Singular.set_const("ringorder_rp", ringorder_rp);
     Singular.set_const("ringorder_dp", ringorder_dp);
     Singular.set_const("ringorder_Dp", ringorder_Dp);
+    Singular.set_const("ringorder_wp", ringorder_wp);
+    Singular.set_const("ringorder_Wp", ringorder_Wp);
     Singular.set_const("ringorder_ls", ringorder_ls);
     Singular.set_const("ringorder_rs", ringorder_rs);
     Singular.set_const("ringorder_ds", ringorder_ds);
     Singular.set_const("ringorder_Ds", ringorder_Ds);
+    Singular.set_const("ringorder_ws", ringorder_ws);
+    Singular.set_const("ringorder_Ws", ringorder_Ws);
+    Singular.set_const("ringorder_a", ringorder_a);
+    Singular.set_const("ringorder_M", ringorder_M);
     Singular.set_const("ringorder_c", ringorder_c);
     Singular.set_const("ringorder_C", ringorder_C);
+    Singular.set_const("ringorder_s", ringorder_s);
+    Singular.set_const("ringorder_S", ringorder_S);
+    Singular.set_const("ringorder_IS", ringorder_IS);
+
+    Singular.method("ringorder_to_int", [](rRingOrder_t a) {
+        return static_cast<int>(a);
+    });
+    Singular.method("ringorder_from_int", [](int a) {
+        return static_cast<rRingOrder_t>(a);
+    });
 
     Singular.method("siInit", [](const char * path) {
         siInit(const_cast<char *>(path));
