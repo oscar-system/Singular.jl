@@ -40,12 +40,10 @@ function deepcopy_internal(a::n_algExt, dict::IdDict)
 end
 
 function hash(a::n_algExt, h::UInt)
-   chash = hash(characteristic(parent(a)), h)
-   # TODO: for when we have algExt_to_transExt:
-   #K = parent(a)
-   #F = parent(modulus(K))
-   #phash = hash(F(libSingular.algExt_to_transExt(a.ptr, K.ptr, F.ptr)))
-   phash = 0
+   K = parent(a)
+   F = parent(modulus(K))
+   phash = hash(F(a))
+   chash = hash(characteristic(K), h)
    return xor(xor(chash, phash), 0x2c42e12d0c837511%UInt)
 end
 
@@ -84,6 +82,13 @@ function modulus(a::N_AlgExtField)
    return a.minpoly
 end
 
+function (F::N_FField)(a::n_algExt)
+   K = parent(a)
+   F == parent(modulus(K)) || error("Parents must coincide")
+   ptr = GC.@preserve a K F libSingular.algExt_to_transExt(a.ptr, K.ptr, F.ptr)
+   return F(ptr)
+end
+
 ###############################################################################
 #
 #   Canonicalisation
@@ -103,22 +108,9 @@ function show(io::IO, F::N_AlgExtField)
          base_ring(F), " with defining equation ", modulus(F))
 end
 
-function AbstractAlgebra.expressify(n::n_algExt; context = nothing)::Any
-   # TODO this easy method might not be the best
-   libSingular.StringSetS("")
-   GC.@preserve n libSingular.n_Write(n.ptr, parent(n).ptr, false)
-   s = libSingular.StringEndS()
-   e = Meta.parse(s)
-   if !isa(e, Expr)
-      return e
-   elseif e.head == :incomplete
-      return s
-   elseif e.head == :call && length(e.args) == 3 && e.args[1] == :/
-      e.args[1] = ://
-      return e
-   else
-      return e
-   end
+function AbstractAlgebra.expressify(a::n_algExt; context = nothing)::Any
+   F = parent(modulus(parent(a)))
+   return AbstractAlgebra.expressify(F(a), context = context)
 end
 
 function Base.show(io::IO, a::n_algExt)
