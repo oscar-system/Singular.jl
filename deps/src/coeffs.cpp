@@ -165,6 +165,23 @@ void singular_define_coeffs(jlcxx::Module & Singular)
         }
     });
 
+    /*
+        Given an element a of K = R[x]/minpoly(x) and the corresponding
+        F = R(x), return the element a as an element of F.
+    */
+    Singular.method("algExt_to_transExt", [](number a, coeffs K, coeffs F) {
+        if (nCoeff_is_algExt(K) && !nCoeff_is_GF(K))
+        {
+            nMapFunc nMap = n_SetMap(K, F);
+            return nMap(a, K, F);
+        }
+        else
+        {
+            WerrorS("cannot use algExt_to_transExt for these coeffients");
+            return n_Init(0, F);
+        }
+    });
+
     /* only used to get the order of a N_GField */
     Singular.method("nfCharQ", [](coeffs n) {return n->m_nfCharQ;});
 
