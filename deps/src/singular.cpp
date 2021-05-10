@@ -13,6 +13,7 @@ static std::string singular_warning;
 // Internal singular interpreter variable
 extern int         inerror;
 
+// these are the temporary callbacks for calls to the interpreter
 static void WerrorS_for_julia(const char * s)
 {
     singular_error += s;
@@ -26,6 +27,25 @@ static void PrintS_for_julia(const char * s)
 static void WarningS_for_julia(const char * s)
 {
     singular_warning += s;
+}
+
+/*
+   This is the non-temporary callback for all errors (unless the temporary
+   ones are in use by call_interpreter). It is probably safest to log the error
+   to both singular_error and stderr, so that a missing libSingular.check_error
+   does not cause error to go completely unnoticed.
+*/
+static void WerrorS_and_reset(const char * s)
+{
+    errorreported = 0;
+    if (!singular_error.empty())
+        singular_error += ".  ";
+    singular_error += s;
+    /* and, copied from WerrorS in Singular:*/
+    fwrite("    singular error: ", 1, 20, stderr);
+    fwrite(s, 1, strlen(s), stderr);
+    fwrite("\n", 1, 1, stderr);
+    fflush(stderr);
 }
 
 JLCXX_MODULE define_julia_module(jlcxx::Module & Singular)
@@ -67,12 +87,23 @@ JLCXX_MODULE define_julia_module(jlcxx::Module & Singular)
 
     Singular.method("siInit", [](const char * path) {
         siInit(const_cast<char *>(path));
+        WerrorS_callback = WerrorS_and_reset;
     });
     Singular.method("versionString", []() {
         return const_cast<const char *>(versionString());
     });
     Singular.method("version", []() {
         return SINGULAR_VERSION;
+    });
+
+    Singular.method("have_error", []() {
+        return !singular_error.empty();
+    });
+
+    Singular.method("get_and_clear_error", []() {
+        std::string s(std::move(singular_error));
+        singular_error.clear();
+        return s;
     });
 
 #define SETTER(A, B)                                    \
