@@ -10,9 +10,6 @@
    @test f.domain == R
    @test f.codomain == S
    @test isequal(f.image, I)
-
-   println("PASS")
-
 end
 
 @testset "alghom.apply" begin

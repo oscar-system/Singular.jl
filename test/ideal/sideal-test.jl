@@ -77,6 +77,11 @@ end
 
    @test equal(I1 + I2, I3)
    @test equal(I1*I2, I4)
+
+   @test equal(I3*x, Ideal(R, x^2, y*x))
+   @test equal(y*I3, Ideal(R, y^2, y*x))
+   @test equal(I3*2, I3)
+   @test equal(2*I3, I3)
 end
 
 @testset "sideal.powering" begin
@@ -135,11 +140,17 @@ end
 
    I1 = Ideal(R, x^2 + x*y + 1, 2y^2 + 3, R(7))
    I2 = Ideal(R, x*y^2 + x + 1, 2x*y + 1, 7x + 1)
+   I3 = Ideal(R, x, y)
 
    I = intersection(I1, I2)
 
    @test contains(I1, I)
    @test contains(I2, I)
+
+   I = intersection(I1, I2, I3)
+
+   @test equal(I, intersection(intersection(I1, I2), I3))
+   @test equal(I, intersection(I1, intersection(I2, I3)))
 end
 
 @testset "sideal.quotient" begin
