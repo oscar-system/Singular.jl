@@ -509,3 +509,9 @@ end
    @test hash(x,zero(UInt)) == hash(x+y-y,zero(UInt))
    @test hash(x,one(UInt)) == hash(x+y-y,one(UInt))
 end
+
+@testset "spoly.errors" begin
+   R, (x,) = PolynomialRing(QQ, ["x"])
+   @test_throws Exception div(R(), R())
+   @test !iszero(std(Ideal(R, R(1))))
+end

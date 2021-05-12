@@ -13,6 +13,8 @@ end
 
 include("libsingular/LibSingularTypes.jl")
 
+include("libsingular/errors.jl")
+
 include("libsingular/coeffs.jl")
 
 include("libsingular/rings.jl")
