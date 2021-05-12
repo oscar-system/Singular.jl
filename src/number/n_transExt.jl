@@ -71,23 +71,33 @@ one(R::N_FField) = R(1)
 zero(R::N_FField) = R(0)
 
 @doc Markdown.doc"""
-    numerator(n::n_transExt)
+    numerator(x::n_transExt)
 
 Return the numerator of the given fraction.
 """
-function numerator(n::n_transExt)
-   c = parent(n)
-   GC.@preserve n c return c(libSingular.n_GetNumerator(n.ptr, c.ptr))
+function numerator(x::n_transExt)
+   c = parent(x)
+   GC.@preserve x c begin
+      xref = Ref(x.ptr)
+      p = libSingular.n_GetNumerator(xref, c.ptr)
+      x.ptr = xref[]
+      return c(p)
+   end
 end
 
 @doc Markdown.doc"""
-    denominator(n::n_transExt)
+    denominator(x::n_transExt)
 
 Return the denominator of the given fraction.
 """
-function denominator(n::n_transExt)
-   c = parent(n)
-   GC.@preserve n c return c(libSingular.n_GetDenom(n.ptr, c.ptr))
+function denominator(x::n_transExt)
+   c = parent(x)
+   GC.@preserve x c begin
+      xref = Ref(x.ptr)
+      p = libSingular.n_GetDenom(xref, c.ptr)
+      x.ptr = xref[]
+      return c(p)
+   end
 end
 
 function isone(n::n_transExt)

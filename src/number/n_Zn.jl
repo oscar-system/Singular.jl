@@ -217,10 +217,12 @@ end
 
 function gcdx(x::n_Zn, y::n_Zn)
    c = parent(x)
-   s = GC.@preserve c [libSingular.n_Init(0, c.ptr)]
-   t = GC.@preserve c [libSingular.n_Init(0, c.ptr)]
-   g = GC.@preserve x y s t c libSingular.n_ExtGcd(x.ptr, y.ptr, pointer(s), pointer(t), c.ptr)
-   return c(g), c(s[]), c(t[])
+   GC.@preserve x y c begin
+      s = Ref(libSingular.n_Init(0, c.ptr))
+      t = Ref(libSingular.n_Init(0, c.ptr))
+      g = libSingular.n_ExtGcd(x.ptr, y.ptr, s, t, c.ptr)
+      return c(g), c(s[]), c(t[])
+   end
 end
 
 ###############################################################################

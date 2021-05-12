@@ -55,14 +55,16 @@ end
 isunit(n::n_Q) = !iszero(n)
 
 @doc Markdown.doc"""
-    numerator(n::n_Q)
+    numerator(x::n_Q)
 
 Return the numerator of the given fraction.
 """
-function numerator(n::n_Q)
-   c = parent(n)
-   GC.@preserve n c begin
-      p = libSingular.n_GetNumerator(n.ptr, c.ptr)
+function numerator(x::n_Q)
+   c = parent(x)
+   GC.@preserve x c QQ ZZ begin
+      xref = Ref(x.ptr)
+      p = libSingular.n_GetNumerator(xref, c.ptr)
+      x.ptr = xref[]
       pp = libSingular.nApplyMapFunc(n_Q_2_n_Z, p, QQ.ptr, ZZ.ptr)
       libSingular.n_Delete(p, QQ.ptr)
       return ZZ(pp)
@@ -70,14 +72,16 @@ function numerator(n::n_Q)
 end
 
 @doc Markdown.doc"""
-    denominator(n::n_Q)
+    denominator(x::n_Q)
 
 Return the denominator of the given fraction.
 """
-function denominator(n::n_Q)
-   c = parent(n)
-   GC.@preserve n c begin
-      p = libSingular.n_GetDenom(n.ptr, c.ptr)
+function denominator(x::n_Q)
+   c = parent(x)
+   GC.@preserve x c QQ ZZ begin
+      xref = Ref(x.ptr)
+      p = libSingular.n_GetDenom(xref, c.ptr)
+      x.ptr = xref[]
       pp = libSingular.nApplyMapFunc(n_Q_2_n_Z, p, QQ.ptr, ZZ.ptr)
       libSingular.n_Delete(p, QQ.ptr)
       return ZZ(pp)
@@ -152,20 +156,29 @@ end
 
 function +(x::n_Q, y::n_Q)
    c = parent(x)
-   p = GC.@preserve x y c libSingular.n_Add(x.ptr, y.ptr, c.ptr)
-   return c(p)
+   GC.@preserve x y c begin
+      p = libSingular.n_Add(x.ptr, y.ptr, c.ptr)
+      p = libSingular.n_Normalize(p, c.ptr)
+      return c(p)
+   end
 end
 
 function -(x::n_Q, y::n_Q)
    c = parent(x)
-   p = GC.@preserve x y c libSingular.n_Sub(x.ptr, y.ptr, c.ptr)
-   return c(p)
+   GC.@preserve x y c begin
+      p = libSingular.n_Sub(x.ptr, y.ptr, c.ptr)
+      p = libSingular.n_Normalize(p, c.ptr)
+      return c(p)
+   end
 end
 
 function *(x::n_Q, y::n_Q)
    c = parent(x)
-   p = GC.@preserve x y c libSingular.n_Mult(x.ptr, y.ptr, c.ptr)
-   return c(p)
+   GC.@preserve x y c begin
+      p = libSingular.n_Mult(x.ptr, y.ptr, c.ptr)
+      p = libSingular.n_Normalize(p, c.ptr)
+      return c(p)
+   end
 end
 
 ###############################################################################
@@ -279,7 +292,7 @@ Given $x$ modulo $y$, find $r/s$ such that $x \equiv r/s \pmod{y}$ for values
 $r$ and $s$ satisfying the bound $y > 2(|r| + 1)(s + 1)$.
 """
 function reconstruct(x::n_Z, y::n_Z)
-   GC.@preserve x y QQ p = libSingular.n_Farey(x.ptr, y.ptr, QQ.ptr)
+   p = GC.@preserve x y QQ libSingular.n_Farey(x.ptr, y.ptr, QQ.ptr)
    return QQ(p)
 end
 
@@ -295,14 +308,18 @@ reconstruct(x::Integer, y::n_Z) = reconstruct(ZZ(x), y)
 
 function addeq!(x::n_Q, y::n_Q)
    c = parent(x)
-   x.ptr = GC.@preserve x y libSingular.n_InpAdd(x.ptr, y.ptr, c.ptr)
-   return x
+   GC.@preserve x y c begin
+      x.ptr = libSingular.n_InpAdd(x.ptr, y.ptr, c.ptr)
+      x.ptr = libSingular.n_Normalize(x.ptr, c.ptr)
+      return x
+   end
 end
 
 function mul!(x::n_Q, y::n_Q, z::n_Q)
    c = parent(x)
    GC.@preserve x y z c begin
       ptr = libSingular.n_Mult(y.ptr, z.ptr, c.ptr)
+      ptr = libSingular.n_Normalize(ptr, c.ptr)
       libSingular.n_Delete(x.ptr, c.ptr)
       x.ptr = ptr
       return x
@@ -313,6 +330,7 @@ function add!(x::n_Q, y::n_Q, z::n_Q)
    c = parent(x)
    GC.@preserve x y z c begin
       ptr = libSingular.n_Add(y.ptr, z.ptr, c.ptr)
+      ptr = libSingular.n_Normalize(ptr, c.ptr)
       libSingular.n_Delete(x.ptr, c.ptr)
       x.ptr = ptr
       return x

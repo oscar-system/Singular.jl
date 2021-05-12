@@ -22,17 +22,6 @@ function n_Write(n::number_ptr, cf::coeffs_ptr, bShortOut::Bool = false)
    n_Write_internal(n, cf, d);
 end
 
-function n_ExtGcd(a::number_ptr, b::number_ptr, s::Ptr{number_ptr}, t::Ptr{number_ptr}, cf:: coeffs_ptr)
-   sp = reinterpret(Ptr{Nothing}, s)
-   tp = reinterpret(Ptr{Nothing}, t)
-   return n_ExtGcd_internal(a, b, sp, tp, cf);
-end
-
-function n_QuotRem(a::number_ptr, b::number_ptr, p::Ptr{number_ptr}, cf::coeffs_ptr)
-   pp = reinterpret(Ptr{Nothing}, p)
-   n_QuotRem_internal(a, b, pp, cf)
-end
-
 function n_ChineseRemainderSym(a::Array{number_ptr, 1}, b::Array{number_ptr, 1}, n::Cint, signed::Cint, cf::coeffs_ptr)
    p1 = reinterpret(Ptr{Nothing}, pointer(a))
    p2 = reinterpret(Ptr{Nothing}, pointer(b))

@@ -161,13 +161,15 @@ end
 #
 ###############################################################################
 
-function gcdx(a::n_unknown{T}, b::n_unknown{T}) where T <: Nemo.RingElem
-   check_parent(a, b)
-   R = parent(a)
-   s = [libSingular.n_Init(0, R.ptr)]
-   t = [libSingular.n_Init(0, R.ptr)]
-   n = GC.@preserve a b s t libSingular.n_ExtGcd(a.ptr, b.ptr, pointer(s), pointer(t), R.ptr)
-   return R(n), R(s[]), R(t[])
+function gcdx(x::n_unknown{T}, y::n_unknown{T}) where T <: Nemo.RingElem
+   check_parent(x, y)
+   R = parent(x)
+   GC.@preserve x y R begin
+      s = Ref(libSingular.n_Init(0, R.ptr))
+      t = Ref(libSingular.n_Init(0, R.ptr))
+      g = libSingular.n_ExtGcd(x.ptr, y.ptr, s, t, R.ptr)
+      return R(g), R(s[]), R(t[])
+   end
 end
 
 ###############################################################################
