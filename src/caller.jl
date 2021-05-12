@@ -45,25 +45,24 @@ end
 
 # take ownership of r
 function create_ring_from_singular_ring(r::libSingular.ring_ptr)
-   ordering = libSingular.ring_ordering_as_symbol(r)
    c = libSingular.rCoeffPtr(r)
    if libSingular.nCoeff_is_Q(c)
-      return PolyRing{n_Q}(r, QQ, ordering)
+      return PolyRing{n_Q}(r, QQ)
    elseif libSingular.nCoeff_is_Zp(c)
       p = Int(libSingular.n_GetChar(c))
-      return PolyRing{n_Zp}(r, N_ZpField(p), ordering)
+      return PolyRing{n_Zp}(r, N_ZpField(p))
    elseif libSingular.nCoeff_is_GF(c)
       p = Int(libSingular.n_GetChar(c))
       q = Int(libSingular.nfCharQ(c))
       d = round(Int, log(p, q))
       s = Symbol(libSingular.n_ParameterName(0, c))
-      return PolyRing{n_GF}(r, N_GField(p, d, s), ordering)
+      return PolyRing{n_GF}(r, N_GField(p, d, s))
    elseif libSingular.nCoeff_is_transExt(c)
       p = Int(libSingular.n_GetChar(c))
       npars = libSingular.n_NumberOfParameters(c)
       S = [Symbol(libSingular.n_ParameterName(i-1, c)) for i in 1:npars]
       F = N_FField(iszero(p) ? QQ : N_ZpField(p), S)
-      return PolyRing{n_transExt}(r, F, ordering)
+      return PolyRing{n_transExt}(r, F)
    elseif libSingular.nCoeff_is_algExt(c)
       # first create the univariate transcendental extension
       p = Int(libSingular.n_GetChar(c))
@@ -73,10 +72,10 @@ function create_ring_from_singular_ring(r::libSingular.ring_ptr)
       # now create the extension
       minpoly = F(libSingular.algExt_GetMinpoly(c, F.ptr))
       K = N_AlgExtField(libSingular.nCopyCoeff(c), minpoly)
-      return PolyRing{n_algExt}(r, K, ordering)
+      return PolyRing{n_algExt}(r, K)
    else
       basering = N_UnknownSingularCoefficientRing(libSingular.nCopyCoeff(c))
-      return PolyRing{n_unknownsingularcoefficient}(r, basering, ordering)
+      return PolyRing{n_unknownsingularcoefficient}(r, basering)
    end
 end
 

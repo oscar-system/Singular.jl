@@ -26,7 +26,7 @@
    end
 end
 
-@testset "PolyRing.ordering" begin
+@testset "PolyRing.ordering.symbol" begin
    R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"])
    I = Ideal(R, x+z, y+z)
    I.isGB = true
@@ -56,4 +56,131 @@ end
    S = fres(I, 0)
    M = S[2]
    @test string(M[1]) == "[-y-z,x+z]"
+end
+
+@testset "PolyRing.ordering.fancy" begin
+   function test_monomials(l)
+      for i in 2:length(l)
+         @test l[i-1] > l[i]
+         @test l[i] < l[rand(1:i-1)]
+      end
+   end
+
+   function test_ordering(o, s, z, w)
+      @test length(o) == length(s)
+      j = 0
+      for i in o
+         j += 1
+         @test s[j] == ordering_as_symbol(i)
+         @test z[j] == ordering_size(i)
+         @test w[j] == ordering_weights(i)
+      end
+   end
+
+   @test_throws ArgumentError ordering_wp(Int[])
+   @test_throws ArgumentError ordering_wp([-1, 2])
+   @test_throws ArgumentError ordering_ws(Int[])
+   @test_throws ArgumentError ordering_ws([0, 1])
+   @test_throws ArgumentError ordering_M([1 2; 3 6])
+   @test_throws ArgumentError ordering_M([1 2 3; 3 6 7])
+
+   R, (x1, x2, x3, x4) = PolynomialRing(QQ, "x".*string.(1:4), ordering =
+                                          ordering_M([1 2; 3 5])*ordering_dp())
+   test_ordering(ordering(R), [:matrix, :degrevlex, :comp1min],
+                              [2, 2, 0],
+                              [Int[1, 2, 3, 5], Int[], Int[]])
+   test_monomials([x1^3*x2^2*x4^3, x1^3*x2^2*x3^2, x1^3*x2^2, x1*x2^3, x1^3*x2,
+      x1*x2^2, x1^2*x2*x3, x1^2*x2*x4, x2^2, x1*x2, x2, x1, x3, x4, one(R)])
+
+   t = [1 0 1 0; 0 1 0 -1; 1 0 0 1; 0 1 1 0]
+   t = ordering_M(Singular.Nemo.matrix(Singular.Nemo.ZZ, t))
+   R, (x1, x2, x3, x4) = PolynomialRing(QQ, "x".*string.(1:4), ordering = t)
+   test_ordering(ordering(R), [:matrix, :comp1min],
+                              [4, 0],
+                              [Int[1,0,1,0, 0,1,0,-1, 1,0,0,1, 0,1,1,0], Int[]])
+   test_monomials([x1^2*x2^2*x3^2, x1^2*x2*x3^2, x1^2*x3^2, x1^2*x3^2*x4,
+      x1*x2^2*x3^2, x1^2*x2*x3, x1*x3^2, x1*x3^2*x4, x1^2*x2^2, x2^2*x3^2*x4,
+      x1*x2*x3, x2*x3^2, x1*x2*x3*x4, x2*x3^2*x4, x1*x3, x3^2, x1*x3*x4,
+      x3^2*x4, x1^2*x4^2, x1*x3*x4^2, x3^2*x4^2, x1*x2^2, x2^2*x3, x2^2*x3*x4,
+      x1*x2, x2*x3, x1*x2*x4, x2*x3*x4, x1, x3, x1*x2*x4^2, x1*x4, x1*x4^2,
+      x2^2, x2^2*x4, x2, x2^2*x4^2, x2*x4, one(R), x2*x4^2, x4, x4^2])
+
+
+   R, (x1, x2, x3, x4) = PolynomialRing(QQ, "x".*string.(1:4), ordering =
+                                             ordering_Wp([1, 2])*ordering_rp())
+   test_ordering(ordering(R), [:weightedlex, :revlex, :comp1min],
+                              [2, 2, 0],
+                              [Int[1, 2], Int[], Int[]])
+   test_monomials([x2^3, x1*x2^2, x1^2*x2, x2^2*x4, x2^2*x3, x2^2, x1^3,
+      x1*x2*x4, x1*x2*x3, x1*x2, x1^2*x4, x1^2*x3, x1^2, x2*x4^2, x2*x3*x4,
+      x2*x4, x2*x3^2, x2*x3, x2, x1*x4^2, x1*x3*x4, x1*x4, x1*x3^2, x1*x3,
+      x1, x4^3, x3*x4^2, x4^2, x3^2*x4, x3*x4, x4, x3^3, x3^2, x3, one(R)])
+
+
+   R, (x1, x2, x3, x4) = PolynomialRing(QQ, "x".*string.(1:4), ordering =
+                                            ordering_rs(2)*ordering_wp([1, 2]))
+   test_ordering(ordering(R), [:negrevlex, :weightedrevlex, :comp1min],
+                              [2, 2, 0],
+                              [Int[], Int[1, 2], Int[]])
+   test_monomials([x4^3, x3*x4^2, x3^2*x4, x4^2, x3^3, x3*x4, x3^2, x4, x3,
+      one(R), x1*x4^2, x1*x3*x4, x1*x3^2, x1*x4, x1*x3, x1, x1^2*x4, x1^2*x3,
+      x1^2, x1^3, x2*x4^2, x2*x3*x4, x2*x3^2, x2*x4, x2*x3, x2, x1*x2*x4,
+      x1*x2*x3, x1*x2, x1^2*x2, x2^2*x4, x2^2*x3, x2^2, x1*x2^2, x2^3])
+
+
+   R, (x1, x2, x3, x4) = PolynomialRing(QQ, "x".*string.(1:4), ordering =
+                                            ordering_ls(2)*ordering_ws([1, 2]))
+   test_ordering(ordering(R), [:neglex, :negweightedrevlex, :comp1min],
+                              [2, 2, 0],
+                              [Int[], Int[1, 2], Int[]])
+   test_monomials([one(R), x3, x3^2, x4, x3^3, x3*x4, x3^2*x4, x4^2, x3*x4^2,
+      x4^3, x2, x2*x3, x2*x3^2, x2*x4, x2*x3*x4, x2*x4^2, x2^2, x2^2*x3,
+      x2^2*x4, x2^3, x1, x1*x3, x1*x3^2, x1*x4, x1*x3*x4, x1*x4^2, x1*x2,
+      x1*x2*x3, x1*x2*x4, x1*x2^2, x1^2, x1^2*x3, x1^2*x4, x1^2*x2, x1^3])
+
+
+   R, (x1, x2, x3, x4) = PolynomialRing(QQ, "x".*string.(1:4), ordering =
+                                            ordering_Ws([1, 2])*ordering_lp(2))
+   test_ordering(ordering(R), [:negweightedlex, :lex, :comp1min],
+                              [2, 2, 0],
+                              [Int[1, 2], Int[], Int[]])
+   test_monomials([x3^3, x3^2*x4, x3^2, x3*x4^2, x3*x4, x3, x4^3, x4^2, x4,
+      one(R), x1*x3^2, x1*x3*x4, x1*x3, x1*x4^2, x1*x4, x1, x1^2*x3, x1^2*x4,
+      x1^2, x2*x3^2, x2*x3*x4, x2*x3, x2*x4^2, x2*x4, x2, x1^3, x1*x2*x3,
+      x1*x2*x4, x1*x2, x1^2*x2, x2^2*x3, x2^2*x4, x2^2, x1*x2^2, x2^3])
+
+
+   R, (x1, x2, x3, x4) = PolynomialRing(QQ, "x".*string.(1:4), ordering =
+                                                 ordering_Dp(2)*ordering_Ds(2))
+   test_ordering(ordering(R), [:deglex, :negdeglex, :comp1min],
+                              [2, 2, 0],
+                              [Int[], Int[], Int[]])
+   test_monomials([x1^3, x1^2*x2, x1*x2^2, x2^3, x1^2, x1^2*x3, x1^2*x4, x1*x2,
+      x1*x2*x3, x1*x2*x4, x2^2, x2^2*x3, x2^2*x4, x1, x1*x3, x1*x4, x1*x3^2,
+      x1*x3*x4, x1*x4^2, x2, x2*x3, x2*x4, x2*x3^2, x2*x3*x4, x2*x4^2, one(R),
+      x3, x4, x3^2, x3*x4, x4^2, x3^3, x3^2*x4, x3*x4^2, x4^3])
+
+
+   R, (x1, x2, x3, x4) = PolynomialRing(QQ, "x".*string.(1:4), ordering =
+                                                                 ordering_ds())
+   test_ordering(ordering(R), [:negdegrevlex, :comp1min],
+                              [4, 0],
+                              [Int[], Int[]])
+   test_monomials([one(R), x1, x2, x3, x4, x1^2, x1*x2, x2^2, x1*x3, x2*x3,
+      x3^2, x1*x4, x2*x4, x3*x4, x4^2, x1^3, x1^2*x2, x1*x2^2, x2^3, x1^2*x3,
+      x1*x2*x3, x2^2*x3, x1*x3^2, x2*x3^2, x3^3, x1^2*x4, x1*x2*x4, x2^2*x4,
+      x1*x3*x4, x2*x3*x4, x3^2*x4, x1*x4^2, x2*x4^2, x3*x4^2, x4^3])
+
+   R, (x1, x2, x3, x4) = PolynomialRing(QQ, "x".*string.(1:4), ordering =
+                                      ordering_a([1, -1, 1, -1])*ordering_dp())
+   test_ordering(ordering(R), [:extraweight, :degrevlex, :comp1min],
+                              [4, 4, 0],
+                              [Int[1, -1, 1, -1], Int[], Int[]])
+   test_monomials([x1^3, x1^2*x3, x1*x3^2, x3^3, x1^3*x2, x1^2*x2*x3,
+      x1*x2*x3^2, x1^2, x1*x3, x3^2, x1^3*x2^2, x1^2*x2^2*x3, x1^2*x2,
+      x1*x2*x3, x2*x3^2, x1^2*x4, x1*x3*x4, x3^2*x4, x1, x3, x1^3*x2^3,
+      x1^2*x2^2, x1*x2^2*x3, x1^2*x2*x4, x1*x2*x3*x4, x1*x2, x2*x3, x1*x4,
+      x3*x4, one(R), x1^2*x2^3, x1^2*x2^2*x4, x1*x2^2, x2^2*x3, x1*x2*x4,
+      x2*x3*x4, x1*x4^2, x3*x4^2, x2, x4, x1*x2^3, x1*x2^2*x4, x1*x2*x4^2,
+      x2^2, x2*x4, x4^2, x2^3, x2^2*x4, x2*x4^2, x4^3])
 end
