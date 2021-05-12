@@ -198,10 +198,12 @@ end
 function *(p::spoly{T}, I::sideal{spoly{T}}) where T <: Nemo.RingElem
    R = base_ring(I)
    R != parent(p) && error("Base rings do not match.")
-   x = libSingular.id_Copy(I.ptr, R.ptr)
-   y = libSingular.p_Copy(p.ptr, R.ptr)
-   ptr = libSingular.id_MultP(x, y, R.ptr)
-   return sideal{spoly{T}}(R, ptr)
+   GC.@preserve I R p begin
+      x = libSingular.id_Copy(I.ptr, R.ptr)
+      y = libSingular.p_Copy(p.ptr, R.ptr)
+      ptr = libSingular.id_MultP(x, y, R.ptr)
+      return sideal{spoly{T}}(R, ptr)
+   end
 end
 
 function *(I::sideal{spoly{T}}, p::spoly{T}) where T <: Nemo.RingElem
@@ -325,7 +327,7 @@ end
 
 function intersection(I::sideal{T}, Js::sideal{T}...) where T <: Nemo.RingElem
    R = base_ring(I)
-   GC.@preserve I Js begin
+   GC.@preserve I Js R begin
       CC = Ptr{Nothing}[I.ptr.cpp_object]
       for J in Js
          push!(CC, J.ptr.cpp_object)
