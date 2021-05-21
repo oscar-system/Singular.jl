@@ -91,7 +91,7 @@ which $I$ is an ideal. The ideal must be over a polynomial ring
 over a field, and a Groebner basis.
 """
 function dimension(I::sideal{S}) where S <: Union{spoly{T}, spoly{n_unknown{U}}} where {T <: Singular.FieldElem, U <: Nemo.FieldElem}
-   I.isGB == false && error("I needs to be a Gröbner basis.")
+   I.isGB == false && error("I needs to be a Groebner basis.")
    R = base_ring(I)
    GC.@preserve I R return Int(libSingular.scDimInt(I.ptr, R.ptr))
 end
@@ -402,7 +402,7 @@ Compared to `std`, `slimgb` uses different strategies for choosing
 a reducer.
 
 If the optional parameter `complete_reduction` is set to `true` the
-function computes a reduced Gröbner basis for $I$.
+function computes a reduced Groebner basis for $I$.
 """
 function slimgb(I::sideal; complete_reduction::Bool=false)
    R = base_ring(I)
@@ -861,12 +861,12 @@ end
     maximal_independent_set(I::sideal{S}; all::Bool = false) where S <: Union{spoly{T}, spoly{n_unknown{U}}} where {T <: Singular.FieldElem, U <: Nemo.FieldElem}
 
 Returns, by default, an array containing a maximal independet set of
-$lead(I)$. $I$ has to be given by a Gröbner basis.
+$lead(I)$. $I$ has to be given by a Groebner basis.
 If the additional parameter "all" is set to true, an array containing
 all maximal independent sets of $lead(I)$ is returned.
 """
 function maximal_independent_set(I::sideal{S}; all::Bool = false) where S <: Union{spoly{T}, spoly{n_unknown{U}}} where {T <: Singular.FieldElem, U <: Nemo.FieldElem}
-   I.isGB == false && error("I needs to be a Gröbner basis.")
+   I.isGB == false && error("I needs to be a Groebner basis.")
    R = base_ring(I)
    Q = base_ring(R)
    d = dimension(I)
