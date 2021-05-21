@@ -836,10 +836,10 @@ end
     independent_sets(I::sideal{S}) where S <: Union{spoly{T}, spoly{n_unknown{U}}} where {T <: Singular.FieldElem, U <: Nemo.FieldElem}
 
 Returns all non-extendable independent sets of $lead(I)$. $I$ has to be given
-by a Gröbner basis.
+by a Groebner basis.
 """
 function independent_sets(I::sideal{S}) where S <: Union{spoly{T}, spoly{n_unknown{U}}} where {T <: Singular.FieldElem, U <: Nemo.FieldElem}
-   I.isGB == false && error("I needs to be a Gröbner basis.")
+   I.isGB == false && error("I needs to be a Groebner basis.")
    R = base_ring(I)
    n = nvars(R)
    a = Array{Int32, 1}()
