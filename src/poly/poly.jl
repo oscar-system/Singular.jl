@@ -1097,7 +1097,8 @@ function zero!(x::polyalg)
          libSingular.p_Delete(x.ptr, parent(x).ptr)
          x.ptr = libSingular.p_ISet(0, parent(x).ptr)
       end
-      return x
+   end
+   return x
 end
 
 ###############################################################################
