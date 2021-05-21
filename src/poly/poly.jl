@@ -1022,11 +1022,11 @@ function jacobian_matrix(p::polyalg)
 end
 
 @doc Markdown.doc"""
-   jacobian_matrix(A::Vector{polyalg, 1})
+   jacobian_matrix(A::Vector{<:polyalg, 1})
 Given an array $A$ of polynomials over the same base ring,
 this function returns the Jacobian matrix of $A$.
 """
-function jacobian_matrix(A::Vector{polyalg{T}}) where T <: Nemo.RingElem
+function jacobian_matrix(A::Vector{<:polyalg{T}}) where T <: Nemo.RingElem
    m = length(A)
    m == 0 && error("Array has to be non-empty.")
    R = parent(A[1])
@@ -1145,7 +1145,7 @@ function MPolyBuildCtx(R::PolyRing)
    GC.@preserve t return MPolyBuildCtx(R, t.ptr)
 end
 
-function push_term!(M::MPolyBuildCtx{polyalg{S}, U}, c::S, expv::Vector{Int}) where {U, S <: Nemo.RingElem}
+function push_term!(M::MPolyBuildCtx{<:polyalg{S}, U}, c::S, expv::Vector{Int}) where {U, S <: Nemo.RingElem}
    if c == 0
       return
    end
@@ -1171,7 +1171,7 @@ function push_term!(M::MPolyBuildCtx{polyalg{S}, U}, c::S, expv::Vector{Int}) wh
    end
 end
 
-function finish(M::MPolyBuildCtx{polyalg{S}, U}) where {S, U}
+function finish(M::MPolyBuildCtx{<:polyalg{S}, U}) where {S, U}
    p = sort_terms!(M.poly)
    return p
 end
