@@ -12,7 +12,7 @@
    @test base_ring(I) == R
 
    @test S isa AbstractAlgebra.Set
-   @test I isa AbstractAlgebra.Module
+   @test I isa sideal
 
    I1 = Ideal(R)
    I2 = Ideal(R, x + y)
