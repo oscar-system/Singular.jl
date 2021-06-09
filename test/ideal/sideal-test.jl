@@ -65,6 +65,15 @@ end
    @test isvar_generated(Ideal(R, x, y))
    @test !isvar_generated(Ideal(R, R(1)))
    @test !isvar_generated(Ideal(R, x + y))
+
+   R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+   @test -1 == dimension(std(Ideal(R, R(-1))))
+   @test -1 == dimension(std(Ideal(R, x, R(1))))
+   @test 0 == dimension(std(Ideal(R, x, y, R(3))))
+   @test 1 == dimension(std(Ideal(R, x, R(3))))
+   @test 1 == dimension(std(Ideal(R, x - y, R(2))))
+   @test 2 == dimension(std(Ideal(R, R(5))))
+   @test 2 == dimension(std(Ideal(R, R(35))))
 end
 
 @testset "sideal.binary_ops" begin
