@@ -383,6 +383,13 @@ void singular_define_ideals(jlcxx::Module & Singular)
         rChangeCurrRing(origin);
         return k;
     });
+    Singular.method("scDimIntRing", [](ideal I, ring R) {
+        const ring origin = currRing;
+        rChangeCurrRing(R);
+        int k = scDimIntRing(I, R->qideal);
+        rChangeCurrRing(origin);
+        return k;
+    });
     Singular.method("fglmzero", [](ideal Isrc, ring Rsrc, ring Rdest ) {
         const ring origin = currRing;
         rChangeCurrRing(Rdest);
