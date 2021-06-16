@@ -20,12 +20,12 @@ mutable struct FreeMod{T <: Nemo.RingElem} <: Module{T}
 end
 
 mutable struct svector{T <: Nemo.RingElem} <: Nemo.ModuleElem{T}
+   base_ring::PolyRing
    ptr::libSingular.poly_ptr # not really a polynomial
    rank::Int
-   base_ring::PolyRing
 
    function svector{T}(R::PolyRing, r::Int, p::libSingular.poly_ptr) where T
-      z = new(p, r, R)
+      z = new(R, p, r)
       R.refcount += 1
       finalizer(_svector_clear_fn, z)
       return z
@@ -71,12 +71,12 @@ mutable struct ModuleClass{T <: Nemo.RingElem} <: Set
 end
 
 mutable struct smodule{T <: Nemo.RingElem} <: Module{T}
-   ptr::libSingular.ideal_ptr # ideal and module types are the same in Singular
    base_ring::PolyRing
+   ptr::libSingular.ideal_ptr # ideal and module types are the same in Singular
    isGB::Bool
 
    function smodule{T}(R::PolyRing, m::libSingular.ideal_ptr) where T
-      z = new(m, R, false)
+      z = new(R, m, false)
       R.refcount += 1
       finalizer(_smodule_clear_fn, z)
       return z

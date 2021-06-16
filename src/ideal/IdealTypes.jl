@@ -19,16 +19,14 @@ mutable struct IdealSet{T <: Nemo.RingElem} <: Set
 end
 
 mutable struct sideal{T <: Nemo.RingElem} <: Module{T}
-   ptr::libSingular.ideal_ptr
    base_ring::PolyRing
+   ptr::libSingular.ideal_ptr
    isGB::Bool
 
    function sideal{T}(R::PolyRing, ids::spoly...) where T
       n = length(ids)
       id = libSingular.idInit(Cint(n),1)
-      z = new(id, R, false)
-      R.refcount += 1
-      finalizer(_sideal_clear_fn, z)
+      z = sideal{T}(R, id)
       for i = 1:n
          p = libSingular.p_Copy(ids[i].ptr, R.ptr)
          libSingular.setindex_internal(id, p, Cint(i - 1))
@@ -37,7 +35,7 @@ mutable struct sideal{T <: Nemo.RingElem} <: Module{T}
    end
 
    function sideal{T}(R::PolyRing, id::libSingular.ideal_ptr) where T
-      z = new(id, R, false)
+      z = new(R, id, false)
       R.refcount += 1
       finalizer(_sideal_clear_fn, z)
       return z
