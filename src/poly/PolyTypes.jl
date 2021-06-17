@@ -41,23 +41,23 @@ mutable struct PolyRing{T <: Nemo.RingElem} <: Nemo.MPolyRing{T}
       finalizer(_PolyRing_clear_fn, d)
       return d
    end
+end
 
-   function PolyRing{T}(R::Union{Ring, Field}, s::Array{Symbol, 1},
-                        ord::sordering, cached::Bool = true,
-                        degree_bound::Int = 0) where T
-      bitmask = Culong(degree_bound)
-      nvars = length(s)
-      # internally in libSingular, degree_bound is set to
-      deg_bound_fix = Int(libSingular.rGetExpSize(bitmask, Cint(nvars)))
-      sord = serialize_ordering(nvars, ord)
-      return get!(PolyRingID, (R, s, sord, deg_bound_fix)) do
-         v = [pointer(Base.Vector{UInt8}(string(str)*"\0")) for str in s]
-         r = libSingular.nCopyCoeff(R.ptr)
-         ptr = libSingular.rDefault_wvhdl_helper(r, v, sord, bitmask)
-         @assert deg_bound_fix == Int(libSingular.rBitmask(ptr))
-         return PolyRing{T}(ptr, R)
-      end::PolyRing{T}
-   end
+function PolyRing{T}(R::Union{Ring, Field}, s::Array{Symbol, 1},
+                     ord::sordering, cached::Bool = true,
+                     degree_bound::Int = 0) where T
+   bitmask = Culong(degree_bound)
+   nvars = length(s)
+   # internally in libSingular, degree_bound is set to
+   deg_bound_fix = Int(libSingular.rGetExpSize(bitmask, Cint(nvars)))
+   sord = serialize_ordering(nvars, ord)
+   return get!(PolyRingID, (R, s, sord, deg_bound_fix)) do
+      v = [pointer(Base.Vector{UInt8}(string(str)*"\0")) for str in s]
+      r = libSingular.nCopyCoeff(R.ptr)
+      ptr = libSingular.rDefault_wvhdl_helper(r, v, sord, bitmask)
+      @assert deg_bound_fix == Int(libSingular.rBitmask(ptr))
+      return PolyRing{T}(ptr, R)
+   end::PolyRing{T}
 end
 
 function _PolyRing_clear_fn(R::PolyRing)
