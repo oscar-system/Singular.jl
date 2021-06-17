@@ -12,10 +12,8 @@ mutable struct MatrixSpace{T <: Nemo.RingElem} <: Set
    ncols::Int
 
    function MatrixSpace{T}(R::PolyRing, r::Int, c::Int) where T
-      if haskey(MatrixSpaceID, (R, r, c))
-         return MatrixSpaceID[R, r, c]
-      else
-         return MatrixSpaceID[R, r, c] = new{T}(R, r, c)
+      return get!(MatrixSpaceID, (R, r, c)) do
+         new{T}(R, r, c)
       end
    end
 end

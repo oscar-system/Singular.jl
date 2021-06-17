@@ -10,17 +10,15 @@ mutable struct IdealSet{T <: Nemo.RingElem} <: Set
    base_ring::PolyRing
 
    function IdealSet{T}(R::PolyRing) where T
-      if haskey(IdealSetID, R)
-         return IdealSetID[R]
-      else
-         return IdealSetID[R] = new(R)
+      return get!(IdealSetID, R) do
+         new(R)
       end
    end
 end
 
 mutable struct sideal{T <: Nemo.RingElem} <: Module{T}
-   ptr::libSingular.ideal_ptr
    base_ring::PolyRing
+   ptr::libSingular.ideal_ptr
    isGB::Bool
 
    function sideal{T}(R::PolyRing, ids::spoly...) where T
@@ -36,7 +34,7 @@ mutable struct sideal{T <: Nemo.RingElem} <: Module{T}
 
    function sideal{T}(R::PolyRing, id::libSingular.ideal_ptr) where T
       T === elem_type(R) || error("type mismatch")
-      z = new(id, R, false)
+      z = new(R, id, false)
       R.refcount += 1
       finalizer(_sideal_clear_fn, z)
       return z
