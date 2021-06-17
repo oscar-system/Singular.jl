@@ -53,7 +53,9 @@ import Nemo: add!, addeq!, base_ring, canonical_unit,
 
 export base_ring, elem_type, parent_type, parent
 
-export ResidueRing, PolynomialRing, Ideal, MaximalIdeal, FreeModule
+export ResidueRing, PolynomialRing, ExteriorAlgebra, WeylAlgebra, Ideal,
+       MaximalIdeal, FreeModule, @PolynomialRing, @WeylAlgebra,
+       @ExteriorAlgebra
 
 export ZZ, QQ, FiniteField, FunctionField, CoefficientRing, Fp
 
@@ -194,7 +196,7 @@ include("LibSingular.jl")
 
 include("Number.jl")
 
-include("Poly.jl")
+include("PolyAlg.jl")
 
 include("Module.jl")
 

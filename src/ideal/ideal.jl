@@ -91,7 +91,7 @@ which $I$ is an ideal. The ideal must be over a polynomial ring
 over a field, and a Groebner basis.
 """
 function dimension(I::sideal{S}) where S <: Union{spoly{T}, spoly{n_unknown{U}}} where {T <: Singular.FieldElem, U <: Nemo.FieldElem}
-   I.isGB == false && error("I needs to be a Gröbner basis.")
+   I.isGB == false && error("I needs to be a Groebner basis.")
    R = base_ring(I)
    GC.@preserve I R return Int(libSingular.scDimInt(I.ptr, R.ptr))
 end
@@ -138,7 +138,7 @@ function deepcopy_internal(I::sideal, dict::IdDict)
    return Ideal(R, ptr)
 end
 
-function check_parent(I::sideal{T}, J::sideal{T}) where T <: Nemo.RingElem
+function check_parent(I::sideal{T}, J::sideal{T}) where T <: AbstractAlgebra.NCRingElem
    base_ring(I) != base_ring(J) && error("Incompatible ideals")
 end
 
@@ -400,9 +400,9 @@ end
 Given an ideal $I$ this function computes a Groebner basis for it.
 Compared to `std`, `slimgb` uses different strategies for choosing
 a reducer.
->
+
 If the optional parameter `complete_reduction` is set to `true` the
-function computes a reduced Gröbner basis for $I$.
+function computes a reduced Groebner basis for $I$.
 """
 function slimgb(I::sideal; complete_reduction::Bool=false)
    R = base_ring(I)
@@ -689,6 +689,46 @@ function MaximalIdeal(R::PolyRing{T}, d::Int) where T <: Nemo.RingElem
    return sideal{S}(R, ptr)
 end
 
+function Ideal(R::WeylAlgebra{T}, ids::pweyl{T}...) where T <: Nemo.RingElem
+   S = elem_type(R)
+   length(ids) == 0 && return sideal{S}(R, R(0))
+   return sideal{S}(R, ids...)
+end
+
+function Ideal(R::WeylAlgebra{T}, ids::Array{pweyl{T}, 1}) where T <: Nemo.RingElem
+   S = elem_type(R)
+   return sideal{S}(R, ids...)
+end
+
+function Ideal(R::WeylAlgebra{T}, id::libSingular.ideal_ptr) where T <: Nemo.RingElem
+   S = elem_type(R)
+   return sideal{S}(R, id)
+end
+
+function (R::WeylAlgebra{T})(id::libSingular.ideal_ptr) where T <: Nemo.RingElem
+   return Ideal(R,id)
+end
+
+function Ideal(R::ExteriorAlgebra{T}, ids::pexterior{T}...) where T <: Nemo.RingElem
+   S = elem_type(R)
+   length(ids) == 0 && return sideal{S}(R, R(0))
+   return sideal{S}(R, ids...)
+end
+
+function Ideal(R::ExteriorAlgebra{T}, ids::Array{pexterior{T}, 1}) where T <: Nemo.RingElem
+   S = elem_type(R)
+   return sideal{S}(R, ids...)
+end
+
+function Ideal(R::ExteriorAlgebra{T}, id::libSingular.ideal_ptr) where T <: Nemo.RingElem
+   S = elem_type(R)
+   return sideal{S}(R, id)
+end
+
+function (R::ExteriorAlgebra{T})(id::libSingular.ideal_ptr) where T <: Nemo.RingElem
+   return Ideal(R,id)
+end
+
 ###############################################################################
 #
 #   Differential functions
@@ -796,10 +836,10 @@ end
     independent_sets(I::sideal{S}) where S <: Union{spoly{T}, spoly{n_unknown{U}}} where {T <: Singular.FieldElem, U <: Nemo.FieldElem}
 
 Returns all non-extendable independent sets of $lead(I)$. $I$ has to be given
-by a Gröbner basis.
+by a Groebner basis.
 """
 function independent_sets(I::sideal{S}) where S <: Union{spoly{T}, spoly{n_unknown{U}}} where {T <: Singular.FieldElem, U <: Nemo.FieldElem}
-   I.isGB == false && error("I needs to be a Gröbner basis.")
+   I.isGB == false && error("I needs to be a Groebner basis.")
    R = base_ring(I)
    n = nvars(R)
    a = Array{Int32, 1}()
@@ -821,12 +861,12 @@ end
     maximal_independent_set(I::sideal{S}; all::Bool = false) where S <: Union{spoly{T}, spoly{n_unknown{U}}} where {T <: Singular.FieldElem, U <: Nemo.FieldElem}
 
 Returns, by default, an array containing a maximal independet set of
-$lead(I)$. $I$ has to be given by a Gröbner basis.
+$lead(I)$. $I$ has to be given by a Groebner basis.
 If the additional parameter "all" is set to true, an array containing
 all maximal independent sets of $lead(I)$ is returned.
 """
 function maximal_independent_set(I::sideal{S}; all::Bool = false) where S <: Union{spoly{T}, spoly{n_unknown{U}}} where {T <: Singular.FieldElem, U <: Nemo.FieldElem}
-   I.isGB == false && error("I needs to be a Gröbner basis.")
+   I.isGB == false && error("I needs to be a Groebner basis.")
    R = base_ring(I)
    Q = base_ring(R)
    d = dimension(I)
@@ -849,3 +889,4 @@ function maximal_independent_set(I::sideal{S}; all::Bool = false) where S <: Uni
       return P
    end
 end
+

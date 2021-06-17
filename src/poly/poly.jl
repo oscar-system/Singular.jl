@@ -27,7 +27,7 @@ export ordering_lp, ordering_rp, ordering_dp, ordering_Dp, ordering_wp, ordering
 #
 ###############################################################################
 
-parent(p::spoly) = p.parent
+parent(p::polyalg) = p.parent
 
 base_ring(R::PolyRing{T}) where T <: Nemo.RingElem = R.base_ring::parent_type(T)
 
@@ -265,11 +265,11 @@ function deepcopy_internal(p::spoly, dict::IdDict)
    return R(p2)
 end
 
-function check_parent(a::spoly{T}, b::spoly{T}) where T <: Nemo.RingElem
+function check_parent(a::polyalg{T}, b::polyalg{T}) where T <: Nemo.RingElem
    parent(a) != parent(b) && error("Incompatible parent objects")
 end
 
-function canonical_unit(a::spoly{T}) where T <: Nemo.RingElem
+function canonical_unit(a::polyalg{T}) where T <: Nemo.RingElem
   return iszero(a) ? one(base_ring(a)) : canonical_unit(leading_coefficient(a))
 end
 
@@ -289,7 +289,7 @@ end
 #
 ###############################################################################
 
-function Base.iterate(x::Nemo.Generic.MPolyCoeffs{spoly{T}}) where T <: Nemo.RingElem
+function Base.iterate(x::Nemo.Generic.MPolyCoeffs{<:polyalg{T}}) where T <: Nemo.RingElem
    p = x.poly
    ptr = p.ptr
    if ptr.cpp_object == C_NULL
@@ -300,7 +300,7 @@ function Base.iterate(x::Nemo.Generic.MPolyCoeffs{spoly{T}}) where T <: Nemo.Rin
    end
 end
 
-function Base.iterate(x::Nemo.Generic.MPolyCoeffs{spoly{T}}, state) where T <: Nemo.RingElem
+function Base.iterate(x::Nemo.Generic.MPolyCoeffs{<:polyalg{T}}, state) where T <: Nemo.RingElem
    state = libSingular.pNext(state)
    if state.cpp_object == C_NULL
       return nothing
@@ -310,7 +310,7 @@ function Base.iterate(x::Nemo.Generic.MPolyCoeffs{spoly{T}}, state) where T <: N
    end
 end
 
-function Base.iterate(x::Nemo.Generic.MPolyExponentVectors{spoly{T}}) where T <: Nemo.RingElem
+function Base.iterate(x::Nemo.Generic.MPolyExponentVectors{<:polyalg{T}}) where T <: Nemo.RingElem
    p = x.poly
    ptr = p.ptr
    if ptr.cpp_object == C_NULL
@@ -323,7 +323,7 @@ function Base.iterate(x::Nemo.Generic.MPolyExponentVectors{spoly{T}}) where T <:
    end
 end
 
-function Base.iterate(x::Nemo.Generic.MPolyExponentVectors{spoly{T}}, state) where T <: Nemo.RingElem
+function Base.iterate(x::Nemo.Generic.MPolyExponentVectors{<:polyalg{T}}, state) where T <: Nemo.RingElem
    state = libSingular.pNext(state)
    if state.cpp_object == C_NULL
       return nothing
@@ -335,7 +335,7 @@ function Base.iterate(x::Nemo.Generic.MPolyExponentVectors{spoly{T}}, state) whe
    end
 end
 
-function Base.iterate(x::Nemo.Generic.MPolyTerms{spoly{T}}) where T <: Nemo.RingElem
+function Base.iterate(x::Nemo.Generic.MPolyTerms{<:polyalg{T}}) where T <: Nemo.RingElem
    p = x.poly
    ptr = p.ptr
    if ptr.cpp_object == C_NULL
@@ -346,7 +346,7 @@ function Base.iterate(x::Nemo.Generic.MPolyTerms{spoly{T}}) where T <: Nemo.Ring
    end
 end
 
-function Base.iterate(x::Nemo.Generic.MPolyTerms{spoly{T}}, state) where T <: Nemo.RingElem
+function Base.iterate(x::Nemo.Generic.MPolyTerms{<:polyalg{T}}, state) where T <: Nemo.RingElem
    state = libSingular.pNext(state)
    if state.cpp_object == C_NULL
       return nothing
@@ -356,7 +356,7 @@ function Base.iterate(x::Nemo.Generic.MPolyTerms{spoly{T}}, state) where T <: Ne
    end
 end
 
-function Base.iterate(x::Nemo.Generic.MPolyMonomials{spoly{T}}) where T <: Nemo.RingElem
+function Base.iterate(x::Nemo.Generic.MPolyMonomials{<:polyalg{T}}) where T <: Nemo.RingElem
    p = x.poly
    ptr = p.ptr
    if ptr.cpp_object == C_NULL
@@ -374,7 +374,7 @@ function Base.iterate(x::Nemo.Generic.MPolyMonomials{spoly{T}}) where T <: Nemo.
    end
 end
 
-function Base.iterate(x::Nemo.Generic.MPolyMonomials{spoly{T}}, state) where T <: Nemo.RingElem
+function Base.iterate(x::Nemo.Generic.MPolyMonomials{<:polyalg{T}}, state) where T <: Nemo.RingElem
    state = libSingular.pNext(state)
    if state.cpp_object == C_NULL
       return nothing
@@ -407,7 +407,7 @@ function show(io::IO, R::PolyRing)
    end
 end
 
-function Base.show(io::IO, a::spoly)
+function Base.show(io::IO, a::polyalg)
    print(io, AbstractAlgebra.obj_to_string(a, context = io))
 end
 
@@ -419,7 +419,7 @@ isnegative(x::spoly) = isconstant(x) && !iszero(x) && isnegative(leading_coeffic
 #
 ###############################################################################
 
-function -(a::spoly)
+function -(a::polyalg)
    R = parent(a)
    GC.@preserve a R begin
       a1 = libSingular.p_Copy(a.ptr, R.ptr)
@@ -434,7 +434,7 @@ end
 #
 ###############################################################################
 
-function (a::spoly{T} + b::spoly{T}) where T <: Nemo.RingElem
+function (a::polyalg{T} + b::polyalg{T}) where T <: Nemo.RingElem
    check_parent(a, b)
    R = parent(a)
    GC.@preserve a b R begin
@@ -445,7 +445,7 @@ function (a::spoly{T} + b::spoly{T}) where T <: Nemo.RingElem
    end
 end
 
-function (a::spoly{T} - b::spoly{T}) where T <: Nemo.RingElem
+function (a::polyalg{T} - b::polyalg{T}) where T <: Nemo.RingElem
    check_parent(a, b)
    R = parent(a)
    GC.@preserve a b R begin
@@ -456,7 +456,7 @@ function (a::spoly{T} - b::spoly{T}) where T <: Nemo.RingElem
    end
 end
 
-function (a::spoly{T} * b::spoly{T}) where T <: Nemo.RingElem
+function (a::polyalg{T} * b::polyalg{T}) where T <: Nemo.RingElem
    check_parent(a, b)
    R = parent(a)
    s = GC.@preserve a b R libSingular.pp_Mult_qq(a.ptr, b.ptr, R.ptr)
@@ -469,7 +469,7 @@ end
 #
 ###############################################################################
 
-function ^(x::spoly, y::Int)
+function ^(x::polyalg, y::Int)
    0 <= y <= typemax(Cint) ||
       throw(DomainError(y, "exponent must be non-negative and <= $(typemax(Cint))"))
    R = parent(x)
@@ -493,12 +493,12 @@ end
 #
 ###############################################################################
 
-function (x::spoly{T} == y::spoly{T}) where T <: Nemo.RingElem
+function (x::polyalg{T} == y::polyalg{T}) where T <: Nemo.RingElem
    check_parent(x, y)
    GC.@preserve x y return Bool(libSingular.p_EqualPolys(x.ptr, y.ptr, parent(x).ptr))
 end
 
-function Base.isless(x::spoly{T}, y::spoly{T}) where T <: Nemo.RingElem
+function Base.isless(x::polyalg{T}, y::polyalg{T}) where T <: Nemo.RingElem
    check_parent(x, y)
    R = parent(x)
    GC.@preserve x y R return libSingular.p_Compare(x.ptr, y.ptr, R.ptr) < 0
@@ -510,7 +510,7 @@ end
 #
 ###############################################################################
 
-function divexact(x::spoly, y::spoly)
+function divexact(x::polyalg, y::polyalg)
    check_parent(x, y)
    R = parent(x)
    GC.@preserve x y R begin
@@ -527,7 +527,7 @@ end
 #
 ###############################################################################
 
-function divexact(x::spoly{T}, y::T) where T <: Nemo.RingElem
+function divexact(x::polyalg{T}, y::T) where T <: Nemo.RingElem
    R = parent(x)
    base_ring(x) != parent(y) && error("Incompatible rings")
    GC.@preserve x y R begin
@@ -537,7 +537,7 @@ function divexact(x::spoly{T}, y::T) where T <: Nemo.RingElem
    end
 end
 
-function divexact(x::spoly, y::n_Z)
+function divexact(x::polyalg, y::n_Z)
    y1 = base_ring(x)(y)
    R = parent(x)
    GC.@preserve x y1 R begin
@@ -547,7 +547,7 @@ function divexact(x::spoly, y::n_Z)
    end
 end
 
-function divexact(x::spoly, y::n_Q)
+function divexact(x::polyalg, y::n_Q)
    y1 = base_ring(x)(y)
    R = parent(x)
    GC.@preserve x y1 R begin
@@ -557,7 +557,7 @@ function divexact(x::spoly, y::n_Q)
    end
 end
 
-function divexact(x::spoly, y::Int)
+function divexact(x::polyalg, y::Int)
    R = base_ring(x)
    S = parent(x)
    GC.@preserve x R S begin
@@ -569,9 +569,9 @@ function divexact(x::spoly, y::Int)
    end
 end
 
-divexact(x::spoly, y::Integer) = divexact(x, base_ring(x)(y))
+divexact(x::polyalg, y::Integer) = divexact(x, base_ring(x)(y))
 
-function divexact(x::spoly, y::Rational)
+function divexact(x::polyalg, y::Rational)
    return divexact(x, base_ring(x)(y))
 end
 
@@ -581,7 +581,7 @@ end
 #
 ###############################################################################
 
-function divides(x::spoly{T}, y::spoly{T}) where T <: Nemo.FieldElem
+function divides(x::polyalg{T}, y::polyalg{T}) where T <: Nemo.FieldElem
    check_parent(x, y)
    R = parent(x)
    GC.@preserve x y R begin
@@ -607,7 +607,7 @@ end
 #
 ###############################################################################
 
-function divrem(x::spoly{T}, y::spoly{T}) where T <: Nemo.FieldElem
+function divrem(x::polyalg{T}, y::polyalg{T}) where T <: Nemo.FieldElem
    check_parent(x, y)
    R = parent(x)
    GC.@preserve x y R begin
@@ -620,7 +620,7 @@ function divrem(x::spoly{T}, y::spoly{T}) where T <: Nemo.FieldElem
    end
 end
 
-function div(x::spoly{T}, y::spoly{T}) where T <: Nemo.FieldElem
+function div(x::polyalg{T}, y::polyalg{T}) where T <: Nemo.FieldElem
    check_parent(x, y)
    R = parent(x)
    GC.@preserve x y R begin
@@ -671,12 +671,12 @@ function lcm(x::spoly{T}, y::spoly{T}) where T <: Nemo.RingElem
 end
 
 @doc Markdown.doc"""
-    primpart(x::spoly)
+    primpart(x::polyalg)
 
 Return the primitive part of the polynomial, i.e. the polynomial divided by the GCD
 of its coefficients.
 """
-function primpart(x::spoly)
+function primpart(x::polyalg)
    R = parent(x)
    p = deepcopy(x)
    libSingular.p_Content(p.ptr, R.ptr)
@@ -684,11 +684,11 @@ function primpart(x::spoly)
 end
 
 @doc Markdown.doc"""
-    content(x::spoly)
+    content(x::polyalg)
 
 Return the content of the polynomial, i.e. the GCD of its coefficients.
 """
-function content(x::spoly)
+function content(x::polyalg)
    R = base_ring(x)
    d = R()
    for c in coefficients(x)
@@ -706,7 +706,7 @@ end
 #
 ###############################################################################
 
-function evaluate(a::spoly{T}, C::Vector{T}) where T <: Nemo.RingElem
+function evaluate(a::polyalg{T}, C::Vector{T}) where T <: Nemo.RingElem
    S = parent(a)
    R = base_ring(a)
    @GC.preserve C begin
@@ -716,30 +716,30 @@ function evaluate(a::spoly{T}, C::Vector{T}) where T <: Nemo.RingElem
    end
 end
 
-function evaluate(a::spoly{T}, C::Vector{U}) where {T <: Nemo.RingElem, U <: Union{Integer, Rational}}
+function evaluate(a::polyalg{T}, C::Vector{U}) where {T <: Nemo.RingElem, U <: Union{Integer, Rational}}
    C2 = [base_ring(a)(c) for c in C]
    return evaluate(a, C2)
 end
 
-function evaluate(a::spoly{T}, C::Vector{n_Z}) where T <: Nemo.RingElem
+function evaluate(a::polyalg{T}, C::Vector{n_Z}) where T <: Nemo.RingElem
    C2 = [base_ring(a)(c) for c in C]
    return evaluate(a, C2)
 end
 
-function (a::spoly{T})(vals::T...) where T <: RingElem
+function (a::polyalg{T})(vals::T...) where T <: RingElem
    length(vals) != nvars(parent(a)) && error("Number of variables does not match number o
 f values")
    return evaluate(a, [vals...])
 end
 
-function (a::spoly{T})(vals::U...) where {T <: RingElem, U <: Union{Integer, Rational,
+function (a::polyalg{T})(vals::U...) where {T <: RingElem, U <: Union{Integer, Rational,
  AbstractFloat}}
    length(vals) != nvars(parent(a)) && error("Number of variables does not match number o
 f values")
    return evaluate(a, [vals...])
 end
 
-function (a::spoly{T})(vals::Union{Nemo.NCRingElem, Nemo.RingElement}...) where T <: RingElem
+function (a::polyalg{T})(vals::Union{Nemo.NCRingElem, Nemo.RingElement}...) where T <: RingElem
    length(vals) != nvars(parent(a)) && error("Number of variables does not match number o
 f values")
    R = base_ring(a)
@@ -851,24 +851,24 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    substitute_variable(p::spoly,i::Int64,q::spoly)
+    substitute_variable(p::polyalg,i::Int64,q::spoly)
 
 Substitutes the `i`-th variable of the polynomial `p` with the polynomial `q`.
 Returns a new polynomial.
 """
-function substitute_variable(p::spoly, i::Int64, q::spoly)
+function substitute_variable(p::polyalg, i::Int64, q::polyalg)
     R = parent(p)
     check_parent(p, q)
     GC.@preserve p q R return R(libSingular.p_Subst(p.ptr,i, q.ptr, R.ptr))
 end
 
 @doc Markdown.doc"""
-    permute_variables(p::spoly, perm::Array{Int64,1}, new_ring::PolyRing)
+    permute_variables(p::polyalg, perm::Array{Int64,1}, new_ring::PolyRing)
 
 Permutes the indeterminates of `p` according to `perm` to the indeterminates
 of the ring `new_ring`.
 """
-function permute_variables(p::spoly, perm::Array{Int64,1}, new_ring::PolyRing)
+function permute_variables(p::polyalg, perm::Array{Int64,1}, new_ring::PolyRing)
    old_ring = parent(p)
    old_base = base_ring(old_ring)
    new_base = base_ring(new_ring)
@@ -950,10 +950,10 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-   jet(x::spoly, n::Int)
+   jet(x::polyalg, n::Int)
 Given a polynomial $x$ this function truncates $x$ up to degree $n$.
 """
-function jet(x::spoly, n::Int)
+function jet(x::polyalg, n::Int)
    p = deepcopy(x)
    R = parent(x)
    p.ptr = GC.@preserve x R libSingular.p_Jet(x.ptr, Cint(n), R.ptr)
@@ -961,11 +961,11 @@ function jet(x::spoly, n::Int)
 end
 
 @doc Markdown.doc"""
-   derivative(x::spoly, n::Int)
+   derivative(x::polyalg, n::Int)
 Given a polynomial $x$ this function returns the derivative of $x$
 with respect to the variable with number $n$.
 """
-function derivative(x::spoly, n::Int)
+function derivative(x::polyalg, n::Int)
    R = parent(x)
    if n > nvars(R) || n < 1
        error("Variable does not exist")
@@ -977,11 +977,11 @@ function derivative(x::spoly, n::Int)
 end
 
 @doc Markdown.doc"""
-   derivative(x::spoly, v::spoly)
+   derivative(x::polyalg, v::polyalg)
 Given a polynomial $x$ this function returns the derivative of $x$
 with respect to the variable $v$.
 """
-function derivative(x::spoly, v::spoly)
+function derivative(x::polyalg, v::polyalg)
    R = parent(x)
    if R == parent(v) && isgen(v)
        p = deepcopy(x)
@@ -993,10 +993,10 @@ function derivative(x::spoly, v::spoly)
 end
 
 @doc Markdown.doc"""
-   jacobian_ideal(x::spoly)
+   jacobian_ideal(x::polyalg)
 Given a polynomial $x$ this function returns the Jacobian ideal of $x$.
 """
-function jacobian_ideal(p::spoly)
+function jacobian_ideal(p::polyalg)
    R = parent(p)
    B = base_ring(R)
    n = nvars(R)
@@ -1008,10 +1008,10 @@ function jacobian_ideal(p::spoly)
 end
 
 @doc Markdown.doc"""
-   jacobian_matrix(x::spoly)
+   jacobian_matrix(x::polyalg)
 Given a polynomial $x$ this function returns the Jacobian matrix of $x$.
 """
-function jacobian_matrix(p::spoly)
+function jacobian_matrix(p::polyalg)
    R = parent(p)
    n = nvars(R)
    J = zero_matrix(R, n, 1)
@@ -1022,11 +1022,11 @@ function jacobian_matrix(p::spoly)
 end
 
 @doc Markdown.doc"""
-   jacobian_matrix(A::Vector{spoly, 1})
+   jacobian_matrix(A::Vector{<:polyalg, 1})
 Given an array $A$ of polynomials over the same base ring,
 this function returns the Jacobian matrix of $A$.
 """
-function jacobian_matrix(A::Vector{spoly{T}}) where T <: Nemo.RingElem
+function jacobian_matrix(A::Vector{<:polyalg{T}}) where T <: Nemo.RingElem
    m = length(A)
    m == 0 && error("Array has to be non-empty.")
    R = parent(A[1])
@@ -1046,13 +1046,13 @@ end
 #
 ###############################################################################
 
-function sort_terms!(x::spoly)
+function sort_terms!(x::polyalg)
    S = parent(x)
    x.ptr = GC.@preserve x S libSingular.p_SortMerge(x.ptr, S.ptr)
    return x
 end
 
-function addeq!(x::spoly, y::spoly)
+function addeq!(x::polyalg, y::polyalg)
    R = parent(x)
    GC.@preserve x y R begin
        if y.ptr == C_NULL
@@ -1065,7 +1065,7 @@ function addeq!(x::spoly, y::spoly)
    end
 end
 
-function mul!(c::spoly, x::spoly, y::spoly)
+function mul!(c::polyalg, x::polyalg, y::polyalg)
    R = parent(x)
    GC.@preserve c x y R begin
       ptr = libSingular.pp_Mult_qq(x.ptr, y.ptr, R.ptr)
@@ -1077,7 +1077,7 @@ function mul!(c::spoly, x::spoly, y::spoly)
    end
 end
 
-function add!(c::spoly, x::spoly, y::spoly)
+function add!(c::polyalg, x::polyalg, y::polyalg)
    R = parent(x)
    GC.@preserve c x y R begin
       x1 = libSingular.p_Copy(x.ptr, R.ptr)
@@ -1091,14 +1091,14 @@ function add!(c::spoly, x::spoly, y::spoly)
    end
 end
 
-function zero!(x::spoly)
+function zero!(x::polyalg)
    GC.@preserve x begin
       if x.ptr != C_NULL
          libSingular.p_Delete(x.ptr, parent(x).ptr)
          x.ptr = libSingular.p_ISet(0, parent(x).ptr)
       end
-      return x
    end
+   return x
 end
 
 ###############################################################################
@@ -1145,7 +1145,7 @@ function MPolyBuildCtx(R::PolyRing)
    GC.@preserve t return MPolyBuildCtx(R, t.ptr)
 end
 
-function push_term!(M::MPolyBuildCtx{spoly{S}, U}, c::S, expv::Vector{Int}) where {U, S <: Nemo.RingElem}
+function push_term!(M::MPolyBuildCtx{<:polyalg{S}, U}, c::S, expv::Vector{Int}) where {U, S <: Nemo.RingElem}
    if c == 0
       return
    end
@@ -1171,7 +1171,7 @@ function push_term!(M::MPolyBuildCtx{spoly{S}, U}, c::S, expv::Vector{Int}) wher
    end
 end
 
-function finish(M::MPolyBuildCtx{spoly{S}, U}) where {S, U}
+function finish(M::MPolyBuildCtx{<:polyalg{S}, U}) where {S, U}
    p = sort_terms!(M.poly)
    return p
 end

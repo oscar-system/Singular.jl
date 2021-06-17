@@ -1,5 +1,7 @@
 abstract type Set <: AbstractAlgebra.Set end
 
+abstract type NCRing <: AbstractAlgebra.NCRing end
+
 abstract type Ring <: AbstractAlgebra.Ring end
 
 abstract type Field <: AbstractAlgebra.Field end
