@@ -83,17 +83,18 @@ $R/I$ is zero, where $R$ is the polynomial ring over which $I$ is an ideal..
 iszerodim(I::sideal) = Bool(libSingular.id_IsZeroDim(I.ptr, base_ring(I).ptr))
 
 @doc Markdown.doc"""
-    dimension(I::sideal{S}) where S <: Union{spoly{T}, spoly{n_unknown{U}}} where {T <: Singular.FieldElem, U <: Nemo.FieldElem}
+    dimension(I::sideal{S}) where S <: Union{spoly{T}, spoly{n_unknown{U}}} where {T <: Singular.RingElem, U <: Nemo.RingElem}
 
 Given an ideal $I$ this function computes the Krull dimension
 of the ring $R/I$, where $R$ is the polynomial ring over
 which $I$ is an ideal. The ideal must be over a polynomial ring
-over a field, and a Groebner basis.
+and a Groebner basis.
 """
-function dimension(I::sideal{S}) where S <: Union{spoly{T}, spoly{n_unknown{U}}} where {T <: Singular.FieldElem, U <: Nemo.FieldElem}
+function dimension(I::sideal{S}) where S <: Union{spoly{T}, spoly{n_unknown{U}}} where {T <: Singular.RingElem, U <: Nemo.RingElem}
    I.isGB == false && error("I needs to be a Gröbner basis.")
    R = base_ring(I)
-   GC.@preserve I R return Int(libSingular.scDimInt(I.ptr, R.ptr))
+   # scDimIntRing does both fields and non-fields
+   GC.@preserve I R return Int(libSingular.scDimIntRing(I.ptr, R.ptr))
 end
 
 @doc Markdown.doc"""
