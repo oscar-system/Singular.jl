@@ -33,6 +33,7 @@ mutable struct sideal{T <: Nemo.RingElem} <: Module{T}
    end
 
    function sideal{T}(R::PolyRing, id::libSingular.ideal_ptr) where T
+      T === elem_type(R) || error("type mismatch")
       z = new(R, id, false)
       R.refcount += 1
       finalizer(_sideal_clear_fn, z)

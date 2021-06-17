@@ -72,7 +72,7 @@ mutable struct spoly{T <: Nemo.RingElem} <: Nemo.MPolyElem{T}
    parent::PolyRing{T}
 
    function spoly{T}(R::PolyRing{T}, p::libSingular.poly_ptr) where T <: Nemo.RingElem
-      z = new{T}(p, R)
+      z = new(p, R)
       R.refcount += 1
       finalizer(_spoly_clear_fn, z)
       return z

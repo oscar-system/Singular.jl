@@ -48,7 +48,7 @@
     # so we pass in a module and let singular do the conversion to a matrix
 
     R, (x, y, z) = PolynomialRing(Singular.QQ, ["x", "y", "z"])
-    m = Singular.smodule{n_Q}(R, vector(R, R(0), R(2)),
+    m = Singular.Module(R, vector(R, R(0), R(2)),
                                  vector(R, R(1), R(1)),
                                  vector(R, R(2), R(0)))
     id = Singular.LibSing4ti2.markov4ti2(m)
@@ -56,7 +56,7 @@
     @test 0 == reduce(x*z-y^2, id)
 
     R, (x, y, z, w) = PolynomialRing(Singular.QQ, ["x", "y", "z", "w"])
-    m = Singular.smodule{n_Q}(R, vector(R, R(0), R(3)),
+    m = Singular.Module(R, vector(R, R(0), R(3)),
                                  vector(R, R(1), R(2)),
                                  vector(R, R(2), R(1)),
                                  vector(R, R(3), R(0)))
@@ -70,7 +70,7 @@
 
     R, (x1, x2, x3, x4, x5, x6, x7, x8, x9) =
                       PolynomialRing(Singular.QQ, ["x"*string(i) for i in 1:9])
-    m = Singular.smodule{n_Q}(R,
+    m = Singular.Module(R,
                         vector(R, R(1), R(1), R(0), R(1), R(1), R(0), R(1)),
                         vector(R, R(1), R(1), R(1), R(0), R(1), R(1), R(1)),
                         vector(R, R(1), R(1), R(1), R(1), R(0), R(1), R(0)),

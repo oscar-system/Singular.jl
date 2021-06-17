@@ -23,6 +23,7 @@ mutable struct smatrix{T <: Nemo.RingElem} <: Nemo.SetElem
    base_ring::PolyRing
 
    function smatrix{T}(R::PolyRing, ptr::libSingular.matrix_ptr) where {T}
+      T === elem_type(R) || error("type mismatch")
       z = new(ptr, R)
       finalizer(_smatrix_clear_fn, z)
       return z

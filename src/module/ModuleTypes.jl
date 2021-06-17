@@ -23,6 +23,7 @@ mutable struct svector{T <: Nemo.RingElem} <: Nemo.ModuleElem{T}
    rank::Int
 
    function svector{T}(R::PolyRing, r::Int, p::libSingular.poly_ptr) where T
+      T === elem_type(R) || error("type mismatch")
       z = new(R, p, r)
       R.refcount += 1
       finalizer(_svector_clear_fn, z)
@@ -72,6 +73,7 @@ mutable struct smodule{T <: Nemo.RingElem} <: Module{T}
    isGB::Bool
 
    function smodule{T}(R::PolyRing, m::libSingular.ideal_ptr) where T
+      T === elem_type(R) || error("type mismatch")
       z = new(R, m, false)
       R.refcount += 1
       finalizer(_smodule_clear_fn, z)
@@ -108,7 +110,8 @@ Val(:module), it will interpret the ideal pointer as a module.
 This needs to be indicated due to the fact that Singular's
 modules and ideals are both stored in the ideal data structure.
 """
-function (R::PolyRing{T})(m::libSingular.ideal_ptr, ::Val{:module}) where T
+function (R::PolyRing)(m::libSingular.ideal_ptr, ::Val{:module})
+   T = elem_type(R)
    return smodule{T}(R,m)
 end
 
