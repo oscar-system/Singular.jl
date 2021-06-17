@@ -10,10 +10,8 @@ mutable struct ResolutionSet{T <: Nemo.RingElem} <: Set
    base_ring::PolyRing
 
    function ResolutionSet{T}(R::PolyRing) where T
-      if haskey(ResolutionSetID, R)
-         return ResolutionSetID[R]
-      else
-         return ResolutionSetID[R] = new(R)
+      return get!(ResolutionSetID, R) do
+         new(R)
       end
    end
 end

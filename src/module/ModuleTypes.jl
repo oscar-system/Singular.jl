@@ -11,10 +11,8 @@ mutable struct FreeMod{T <: Nemo.RingElem} <: Module{T}
    rank::Int
 
    function FreeMod{T}(R::PolyRing, r::Int) where T
-      if haskey(FreeModID, (R, r))
-         return FreeModID[R, r]::FreeMod{T}
-      else
-         return FreeModID[R, r] = new(R, r)
+      return get!(FreeModID, (R, r)) do
+         new(R, r)
       end
    end
 end
@@ -62,10 +60,8 @@ mutable struct ModuleClass{T <: Nemo.RingElem} <: Set
    base_ring::PolyRing
 
    function ModuleClass{T}(R::PolyRing) where T
-      if haskey(ModuleClassID, R)
-         return ModuleClassID[R]
-      else
-         return ModuleClassID[R] = new(R)
+      return get!(ModuleClassID, R) do
+         new(R)
       end
    end
 end

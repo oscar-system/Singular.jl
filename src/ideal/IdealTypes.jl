@@ -10,10 +10,8 @@ mutable struct IdealSet{T <: Nemo.RingElem} <: Set
    base_ring::PolyRing
 
    function IdealSet{T}(R::PolyRing) where T
-      if haskey(IdealSetID, R)
-         return IdealSetID[R]
-      else
-         return IdealSetID[R] = new(R)
+      return get!(IdealSetID, R) do
+         new(R)
       end
    end
 end

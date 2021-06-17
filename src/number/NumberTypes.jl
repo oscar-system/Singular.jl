@@ -34,15 +34,13 @@ mutable struct Integers <: Ring
    refcount::Int
 
    function Integers()
-      if haskey(IntegersID, :ZZ)
-         d = IntegersID[:ZZ]::Integers
-      else
+      return get!(IntegersID, :ZZ) do
          ptr = libSingular.nInitChar(libSingular.n_Z, Ptr{Nothing}(0))
          d = new(ptr, 0)
          IntegersID[:ZZ] = d
          finalizer(_Ring_finalizer, d)
+         return d
       end
-      return d
    end
 end
 
@@ -77,15 +75,13 @@ mutable struct Rationals <: Field
    refcount::Int
 
    function Rationals()
-      if haskey(RationalsID, :QQ)
-         d = RationalsID[:QQ]::Rationals
-      else
+      return get!(RationalsID, :QQ) do
          ptr = libSingular.nInitChar(libSingular.n_Q, Ptr{Nothing}(0))
          d = new(ptr, 0)
          RationalsID[:QQ] = d
          finalizer(_Ring_finalizer, d)
+         return d
       end
-      return d
    end
 end
 
@@ -125,20 +121,15 @@ mutable struct N_ZnRing <: Ring
    refcount::Int
 
    function N_ZnRing(n::Int, cached::Bool = true)
-      if cached && haskey(N_ZnRingID, n)
-         d = N_ZnRingID[n]::N_ZnRing
-      else
+      return AbstractAlgebra.get_cached!(N_ZnRingID, n, cached) do
          info = ZnmInfo(BigInt(n), UInt(1))
          GC.@preserve info begin
             ptr = libSingular.nInitChar(libSingular.n_Zn, pointer_from_objref(info))
             d = new(ptr, libSingular.n_SetMap(ZZ.ptr, ptr), libSingular.n_SetMap(ptr, ZZ.ptr), 1)
          end
-         if cached
-            N_ZnRingID[n] = d
-         end
          finalizer(_Ring_finalizer, d)
-      end
-      return d
+         return d
+      end::N_ZnRing
    end
 end
 
@@ -175,18 +166,13 @@ mutable struct N_ZpField <: Field
    refcount::Int
 
    function N_ZpField(n::Int, cached::Bool = true)
-      if cached && haskey(N_ZpFieldID, n)
-         d = N_ZpFieldID[n]::N_ZpField
-      else
+      return AbstractAlgebra.get_cached!(N_ZpFieldID, n, cached) do
          ptr = libSingular.nInitChar(libSingular.n_Zp, Ptr{Nothing}(n))
          d = new(ptr, libSingular.n_SetMap(ZZ.ptr, ptr),
               libSingular.n_SetMap(ptr, ZZ.ptr), 1)
-         if cached
-            N_ZpFieldID[n] = d
-         end
          finalizer(_Ring_finalizer, d)
-      end
-      return d
+         return d
+      end::N_ZpField
    end
 end
 
@@ -238,9 +224,7 @@ mutable struct N_GField <: Field
    S::Symbol
 
    function N_GField(p::Int, n::Int, S::Symbol, cached::Bool = true)
-      if cached && haskey(N_GFieldID, (p, n, S))
-         d = N_GFieldID[p, n, S]::N_GField
-      else
+      return AbstractAlgebra.get_cached!(N_GFieldID, (p, n, S), cached) do
          # NOTE: degree 1 special case
          # A N_GField with n = 1 - when passed through Singular and to
          # create_ring_from_singular_ring - will be recognized as a N_ZpField.
@@ -265,11 +249,8 @@ mutable struct N_GField <: Field
          d = new(ptr, n, libSingular.n_SetMap(ZZ.ptr, ptr),
                          libSingular.n_SetMap(ptr, ZZ.ptr), 1, S)
          finalizer(_Ring_finalizer, d)
-         if cached
-            N_GFieldID[p, n, S] = d
-         end
-      end
-      return d
+         return d
+      end::N_GField
    end
 end
 
@@ -312,19 +293,14 @@ mutable struct N_FField <: Field
    S::Array{Symbol, 1}
 
    function N_FField(F::Field, S::Array{Symbol, 1}, cached::Bool = true)
-      if cached && haskey(N_FFieldID, (F, S))
-         d = N_FFieldID[F, S]::N_FField
-      else
+      return AbstractAlgebra.get_cached!(N_FFieldID, (F, S), cached) do
          v = [pointer(Base.Vector{UInt8}(string(str)*"\0")) for str in S]
          cf = libSingular.nCopyCoeff(F.ptr)
          ptr = libSingular.transExt_helper(cf, v)
          d = new(ptr, F, 1, S)
          finalizer(_Ring_finalizer, d)
-         if cached
-            N_FFieldID[F, S] = d
-         end
-      end
-      return d
+         return d
+      end::N_FField
    end
 end
 
@@ -381,20 +357,14 @@ mutable struct N_AlgExtField <: Field
       end
    end
 
-   # constructor for R[x]/minpoly from R(x) and minpoly in R(x) 
+   # constructor for R[x]/minpoly from R(x) and minpoly in R(x)
    function N_AlgExtField(F::N_FField, minpoly::n_transExt, cached::Bool = true)
       parent(minpoly) == F || error("minpoly parent mismatch")
       transcendence_degree(F) == 1 || error("Only algebraic extensions in one variable are supported")
-      if cached && haskey(N_AlgExtFieldID, (F, minpoly))
-         d = N_AlgExtFieldID[F, minpoly]::N_AlgExtField
-      else
+      return AbstractAlgebra.get_cached!(N_AlgExtFieldID, (F, minpoly), cached) do
          ptr = libSingular.transExt_SetMinpoly(F.ptr, minpoly.ptr)
-         d = N_AlgExtField(ptr, minpoly, cached)
-         if cached
-            N_AlgExtFieldID[F, minpoly] = d
-         end
-      end
-      return d
+         return N_AlgExtField(ptr, minpoly, cached)
+      end::N_AlgExtField
    end
 end
 
@@ -428,19 +398,14 @@ mutable struct CoefficientRing{T <: Nemo.RingElem} <: Ring
    base_ring::Nemo.Ring
 
    function CoefficientRing{T}(R::Nemo.Ring, cached::Bool=true) where T
-      if haskey(CoeffRingID, R)
-         return CoeffRingID[R]::CoefficientRing{T}
-      else
+      return AbstractAlgebra.get_cached!(CoeffRingID, R, cached) do
          c = libSingular.register(R)
          GC.@preserve R begin
             ptr = pointer_from_objref(R)
             z = new(libSingular.nInitChar(c, ptr), R)
          end
-         if cached
-           CoeffRingID[R] = z
-         end
          return z
-      end
+      end::CoefficientRing{T}
    end
 end
 

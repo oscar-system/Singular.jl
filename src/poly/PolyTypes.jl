@@ -50,16 +50,13 @@ mutable struct PolyRing{T <: Nemo.RingElem} <: Nemo.MPolyRing{T}
       # internally in libSingular, degree_bound is set to
       deg_bound_fix = Int(libSingular.rGetExpSize(bitmask, Cint(nvars)))
       sord = serialize_ordering(nvars, ord)
-      if haskey(PolyRingID, (R, s, sord, deg_bound_fix))
-         return PolyRingID[R, s, sord, deg_bound_fix]::PolyRing{T}
-      else
+      return get!(PolyRingID, (R, s, sord, deg_bound_fix)) do
          v = [pointer(Base.Vector{UInt8}(string(str)*"\0")) for str in s]
          r = libSingular.nCopyCoeff(R.ptr)
          ptr = libSingular.rDefault_wvhdl_helper(r, v, sord, bitmask)
          @assert deg_bound_fix == Int(libSingular.rBitmask(ptr))
-         PolyRingID[R, s, sord, deg_bound_fix] = d = PolyRing{T}(ptr, R)
-         return d
-      end
+         return PolyRing{T}(ptr, R)
+      end::PolyRing{T}
    end
 end
 
