@@ -146,12 +146,14 @@ end
 #
 ###############################################################################
 
-function (S::ResolutionSet{T})(ptr::libSingular.syStrategy_ptr, len::Int = 0) where T <: AbstractAlgebra.RingElem
+function (S::ResolutionSet)(ptr::libSingular.syStrategy_ptr, len::Int = 0)
    R = base_ring(S)
+   T = elem_type(R)
    return sresolution{T}(R, ptr)
 end
 
-function (R::PolyRing{T})(ptr::libSingular.syStrategy_ptr, ::Val{:resolution}) where T <: AbstractAlgebra.RingElement
+function (R::PolyRing)(ptr::libSingular.syStrategy_ptr, ::Val{:resolution})
+    T = elem_type(R)
     return sresolution{T}(R, ptr, libSingular.get_minimal_res(ptr) != C_NULL )
 end
 

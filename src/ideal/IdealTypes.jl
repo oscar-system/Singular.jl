@@ -26,9 +26,7 @@ mutable struct sideal{T <: Nemo.RingElem} <: Module{T}
    function sideal{T}(R::PolyRing, ids::spoly...) where T
       n = length(ids)
       id = libSingular.idInit(Cint(n),1)
-      z = new(id, R, false)
-      R.refcount += 1
-      finalizer(_sideal_clear_fn, z)
+      z = sideal{T}(R, id)
       for i = 1:n
          p = libSingular.p_Copy(ids[i].ptr, R.ptr)
          libSingular.setindex_internal(id, p, Cint(i - 1))
@@ -37,6 +35,7 @@ mutable struct sideal{T <: Nemo.RingElem} <: Module{T}
    end
 
    function sideal{T}(R::PolyRing, id::libSingular.ideal_ptr) where T
+      T === elem_type(R) || error("type mismatch")
       z = new(id, R, false)
       R.refcount += 1
       finalizer(_sideal_clear_fn, z)
