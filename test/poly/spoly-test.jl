@@ -516,3 +516,24 @@ end
    @test_throws Exception div(R(), R())
    @test !iszero(std(Ideal(R, R(1))))
 end
+
+@testset "spoly.to_univariate" begin
+
+   touni = Singular.AbstractAlgebra.to_univariate
+
+   S, t = Singular.AbstractAlgebra.PolynomialRing(Singular.QQ, "t")
+
+   R,(x,y) = PolynomialRing(QQ, ["x", "y"], ordering=:deglex)
+   @test touni(S, 0*x) == zero(S)
+   @test touni(S, 1+0*x) == one(S)
+   @test touni(S, y+2*y^2+3*y^3) == t+2*t^2+3*t^3
+   @test touni(S, x+2*x^2+3*x^3) == t+2*t^2+3*t^3
+   @test_throws Exception touni(S, (1+x)*(1+y))
+
+   R,(x,y) = PolynomialRing(QQ, ["x", "y"], ordering=:neglex)
+   @test touni(S, 0*x) == zero(S)
+   @test touni(S, 1+0*x) == one(S)
+   @test touni(S, (1+2*y)^6) == (1+2*t)^6
+   @test touni(S, (1+2*x)^6) == (1+2*t)^6
+   @test_throws Exception touni(S, (1+x)*(1+y))
+end
