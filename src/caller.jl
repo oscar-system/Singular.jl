@@ -22,6 +22,7 @@ casting_functions_pre = Dict(
     :IDEAL_CMD      => (libSingular.IDEAL_CMD_CASTER,      true, ()),
     :MODUL_CMD      => (libSingular.IDEAL_CMD_CASTER,      true, (:module,)),
     :VECTOR_CMD     => (libSingular.POLY_CMD_CASTER,       true, (:vector,)),
+    :MATRIX_CMD     => (libSingular.MATRIX_CMD_CASTER,     true, ()),
     :INT_CMD        => (libSingular.INT_CMD_CASTER,        false, ()),
     :STRING_CMD     => (libSingular.STRING_CMD_CASTER,     false, ()),
     :LIST_CMD       => (libSingular.LIST_CMD_TRAVERSAL,    false, ()),
@@ -92,6 +93,10 @@ function convert_return_value(single_value, rng = nothing)
     elseif cast isa CxxWrap.CxxWrapCore.CxxPtr{Singular.libSingular.ring}
         new_ring = create_ring_from_singular_ring(cast)
         return [new_ring, convert_ring_content(libSingular.get_ring_content(cast), new_ring)]
+    elseif cast isa Singular.libSingular.matrix_ptr
+        return smatrix{elem_type(rng)}(rng, cast)
+    elseif cast isa CxxWrap.StdLib.StdStringAllocated
+        return String(cast)
     elseif cast_desc[2]
         if length(cast_desc[3]) > 0
             cast = rng(cast, Val(cast_desc[3][1]))
@@ -192,14 +197,15 @@ function prepare_argument(x::sresolution)
 end
 
 function prepare_argument(x::Any)
+    in(:ptr, fieldnames(typeof(x))) || error("unrecognized argument")
     if x.ptr isa libSingular.number_ptr
         ptr = x.ptr
         rng = parent(x)
         new_ptr = libSingular.n_Copy(ptr, rng.ptr)
         return Any[mapping_types_reversed[:NUMBER_CMD], new_ptr.cpp_object], nothing
     elseif x.ptr isa libSingular.matrix_ptr
-        rng = parent(x)
-        return Any[mapping_types_reversed[:MATRIX_CMD], libSingular.mpCopy(x.ptr, rng.ptr).cpp_object ], rng
+        rng = base_ring(x)
+        return Any[mapping_types_reversed[:MATRIX_CMD], libSingular.mp_Copy(x.ptr, rng.ptr).cpp_object ], rng
     elseif x.ptr isa libSingular.__mpz_struct
         return Any[mapping_types_reversed[:BIGINT_CMD], x.ptr.cpp_object], nothing
     elseif x.ptr isa libSingular.map_ptr
@@ -207,7 +213,7 @@ function prepare_argument(x::Any)
     elseif x.ptr isa libSingular.bigintmat
         return Any[mapping_types_reversed[:BIGINTMAT_CMD], x.ptr.cpp_object], nothing
     end
-
+    error("unrecognized argument")
 end
 
 function low_level_caller_rng(lib::String, name::String, ring, args...)
