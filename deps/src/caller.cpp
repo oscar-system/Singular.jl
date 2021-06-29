@@ -28,6 +28,7 @@ static jl_value_t * get_type_mapper()
         {RING_CMD, "RING_CMD"},
         {POLY_CMD, "POLY_CMD"},
         {IDEAL_CMD, "IDEAL_CMD"},
+        {MATRIX_CMD, "MATRIX_CMD"},
         {INT_CMD, "INT_CMD"},
         {STRING_CMD, "STRING_CMD"},
         {LIST_CMD, "LIST_CMD"},
@@ -357,6 +358,8 @@ void singular_define_caller(jlcxx::Module & Singular)
                     [](void * obj) { return reinterpret_cast<poly>(obj); });
     Singular.method("IDEAL_CMD_CASTER",
                     [](void * obj) { return reinterpret_cast<ideal>(obj); });
+    Singular.method("MATRIX_CMD_CASTER",
+                    [](void * obj) { return reinterpret_cast<matrix>(obj); });
     Singular.method("INT_CMD_CASTER", [](void * obj) {
         return jl_box_int64(reinterpret_cast<long>(obj));
     });
