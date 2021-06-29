@@ -197,7 +197,7 @@ function prepare_argument(x::sresolution)
 end
 
 function prepare_argument(x::Any)
-    in(:ptr, fieldnames(typeof(x))) || error("unrecognized argument")
+    :ptr in fieldnames(typeof(x)) || error("unrecognized argument $x")
     if x.ptr isa libSingular.number_ptr
         ptr = x.ptr
         rng = parent(x)
@@ -213,7 +213,7 @@ function prepare_argument(x::Any)
     elseif x.ptr isa libSingular.bigintmat
         return Any[mapping_types_reversed[:BIGINTMAT_CMD], x.ptr.cpp_object], nothing
     end
-    error("unrecognized argument")
+    error("unrecognized argument $x")
 end
 
 function low_level_caller_rng(lib::String, name::String, ring, args...)

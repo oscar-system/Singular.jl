@@ -83,17 +83,17 @@ end
    M1 = Matrix(R, [0 1 0; 0 0 1; 1 0 0])
    M2 = Matrix(R, [1 0 0; 0 w 0; 0 0 w^2])
    P, S, IS = Singular.LibFinvar.invariant_ring(M1, M2)
-   @assert isa(P, Singular.smatrix{Singular.spoly{Singular.n_algExt}})
-   @assert typeof(P) == typeof(S) == typeof(IS)
-   @assert nrows(P) == 1
-   @assert ncols(P) == 3
+   @test P isa Singular.smatrix{Singular.spoly{Singular.n_algExt}}
+   @test typeof(P) == typeof(S) == typeof(IS)
+   @test nrows(P) == 1
+   @test ncols(P) == 3
 end
 
 @testset "caller.LibSolve" begin
    R, (x,) = PolynomialRing(Singular.QQ, ["s"])
    l = Singular.LibSolve.solve(Ideal(R, [x^5+1]), "nodisplay")
    S = l[1]
-   @test isa(S, Singular.PolyRing{Singular.n_unknownsingularcoefficient})
+   @test S isa Singular.PolyRing{Singular.n_unknownsingularcoefficient}
    for y in l[2][:SOL]
       @test isa(y^5+1, Singular.n_unknownsingularcoefficient)
    end
@@ -104,7 +104,7 @@ end
    I = Ideal(R, z-x^4, z-y^6)
    l = Singular.LibNormal.normal(I)
    S = l[1][1][1]
-   @test isa(S, Singular.PolyRing{n_Q})
+   @test S isa Singular.PolyRing{n_Q}
    @test base_ring(gens(l[1][1][2][:norid])[1]*gens(S)[1]) == QQ
 
    F, a = FiniteField(5, 3, "b")
@@ -112,14 +112,14 @@ end
    I = Ideal(R, a*z-x^4, z-y^6)
    l = Singular.LibNormal.normal(I)
    S = l[1][1][1]
-   @test isa(S, Singular.PolyRing{n_GF})
+   @test S isa Singular.PolyRing{n_GF}
    @test base_ring(gens(l[1][1][2][:norid])[1]*gens(S)[1]*a) == F
 
    R, (x, y, z) = PolynomialRing(Fp(17), ["x", "y", "z"])
    I = Ideal(R, z-x^4, z-y^6)
    l = Singular.LibNormal.normal(I)
    S = l[1][1][1]
-   @test isa(S, Singular.PolyRing{n_Zp})
+   @test S isa Singular.PolyRing{n_Zp}
    @test base_ring(gens(l[1][1][2][:norid])[1]*gens(S)[1]) == Fp(17)
 
    F, (a, b, c) = FunctionField(Fp(17), ["a", "b", "c"])
@@ -127,7 +127,7 @@ end
    I = Ideal(R, a*z-x^4, b*c*z-y^6)
    l = Singular.LibNormal.normal(I)
    S = l[1][1][1]
-   @test isa(S, Singular.PolyRing{n_transExt})
+   @test S isa Singular.PolyRing{n_transExt}
    @test base_ring(gens(l[1][1][2][:norid])[1]*gens(S)[1]*a) == F
 
    F, (a, b, c) = FunctionField(QQ, ["a", "b", "c"])
@@ -135,7 +135,7 @@ end
    I = Ideal(R, a*z-x^4, b*c*z-y^6)
    l = Singular.LibNormal.normal(I)
    S = l[1][1][1]
-   @test isa(S, Singular.PolyRing{n_transExt})
+   @test S isa Singular.PolyRing{n_transExt}
    @test base_ring(gens(l[1][1][2][:norid])[1]) == F
    @test base_ring(gens(l[1][1][2][:norid])[1]*gens(S)[1]*a) == F
 
@@ -145,7 +145,7 @@ end
    I = Ideal(R, a*z-x^4, z-y^6)
    l = Singular.LibNormal.normal(I)
    S = l[1][1][1]
-   @test isa(S, Singular.PolyRing{n_algExt})
+   @test S isa Singular.PolyRing{n_algExt}
    @test base_ring(gens(l[1][1][2][:norid])[1]*gens(S)[1]*a) == K
 
    F, (Fa,) = FunctionField(Fp(7), ["a"])
@@ -154,7 +154,7 @@ end
    I = Ideal(R, a*z-x^4, z-y^6)
    l = Singular.LibNormal.normal(I)
    S = l[1][1][1]
-   @test isa(S, Singular.PolyRing{n_algExt})
+   @test S isa Singular.PolyRing{n_algExt}
    @test base_ring(gens(l[1][1][2][:norid])[1]*gens(S)[1]*a) == K
 end
 
