@@ -401,14 +401,14 @@ end
 function show(io::IO, R::PolyRing)
    s = libSingular.rString(R.ptr)
    if libSingular.rIsQuotientRing(R.ptr)
-     print(io, "Singular Polynomial Quotient Ring ", s)
+      print(io, "Singular Polynomial Quotient Ring ", s)
    else
-     print(io, "Singular Polynomial Ring ", s)
+      print(io, "Singular Polynomial Ring ", s)
    end
 end
 
-function Base.show(io::IO, a::spoly)
-   print(io, AbstractAlgebra.obj_to_string(a, context = io))
+function show(io::IO, a::spoly)
+   AbstractAlgebra.show_via_expressify(io, a)
 end
 
 isnegative(x::spoly) = isconstant(x) && !iszero(x) && isnegative(leading_coefficient(x))

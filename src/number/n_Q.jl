@@ -126,11 +126,8 @@ function AbstractAlgebra.expressify(n::n_Q; context = nothing)::Any
    return AbstractAlgebra.expressify(Rational{BigInt}(n), context = context)
 end
 
-function show(io::IO, n::n_Q)
-   libSingular.StringSetS("")
-   c = parent(n)
-   GC.@preserve n c libSingular.n_Write(n.ptr, c.ptr, false)
-   print(io, libSingular.StringEndS())
+function show(io::IO, a::n_Q)
+   AbstractAlgebra.show_via_expressify(io, a)
 end
 
 isnegative(x::n_Q) = !libSingular.n_GreaterZero(x.ptr, parent(x).ptr) &&
