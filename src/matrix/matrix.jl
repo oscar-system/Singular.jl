@@ -223,6 +223,15 @@ end
 #
 ###############################################################################
 
+function Matrix(R::PolyRing{T}, a::AbstractArray{S, 2}) where {T, S}
+   (r, c) = size(a)
+   m = zero_matrix(R, r, c)
+   for i in 1:r, j in 1:c
+      m[i, j] = R(a[i, j])
+   end
+   return m
+end
+
 function Matrix(I::smodule{T}) where T <: Nemo.RingElem
    GC.@preserve I return smatrix{T}(base_ring(I), I.ptr)
 end
