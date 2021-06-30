@@ -106,6 +106,15 @@ end
 
    R, (x, ) = PolynomialRing(FiniteField(5, 3, "a")[1], ["x", ])
    @test string(x) == "x"
+
+   # the answers should be printed in reduced form.
+   R, (x,) = PolynomialRing(QQ, ["x"])
+   @test string((QQ(1//2) + QQ(3//2)*x)(1)) == "2"
+
+   Qa, (a,) = FunctionField(QQ, ["a"])
+   R, (x,) = PolynomialRing(Qa, ["x"])
+   @test string((1//a + (1)//(a-1)*x + (a-1)//a*x^2)(1)) == "a//(a - 1)"
+   @test string((1//a + (1)//(a-1)*x + (a^2-3*a+1)//(a^2-a)*x^2)(1)) == "1"
 end
 
 @testset "spoly.manipulation" begin
