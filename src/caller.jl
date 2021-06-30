@@ -151,49 +151,67 @@ function prepare_argument(x::String)
 end
 
 function prepare_argument(x::PolyRing)
-    new_ptr = libSingular.get_ring_ref(x.ptr)
+    GC.@preserve x new_ptr = libSingular.get_ring_ref(x.ptr)
     return Any[mapping_types_reversed[:RING_CMD], new_ptr], x
 end
 
 function prepare_argument(x::spoly)
-    rng = parent(x)
-    return Any[mapping_types_reversed[:POLY_CMD], libSingular.copy_polyptr_to_void(x.ptr, rng.ptr)], rng
+    R = parent(x)
+    GC.@preserve x R return (Any[mapping_types_reversed[:POLY_CMD],
+                                 libSingular.copy_polyptr_to_void(x.ptr, R.ptr)],
+                             R)
 end
 
 function prepare_argument(x::svector)
-    rng = parent(x).base_ring
-    return Any[mapping_types_reversed[:VECTOR_CMD], libSingular.copy_polyptr_to_void(x.ptr, rng.ptr)], rng
+    R = parent(x).base_ring
+    GC.@preserve x R return (Any[mapping_types_reversed[:VECTOR_CMD],
+                                 libSingular.copy_polyptr_to_void(x.ptr, R.ptr)],
+                             R)
 end
 
 function prepare_argument(x::sideal)
-    rng = parent(x).base_ring
-    return Any[mapping_types_reversed[:IDEAL_CMD], libSingular.copy_idealptr_to_void(x.ptr, rng.ptr)], rng
+    R = parent(x).base_ring
+    GC.@preserve x R return (Any[mapping_types_reversed[:IDEAL_CMD],
+                                 libSingular.copy_idealptr_to_void(x.ptr, R.ptr)],
+                             R)
 end
 
-function prepare_argument(x::Array{Any, 1}, rng::PolyRing)
+function prepare_argument(x::Array{Any, 1}, R::PolyRing)
     args = Array{Any, 1}()
     types = Array{Int, 1}()
     for i in x
        if typeof(i) == Array{Any, 1}
-          p = prepare_argument(i, rng)
+          p = prepare_argument(i, R)
        else
           p = prepare_argument(i)
        end
        push!(args, p[1][2])
        push!(types, p[1][1])
     end
-    return Any[mapping_types_reversed[:LIST_CMD], libSingular.jl_array_to_void(args,types, rng.ptr)], rng
+    GC.@preserve x R return (Any[mapping_types_reversed[:LIST_CMD],
+                                 libSingular.jl_array_to_void(args, types, R.ptr)],
+                             R)
 end
 
 function prepare_argument(x::smodule)
-    rng = parent(x).base_ring
-    return Any[mapping_types_reversed[:MODUL_CMD], libSingular.copy_idealptr_to_void(x.ptr, rng.ptr)], rng
+    R = parent(x).base_ring
+    GC.@preserve x R return (Any[mapping_types_reversed[:MODUL_CMD],
+                                 libSingular.copy_idealptr_to_void(x.ptr, R.ptr)],
+                             R)
 end
 
 function prepare_argument(x::sresolution)
-    rng = base_ring(x)
-    res = Any[mapping_types_reversed[:RESOLUTION_CMD], libSingular.create_syStrategy_data(x.ptr, rng.ptr)]
-    return res, rng
+    R = base_ring(x)
+    GC.@preserve x R return (Any[mapping_types_reversed[:RESOLUTION_CMD],
+                                 libSingular.create_syStrategy_data(x.ptr, R.ptr)],
+                             R)
+end
+
+function prepare_argument(x::smatrix)
+    R = base_ring(x)
+    GC.@preserve x R return (Any[mapping_types_reversed[:MATRIX_CMD],
+                                  libSingular.mp_Copy(x.ptr, R.ptr).cpp_object],
+                              R)
 end
 
 function prepare_argument(x::Any)
@@ -203,9 +221,6 @@ function prepare_argument(x::Any)
         rng = parent(x)
         new_ptr = libSingular.n_Copy(ptr, rng.ptr)
         return Any[mapping_types_reversed[:NUMBER_CMD], new_ptr.cpp_object], nothing
-    elseif x.ptr isa libSingular.matrix_ptr
-        rng = base_ring(x)
-        return Any[mapping_types_reversed[:MATRIX_CMD], libSingular.mp_Copy(x.ptr, rng.ptr).cpp_object ], rng
     elseif x.ptr isa libSingular.__mpz_struct
         return Any[mapping_types_reversed[:BIGINT_CMD], x.ptr.cpp_object], nothing
     elseif x.ptr isa libSingular.map_ptr
