@@ -94,13 +94,13 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    minres{T <: AbstractAlgebra.RingElem}(r::sresolution{T})
+    minres{T <: AbstractAlgebra.FieldElem}(r::sresolution{T})
 
 Return a minimal free resolution, given any free resolution. In the graded
 case, there exists a uniquely determined minimal resolution. If the supplied
 resolution is already minimal, it may be returned without making a copy.
 """
-function minres(r::sresolution{T}) where T <: AbstractAlgebra.RingElem
+function minres(r::sresolution{T}) where T <: AbstractAlgebra.FieldElem
    if r.minimal
       return r
    end
