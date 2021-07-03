@@ -20,8 +20,8 @@
    K2, _ = FunctionField(QQ, 3)
    K3, _ = FunctionField(QQ, 3, cached = false)
 
-   @test K1 == K2
-   @test K1 != K3
+   @test K1 === K2
+   @test K1 !== K3
 end
 
 @testset "n_transExt.printing" begin
