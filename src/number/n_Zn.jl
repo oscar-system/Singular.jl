@@ -86,12 +86,18 @@ function Base.show(io::IO, ::MIME"text/plain", a::n_Zn)
    print(io, AbstractAlgebra.obj_to_string(a, context = io))
 end
 
-function AbstractAlgebra.expressify(n::n_Zn; context = nothing)::Any
-   x = BigInt()
+function BigInt(n::n_Zn)
+   z = BigInt()
    GC.@preserve n begin
-      ccall((:__gmpz_set, :libgmp), Cvoid, (Ref{BigInt},  Ptr{Any}), x, n.ptr.cpp_object)
+      ccall((:__gmpz_set, :libgmp), Cvoid,
+            (Ref{BigInt}, Ptr{Any}),
+            z, n.ptr.cpp_object)
    end
-   return AbstractAlgebra.expressify(x, context = context)
+   return z
+end
+
+function AbstractAlgebra.expressify(n::n_Zn; context = nothing)
+   return BigInt(n)
 end
 
 function show(io::IO, n::n_Zn)
@@ -291,15 +297,20 @@ promote_rule(C::Type{n_Zn}, ::Type{n_Z}) = n_Zn
 
 (R::N_ZnRing)(n::libSingular.number_ptr) = n_Zn(R, n)
 
+(R::N_ZnRing)(n::Nemo.nmod) = n_Zn(R, lift(n))
+
+(R::N_ZnRing)(n::Nemo.fmpz_mod) = n_Zn(R, lift(n))
+
+(R::Nemo.NmodRing)(n::n_Zn) = R(BigInt(n))
+
+(R::Nemo.FmpzModRing)(n::n_Zn) = R(BigInt(n))
+
 ###############################################################################
 #
 #   SingularResidueRing constructor
 #
 ###############################################################################
 
-function ResidueRing(R::Integers, a::Int; cached=true)
-   a == 0 && throw(DivideError())
-   a < 0 && throw(DomainError(a, "modulus must be non-negative"))
+ResidueRing(R::Integers, a::Int; cached=true) = N_ZnRing(BigInt(a), cached)
 
-   return N_ZnRing(a, cached)
-end
+ResidueRing(R::Integers, a::BigInt; cached=true) = N_ZnRing(a, cached)
