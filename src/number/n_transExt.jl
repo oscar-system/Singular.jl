@@ -379,5 +379,5 @@ with transcendence degree $n$ and transcendence basis $a1, ..., an$.
 """
 function FunctionField(F::Singular.Field, n::Int; cached::Bool=true)
    S = ["a$i" for i in 1:n]
-   return FunctionField(F, S, cached)
+   return FunctionField(F, S, cached = cached)
 end
