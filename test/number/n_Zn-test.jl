@@ -59,6 +59,10 @@ end
 
    @test -R(3) == R(2)
    @test -R() == R()
+
+   R = ResidueRing(ZZ, BigInt(10)^40)
+   @test iszero(R(10)^40)
+
 end
 
 @testset "n_Zn.binary_ops" begin
