@@ -10,7 +10,19 @@
    @test F != F2
    @test F1 != F2
 
+   F = ResidueRing(ZZ, BigInt(10)^50)
+   F1 = ResidueRing(ZZ, BigInt(10)^50)
+   F2 = ResidueRing(ZZ, BigInt(10)^50, cached = false)
+
+   @test F isa Singular.Ring
+   @test F1 isa Singular.Ring
+   @test F2 isa Singular.Ring
+   @test F == F1
+   @test F != F2
+   @test F1 != F2
+
    @test_throws DomainError ResidueRing(ZZ, -rand(1:99))
+
 end
 
 @testset "n_Zn.printing" begin
@@ -32,6 +44,14 @@ end
    @test characteristic(R) == 6
 
    @test deepcopy(R(2)) == R(2)
+
+   NR = Nemo.ResidueRing(Nemo.ZZ, 6)
+   @test R(2) == R(NR(2))
+   @test NR(2) == NR(R(2))
+
+   NR = Nemo.ResidueRing(Nemo.ZZ, Nemo.ZZ(6))
+   @test R(2) == R(NR(2))
+   @test NR(2) == NR(R(2))
 end
 
 @testset "n_Zn.unary_ops" begin
