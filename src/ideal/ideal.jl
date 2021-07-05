@@ -607,7 +607,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-     fres{T <: Nemo.FieldElem}(id::Union{sideal{T}, smodule{T}},
+     fres{T <: Singular.FieldElem}(id::Union{sideal{T}, smodule{T}},
       max_length::Int, method::String="complete")
 Compute a free resolution of the given ideal/module up to the maximum given
 length. The ideal/module must be over a polynomial ring over a field, and
@@ -618,7 +618,7 @@ the syzygy module of the previous module, starting with the given
 ideal/module.
 The `max_length` can be set to $0$ if the full free resolution is required.
 """
-function fres(id::Union{sideal{T}, smodule{T}}, max_length::Int, method::String = "complete") where T <: Nemo.FieldElem
+function fres(id::Union{sideal{T}, smodule{T}}, max_length::Int, method::String = "complete") where T <: Singular.FieldElem
    id.isGB == false && error("input is not a standard basis")
    max_length < 0 && error("length for fres must not be negative")
    R = base_ring(id)
@@ -637,14 +637,14 @@ function fres(id::Union{sideal{T}, smodule{T}}, max_length::Int, method::String 
 end
 
 @doc Markdown.doc"""
-     sres{T <: Nemo.FieldElem}(id::sideal{T}, max_length::Int)
+     sres{T <: Singular.FieldElem}(id::sideal{T}, max_length::Int)
 Compute a (free) Schreyer resolution of the given ideal up to the maximum
 given length. The ideal must be over a polynomial ring over a field, and a
 Groebner basis. The result is given as a resolution, whose i-th entry is
 the syzygy module of the previous module, starting with the given ideal.
 The `max_length` can be set to $0$ if the full free resolution is required.
 """
-function sres(I::sideal{T}, max_length::Int) where T <: Nemo.FieldElem
+function sres(I::sideal{T}, max_length::Int) where T <: Singular.FieldElem
    I.isGB == false && error("Not a Groebner basis ideal")
    R = base_ring(I)
    if max_length == 0
