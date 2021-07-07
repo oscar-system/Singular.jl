@@ -581,7 +581,7 @@ end
 #
 ###############################################################################
 
-function divides(x::spoly{T}, y::spoly{T}) where T <: Nemo.FieldElem
+function divides(x::spoly{T}, y::spoly{T}) where T <: Union{S, n_unknown{S}} where S <: Nemo.FieldElem
    check_parent(x, y)
    R = parent(x)
    GC.@preserve x y R begin
@@ -607,7 +607,7 @@ end
 #
 ###############################################################################
 
-function divrem(x::spoly{T}, y::spoly{T}) where T <: Nemo.FieldElem
+function divrem(x::spoly{T}, y::spoly{T}) where T <: Union{S, n_unknown{S}} where S <: Nemo.FieldElem
    check_parent(x, y)
    R = parent(x)
    GC.@preserve x y R begin
@@ -620,7 +620,7 @@ function divrem(x::spoly{T}, y::spoly{T}) where T <: Nemo.FieldElem
    end
 end
 
-function div(x::spoly{T}, y::spoly{T}) where T <: Nemo.FieldElem
+function div(x::spoly{T}, y::spoly{T}) where T <: Union{S, n_unknown{S}} where S <: Nemo.FieldElem
    check_parent(x, y)
    R = parent(x)
    GC.@preserve x y R begin
@@ -649,7 +649,7 @@ function gcd(x::spoly{T}, y::spoly{T}) where T <: Nemo.RingElem
    end
 end
 
-function gcdx(x::spoly{T}, y::spoly{T}) where T <: Nemo.FieldElem
+function gcdx(x::spoly{T}, y::spoly{T}) where T <: Union{S, n_unknown{S}} where S <: Nemo.FieldElem
    check_parent(x, y)
    R = parent(x)
    GC.@preserve x y R begin
