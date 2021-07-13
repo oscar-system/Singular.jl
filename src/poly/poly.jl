@@ -581,7 +581,8 @@ end
 #
 ###############################################################################
 
-function divides(x::spoly{T}, y::spoly{T}) where T <: Nemo.FieldElem
+function divides(x::spoly{T}, y::spoly{T}) where T <: Union{S, n_unknown{S}} where
+                                                 S <: Nemo.FieldElem
    check_parent(x, y)
    R = parent(x)
    GC.@preserve x y R begin
@@ -607,29 +608,24 @@ end
 #
 ###############################################################################
 
-function divrem(x::spoly{T}, y::spoly{T}) where T <: Nemo.FieldElem
-   check_parent(x, y)
-   R = parent(x)
-   GC.@preserve x y R begin
-      px = libSingular.p_Copy(x.ptr, R.ptr)
-      py = libSingular.p_Copy(y.ptr, R.ptr)
-      q, r = libSingular.p_DivRem(px, py, R.ptr)
-      qref = libSingular.toPolyRef(q)
-      rref = libSingular.toPolyRef(r)
-      return R(qref), R(rref)
-   end
+function divrem(a::spoly{T}, b::spoly{T}) where T <: Union{S, n_unknown{S}} where
+                                                S <: Nemo.FieldElem
+    check_parent(a, b)
+    iszero(b) && throw(DivideError())
+    R = parent(a)
+    q, r, _ = lift(Module(R, vector(R, b)), Module(R, vector(R, a)),
+                   false, false, true)
+    return (Array(q[1])[1], Array(r[1])[1])
 end
 
-function div(x::spoly{T}, y::spoly{T}) where T <: Nemo.FieldElem
-   check_parent(x, y)
-   R = parent(x)
-   GC.@preserve x y R begin
-      px = libSingular.p_Copy(x.ptr, R.ptr)
-      py = libSingular.p_Copy(y.ptr, R.ptr)
-      q = R(libSingular.p_Divide(px, py, R.ptr))
-      libSingular.check_error()
-      return q
-   end
+function div(a::spoly{T}, b::spoly{T}) where T <: Union{S, n_unknown{S}} where
+                                             S <: Nemo.FieldElem
+    check_parent(a, b)
+    iszero(b) && throw(DivideError())
+    R = parent(a)
+    q, _, _ = lift(Module(R, vector(R, b)), Module(R, vector(R, a)),
+                   false, false, true)
+    return Array(q[1])[1]
 end
 
 ###############################################################################
@@ -649,17 +645,17 @@ function gcd(x::spoly{T}, y::spoly{T}) where T <: Nemo.RingElem
    end
 end
 
-function gcdx(x::spoly{T}, y::spoly{T}) where T <: Nemo.FieldElem
+function gcdx(x::spoly{T}, y::spoly{T}) where T <: Union{S, n_unknown{S}} where
+                                              S <: Nemo.FieldElem
    check_parent(x, y)
    R = parent(x)
    GC.@preserve x y R begin
       x1 = libSingular.p_Copy(x.ptr, R.ptr)
       y1 = libSingular.p_Copy(y.ptr, R.ptr)
-      s = [libSingular.p_ISet(0,R.ptr)]
-      t = [libSingular.p_ISet(0,R.ptr)]
-      p = [libSingular.p_ISet(0,R.ptr)]
-      libSingular.p_ExtGcd(x1, y1, pointer(p), pointer(s), pointer(t), R.ptr)
-      return R(p[]), R(s[]), R(t[])
+      p, s, t = libSingular.singclap_extgcd(x1, y1, R.ptr)
+      res = (R(p), R(s), R(t))
+      libSingular.check_error()
+      return res
    end
 end
 

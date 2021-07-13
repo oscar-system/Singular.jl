@@ -305,33 +305,37 @@ end
 end
 
 @testset "spoly.euclidean_division" begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   for k in [QQ, Nemo.QQ]
+      R, (x, y) = PolynomialRing(k, ["x", "y"])
 
-   a = x^2*y^2 + 3x + 1
-   b = x*y + 1
+      a = x^2*y^2 + 3x + 1
+      b = x*y + 1
 
-   q, r = divrem(a, b)
-   @test a == b*q + r
+      q, r = divrem(a, b)
+      @test a == b*q + r
 
-   q2 = div(a, b)
-   @test q2 == q
+      q2 = div(a, b)
+      @test q2 == q
+   end
 end
 
 @testset "spoly.divides" begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   for k in [QQ, Nemo.QQ]
+      R, (x, y) = PolynomialRing(k, ["x", "y"])
 
-   a = x^2 + 3x + 1
-   b = x*y + 1
+      a = x^2 + 3x + 1
+      b = x*y + 1
 
-   flag, q = divides(a*b, b)
-   @test flag && q == a
+      flag, q = divides(a*b, b)
+      @test flag && q == a
 
-   flag, q = divides(a, y)
-   @test !flag
+      flag, q = divides(a, y)
+      @test !flag
 
-   val, q = remove(a*b^3, b)
-   @test val == 3 && q == a
-   @test valuation(a*b^3, b) == 3
+      val, q = remove(a*b^3, b)
+      @test val == 3 && q == a
+      @test valuation(a*b^3, b) == 3
+   end
 end
 
 @testset "spoly.gcd_lcm" begin
@@ -350,14 +354,20 @@ end
 end
 
 @testset "spoly.extended_gcd" begin
-   R, (x, ) = PolynomialRing(QQ, ["x", ])
+   for k in [QQ, Nemo.QQ]
+      R, (x, ) = PolynomialRing(k, ["x", ])
 
-   a = x^2 + 3x + 1
-   b = 2x + 4
+      a = x^2 + 3x + 1
+      b = 2x + 4
 
-   g, s, t = gcdx(a, b)
-
-   @test s*a + t*b == g
+      if k == Nemo.QQ
+         @test_throws Exception gcdx(a, b)
+      else
+         g, s, t = gcdx(a, b)
+         @test !iszero(g)
+         @test s*a + t*b == g
+      end
+   end
 end
 
 @testset "spoly.evaluate" begin
