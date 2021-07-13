@@ -381,9 +381,11 @@ mutable struct n_algExt <: Nemo.FieldElem
     end
 end
 
-n_algExt(c::N_AlgExtField, n::Integer = 0) = n_algExt(c, libSingular.number_ptr(n, c.ptr))
-n_algExt(c::N_AlgExtField, n::Nemo.fmpz) = n_algExt(c, libSingular.number_ptr(n, c.ptr))
-n_algExt(c::N_AlgExtField, n::n_Z) = n_algExt(c, BigInt(n))
+# these are broken: see https://github.com/oscar-system/Singular.jl/issues/456
+# for now we go by way of n_transExt, which is not broken
+#n_algExt(c::N_AlgExtField, n::Integer = 0) = n_algExt(c, libSingular.number_ptr(n, c.ptr))
+#n_algExt(c::N_AlgExtField, n::Nemo.fmpz) = n_algExt(c, libSingular.number_ptr(n, c.ptr))
+#n_algExt(c::N_AlgExtField, n::n_Z) = n_algExt(c, BigInt(n))
 
 
 ###############################################################################
