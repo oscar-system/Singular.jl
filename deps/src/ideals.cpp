@@ -239,6 +239,18 @@ void singular_define_ideals(jlcxx::Module & Singular)
         return std::make_tuple(res, rest);
     });
 
+    Singular.method("id_Lift", [](ideal m, ideal sm, bool goodShape,
+                                  bool isSB, bool divide, ring o) {
+        const ring origin = currRing;
+        rChangeCurrRing(o);
+        ideal rest;
+        matrix unit;
+        ideal res = idLift(m, sm, &rest, BOOLEAN(goodShape), BOOLEAN(isSB),
+                                            BOOLEAN(divide), &unit, GbDefault);
+        rChangeCurrRing(origin);
+        return std::make_tuple(res, rest, unit);
+    });
+
     Singular.method("id_LiftStd", [](ideal m, ring o, bool complete_reduction = false) {
         const ring origin = currRing;
         rChangeCurrRing(o);

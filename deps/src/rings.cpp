@@ -315,6 +315,14 @@ void singular_define_rings(jlcxx::Module & Singular)
        }
     });
     Singular.method("singclap_gcd", singclap_gcd);
+
+    Singular.method("singclap_extgcd", [](spolyrec * a, spolyrec * b, ip_sring * r) {
+        poly res, s, t;
+        singclap_extgcd(a, b, res, s, t, r);
+        return std::make_tuple(res, s, t);
+    });
+
+    /* TODO check if we can get rid of this nonsensical function */
     Singular.method("p_ExtGcd_internal", [](spolyrec * a, spolyrec * b,
                                             void * res, void * s, void * t,
                                             ip_sring * r) {
