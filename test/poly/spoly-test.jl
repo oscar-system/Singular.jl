@@ -304,6 +304,18 @@ end
    @test divexact(2a, BigInt(2)//3) == 3a
 end
 
+@testset "spoly.adhoc_binary_operation" begin
+   R, (x, ) = PolynomialRing(QQ, ["x", ])
+
+   a = x^2 + 3x + 1
+
+   @test Nemo.QQ(2)*a == 2*a
+   @test a*Nemo.QQ(2) == 2*a
+   @test Nemo.QQ(2) + a == 2 + a
+   @test a + Nemo.QQ(2) == 2 + a
+   @test divexact(2a, Nemo.QQ(2)) == a
+end
+
 @testset "spoly.euclidean_division" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 

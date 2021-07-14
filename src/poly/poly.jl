@@ -575,6 +575,35 @@ function divexact(x::spoly, y::Rational)
    return divexact(x, base_ring(x)(y))
 end
 
+################################################################################
+#
+#   Ad hoc binary
+#
+################################################################################
+
+# We cannot use the promote_rule mechanism, since n_Q and fmpq have no and
+# should not have a promote_rule
+
+function +(x::spoly, y::fmpq)
+  return x + parent(x)(y)
+end
+
+function +(x::fmpq, y::spoly)
+  return parent(y)(x) + y
+end
+
+function *(x::spoly, y::fmpq)
+  return x * parent(x)(y)
+end
+
+function *(x::fmpq, y::spoly)
+  return parent(y)(x) * y
+end
+
+function divexact(x::spoly, y::fmpq)
+  return divexact(x, parent(x)(y))
+end
+
 ###############################################################################
 #
 #   Divisibility testing
