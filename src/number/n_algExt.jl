@@ -291,6 +291,7 @@ promote_rule(C::Type{n_algExt}, ::Type{Nemo.fmpz}) = n_algExt
 
 promote_rule(C::Type{n_algExt}, ::Type{n_Z}) = n_algExt
 
+# TODO really need a hand-crafted nf_elem <-> n_algExt
 function (SK::Singular.N_AlgExtField)(a::Singular.Nemo.nf_elem)
   K = parent(a)
   SKa = gen(SK)
@@ -305,11 +306,15 @@ end
 function (K::Singular.Nemo.AnticNumberField)(a::Singular.n_algExt)
   SK = parent(a)
   SF = parent(modulus(SK))
-  Sa = n_transExt_to_spoly(SF(a))
+  # it gets even worse: n_transExt_to_spoly only converts the "numerator"
+  #                     which doesn't include the "denominator" we need
+  SFa = SF(a)
+  numSa = n_transExt_to_spoly(numerator(SFa))
+  denSa = first(coefficients(n_transExt_to_spoly(denominator(SFa))))
   res = zero(K)
   Ka = gen(K)
-  for (c, e) in zip(coefficients(Sa), exponent_vectors(Sa))
-    res += Singular.Nemo.fmpq(c)*Ka^e[1]
+  for (c, e) in zip(coefficients(numSa), exponent_vectors(numSa))
+    res += Singular.Nemo.fmpq(c//denSa)*Ka^e[1]
   end
   return res
 end
