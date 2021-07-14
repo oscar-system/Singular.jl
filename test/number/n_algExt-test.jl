@@ -79,6 +79,8 @@ end
    @assert 0*b+1 == K2(K1(0*b+1))
    @assert a^2 == K1(K2(a^2))
    @assert b^2 == K2(K1(b^2))
+   @assert a^3//3 == K1(K2(a^3//3))
+   @assert b^3//3 == K2(K1(b^3//3))
 end
 
 @testset "n_algExt.unary_ops" begin
