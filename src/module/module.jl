@@ -187,13 +187,13 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    sres{T <: Singular.FieldElem}(I::smodule{T}, max_length::Int)
+    sres{T <: Nemo.FieldElem}(I::smodule{T}, max_length::Int)
 
 Compute a free resolution of the given module $I$ of length up to the given
 maximum length. If `max_length` is set to zero, a full length free
 resolution is computed. Each element of the resolution is itself a module.
 """
-function sres(I::smodule{T}, max_length::Int) where T <: Singular.FieldElem
+function sres(I::smodule{T}, max_length::Int) where T <: Nemo.FieldElem
    I.isGB == false && error("Not a Groebner basis ideal")
    R = base_ring(I)
    if max_length == 0
