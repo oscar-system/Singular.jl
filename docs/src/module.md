@@ -205,7 +205,7 @@ Z = syz(M)
 ### Free resolutions
 
 ```@docs
-sres{T <: Nemo.FieldElem}(::smodule{T}, ::Int)
+sres{T <: Nemo.RingElem}(::smodule{T}, ::Int)
 ```
 
 **Examples**

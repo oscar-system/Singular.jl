@@ -249,7 +249,7 @@ fglm(::sideal, ::Symbol)
 ```
 
 ```@docs
-satstd{T <: AbstractAlgebra.FieldElem}(::sideal{T}, ::sideal{T})
+satstd{T <: AbstractAlgebra.RingElem}(::sideal{T}, ::sideal{T})
 ```
 
 ```@docs
@@ -351,11 +351,11 @@ iszero(M*N)
 ### Free resolutions
 
 ```@docs
-fres{T <: Nemo.FieldElem}(::sideal{T}, ::Int, ::String)
+fres{T <: Nemo.RingElem}(::sideal{T}, ::Int, ::String)
 ```
 
 ```@docs
-sres{T <: Nemo.FieldElem}(::sideal{T}, ::Int)
+sres{T <: Nemo.RingElem}(::sideal{T}, ::Int)
 ```
 
 **Examples**
