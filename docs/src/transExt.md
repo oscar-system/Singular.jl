@@ -21,9 +21,10 @@ all the parent object types belong to the abstract type `Field`.
 
 ## Function field functionality
 
-Singular.jl function fields implement the Field interface of AbstractAlgebra.jl.
+Singular.jl function fields provide all the functionality for fields described by
+AbstractAlgebra.jl.
 
-<https://nemocas.github.io/AbstractAlgebra.jl/fields.html>
+<https://nemocas.github.io/AbstractAlgebra.jl/latest/field>
 
 Below, we describe the functionality that is specific to Singular function field and not
 already listed at the given link.

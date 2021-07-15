@@ -31,12 +31,12 @@ all the integer ring parent object types belong to the abstract type `Ring`.
 
 ## Integer functionality
 
-Singular.jl integers implement the ring and possibly some parts of the Euclidean ring
-interfaces of AbstractAlgebra.jl.
+Singular.jl provides all the ring and possibly some parts of the Euclidean ring
+functionality of AbstractAlgebra.jl.
 
-<https://nemocas.github.io/AbstractAlgebra.jl/rings.html>
+<https://nemocas.github.io/AbstractAlgebra.jl/latest/ring>
 
-<https://nemocas.github.io/AbstractAlgebra.jl/euclidean.html>
+<https://nemocas.github.io/AbstractAlgebra.jl/latest/euclidean_interface>
 
 Below, we describe the functionality that is specific to the Singular integer ring.
 
