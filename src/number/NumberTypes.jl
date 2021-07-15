@@ -112,7 +112,7 @@ mutable struct ZnmInfo
    exp::UInt
 end
 
-const N_ZnRingID = Dict{Int, Ring}()
+const N_ZnRingID = Dict{BigInt, Ring}()
 
 mutable struct N_ZnRing <: Ring
    ptr::libSingular.coeffs_ptr
@@ -120,9 +120,10 @@ mutable struct N_ZnRing <: Ring
    to_n_Z::Ptr{Nothing}
    refcount::Int
 
-   function N_ZnRing(n::Int, cached::Bool = true)
+   function N_ZnRing(n::BigInt, cached::Bool = true)
+      n <= 0 && throw(DomainError(n, "modulus must be positive"))
       return AbstractAlgebra.get_cached!(N_ZnRingID, n, cached) do
-         info = ZnmInfo(BigInt(n), UInt(1))
+         info = ZnmInfo(n, UInt(1))
          GC.@preserve info begin
             ptr = libSingular.nInitChar(libSingular.n_Zn, pointer_from_objref(info))
             d = new(ptr, libSingular.n_SetMap(ZZ.ptr, ptr), libSingular.n_SetMap(ptr, ZZ.ptr), 1)
@@ -380,9 +381,11 @@ mutable struct n_algExt <: Nemo.FieldElem
     end
 end
 
-n_algExt(c::N_AlgExtField, n::Integer = 0) = n_algExt(c, libSingular.number_ptr(n, c.ptr))
-n_algExt(c::N_AlgExtField, n::Nemo.fmpz) = n_algExt(c, libSingular.number_ptr(n, c.ptr))
-n_algExt(c::N_AlgExtField, n::n_Z) = n_algExt(c, BigInt(n))
+# these are broken: see https://github.com/oscar-system/Singular.jl/issues/456
+# for now we go by way of n_transExt, which is not broken
+#n_algExt(c::N_AlgExtField, n::Integer = 0) = n_algExt(c, libSingular.number_ptr(n, c.ptr))
+#n_algExt(c::N_AlgExtField, n::Nemo.fmpz) = n_algExt(c, libSingular.number_ptr(n, c.ptr))
+#n_algExt(c::N_AlgExtField, n::n_Z) = n_algExt(c, BigInt(n))
 
 
 ###############################################################################
