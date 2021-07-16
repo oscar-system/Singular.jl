@@ -263,6 +263,31 @@ end
    @test deepcopy(f1c[1]) == f1c[1]
 end
 
+@testset "Nemo.gfp_fmpz_mod" begin
+
+   U = Nemo.GF(Nemo.fmpz(11))
+
+   R, (x, y) = PolynomialRing(U, ["x", "y"])
+
+   wrappedUtype = Singular.n_unknown{Singular.MutableRingElemWrapper{Nemo.GaloisFmpzField, Nemo.gfp_fmpz_elem}}
+
+   f1 = 3x*y + x^2 + 2y
+   f2 = y^2 + 1
+   f3 = x^2 + 2x + 1
+
+   f1c = [c for c in coefficients(f1)]
+   @test f1c[1] isa wrappedUtype
+   @test U(f1c[1]) isa Nemo.gfp_fmpz_elem
+   @test !isempty(string(f1c[1]))
+   @test leading_coefficient(f1) == f1c[1]
+   @test base_ring(R)(U(3)) isa wrappedUtype
+   @test f1 + 2 == 2 + f1
+   @test f1 - 2 == -(2 - f1)
+   @test 2*f1 == f1*2
+   @test f1 + U(2) == U(2) + f1
+
+end
+
 @testset "Nemo.NemoField" begin
    U = Nemo.Generic.FractionField(Nemo.ZZ)
 

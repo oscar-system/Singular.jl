@@ -1159,6 +1159,10 @@ function promote_rule(::Type{spoly{T}}, ::Type{T}) where {T <: Nemo.RingElem}
    return spoly{T}
 end
 
+function promote_rule(::Type{spoly{n_unknown{MutableRingElemWrapper{S, T}}}}, ::Type{U}) where {T <: Nemo.RingElem, U <: Nemo.RingElem, S}
+   return spoly{n_unknown{MutableRingElemWrapper{S, T}}}
+end
+
 ###############################################################################
 #
 #   Build context
