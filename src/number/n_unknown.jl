@@ -242,8 +242,116 @@ end
 #
 ###############################################################################
 
+mutable struct MutableRingWrapper{S, T} <: Nemo.Ring
+   data::S
+end
+
+mutable struct MutableRingElemWrapper{S, T} <: Nemo.RingElem
+   data::T
+   parent::MutableRingWrapper{S, T}
+end
+
+function promote_rule(::Type{n_unknown{MutableRingElemWrapper{S, T}}}, ::Type{T}) where {T <: Nemo.RingElem, S}
+   return T
+end
+
+function expressify(a::MutableRingWrapper{S, T}; context = nothing) where {S, T}
+   return expressify(a.data, context = context)
+end
+
+function expressify(a::MutableRingElemWrapper{S, T}; context = nothing) where {S, T}
+   return expressify(a.data, context = context)
+end
+
+function Base.show(io::IO, a::MutableRingWrapper{S, T}) where {S, T}
+   Base.show(io, a.data)
+end
+
+function Base.show(io::IO, a::MutableRingElemWrapper{S, T}) where {S, T}
+   Base.show(io, a.data)
+end
+
+function elem_type(::Type{MutableRingWrapper{S, T}}) where {S, T}
+   return MutableRingElemWrapper{S, T}
+end
+
+function parent(a::MutableRingElemWrapper{S, T}) where {S, T}
+   return a.parent
+end
+
+function (R::MutableRingWrapper{S, T})() where {S, T}
+   return MutableRingElemWrapper{S, T}(R.data(), R)
+end
+
+function (R::MutableRingWrapper{S, T})(a::MutableRingElemWrapper) where {S, T}
+   @assert R == a.parent
+   return MutableRingElemWrapper{S, T}(R.data(a.data), R)
+end
+
+function Base.deepcopy_internal(a::MutableRingElemWrapper{S, T}, dict::IdDict) where {S, T}
+   return MutableRingElemWrapper{S, T}(deepcopy_internal(a.data, dict), a.parent)
+end
+
+# should be R::S
+function (R::Nemo.Ring)(a::n_unknown{MutableRingElemWrapper{S, T}}) where {S, T}
+   GC.@preserve a begin
+      ja = libSingular.julia(libSingular.cast_number_to_void(a.ptr))
+      @assert R == ja.parent.data
+      return ja.data::T
+   end
+end
+
+function (wR::CoefficientRing{MutableRingWrapper{S, T}})(a::T) where {S, T}
+   R = julia(wR.ptr)::MutableRingWrapper{S, T}
+   wa = MutableRingElemWrapper{S, T}(a, R)
+   ptr = libSingular.cast_void_to_number(libSingular.number(a))
+   return n_unknown{MutableRingWrapper{S, T}}(ptr, R)
+end
+
+function (R::MutableRingWrapper{S, T})(a) where {S, T}
+   return MutableRingElemWrapper{S, T}(R.data(a), R)
+end
+
+function ==(a::MutableRingElemWrapper{S, T}, b::MutableRingElemWrapper{S, T}) where {S, T}
+   return a.data == b.data
+end
+
+function -(a::MutableRingElemWrapper{S, T}) where {S, T}
+   return MutableRingElemWrapper{S, T}(-a.data, a.parent)
+end
+
+function +(a::MutableRingElemWrapper{S, T}, b::MutableRingElemWrapper{S, T}) where {S, T}
+   return MutableRingElemWrapper{S, T}(a.data+b.data, a.parent)
+end
+
+function -(a::MutableRingElemWrapper{S, T}, b::MutableRingElemWrapper{S, T}) where {S, T}
+   return MutableRingElemWrapper{S, T}(a.data-b.data, a.parent)
+end
+
+function *(a::MutableRingElemWrapper{S, T}, b::MutableRingElemWrapper{S, T}) where {S, T}
+   return MutableRingElemWrapper{S, T}(a.data*b.data, a.parent)
+end
+
+function mul!(z::MutableRingElemWrapper{S, T}, a::MutableRingElemWrapper{S, T}, b::MutableRingElemWrapper{S, T}) where {S, T}
+   return MutableRingElemWrapper{S, T}(mul!(z.data, a.data, b.data), a.parent)
+end
+
+function zero(a::MutableRingElemWrapper{S, T}) where {S, T}
+   return MutableRingElemWrapper{S, T}(zero(a.data), a.parent)
+end
+
+function one(a::MutableRingElemWrapper{S, T}) where {S, T}
+   return MutableRingElemWrapper{S, T}(one(a.data), a.parent)
+end
+
+
 function CoefficientRing(R::Nemo.Ring)
    T = elem_type(R)
-   return CoefficientRing{T}(R)
+   if ismutable(R())    # ismutabletype(T)
+      return CoefficientRing{T}(R)
+   else
+      RR = MutableRingWrapper{typeof(R), elem_type(R)}(R)
+      return CoefficientRing{elem_type(RR)}(RR)
+   end
 end
 
