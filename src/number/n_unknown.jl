@@ -399,7 +399,16 @@ end
 
 function CoefficientRing(R::Nemo.Ring)
    T = elem_type(R)
-   if ismutable(R())    # ismutabletype(T)
+
+   if VERSION >= v"1.8"
+      ok = ismutabletype(T)
+   elseif VERSION >= v"1.5"
+      ok = ismutable(R())
+   else
+      ok = !isimmutable(R())
+   end
+
+   if ok
       return CoefficientRing{T}(R)
    else
       RR = MutableRingWrapper{typeof(R), elem_type(R)}(R)
