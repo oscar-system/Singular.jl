@@ -285,7 +285,24 @@ end
    @test f1 - 2 == -(2 - f1)
    @test 2*f1 == f1*2
    @test f1 + U(2) == U(2) + f1
+   @test f1 - U(2) == -(U(2) - f1)
+   @test U(2)*f1 == f1*U(2)
+   @test f1*x == x*f1
+   @test deepcopy(f1) == f1
+   @test f1*f2 == f2*f1
+   @test divexact(f1*f2, f1) == f2
+   @test f1^3*f1^3 == f1^6
+   @test inv(f1c[2])*f1c[2] == 1
+   @test gcd(f1c[1], f1c[2]) == U(1)
+   @test divexact(f1c[2], f1c[1]) == U(3)
+   @test f1c[2] - f1c[1] == U(2)
+   @test f1c[1] + f1c[2] == U(4)
+   @test length(string((x+y)^2)) > 3
+   @test hash((x+y)^2) == hash(x^2+2*x*y+y^2)
+   @test deepcopy(f1c[1]) == f1c[1]
 
+   I = Ideal(R, x*y+x^3+1, x*y^2+x^2+1)
+   @test ngens(std(I)) == 3
 end
 
 @testset "Nemo.NemoField" begin
