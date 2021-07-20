@@ -390,17 +390,17 @@ end
 
 ###############################################################################
 #
-#   SingularCoefficientRing/n_unknown
+#   N_{Ring|Field}/n_{Ring|Field}Elem
 #
 ###############################################################################
 
 const CoeffRingID = Dict{Nemo.Ring, Ring}()
 
-mutable struct CoefficientRing{T <: Nemo.RingElem} <: Ring
+mutable struct N_Ring{T <: Nemo.RingElem} <: Ring
    ptr::libSingular.coeffs_ptr
    base_ring::Nemo.Ring
 
-   function CoefficientRing{T}(R::Nemo.Ring, cached::Bool=true) where T
+   function N_Ring{T}(R::Nemo.Ring, cached::Bool=true) where T
       return AbstractAlgebra.get_cached!(CoeffRingID, R, cached) do
          c = libSingular.register(R)
          GC.@preserve R begin
@@ -408,15 +408,40 @@ mutable struct CoefficientRing{T <: Nemo.RingElem} <: Ring
             z = new(libSingular.nInitChar(c, ptr), R)
          end
          return z
-      end::CoefficientRing{T}
+      end::N_Ring{T}
    end
 end
 
-mutable struct n_unknown{T <: Nemo.RingElem} <: Nemo.RingElem
+mutable struct n_RingElem{T <: Nemo.RingElem} <: Nemo.RingElem
    ptr::libSingular.number_ptr
-   parent::CoefficientRing{T}
-
+   parent::N_Ring{T}
 end
+
+const CoeffFieldID = Dict{Nemo.Field, Field}()
+
+mutable struct N_Field{T <: Nemo.FieldElem} <: Field
+   ptr::libSingular.coeffs_ptr
+   base_ring::Nemo.Field
+
+   function N_Field{T}(R::Nemo.Field, cached::Bool=true) where T
+      return AbstractAlgebra.get_cached!(CoeffFieldID, R, cached) do
+         c = libSingular.register(R)
+         GC.@preserve R begin
+            ptr = pointer_from_objref(R)
+            z = new(libSingular.nInitChar(c, ptr), R)
+         end
+         return z
+      end::N_Field{T}
+   end
+end
+
+mutable struct n_FieldElem{T <: Nemo.FieldElem} <: Nemo.FieldElem
+   ptr::libSingular.number_ptr
+   parent::N_Field{T}
+end
+
+const N_unknown = Union{N_Ring, N_Field}
+const n_unknown = Union{n_RingElem, n_FieldElem}
 
 ###############################################################################
 #
