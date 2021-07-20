@@ -295,7 +295,7 @@ end
 
 represents the generators of SM in terms of the generators of M.
 Returns result, rest
-(Matrix(SM) = (Matrix(M)-Matrix(rest))*matrix(result))
+(Matrix(SM)-Matrix(rest) = Matrix(M)*Matrix(result))
 If SM is in M, rest is the null module
 """
 function lift(M::smodule{T}, SM::smodule{T}) where T
@@ -310,8 +310,9 @@ end
 
 represents the generators of SM in terms of the generators of M.
 Returns result, rest
-(Matrix(SM) = (Matrix(M)-Matrix(rest))*matrix(result))
+(Matrix(SM)*U-Matrix(rest) = Matrix(M)*Matrix(result))
 If SM is in M, rest is the null module
+U is a diagonal matrix of units, differs from unity matrix only for local ring orderings
 
 goodShape: maximal non-zero index in generators of SM <= that of M
 isSB: generators of M form a Groebner basis
