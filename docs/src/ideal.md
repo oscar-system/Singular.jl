@@ -447,7 +447,7 @@ If an arbitrary ideal $I$ is passed to the function, the computation is performe
 the leading ideal of $I$.
 
 ```@docs
-independent_sets(I::sideal{spoly{T}}) where T <: Singular.FieldElem
+independent_sets(I::sideal{spoly{T}}) where T <: Nemo.FieldElem
 ```
 
 ```@docs

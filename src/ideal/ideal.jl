@@ -794,7 +794,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    independent_sets(I::sideal{spoly{T}}) where T <: Singular.FieldElem
+    independent_sets(I::sideal{spoly{T}}) where T <: Nemo.FieldElem
 
 Returns all non-extendable independent sets of $lead(I)$. $I$ has to be given
 by a Groebner basis.
