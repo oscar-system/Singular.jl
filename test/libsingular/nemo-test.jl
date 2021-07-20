@@ -263,6 +263,48 @@ end
    @test deepcopy(f1c[1]) == f1c[1]
 end
 
+@testset "Nemo.gfp_fmpz_mod" begin
+
+   U = Nemo.GF(Nemo.fmpz(11))
+
+   R, (x, y) = PolynomialRing(U, ["x", "y"])
+
+   wrappedUtype = Singular.n_unknown{Singular.MutableRingElemWrapper{Nemo.GaloisFmpzField, Nemo.gfp_fmpz_elem}}
+
+   f1 = 3x*y + x^2 + 2y
+   f2 = y^2 + 1
+   f3 = x^2 + 2x + 1
+
+   f1c = [c for c in coefficients(f1)]
+   @test f1c[1] isa wrappedUtype
+   @test U(f1c[1]) isa Nemo.gfp_fmpz_elem
+   @test !isempty(string(f1c[1]))
+   @test leading_coefficient(f1) == f1c[1]
+   @test base_ring(R)(U(3)) isa wrappedUtype
+   @test f1 + 2 == 2 + f1
+   @test f1 - 2 == -(2 - f1)
+   @test 2*f1 == f1*2
+   @test f1 + U(2) == U(2) + f1
+   @test f1 - U(2) == -(U(2) - f1)
+   @test U(2)*f1 == f1*U(2)
+   @test f1*x == x*f1
+   @test deepcopy(f1) == f1
+   @test f1*f2 == f2*f1
+   @test divexact(f1*f2, f1) == f2
+   @test f1^3*f1^3 == f1^6
+   @test inv(f1c[2])*f1c[2] == 1
+   @test gcd(f1c[1], f1c[2]) == U(1)
+   @test divexact(f1c[2], f1c[1]) == U(3)
+   @test f1c[2] - f1c[1] == U(2)
+   @test f1c[1] + f1c[2] == U(4)
+   @test length(string((x+y)^2)) > 3
+   @test hash((x+y)^2) == hash(x^2+2*x*y+y^2)
+   @test deepcopy(f1c[1]) == f1c[1]
+
+   I = Ideal(R, x*y+x^3+1, x*y^2+x^2+1)
+   @test ngens(std(I)) == 3
+end
+
 @testset "Nemo.NemoField" begin
    U = Nemo.Generic.FractionField(Nemo.ZZ)
 

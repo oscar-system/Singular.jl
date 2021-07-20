@@ -242,8 +242,177 @@ end
 #
 ###############################################################################
 
+mutable struct MutableRingWrapper{S, T} <: Nemo.Ring
+   data::S
+end
+
+mutable struct MutableRingElemWrapper{S, T} <: Nemo.RingElem
+   data::T
+   parent::MutableRingWrapper{S, T}
+end
+
+function promote_rule(::Type{n_unknown{MutableRingElemWrapper{S, T}}}, ::Type{T}) where {T <: Nemo.RingElem, S}
+   return n_unknown{MutableRingElemWrapper{S, T}}
+end
+
+function expressify(a::MutableRingWrapper{S, T}; context = nothing) where {S, T}
+   return expressify(a.data, context = context)
+end
+
+function expressify(a::MutableRingElemWrapper{S, T}; context = nothing) where {S, T}
+   return expressify(a.data, context = context)
+end
+
+function Base.show(io::IO, a::MutableRingWrapper{S, T}) where {S, T}
+   Base.show(io, a.data)
+end
+
+function Base.show(io::IO, a::MutableRingElemWrapper{S, T}) where {S, T}
+   Base.show(io, a.data)
+end
+
+function elem_type(::Type{MutableRingWrapper{S, T}}) where {S, T}
+   return MutableRingElemWrapper{S, T}
+end
+
+function parent(a::MutableRingElemWrapper{S, T}) where {S, T}
+   return a.parent
+end
+
+function (R::MutableRingWrapper{S, T})() where {S, T}
+   return MutableRingElemWrapper{S, T}(R.data(), R)
+end
+
+function (R::MutableRingWrapper{S, T})(a::MutableRingElemWrapper) where {S, T}
+   R == a.parent || error("Unable to coerce element")
+   return MutableRingElemWrapper{S, T}(R.data(a.data), R)
+end
+
+function Base.deepcopy_internal(a::MutableRingElemWrapper{S, T}, dict::IdDict) where {S, T}
+   return MutableRingElemWrapper{S, T}(deepcopy_internal(a.data, dict), a.parent)
+end
+
+# should be R::S
+function (R::Nemo.Ring)(a::n_unknown{MutableRingElemWrapper{S, T}}) where {S, T}
+   GC.@preserve a begin
+      ja = libSingular.julia(libSingular.cast_number_to_void(a.ptr))
+      R == ja.parent.data || error("Unable to coerce element")
+      return ja.data::T
+   end
+end
+
+function (R::MutableRingWrapper{S, T})(a) where {S, T}
+   return MutableRingElemWrapper{S, T}(R.data(a), R)
+end
+
+function zero(R::MutableRingWrapper{S, T}) where {S, T}
+   return MutableRingElemWrapper{S, T}(zero(R.data), R)
+end
+
+function one(R::MutableRingWrapper{S, T}) where {S, T}
+   return MutableRingElemWrapper{S, T}(one(R.data), R)
+end
+
+function Base.hash(a::MutableRingElemWrapper{S, T}, b::UInt) where {S, T}
+   return hash(a.data, b)
+end
+
+# one input, one non-wrapped output
+for op in (:iszero, :isone)
+   @eval begin
+      function ($op)(a::MutableRingElemWrapper{S, T}) where {S, T}
+         return ($op)(a.data)
+      end
+   end
+end
+
+# one input, one wrapped output
+for op in (:-, :zero, :one)
+   @eval begin
+      function ($op)(a::MutableRingElemWrapper{S, T}) where {S, T}
+         return MutableRingElemWrapper{S, T}(($op)(a.data), a.parent)
+      end
+   end
+end
+
+# two inputs, one non-wrapped output
+for op in (:(==), )
+   @eval begin
+      function ($op)(a::MutableRingElemWrapper{S, T}, b::MutableRingElemWrapper{S, T}) where {S, T}
+         return ($op)(a.data, b.data)
+      end
+   end
+end
+
+# two inputs, one wrapped output
+for op in (:+, :-, :*, :div, :divexact, :gcd)
+   @eval begin
+      function ($op)(a::MutableRingElemWrapper{S, T}, b::MutableRingElemWrapper{S, T}) where {S, T}
+         return MutableRingElemWrapper{S, T}(($op)(a.data, b.data), a.parent)
+      end
+   end
+end
+
+# two inputs, one non-wrapped and one wrapped output
+for op in (:divides, )
+   @eval begin
+      function ($op)(a::MutableRingElemWrapper{S, T}, b::MutableRingElemWrapper{S, T}) where {S, T}
+         res1, res2 = ($op)(a.data, b.data)
+         return (res1, MutableRingElemWrapper{S, T}(res2, a.parent))
+      end
+   end
+end
+
+# two inputs, two wrapped outputs
+for op in (:divrem, )
+   @eval begin
+      function ($op)(a::MutableRingElemWrapper{S, T}, b::MutableRingElemWrapper{S, T}) where {S, T}
+         res1, res2 = ($op)(a.data, b.data)
+         return (MutableRingElemWrapper{S, T}(res1, a.parent),
+                 MutableRingElemWrapper{S, T}(res2, a.parent))
+      end
+   end
+end
+
+# two inputs, three wrapped outputs
+for op in (:gcdx, )
+   @eval begin
+      function ($op)(a::MutableRingElemWrapper{S, T}, b::MutableRingElemWrapper{S, T}) where {S, T}
+         res1, res2, res3 = ($op)(a.data, b.data)
+         return (MutableRingElemWrapper{S, T}(res1, a.parent),
+                 MutableRingElemWrapper{S, T}(res2, a.parent),
+                 MutableRingElemWrapper{S, T}(res3, a.parent))
+      end
+   end
+end
+
+function addeq!(z::MutableRingElemWrapper{S, T}, a::MutableRingElemWrapper{S, T}) where {S, T}
+   addeq!(z.data, a.data)
+   return z
+end
+
+function mul!(z::MutableRingElemWrapper{S, T}, a::MutableRingElemWrapper{S, T}, b::MutableRingElemWrapper{S, T}) where {S, T}
+   mul!(z.data, a.data, b.data)
+   return z
+end
+
+
 function CoefficientRing(R::Nemo.Ring)
    T = elem_type(R)
-   return CoefficientRing{T}(R)
+
+   if VERSION >= v"1.8"
+      ok = ismutabletype(T)
+   elseif VERSION >= v"1.5"
+      ok = ismutable(R())
+   else
+      ok = !isimmutable(R())
+   end
+
+   if ok
+      return CoefficientRing{T}(R)
+   else
+      RR = MutableRingWrapper{typeof(R), elem_type(R)}(R)
+      return CoefficientRing{elem_type(RR)}(RR)
+   end
 end
 

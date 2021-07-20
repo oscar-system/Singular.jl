@@ -1159,6 +1159,10 @@ function promote_rule(::Type{spoly{T}}, ::Type{T}) where {T <: Nemo.RingElem}
    return spoly{T}
 end
 
+function promote_rule(::Type{spoly{n_unknown{MutableRingElemWrapper{S, T}}}}, ::Type{U}) where {T <: Nemo.RingElem, U <: Nemo.RingElem, S}
+   return spoly{n_unknown{MutableRingElemWrapper{S, T}}}
+end
+
 ###############################################################################
 #
 #   Build context
@@ -1239,9 +1243,16 @@ function (R::PolyRing{T})(n::T) where T <: Nemo.RingElem
    GC.@preserve n return spoly{T}(R, n.ptr)
 end
 
-function (R::Singular.PolyRing{T})(n::T) where T<:Singular.n_unknown
+function (R::PolyRing{T})(n::T) where T<:Singular.n_unknown
    parent(n) != base_ring(R) && error("Unable to coerce into polynomial ring")
    GC.@preserve n return spoly{T}(R, n.ptr)
+end
+
+function (R::PolyRing{n_unknown{MutableRingElemWrapper{S, T}}})(
+   n::n_unknown{MutableRingElemWrapper{S, T}}
+) where {S, T}
+   parent(n) != base_ring(R) && error("Unable to coerce into polynomial ring")
+   GC.@preserve n return spoly{n_unknown{MutableRingElemWrapper{S, T}}}(R, n.ptr)
 end
 
 function (R::PolyRing)(f::T) where T <: Nemo.MPolyElem
