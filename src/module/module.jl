@@ -297,6 +297,7 @@ represents the generators of SM in terms of the generators of M.
 Returns result, rest
 (Matrix(SM)-Matrix(rest) = Matrix(M)*Matrix(result))
 If SM is in M, rest is the null module
+otherwise: rest = SM
 """
 function lift(M::smodule{T}, SM::smodule{T}) where T
    R = base_ring(M)
@@ -312,6 +313,8 @@ represents the generators of SM in terms of the generators of M.
 Returns result, rest
 (Matrix(SM)*U-Matrix(rest) = Matrix(M)*Matrix(result))
 If SM is in M, rest is the null module
+otherwise: rest = SM (if not divide)
+or: rest=normalform(SM,std(M))
 U is a diagonal matrix of units, differs from unity matrix only for local ring orderings
 
 goodShape: maximal non-zero index in generators of SM <= that of M
