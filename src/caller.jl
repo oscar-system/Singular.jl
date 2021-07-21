@@ -60,8 +60,33 @@ function create_casting_functions()
     return Dict(mapping_types_reversed[sym] => func for (sym, func) in casting_functions_pre)
 end
 
+# for the translation of a non-tuple return
+# list are possile here, but they are still wrapped in the opaque valueptr
+function convert_normal_value(valueptr, typ, R)
+    cast_desc = casting_functions[typ]
+    cast = cast_desc[1](valueptr)
+    if cast isa Array{Any}
+        # value is a normal singular list
+        return convert_return(cast, R)
+    elseif cast isa CxxWrap.CxxWrapCore.CxxPtr{Singular.libSingular.ring}
+        new_ring = create_ring_from_singular_ring(cast)
+        return [new_ring, convert_ring_content(libSingular.get_ring_content(cast), new_ring)]
+    elseif cast isa Singular.libSingular.matrix_ptr
+        return smatrix{elem_type(R)}(R, cast)
+    elseif cast isa CxxWrap.StdLib.StdStringAllocated
+        return String(cast)
+    elseif cast_desc[2]
+        if length(cast_desc[3]) > 0
+            cast = R(cast, Val(cast_desc[3][1]))
+        else
+            cast = R(cast)
+        end
+    end
+    return cast
+end
+
 function convert_ring_content(value_list, R)
-    return Dict(i[2] => convert_return([false, i[3], i[1]], R) for i in value_list)
+    return Dict(i[2] => convert_normal_value(i[3], i[1], R) for i in value_list)
 end
 
 # take ownership of r
@@ -108,28 +133,11 @@ function convert_return(value::Vector, R = nothing)
     elseif value[1]
         # value is a singular tuple: should only happen at the top level
         return [convert_return(value[i], R) for i in 2:length(value)]
+    else
+        # value is a normal singular value
+        # singular lists here are behind pointers
+        return convert_normal_value(value[2], value[3], R)
     end
-    # value is a normal singular value
-    cast_desc = casting_functions[value[3]]
-    cast = cast_desc[1](value[2])
-    if cast isa Array{Any}
-        # value is a normal singular list
-        return convert_return(cast, R)
-    elseif cast isa CxxWrap.CxxWrapCore.CxxPtr{Singular.libSingular.ring}
-        new_ring = create_ring_from_singular_ring(cast)
-        return [new_ring, convert_ring_content(libSingular.get_ring_content(cast), new_ring)]
-    elseif cast isa Singular.libSingular.matrix_ptr
-        return smatrix{elem_type(R)}(R, cast)
-    elseif cast isa CxxWrap.StdLib.StdStringAllocated
-        return String(cast)
-    elseif cast_desc[2]
-        if length(cast_desc[3]) > 0
-            cast = R(cast, Val(cast_desc[3][1]))
-        else
-            cast = R(cast)
-        end
-    end
-    return cast
 end
 
 function get_ring(arg_list)
