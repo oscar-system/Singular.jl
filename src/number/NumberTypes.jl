@@ -440,8 +440,8 @@ mutable struct n_FieldElem{T <: Nemo.FieldElem} <: Nemo.FieldElem
    parent::N_Field{T}
 end
 
-const N_unknown = Union{N_Ring, N_Field}
-const n_unknown = Union{n_RingElem, n_FieldElem}
+const N_unknown{T} = Union{N_Ring{T}, N_Field{T}}
+const n_unknown{T} = Union{n_RingElem{T}, n_FieldElem{T}}
 
 ###############################################################################
 #

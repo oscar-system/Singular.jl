@@ -15,12 +15,19 @@ only used internally, and Nemo rings and fields work directly as Singular coeffi
 rings, and all the coercions and ad hoc functions that one would expect to be present
 are implemented.
 
+The Singular.jl `n_RingElem` (resp. `n_FieldElem`) types belong directly to the
+abstract type `RingElem` (resp. `FieldElem`) and their parent object types belong
+to the abstract type `Ring` (resp. `Field`). We also have the following type
+definitions for compatibility with previous version of Singular.jl.
+
+```julia
+const N_unknown{T} = Union{N_Ring{T}, N_Field{T}}
+const n_unknown{T} = Union{n_RingElem{T}, n_FieldElem{T}}
+```
+
 All of the Singular polynomial arithmetic should work for any Nemo ring and everything,
 including ideals, modules, standard basis, syzygies, resolutions, etc., should work
 with any Nemo field.
-
-The Singular.jl `n_RingElem` types belong directly to the abstract type `RingElem` and
-their parent object types belong to the abstract type `Ring`.
 
 Specialised efficient wrappers exist for certain Nemo coefficient ring types.
 
