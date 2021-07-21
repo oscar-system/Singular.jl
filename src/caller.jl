@@ -1,6 +1,39 @@
+# The return of a singular library procedure is always a tuple of normal
+# singular values. This tuple can be of length one, indicating one return value.
+# Normal singular values (singular lists, polys, ideals, ints, ...) do not have
+# tuples in them
+#
+# Normal singular values are returned from libsingular to julia as a Vector{Any}:
+#     [false, ptr, type]
+# where ptr is a ptr to the normal singular value and type is int type code.
+#
+# Tuples of length n > 1 are returned from libsingular as a Vector{Any}:
+#     [true, obj1, obj2, ..., objn]
+# where each obji is a normal singular value. So, the case of two return values
+# from singular (a return of a tuple of length 2) is:
+#     [true, [false, ptr1, type1], [false, ptr2, type2]]
 
+# Now, the fun begins when considering how singular lists are returned from
+# libsingular. A singular list (which is a normal singular value) of length n
+# is returned as Vector{Any}:
+#     [obj1, obj2, ..., objn]
+# Since true or false is never the representation of a normal singular value,
+# these julia objects can be distinguished from the normal (non-list) values
+# and tuples of normal values by seeing if the first argument is a Bool.
+
+# Finally the really fun part: When coverting everything back to something for
+# julia, the following both produce the same julia result [a, b]:
+#     - (a,b): a tuple of length 2 returned by a procedure
+#     - list(a,b): a list of length 2 returned by a procedure
+# Therefore, the user has to know how to interpret the result.
+
+# for the translation of any return (tuple or non-tuple)
 function recursive_translate(x, R)
     if length(x) > 0 && x[1] isa Bool
+        # Since singular lists do not contain tuples, x[1] could only be true
+        # if this were called on the top level of the return of a procedure.
+        # Since convert_return_list is used at the top level, x[1] should be false.
+        @assert !x[1]
         return convert_return_list(x, R)
     else
         return [ recursive_translate(i, R) for i in x]
