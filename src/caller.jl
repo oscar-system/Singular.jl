@@ -27,19 +27,6 @@
 #     - list(a,b): a list of length 2 returned by a procedure
 # Therefore, the user has to know how to interpret the result.
 
-# for the translation of any return (tuple or non-tuple)
-function recursive_translate(x, R)
-    if length(x) > 0 && x[1] isa Bool
-        # Since singular lists do not contain tuples, x[1] could only be true
-        # if this were called on the top level of the return of a procedure.
-        # Since convert_return_list is used at the top level, x[1] should be false.
-        @assert !x[1]
-        return convert_return_list(x, R)
-    else
-        return [ recursive_translate(i, R) for i in x]
-    end
-end
-
 #=
    Entries in this array are as follows
       1. CMD type of return lvar
@@ -73,8 +60,8 @@ function create_casting_functions()
     return Dict(mapping_types_reversed[sym] => func for (sym, func) in casting_functions_pre)
 end
 
-function convert_ring_content(value_list, rng)
-    return Dict(i[2] => convert_return_value([false, i[3], i[1]], rng) for i in value_list)
+function convert_ring_content(value_list, R)
+    return Dict(i[2] => convert_return([false, i[3], i[1]], R) for i in value_list)
 end
 
 # take ownership of r
@@ -113,40 +100,36 @@ function create_ring_from_singular_ring(r::libSingular.ring_ptr)
    end
 end
 
-# Converts a single return value back to Julia, i.e.,
-# a single lvar, not a linked list of such.
-function convert_return_value(single_value, rng = nothing)
-    if single_value[1]
-        error("received list instead of single value")
+# for the translation of any return (tuple or non-tuple)
+function convert_return(value::Vector, R = nothing)
+    if !(length(value) > 0 && value[1] isa Bool)
+        # value is a normal singular list
+        return [convert_return(i, R) for i in value]
+    elseif value[1]
+        # value is a singular tuple: should only happen at the top level
+        return [convert_return(value[i], R) for i in 2:length(value)]
     end
-    cast_desc = casting_functions[single_value[3]]
-    cast = cast_desc[1](single_value[2])
+    # value is a normal singular value
+    cast_desc = casting_functions[value[3]]
+    cast = cast_desc[1](value[2])
     if cast isa Array{Any}
-        return recursive_translate(cast, rng)
+        # value is a normal singular list
+        return convert_return(cast, R)
     elseif cast isa CxxWrap.CxxWrapCore.CxxPtr{Singular.libSingular.ring}
         new_ring = create_ring_from_singular_ring(cast)
         return [new_ring, convert_ring_content(libSingular.get_ring_content(cast), new_ring)]
     elseif cast isa Singular.libSingular.matrix_ptr
-        return smatrix{elem_type(rng)}(rng, cast)
+        return smatrix{elem_type(R)}(R, cast)
     elseif cast isa CxxWrap.StdLib.StdStringAllocated
         return String(cast)
     elseif cast_desc[2]
         if length(cast_desc[3]) > 0
-            cast = rng(cast, Val(cast_desc[3][1]))
+            cast = R(cast, Val(cast_desc[3][1]))
         else
-            cast = rng(cast)
+            cast = R(cast)
         end
     end
     return cast
-end
-
-# Converts a linked list of lvars (already converted to Julia array) back
-# to Singular.jl types.
-function convert_return_list(list_value, ring = nothing)
-    if list_value[1]
-        return map(i -> convert_return_value(i, ring), list_value[2:end])
-    end
-    return convert_return_value(list_value, ring)
 end
 
 function get_ring(arg_list)
@@ -276,7 +259,7 @@ function low_level_caller_rng(lib::String, name::String, ring, args...)
     end
     arguments = Any[i for (i, j) in arguments]
     return_value = libSingular.call_singular_library_procedure(name, ring.ptr, arguments)
-    return convert_return_list(return_value, ring)
+    return convert_return(return_value, ring)
 end
 
 function low_level_caller(lib::String, name::String, args...)
@@ -292,5 +275,5 @@ function low_level_caller(lib::String, name::String, args...)
     return_values = nothing
     rng_ptr = (rng == nothing) ? C_NULL : rng.ptr
     return_value = libSingular.call_singular_library_procedure(name, rng_ptr, arguments)
-    return convert_return_list(return_value, rng)
+    return convert_return(return_value, rng)
 end
