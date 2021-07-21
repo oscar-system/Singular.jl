@@ -27,62 +27,120 @@
 #     - list(a,b): a list of length 2 returned by a procedure
 # Therefore, the user has to know how to interpret the result.
 
-#=
-   Entries in this array are as follows
-      1. CMD type of return lvar
-      2. Casting function to correct CxxWrap pointer type
-      3. True if this pointer needs to be passed to a ring to construct the right object
-      4. If the pointer type if ambigious (module, ideal), an additional argument that
-         needs to be passed to the ring to construct the right object.
-=#
-casting_functions_pre = Dict(
-    :NUMBER_CMD     => (libSingular.NUMBER_CMD_CASTER,     true, ()),
-    :RING_CMD       => (libSingular.RING_CMD_CASTER,       false, ()),
-    :POLY_CMD       => (libSingular.POLY_CMD_CASTER,       true, ()),
-    :IDEAL_CMD      => (libSingular.IDEAL_CMD_CASTER,      true, ()),
-    :MODUL_CMD      => (libSingular.IDEAL_CMD_CASTER,      true, (:module,)),
-    :VECTOR_CMD     => (libSingular.POLY_CMD_CASTER,       true, (:vector,)),
-    :MATRIX_CMD     => (libSingular.MATRIX_CMD_CASTER,     true, ()),
-    :INT_CMD        => (libSingular.INT_CMD_CASTER,        false, ()),
-    :STRING_CMD     => (libSingular.STRING_CMD_CASTER,     false, ()),
-    :LIST_CMD       => (libSingular.LIST_CMD_TRAVERSAL,    false, ()),
-    :INTVEC_CMD     => (libSingular.INTVEC_CMD_CASTER,     false, ()),
-    :INTMAT_CMD     => (libSingular.INTMAT_CMD_CASTER,     false, ()),
-    :BIGINT_CMD     => (libSingular.BIGINT_CMD_CASTER,     false, ()),
-    :BIGINTMAT_CMD  => (libSingular.BIGINTMAT_CMD_CASTER,  false, ()),
-    :MAP_CMD        => (libSingular.MAP_CMD_CASTER,        false, ()),
-    :RESOLUTION_CMD => (libSingular.RESOLUTION_CMD_CASTER, true, (:resolution,)),
-    )
-
 casting_functions = nothing
 
 function create_casting_functions()
-    return Dict(mapping_types_reversed[sym] => func for (sym, func) in casting_functions_pre)
+    return Dict(
+        mapping_types_reversed[:NUMBER_CMD] =>
+            function (vptr, R)
+                cast = libSingular.NUMBER_CMD_CASTER(vptr)
+                # TODO hmm, the number should not be put into the poly ring
+                return R(cast)
+            end
+        ,
+        mapping_types_reversed[:RING_CMD] =>
+            function (vptr, R)
+                cast = libSingular.RING_CMD_CASTER(vptr)
+                new_ring = create_ring_from_singular_ring(cast)
+                return [new_ring, convert_ring_content(libSingular.get_ring_content(cast), new_ring)]
+            end
+        ,
+        mapping_types_reversed[:POLY_CMD] =>
+            function (vptr, R)
+                cast = libSingular.POLY_CMD_CASTER(vptr)
+                return spoly{elem_type(base_ring(R))}(R, cast)
+            end
+        ,
+        mapping_types_reversed[:IDEAL_CMD] =>
+            function (vptr, R)
+                cast = libSingular.IDEAL_CMD_CASTER(vptr)
+                return sideal{elem_type(R)}(R, cast)
+            end
+        ,
+        mapping_types_reversed[:MODUL_CMD] =>
+            function (vptr, R)
+                cast = libSingular.IDEAL_CMD_CASTER(vptr)
+                return smodule{elem_type(R)}(R, cast)
+            end
+        ,
+        mapping_types_reversed[:VECTOR_CMD] =>
+            function (vptr, R)
+                cast = libSingular.POLY_CMD_CASTER(vptr)
+                return svector{elem_type(R)}(R, 1, cast)
+            end
+        ,
+        mapping_types_reversed[:MATRIX_CMD] =>
+            function (vptr, R)
+                cast = libSingular.MATRIX_CMD_CASTER(vptr)
+                return smatrix{elem_type(R)}(R, cast)
+            end
+        ,
+        mapping_types_reversed[:INT_CMD] =>
+            function (vptr, R)
+                cast = libSingular.INT_CMD_CASTER(vptr)
+                return cast
+            end
+        ,
+        mapping_types_reversed[:STRING_CMD] =>
+            function (vptr, R)
+                cast = libSingular.STRING_CMD_CASTER(vptr)
+                return String(cast)
+            end
+        ,
+        mapping_types_reversed[:LIST_CMD] =>
+            function (vptr, R)
+                cast = libSingular.LIST_CMD_TRAVERSAL(vptr)
+                return convert_return(cast, R)
+            end
+        ,
+        mapping_types_reversed[:INTVEC_CMD] =>
+            function (vptr, R)
+                cast = libSingular.INTVEC_CMD_CASTER(vptr)
+                return cast
+            end
+        ,
+        mapping_types_reversed[:INTMAT_CMD] =>
+            function (vptr, R)
+                cast = libSingular.INTMAT_CMD_CASTER(vptr)
+                return cast
+            end
+        ,
+        mapping_types_reversed[:BIGINT_CMD] =>
+            function (vptr, R)
+                cast = libSingular.BIGINT_CMD_CASTER(vptr)
+                # TODO this leak cannot possibly be correct
+                return cast
+            end
+        ,
+        mapping_types_reversed[:BIGINTMAT_CMD] =>
+            function (vptr, R)
+                cast = libSingular.BIGINTMAT_CMD_CASTER(vptr)
+                # TODO this leak cannot possibly be useful
+                return cast
+            end
+        ,
+        mapping_types_reversed[:MAP_CMD] =>
+            function (vptr, R)
+                cast = libSingular.MAP_CMD_CASTER(vptr)
+                # TODO this leak cannot possibly be useful
+                return cast
+            end
+        ,
+        mapping_types_reversed[:RESOLUTION_CMD] =>
+            function (vptr, R)
+                cast = libSingular.RESOLUTION_CMD_CASTER(vptr)
+                return R(cast, Val(:resolution))  # eh
+            end
+        )
 end
 
 # for the translation of a non-tuple return
 # list are possile here, but they are still wrapped in the opaque valueptr
 function convert_normal_value(valueptr, typ, R)
-    cast_desc = casting_functions[typ]
-    cast = cast_desc[1](valueptr)
-    if cast isa Array{Any}
-        # value is a normal singular list
-        return convert_return(cast, R)
-    elseif cast isa CxxWrap.CxxWrapCore.CxxPtr{Singular.libSingular.ring}
-        new_ring = create_ring_from_singular_ring(cast)
-        return [new_ring, convert_ring_content(libSingular.get_ring_content(cast), new_ring)]
-    elseif cast isa Singular.libSingular.matrix_ptr
-        return smatrix{elem_type(R)}(R, cast)
-    elseif cast isa CxxWrap.StdLib.StdStringAllocated
-        return String(cast)
-    elseif cast_desc[2]
-        if length(cast_desc[3]) > 0
-            cast = R(cast, Val(cast_desc[3][1]))
-        else
-            cast = R(cast)
-        end
-    end
-    return cast
+    mapper = get(casting_functions, typ) do
+                    error("unrecognized return with singular type number $typ")
+                end
+    return mapper(valueptr, R)
 end
 
 function convert_ring_content(value_list, R)
