@@ -6,7 +6,7 @@
    f3 = x^2 + 2x + 1
 
    f1c = [c for c in coefficients(f1)]
-   @test isa(f1c[1], Singular.n_unknown{Nemo.fmpq})
+   @test isa(f1c[1], Singular.n_FieldElem{Nemo.fmpq})
    @test isa(Nemo.QQ(f1c[1]), Nemo.fmpq)
    @test !isempty(string(f1c[1]))
    @test leading_coefficient(f1) == f1c[1]
@@ -58,8 +58,8 @@ end
    f3 = x^2 + 2x + 1
 
    f1c = [c for c in coefficients(f1)]
-   @test isa(f1c[1], Singular.n_unknown{Nemo.fmpz})
-   @test isa(Nemo.ZZ(f1c[1]), Nemo.fmpz)
+   @test f1c[1] isa Singular.n_RingElem{Nemo.fmpz}
+   @test Nemo.ZZ(f1c[1]) isa Nemo.fmpz
    @test !isempty(string(f1c[1]))
    @test leading_coefficient(f1) == f1c[1]
 
@@ -108,8 +108,8 @@ end
    f3 = x^2 + 2x + 1
 
    f1c = [c for c in coefficients(f1)]
-   @test isa(f1c[1], Singular.n_unknown{Nemo.fq_nmod})
-   @test isa(F(f1c[1]), Nemo.fq_nmod)
+   @test f1c[1] isa Singular.n_FieldElem{Nemo.fq_nmod}
+   @test F(f1c[1]) isa Nemo.fq_nmod
    @test !isempty(string(f1c[1]))
    @test leading_coefficient(f1) == f1c[1]
 
@@ -164,8 +164,8 @@ end
    f3 = x^2 + 2x + 1
 
    f1c = [c for c in coefficients(f1)]
-   @test isa(f1c[1], Singular.n_unknown{Nemo.fq})
-   @test isa(F(f1c[1]), Nemo.fq)
+   @test f1c[1] isa Singular.n_FieldElem{Nemo.fq}
+   @test F(f1c[1]) isa Nemo.fq
    @test !isempty(string(f1c[1]))
    @test leading_coefficient(f1) == f1c[1]
 
@@ -219,8 +219,8 @@ end
    f3 = x^2 + 2x + 1
 
    f1c = [c for c in coefficients(f1)]
-   @test isa(f1c[1], Singular.n_unknown{Nemo.nf_elem})
-   @test isa(K(f1c[1]), Nemo.nf_elem)
+   @test f1c[1] isa Singular.n_FieldElem{Nemo.nf_elem}
+   @test K(f1c[1]) isa Nemo.nf_elem
    @test !isempty(string(f1c[1]))
    @test leading_coefficient(f1) == f1c[1]
 
@@ -269,7 +269,7 @@ end
 
    R, (x, y) = PolynomialRing(U, ["x", "y"])
 
-   wrappedUtype = Singular.n_unknown{Singular.MutableRingElemWrapper{Nemo.GaloisFmpzField, Nemo.gfp_fmpz_elem}}
+   wrappedUtype = Singular.n_FieldElem{Singular.FieldElemWrapper{Nemo.GaloisFmpzField, Nemo.gfp_fmpz_elem}}
 
    f1 = 3x*y + x^2 + 2y
    f2 = y^2 + 1
@@ -278,6 +278,48 @@ end
    f1c = [c for c in coefficients(f1)]
    @test f1c[1] isa wrappedUtype
    @test U(f1c[1]) isa Nemo.gfp_fmpz_elem
+   @test !isempty(string(f1c[1]))
+   @test leading_coefficient(f1) == f1c[1]
+   @test base_ring(R)(U(3)) isa wrappedUtype
+   @test f1 + 2 == 2 + f1
+   @test f1 - 2 == -(2 - f1)
+   @test 2*f1 == f1*2
+   @test f1 + U(2) == U(2) + f1
+   @test f1 - U(2) == -(U(2) - f1)
+   @test U(2)*f1 == f1*U(2)
+   @test f1*x == x*f1
+   @test deepcopy(f1) == f1
+   @test f1*f2 == f2*f1
+   @test divexact(f1*f2, f1) == f2
+   @test f1^3*f1^3 == f1^6
+   @test inv(f1c[2])*f1c[2] == 1
+   @test gcd(f1c[1], f1c[2]) == U(1)
+   @test divexact(f1c[2], f1c[1]) == U(3)
+   @test f1c[2] - f1c[1] == U(2)
+   @test f1c[1] + f1c[2] == U(4)
+   @test length(string((x+y)^2)) > 3
+   @test hash((x+y)^2) == hash(x^2+2*x*y+y^2)
+   @test deepcopy(f1c[1]) == f1c[1]
+
+   I = Ideal(R, x*y+x^3+1, x*y^2+x^2+1)
+   @test ngens(std(I)) == 3
+end
+
+@testset "Nemo.fmpz_mod" begin
+
+   U = Nemo.ResidueRing(Nemo.ZZ, Nemo.fmpz(11))
+
+   R, (x, y) = PolynomialRing(U, ["x", "y"])
+
+   wrappedUtype = Singular.n_RingElem{Singular.RingElemWrapper{Nemo.FmpzModRing, Nemo.fmpz_mod}}
+
+   f1 = 3x*y + x^2 + 2y
+   f2 = y^2 + 1
+   f3 = x^2 + 2x + 1
+
+   f1c = [c for c in coefficients(f1)]
+   @test f1c[1] isa wrappedUtype
+   @test U(f1c[1]) isa Nemo.fmpz_mod
    @test !isempty(string(f1c[1]))
    @test leading_coefficient(f1) == f1c[1]
    @test base_ring(R)(U(3)) isa wrappedUtype
@@ -315,8 +357,8 @@ end
    f3 = x^2 + 2x + 1
 
    f1c = [c for c in coefficients(f1)]
-   @test isa(f1c[1], Singular.n_unknown{AbstractAlgebra.Generic.Frac{Nemo.fmpz}})
-   @test isa(U(f1c[1]), AbstractAlgebra.Generic.Frac{Nemo.fmpz})
+   @test f1c[1] isa Singular.n_FieldElem{AbstractAlgebra.Generic.Frac{Nemo.fmpz}}
+   @test U(f1c[1]) isa AbstractAlgebra.Generic.Frac{Nemo.fmpz}
    @test !isempty(string(f1c[1]))
    @test leading_coefficient(f1) == f1c[1]
 
@@ -365,8 +407,8 @@ end
    f3 = x^2 + 2x + 1
 
    f1c = [c for c in coefficients(f1)]
-   @test isa(f1c[1], Singular.n_unknown{Nemo.fmpz_poly})
-   @test isa(U(f1c[1]), Nemo.fmpz_poly)
+   @test f1c[1] isa Singular.n_RingElem{Nemo.fmpz_poly}
+   @test U(f1c[1]) isa Nemo.fmpz_poly
    @test !isempty(string(f1c[1]))
    @test leading_coefficient(f1) == f1c[1]
 

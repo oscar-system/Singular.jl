@@ -94,7 +94,7 @@ iszerodim(::sideal)
 ```
 
 ```@docs
-dimension(I::sideal{S}) where S <: Union{spoly{T}, spoly{n_unknown{U}}} where {T <: Singular.FieldElem, U <: Nemo.FieldElem}
+dimension(I::sideal{spoly{T}}) where T <: Nemo.RingElem
 ```
 
 ```@docs
@@ -447,11 +447,11 @@ If an arbitrary ideal $I$ is passed to the function, the computation is performe
 the leading ideal of $I$.
 
 ```@docs
-independent_sets(I::sideal{S}) where S <: Union{spoly{T}, spoly{n_unknown{U}}} where {T <: Singular.FieldElem, U <: Nemo.FieldElem}
+independent_sets(I::sideal{spoly{T}}) where T <: Nemo.FieldElem
 ```
 
 ```@docs
-maximal_independent_set(I::sideal{S}; all::Bool = false) where S <: Union{spoly{T}, spoly{n_unknown{U}}} where {T <: Singular.FieldElem, U <: Nemo.FieldElem}
+maximal_independent_set(I::sideal{spoly{T}}; all::Bool = false) where T <: Nemo.FieldElem
 ```
 
 ```julia
