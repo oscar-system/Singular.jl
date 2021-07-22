@@ -107,13 +107,14 @@ function create_casting_functions()
         ,
         mapping_types_reversed[:BIGINT_CMD] =>
             function (vptr, R)
-                cast = libSingular.BIGINT_CMD_CASTER(vptr)
-                # TODO this leak cannot possibly be correct
-                return cast
+                error("unable to return a bigint from a singular library procedure")
+#                cast = libSingular.NUMBER_CMD_CASTER(vptr)
+#                return libSingular.n_GetMPZ(cast, libSingular.get_coeffs_BIGINT())
             end
         ,
         mapping_types_reversed[:BIGINTMAT_CMD] =>
             function (vptr, R)
+                error("unable to return a bigintmat from a singular library procedure")
                 cast = libSingular.BIGINTMAT_CMD_CASTER(vptr)
                 # TODO this leak cannot possibly be useful
                 return cast
@@ -121,9 +122,13 @@ function create_casting_functions()
         ,
         mapping_types_reversed[:MAP_CMD] =>
             function (vptr, R)
-                cast = libSingular.MAP_CMD_CASTER(vptr)
-                # TODO this leak cannot possibly be useful
-                return cast
+                @warn "returning a map from a singular library procedure as an ideal" maxlog=1
+                # punning in libpolys/polys/simpleideals.h: clear the preimage
+                # string of the map and replace it with the rank 1 of the ideal
+                libSingular.omFree(unsafe_load(reinterpret(Ptr{Ptr{UInt8}}, vptr), 2))
+                unsafe_store!(reinterpret(Ptr{Int}, vptr), 1, 2)
+                cast = libSingular.IDEAL_CMD_CASTER(vptr)
+                return sideal{elem_type(R)}(R, cast)
             end
         ,
         mapping_types_reversed[:RESOLUTION_CMD] =>
@@ -135,7 +140,7 @@ function create_casting_functions()
 end
 
 # for the translation of a non-tuple return
-# list are possile here, but they are still wrapped in the opaque valueptr
+# list are possible here, but they are still wrapped in the opaque valueptr
 function convert_normal_value(valueptr, typ, R)
     mapper = get(casting_functions, typ) do
                     error("unrecognized return with singular type number $typ")
