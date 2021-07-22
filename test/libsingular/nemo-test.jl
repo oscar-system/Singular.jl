@@ -99,6 +99,10 @@ end
 end
 
 @testset "Nemo.fq_nmod" begin
+   F, _ = Nemo.FiniteField(Nemo.next_prime(fld(typemax(Int),2)), 2, "a")
+   R, _ = PolynomialRing(F, ["x", "y"])
+   @test R isa Singular.PolyRing{Singular.n_FieldElem{Nemo.fq_nmod}}
+
    F, a = Nemo.FiniteField(7, 2, "a")
 
    R, (x, y) = PolynomialRing(F, ["x", "y"])
@@ -155,6 +159,10 @@ end
 end
 
 @testset "Nemo.fq" begin
+   F, _ = Nemo.FiniteField(Nemo.next_prime(Nemo.ZZ(10)^50), 2, "a")
+   R, _ = PolynomialRing(F, ["x", "y"])
+   @test R isa Singular.PolyRing{Singular.n_FieldElem{Nemo.fq}}
+
    F, a = Nemo.FiniteField(Nemo.ZZ(7), 2, "a")
 
    R, (x, y) = PolynomialRing(F, ["x", "y"])
