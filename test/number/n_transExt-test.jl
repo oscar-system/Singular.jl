@@ -11,10 +11,6 @@
    @test F1 != F2
 
    @test_throws ArgumentError FunctionField(QQ, String[])
-   @test_throws ArgumentError FunctionField(QQ, ["", "b"])
-   @test_throws ArgumentError FunctionField(QQ, ["a", ""])
-   @test_throws ArgumentError FunctionField(QQ, [""])
-   @test_throws ArgumentError FunctionField(QQ, ["a", "b", "a"])
 
    K1, _ = FunctionField(QQ, ["a1", "a2", "a3"])
    K2, _ = FunctionField(QQ, 3)

@@ -1774,7 +1774,7 @@ end
 ###############################################################################
 
 function _PolynomialRing(R, s::Array{String, 1}, ordering, ordering2, cached, degree_bound)
-   S = [Symbol(v) for v in s]
+   S = rename_symbols(all_symbols(R), s, "x")
    T = elem_type(R)
    if isa(ordering, Symbol)
       ord1 = sym2ringorder[ordering]
