@@ -365,9 +365,7 @@ function FunctionField(F::Singular.Field, S::Vector{String}; cached::Bool=true)
    isa(F, Rationals) || isa(F, N_ZpField) ||
              error("Only transcendental extensions of Q and Fp are supported.")
    isempty(S) && throw(ArgumentError("array must be non-empty"))
-   any(isempty, S) && throw(ArgumentError("strings in array must be non-empty"))
-   allunique(S) || throw(ArgumentError("strings in array must be pairwise different"))
-   R = N_FField(F, Symbol.(S), cached)
+   R = N_FField(F, rename_symbols(all_symbols(F), S, "t"), cached)
    return tuple(R, transcendence_basis(R))
 end
 

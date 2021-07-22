@@ -52,3 +52,69 @@ let zero_parameter_types = [
       end
    end
 end
+
+
+#=
+   messy hack #2:
+
+   The names used for singular rings have to work with the singular interpreter,
+   which constantly prints and parses objects.
+=#
+
+# return an array of all symbols used for printing objects in the ring
+function all_symbols(R::Nemo.Ring)
+   return Symbol[]
+end
+
+function all_symbols(R::N_GField)
+   return Symbol[R.S]
+end
+
+function all_symbols(R::N_AlgExtField)
+   return all_symbols(parent(R.minpoly))
+end
+
+function all_symbols(R::Union{N_FField, PolyRing})
+   return vcat(all_symbols(base_ring(R)), symbols(R))
+end
+
+# return an appropriate Symbol version of x that avoids
+# bad singular interpreter names and does not conflict with prev.
+# gensym generates truly awful names, so cannot use that
+function rename_symbol(prev::Base.Set{String}, x::String, def::String)
+   # insert list of reserved identifier names here
+   bad = !occursin(r"\A[@a-zA-Z\']([@a-zA-Z\']*[0-9]*_*)*\Z", x) ||
+            x == "minpoly"
+   if bad
+      x = def
+   end
+
+   x in prev || return Symbol(x)
+
+   i = 0
+   while (i += 1) < 10000
+      xi = x*string(i)
+      xi in prev || return Symbol(xi)
+   end
+
+   i = BigInt(i)
+   while true
+      xi = x*string(i)
+      xi in prev || return Symbol(xi)
+   end
+end
+
+function rename_symbol(x::String, def::String)
+   return rename_symbol(Base.Set{String}(), x, def)
+end
+
+function rename_symbols(prev::Vector{Symbol}, xcands::Vector{String}, def::String)
+   prev = Base.Set(map(String, prev))
+   realxs = Symbol[]
+   for i in xcands
+      realx = rename_symbol(prev, i, def)
+      push!(realxs, realx)
+      push!(prev, String(realx))
+   end
+   return realxs
+end
