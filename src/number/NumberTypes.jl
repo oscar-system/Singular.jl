@@ -112,7 +112,7 @@ mutable struct ZnmInfo
    exp::UInt
 end
 
-const N_ZnRingID = Dict{Int, Ring}()
+const N_ZnRingID = Dict{BigInt, Ring}()
 
 mutable struct N_ZnRing <: Ring
    ptr::libSingular.coeffs_ptr
@@ -120,9 +120,10 @@ mutable struct N_ZnRing <: Ring
    to_n_Z::Ptr{Nothing}
    refcount::Int
 
-   function N_ZnRing(n::Int, cached::Bool = true)
+   function N_ZnRing(n::BigInt, cached::Bool = true)
+      n <= 0 && throw(DomainError(n, "modulus must be positive"))
       return AbstractAlgebra.get_cached!(N_ZnRingID, n, cached) do
-         info = ZnmInfo(BigInt(n), UInt(1))
+         info = ZnmInfo(n, UInt(1))
          GC.@preserve info begin
             ptr = libSingular.nInitChar(libSingular.n_Zn, pointer_from_objref(info))
             d = new(ptr, libSingular.n_SetMap(ZZ.ptr, ptr), libSingular.n_SetMap(ptr, ZZ.ptr), 1)
@@ -380,24 +381,26 @@ mutable struct n_algExt <: Nemo.FieldElem
     end
 end
 
-n_algExt(c::N_AlgExtField, n::Integer = 0) = n_algExt(c, libSingular.number_ptr(n, c.ptr))
-n_algExt(c::N_AlgExtField, n::Nemo.fmpz) = n_algExt(c, libSingular.number_ptr(n, c.ptr))
-n_algExt(c::N_AlgExtField, n::n_Z) = n_algExt(c, BigInt(n))
+# these are broken: see https://github.com/oscar-system/Singular.jl/issues/456
+# for now we go by way of n_transExt, which is not broken
+#n_algExt(c::N_AlgExtField, n::Integer = 0) = n_algExt(c, libSingular.number_ptr(n, c.ptr))
+#n_algExt(c::N_AlgExtField, n::Nemo.fmpz) = n_algExt(c, libSingular.number_ptr(n, c.ptr))
+#n_algExt(c::N_AlgExtField, n::n_Z) = n_algExt(c, BigInt(n))
 
 
 ###############################################################################
 #
-#   SingularCoefficientRing/n_unknown
+#   N_{Ring|Field}/n_{Ring|Field}Elem
 #
 ###############################################################################
 
 const CoeffRingID = Dict{Nemo.Ring, Ring}()
 
-mutable struct CoefficientRing{T <: Nemo.RingElem} <: Ring
+mutable struct N_Ring{T <: Nemo.RingElem} <: Ring
    ptr::libSingular.coeffs_ptr
    base_ring::Nemo.Ring
 
-   function CoefficientRing{T}(R::Nemo.Ring, cached::Bool=true) where T
+   function N_Ring{T}(R::Nemo.Ring, cached::Bool=true) where T
       return AbstractAlgebra.get_cached!(CoeffRingID, R, cached) do
          c = libSingular.register(R)
          GC.@preserve R begin
@@ -405,15 +408,40 @@ mutable struct CoefficientRing{T <: Nemo.RingElem} <: Ring
             z = new(libSingular.nInitChar(c, ptr), R)
          end
          return z
-      end::CoefficientRing{T}
+      end::N_Ring{T}
    end
 end
 
-mutable struct n_unknown{T <: Nemo.RingElem} <: Nemo.RingElem
+mutable struct n_RingElem{T <: Nemo.RingElem} <: Nemo.RingElem
    ptr::libSingular.number_ptr
-   parent::CoefficientRing{T}
-
+   parent::N_Ring{T}
 end
+
+const CoeffFieldID = Dict{Nemo.Field, Field}()
+
+mutable struct N_Field{T <: Nemo.FieldElem} <: Field
+   ptr::libSingular.coeffs_ptr
+   base_ring::Nemo.Field
+
+   function N_Field{T}(R::Nemo.Field, cached::Bool=true) where T
+      return AbstractAlgebra.get_cached!(CoeffFieldID, R, cached) do
+         c = libSingular.register(R)
+         GC.@preserve R begin
+            ptr = pointer_from_objref(R)
+            z = new(libSingular.nInitChar(c, ptr), R)
+         end
+         return z
+      end::N_Field{T}
+   end
+end
+
+mutable struct n_FieldElem{T <: Nemo.FieldElem} <: Nemo.FieldElem
+   ptr::libSingular.number_ptr
+   parent::N_Field{T}
+end
+
+const N_unknown{T} = Union{N_Ring{T}, N_Field{T}}
+const n_unknown{T} = Union{n_RingElem{T}, n_FieldElem{T}}
 
 ###############################################################################
 #

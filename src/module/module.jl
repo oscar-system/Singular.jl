@@ -295,13 +295,39 @@ end
 
 represents the generators of SM in terms of the generators of M.
 Returns result, rest
-(Matrix(SM) = (Matrix(M)-Matrix(rest))*matrix(result))
+(Matrix(SM)-Matrix(rest) = Matrix(M)*Matrix(result))
 If SM is in M, rest is the null module
+otherwise: rest = SM
 """
-function lift(M::smodule, SM::smodule)
+function lift(M::smodule{T}, SM::smodule{T}) where T
    R = base_ring(M)
-   ptr,rest_ptr = GC.@preserve M SM R libSingular.id_Lift(M.ptr, SM.ptr, R.ptr)
-   return Module(R, ptr),Module(R,rest_ptr)
+   R == base_ring(SM) || error("base rings must match")
+   ptr, rest_ptr = GC.@preserve M SM R libSingular.id_Lift(M.ptr, SM.ptr, R.ptr)
+   return Module(R, ptr), Module(R,rest_ptr)
+end
+
+@doc Markdown.doc"""
+    lift(M::smodule, SM::smodule, goodShape::Bool, isSB::Bool, divide::Bool)
+
+represents the generators of SM in terms of the generators of M.
+Returns result, rest
+(Matrix(SM)*U-Matrix(rest) = Matrix(M)*Matrix(result))
+If SM is in M, rest is the null module
+otherwise: rest = SM (if not divide)
+or: rest=normalform(SM,std(M))
+U is a diagonal matrix of units, differs from unity matrix only for local ring orderings
+
+goodShape: maximal non-zero index in generators of SM <= that of M
+isSB: generators of M form a Groebner basis
+divide: allow SM not to be a submodule of M
+"""
+function lift(M::smodule{T}, SM::smodule{T},
+                            goodShape::Bool, isSB::Bool, divide::Bool) where T
+   R = base_ring(M)
+   R == base_ring(SM) || error("base rings must match")
+   res, rest, U = GC.@preserve M SM R libSingular.id_Lift(M.ptr, SM.ptr,
+                                                goodShape, isSB, divide, R.ptr)
+   return (smodule{T}(R, res), smodule{T}(R, rest), smatrix{T}(R, U))
 end
 
 ###############################################################################
