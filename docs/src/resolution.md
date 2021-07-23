@@ -114,7 +114,7 @@ B = betti(M)
 ### Minimal resolutions
 
 ```@docs
-minres{T <: AbstractAlgebra.FieldElem}(::sresolution{T})
+minres{T <: Nemo.FieldElem}(::sresolution{spoly{T}})
 ```
 
 **Examples**

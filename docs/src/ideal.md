@@ -249,7 +249,7 @@ fglm(::sideal, ::Symbol)
 ```
 
 ```@docs
-satstd{T <: AbstractAlgebra.FieldElem}(::sideal{T}, ::sideal{T})
+satstd{T <: Nemo.FieldElem}(::sideal{spoly{T}}, ::sideal{spoly{T}})
 ```
 
 ```@docs
@@ -351,11 +351,11 @@ iszero(M*N)
 ### Free resolutions
 
 ```@docs
-fres{T <: Singular.FieldElem}(::sideal{T}, ::Int, ::String)
+fres{T <: Nemo.FieldElem}(::sideal{spoly{T}}, ::Int, ::String)
 ```
 
 ```@docs
-sres{T <: Singular.FieldElem}(::sideal{T}, ::Int)
+sres{T <: Nemo.FieldElem}(::sideal{spoly{T}}, ::Int)
 ```
 
 **Examples**
