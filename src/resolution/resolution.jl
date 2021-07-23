@@ -135,7 +135,7 @@ function show(io::IO, r::sresolution)
          if ptr.cpp_object == C_NULL
             break
          end
-         print(io, " <- R^", libSingular.ngens(ptr))
+         print(io, " <- R^", libSingular.idElem(ptr))
       end
    end
 end
