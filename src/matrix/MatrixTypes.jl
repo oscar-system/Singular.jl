@@ -4,9 +4,7 @@
 #
 ###############################################################################
 
-const MatrixSpaceID = Dict{Tuple{PolyRing, Int, Int}, Set}()
-
-mutable struct MatrixSpace{T <: Nemo.RingElem} <: Set
+mutable struct MatrixSpace{T <: Nemo.RingElem} <: AbstractAlgebra.MatSpace{T}
    base_ring::PolyRing
    nrows::Int
    ncols::Int
@@ -18,7 +16,9 @@ mutable struct MatrixSpace{T <: Nemo.RingElem} <: Set
    end
 end
 
-mutable struct smatrix{T <: Nemo.RingElem} <: Nemo.SetElem
+const MatrixSpaceID = Dict{Tuple{PolyRing, Int, Int}, MatrixSpace}()
+
+mutable struct smatrix{T <: Nemo.RingElem} <: AbstractAlgebra.MatElem{T}
    ptr::libSingular.matrix_ptr
    base_ring::PolyRing
 
@@ -40,4 +40,3 @@ end
 function _smatrix_clear_fn(I::smatrix)
    libSingular.mp_Delete(I.ptr, I.base_ring.ptr)
 end
-
