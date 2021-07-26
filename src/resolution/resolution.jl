@@ -94,19 +94,19 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    minres{T <: AbstractAlgebra.RingElem}(r::sresolution{T})
+    minres{T <: Nemo.FieldElem}(r::sresolution{spoly{T}})
 
 Return a minimal free resolution, given any free resolution. In the graded
 case, there exists a uniquely determined minimal resolution. If the supplied
 resolution is already minimal, it may be returned without making a copy.
 """
-function minres(r::sresolution{T}) where T <: AbstractAlgebra.RingElem
+function minres(r::sresolution{spoly{T}}) where T <: Nemo.FieldElem
    if r.minimal
       return r
    end
    R = base_ring(r)
    ptr = GC.@preserve r R libSingular.syMinimize(r.ptr, R.ptr)
-   return sresolution{T}(R, ptr, true)
+   return sresolution{spoly{T}}(R, ptr, true)
 end
 
 ###############################################################################
@@ -135,7 +135,7 @@ function show(io::IO, r::sresolution)
          if ptr.cpp_object == C_NULL
             break
          end
-         print(io, " <- R^", libSingular.ngens(ptr))
+         print(io, " <- R^", libSingular.idElem(ptr))
       end
    end
 end

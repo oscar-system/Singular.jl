@@ -82,13 +82,6 @@ function modulus(a::N_AlgExtField)
    return a.minpoly
 end
 
-function (F::N_FField)(a::n_algExt)
-   K = parent(a)
-   F == parent(modulus(K)) || error("Parents must coincide")
-   ptr = GC.@preserve a K F libSingular.algExt_to_transExt(a.ptr, K.ptr, F.ptr)
-   return F(ptr)
-end
-
 ###############################################################################
 #
 #   Canonicalisation
@@ -298,20 +291,71 @@ promote_rule(C::Type{n_algExt}, ::Type{Nemo.fmpz}) = n_algExt
 
 promote_rule(C::Type{n_algExt}, ::Type{n_Z}) = n_algExt
 
+# TODO really need a hand-crafted nf_elem <-> n_algExt
+function (SK::Singular.N_AlgExtField)(a::Singular.Nemo.nf_elem)
+  K = parent(a)
+  SKa = gen(SK)
+  res = SK(coeff(a, 0))
+  for i in 1:degree(K)-1
+    res += SK(coeff(a, i))*SKa^i
+  end
+  return res
+end
+
+# this is going to be dreadfully slow
+function (K::Singular.Nemo.AnticNumberField)(a::Singular.n_algExt)
+  SK = parent(a)
+  SF = parent(modulus(SK))
+  # it gets even worse: n_transExt_to_spoly only converts the "numerator"
+  #                     which doesn't include the "denominator" we need
+  SFa = SF(a)
+  numSa = n_transExt_to_spoly(numerator(SFa))
+  denSa = first(coefficients(n_transExt_to_spoly(denominator(SFa))))
+  res = zero(K)
+  Ka = gen(K)
+  for (c, e) in zip(coefficients(numSa), exponent_vectors(numSa))
+    res += Singular.Nemo.fmpq(c//denSa)*Ka^e[1]
+  end
+  return res
+end
+
+function (F::N_FField)(a::n_algExt)
+   K = parent(a)
+   F == parent(modulus(K)) || error("Parents must coincide")
+   ptr = GC.@preserve a K F libSingular.algExt_to_transExt(a.ptr, K.ptr, F.ptr)
+   return F(ptr)
+end
+
 ###############################################################################
 #
 #   Parent call functions
 #
 ###############################################################################
 
-(R::N_AlgExtField)(n::IntegerLikeTypes = 0) = n_algExt(R, n)
+function (K::N_AlgExtField)(a::n_transExt)
+   F = parent(a)
+   F == parent(modulus(K)) || error("Parents must coincide")
+   ptr = GC.@preserve a K F libSingular.transExt_to_algExt(a.ptr, K.ptr, F.ptr)
+   return K(ptr)
+end
 
-function (R::N_AlgExtField)(n::n_algExt)
-   R != parent(n) && error("Parent ring does not match.")
+function (K::N_AlgExtField)(a::n_algExt)
+   K == parent(a) || error("Parents must coincide")
    return n
 end
 
-(R::N_AlgExtField)(n::libSingular.number_ptr) = n_algExt(R, n)
+function (K::N_AlgExtField)(a::IntegerLikeTypes = 0)
+  F = parent(modulus(K))
+  return K(F(a))
+end
+
+function (K::Singular.N_AlgExtField)(a::Singular.Nemo.fmpq)
+  return K(numerator(a))//K(denominator(a))
+end
+
+function (K::N_AlgExtField)(n::libSingular.number_ptr)
+  return n_algExt(K, n)
+end
 
 ###############################################################################
 #
