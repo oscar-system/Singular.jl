@@ -214,4 +214,6 @@ include("Map.jl")
 
 include("MessyHacks.jl")
 
+include("Groebnerwalk.jl")
+
 end # module
