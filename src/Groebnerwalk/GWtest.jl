@@ -3,7 +3,7 @@ using Pkg
 using Oscar
 
 
-case = 4
+case = 3
 
 
 if case == 1 || case == 99
@@ -119,9 +119,9 @@ if case == 4 || case == 99
     )
 
 
-    f1 = x * y^3 + y^4 + y * z^2 - u^2 #* y * x * w^3
-    f2 = 2 * x^2 * y + x^3 * y + 2 #* w * y^2 * z #+ u * x * v^4
-    f3 = 2 - 3 * x^2 * v * w #+ #u+ w^2 #* y + v^3
+    f1 =  y^4 + y * z^2 - u^2*w
+    f2 = 2 * x^2 * y + x^3 * w *u^2 +x
+    f3 = 2 - 3 * x^2 * v *z^4 *w
     I = Singular.Ideal(R, [f1, f2, f3])
     I = Oscar.Singular.std(I, complete_reduction = true)
 
@@ -130,7 +130,12 @@ if case == 4 || case == 99
         I,
         ordering_as_matrix(:degrevlex, 6),
         ordering_as_matrix(:lex, 6),
-        :generic
+    )
+    @time K = groebner_walk(
+        I,
+        ordering_as_matrix(:degrevlex, 6),
+        ordering_as_matrix(:lex, 6),
+        :generic,
     )
 
 
@@ -139,11 +144,13 @@ if case == 4 || case == 99
         ["x", "y", "z", "u", "v", "w"],
         ordering = Oscar.Singular.ordering_M(ordering_as_matrix(:lex, 6)),
     )
-    @time T1 = Singular.std(
+    T1 = Singular.std(
         Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(I)]),
         complete_reduction = true,
     )
     T2 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(J)])
+    T3 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(K)])
 
-    println("test 4: ", equalitytest(T1, T2))
+
+    println("test 4: ", equalitytest(T2,T3))
 end

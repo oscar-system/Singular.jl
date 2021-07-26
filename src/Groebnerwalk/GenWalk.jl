@@ -59,54 +59,6 @@ function isparallel(u::Vector{Int64}, v::Vector{Int64})
     return true
 end
 
-#=function reducegeneric(
-    p::Singular.spoly,
-    G::Singular.sideal,
-    Lm::Vector{Singular.spoly{Singular.n_unknown{fmpq}}},
-)
-    R = base_ring(G)
-    S, V = PolynomialRing(
-        base_ring(R).base_ring,
-        [String(s) for s in symbols(R)],
-        ordering = :lex,
-    )
-    lm = gens(ideal(S, Lm))
-    gen = gens(ideal(S, gens(G)))
-    h = first(gens(ideal(S, [p])))
-    Gh = []
-    for i = 1:ngens(G)
-        for mon in terms(h)
-            (q, r) = divrem(mon, lm[i])
-            if r == 0
-                push!(Gh, (lm[i], gen[i], q))
-                break
-            end
-        end
-    end
-    while (h != 0 && !isempty(Gh))
-        (l, g, q) = first(Gh)
-        h = h - g * q
-
-        #println("terminated:", " = ", h , " spaace ", g, " * ", q)
-        Gh = []
-        term = false
-        for i = 1:ngens(G)
-            for mon in terms(h)
-                (q, r) = divrem(mon, lm[i])
-                if r == 0
-                    term = true
-                    push!(Gh, (lm[i], gen[i], q))
-                    #println("mon", mon)
-                    #println(lm[i]," * ", q," = ", mon, " from ", h)
-                    break
-                end
-            end
-            term == true ? break : continue
-        end
-    end
-    return h
-end
-=#
 function liftgeneric(
     G::Singular.sideal,
     Lm::Vector{Singular.spoly{Singular.n_unknown{fmpq}}},

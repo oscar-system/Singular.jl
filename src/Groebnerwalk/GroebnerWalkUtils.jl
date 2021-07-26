@@ -222,47 +222,8 @@ function interreduce_new(
 end
     return Oscar.Singular.Ideal(R, [R(p) for p in gens])
 end
-#Refactor: Using Polynomial-arithmetik is expensive. Use MPolybuildCTX
-#=function interreduce(
-    G::Singular.sideal,
-    Lm::Vector{Singular.spoly{Singular.n_unknown{fmpq}}},
-)
-    reducedGB = []
-    R = base_ring(G)
-    S, V = PolynomialRing(
-        base_ring(R).base_ring,
-        [String(s) for s in symbols(R)],
-        ordering = :lex,
-    )
-    lm = gens(ideal(S, Lm))
-    gen = gens(ideal(S, gens(G)))
-    changed = true
-    while changed
-        changed = false
-        for i = 1:ngens(G)
-            Lmrest = filter(x -> x != lm[i], lm)
-            genrest = filter(x -> x != gen[i], gen)
-            poly = gen[i]
-            for mon in terms(gen[i])
-                (q, r) = divrem(mon, Lmrest)
-                if r == 0
-                    changed = true
-                    poly = poly - change_ring(R(vec_sum(q, genrest)), R)
-                    break
-                    if poly == 0
-                        lm[i] = 0
-                    end
-                end
-            end
-            push!(reducedGB, poly)
-        end
-        gen = gens(ideal(S, [S(p) for p in reducedGB]))
-        reducedGB = []
-    end
-    return Oscar.Singular.Ideal(R, [R(p) for p in gen])
-end
-=#
-#Refactor: Using Polynomial-arithmetik is expensive. Use MPolybuildCTX
+
+#Use MPolybuildCTX
 function vec_sum(p::Vector{fmpq_mpoly}, q::Vector{fmpq_mpoly})
     poly = 0
     for i = 1:length(p)
@@ -270,6 +231,7 @@ function vec_sum(p::Vector{fmpq_mpoly}, q::Vector{fmpq_mpoly})
     end
     return poly
 end
+
 # Singular.isequal depends on order of generators
 function equalitytest(G::Singular.sideal, K::Singular.sideal)
     generators = gens(G)

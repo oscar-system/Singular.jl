@@ -1,7 +1,7 @@
 using Oscar
 
 
-#Solves problems with wight vectors of floats.
+#Solves problems with weight vectors of floats.
 function convertBoundingVector(wtemp::Vector{T}) where {T<:Number}
     w = Vector{Int64}()
     for i = 1:length(wtemp)

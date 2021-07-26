@@ -1,12 +1,12 @@
 using Oscar
 
-export groebner_walk
+export groebnerwalk
 
 
 ###############################################################
 #Implementation of the gröbner walk.
 #TODO: Implement pertubed version.
-#TODO: Implement generic version.
+#TODO: Improve GenWalk algorithm
 #TODO: Implement fractal version.
 ###############################################################
 
@@ -16,12 +16,11 @@ export groebner_walk
 #TODO: Implement input checks
 #Fragen:
 #Singular.reduce für f % G selbst programmieren?
-#Interreduction selbst endgültig programmieren programmieren?
-#Für divrem in Oscar-Ideal: sinnvoller möglich?
+#Für divrem in Oscar-Ideal: sinnvoller möglich? reduce liefert nur den rest
 #Arithmetik von Polynomen -> Immer MPolyBuildCTX?
 ###############################################################
 
-function groebner_walk(
+function groebnerwalk(
     G::Singular.sideal,
     S::Matrix{Int64},
     T::Matrix{Int64},
@@ -145,6 +144,7 @@ end
 
 ###############################################################
 #Fractal-version of the groebner walk by Amrhein & Gloor (200)
+#TODO: Finish this
 ###############################################################
 
 function fractal_walk(
