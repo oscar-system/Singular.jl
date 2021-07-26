@@ -47,7 +47,7 @@ polynomials that is not documented in the general multivariate interface.
 ### Constructors
 
 ```julia
-PolynomialRing(R::Union{Ring, Field}, s::Array{String, 1};
+PolynomialRing(R::Union{Ring, Field}, s::Vector{String};
    cached::Bool = true, ordering = :degrevlex,
       ordering2::Symbol = :comp1min, degree_bound::Int = 0)
 ```

@@ -285,15 +285,15 @@ end
 #
 ###############################################################################
 
-const N_FFieldID = Dict{Tuple{Field, Array{Symbol, 1}}, Field}()
+const N_FFieldID = Dict{Tuple{Field, Vector{Symbol}}, Field}()
 
 mutable struct N_FField <: Field
    ptr::libSingular.coeffs_ptr
    base_ring::Field
    refcount::Int
-   S::Array{Symbol, 1}
+   S::Vector{Symbol}
 
-   function N_FField(F::Field, S::Array{Symbol, 1}, cached::Bool = true)
+   function N_FField(F::Field, S::Vector{Symbol}, cached::Bool = true)
       return AbstractAlgebra.get_cached!(N_FFieldID, (F, S), cached) do
          v = [pointer(Base.Vector{UInt8}(string(str)*"\0")) for str in S]
          cf = libSingular.nCopyCoeff(F.ptr)

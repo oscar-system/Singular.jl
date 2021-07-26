@@ -9,7 +9,7 @@
 struct sorder_block
    order::Singular.libSingular.rRingOrder_t
    size::Int               # per-order meaning.
-   weights::Array{Int,1}   # per-order meaning. empty for dp, Dp, ...
+   weights::Vector{Int}   # per-order meaning. empty for dp, Dp, ...
 end
 
 struct sordering
@@ -43,7 +43,7 @@ mutable struct PolyRing{T <: Nemo.RingElem} <: Nemo.MPolyRing{T}
    end
 end
 
-function PolyRing{T}(R::Union{Ring, Field}, s::Array{Symbol, 1},
+function PolyRing{T}(R::Union{Ring, Field}, s::Vector{Symbol},
                      ord::sordering, cached::Bool = true,
                      degree_bound::Int = 0) where T
    bitmask = Culong(degree_bound)

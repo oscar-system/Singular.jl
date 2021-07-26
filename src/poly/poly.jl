@@ -774,7 +774,7 @@ f values")
    # First work out types of products
    r = R()
    c = zero(R)
-   U = Array{Any, 1}(undef, length(vals))
+   U = Vector{Any}(undef, length(vals))
    for j = 1:length(vals)
       W = typeof(vals[j])
       if ((W <: Integer && W != BigInt) ||
@@ -822,7 +822,7 @@ function factor_squarefree(x::spoly)
     error("Base ring not supported.")
   end
 
-  a = Array{Int32, 1}()
+  a = Vector{Int32}()
   I = GC.@preserve x R Ideal(R, libSingular.singclap_sqrfree(x.ptr, a, R.ptr))
   D = Dict{typeof(I[1]), Int64}()
   n = ngens(I)
@@ -851,7 +851,7 @@ function factor(x::spoly)
     error("Base ring not supported.")
   end
 
-  a = Array{Int32, 1}()
+  a = Vector{Int32}()
   I = GC.@preserve x R Ideal(R, libSingular.singclap_factorize(x.ptr, a, R.ptr))
   D = Dict{typeof(I[1]), Int64}()
   n = ngens(I)
@@ -884,19 +884,19 @@ function substitute_variable(p::spoly, i::Int64, q::spoly)
 end
 
 @doc Markdown.doc"""
-    permute_variables(p::spoly, perm::Array{Int64,1}, new_ring::PolyRing)
+    permute_variables(p::spoly, perm::Vector{Int64}, new_ring::PolyRing)
 
 Permutes the indeterminates of `p` according to `perm` to the indeterminates
 of the ring `new_ring`.
 """
-function permute_variables(p::spoly, perm::Array{Int64,1}, new_ring::PolyRing)
+function permute_variables(p::spoly, perm::Vector{Int64}, new_ring::PolyRing)
    old_ring = parent(p)
    old_base = base_ring(old_ring)
    new_base = base_ring(new_ring)
    GC.@preserve p new_ring old_ring old_base new_base begin
        perm_64 = [0]
        append!(perm_64,perm)
-       perm_32 = convert(Array{Int32,1},perm_64)
+       perm_32 = convert(Vector{Int32},perm_64)
        map_ptr = libSingular.n_SetMap(old_base.ptr, new_base.ptr)
        poly_ptr = libSingular.p_PermPoly(p.ptr, perm_32, old_ring.ptr,
                                      new_ring.ptr, map_ptr, Ptr{Int32}(C_NULL))
@@ -1030,7 +1030,7 @@ function jacobian_ideal(p::spoly)
    R = parent(p)
    B = base_ring(R)
    n = nvars(R)
-   J = Array{spoly{elem_type(B)}, 1}()
+   J = Vector{spoly{elem_type(B)}}()
    for i in 1:n
        push!(J, derivative(p, i))
    end
@@ -1773,7 +1773,7 @@ end
 #
 ###############################################################################
 
-function _PolynomialRing(R, s::Array{String, 1}, ordering, ordering2, cached, degree_bound)
+function _PolynomialRing(R, s::Vector{String}, ordering, ordering2, cached, degree_bound)
    S = rename_symbols(all_symbols(R), s, "x")
    T = elem_type(R)
    if isa(ordering, Symbol)
@@ -1797,13 +1797,13 @@ function _PolynomialRing(R, s::Array{String, 1}, ordering, ordering2, cached, de
 end
 
 # keyword arguments do not participate in dispatch
-function PolynomialRing(R::Union{Ring, Field}, s::Array{String, 1};
+function PolynomialRing(R::Union{Ring, Field}, s::Vector{String};
                         ordering = :degrevlex, ordering2::Symbol = :comp1min,
                         cached::Bool = true, degree_bound::Int = 0)
    return _PolynomialRing(R, s, ordering, ordering2, cached, degree_bound)
 end
 
-function PolynomialRing(R::Nemo.Ring, s::Array{String, 1}; cached::Bool = true,
+function PolynomialRing(R::Nemo.Ring, s::Vector{String}; cached::Bool = true,
       ordering = :degrevlex, ordering2::Symbol = :comp1min,
       degree_bound::Int = 0)
    R = CoefficientRing(R)

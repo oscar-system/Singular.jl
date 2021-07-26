@@ -52,7 +52,7 @@ creating ideals.
 
 ```julia
 Ideal(R::PolyRing{T}, ids::spoly{T}...) where T <: Nemo.RingElem
-Ideal(R::PolyRing{T}, ids::Array{spoly{T}, 1}) where T <: Nemo.RingElem
+Ideal(R::PolyRing{T}, ids::Vector{spoly{T}}) where T <: Nemo.RingElem
 ```
 
 Construct the ideal over the polynomial ring $R$ whose (polynomial) generators are given

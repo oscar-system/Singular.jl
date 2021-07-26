@@ -164,14 +164,14 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    Resolution(C::Array{smodule{T}, 1}) where T <: AbstractAlgebra.RingElem
+    Resolution(C::Vector{smodule{T}}) where T <: AbstractAlgebra.RingElem
 
 Create a new resolution whose maps are given by the elements of an array C of
 modules. Note that it is not checked that the maps are actually composable
 and that their pairwise composition is the zero map, that is, that the
 created resolution is a complex.
 """
-function Resolution(C::Array{smodule{T}, 1}) where T <: AbstractAlgebra.RingElem
+function Resolution(C::Vector{smodule{T}}) where T <: AbstractAlgebra.RingElem
     len = size(C, 1)+1
     len > 1 || error("no module specified")
     R = base_ring(C[1])

@@ -74,7 +74,7 @@ function compose(f::Map(SAlgHom), g::Map(SAlgHom))
    GC.@preserve f R g S ptr = libSingular.maMapIdeal(f.ptr, R.ptr, g.ptr, S.ptr,
                                 libSingular.ndCopyMap())
 
-   V = Array{spoly, 1}()
+   V = Vector{spoly}()
 
    for i in 1:n
       p = libSingular.getindex(ptr, Cint(i - 1))
