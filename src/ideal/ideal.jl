@@ -38,7 +38,7 @@ Return the generators in the internal representation of the ideal $I$ as an arra
 """
 function gens(I::sideal)
    R = base_ring(I)
-   ngens(I) == 0 && return Array{elem_type(R), 1}()
+   ngens(I) == 0 && return Vector{elem_type(R)}()
    return [I[i] for i in 1:Singular.ngens(I)]
 end
 
@@ -667,7 +667,7 @@ function Ideal(R::PolyRing{T}, ids::spoly{T}...) where T <: Nemo.RingElem
    return sideal{S}(R, ids...)
 end
 
-function Ideal(R::PolyRing{T}, ids::Array{spoly{T}, 1}) where T <: Nemo.RingElem
+function Ideal(R::PolyRing{T}, ids::Vector{spoly{T}}) where T <: Nemo.RingElem
    S = elem_type(R)
    return sideal{S}(R, ids...)
 end
@@ -803,13 +803,13 @@ function independent_sets(I::sideal{spoly{T}}) where T <: Nemo.FieldElem
    I.isGB == false && error("I needs to be a Groebner basis.")
    R = base_ring(I)
    n = nvars(R)
-   a = Array{Int32, 1}()
+   a = Vector{Int32}()
    GC.@preserve I R libSingular.scIndIndset(I.ptr, R.ptr, a, true)
    m = Int(div(length(a), n))
    a = Int.(transpose(reshape(a, n, m)))
-   P = Array{Array{spoly{T}, 1}, 1}()
+   P = Vector{Vector{spoly{T}}}()
    for i in 1:m
-      b  = Array{spoly{T}, 1}()
+      b  = Vector{spoly{T}}()
       for j in findall(x->x == 1, a[i, :])
          push!(b, gen(R, j))
       end
@@ -831,7 +831,7 @@ function maximal_independent_set(I::sideal{spoly{T}}; all::Bool = false) where T
    R = base_ring(I)
    d = dimension(I)
    if all == true
-      P = Array{Array{spoly{T}, 1}, 1}()
+      P = Vector{Vector{spoly{T}}}()
       res = independent_sets(I)
       for i in 1:length(res)
          if length(res[i]) == d
@@ -840,9 +840,9 @@ function maximal_independent_set(I::sideal{spoly{T}}; all::Bool = false) where T
       end
       return P
    else
-      a = Array{Int32, 1}()
+      a = Vector{Int32}()
       GC.@preserve I R libSingular.scIndIndset(I.ptr, R.ptr, a, all)
-      P = Array{spoly{T}, 1}()
+      P = Vector{spoly{T}}()
       for j in findall(x->x == 1, a)
          push!(P, gen(R, j))
       end

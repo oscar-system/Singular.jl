@@ -22,7 +22,7 @@ function n_Write(n::number_ptr, cf::coeffs_ptr, bShortOut::Bool = false)
    n_Write_internal(n, cf, d);
 end
 
-function n_ChineseRemainderSym(a::Array{number_ptr, 1}, b::Array{number_ptr, 1}, n::Cint, signed::Cint, cf::coeffs_ptr)
+function n_ChineseRemainderSym(a::Vector{number_ptr}, b::Vector{number_ptr}, n::Cint, signed::Cint, cf::coeffs_ptr)
    p1 = reinterpret(Ptr{Nothing}, pointer(a))
    p2 = reinterpret(Ptr{Nothing}, pointer(b))
    return n_ChineseRemainderSym_internal(p1, p2, n, signed, cf)
@@ -59,7 +59,7 @@ import Nemo
 
 mutable struct live_cache
    num::Int
-   A::Array{Nemo.RingElem, 1}
+   A::Vector{Nemo.RingElem}
 end
 
 const nemoNumberID = Base.Dict{UInt, live_cache}()

@@ -221,11 +221,11 @@ function get_ring(arg_list)
     return ring
 end
 
-function prepare_argument(x::Array{Int64, 1})
+function prepare_argument(x::Vector{Int64})
     return Any[mapping_types_reversed[:INTVEC_CMD], libSingular.jl_array_to_intvec(x)], nothing
 end
 
-function prepare_argument(x::Array{Int64, 2})
+function prepare_argument(x::Matrix{Int64})
     return Any[mapping_types_reversed[:INTMAT_CMD], libSingular.jl_array_to_intmat(x)], nothing
 end
 
@@ -263,11 +263,11 @@ function prepare_argument(x::sideal)
                              R)
 end
 
-function prepare_argument(x::Array{Any, 1}, R::PolyRing)
-    args = Array{Any, 1}()
-    types = Array{Int, 1}()
+function prepare_argument(x::Vector{Any}, R::PolyRing)
+    args = Vector{Any}()
+    types = Vector{Int}()
     for i in x
-       if typeof(i) == Array{Any, 1}
+       if typeof(i) == Vector{Any}
           p = prepare_argument(i, R)
        else
           p = prepare_argument(i)
@@ -320,9 +320,9 @@ end
 
 function low_level_caller_rng(lib::String, name::String, ring, args...)
     libSingular.load_library(lib)
-    arguments = Array{Any, 1}()
+    arguments = Vector{Any}()
     for i in args
-       if typeof(i) == Array{Any, 1} 
+       if typeof(i) == Vector{Any} 
           push!(arguments, prepare_argument(i, ring))
        else
           push!(arguments, prepare_argument(i))
