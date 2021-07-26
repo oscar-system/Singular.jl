@@ -1,9 +1,4 @@
-
 using Oscar
-
-
-
-
 
 #Returns the initials of polynomials w.r.t. a weight vector.
 #The ordering doesn´t affect this.
