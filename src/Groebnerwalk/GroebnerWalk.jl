@@ -129,7 +129,7 @@ function generic_step(
         complete_reduction = true,
     )
 
-    println("Facet Ideal: ", facet_Ideal)
+    #println("Facet Ideal: ", facet_Ideal)
 
     liftArray, Newlm = liftgeneric(G, lm, facet_Ideal)
     Gnew = Oscar.Singular.Ideal(S, [S(x) for x in liftArray])
