@@ -1,0 +1,35 @@
+using Pkg
+
+using Oscar
+import Oscar: MPolyIdeal, singular_ring
+import Oscar.Singular: std, Ideal, ordering_ws
+import AbstractAlgebra
+
+S, (x, y) = Oscar.Singular.PolynomialRing(
+    QQ,
+    ["x", "y"],
+    ordering = Oscar.Singular.ordering_wp([1, 1]),
+)
+R, (x, y) = Oscar.Singular.PolynomialRing(
+    QQ,
+    ["x", "y"],
+    ordering = Oscar.Singular.ordering_wp([100, 17]),
+)
+
+
+
+
+
+
+#R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"], ordering =:deglex)
+
+#R, (x, y) = PolynomialRing(QQ, ["x", "y"], ordering= :degrevlex)
+f1 = -x*y^2 + y^6 - y^3
+f2 = x*y^3 - x - y^2
+f3 = x^2 - y^3
+lm = y^6, x*y^3, x^2]
+#f1= x*y^3+y^4+y*z^2 -u^2*y*x*w^3
+#f2= 2*x^2*y+x^3*y+2*x*y^2*z + u*x*v^4
+#f3=2 - 3*x^2*y+ w^2*y + v^3
+#I = ideal(R, [f1,f2]);
+I = Singular.Ideal(S, f1, f2, f3)
