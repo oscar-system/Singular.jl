@@ -575,6 +575,35 @@ function divexact(x::spoly, y::Rational)
    return divexact(x, base_ring(x)(y))
 end
 
+################################################################################
+#
+#   Ad hoc binary
+#
+################################################################################
+
+# We cannot use the promote_rule mechanism, since n_Q and fmpq have no and
+# should not have a promote_rule
+
+function +(x::spoly, y::fmpq)
+  return x + parent(x)(y)
+end
+
+function +(x::fmpq, y::spoly)
+  return parent(y)(x) + y
+end
+
+function *(x::spoly, y::fmpq)
+  return x * parent(x)(y)
+end
+
+function *(x::fmpq, y::spoly)
+  return parent(y)(x) * y
+end
+
+function divexact(x::spoly, y::fmpq)
+  return divexact(x, parent(x)(y))
+end
+
 ###############################################################################
 #
 #   Divisibility testing
@@ -607,29 +636,22 @@ end
 #
 ###############################################################################
 
-function divrem(x::spoly{T}, y::spoly{T}) where T <: Nemo.FieldElem
-   check_parent(x, y)
-   R = parent(x)
-   GC.@preserve x y R begin
-      px = libSingular.p_Copy(x.ptr, R.ptr)
-      py = libSingular.p_Copy(y.ptr, R.ptr)
-      q, r = libSingular.p_DivRem(px, py, R.ptr)
-      qref = libSingular.toPolyRef(q)
-      rref = libSingular.toPolyRef(r)
-      return R(qref), R(rref)
-   end
+function divrem(a::spoly{T}, b::spoly{T}) where T <: Nemo.FieldElem
+    check_parent(a, b)
+    iszero(b) && throw(DivideError())
+    R = parent(a)
+    q, r, _ = lift(Module(R, vector(R, b)), Module(R, vector(R, a)),
+                   false, false, true)
+    return (Array(q[1])[1], Array(r[1])[1])
 end
 
-function div(x::spoly{T}, y::spoly{T}) where T <: Nemo.FieldElem
-   check_parent(x, y)
-   R = parent(x)
-   GC.@preserve x y R begin
-      px = libSingular.p_Copy(x.ptr, R.ptr)
-      py = libSingular.p_Copy(y.ptr, R.ptr)
-      q = R(libSingular.p_Divide(px, py, R.ptr))
-      libSingular.check_error()
-      return q
-   end
+function div(a::spoly{T}, b::spoly{T}) where T <: Nemo.FieldElem
+    check_parent(a, b)
+    iszero(b) && throw(DivideError())
+    R = parent(a)
+    q, _, _ = lift(Module(R, vector(R, b)), Module(R, vector(R, a)),
+                   false, false, true)
+    return Array(q[1])[1]
 end
 
 ###############################################################################
@@ -655,11 +677,10 @@ function gcdx(x::spoly{T}, y::spoly{T}) where T <: Nemo.FieldElem
    GC.@preserve x y R begin
       x1 = libSingular.p_Copy(x.ptr, R.ptr)
       y1 = libSingular.p_Copy(y.ptr, R.ptr)
-      s = [libSingular.p_ISet(0,R.ptr)]
-      t = [libSingular.p_ISet(0,R.ptr)]
-      p = [libSingular.p_ISet(0,R.ptr)]
-      libSingular.p_ExtGcd(x1, y1, pointer(p), pointer(s), pointer(t), R.ptr)
-      return R(p[]), R(s[]), R(t[])
+      p, s, t = libSingular.singclap_extgcd(x1, y1, R.ptr)
+      res = (R(p), R(s), R(t))
+      libSingular.check_error()
+      return res
    end
 end
 
@@ -903,11 +924,11 @@ function AsEquivalentSingularPolynomialRing(R::AbstractAlgebra.Generic.MPolyRing
 end
 
 @doc Markdown.doc"""
-    AsEquivalentAbstractAlgebraPolynomialRing(R::Singular.PolyRing{Singular.n_unknown{T}}; ordering::Symbol = :degrevlex)  where {T <: RingElem}
+    AsEquivalentAbstractAlgebraPolynomialRing(R::Singular.PolyRing{T}; ordering::Symbol = :degrevlex) where T <: Singular.n_unknown
 
 Return an AbstractAlgebra (multivariate) polynomial ring over the base ring of $R$ in variables having the same names as those of R.
 """
-function AsEquivalentAbstractAlgebraPolynomialRing(R::Singular.PolyRing{Singular.n_unknown{T}}; ordering::Symbol = :degrevlex)  where {T <: RingElem}
+function AsEquivalentAbstractAlgebraPolynomialRing(R::Singular.PolyRing{T}; ordering::Symbol = :degrevlex) where T <: Singular.n_unknown
    return AbstractAlgebra.Generic.PolynomialRing(base_ring(R).base_ring,
 	       [String(s) for s in symbols(R)], ordering=ordering)
 end
@@ -929,12 +950,21 @@ function (R::PolyRing)(p::AbstractAlgebra.Generic.MPoly{T}) where T <: Nemo.Ring
 end
 
 @doc Markdown.doc"""
-    (R::AbstractAlgebra.Generic.MPolyRing{T}){T <: Nemo.RingElem}(p::Singular.spoly{Singular.n_unknown{T}})
+    (R::AbstractAlgebra.Generic.MPolyRing{T}) where T <: Nemo.RingElem
 
 Return an AbstractAlgebra polynomial in the ring $R$ with the same
 coefficients and exponents as $p$.
 """
-function (R::AbstractAlgebra.Generic.MPolyRing{T})(p::Singular.spoly{Singular.n_unknown{T}}) where T <: Nemo.RingElem
+function (R::AbstractAlgebra.Generic.MPolyRing{T})(p::Singular.spoly{Singular.n_RingElem{T}}) where T <: Nemo.RingElem
+   B = MPolyBuildCtx(R)
+   cvzip = zip(coefficients(p), exponent_vectors(p))
+   for (c, v) in cvzip
+      GC.@preserve c push_term!(B, libSingular.julia(libSingular.cast_number_to_void(c.ptr)), v)
+   end
+   return finish(B)
+end
+
+function (R::AbstractAlgebra.Generic.MPolyRing{T})(p::Singular.spoly{Singular.n_FieldElem{T}}) where T <: Nemo.FieldElem
    B = MPolyBuildCtx(R)
    cvzip = zip(coefficients(p), exponent_vectors(p))
    for (c, v) in cvzip
@@ -1134,6 +1164,14 @@ function promote_rule(::Type{spoly{T}}, ::Type{T}) where {T <: Nemo.RingElem}
    return spoly{T}
 end
 
+function promote_rule(::Type{spoly{n_RingElem{RingElemWrapper{S, T}}}}, ::Type{U}) where {T <: Nemo.RingElem, U <: Nemo.RingElem, S}
+   return spoly{n_RingElem{RingElemWrapper{S, T}}}
+end
+
+function promote_rule(::Type{spoly{n_FieldElem{FieldElemWrapper{S, T}}}}, ::Type{U}) where {T <: Nemo.FieldElem, U <: Nemo.FieldElem, S}
+   return spoly{n_FieldElem{FieldElemWrapper{S, T}}}
+end
+
 ###############################################################################
 #
 #   Build context
@@ -1214,9 +1252,23 @@ function (R::PolyRing{T})(n::T) where T <: Nemo.RingElem
    GC.@preserve n return spoly{T}(R, n.ptr)
 end
 
-function (R::Singular.PolyRing{T})(n::T) where T<:Singular.n_unknown
+function (R::PolyRing{T})(n::T) where T <: Singular.n_unknown
    parent(n) != base_ring(R) && error("Unable to coerce into polynomial ring")
    GC.@preserve n return spoly{T}(R, n.ptr)
+end
+
+function (R::PolyRing{n_RingElem{RingElemWrapper{S, T}}})(
+   n::n_RingElem{RingElemWrapper{S, T}}
+) where {S, T}
+   parent(n) != base_ring(R) && error("Unable to coerce into polynomial ring")
+   GC.@preserve n return spoly{n_RingElem{RingElemWrapper{S, T}}}(R, n.ptr)
+end
+
+function (R::PolyRing{n_FieldElem{FieldElemWrapper{S, T}}})(
+   n::n_FieldElem{FieldElemWrapper{S, T}}
+) where {S, T}
+   parent(n) != base_ring(R) && error("Unable to coerce into polynomial ring")
+   GC.@preserve n return spoly{n_FieldElem{FieldElemWrapper{S, T}}}(R, n.ptr)
 end
 
 function (R::PolyRing)(f::T) where T <: Nemo.MPolyElem
@@ -1722,7 +1774,7 @@ end
 ###############################################################################
 
 function _PolynomialRing(R, s::Array{String, 1}, ordering, ordering2, cached, degree_bound)
-   S = [Symbol(v) for v in s]
+   S = rename_symbols(all_symbols(R), s, "x")
    T = elem_type(R)
    if isa(ordering, Symbol)
       ord1 = sym2ringorder[ordering]

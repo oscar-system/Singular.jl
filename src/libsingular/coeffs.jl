@@ -35,8 +35,7 @@ end
 
 # omalloc free
 function omFree(m :: Ptr{T}) where {T}
-   mp = reinterpret(Ptr{Nothing}, m)
-   omFree_internal(m)
+   omFree_internal(reinterpret(Ptr{Nothing}, m))
 end
 
 ###############################################################################
