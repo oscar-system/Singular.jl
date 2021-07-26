@@ -188,7 +188,7 @@ end
 #
 ###############################################################################
 
-function Array(v::svector{spoly{T}}) where T <: Nemo.RingElem
+function Base.Array(v::svector{spoly{T}}) where T <: Nemo.RingElem
    R = base_ring(v)
    GC.@preserve v R begin
       n = v.rank
