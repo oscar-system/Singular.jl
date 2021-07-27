@@ -3,7 +3,7 @@ using Pkg
 using Oscar
 
 
-case = 3
+case = 1
 
 
 if case == 1 || case == 99
@@ -21,7 +21,7 @@ if case == 1 || case == 99
 
     S, V = Oscar.Singular.PolynomialRing(QQ, ["x", "y"], ordering = :lex)
 
-    J = groebner_walk(
+    J = groebnerwalk(
         I,
         ordering_as_matrix(:degrevlex, 2),
         ordering_as_matrix(:lex, 2),
@@ -53,7 +53,7 @@ if case == 2 || case == 99
     I = Oscar.Singular.std(I, complete_reduction = true)
 
 
-    J = groebner_walk(
+    J = groebnerwalk(
         I,
         ordering_as_matrix([5, 4, 1], :deglex),
         ordering_as_matrix([6, 1, 3], :lex),
@@ -92,7 +92,7 @@ if case == 3 || case == 99
 
     I = Oscar.Singular.std(I, complete_reduction = true)
 
-    T1 = groebner_walk(
+    T1 = groebnerwalk(
         I,
         ordering_as_matrix(:deglex, 2),
         ordering_as_matrix(:lex, 2),
@@ -126,12 +126,12 @@ if case == 4 || case == 99
     I = Oscar.Singular.std(I, complete_reduction = true)
 
 
-    @time J = groebner_walk(
+    @time J = groebnerwalk(
         I,
         ordering_as_matrix(:degrevlex, 6),
         ordering_as_matrix(:lex, 6),
     )
-    @time K = groebner_walk(
+    @time K = groebnerwalk(
         I,
         ordering_as_matrix(:degrevlex, 6),
         ordering_as_matrix(:lex, 6),

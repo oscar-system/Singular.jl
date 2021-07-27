@@ -2,14 +2,12 @@ using Oscar
 
 export groebnerwalk
 
-
 ###############################################################
 #Implementation of the gröbner walk.
 #TODO: Implement pertubed version.
 #TODO: Improve GenWalk algorithm
 #TODO: Implement fractal version.
 ###############################################################
-
 
 ###############################################################
 #Top-Level
