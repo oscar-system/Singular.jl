@@ -105,6 +105,19 @@ auto id_StdHilb_helper(ideal a, ring b, jlcxx::ArrayRef<int> h, bool complete_re
     return id;
 }
 
+auto id_InterRed_helper(ideal a, ring b)
+{
+    ideal id = NULL;
+    if (!idIs0(a)) {
+        const ring   origin = currRing;
+        rChangeCurrRing(b);
+        id = kInterRed(a, b->qideal);
+        rChangeCurrRing(origin);
+    }
+    else
+        id = idInit(0, a->rank);
+    return id;
+}
 
 auto id_Std_helper(ideal a, ring b, bool complete_reduction = false)
 {
@@ -221,6 +234,8 @@ void singular_define_ideals(jlcxx::Module & Singular)
 
     Singular.method("id_Std", &id_Std_helper);
     Singular.method("id_StdHilb", &id_StdHilb_helper);
+
+    Singular.method("id_InterRed", &id_InterRed_helper);
 
     Singular.method("id_Eliminate", [](ideal m, poly p, ring o) {
         const ring origin = currRing;
