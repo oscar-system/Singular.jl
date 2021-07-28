@@ -230,7 +230,7 @@ end
 end
 
 @testset "sideal.interreduce" begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y", "z"])
+   R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"])
 
    I = Ideal(R, z*x + y^3, z + y^3, z + x*y)
 
