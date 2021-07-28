@@ -87,6 +87,12 @@ function isquotient_ring(R::PolyRing)
    GC.@preserve R return Bool(Singular.libSingular.rIsQuotientRing(R.ptr))
 end
 
+@doc Markdown.doc"""
+    characteristic(R::PolyRing)
+
+Return the characteristic of $R$. This function is currently unreliable if the
+characteristic does not fit into a `Cint`.
+"""
 function characteristic(R::PolyRing)
    GC.@preserve R return Int(libSingular.rChar(R.ptr))
 end

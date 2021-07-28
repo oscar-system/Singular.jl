@@ -16,7 +16,15 @@ base_ring(a::n_Zn) = ZZ
 
 base_ring(a::N_ZnRing) = ZZ
 
-characteristic(R::N_ZnRing) = ZZ(libSingular.n_GetChar(R.ptr))
+@doc Markdown.doc"""
+    characteristic(R::N_ZnRing)
+
+Return the characteristic of $R$. This function is currently unreliable if the
+characteristic does not fit into a `Cint`.
+"""
+function characteristic(R::N_ZnRing)
+   return ZZ(libSingular.n_GetChar(R.ptr))
+end
 
 function deepcopy_internal(a::n_Zn, dict::IdDict)
    return parent(a)(libSingular.n_Copy(a.ptr, parent(a).ptr))

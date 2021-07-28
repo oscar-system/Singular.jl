@@ -16,7 +16,14 @@ base_ring(a::n_Zp) = Union{}
 
 base_ring(a::N_ZpField) = Union{}
 
-characteristic(R::N_ZpField) = ZZ(libSingular.n_GetChar(R.ptr))
+@doc Markdown.doc"""
+    characteristic(R::N_ZpField)
+
+Return the characteristic of $R$.
+"""
+function characteristic(R::N_ZpField)
+   return ZZ(libSingular.n_GetChar(R.ptr))
+end
 
 function deepcopy_internal(a::n_Zp, dict::IdDict)
    c = parent(a)

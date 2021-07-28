@@ -146,7 +146,7 @@ ordering_Dp(nvars::Int = 1)
 ```
 
 ```@docs
-ordering_Wp(w::Vector{Int})
+ordering_wp(w::Vector{Int})
 ```
 
 ```@docs
@@ -182,7 +182,7 @@ ordering_a(w::Vector{Int})
 ```
 
 ```@docs
-ordering_M(m::Matrix{Int}, checked::Bool = true)
+ordering_M(m::Matrix{Int}; checked::Bool = true)
 ```
 
 ```@docs
@@ -444,7 +444,7 @@ AsEquivalentSingularPolynomialRing(R::AbstractAlgebra.Generic.MPolyRing{T}; cach
 ```
 
 ```@docs
-AsEquivalentAbstractAlgebraPolynomialRing(R::Singular.PolyRing{Singular.n_unknown{T}}; ordering::Symbol = :degrevlex)  where {T <: Nemo.RingElem}
+AsEquivalentAbstractAlgebraPolynomialRing(R::Singular.PolyRing{T}; ordering::Symbol = :degrevlex) where T <: Singular.n_unknown
 ```
 
 **Examples**
