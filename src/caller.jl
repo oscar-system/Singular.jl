@@ -322,7 +322,7 @@ function low_level_caller_rng(lib::String, name::String, ring, args...)
     libSingular.load_library(lib)
     arguments = Vector{Any}()
     for i in args
-       if typeof(i) == Vector{Any} 
+       if typeof(i) == Vector{Any}
           push!(arguments, prepare_argument(i, ring))
        else
           push!(arguments, prepare_argument(i))

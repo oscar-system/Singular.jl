@@ -446,7 +446,7 @@ end
 @testset "spoly.convert_Nemo.MPoly_to_Singular.spoly" begin
    R, (x, y, z) = Nemo.PolynomialRing(Nemo.QQ, ["x", "y", "z"])
    S, (a, b, c) = PolynomialRing(QQ, ["a", "b", "c"])
-   
+
    f = x^2+y^3+z^5
 
    @test S(f) == a^2+b^3+c^5

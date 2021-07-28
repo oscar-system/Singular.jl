@@ -1329,7 +1329,7 @@ function AbstractAlgebra.expressify(a::sordering; context = nothing)
          this = Expr(:call, :ordering_Ws, string(i.weights))
       elseif i.order == ringorder_a
          this = Expr(:call, :ordering_a, string(i.weights))
-      elseif i.order == ringorder_M         
+      elseif i.order == ringorder_M
          this = Expr(:call, :ordering_M, string(transpose(reshape(i.weights, (i.size, i.size)))))
       elseif i.order == ringorder_C
          this = Expr(:call, :ordering_C)
@@ -1364,7 +1364,7 @@ end
 
 function _is_weighted_ordering(t::libSingular.rRingOrder_t)
     return t == ringorder_wp || t == ringorder_ws ||
-           t == ringorder_Wp || t == ringorder_Ws 
+           t == ringorder_Wp || t == ringorder_Ws
 end
 
 function _basic_ordering(t::libSingular.rRingOrder_t, size::Int)
@@ -1682,7 +1682,7 @@ function serialize_ordering(nvars::Int, ord::sordering)
          push!(b, length(i.weights))
          for j in 1:nweights
             push!(b, i.weights[j])
-         end         
+         end
       else
          blksize = i.size
          if _is_weighted_ordering(i.order)
@@ -1758,7 +1758,7 @@ function deserialize_ordering(b::Vector{Cint})
          @assert nweights == 0
          push!(data, sorder_block(o, 0, Int[]))
       elseif o == ringorder_s
-         push!(data, sorder_block(o, blk0, Int[]))         
+         push!(data, sorder_block(o, blk0, Int[]))
       else
          error("unknown ordering $o")
       end
