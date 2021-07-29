@@ -16,7 +16,9 @@ base_ring(a::n_GF) = Union{}
 
 base_ring(a::N_GField) = Union{}
 
-characteristic(R::N_GField) = ZZ(_characteristic(R))
+function characteristic(R::N_GField)
+   return ZZ(_characteristic(R))
+end
 
 _characteristic(R::N_GField) = Int(libSingular.n_GetChar(R.ptr))
 

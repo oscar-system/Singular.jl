@@ -84,14 +84,6 @@ Singular.transcendence_basis(::N_FField)
 ```
 
 ```@docs
-Singular.characteristic(::N_FField)
-```
-
-```@docs
-isunit(::n_transExt)
-```
-
-```@docs
 Singular.n_transExt_to_spoly(::n_transExt)
 ```
 

@@ -52,14 +52,6 @@ Coerce a Flint integer value into the field.
 Singular.degree(::N_GField)
 ```
 
-```@docs
-Singular.characteristic(::N_GField)
-```
-
-```@docs
-isunit(::n_GF)
-```
-
 **Examples**
 
 ```julia

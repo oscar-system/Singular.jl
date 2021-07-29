@@ -16,7 +16,9 @@ base_ring(a::n_Zn) = ZZ
 
 base_ring(a::N_ZnRing) = ZZ
 
-characteristic(R::N_ZnRing) = ZZ(libSingular.n_GetChar(R.ptr))
+function characteristic(R::N_ZnRing)
+   return ZZ(libSingular.n_GetChar(R.ptr))
+end
 
 function deepcopy_internal(a::n_Zn, dict::IdDict)
    return parent(a)(libSingular.n_Copy(a.ptr, parent(a).ptr))
@@ -57,11 +59,6 @@ function iszero(n::n_Zn)
    GC.@preserve n c return libSingular.n_IsZero(n.ptr, c.ptr)
 end
 
-@doc Markdown.doc"""
-    isunit(n::n_Zn)
-
-Return `true` if the given value is a unit in the integers modulo $n$.
-"""
 isunit(n::n_Zn) = gcd(n, parent(n)(characteristic(parent(n)))) == 1
 
 ###############################################################################

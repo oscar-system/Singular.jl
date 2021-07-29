@@ -51,19 +51,11 @@ Coerce a Julia integer value into the integer ring.
 ### Basic manipulation
 
 ```@docs
-isunit(::n_Z)
-```
-
-```@docs
 denominator(::n_Z)
 ```
 
 ```@docs
 numerator(::n_Z)
-```
-
-```@docs
-abs(::n_Z)
 ```
 
 **Examples**
