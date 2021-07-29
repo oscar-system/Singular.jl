@@ -729,8 +729,7 @@ end
 
 function evaluate(a::spoly{T}, C::Vector{T}) where T <: Nemo.RingElem
    S = parent(a)
-   R = base_ring(a)
-   GC.@preserve C begin
+   GC.@preserve a C S begin
       carr = [c.ptr.cpp_object for c in C]
       n = libSingular.maEvalAt(a.ptr, carr, S.ptr)
       return base_ring(a)(n)
