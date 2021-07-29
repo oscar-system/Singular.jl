@@ -16,12 +16,6 @@ base_ring(a::n_Zn) = ZZ
 
 base_ring(a::N_ZnRing) = ZZ
 
-@doc Markdown.doc"""
-    characteristic(R::N_ZnRing)
-
-Return the characteristic of $R$. This function is currently unreliable if the
-characteristic does not fit into a `Cint`.
-"""
 function characteristic(R::N_ZnRing)
    return ZZ(libSingular.n_GetChar(R.ptr))
 end
@@ -65,11 +59,6 @@ function iszero(n::n_Zn)
    GC.@preserve n c return libSingular.n_IsZero(n.ptr, c.ptr)
 end
 
-@doc Markdown.doc"""
-    isunit(n::n_Zn)
-
-Return `true` if the given value is a unit in the integers modulo $n$.
-"""
 isunit(n::n_Zn) = gcd(n, parent(n)(characteristic(parent(n)))) == 1
 
 ###############################################################################

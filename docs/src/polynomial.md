@@ -258,10 +258,6 @@ has_local_ordering(R::PolyRing)
 ```
 
 ```@docs
-Singular.characteristic(R::PolyRing)
-```
-
-```@docs
 degree_bound(R::PolyRing)
 ```
 

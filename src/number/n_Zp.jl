@@ -16,11 +16,6 @@ base_ring(a::n_Zp) = Union{}
 
 base_ring(a::N_ZpField) = Union{}
 
-@doc Markdown.doc"""
-    characteristic(R::N_ZpField)
-
-Return the characteristic of $R$.
-"""
 function characteristic(R::N_ZpField)
    return ZZ(libSingular.n_GetChar(R.ptr))
 end
@@ -56,11 +51,6 @@ function iszero(n::n_Zp)
    GC.@preserve n return libSingular.n_IsZero(n.ptr, c.ptr)
 end
 
-@doc Markdown.doc"""
-    isunit(n::n_Zp)
-
-Return `true` if $n$ is a unit in the field, i.e. nonzero.
-"""
 isunit(n::n_Zp) = !iszero(n)
 
 ###############################################################################
