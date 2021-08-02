@@ -55,6 +55,7 @@ mutable struct n_Z <: Nemo.RingElem
     end
 end
 
+n_Z(n::n_Z) = n
 n_Z(n::Integer = 0) = n_Z(libSingular.number_ptr(n, ZZ.ptr))
 n_Z(n::Nemo.fmpz) = n_Z(libSingular.number_ptr(n, ZZ.ptr))
 
@@ -96,6 +97,7 @@ mutable struct n_Q <: Nemo.FieldElem
     end
 end
 
+n_Q(n::n_Q) = n
 n_Q(n::Integer = 0) = n_Q(libSingular.number_ptr(n, QQ.ptr))
 n_Q(n::Nemo.fmpz) = n_Q(libSingular.number_ptr(n, QQ.ptr))
 n_Q(n::n_Z) = n_Q(libSingular.nApplyMapFunc(n_Z_2_n_Q, n.ptr, ZZ.ptr, QQ.ptr))
