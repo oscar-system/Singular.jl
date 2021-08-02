@@ -136,7 +136,7 @@ end
 #
 ###############################################################################
 
-function divexact(a::n_unknown, b::n_unknown)
+function divexact(a::n_unknown, b::n_unknown; check::Bool=true)
    check_parent(a, b)
    R = parent(a)
    n = GC.@preserve a b R libSingular.n_ExactDiv(a.ptr, b.ptr, R.ptr)
@@ -419,7 +419,7 @@ for op in (:iszero, :isone)
 end
 
 # one input, one wrapped output
-for op in (:-, :zero, :one)
+for op in (:-, :zero, :one, :inv)
    @eval begin
       function ($op)(a::($rew){S, T}) where {S, T}
          return ($rew){S, T}(($op)(a.data), a.parent)
@@ -437,10 +437,19 @@ for op in (:(==), )
 end
 
 # two inputs, one wrapped output
-for op in (:+, :-, :*, :div, :divexact, :gcd)
+for op in (:+, :-, :*, :div, :gcd)
    @eval begin
       function ($op)(a::($rew){S, T}, b::($rew){S, T}) where {S, T}
          return ($rew){S, T}(($op)(a.data, b.data), a.parent)
+      end
+   end
+end
+
+# two inputs, checked, one wrapped output
+for op in (:divexact, )
+   @eval begin
+      function ($op)(a::($rew){S, T}, b::($rew){S, T}; check::Bool=true) where {S, T}
+         return ($rew){S, T}(($op)(a.data, b.data, check=check), a.parent)
       end
    end
 end

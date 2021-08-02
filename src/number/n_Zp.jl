@@ -198,7 +198,7 @@ function inv(x::n_Zp)
    return c(p)
 end
 
-function divexact(x::n_Zp, y::n_Zp)
+function divexact(x::n_Zp, y::n_Zp; check::Bool=true)
    c = parent(x)
    p = GC.@preserve x y c libSingular.n_Div(x.ptr, y.ptr, c.ptr)
    return c(p)

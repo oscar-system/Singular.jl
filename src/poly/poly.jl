@@ -510,7 +510,7 @@ end
 #
 ###############################################################################
 
-function divexact(x::spoly, y::spoly)
+function divexact(x::spoly, y::spoly; check::Bool=true)
    check_parent(x, y)
    R = parent(x)
    GC.@preserve x y R begin
@@ -527,7 +527,7 @@ end
 #
 ###############################################################################
 
-function divexact(x::spoly{T}, y::T) where T <: Nemo.RingElem
+function divexact(x::spoly{T}, y::T; check::Bool=true) where T <: Nemo.RingElem
    R = parent(x)
    base_ring(x) != parent(y) && error("Incompatible rings")
    GC.@preserve x y R begin
@@ -537,7 +537,7 @@ function divexact(x::spoly{T}, y::T) where T <: Nemo.RingElem
    end
 end
 
-function divexact(x::spoly, y::n_Z)
+function divexact(x::spoly, y::n_Z; check::Bool=true)
    y1 = base_ring(x)(y)
    R = parent(x)
    GC.@preserve x y1 R begin
@@ -547,7 +547,7 @@ function divexact(x::spoly, y::n_Z)
    end
 end
 
-function divexact(x::spoly, y::n_Q)
+function divexact(x::spoly, y::n_Q; check::Bool=true)
    y1 = base_ring(x)(y)
    R = parent(x)
    GC.@preserve x y1 R begin
@@ -557,7 +557,7 @@ function divexact(x::spoly, y::n_Q)
    end
 end
 
-function divexact(x::spoly, y::Int)
+function divexact(x::spoly, y::Int; check::Bool=true)
    R = base_ring(x)
    S = parent(x)
    GC.@preserve x R S begin
@@ -569,10 +569,10 @@ function divexact(x::spoly, y::Int)
    end
 end
 
-divexact(x::spoly, y::Integer) = divexact(x, base_ring(x)(y))
+divexact(x::spoly, y::Integer; check::Bool=true) = divexact(x, base_ring(x)(y), check=check)
 
-function divexact(x::spoly, y::Rational)
-   return divexact(x, base_ring(x)(y))
+function divexact(x::spoly, y::Rational; check::Bool=true)
+   return divexact(x, base_ring(x)(y), check=check)
 end
 
 ################################################################################
@@ -600,8 +600,8 @@ function *(x::fmpq, y::spoly)
   return parent(y)(x) * y
 end
 
-function divexact(x::spoly, y::fmpq)
-  return divexact(x, parent(x)(y))
+function divexact(x::spoly, y::fmpq; check::Bool=true)
+  return divexact(x, parent(x)(y), check=check)
 end
 
 ###############################################################################
@@ -1502,16 +1502,16 @@ ordering_a(w::Vector{Int}) = sordering([sorder_block(ringorder_a, 0, w)])
 Represents a block of variables with a general matrix ordering.
 The matrix `m` is expected to be invertible, and this is checked by default.
 """
-function ordering_M(m::Matrix{Int}; checked::Bool = true)
+function ordering_M(m::Matrix{Int}; check::Bool=true)
    (nr, nc) = size(m)
    nr > 0 && nr == nc || throw(ArgumentError("weight matrix must be square"))
-   !checked || !iszero(Nemo.det(Nemo.matrix(Nemo.ZZ, m))) || throw(ArgumentError("weight matrix must nonsingular"))
+   !check || !iszero(Nemo.det(Nemo.matrix(Nemo.ZZ, m))) || throw(ArgumentError("weight matrix must nonsingular"))
    return sordering([sorder_block(ringorder_M, nr, vec(transpose(m)))])
 end
 
-function ordering_M(m::fmpz_mat, checked::Bool = true)
-   !checked || !iszero(Nemo.det(m)) || throw(ArgumentError("weight matrix must nonsingular"))
-   return ordering_M(Int.(m), checked = false)
+function ordering_M(m::fmpz_mat, check::Bool=true)
+   !check || !iszero(Nemo.det(m)) || throw(ArgumentError("weight matrix must nonsingular"))
+   return ordering_M(Int.(m), check=false)
 end
 
 # C, c, and S can take a dummy int in singular, but they do nothing with it?
