@@ -7,15 +7,19 @@
 # simple and allow conversions between fmpz_mat and Matrix{BigInt}.
 
 function sbigintmat(r::Int, c::Int)
-    return sbigintmat(libSingular.bigintmat_init(r, c))
+   return sbigintmat(libSingular.bigintmat_init(r, c))
 end
 
 function ncols(m::sbigintmat)
-    return Int(libSingular.bigintmat_ncols(m.ptr))
+   return Int(libSingular.bigintmat_ncols(m.ptr))
 end
 
 function nrows(m::sbigintmat)
-    return Int(libSingular.bigintmat_nrows(m.ptr))
+   return Int(libSingular.bigintmat_nrows(m.ptr))
+end
+
+function size(m::sbigintmat)
+   return (ncols(m), nrows(m))
 end
 
 function getindex(m::sbigintmat, i::Int, j::Int)
@@ -27,7 +31,7 @@ function getindex(m::sbigintmat, i::Int, j::Int)
    end
 end
 
-function setindex!(m::sbigintmat, a::Union{BigInt, fmpz}, i::Int, j::Int)
+function setindex!(m::sbigintmat, a::Union{Integer, fmpz}, i::Int, j::Int)
    (0 < i <= nrows(m) && 0 < j <= ncols(m)) || error("index out of range")
    # rawset consumes our ptr
    ptr = libSingular.number_ptr(a, libSingular.get_coeffs_BIGINT())
@@ -49,5 +53,46 @@ function show(io::IO, M::sbigintmat)
       end
    end
    print(io, "]")
+end
+
+# conversion to bigintmat
+
+function sbigintmat(a::Nemo.MatElem{ <: Union{Nemo.Integer, Nemo.fmpz}})
+   (r, c) = (nrows(a), ncols(a))
+   z = sbigintmat(r, c)
+   for i in 1:r, j in 1:c
+      z[i, j] = a[i, j]
+   end
+   return z
+end
+
+function sbigintmat(a::Matrix{ <: Integer})
+   (r, c) = size(a)
+   z = sbigintmat(r, c)
+   for i in 1:r, j in 1:c
+      z[i, j] = a[i, j]
+   end
+   return z
+end
+
+
+# conversion out of bigintmat
+
+function Base.Array(a::sbigintmat)
+   (r, c) = size(a)
+   z = zeros(BigInt, r, c)
+   for i in 1:r, j in 1:c
+      z[i, j] = a[i, j]
+   end
+   return z
+end
+
+function Nemo.matrix(R::Nemo.Ring, a::sbigintmat)
+   (r, c) = size(a)
+   z = zero_matrix(R, r, c)
+   for i in 1:r, j in 1:c
+      z[i, j] = a[i, j]
+   end
+   return z
 end
 
