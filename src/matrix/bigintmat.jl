@@ -18,11 +18,11 @@ function nrows(m::sbigintmat)
    return Int(libSingular.bigintmat_nrows(m.ptr))
 end
 
-function size(m::sbigintmat)
+function Base.size(m::sbigintmat)
    return (ncols(m), nrows(m))
 end
 
-function getindex(m::sbigintmat, i::Int, j::Int)
+function Base.getindex(m::sbigintmat, i::Int, j::Int)
    (0 < i <= nrows(m) && 0 < j <= ncols(m)) || error("index out of range")
    GC.@preserve m begin
       # not our own ptr
@@ -31,14 +31,14 @@ function getindex(m::sbigintmat, i::Int, j::Int)
    end
 end
 
-function setindex!(m::sbigintmat, a::Union{Integer, fmpz}, i::Int, j::Int)
+function Base.setindex!(m::sbigintmat, a::Union{Integer, fmpz}, i::Int, j::Int)
    (0 < i <= nrows(m) && 0 < j <= ncols(m)) || error("index out of range")
    # rawset consumes our ptr
    ptr = libSingular.number_ptr(a, libSingular.get_coeffs_BIGINT())
    GC.@preserve m libSingular.bigintmat_rawset(m.ptr, ptr, Cint(i), Cint(j))
 end
 
-function show(io::IO, M::sbigintmat)
+function Base.show(io::IO, M::sbigintmat)
    print(io, "[")
    m = nrows(M)
    n = ncols(M)
