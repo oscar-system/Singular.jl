@@ -205,7 +205,7 @@ function inv(x::n_algExt)
    return c(p)
 end
 
-function divexact(x::n_algExt, y::n_algExt)
+function divexact(x::n_algExt, y::n_algExt; check::Bool=true)
    check_parent(x, y)
    c = parent(x)
    p = GC.@preserve x y c libSingular.n_Div(x.ptr, y.ptr, c.ptr)

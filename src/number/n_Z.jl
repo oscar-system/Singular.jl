@@ -220,7 +220,7 @@ function div(x::n_Z, y::n_Z)
    return c(p)
 end
 
-function divexact(x::n_Z, y::n_Z)
+function divexact(x::n_Z, y::n_Z; check::Bool=true)
    c = parent(x)
    p = GC.@preserve x y c libSingular.n_ExactDiv(x.ptr, y.ptr, c.ptr)
    return c(p)
