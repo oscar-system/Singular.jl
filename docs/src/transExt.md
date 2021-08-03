@@ -34,7 +34,7 @@ already listed at the given link.
 The following constructors are available to create function fields and their elements.
 
 ```@docs
-Singular.FunctionField(::Field, ::Array{String, 1}; ::Bool)
+Singular.FunctionField(::Field, ::Vector{String}; ::Bool)
 ```
 
 In case the user does not want to specify a transcendence basis the following
@@ -81,14 +81,6 @@ Singular.transcendence_degree(::N_FField)
 
 ```@docs
 Singular.transcendence_basis(::N_FField)
-```
-
-```@docs
-Singular.characteristic(::N_FField)
-```
-
-```@docs
-isunit(::n_transExt)
 ```
 
 ```@docs

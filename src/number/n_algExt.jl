@@ -25,11 +25,6 @@ function gen(F::N_AlgExtField)
    GC.@preserve F return F(libSingular.n_Param(Cint(1), F.ptr))
 end
 
-@doc Markdown.doc"""
-    characteristic(R::N_AlgExtField)
-
-Return the characteristic of the field.
-"""
 function characteristic(R::N_AlgExtField)
    GC.@preserve R return ZZ(libSingular.n_GetChar(R.ptr))
 end
@@ -72,10 +67,6 @@ function iszero(n::n_algExt)
    GC.@preserve n c return libSingular.n_IsZero(n.ptr, c.ptr)
 end
 
-@doc Markdown.doc"""
-   isunit(n::n_algExt)
-Return `true` if $n$ is a unit in the field, i.e. nonzero.
-"""
 isunit(n::n_algExt) = !iszero(n)
 
 function modulus(a::N_AlgExtField)
@@ -214,7 +205,7 @@ function inv(x::n_algExt)
    return c(p)
 end
 
-function divexact(x::n_algExt, y::n_algExt)
+function divexact(x::n_algExt, y::n_algExt; check::Bool=true)
    check_parent(x, y)
    c = parent(x)
    p = GC.@preserve x y c libSingular.n_Div(x.ptr, y.ptr, c.ptr)

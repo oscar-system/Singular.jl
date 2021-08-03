@@ -55,6 +55,7 @@ mutable struct n_Z <: Nemo.RingElem
     end
 end
 
+n_Z(n::n_Z) = n
 n_Z(n::Integer = 0) = n_Z(libSingular.number_ptr(n, ZZ.ptr))
 n_Z(n::Nemo.fmpz) = n_Z(libSingular.number_ptr(n, ZZ.ptr))
 
@@ -96,6 +97,7 @@ mutable struct n_Q <: Nemo.FieldElem
     end
 end
 
+n_Q(n::n_Q) = n
 n_Q(n::Integer = 0) = n_Q(libSingular.number_ptr(n, QQ.ptr))
 n_Q(n::Nemo.fmpz) = n_Q(libSingular.number_ptr(n, QQ.ptr))
 n_Q(n::n_Z) = n_Q(libSingular.nApplyMapFunc(n_Z_2_n_Q, n.ptr, ZZ.ptr, QQ.ptr))
@@ -285,15 +287,15 @@ end
 #
 ###############################################################################
 
-const N_FFieldID = Dict{Tuple{Field, Array{Symbol, 1}}, Field}()
+const N_FFieldID = Dict{Tuple{Field, Vector{Symbol}}, Field}()
 
 mutable struct N_FField <: Field
    ptr::libSingular.coeffs_ptr
    base_ring::Field
    refcount::Int
-   S::Array{Symbol, 1}
+   S::Vector{Symbol}
 
-   function N_FField(F::Field, S::Array{Symbol, 1}, cached::Bool = true)
+   function N_FField(F::Field, S::Vector{Symbol}, cached::Bool = true)
       return AbstractAlgebra.get_cached!(N_FFieldID, (F, S), cached) do
          v = [pointer(Base.Vector{UInt8}(string(str)*"\0")) for str in S]
          cf = libSingular.nCopyCoeff(F.ptr)

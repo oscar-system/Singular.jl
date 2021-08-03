@@ -34,11 +34,6 @@ function transcendence_basis(F::N_FField)
    GC.@preserve F return [F(libSingular.n_Param(Cint(i), F.ptr)) for i = 1:n]
 end
 
-@doc Markdown.doc"""
-    characteristic(R::N_FField)
-
-Return the characteristic of the field.
-"""
 function characteristic(R::N_FField)
    GC.@preserve R return ZZ(libSingular.n_GetChar(R.ptr))
 end
@@ -73,7 +68,7 @@ zero(R::N_FField) = R(0)
 @doc Markdown.doc"""
     numerator(x::n_transExt)
 
-Return the numerator of the given fraction.
+Return the numerator of $x$.
 """
 function numerator(x::n_transExt)
    c = parent(x)
@@ -88,7 +83,7 @@ end
 @doc Markdown.doc"""
     denominator(x::n_transExt)
 
-Return the denominator of the given fraction.
+Return the denominator of $x$.
 """
 function denominator(x::n_transExt)
    c = parent(x)
@@ -110,10 +105,6 @@ function iszero(n::n_transExt)
    GC.@preserve n c return libSingular.n_IsZero(n.ptr, c.ptr)
 end
 
-@doc Markdown.doc"""
-   isunit(n::n_transExt)
-Return `true` if $n$ is a unit in the field, i.e. nonzero.
-"""
 isunit(n::n_transExt) = !iszero(n)
 
 function _tExt_to_poly(R::N_FField, cached)
@@ -259,7 +250,7 @@ function inv(x::n_transExt)
    return c(p)
 end
 
-function divexact(x::n_transExt, y::n_transExt)
+function divexact(x::n_transExt, y::n_transExt; check::Bool=true)
    c = parent(x)
    p = GC.@preserve x y c libSingular.n_Div(x.ptr, y.ptr, c.ptr)
    return c(p)

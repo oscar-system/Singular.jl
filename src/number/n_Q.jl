@@ -57,7 +57,7 @@ isunit(n::n_Q) = !iszero(n)
 @doc Markdown.doc"""
     numerator(x::n_Q)
 
-Return the numerator of the given fraction.
+Return in `ZZ` the numerator of $x$.
 """
 function numerator(x::n_Q)
    c = parent(x)
@@ -74,7 +74,7 @@ end
 @doc Markdown.doc"""
     denominator(x::n_Q)
 
-Return the denominator of the given fraction.
+Return in `ZZ` the denominator of $x$.
 """
 function denominator(x::n_Q)
    c = parent(x)
@@ -88,11 +88,6 @@ function denominator(x::n_Q)
    end
 end
 
-@doc Markdown.doc"""
-    abs(n::n_Q)
-
-Return the absolute value of the given fraction.
-"""
 function abs(n::n_Q)
    c = parent(n)
    GC.@preserve n c begin
@@ -248,7 +243,7 @@ function inv(x::n_Q)
    return c(p)
 end
 
-function divexact(x::n_Q, y::n_Q)
+function divexact(x::n_Q, y::n_Q; check::Bool=true)
    c = parent(x)
    p = GC.@preserve x y c libSingular.n_Div(x.ptr, y.ptr, c.ptr)
    return c(p)

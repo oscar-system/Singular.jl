@@ -223,7 +223,7 @@ end
 #
 ###############################################################################
 
-function Matrix(R::PolyRing{T}, a::AbstractArray{S, 2}) where {T, S}
+function Matrix(R::PolyRing{T}, a::AbstractMatrix{S}) where {T, S}
    (r, c) = size(a)
    m = zero_matrix(R, r, c)
    for i in 1:r, j in 1:c

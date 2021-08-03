@@ -510,7 +510,7 @@ end
 #
 ###############################################################################
 
-function divexact(x::spoly, y::spoly)
+function divexact(x::spoly, y::spoly; check::Bool=true)
    check_parent(x, y)
    R = parent(x)
    GC.@preserve x y R begin
@@ -527,7 +527,7 @@ end
 #
 ###############################################################################
 
-function divexact(x::spoly{T}, y::T) where T <: Nemo.RingElem
+function divexact(x::spoly{T}, y::T; check::Bool=true) where T <: Nemo.RingElem
    R = parent(x)
    base_ring(x) != parent(y) && error("Incompatible rings")
    GC.@preserve x y R begin
@@ -537,7 +537,7 @@ function divexact(x::spoly{T}, y::T) where T <: Nemo.RingElem
    end
 end
 
-function divexact(x::spoly, y::n_Z)
+function divexact(x::spoly, y::n_Z; check::Bool=true)
    y1 = base_ring(x)(y)
    R = parent(x)
    GC.@preserve x y1 R begin
@@ -547,7 +547,7 @@ function divexact(x::spoly, y::n_Z)
    end
 end
 
-function divexact(x::spoly, y::n_Q)
+function divexact(x::spoly, y::n_Q; check::Bool=true)
    y1 = base_ring(x)(y)
    R = parent(x)
    GC.@preserve x y1 R begin
@@ -557,7 +557,7 @@ function divexact(x::spoly, y::n_Q)
    end
 end
 
-function divexact(x::spoly, y::Int)
+function divexact(x::spoly, y::Int; check::Bool=true)
    R = base_ring(x)
    S = parent(x)
    GC.@preserve x R S begin
@@ -569,10 +569,10 @@ function divexact(x::spoly, y::Int)
    end
 end
 
-divexact(x::spoly, y::Integer) = divexact(x, base_ring(x)(y))
+divexact(x::spoly, y::Integer; check::Bool=true) = divexact(x, base_ring(x)(y), check=check)
 
-function divexact(x::spoly, y::Rational)
-   return divexact(x, base_ring(x)(y))
+function divexact(x::spoly, y::Rational; check::Bool=true)
+   return divexact(x, base_ring(x)(y), check=check)
 end
 
 ################################################################################
@@ -600,8 +600,8 @@ function *(x::fmpq, y::spoly)
   return parent(y)(x) * y
 end
 
-function divexact(x::spoly, y::fmpq)
-  return divexact(x, parent(x)(y))
+function divexact(x::spoly, y::fmpq; check::Bool=true)
+  return divexact(x, parent(x)(y), check=check)
 end
 
 ###############################################################################
@@ -729,8 +729,7 @@ end
 
 function evaluate(a::spoly{T}, C::Vector{T}) where T <: Nemo.RingElem
    S = parent(a)
-   R = base_ring(a)
-   @GC.preserve C begin
+   GC.@preserve a C S begin
       carr = [c.ptr.cpp_object for c in C]
       n = libSingular.maEvalAt(a.ptr, carr, S.ptr)
       return base_ring(a)(n)
@@ -774,7 +773,7 @@ f values")
    # First work out types of products
    r = R()
    c = zero(R)
-   U = Array{Any, 1}(undef, length(vals))
+   U = Vector{Any}(undef, length(vals))
    for j = 1:length(vals)
       W = typeof(vals[j])
       if ((W <: Integer && W != BigInt) ||
@@ -822,7 +821,7 @@ function factor_squarefree(x::spoly)
     error("Base ring not supported.")
   end
 
-  a = Array{Int32, 1}()
+  a = Vector{Int32}()
   I = GC.@preserve x R Ideal(R, libSingular.singclap_sqrfree(x.ptr, a, R.ptr))
   D = Dict{typeof(I[1]), Int64}()
   n = ngens(I)
@@ -851,7 +850,7 @@ function factor(x::spoly)
     error("Base ring not supported.")
   end
 
-  a = Array{Int32, 1}()
+  a = Vector{Int32}()
   I = GC.@preserve x R Ideal(R, libSingular.singclap_factorize(x.ptr, a, R.ptr))
   D = Dict{typeof(I[1]), Int64}()
   n = ngens(I)
@@ -884,19 +883,19 @@ function substitute_variable(p::spoly, i::Int64, q::spoly)
 end
 
 @doc Markdown.doc"""
-    permute_variables(p::spoly, perm::Array{Int64,1}, new_ring::PolyRing)
+    permute_variables(p::spoly, perm::Vector{Int64}, new_ring::PolyRing)
 
 Permutes the indeterminates of `p` according to `perm` to the indeterminates
 of the ring `new_ring`.
 """
-function permute_variables(p::spoly, perm::Array{Int64,1}, new_ring::PolyRing)
+function permute_variables(p::spoly, perm::Vector{Int64}, new_ring::PolyRing)
    old_ring = parent(p)
    old_base = base_ring(old_ring)
    new_base = base_ring(new_ring)
    GC.@preserve p new_ring old_ring old_base new_base begin
        perm_64 = [0]
        append!(perm_64,perm)
-       perm_32 = convert(Array{Int32,1},perm_64)
+       perm_32 = convert(Vector{Int32},perm_64)
        map_ptr = libSingular.n_SetMap(old_base.ptr, new_base.ptr)
        poly_ptr = libSingular.p_PermPoly(p.ptr, perm_32, old_ring.ptr,
                                      new_ring.ptr, map_ptr, Ptr{Int32}(C_NULL))
@@ -1030,7 +1029,7 @@ function jacobian_ideal(p::spoly)
    R = parent(p)
    B = base_ring(R)
    n = nvars(R)
-   J = Array{spoly{elem_type(B)}, 1}()
+   J = Vector{spoly{elem_type(B)}}()
    for i in 1:n
        push!(J, derivative(p, i))
    end
@@ -1329,7 +1328,7 @@ function AbstractAlgebra.expressify(a::sordering; context = nothing)
          this = Expr(:call, :ordering_Ws, string(i.weights))
       elseif i.order == ringorder_a
          this = Expr(:call, :ordering_a, string(i.weights))
-      elseif i.order == ringorder_M         
+      elseif i.order == ringorder_M
          this = Expr(:call, :ordering_M, string(transpose(reshape(i.weights, (i.size, i.size)))))
       elseif i.order == ringorder_C
          this = Expr(:call, :ordering_C)
@@ -1364,7 +1363,7 @@ end
 
 function _is_weighted_ordering(t::libSingular.rRingOrder_t)
     return t == ringorder_wp || t == ringorder_ws ||
-           t == ringorder_Wp || t == ringorder_Ws 
+           t == ringorder_Wp || t == ringorder_Ws
 end
 
 function _basic_ordering(t::libSingular.rRingOrder_t, size::Int)
@@ -1502,16 +1501,16 @@ ordering_a(w::Vector{Int}) = sordering([sorder_block(ringorder_a, 0, w)])
 Represents a block of variables with a general matrix ordering.
 The matrix `m` is expected to be invertible, and this is checked by default.
 """
-function ordering_M(m::Matrix{Int}; checked::Bool = true)
+function ordering_M(m::Matrix{Int}; check::Bool=true)
    (nr, nc) = size(m)
    nr > 0 && nr == nc || throw(ArgumentError("weight matrix must be square"))
-   !checked || !iszero(Nemo.det(Nemo.matrix(Nemo.ZZ, m))) || throw(ArgumentError("weight matrix must nonsingular"))
+   !check || !iszero(Nemo.det(Nemo.matrix(Nemo.ZZ, m))) || throw(ArgumentError("weight matrix must nonsingular"))
    return sordering([sorder_block(ringorder_M, nr, vec(transpose(m)))])
 end
 
-function ordering_M(m::fmpz_mat, checked::Bool = true)
-   !checked || !iszero(Nemo.det(m)) || throw(ArgumentError("weight matrix must nonsingular"))
-   return ordering_M(Int.(m), checked = false)
+function ordering_M(m::fmpz_mat, check::Bool=true)
+   !check || !iszero(Nemo.det(m)) || throw(ArgumentError("weight matrix must nonsingular"))
+   return ordering_M(Int.(m), check=false)
 end
 
 # C, c, and S can take a dummy int in singular, but they do nothing with it?
@@ -1682,7 +1681,7 @@ function serialize_ordering(nvars::Int, ord::sordering)
          push!(b, length(i.weights))
          for j in 1:nweights
             push!(b, i.weights[j])
-         end         
+         end
       else
          blksize = i.size
          if _is_weighted_ordering(i.order)
@@ -1758,7 +1757,7 @@ function deserialize_ordering(b::Vector{Cint})
          @assert nweights == 0
          push!(data, sorder_block(o, 0, Int[]))
       elseif o == ringorder_s
-         push!(data, sorder_block(o, blk0, Int[]))         
+         push!(data, sorder_block(o, blk0, Int[]))
       else
          error("unknown ordering $o")
       end
@@ -1773,7 +1772,7 @@ end
 #
 ###############################################################################
 
-function _PolynomialRing(R, s::Array{String, 1}, ordering, ordering2, cached, degree_bound)
+function _PolynomialRing(R, s::Vector{String}, ordering, ordering2, cached, degree_bound)
    S = rename_symbols(all_symbols(R), s, "x")
    T = elem_type(R)
    if isa(ordering, Symbol)
@@ -1797,13 +1796,13 @@ function _PolynomialRing(R, s::Array{String, 1}, ordering, ordering2, cached, de
 end
 
 # keyword arguments do not participate in dispatch
-function PolynomialRing(R::Union{Ring, Field}, s::Array{String, 1};
+function PolynomialRing(R::Union{Ring, Field}, s::Vector{String};
                         ordering = :degrevlex, ordering2::Symbol = :comp1min,
                         cached::Bool = true, degree_bound::Int = 0)
    return _PolynomialRing(R, s, ordering, ordering2, cached, degree_bound)
 end
 
-function PolynomialRing(R::Nemo.Ring, s::Array{String, 1}; cached::Bool = true,
+function PolynomialRing(R::Nemo.Ring, s::Vector{String}; cached::Bool = true,
       ordering = :degrevlex, ordering2::Symbol = :comp1min,
       degree_bound::Int = 0)
    R = CoefficientRing(R)

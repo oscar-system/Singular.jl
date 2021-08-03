@@ -16,7 +16,9 @@ base_ring(a::n_GF) = Union{}
 
 base_ring(a::N_GField) = Union{}
 
-characteristic(R::N_GField) = ZZ(_characteristic(R))
+function characteristic(R::N_GField)
+   return ZZ(_characteristic(R))
+end
 
 _characteristic(R::N_GField) = Int(libSingular.n_GetChar(R.ptr))
 
@@ -215,7 +217,7 @@ function inv(x::n_GF)
    return c(p)
 end
 
-function divexact(x::n_GF, y::n_GF)
+function divexact(x::n_GF, y::n_GF; check::Bool=true)
    c = parent(x)
    p = GC.@preserve x y c libSingular.n_Div(x.ptr, y.ptr, c.ptr)
    return c(p)

@@ -16,7 +16,9 @@ base_ring(a::n_Zp) = Union{}
 
 base_ring(a::N_ZpField) = Union{}
 
-characteristic(R::N_ZpField) = ZZ(libSingular.n_GetChar(R.ptr))
+function characteristic(R::N_ZpField)
+   return ZZ(libSingular.n_GetChar(R.ptr))
+end
 
 function deepcopy_internal(a::n_Zp, dict::IdDict)
    c = parent(a)
@@ -49,11 +51,6 @@ function iszero(n::n_Zp)
    GC.@preserve n return libSingular.n_IsZero(n.ptr, c.ptr)
 end
 
-@doc Markdown.doc"""
-    isunit(n::n_Zp)
-
-Return `true` if $n$ is a unit in the field, i.e. nonzero.
-"""
 isunit(n::n_Zp) = !iszero(n)
 
 ###############################################################################
@@ -198,7 +195,7 @@ function inv(x::n_Zp)
    return c(p)
 end
 
-function divexact(x::n_Zp, y::n_Zp)
+function divexact(x::n_Zp, y::n_Zp; check::Bool=true)
    c = parent(x)
    p = GC.@preserve x y c libSingular.n_Div(x.ptr, y.ptr, c.ptr)
    return c(p)

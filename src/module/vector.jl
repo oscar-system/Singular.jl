@@ -164,7 +164,7 @@ end
 #
 ###############################################################################
 
-function (S::FreeMod{T})(a::Array{T, 1}) where T <: AbstractAlgebra.RingElem
+function (S::FreeMod{T})(a::Vector{T}) where T <: AbstractAlgebra.RingElem
    R = base_ring(S) # polynomial ring
    GC.@preserve a R begin
       n = size(a)[1]
@@ -188,11 +188,11 @@ end
 #
 ###############################################################################
 
-function Array(v::svector{spoly{T}}) where T <: Nemo.RingElem
+function Base.Array(v::svector{spoly{T}}) where T <: Nemo.RingElem
    R = base_ring(v)
    GC.@preserve v R begin
       n = v.rank
-      aa_val = Array{Ptr{Nothing},1}(undef, n)
+      aa_val = Vector{Ptr{Nothing}}(undef, n)
       libSingular.p_Vector2Array(v.ptr, reinterpret(Ptr{Nothing},pointer(aa_val)), n, R.ptr)
       aa = [libSingular.internal_void_to_poly_helper(p) for p in aa_val]
       return [spoly{T}(R, p) for p in aa]

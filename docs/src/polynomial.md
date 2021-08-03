@@ -47,7 +47,7 @@ polynomials that is not documented in the general multivariate interface.
 ### Constructors
 
 ```julia
-PolynomialRing(R::Union{Ring, Field}, s::Array{String, 1};
+PolynomialRing(R::Union{Ring, Field}, s::Vector{String};
    cached::Bool = true, ordering = :degrevlex,
       ordering2::Symbol = :comp1min, degree_bound::Int = 0)
 ```
@@ -146,7 +146,7 @@ ordering_Dp(nvars::Int = 1)
 ```
 
 ```@docs
-ordering_Wp(w::Vector{Int})
+ordering_wp(w::Vector{Int})
 ```
 
 ```@docs
@@ -182,7 +182,7 @@ ordering_a(w::Vector{Int})
 ```
 
 ```@docs
-ordering_M(m::Matrix{Int}, checked::Bool = true)
+ordering_M(m::Matrix{Int}; checked::Bool = true)
 ```
 
 ```@docs
@@ -255,10 +255,6 @@ has_mixed_ordering(R::PolyRing)
 
 ```@docs
 has_local_ordering(R::PolyRing)
-```
-
-```@docs
-Singular.characteristic(R::PolyRing)
 ```
 
 ```@docs
@@ -444,7 +440,7 @@ AsEquivalentSingularPolynomialRing(R::AbstractAlgebra.Generic.MPolyRing{T}; cach
 ```
 
 ```@docs
-AsEquivalentAbstractAlgebraPolynomialRing(R::Singular.PolyRing{Singular.n_unknown{T}}; ordering::Symbol = :degrevlex)  where {T <: Nemo.RingElem}
+AsEquivalentAbstractAlgebraPolynomialRing(R::Singular.PolyRing{T}; ordering::Symbol = :degrevlex) where T <: Singular.n_unknown
 ```
 
 **Examples**

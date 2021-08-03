@@ -47,7 +47,7 @@ over a polynomial ring, as described in the relevant sections of the
 documentation, or they can be created by the following constructor:
 
 ```@docs
-Resolution(::Array{smodule{T}, 1}) where T <: AbstractAlgebra.FieldElem
+Resolution(::Vector{smodule{T}}) where T <: AbstractAlgebra.FieldElem
 ```
 
 **Example**

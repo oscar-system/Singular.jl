@@ -58,14 +58,6 @@ Coerce a Singular or Flint integer value into the field.
 
 ### Basic manipulation
 
-```@docs
-isunit(::n_Zp)
-```
-
-```@docs
-Singular.characteristic(::N_ZpField)
-```
-
 **Examples**
 
 ```julia

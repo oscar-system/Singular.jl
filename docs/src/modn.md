@@ -51,14 +51,6 @@ Coerce a Singular or Flint integer value into the ring.
 
 ### Basic manipulation
 
-```@docs
-isunit(::n_Zn)
-```
-
-```@docs
-Singular.characteristic(::N_ZnRing)
-```
-
 **Examples**
 
 ```
