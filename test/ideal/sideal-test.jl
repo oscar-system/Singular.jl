@@ -229,6 +229,16 @@ end
    @test B.isGB == true
 end
 
+@testset "sideal.interreduce" begin
+   R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"])
+
+   I = Ideal(R, z*x + y^3, z + y^3, z + x*y)
+
+   A = interreduce(I)
+
+   @test isequal(A, Ideal(R, x*z - z, x*y + z, y^3 + x*z))
+end
+
 @testset "sideal.fglm" begin
    R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"], ordering = :lex)
    I = Ideal(R, y^3+x^2, x^2*y+x^2, x^3-x^2, z^4-x^2-y)

@@ -2,7 +2,7 @@ export sideal, IdealSet, syz, lead, normalize!, isconstant, iszerodim, fglm,
        fres, dimension, highcorner, jet, kbase, minimal_generating_set,
        independent_sets, maximal_independent_set, ngens, sres, intersection,
        quotient, reduce, eliminate, kernel, equal, contains, isvar_generated,
-       saturation, satstd, slimgb, std, vdim
+       saturation, satstd, slimgb, std, vdim, interreduce
 
 ###############################################################################
 #
@@ -429,6 +429,20 @@ function std(I::sideal; complete_reduction::Bool=false)
    libSingular.idSkipZeroes(ptr)
    z = Ideal(R, ptr)
    z.isGB = true
+   return z
+end
+
+@doc Markdown.doc"""
+    interreduce(I::sideal)
+
+Interreduce the elements of I such that no leading term is divisible by another
+leading term
+"""
+function interreduce(I::sideal)
+   R = base_ring(I)
+   ptr = GC.@preserve I R libSingular.id_InterRed(I.ptr, R.ptr)
+   libSingular.idSkipZeroes(ptr)
+   z = Ideal(R, ptr)
    return z
 end
 
