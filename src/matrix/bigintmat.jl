@@ -19,7 +19,7 @@ function nrows(m::sbigintmat)
 end
 
 function Base.size(m::sbigintmat)
-   return (ncols(m), nrows(m))
+   return (nrows(m), ncols(m))
 end
 
 function Base.getindex(m::sbigintmat, i::Int, j::Int)
@@ -57,7 +57,8 @@ end
 
 # conversion to bigintmat
 
-function sbigintmat(a::Nemo.MatElem{ <: Union{Nemo.Integer, Nemo.fmpz}})
+function sbigintmat(a::Union{Nemo.MatElem{ <: Union{Nemo.Integer, Nemo.fmpz}},
+                          Nemo.MatAlgElem{ <: Union{Nemo.Integer, Nemo.fmpz}}})
    (r, c) = (nrows(a), ncols(a))
    z = sbigintmat(r, c)
    for i in 1:r, j in 1:c
@@ -96,3 +97,13 @@ function Nemo.matrix(R::Nemo.Ring, a::sbigintmat)
    return z
 end
 
+function (R::Union{Nemo.MatSpace, Nemo.MatAlgebra})(a::sbigintmat)
+   r = nrows(a)
+   c = ncols(a)
+   r == nrows(R) && c == ncols(R) || error("wrong matrix dimensions")
+   z = zero(R)
+   for i in 1:r, j in 1:c
+      z[i, j] = a[i, j]
+   end
+   return z
+end

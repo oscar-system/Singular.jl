@@ -266,6 +266,14 @@ function prepare_argument(x::sbigintmat)
                            false)
 end
 
+function prepare_argument(x::Union{
+                          Matrix{ <: Union{Nemo.Integer, Nemo.fmpz}},
+                          Nemo.MatElem{ <: Union{Nemo.Integer, Nemo.fmpz}},
+                          Nemo.MatAlgElem{ <: Union{Nemo.Integer, Nemo.fmpz}}})
+    return prepare_argument(sbigintmat(x))
+end
+
+
 function prepare_argument(x::Vector{Any}, R::PolyRing)
     args = Vector{Any}()
     types = Vector{Int}()
