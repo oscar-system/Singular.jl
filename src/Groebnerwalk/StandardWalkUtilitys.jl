@@ -4,6 +4,7 @@ using Oscar
 #Utilitys for standard_walk
 ###############################################################
 
+
 #Solves problems with weight vectors of floats.
 function convertBoundingVector(wtemp::Vector{T}) where {T<:Number}
     w = Vector{Int64}()

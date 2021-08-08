@@ -23,6 +23,7 @@ function groebnerwalk(
     S::Matrix{Int64},
     T::Matrix{Int64},
     grwalktype::Symbol = :standard,
+    k::Int64 = 0,
 )
 
     if grwalktype == :standard
@@ -30,7 +31,7 @@ function groebnerwalk(
     elseif grwalktype == :generic
         walk = (x, y, z) -> generic_walk(x, y, z)
     elseif grwalktype == :pertubed
-        walk = (x, y, z) -> pertubed_walk(x, y, z)
+        walk = (x, y, z) -> pertubed_walk(x, y, z, k)
     elseif grwalktype == :fractal
         walk = (x, y, z) -> fractal_walk(x, y, z)
         #error("Choose a strategy from: :generic, :standard ...")
@@ -58,7 +59,7 @@ function standard_walk(G::Singular.sideal, S::Matrix{Int64}, T::Matrix{Int64})
     while cweight != tweight
         cweight = nextw(G, cweight, tweight)
         G = standard_step(G, cweight, tweight, T)
-        #@info "Current Gröbnerbase: " G
+        @info "Current Gröbnerbase: " G
     end
 
     #finalization
@@ -105,7 +106,7 @@ function generic_walk(G::Singular.sideal, S::Matrix{Int64}, T::Matrix{Int64})
 
     while !isempty(v)
         G, lm = generic_step(G, R, v, T, lm)
-        @info "Current Gröbnerbase: " G
+        #@info "Current Gröbnerbase: " G
         v = nextV(G,lm, v, S, T)
     end
     G = Oscar.Singular.Ideal(R, [change_ring(x, R) for x in gens(G)])
@@ -140,37 +141,35 @@ function generic_step(
 end
 
 
+
 ###############################################################
-#Fractal-version of the groebner walk by Amrhein & Gloor (200)
-#TODO: Finish this
+#Pertubed-version of the groebner walk Amrhein et al.
 ###############################################################
+function pertubed_walk(G::Singular.sideal, S::Matrix{Int64}, T::Matrix{Int64}, k::Int64)
+    p = k
+    sweight = pert_Vectors(G, S, p)
+    println(sweight)
 
-function fractal_walk(
-    G::Singular.sideal,
-    cweight::Array{Int,1},
-    tweight::Array{Int,1},
-    tord::Symbol,
-)
-
-    T = ordering_as_Matrix(tweight, tord)
-    M  = nextw(G, cweight, tweight)
-    R = base_ring(G)
-    S, V = change_order(G, cw, tw, ordering)
-
-    inwG = initials(S, gens(G), cw)
-
-    IinwG = Singular.std(
-        Oscar.Singular.Ideal(S, [S(x) for x in inwG]),
-        complete_reduction = true,
-    )
-    G.isGB = true
-
-    #Lifting to GB of new cone
-    rest = [
-        gen - change_ring(Oscar.Singular.reduce(change_ring(gen, R), G), S)
-        for gen in gens(IinwG)
-    ]
-    Gnew = Oscar.Singular.Ideal(S, [S(x) for x in rest])
-    Gnew.isGB = true
-    return std(Gnew, complete_reduction = true)
+    #loop
+    term = false
+    while !term
+        tweight = pert_Vectors(G, T, p)
+        println(tweight)
+        G = groebnerwalk(G, change_weight_vector(sweight, S), change_weight_vector(tweight,T))
+        #@info "Current Gröbnerbase: " G
+        if inCone(G, T, tweight)
+            term = true
+        else
+        if k == 1
+            R, V = change_order(G, T)
+            G = Oscar.Singular.Ideal(R, [change_ring(x, R) for x in gens(G)])
+        G = Singular.std(G, complete_reduction=true)
+        term = true
+    end
+    println(k)
+    p = p-1
+    sweight = tweight
+    end
+end
+    return G
 end

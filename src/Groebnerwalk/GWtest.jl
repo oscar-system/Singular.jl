@@ -25,17 +25,26 @@ if case == 1 || case == 99
         I,
         ordering_as_matrix(:degrevlex, 2),
         ordering_as_matrix(:lex, 2),
-        :generic,
+    )
+    K = groebnerwalk(
+        I,
+        ordering_as_matrix(:degrevlex, 2),
+        ordering_as_matrix(:lex, 2),
+        :pertubed,
+        2,
     )
     T1 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(J)])
+    T2 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(K)])
 
     S, V = Oscar.Singular.PolynomialRing(QQ, ["x", "y"], ordering = :lex)
-    T2 = Singular.std(
+    T3 = Singular.std(
         Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(I)]),
         complete_reduction = true,
     )
 
-    println("test 1: ", equalitytest(T1, T2))
+    println("test 1: ", equalitytest(T3, T1))
+    println("test 2: ", equalitytest(T3, T2))
+
 end
 
 if case == 2 || case == 99
@@ -131,11 +140,18 @@ if case == 4 || case == 99
         ordering_as_matrix(:degrevlex, 6),
         ordering_as_matrix(:lex, 6),
     )
-    @time K = groebnerwalk(
+#=    @time K = groebnerwalk(
         I,
         ordering_as_matrix(:degrevlex, 6),
         ordering_as_matrix(:lex, 6),
         :generic,
+    ) =#
+    @time L = groebnerwalk(
+        I,
+        ordering_as_matrix(:degrevlex, 6),
+        ordering_as_matrix(:lex, 6),
+        :pertubed,
+        2
     )
 
 
@@ -149,8 +165,11 @@ if case == 4 || case == 99
         complete_reduction = true,
     )
     T2 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(J)])
-    T3 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(K)])
+    #T3 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(K)])
+    T4 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(L)])
 
 
-    println("test 4: ", equalitytest(T2,T3))
+println("T4    ", T4)
+println("T2    ", T2)
+    println("test 4: ", equalitytest(T2,T1), " and ", equalitytest(T1, T4), " and ", equalitytest(T1, T4))
 end

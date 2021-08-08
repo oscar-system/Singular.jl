@@ -142,6 +142,14 @@ function ordering_as_matrix(w::Vector{Int64}, ord::Symbol)
     end
 end
 
+function change_weight_vector(w::Vector{Int64}, M::Matrix{Int64})
+    return [
+                w'
+                M[2:length(w), :]
+            ]
+end
+
+
 function ordering_as_matrix(ord::Symbol, nvars::Int64)
     if ord == :lex || ord == Symbol("Singular(lp)")
         #return [w'; ident_matrix(length(w))[1:length(w)-1,:]]
@@ -172,23 +180,66 @@ function current_Order_of_Cone(v::Vector{Int64}, T::Matrix{Int64})
     return M
 end
 
-function pert_Vectors(M::Matrix{Int64}, p::Integer)
-
+function pert_Vectors(G:: Singular.sideal, M::Matrix{Int64}, p::Integer)
+    m = []
+    n = size(M)[1]
+    for i in 1:p
+        max = M[i, 1]
+        for j in 2:n
+            if M[i, j] > max
+                println(M[i,j])
+                max = M[i,j]
+                println(max)
+            end
+        end
+        push!(m, max)
+    end
+    msum = 0
+    for i in 2:p
+    msum = msum + m[i]
+end
+println(msum)
+maxtdeg = 0
+for g in gens(G)
+    td = tdeg(g)
+    if (td > maxtdeg)
+        maxtdeg = td
+    end
+end
+println(maxtdeg)
+e = maxtdeg * msum + 1
+w = M[1,:] * e^(p-1)
+for i in 2:p
+    w = w + e^(p-i)* M[i,:]
+end
+return w
 end
 
 function tdeg(p::Singular.spoly)
     max = 0
-    for mon in monomials
+    for mon in monomials(p)
         ev = collect(exponent_vectors(mon))
         sum = 0
         for e in ev
-            sum = e + sum
+            sum = e[1] + sum
         end
         if (max < sum)
             max = sum
         end
     end
     return max
+end
+
+function inCone(G::Singular.sideal, T::Matrix{Int64}, w::Vector{Int64})
+    R, V = change_order(G, T)
+    G = Oscar.Singular.Ideal(R, [change_ring(x, R) for x in gens(G)])
+    cvzip = zip(gens(G), initials(R, gens(G), w))
+    for (g, ing) in cvzip
+        if !isequal(Singular.leading_term(g), Singular.leading_term(ing))
+            return false
+        end
+    end
+    return true
 end
 
 function interreduce_new(

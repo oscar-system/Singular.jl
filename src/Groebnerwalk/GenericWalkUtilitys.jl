@@ -99,15 +99,15 @@ function nextV(
     T::Matrix{Int64},
 )
     V = filter(x -> bigger_than_zero(S, x), diff_vectors(G, Lm))
-    @info "#1 Current V: " V
+    #@info "#1 Current V: " V
 
     filter!(x -> less_than_zero(T, x), V)
-    @info "#2 Current V: " V
+    #@info "#2 Current V: " V
 
     if (w != [0])
         filter!(x -> less_facet(w, x, S, T), V)
     end
-    @info "#3 Current V: " V
+    #@info "#3 Current V: " V
     if isempty(V)
         return V
     end
@@ -120,7 +120,7 @@ function nextV(
         end
     end
 
-    @info "#4 Current V: " minV
+    #@info "#4 Current V: " minV
     return minV
 end
 function nextV(
@@ -130,15 +130,15 @@ function nextV(
     T::Matrix{Int64},
 )
     V = filter(x -> bigger_than_zero(S, x), diff_vectors(G))
-    @info "#1 Current V: " V
+    #@info "#1 Current V: " V
 
     filter!(x -> less_than_zero(T, x), V)
-    @info "#2 Current V: " V
+    #@info "#2 Current V: " V
 
     if (w != [0])
         filter!(x -> less_facet(w, x, S, T), V)
     end
-    @info "#3 Current V: " V
+    #@info "#3 Current V: " V
     if isempty(V)
         return V
     end
@@ -151,7 +151,7 @@ function nextV(
         end
     end
 
-    @info "#4 Current V: " minV
+    #@info "#4 Current V: " minV
     return minV
 end
 
