@@ -318,10 +318,14 @@ jl_value_t * lookup_singular_library_symbol_wo_rng(
         {
             sleftv x;
             x.Copy((leftv)v);
+            // return is a Vector so distinguishable from the Int error below
             return get_julia_type_from_sleftv(&x);
         }
     }
-    return jl_box_int64(progress); // return to julia a plain int for error
+    // return to julia a plain Int for error
+    // 0: package not found
+    // 1: package found but symbol not found
+    return jl_box_int64(progress);
 }
 
 jl_value_t * convert_nested_list(void * l_void)
