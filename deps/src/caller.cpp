@@ -304,7 +304,26 @@ jl_value_t * call_singular_library_procedure_wo_rng(
     return call_singular_library_procedure(name, reinterpret_cast<ring>(rng), arguments);
 }
 
-
+jl_value_t * lookup_singular_library_symbol_wo_rng(
+    std::string pack,
+    std::string name)
+{
+    int progress = 0;
+    leftv u = (leftv) IDROOT->get(pack.c_str(),0);
+    if (u != NULL)
+    {
+        progress++;
+        idhdl v = ((package)(u->Data()))->idroot->get(name.c_str(), 0);
+        if (v != NULL)
+        {
+            sleftv x;
+            x.Init();
+            x.Copy((leftv)v);
+            return get_julia_type_from_sleftv(&x);  // any cleanup for x ???
+        }
+    }
+    return jl_box_int64(progress); // return to julia a plain int for error
+}
 
 jl_value_t * convert_nested_list(void * l_void)
 {
@@ -348,6 +367,8 @@ void singular_define_caller(jlcxx::Module & Singular)
         }
         return jl_true;
     });
+    Singular.method("lookup_singular_library_symbol_wo_rng",
+                    &lookup_singular_library_symbol_wo_rng);
     Singular.method("call_singular_library_procedure",
                     &call_singular_library_procedure);
     Singular.method("call_singular_library_procedure",
