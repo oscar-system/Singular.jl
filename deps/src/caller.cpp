@@ -197,6 +197,12 @@ static jl_value_t * copy_idealptr_to_void(ideal i, ring r)
     return jl_box_voidpointer(reinterpret_cast<void *>(i_copy));
 }
 
+static jl_value_t * copy_bigintmatptr_to_void(bigintmat * m)
+{
+    bigintmat * m_copy = new bigintmat(m);
+    return jl_box_voidpointer(reinterpret_cast<void *>(m_copy));
+}
+
 static void * copy_string_to_void(std::string s)
 {
     return reinterpret_cast<void *>(omStrDup(s.c_str()));
@@ -389,6 +395,7 @@ void singular_define_caller(jlcxx::Module & Singular)
     Singular.method("get_ring_ref", &get_ring_ref);
     Singular.method("copy_polyptr_to_void", &copy_polyptr_to_void);
     Singular.method("copy_idealptr_to_void", &copy_idealptr_to_void);
+    Singular.method("copy_bigintmatptr_to_void", &copy_bigintmatptr_to_void);
     Singular.method("jl_array_to_intvec", &jl_array_to_intvec);
     Singular.method("jl_array_to_intmat", &jl_array_to_intmat);
     Singular.method("copy_string_to_void", &copy_string_to_void);

@@ -81,4 +81,5 @@ void singular_define_coeff_rings(jlcxx::Module & singular){
     singular.method("get_coeff_data_void",[](void* c){ return reinterpret_cast<coeffs>(c)->data; });
     singular.method("cast_number_to_void",[](number n){ return reinterpret_cast<void*>(n); });
     singular.method("cast_void_to_number",[](void* n){ return reinterpret_cast<number>(n); });
+    singular.method("get_coeffs_BIGINT", []() {return coeffs_BIGINT;});
 }

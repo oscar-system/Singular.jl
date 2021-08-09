@@ -54,4 +54,23 @@ void singular_define_matrices(jlcxx::Module & Singular)
         omFree(str_ptr);
         return s;
     });
+
+    Singular.method("bigintmat_init", [](int r, int c) {
+        return new bigintmat(r, c, coeffs_BIGINT);
+    });
+    Singular.method("bigintmat_clear", [](bigintmat * m) {
+        delete m;
+    });
+    Singular.method("bigintmat_nrows", [](bigintmat * m) {
+        return m->rows();
+    });
+    Singular.method("bigintmat_ncols", [](bigintmat * m) {
+        return m->cols();
+    });
+    Singular.method("bigintmat_viewindex", [](bigintmat * m, int i, int j) {
+        return m->view(i, j);
+    });
+    Singular.method("bigintmat_rawset", [](bigintmat * m, number n, int i, int j) {
+        m->rawset(i, j, n, NULL);
+    });
 }
