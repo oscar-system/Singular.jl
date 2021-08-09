@@ -187,3 +187,18 @@ end
     @test length(findall(P->P== x, M[1])) == 1
     @test M[2] == x
 end
+
+@testset "caller.lookup_library_symbol" begin
+    F = FiniteField(3, 1, "a")[1]
+    R, (x, y, z) = PolynomialRing(F, ["x", "y", "z" ])
+    A = Matrix(R, [0 1 0; -1 0 0; 0 0 -1])
+    Singular.LibFinvar.reynolds_molien(A, "")
+
+    x = Singular.lookup_library_symbol("Finvar", "newring")
+    @test length(x) == 2
+    @test x[1] isa PolyRing
+    @test x[2][:M] isa smatrix
+
+    @test_throws Exception Singular.lookup_library_symbol("Finvar", "meiyou")
+    @test_throws Exception Singular.lookup_library_symbol("blah", "bluh")
+end

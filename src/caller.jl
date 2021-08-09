@@ -348,3 +348,14 @@ function low_level_caller(lib::String, name::String, args...)
     return_value = libSingular.call_singular_library_procedure(name, rng_ptr, arguments)
     return convert_return(return_value, rng)
 end
+
+function lookup_library_symbol(pack::String, name::String)
+    (err::Int, res) = libSingular.lookup_singular_library_symbol_wo_rng(pack, name)
+    if err == 0
+        return convert_return(res, nothing)
+    elseif err == 1
+        error("Singular symbol "*pack*"::"*name*" does not exist")
+    else
+        error("Singular package "*pack*" does not exist")
+    end
+end
