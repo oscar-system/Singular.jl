@@ -308,24 +308,30 @@ jl_value_t * lookup_singular_library_symbol_wo_rng(
     std::string pack,
     std::string name)
 {
-    int progress = 0;
+    
+    int err = 2;
+    jl_value_t * res = jl_nothing;
+    jl_array_t * answer = jl_alloc_array_1d(jl_array_any_type, 2);
     leftv u = (leftv) IDROOT->get(pack.c_str(),0);
     if (u != NULL)
     {
-        progress++;
+        err--;
         idhdl v = ((package)(u->Data()))->idroot->get(name.c_str(), 0);
         if (v != NULL)
         {
+            err--;
             sleftv x;
             x.Copy((leftv)v);
-            // return is a Vector so distinguishable from the Int error below
-            return get_julia_type_from_sleftv(&x);
+            res = get_julia_type_from_sleftv(&x);
         }
     }
-    // return to julia a plain Int for error
-    // 0: package not found
-    // 1: package found but symbol not found
-    return jl_box_int64(progress);
+    // return to julia [err, res]
+    // err=0: no error, res is the value of the symbol
+    // err=1: package found but symbol not found, res is junk
+    // err=2: package not found, res is junk
+    jl_arrayset(answer, jl_box_int64(err), 0);
+    jl_arrayset(answer, res, 1);
+    return reinterpret_cast<jl_value_t *>(answer);
 }
 
 jl_value_t * convert_nested_list(void * l_void)
