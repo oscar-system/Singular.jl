@@ -317,9 +317,8 @@ jl_value_t * lookup_singular_library_symbol_wo_rng(
         if (v != NULL)
         {
             sleftv x;
-            x.Init();
             x.Copy((leftv)v);
-            return get_julia_type_from_sleftv(&x);  // any cleanup for x ???
+            return get_julia_type_from_sleftv(&x);
         }
     }
     return jl_box_int64(progress); // return to julia a plain int for error
