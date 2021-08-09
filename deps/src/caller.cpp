@@ -308,7 +308,6 @@ jl_value_t * lookup_singular_library_symbol_wo_rng(
     std::string pack,
     std::string name)
 {
-    
     int err = 2;
     jl_value_t * res = jl_nothing;
     jl_array_t * answer = jl_alloc_array_1d(jl_array_any_type, 2);
