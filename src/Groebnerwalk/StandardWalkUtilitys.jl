@@ -15,13 +15,15 @@ function convertBoundingVector(wtemp::Vector{T}) where {T<:Number}
 end
 
 function nextw(
-    I::Singular.sideal,
+    G::Singular.sideal,
     cweight::Array{T,1},
     tweight::Array{K,1},
 ) where {T<:Number,K<:Number}
-    #@info "Computing next Boundingvector for I = " base_ring(I)
     tv = []
-    for v in diff_vectors(I)
+    if cweight == [4,1]
+
+end
+    for v in diff_vectors(G)
         if dot(tweight, v) < 0
             push!(tv, dot(cweight, v) // (dot(cweight, v) - dot(tweight, v)))
         end

@@ -3,7 +3,7 @@ using Pkg
 using Oscar
 
 
-case = 1
+case = 2
 
 
 if case == 1 || case == 99
@@ -66,7 +66,8 @@ if case == 2 || case == 99
         I,
         ordering_as_matrix([5, 4, 1], :deglex),
         ordering_as_matrix([6, 1, 3], :lex),
-        :generic,
+        :pertubed,
+        3
     )
 
     S, V = Oscar.Singular.PolynomialRing(
@@ -150,8 +151,7 @@ if case == 4 || case == 99
         I,
         ordering_as_matrix(:degrevlex, 6),
         ordering_as_matrix(:lex, 6),
-        :pertubed,
-        2
+        :generic,
     )
 
 
@@ -169,7 +169,5 @@ if case == 4 || case == 99
     T4 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(L)])
 
 
-println("T4    ", T4)
-println("T2    ", T2)
     println("test 4: ", equalitytest(T2,T1), " and ", equalitytest(T1, T4), " and ", equalitytest(T1, T4))
 end

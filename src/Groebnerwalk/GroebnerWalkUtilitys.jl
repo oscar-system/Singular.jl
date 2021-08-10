@@ -39,7 +39,7 @@ end
 
 function diff_vectors(
     I::Singular.sideal,
-    Lm::Vector{Singular.spoly{Singular.n_unknown{fmpq}}},
+    Lm::Vector{Singular.spoly{Singular.n_FieldElem{fmpq}}},
 )
     v = []
     for i = 1:ngens(I)
@@ -172,20 +172,6 @@ function ordering_as_matrix(ord::Symbol, nvars::Int64)
     end
 end
 
-
-
-#Not needed at the moment. Use this instead of a(),ordering_M
-function current_Order_of_Cone(v::Vector{Int64}, T::Matrix{Int64})
-    if isequal(v, T[1,:])
-        return T
-    end
-    M = [
-        v'
-        T[1:length(v)-1, :]
-    ]
-    return M
-end
-
 function pert_Vectors(G::Singular.sideal, M::Matrix{Int64}, p::Integer)
     m = []
     n = size(M)[1]
@@ -247,7 +233,7 @@ end
 
 function interreduce_new(
     G::Singular.sideal,
-    Lm::Vector{Singular.spoly{Singular.n_unknown{fmpq}}},
+    Lm::Vector{Singular.spoly{Singular.n_FieldElem{fmpq}}},
 )
     R = base_ring(G)
     gens = collect(Singular.gens(G))
@@ -257,8 +243,8 @@ function interreduce_new(
         for i = 1:ngens(G)
             #gensrest = filter(x -> x != gens[i], gens)
             gensrest =
-                Array{Singular.spoly{Singular.n_unknown{fmpq}},1}(undef, 0)
-            Lmrest = Array{Singular.spoly{Singular.n_unknown{fmpq}},1}(undef, 0)
+                Array{Singular.spoly{Singular.n_FieldElem{fmpq}},1}(undef, 0)
+            Lmrest = Array{Singular.spoly{Singular.n_FieldElem{fmpq}},1}(undef, 0)
             ## New function
             for j = 1:ngens(G)
                 if i != j
