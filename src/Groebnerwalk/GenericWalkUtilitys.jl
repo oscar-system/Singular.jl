@@ -8,7 +8,7 @@ function facet_initials(
     R::MPolyRing,
     G::Singular.sideal,
     v::Vector{Int64},
-    lm::Vector{Singular.spoly{Singular.n_unknown{fmpq}}},
+    lm::Vector{Singular.spoly{Singular.n_FieldElem{fmpq}}},
 )
     inits = []
     count = 1
@@ -64,18 +64,18 @@ end
 
 function liftgeneric(
     G::Singular.sideal,
-    Lm::Vector{Singular.spoly{Singular.n_unknown{fmpq}}},
+    Lm::Vector{Singular.spoly{Singular.n_FieldElem{fmpq}}},
     I::Singular.sideal,
 )
     S = base_ring(G)
     count = 1
-    Newlm = Array{Singular.spoly{Singular.n_unknown{fmpq}},1}(undef, 0)
-    liftArray = Array{fmpq_mpoly,1}(undef, 0)
+    Newlm = Array{Singular.spoly{Singular.n_FieldElem{fmpq}},1}(undef, 0)
+    liftArray = Array{Singular.spoly{Singular.n_FieldElem{fmpq}},1}(undef, 0)
     for g in gens(I)
         diff =
-            change_ring(g, S) - reducegeneric_recursiv(change_ring(g, S), G, Lm)
+            change_ring(g, S) - first(gens(Oscar.Singular.Ideal(S, S(reducegeneric_recursiv(change_ring(g, S), G, Lm)))))
         if diff != 0
-            push!(Newlm, Oscar.Singular.leading_monomial(g))
+            push!(Newlm, Singular.leading_monomial(g))
             push!(liftArray, diff)
         end
     end
@@ -83,8 +83,8 @@ function liftgeneric(
 end
 
 function check_zeros(
-    G::Vector{fmpq_mpoly},
-    Lm::Vector{Singular.spoly{Singular.n_unknown{fmpq}}},
+    G::Vector{Singular.spoly{Singular.n_FieldElem{fmpq}}},
+    Lm::Vector{Singular.spoly{Singular.n_FieldElem{fmpq}}},
 )
     Lm = filter(x -> x != 0, Lm)
     G = filter(x -> x != 0, G)
@@ -93,7 +93,7 @@ end
 
 function nextV(
     G::Singular.sideal,
-    Lm::Vector{Singular.spoly{Singular.n_unknown{fmpq}}},
+    Lm::Vector{Singular.spoly{Singular.n_FieldElem{fmpq}}},
     w::Vector{Int64},
     S::Matrix{Int64},
     T::Matrix{Int64},
@@ -198,7 +198,7 @@ end
 function reducegeneric_recursiv(
     p::T,
     G::Singular.sideal,
-    Lm::Vector{Singular.spoly{Singular.n_unknown{fmpq}}},
+    Lm::Vector{Singular.spoly{Singular.n_FieldElem{fmpq}}},
 ) where {T<:RingElement}
     R = base_ring(G)
     S, V = PolynomialRing(
@@ -216,10 +216,11 @@ function reducegeneric_recursiv(
             end
         end
     end
+    mul = gens(ideal(S, gens(G)))
     if !isempty(Gh)
         for (i, q) in Gh
             return reducegeneric_recursiv(
-                p - q * gens(ideal(S, gens(G)))[i],
+                first(gens(ideal(S, [p]))) - (q * mul[i]),
                 G,
                 Lm,
             )
