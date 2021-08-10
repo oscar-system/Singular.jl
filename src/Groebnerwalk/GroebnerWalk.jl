@@ -42,7 +42,6 @@ function groebnerwalk(
     ######TODO:Check the parameter#####
     R = singular_ring(base_ring(G))
     I = Singular.Ideal(R, [R(x) for x in gens(G)])
-
     return walk(I, S, T)
 end
 
@@ -53,7 +52,7 @@ end
 function standard_walk(G::Singular.sideal, S::Matrix{Int64}, T::Matrix{Int64})
     cweight = S[1, :]
     tweight = T[1, :]
-    G = standard_step(I, cweight, tweight, T)
+    G = standard_step(G, cweight, tweight, T)
 
     #loop
     while cweight != tweight
@@ -77,12 +76,14 @@ function standard_step(
     R = base_ring(G)
     S, V = change_order(G, cw, T)
     inwG = initials(S, gens(G), cw)
+
     IinwG = Singular.std(
         Oscar.Singular.Ideal(S, [S(x) for x in inwG]),
         complete_reduction = true,
     )
 
     #Lifting to GB of new cone
+    G.isGB = true
     rest = [
         gen - change_ring(Oscar.Singular.reduce(change_ring(gen, R), G), S)
         for gen in gens(IinwG)
@@ -148,28 +149,29 @@ end
 function pertubed_walk(G::Singular.sideal, S::Matrix{Int64}, T::Matrix{Int64}, k::Int64)
     p = k
     sweight = pert_Vectors(G, S, p)
-    println(sweight)
-
+    Gnew = G
     #loop
     term = false
     while !term
-        tweight = pert_Vectors(G, T, p)
-        println(tweight)
-        G = groebnerwalk(G, change_weight_vector(sweight, S), change_weight_vector(tweight,T))
+        tweight = pert_Vectors(Gnew, T, p)
+        Sp = current_Order_of_Cone(sweight, T)
+        Tp = current_Order_of_Cone(tweight, T)
+
+        Gnew = groebnerwalk(Gnew, Sp, Tp)
         #@info "Current Gröbnerbase: " G
-        if inCone(G, T, tweight)
+        if inCone(Gnew, T, tweight)
             term = true
+            break
         else
         if k == 1
-            R, V = change_order(G, T)
-            G = Oscar.Singular.Ideal(R, [change_ring(x, R) for x in gens(G)])
-        G = Singular.std(G, complete_reduction=true)
+            R, V = change_order(Gnew, T)
+            Gnew = Oscar.Singular.Ideal(R, [change_ring(x, R) for x in gens(Gnew)])
+        Gnew = Singular.std(Gnew, complete_reduction=true)
         term = true
     end
-    println(k)
     p = p-1
     sweight = tweight
     end
 end
-    return G
+    return Gnew
 end

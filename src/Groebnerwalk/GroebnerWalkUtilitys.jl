@@ -40,11 +40,14 @@ end
 function diff_vectors(
     I::Singular.sideal,
     Lm::Vector{Singular.spoly{Singular.n_unknown{fmpq}}},
-    )
+)
     v = []
-    for i in 1:ngens(I)
+    for i = 1:ngens(I)
         ltu = Singular.leading_exponent_vector(Lm[i])
-        for e in filter(x -> ltu != x, collect(Singular.exponent_vectors(gens(I)[i])))
+        for e in filter(
+            x -> ltu != x,
+            collect(Singular.exponent_vectors(gens(I)[i])),
+        )
             push!(v, ltu .- e)
         end
     end
@@ -144,9 +147,9 @@ end
 
 function change_weight_vector(w::Vector{Int64}, M::Matrix{Int64})
     return [
-                w'
-                M[2:length(w), :]
-            ]
+        w'
+        M[2:length(w), :]
+    ]
 end
 
 
@@ -173,6 +176,9 @@ end
 
 #Not needed at the moment. Use this instead of a(),ordering_M
 function current_Order_of_Cone(v::Vector{Int64}, T::Matrix{Int64})
+    if isequal(v, T[1,:])
+        return T
+    end
     M = [
         v'
         T[1:length(v)-1, :]
@@ -180,39 +186,36 @@ function current_Order_of_Cone(v::Vector{Int64}, T::Matrix{Int64})
     return M
 end
 
-function pert_Vectors(G:: Singular.sideal, M::Matrix{Int64}, p::Integer)
+function pert_Vectors(G::Singular.sideal, M::Matrix{Int64}, p::Integer)
     m = []
     n = size(M)[1]
-    for i in 1:p
+    for i = 1:p
         max = M[i, 1]
-        for j in 2:n
-            if M[i, j] > max
-                println(M[i,j])
-                max = M[i,j]
-                println(max)
+        for j = 2:n
+            temp = abs(M[i, j])
+            if temp > max
+                max = temp
             end
         end
         push!(m, max)
     end
     msum = 0
-    for i in 2:p
-    msum = msum + m[i]
-end
-println(msum)
-maxtdeg = 0
-for g in gens(G)
-    td = tdeg(g)
-    if (td > maxtdeg)
-        maxtdeg = td
+    for i = 2:p
+        msum = msum + m[i]
     end
-end
-println(maxtdeg)
-e = maxtdeg * msum + 1
-w = M[1,:] * e^(p-1)
-for i in 2:p
-    w = w + e^(p-i)* M[i,:]
-end
-return w
+    maxtdeg = 0
+    for g in gens(G)
+        td = tdeg(g)
+        if (td > maxtdeg)
+            maxtdeg = td
+        end
+    end
+    e = maxtdeg * msum + 1
+    w = M[1, :] * e^(p - 1)
+    for i = 2:p
+        w = w + e^(p - i) * M[i, :]
+    end
+    return w
 end
 
 function tdeg(p::Singular.spoly)
@@ -244,32 +247,38 @@ end
 
 function interreduce_new(
     G::Singular.sideal,
-    Lm::Vector{Singular.spoly{Singular.n_unknown{fmpq}}})
-    R=base_ring(G)
+    Lm::Vector{Singular.spoly{Singular.n_unknown{fmpq}}},
+)
+    R = base_ring(G)
     gens = collect(Singular.gens(G))
     changed = true
     while changed
         changed = false
-    for i = 1:ngens(G)
-        #gensrest = filter(x -> x != gens[i], gens)
-        gensrest = Array{Singular.spoly{Singular.n_unknown{fmpq}},1}(undef, 0)
-        Lmrest = Array{Singular.spoly{Singular.n_unknown{fmpq}},1}(undef, 0)
-        ## New function
-        for j = 1:ngens(G)
-            if i != j
-        push!(gensrest, gens[j])
-        push!(Lmrest, Lm[j])
-    end
-    end
-        #Lmrest = filter(x -> x != Lm[i], Lm)
-        gen =reducegeneric_recursiv(gens[i], Singular.Ideal(R,gensrest), Lmrest)
-        if gens[i] != gen
-            changed = true
-            gens[i]= first(Singular.gens(Singular.Ideal(R, R(gen))))
-            break
+        for i = 1:ngens(G)
+            #gensrest = filter(x -> x != gens[i], gens)
+            gensrest =
+                Array{Singular.spoly{Singular.n_unknown{fmpq}},1}(undef, 0)
+            Lmrest = Array{Singular.spoly{Singular.n_unknown{fmpq}},1}(undef, 0)
+            ## New function
+            for j = 1:ngens(G)
+                if i != j
+                    push!(gensrest, gens[j])
+                    push!(Lmrest, Lm[j])
+                end
+            end
+            #Lmrest = filter(x -> x != Lm[i], Lm)
+            gen = reducegeneric_recursiv(
+                gens[i],
+                Singular.Ideal(R, gensrest),
+                Lmrest,
+            )
+            if gens[i] != gen
+                changed = true
+                gens[i] = first(Singular.gens(Singular.Ideal(R, R(gen))))
+                break
+            end
         end
     end
-end
     return Oscar.Singular.Ideal(R, [R(p) for p in gens])
 end
 
