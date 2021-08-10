@@ -69,6 +69,11 @@ end
    F2, b = Singular.Nemo.PolynomialRing(Singular.Nemo.QQ, "b")
    K2, b = Singular.Nemo.NumberField(b^4 + 1, "b")
 
+   @assert K1(1//2) == 1//2
+   @assert K1(1//2) == big(1//2)
+   @assert K1(1//2) == QQ(1//2)
+   @assert K1(1//2) == Singular.Nemo.QQ(1//2)
+
    @assert K1(b) isa Singular.n_algExt
    @assert K2(a) isa Singular.Nemo.nf_elem
    @assert a == K1(K2(a))
