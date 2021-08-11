@@ -66,6 +66,14 @@ end
 
    @test deepcopy(F(2)) == F(2)
    @test n_transExt_to_spoly(x, parent_ring = R) == p
+
+   @test F(1//2) == F(3)
+   @test F(1//2) == 1//2
+   @test F(1//2) == big(1//2)
+   @test F(1//2) == QQ(1//2)
+   @test F(1//2) == Nemo.QQ(1//2)
+   @test F(Nemo.GF(5)(3)) == 1//2
+   @test_throws Exception F(Nemo.GF(7)(3))
 end
 
 @testset "n_transExt.unary_ops" begin

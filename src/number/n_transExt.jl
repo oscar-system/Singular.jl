@@ -321,9 +321,15 @@ end
 
 promote_rule(C::Type{n_transExt}, ::Type{T}) where T <: Integer = n_transExt
 
+promote_rule(C::Type{n_transExt}, ::Type{T}) where T <: Rational = n_transExt
+
 promote_rule(C::Type{n_transExt}, ::Type{Nemo.fmpz}) = n_transExt
 
+promote_rule(C::Type{n_transExt}, ::Type{Nemo.fmpq}) = n_transExt
+
 promote_rule(C::Type{n_transExt}, ::Type{n_Z}) = n_transExt
+
+promote_rule(C::Type{n_transExt}, ::Type{n_Q}) = n_transExt
 
 ###############################################################################
 #
@@ -336,6 +342,17 @@ promote_rule(C::Type{n_transExt}, ::Type{n_Z}) = n_transExt
 function (R::N_FField)(n::n_transExt)
    R != parent(n) && error("Parent ring does not match.")
    return n
+end
+
+function (F::Singular.N_FField)(x::gfp_elem)
+   if characteristic(F) != characteristic(parent(x))
+      throw(ArgumentError("wrong characteristic"))
+   end
+   return n_transExt(F, x.data)
+end
+
+function (F::Singular.N_FField)(x::Union{n_Q, Nemo.fmpq, Rational})
+   return F(numerator(x)) // F(denominator(x))
 end
 
 (R::N_FField)(n::libSingular.number_ptr) = n_transExt(R, n)
