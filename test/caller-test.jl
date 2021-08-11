@@ -11,6 +11,8 @@
     @test 1 == Singular.LibSets.isEqualInt(R, Singular.QQ(1), Singular.QQ(1))
     @test 1 == Singular.LibSets.isEqualInt(R, [1,2,3], [1,2,3])
     @test 1 == Singular.LibSets.isEqualInt(R, [1 2; 3 4], [1 2; 3 4])
+    @test 1 == Singular.LibSets.isEqualInt(R, BigInt[1 2; 3 4],
+                                              Nemo.matrix(Nemo.ZZ, [1 2; 3 4]))
 
     R, (x,y,z) = PolynomialRing(Singular.QQ, ["x", "y", "z"])
 
