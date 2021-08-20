@@ -278,9 +278,15 @@ end
 
 promote_rule(C::Type{n_algExt}, ::Type{T}) where T <: Integer = n_algExt
 
+promote_rule(C::Type{n_algExt}, ::Type{T}) where T <: Rational = n_algExt
+
 promote_rule(C::Type{n_algExt}, ::Type{Nemo.fmpz}) = n_algExt
 
+promote_rule(C::Type{n_algExt}, ::Type{Nemo.fmpq}) = n_algExt
+
 promote_rule(C::Type{n_algExt}, ::Type{n_Z}) = n_algExt
+
+promote_rule(C::Type{n_algExt}, ::Type{n_Q}) = n_algExt
 
 # TODO really need a hand-crafted nf_elem <-> n_algExt
 function (SK::Singular.N_AlgExtField)(a::Singular.Nemo.nf_elem)
@@ -336,11 +342,10 @@ function (K::N_AlgExtField)(a::n_algExt)
 end
 
 function (K::N_AlgExtField)(a::IntegerLikeTypes = 0)
-  F = parent(modulus(K))
-  return K(F(a))
+  return n_algExt(K, a)
 end
 
-function (K::Singular.N_AlgExtField)(a::Singular.Nemo.fmpq)
+function (K::Singular.N_AlgExtField)(a::Union{n_Q, Nemo.fmpq, Rational})
   return K(numerator(a))//K(denominator(a))
 end
 
