@@ -20,12 +20,15 @@ function nextw(
     tweight::Array{K,1},
 ) where {T<:Number,K<:Number}
     tv = []
-    if cweight == [4,1]
 
-end
     for v in diff_vectors(G)
-        if dot(tweight, v) < 0
-            push!(tv, dot(cweight, v) // (dot(cweight, v) - dot(tweight, v)))
+        cw = dot(cweight, v)
+        tw = dot(tweight, v)
+        ctw = cw - tw
+        if tw < 0
+            if ctw != 0
+            push!(tv, cw // ctw)
+        end
         end
     end
     #tv = [dot(cweight, v) < 0 ? dot(cweight, v) / (dot(cweight, v) - dot(tweight, v)) : nothing for v = V ]

@@ -3,7 +3,7 @@ using Pkg
 using Oscar
 
 
-case = 2
+case = 1
 
 
 if case == 1 || case == 99
@@ -21,17 +21,18 @@ if case == 1 || case == 99
 
     S, V = Oscar.Singular.PolynomialRing(QQ, ["x", "y"], ordering = :lex)
 
-    J = groebnerwalk(
+    @time J = groebnerwalk(
         I,
         ordering_as_matrix(:degrevlex, 2),
         ordering_as_matrix(:lex, 2),
+        :fractal
     )
-    K = groebnerwalk(
+    @time K = groebnerwalk(
         I,
         ordering_as_matrix(:degrevlex, 2),
         ordering_as_matrix(:lex, 2),
         :pertubed,
-        2,
+        2
     )
     T1 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(J)])
     T2 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(K)])
@@ -62,12 +63,11 @@ if case == 2 || case == 99
     I = Oscar.Singular.std(I, complete_reduction = true)
 
 
-    J = groebnerwalk(
+    @time J = groebnerwalk(
         I,
         ordering_as_matrix([5, 4, 1], :deglex),
         ordering_as_matrix([6, 1, 3], :lex),
-        :pertubed,
-        3
+        :fractal,
     )
 
     S, V = Oscar.Singular.PolynomialRing(
@@ -75,11 +75,9 @@ if case == 2 || case == 99
         ["x", "y", "z"],
         ordering = Singular.ordering_M(ordering_as_matrix([6, 1, 3], :lex)),
     )
-    T1 = Singular.std(
-        Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(J)]),
-        complete_reduction = true,
-    )
-    T2 = Singular.std(
+    T1 =Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(J)])
+
+    @time T2 = Singular.std(
         Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(I)]),
         complete_reduction = true,
     )
