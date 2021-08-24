@@ -71,7 +71,7 @@ function standard_walk(
     while cweight != tweight
         cweight = nextw(G, cweight, tweight)
         G = standard_step(G, cweight, tweight, T)
-        @info "Current Gröbnerbase: " G
+        #@info "Current Gröbnerbase: " G
     end
 
     return G
@@ -190,7 +190,7 @@ function pertubed_walk(
     end
     return Gnew
 end
-
+#=
 function fractal_walk(G::Singular.sideal, S::Matrix{Int64}, T::Matrix{Int64})
     PVecs = [pert_Vectors(G, T, i) for i = 1:nvars(R)]
 
@@ -226,7 +226,7 @@ function fractal_recursiv(
         if p == nvars(R)
             Gnew = Singular.std(Singular.Ideal(Rn, [change_ring(x, Rn) for x in Gw]), complete_reduction = true)
         else
-            Gnew = fractal_recursiv(Singular.Ideal(R, [x for x in Gw]), S, T, w, PVecs, p + 1)
+            Gnew = fractal_recursiv(Singular.Ideal(R, [x for x in Gw]), S, T, PVecs, p + 1)
         end
 
         rest = [
@@ -239,6 +239,72 @@ function fractal_recursiv(
         R = Rn
     end
     @info "Current Gröbnerbase: " G
+
+    return G
+end
+=#
+
+ PVecs = []
+ function checkPvecs()
+     global PVecs
+     println(PVecs)
+ end
+function fractal_walk(G::Singular.sideal, S::MonomialOrder{Matrix{Int64}, Vector{Int64}}, T::MonomialOrder{Matrix{Int64}, Vector{Int64}})
+    global PVecs = [pert_Vectors(G, T, i) for i = 1:nvars(R)]
+
+    return fractal_recursiv(G, S, T, PVecs, 1)
+end
+
+function fractal_recursiv(
+    G::Singular.sideal,
+    S::MonomialOrder{Matrix{Int64}, Vector{Int64}},
+    T::MonomialOrder{Matrix{Int64}, Vector{Int64}},
+    PVecs::Vector{Vector{Int64}},
+    p::Int64,
+)
+    R = base_ring(G)
+    term = false
+    G.isGB = true
+    if S.t == [0]
+    cweight = S.w
+else
+    cweight = S.t
+end
+
+    while !term
+        w = nextw(G, cweight, PVecs[p])
+
+        T.t = w
+        Rn, V = change_order(G, T)
+        Gw = initials(R, gens(G), w)
+        if p == nvars(R)
+            Gnew = Singular.std(Singular.Ideal(Rn, [change_ring(x, Rn) for x in Gw]), complete_reduction = true)
+            term = true
+        else
+            #tempPVecs = [pert_Vectors(G, insert_weight_vector(w, T.m), i) for i = 1:nvars(R)]
+            Gnew = fractal_recursiv(Singular.Ideal(R, [x for x in Gw]), S, T, PVecs, p + 1)
+        end
+
+        rest = [
+            change_ring(gen, Rn) - change_ring(Oscar.Singular.reduce(change_ring(gen, R), G), Rn)
+            for gen in gens(Gnew)
+        ]
+        G = Oscar.Singular.Ideal(Rn, [Rn(x) for x in rest])
+        G.isGB = true
+        G = Singular.std(G, complete_reduction = true)
+        R = Rn
+        S = T
+
+        if cweight == PVecs[p]
+            if inCone(G, T, PVecs[p])
+                return G
+            else
+                global PVecs = [pert_Vectors(G, T, i) for i = 1:nvars(R)]
+            end
+        end
+        cweight = w
+        @info "Current Gröbnerbase: " G
+    end
 
     return G
 end

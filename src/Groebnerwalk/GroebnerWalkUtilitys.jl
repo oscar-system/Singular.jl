@@ -36,6 +36,11 @@ function initials(
     end
     return inits
 end
+mutable struct MonomialOrder{T<:Matrix{Int64},v<:Vector{Int64}, tv<:Vector{Int64}}
+    m::T
+    w::v
+    t::tv
+end
 
 function diff_vectors(
     I::Singular.sideal,
@@ -81,6 +86,29 @@ function change_order(
         Gstrich,
         ordering = Oscar.Singular.ordering_a(cweight) *
                    Oscar.Singular.ordering_M(T),
+    )
+    return S, H
+end
+function change_order(
+    I::Singular.sideal,
+    T::MonomialOrder{Matrix{Int64}, Vector{Int64}},
+) where {L<:Number,K<:Number}
+    R = I.base_ring
+    G = Singular.gens(I.base_ring)
+    Gstrich = string.(G)
+    if T.w == [0]
+        S, H = Oscar.Singular.PolynomialRing(
+            R.base_ring,
+            Gstrich,
+            ordering = Oscar.Singular.ordering_a(T.t)*
+                       Oscar.Singular.ordering_M(T.m),
+        )
+    end
+    S, H = Oscar.Singular.PolynomialRing(
+        R.base_ring,
+        Gstrich,
+        ordering = Oscar.Singular.ordering_a(T.t) *Oscar.Singular.ordering_a(T.w)*
+                   Oscar.Singular.ordering_M(T.m)
     )
     return S, H
 end
@@ -151,6 +179,12 @@ function change_weight_vector(w::Vector{Int64}, M::Matrix{Int64})
         M[2:length(w), :]
     ]
 end
+function insert_weight_vector(w::Vector{Int64}, M::Matrix{Int64})
+    return [
+        w'
+        M[1:length(w)-1, :]
+    ]
+end
 
 
 function ordering_as_matrix(ord::Symbol, nvars::Int64)
@@ -164,16 +198,92 @@ function ordering_as_matrix(ord::Symbol, nvars::Int64)
             ident_matrix(nvars)[1:nvars-1, :]
         ]
     end
-    if ord == :degrevlex || a.ord == Symbol("Singular(dp)")
+    if ord == :degrevlex || ord == Symbol("Singular(dp)")
         return [
             ones(Int64, nvars)'
             anti_diagonal_matrix(nvars)[1:nvars-1, :]
         ]
     end
+    if ord == :revlex || ord == Symbol("Singular(dp)")
+        return anti_diagonal_matrix(nvars)[1:nvars, :]
+
+    end
 end
 
+function pert_Vectors(G::Singular.sideal, T::MonomialOrder{Matrix{Int64}, Vector{Int64}}, p::Integer)
+    m = []
+    if T.w == nothing
+    M = T.m
+else
+    M = insert_weight_vector(T.w, T.m)
+end
+    n = size(M)[1]
+    for i = 1:p
+        max = M[i, 1]
+        for j = 2:n
+            temp = abs(M[i, j])
+            if temp > max
+                max = temp
+            end
+        end
+        push!(m, max)
+    end
+    msum = 0
+    for i = 2:p
+        msum = msum + m[i]
+    end
+    maxtdeg = 0
+    for g in gens(G)
+        td = tdeg(g)
+        if (td > maxtdeg)
+            maxtdeg = td
+        end
+    end
+    e = maxtdeg * msum + 1
+    w = M[1, :] * e^(p - 1)
+    for i = 2:p
+        w = w + e^(p - i) * M[i, :]
+    end
+    return w
+end
 function pert_Vectors(G::Singular.sideal, M::Matrix{Int64}, p::Integer)
     m = []
+    n = size(M)[1]
+    for i = 1:p
+        max = M[i, 1]
+        for j = 2:n
+            temp = abs(M[i, j])
+            if temp > max
+                max = temp
+            end
+        end
+        push!(m, max)
+    end
+    msum = 0
+    for i = 2:p
+        msum = msum + m[i]
+    end
+    maxtdeg = 0
+    for g in gens(G)
+        td = tdeg(g)
+        if (td > maxtdeg)
+            maxtdeg = td
+        end
+    end
+    e = maxtdeg * msum + 1
+    w = M[1, :] * e^(p - 1)
+    for i = 2:p
+        w = w + e^(p - i) * M[i, :]
+    end
+    return w
+end
+function pert_Vectors(G::Singular.sideal, T::MonomialOrder{Matrix{Int64}, Vector{Int64}}, p::Integer)
+    m = []
+    if T.w == nothing
+    M = T.m
+else
+    M = insert_weight_vector(T.w, T.m)
+end
     n = size(M)[1]
     for i = 1:p
         max = M[i, 1]
@@ -219,10 +329,10 @@ function tdeg(p::Singular.spoly)
     return max
 end
 
-function inCone(G::Singular.sideal, T::Matrix{Int64}, w::Vector{Int64})
-    R, V = change_order(G, T)
-    G = Oscar.Singular.Ideal(R, [change_ring(x, R) for x in gens(G)])
-    cvzip = zip(gens(G), initials(R, gens(G), w))
+function inCone(G::Singular.sideal, T::Matrix{Int64},t::Vector{Int64})
+    R, V = change_order(G, t, T)
+    I = Oscar.Singular.Ideal(R, [change_ring(x, R) for x in gens(G)])
+    cvzip = zip(gens(I), initials(R, gens(I), t))
     for (g, ing) in cvzip
         if !isequal(Singular.leading_term(g), Singular.leading_term(ing))
             return false
@@ -230,6 +340,18 @@ function inCone(G::Singular.sideal, T::Matrix{Int64}, w::Vector{Int64})
     end
     return true
 end
+function inCone(G::Singular.sideal, T::MonomialOrder{Matrix{Int64}, Vector{Int64}},t::Vector{Int64})
+    R, V = change_order(G, MonomialOrder(T.m, T.w, [0]))
+    I = Oscar.Singular.Ideal(R, [change_ring(x, R) for x in gens(G)])
+    cvzip = zip(gens(I), initials(R, gens(I), t))
+    for (g, ing) in cvzip
+        if !isequal(Singular.leading_term(g), Singular.leading_term(ing))
+            return false
+        end
+    end
+    return true
+end
+
 
 function interreduce_new(
     G::Singular.sideal,
