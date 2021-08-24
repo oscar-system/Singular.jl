@@ -4,9 +4,9 @@ export groebnerwalk
 
 ###############################################################
 #Implementation of the gröbner walk.
-#TODO: Implement pertubed version.
+#TODO: Improve pertubed version.
 #TODO: Improve GenWalk algorithm
-#TODO: Implement fractal version.
+#TODO: Improve fractal version.
 ###############################################################
 
 ###############################################################
@@ -59,13 +59,19 @@ function standard_walk(G::Singular.sideal, S::Matrix{Int64}, T::Matrix{Int64})
     standard_walk(G, S, T, cweight, tweight)
 end
 
-function standard_walk(G::Singular.sideal, S::Matrix{Int64}, T::Matrix{Int64}, cweight::Vector{Int64}, tweight::Vector{Int64})
+function standard_walk(
+    G::Singular.sideal,
+    S::Matrix{Int64},
+    T::Matrix{Int64},
+    cweight::Vector{Int64},
+    tweight::Vector{Int64},
+)
 
     #loop
     while cweight != tweight
         cweight = nextw(G, cweight, tweight)
         G = standard_step(G, cweight, tweight, T)
-        #@info "Current Gröbnerbase: " G
+        @info "Current Gröbnerbase: " G
     end
 
     return G
@@ -112,7 +118,7 @@ function generic_walk(G::Singular.sideal, S::Matrix{Int64}, T::Matrix{Int64})
     while !isempty(v)
         G, lm = generic_step(G, R, v, T, lm)
         #@info "Current Gröbnerbase: " G
-        v = nextV(G,lm, v, S, T)
+        v = nextV(G, lm, v, S, T)
     end
     return G
 end
@@ -122,7 +128,7 @@ function generic_step(
     S::MPolyRing,
     v::Vector{Int64},
     T::Matrix{Int64},
-    lm::Vector{Singular.spoly{Singular.n_FieldElem{fmpq}}}
+    lm::Vector{Singular.spoly{Singular.n_FieldElem{fmpq}}},
 )
     R = base_ring(G)
     facet_Generators = facet_initials(S, G, v, lm)
@@ -145,11 +151,15 @@ function generic_step(
 end
 
 
-
 ###############################################################
 #Pertubed-version of the groebner walk Amrhein et al.
 ###############################################################
-function pertubed_walk(G::Singular.sideal, S::Matrix{Int64}, T::Matrix{Int64}, k::Int64)
+function pertubed_walk(
+    G::Singular.sideal,
+    S::Matrix{Int64},
+    T::Matrix{Int64},
+    k::Int64,
+)
     p = k
     sweight = pert_Vectors(G, S, p)
     Gnew = G
@@ -165,15 +175,70 @@ function pertubed_walk(G::Singular.sideal, S::Matrix{Int64}, T::Matrix{Int64}, k
             term = true
             break
         else
-        if k == 1
-            R, V = change_order(Gnew, T)
-            Gnew = Oscar.Singular.Ideal(R, [change_ring(x, R) for x in gens(Gnew)])
-        Gnew = Singular.std(Gnew, complete_reduction=true)
-        term = true
+            if k == 1
+                R, V = change_order(Gnew, T)
+                Gnew = Oscar.Singular.Ideal(
+                    R,
+                    [change_ring(x, R) for x in gens(Gnew)],
+                )
+                Gnew = Singular.std(Gnew, complete_reduction = true)
+                term = true
+            end
+            p = p - 1
+            sweight = tweight
+        end
     end
-    p = p-1
-    sweight = tweight
-    end
-end
     return Gnew
+end
+
+function fractal_walk(G::Singular.sideal, S::Matrix{Int64}, T::Matrix{Int64})
+    PVecs = [pert_Vectors(G, T, i) for i = 1:nvars(R)]
+
+    return fractal_recursiv(G, S, T,S[1,:], PVecs, 1)
+end
+
+function fractal_recursiv(
+    G::Singular.sideal,
+    S::Matrix{Int64},
+    T::Matrix{Int64},
+    cweight::Vector{Int64},
+    PVecs::Vector{Vector{Int64}},
+    p::Int64,
+)
+    R = base_ring(G)
+    term = false
+    G.isGB = true
+
+    while !term
+        w = nextw(G, cweight, PVecs[p])
+        if w == PVecs[p]
+            if inCone(G, T, w)
+                println(G, T, w)
+                println(inCone(G,T,w))
+                term = true
+                break
+            else
+                PVecs = [pert_Vectors(G, T, i) for i = 1:nvars(R)]
+            end
+        end
+        Rn, V = change_order(G, w, T)
+        Gw = initials(R, gens(G), w)
+        if p == nvars(R)
+            Gnew = Singular.std(Singular.Ideal(Rn, [change_ring(x, Rn) for x in Gw]), complete_reduction = true)
+        else
+            Gnew = fractal_recursiv(Singular.Ideal(R, [x for x in Gw]), S, T, w, PVecs, p + 1)
+        end
+
+        rest = [
+            change_ring(gen, Rn) - change_ring(Oscar.Singular.reduce(change_ring(gen, R), G), Rn)
+            for gen in gens(Gnew)
+        ]
+        G = Oscar.Singular.Ideal(Rn, [Rn(x) for x in rest])
+        G.isGB = true
+        G = Singular.std(G, complete_reduction = true)
+        R = Rn
+    end
+    @info "Current Gröbnerbase: " G
+
+    return G
 end
