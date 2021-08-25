@@ -1,4 +1,5 @@
 using Oscar
+include("GroebnerWalkUtilitys.jl")
 
 ###############################################################
 #Utilitys for generic_walk
@@ -228,4 +229,41 @@ function reducegeneric_recursiv(
     else
         return p
     end
+end
+
+function interreduce_new(
+    G::Singular.sideal,
+    Lm::Vector{Singular.spoly{Singular.n_FieldElem{fmpq}}},
+)
+    R = base_ring(G)
+    gens = collect(Singular.gens(G))
+    changed = true
+    while changed
+        changed = false
+        for i = 1:ngens(G)
+            #gensrest = filter(x -> x != gens[i], gens)
+            gensrest =
+                Array{Singular.spoly{Singular.n_FieldElem{fmpq}},1}(undef, 0)
+            Lmrest = Array{Singular.spoly{Singular.n_FieldElem{fmpq}},1}(undef, 0)
+            ## New function
+            for j = 1:ngens(G)
+                if i != j
+                    push!(gensrest, gens[j])
+                    push!(Lmrest, Lm[j])
+                end
+            end
+            #Lmrest = filter(x -> x != Lm[i], Lm)
+            gen = reducegeneric_recursiv(
+                gens[i],
+                Singular.Ideal(R, gensrest),
+                Lmrest,
+            )
+            if gens[i] != gen
+                changed = true
+                gens[i] = first(Singular.gens(Singular.Ideal(R, R(gen))))
+                break
+            end
+        end
+    end
+    return Oscar.Singular.Ideal(R, [R(p) for p in gens])
 end

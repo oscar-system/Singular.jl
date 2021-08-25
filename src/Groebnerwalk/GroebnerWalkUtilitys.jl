@@ -1,5 +1,4 @@
 using Oscar
-
 ###############################################################
 #Utilitys for Groebnerwalks
 ###############################################################
@@ -89,28 +88,7 @@ function change_order(
     )
     return S, H
 end
-function change_order(
-    I::Singular.sideal,
-    T::MonomialOrder{Matrix{Int64}, Vector{Int64}},
-) where {L<:Number,K<:Number}
-    R = I.base_ring
-    G = Singular.gens(I.base_ring)
-    Gstrich = string.(G)
-        S, H = Oscar.Singular.PolynomialRing(
-            R.base_ring,
-            Gstrich,
-            ordering = Oscar.Singular.ordering_a(T.w)*
-                       Oscar.Singular.ordering_M(T.m),
-        )
-#=    S, H = Oscar.Singular.PolynomialRing(
-        R.base_ring,
-        Gstrich,
-        ordering = Oscar.Singular.ordering_a(T.t) *Oscar.Singular.ordering_a(T.w)*
-                   Oscar.Singular.ordering_M(T.m)
-    )
-    return S, H
-    =#
-end
+
 
 function change_order(
     I::Singular.sideal,
@@ -203,12 +181,8 @@ function ordering_as_matrix(ord::Symbol, nvars::Int64)
             anti_diagonal_matrix(nvars)[1:nvars-1, :]
         ]
     end
-    if ord == :revlex || ord == Symbol("Singular(dp)")
-        return anti_diagonal_matrix(nvars)[1:nvars, :]
-
-    end
 end
-
+#=
 function pert_Vectors(G::Singular.sideal, T::MonomialOrder{Matrix{Int64}, Vector{Int64}}, p::Integer)
     m = []
     if T.t == nothing
@@ -245,6 +219,7 @@ end
     end
     return w
 end
+=#
 function pert_Vectors(G::Singular.sideal, M::Matrix{Int64}, p::Integer)
     m = []
     n = size(M)[1]
@@ -330,18 +305,7 @@ function tdeg(p::Singular.spoly)
 end
 
 function inCone(G::Singular.sideal, T::Matrix{Int64},t::Vector{Int64})
-    R, V = change_order(G, t, T)
-    I = Oscar.Singular.Ideal(R, [change_ring(x, R) for x in gens(G)])
-    cvzip = zip(gens(I), initials(R, gens(I), t))
-    for (g, ing) in cvzip
-        if !isequal(Singular.leading_term(g), Singular.leading_term(ing))
-            return false
-        end
-    end
-    return true
-end
-function inCone(G::Singular.sideal, T::MonomialOrder{Matrix{Int64}, Vector{Int64}},t::Vector{Int64})
-    R, V = change_order(G, T.t, T.m)
+    R, V = change_order(G, T)
     I = Oscar.Singular.Ideal(R, [change_ring(x, R) for x in gens(G)])
     cvzip = zip(gens(I), initials(R, gens(I), t))
     for (g, ing) in cvzip
@@ -353,42 +317,9 @@ function inCone(G::Singular.sideal, T::MonomialOrder{Matrix{Int64}, Vector{Int64
 end
 
 
-function interreduce_new(
-    G::Singular.sideal,
-    Lm::Vector{Singular.spoly{Singular.n_FieldElem{fmpq}}},
-)
-    R = base_ring(G)
-    gens = collect(Singular.gens(G))
-    changed = true
-    while changed
-        changed = false
-        for i = 1:ngens(G)
-            #gensrest = filter(x -> x != gens[i], gens)
-            gensrest =
-                Array{Singular.spoly{Singular.n_FieldElem{fmpq}},1}(undef, 0)
-            Lmrest = Array{Singular.spoly{Singular.n_FieldElem{fmpq}},1}(undef, 0)
-            ## New function
-            for j = 1:ngens(G)
-                if i != j
-                    push!(gensrest, gens[j])
-                    push!(Lmrest, Lm[j])
-                end
-            end
-            #Lmrest = filter(x -> x != Lm[i], Lm)
-            gen = reducegeneric_recursiv(
-                gens[i],
-                Singular.Ideal(R, gensrest),
-                Lmrest,
-            )
-            if gens[i] != gen
-                changed = true
-                gens[i] = first(Singular.gens(Singular.Ideal(R, R(gen))))
-                break
-            end
-        end
-    end
-    return Oscar.Singular.Ideal(R, [R(p) for p in gens])
-end
+#############################################
+# unspecific help functions
+#############################################
 
 #Use MPolybuildCTX
 function vec_sum(p::Vector{fmpq_mpoly}, q::Vector{fmpq_mpoly})
@@ -397,6 +328,22 @@ function vec_sum(p::Vector{fmpq_mpoly}, q::Vector{fmpq_mpoly})
         poly = poly + p[i] * q[i]
     end
     return poly
+end
+
+function ident_matrix(n::Int64)
+    M = zeros(Int64, n, n)
+    for i = 1:n
+        M[i, i] = 1
+    end
+    return M
+end
+
+function anti_diagonal_matrix(n::Int64)
+    M = zeros(Int64, n, n)
+    for i = 1:n
+        M[i, n+1-i] = -1
+    end
+    return M
 end
 
 # Singular.isequal depends on order of generators
@@ -414,24 +361,4 @@ function equalitytest(G::Singular.sideal, K::Singular.sideal)
         return true
     end
     return false
-end
-
-
-#############################################
-# unspecific help functions
-#############################################
-function ident_matrix(n::Int64)
-    M = zeros(Int64, n, n)
-    for i = 1:n
-        M[i, i] = 1
-    end
-    return M
-end
-
-function anti_diagonal_matrix(n::Int64)
-    M = zeros(Int64, n, n)
-    for i = 1:n
-        M[i, n+1-i] = -1
-    end
-    return M
 end

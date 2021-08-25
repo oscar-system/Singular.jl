@@ -1,4 +1,9 @@
 using Oscar
+include("GroebnerWalkUtilitys.jl")
+include("FractalWalkUtilitys.jl")
+include("GenericWalkUtilitys.jl")
+include("StandardWalkUtilitys.jl")
+
 
 export groebnerwalk
 
@@ -66,16 +71,17 @@ function standard_walk(
     tweight::Vector{Int64},
 )
 
-w = cweight
     #loop
-    while w != [0]
-        cweight = w
+    term = false
+    while !term
         G = standard_step(G, cweight, tweight, T)
-        w = nextw(G, cweight, tweight)
-        @info "Current Gröbnerbase: " G
+        println(cweight, tweight)
+        if cweight == tweight
+            term = true
+        else
+        cweight = nextw(G, cweight, tweight)
     end
-    if !inCone(G, MonomialOrder(T,[0],tweight), cweight)
-        G = standard_step(G ,tweight, tweight, T)
+        @info "Current Gröbnerbase: " G
     end
     return G
 
@@ -169,14 +175,14 @@ function pertubed_walk(
     #loop
     term = false
     while !term
-        println(Gnew)
         tweight = pert_Vectors(Gnew, T, p)
+        println(tweight)
         Gnew = standard_walk(Gnew, S, T, sweight, tweight)
-        #@info "Current Gröbnerbase: " G
+        @info "Current Gröbnerbase in Top level: " Gnew
 
         if inCone(Gnew, T, tweight)
             term = true
-            break
+            println("test")
         else
             if k == 1
                 R, V = change_order(Gnew, T)
@@ -186,7 +192,10 @@ function pertubed_walk(
                 )
                 Gnew = Singular.std(Gnew, complete_reduction = true)
                 term = true
+                println("test2")
             end
+            println("test3")
+
             p = p - 1
             sweight = tweight
         end
@@ -271,7 +280,7 @@ function fractal_recursiv(
 
 
     while !term
-        w = nextw(G, cweight, PVecs[p])
+        w = nextw_fr(G, cweight, PVecs[p])
         if w == [0]
             if !inCone(G, T, cweight)
                 w = PVecs[p]
