@@ -25,16 +25,16 @@ function nextw(
         tw = dot(tweight, v)
         ctw = cw - tw
         if tw < 0
-            if ctw != 0
             push!(tv, cw // ctw)
-        end
         end
     end
     #tv = [dot(cweight, v) < 0 ? dot(cweight, v) / (dot(cweight, v) - dot(tweight, v)) : nothing for v = V ]
-    push!(tv, 1)
+    if isempty(tv)
+        return [0]
+    end
     t = minimum(tv)
-    if (t == 1 || 0 == float(t))
-        return tweight
+    if (0 == float(t))
+        return [0]
     end
     w = (1 - t) * cweight + t * tweight
     return convertBoundingVector(w)

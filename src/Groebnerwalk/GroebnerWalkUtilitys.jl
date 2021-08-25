@@ -96,21 +96,20 @@ function change_order(
     R = I.base_ring
     G = Singular.gens(I.base_ring)
     Gstrich = string.(G)
-    if T.w == [0]
         S, H = Oscar.Singular.PolynomialRing(
             R.base_ring,
             Gstrich,
-            ordering = Oscar.Singular.ordering_a(T.t)*
+            ordering = Oscar.Singular.ordering_a(T.w)*
                        Oscar.Singular.ordering_M(T.m),
         )
-    end
-    S, H = Oscar.Singular.PolynomialRing(
+#=    S, H = Oscar.Singular.PolynomialRing(
         R.base_ring,
         Gstrich,
         ordering = Oscar.Singular.ordering_a(T.t) *Oscar.Singular.ordering_a(T.w)*
                    Oscar.Singular.ordering_M(T.m)
     )
     return S, H
+    =#
 end
 
 function change_order(
@@ -212,10 +211,10 @@ end
 
 function pert_Vectors(G::Singular.sideal, T::MonomialOrder{Matrix{Int64}, Vector{Int64}}, p::Integer)
     m = []
-    if T.w == nothing
+    if T.t == nothing
     M = T.m
 else
-    M = insert_weight_vector(T.w, T.m)
+    M = insert_weight_vector(T.t, T.m)
 end
     n = size(M)[1]
     for i = 1:p
@@ -279,7 +278,8 @@ function pert_Vectors(G::Singular.sideal, M::Matrix{Int64}, p::Integer)
 end
 function pert_Vectors(G::Singular.sideal, T::MonomialOrder{Matrix{Int64}, Vector{Int64}}, p::Integer)
     m = []
-    if T.w == nothing
+    if T.t == T.m[1,size(T.m)[1]]
+        println("testtest")
     M = T.m
 else
     M = insert_weight_vector(T.w, T.m)
@@ -341,7 +341,7 @@ function inCone(G::Singular.sideal, T::Matrix{Int64},t::Vector{Int64})
     return true
 end
 function inCone(G::Singular.sideal, T::MonomialOrder{Matrix{Int64}, Vector{Int64}},t::Vector{Int64})
-    R, V = change_order(G, MonomialOrder(T.m, T.w, [0]))
+    R, V = change_order(G, T.t, T.m)
     I = Oscar.Singular.Ideal(R, [change_ring(x, R) for x in gens(G)])
     cvzip = zip(gens(I), initials(R, gens(I), t))
     for (g, ing) in cvzip

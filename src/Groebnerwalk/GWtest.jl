@@ -3,8 +3,8 @@ using Pkg
 using Oscar
 
 
-case = 1
-
+case = 99
+success = true
 
 if case == 1 || case == 99
     R, (x, y) = Oscar.Singular.PolynomialRing(
@@ -23,14 +23,15 @@ if case == 1 || case == 99
 
     @time J = fractal_walk(
         I,
-        MonomialOrder(ordering_as_matrix(:revlex, 2), [1, 1], [0]),
-        MonomialOrder(ordering_as_matrix(:lex, 2), [1, 0], [0]),
+        MonomialOrder(ordering_as_matrix(:degrevlex, 2), [1, 1], [0]),
+        MonomialOrder(ordering_as_matrix(:lex, 2), [1, 0], [1, 0]),
     )
     @time K = groebnerwalk(
         I,
         ordering_as_matrix(:degrevlex, 2),
         ordering_as_matrix(:lex, 2),
-        :standard,
+        :pertubed,
+        2
     )
     T1 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(J)])
     T2 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(K)])
@@ -43,7 +44,9 @@ if case == 1 || case == 99
 
     println("test 1: ", equalitytest(T3, T1))
     println("test 2: ", equalitytest(T3, T2))
-
+    if !(equalitytest(T3, T1) && equalitytest(T3, T2))
+        success = false
+    end
 end
 
 if case == 2 || case == 99
@@ -64,7 +67,7 @@ if case == 2 || case == 99
     @time J = fractal_walk(
         I,
         MonomialOrder(ordering_as_matrix(:deglex, 3), [5, 4, 1], [0]),
-        MonomialOrder(ordering_as_matrix(:lex, 3), [6, 1, 3], [0]),
+        MonomialOrder(ordering_as_matrix(:lex, 3), [6, 1, 3], [6, 1, 3]),
     )
 
     S, V = Oscar.Singular.PolynomialRing(
@@ -80,7 +83,9 @@ if case == 2 || case == 99
     )
 
     println("test 2: ", equalitytest(T1, T2))
-
+    if !(equalitytest(T2, T1))
+        success = false
+    end
 end
 
 
@@ -114,6 +119,9 @@ if case == 3 || case == 99
     )
     println("test 3: ", equalitytest(T1, T2))
 
+    if !(equalitytest(T2, T1))
+        success = false
+    end
 end
 
 if case == 4 || case == 99
@@ -170,4 +178,8 @@ if case == 4 || case == 99
     println("std :", T1)
 
     println("test 4: ", equalitytest(T2, T1), " and ", equalitytest(T1, T4))
+    if !(equalitytest(T2, T1) && equalitytest(T1, T4))
+        success = false
+    end
 end
+println("All tests were: ", success)
