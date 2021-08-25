@@ -316,6 +316,16 @@ function inCone(G::Singular.sideal, T::Matrix{Int64},t::Vector{Int64})
     return true
 end
 
+function liftGW(G::Singular.sideal, InG::Singular.sideal, R::Singular.PolyRing, S::Singular.PolyRing)
+    G.isGB = true
+    rest = [
+        gen - change_ring(Oscar.Singular.reduce(change_ring(gen, R), G), S)
+        for gen in gens(InG)
+    ]
+    Gnew = Oscar.Singular.Ideal(S, [S(x) for x in rest])
+    Gnew.isGB = true
+    return Gnew
+end
 
 #############################################
 # unspecific help functions

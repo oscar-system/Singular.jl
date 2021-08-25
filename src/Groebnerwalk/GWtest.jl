@@ -41,17 +41,17 @@ if case == 1 || case == 99
         :pertubed,
         2
     )
-    #=
+
     @time M = groebnerwalk(
         I,
         ordering_as_matrix(:degrevlex, 2),
         ordering_as_matrix(:lex, 2),
         :generic
-    ) =#
+    )
     T1 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(J)])
     T2 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(K)])
     T3 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(L)])
-    #T4 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(M)])
+    T4 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(M)])
 
     T0 = Singular.std(
         Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(I)]),
@@ -61,12 +61,12 @@ if case == 1 || case == 99
     println("test fractal: ", equalitytest(T0, T1))
     println("test pertubed: ", equalitytest(T2, T0))
     println("test standard: ", equalitytest(T3, T0))
-    #println("test generic: ", equalitytest(T4, T0))
+    println("test generic: ", equalitytest(T4, T0))
 
 
-    #if !(equalitytest(T2, T1) && equalitytest(T3, T4))
-    #    success = false
-    #end
+    if !(equalitytest(T2, T1) && equalitytest(T3, T4))
+       success = false
+    end
 end
 
 if case == 2 || case == 99

@@ -69,3 +69,13 @@ function change_order(
     return S, H
     =#
 end
+
+function liftGWfr(G::Singular.sideal, Gw::Singular.sideal, R::Singular.PolyRing, S::Singular.PolyRing)
+rest = [
+    change_ring(gen, S) - change_ring(Oscar.Singular.reduce(change_ring(gen, R), G), S)
+    for gen in gens(Gw)
+]
+G = Oscar.Singular.Ideal(S, [S(x) for x in rest])
+G.isGB = true
+return G
+end

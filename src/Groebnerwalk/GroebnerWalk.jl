@@ -95,21 +95,20 @@ function standard_step(
 )
     R = base_ring(G)
     S, V = change_order(G, cw, T)
+
+    #taking initials
     inwG = initials(S, gens(G), cw)
+
+    #Initial Ideal
     IinwG = Singular.std(
         Oscar.Singular.Ideal(S, [S(x) for x in inwG]),
         complete_reduction = true,
     )
 
     #Lifting to GB of new cone
-    G.isGB = true
-    rest = [
-        gen - change_ring(Oscar.Singular.reduce(change_ring(gen, R), G), S)
-        for gen in gens(IinwG)
-    ]
-    Gnew = Oscar.Singular.Ideal(S, [S(x) for x in rest])
-    Gnew.isGB = true
+    Gnew = liftGW(G, IinwG, R, S)
 
+    #Interreduce
     return Oscar.Singular.std(Gnew, complete_reduction = true)
 end
 
@@ -147,12 +146,9 @@ function generic_step(
         complete_reduction = true,
     )
 
-    #println("Facet Ideal: ", facet_Ideal)
-
     liftArray, Newlm = liftgeneric(G, lm, facet_Ideal)
     Gnew = Oscar.Singular.Ideal(S, [x for x in liftArray])
 
-    #println("New lifted GB:   ", Gnew, "  with LM:  ", Newlm)
     Gnew = interreduce_new(Gnew, Newlm)
     Gnew = Oscar.Singular.Ideal(R, [change_ring(x, R) for x in gens(Gnew)])
     Gnew.isGB = true
@@ -304,21 +300,14 @@ function fractal_recursiv(
             Gnew = Singular.std(Singular.Ideal(Rn, [change_ring(x, Rn) for x in Gw]), complete_reduction = true)
             @info "Computed Gröbnerbase: " Gnew "in depth: " p
         else
-            #tempPVecs = [pert_Vectors(G, insert_weight_vector(w, T.m), i) for i = 1:nvars(R)]
             Gnew = fractal_recursiv(Singular.Ideal(R, [x for x in Gw]), S, T, PVecs, p + 1)
         end
 
-        rest = [
-            change_ring(gen, Rn) - change_ring(Oscar.Singular.reduce(change_ring(gen, R), G), Rn)
-            for gen in gens(Gnew)
-        ]
-        G = Oscar.Singular.Ideal(Rn, [Rn(x) for x in rest])
-        G.isGB = true
+        G = liftGWfr(G, Gnew, R, Rn)
         G = Singular.std(G, complete_reduction = true)
         R = Rn
         S = T
         cweight = w
     end
-
     return G
 end
