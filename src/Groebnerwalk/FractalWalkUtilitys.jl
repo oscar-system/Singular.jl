@@ -3,6 +3,7 @@ include("GroebnerWalkUtilitys.jl")
 #Solves problems with weight vectors of floats.
 function convertBoundingVector(wtemp::Vector{T}) where {T<:Number}
     w = Vector{Int64}()
+
     for i = 1:length(wtemp)
         push!(w, float(divexact(wtemp[i], gcd(wtemp))))
     end
@@ -14,6 +15,9 @@ function nextw_fr(
     cweight::Array{T,1},
     tweight::Array{K,1},
 ) where {T<:Number,K<:Number}
+if (cweight == tweight)
+    return [0]
+end
     tv = []
     for v in diff_vectors(G)
         cw = dot(cweight, v)
@@ -24,14 +28,15 @@ function nextw_fr(
         end
     end
     #tv = [dot(cweight, v) < 0 ? dot(cweight, v) / (dot(cweight, v) - dot(tweight, v)) : nothing for v = V ]
-    if isempty(tv)
-        return [0]
-    end
+    push!(tv, 1)
     t = minimum(tv)
     if (0 == float(t))
-        return [0]
+        return cweight
     end
     w = (1 - t) * cweight + t * tweight
+    if (t == 1)
+        return tweight
+    end
     return convertBoundingVector(w)
 end
 
@@ -78,4 +83,21 @@ rest = [
 G = Oscar.Singular.Ideal(S, [S(x) for x in rest])
 G.isGB = true
 return G
+end
+
+function ismonomial(Gw::Vector{Any})
+    for g in Gw
+        if size(collect(Singular.coefficients(g)))[1] > 1
+            return false
+        end
+    end
+    return true
+end
+function isBinomial(Gw::Vector{Any})
+    for g in Gw
+        if size(collect(Singular.coefficients(g)))[1] > 2
+            return false
+        end
+    end
+    return true
 end

@@ -182,14 +182,15 @@ function ordering_as_matrix(ord::Symbol, nvars::Int64)
         ]
     end
 end
-#=
-function pert_Vectors(G::Singular.sideal, T::MonomialOrder{Matrix{Int64}, Vector{Int64}}, p::Integer)
-    m = []
-    if T.t == nothing
+
+function pert_Vectors(G::Singular.sideal, Mo::MonomialOrder{Matrix{Int64}}, t::Vector{Int64}, p::Integer)
+    if t == Mo.m[1,size(Mo.m)[1]]
+        println("testtest")
     M = T.m
 else
-    M = insert_weight_vector(T.t, T.m)
+    M = insert_weight_vector(t, Mo.m)
 end
+m = []
     n = size(M)[1]
     for i = 1:p
         max = M[i, 1]
@@ -219,7 +220,7 @@ end
     end
     return w
 end
-=#
+
 function pert_Vectors(G::Singular.sideal, M::Matrix{Int64}, p::Integer)
     m = []
     n = size(M)[1]
@@ -257,7 +258,7 @@ function pert_Vectors(G::Singular.sideal, T::MonomialOrder{Matrix{Int64}, Vector
         println("testtest")
     M = T.m
 else
-    M = insert_weight_vector(T.w, T.m)
+    M = insert_weight_vector(T.t, T.m)
 end
     n = size(M)[1]
     for i = 1:p

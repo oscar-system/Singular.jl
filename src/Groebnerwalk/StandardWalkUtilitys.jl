@@ -35,7 +35,6 @@ function nextw(
     #tv = [dot(cweight, v) < 0 ? dot(cweight, v) / (dot(cweight, v) - dot(tweight, v)) : nothing for v = V ]
     push!(tv, 1)
     t = minimum(tv)
-    println(t)
     w = (1 - t) * cweight + t * tweight
     return convertBoundingVector(w)
 end
