@@ -10,35 +10,6 @@ function convertBoundingVector(wtemp::Vector{T}) where {T<:Number}
     return w
 end
 
-function nextw_fr(
-    G::Singular.sideal,
-    cweight::Array{T,1},
-    tweight::Array{K,1},
-) where {T<:Number,K<:Number}
-if (cweight == tweight)
-    return [0]
-end
-    tv = []
-    for v in diff_vectors(G)
-        cw = dot(cweight, v)
-        tw = dot(tweight, v)
-        ctw = cw - tw
-        if tw < 0
-            push!(tv, cw // ctw)
-        end
-    end
-    #tv = [dot(cweight, v) < 0 ? dot(cweight, v) / (dot(cweight, v) - dot(tweight, v)) : nothing for v = V ]
-    push!(tv, 1)
-    t = minimum(tv)
-    if (0 == float(t))
-        return cweight
-    end
-    w = (1 - t) * cweight + t * tweight
-    if (t == 1)
-        return tweight
-    end
-    return convertBoundingVector(w)
-end
 
 function inCone(G::Singular.sideal, T::MonomialOrder{Matrix{Int64}, Vector{Int64}},t::Vector{Int64})
     R, V = change_order(G, T.t, T.m)
@@ -100,4 +71,37 @@ function isBinomial(Gw::Vector{Any})
         end
     end
     return true
+end
+function nextw_fr(
+    G::Singular.sideal,
+    cweight::Array{T,1},
+    tweight::Array{K,1},
+) where {T<:Number,K<:Number}
+if (cweight == tweight)
+    return [0]
+end
+    tv = []
+    for v in diff_vectors(G)
+        tw = dot(tweight, v)
+        if tw < 0
+            push!(tv, dot(cweight, v) // (dot(cweight, v) - tw))
+        end
+    end
+    #tv = [dot(cweight, v) < 0 ? dot(cweight, v) / (dot(cweight, v) - dot(tweight, v)) : nothing for v = V ]
+    push!(tv, 1)
+    t = minimum(tv)
+    if (0 == numerator(t))
+        filter!(x -> (numerator(x) > 0 && x!=1), tv)
+        if isempty(tv)
+            return[0]
+        else
+        t = minimum(tv)
+    end
+    end
+    if (t == 1)
+        return tweight
+    end
+    w = (1 - t) * cweight + t * tweight
+
+    return convertBoundingVector(w)
 end

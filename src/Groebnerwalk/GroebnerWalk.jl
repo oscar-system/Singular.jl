@@ -186,6 +186,7 @@ function pertubed_walk(
 )
     p = k
     sweight = pert_Vectors(G, S, p)
+    println(sweight)
     Gnew = G
     #loop
     term = false
@@ -208,66 +209,38 @@ function pertubed_walk(
                 Gnew = Singular.std(Gnew, complete_reduction = true)
                 term = true
             end
-
             p = p - 1
             sweight = tweight
         end
     end
     return Gnew
 end
-#=
-function fractal_walk(G::Singular.sideal, S::Matrix{Int64}, T::Matrix{Int64})
-    PVecs = [pert_Vectors(G, T, i) for i = 1:nvars(R)]
 
-    return fractal_recursiv(G, S, T,S[1,:], PVecs, 1)
+counterFr = 0
+counterFrFin = false
+function deleteCounterFr()
+    global counterFr
+    temp = counterFr
+    counterFr = 0
+    global counterFrFin = false
+    return temp
 end
-
-function fractal_recursiv(
-    G::Singular.sideal,
-    S::Matrix{Int64},
-    T::Matrix{Int64},
-    cweight::Vector{Int64},
-    PVecs::Vector{Vector{Int64}},
-    p::Int64,
-)
-    R = base_ring(G)
-    term = false
-    G.isGB = true
-
-    while !term
-        w = nextw(G, cweight, PVecs[p])
-        if w == PVecs[p]
-            if inCone(G, T, w)
-                println(G, T, w)
-                println(inCone(G,T,w))
-                term = true
-                break
-            else
-                PVecs = [pert_Vectors(G, T, i) for i = 1:nvars(R)]
-            end
-        end
-        Rn, V = change_order(G, w, T)
-        Gw = initials(R, gens(G), w)
-        if p == nvars(R)
-            Gnew = Singular.std(Singular.Ideal(Rn, [change_ring(x, Rn) for x in Gw]), complete_reduction = true)
-        else
-            Gnew = fractal_recursiv(Singular.Ideal(R, [x for x in Gw]), S, T, PVecs, p + 1)
-        end
-
-        rest = [
-            change_ring(gen, Rn) - change_ring(Oscar.Singular.reduce(change_ring(gen, R), G), Rn)
-            for gen in gens(Gnew)
-        ]
-        G = Oscar.Singular.Ideal(Rn, [Rn(x) for x in rest])
-        G.isGB = true
-        G = Singular.std(G, complete_reduction = true)
-        R = Rn
+function getCounterFr()
+    global counterFr
+    return counterFr
+end
+function raiseCounterFr(std::Bool = false)
+    global counterFrFin
+    if !counterFrFin || std
+        counterFrFin = true
+        global counterFr = getCounterFr() + 1
+        return true
     end
-    @info "Current Gröbnerbase: " G
-
-    return G
-end
-=#
+    return false
+    end
+    function resetCounterFr()
+        global counterFrFin = false
+    end
 
 PVecs = []
 function checkPvecs()
@@ -284,7 +257,7 @@ global PVecs = [pert_Vectors(G, T, i) for i = 1:nvars(R)]
 println("FacrtalWalk_standard results")
 println("Crossed Cones in: ")
 Gb = fractal_recursiv(G, S, T, PVecs, 1)
-println("Cones crossed: ", getCounter())
+println("Cones crossed: ", deleteCounterFr())
 return Gb
 end
 
@@ -300,34 +273,34 @@ function fractal_recursiv(
     G.isGB = true
     cweight = S.w
 
-
     while !term
         w = nextw_fr(G, cweight, PVecs[p])
         if (w == [0])
             if inCone(G, T, PVecs[p])
-                #@info "Incone Gröbnerbase: " G "in depth: " p
-                #println(inCone)
+                if raiseCounterFr()
+                println(PVecs[p], " in depth", p)
+            end
                 return G
             else
-                #println("test")
-                global PVecs = [pert_Vectors(G, T, i) for i = 1:nvars(R)]
-                #checkPvecs()
+                global PVecs = [pert_Vectors(G, T, 10, i) for i = 1:nvars(R)]
+                println(PVecs)
                 continue
             end
         end
         T.w = w
         Rn, V = change_order(G, T)
         Gw = initials(R, gens(G), w)
+
         if p == nvars(R)
             Gnew = Singular.std(
                 Singular.Ideal(Rn, [change_ring(x, Rn) for x in Gw]),
                 complete_reduction = true,
             )
             println(w, " in depth", p)
-            #@info "Computed Gröbnerbase: " Gnew "in depth: " p
-            #println("Computed Gröbnerbase: ", w, "in depth: ", p)
-            global counter = getCounter() + 1
+            raiseCounterFr(true)
         else
+            resetCounterFr()
+
             Gnew = fractal_recursiv(
                 Singular.Ideal(R, [x for x in Gw]),
                 S,
@@ -335,11 +308,10 @@ function fractal_recursiv(
                 PVecs,
                 p + 1,
             )
-            #println("Computed Gröbnerbase: ", w, "in depth: ", p)
-
         end
 
         G = liftGWfr(G, Gnew, R, Rn)
+
         G = Singular.std(G, complete_reduction = true)
         R = Rn
         S = T
@@ -348,6 +320,7 @@ function fractal_recursiv(
 
     return G
 end
+
 cwPert = []
 firstStepMode = false
 function cwpert(p::Int64)
@@ -364,7 +337,7 @@ global PVecs = [pert_Vectors(G, T, i) for i = 1:nvars(R)]
 println("FractalWalk_withStartorder results")
 println("Crossed Cones in: ")
 Gb = fractal_recursiv2(G, S, T, PVecs, 1)
-println("Cones crossed: ", getCounter())
+println("Cones crossed: ", deleteCounterFr())
 return Gb
 end
 
@@ -396,11 +369,12 @@ function fractal_recursiv2(
         if w == [0]
 
             if inCone(G, T, PVecs[p])
-                #@info "Incone Gröbnerbase: " G "in depth: " p
-                #println(inCone)
+                if raiseCounterFr()
+                println(PVecs[p], " in depth", p)
+            end
                 return G
             else
-                global PVecs = [pert_Vectors(G, T, i) for i = 1:nvars(R)]
+                global PVecs = [pert_Vectors(G, T, 10, i) for i = 1:nvars(R)]
                 continue
             end
         end
@@ -412,11 +386,12 @@ function fractal_recursiv2(
                 Singular.Ideal(Rn, [change_ring(x, Rn) for x in Gw]),
                 complete_reduction = true,
             )
-            println(w, " in depth: ", p)
-            global counter = getCounter() + 1
+            println(w, " in depth", p)
+            raiseCounterFr(true)
             #println("Computed Gröbnerbase: ", w, "in depth: ", p)
 
         else
+            resetCounterFr()
             Gnew = fractal_recursiv2(
                 Singular.Ideal(R, [x for x in Gw]),
                 S,
@@ -425,7 +400,6 @@ function fractal_recursiv2(
                 p + 1,
             )
             global firstStepMode = false
-            #println("Computed Gröbnerbase: ", w, "in depth: ", p)
         end
 
         G = liftGWfr(G, Gnew, R, Rn)
@@ -442,11 +416,10 @@ function fractal_walk3(
     T::MonomialOrder{Matrix{Int64},Vector{Int64}},
 )
 global PVecs = [pert_Vectors(G, T, i) for i = 1:nvars(R)]
-
 println("FractalWalk_withStartorderLex results")
 println("Crossed Cones in: ")
 Gb = fractal_recursiv3(G, S, T, PVecs, 1)
-println("Cones crossed: ", getCounter())
+println("Cones crossed: ", deleteCounterFr())
 return Gb
 end
 
@@ -483,11 +456,12 @@ function fractal_recursiv3(
         if w == [0]
 
             if inCone(G, T, PVecs[p])
-                #@info "Incone Gröbnerbase: " G "in depth: " p
-                #println(inCone)
+                if raiseCounterFr()
+                println(PVecs[p], " in depth", p)
+            end
                 return G
             else
-                global PVecs = [pert_Vectors(G, T, i) for i = 1:nvars(R)]
+                global PVecs = [pert_Vectors(G, T, 10, i) for i = 1:nvars(R)]
                 continue
             end
         end
@@ -499,11 +473,12 @@ function fractal_recursiv3(
                 Singular.Ideal(Rn, [change_ring(x, Rn) for x in Gw]),
                 complete_reduction = true,
             )
-            global counter = getCounter() + 1
-            println(w, " in depth: ", p)
+            println(w, " in depth", p)
+            raiseCounterFr(true)
             #println("Computed Gröbnerbase: ", w, "in depth: ", p)
 
         else
+            resetCounterFr
             Gnew = fractal_recursiv3(
                 Singular.Ideal(R, [x for x in Gw]),
                 S,
@@ -512,7 +487,6 @@ function fractal_recursiv3(
                 p + 1,
             )
             global firstStepMode = false
-            #println("Computed Gröbnerbase: ", w, "in depth: ", p)
         end
 
         G = liftGWfr(G, Gnew, R, Rn)
@@ -533,7 +507,7 @@ println("Crossed Cones in: ")
     global PVecs = [pert_Vectors(G, T, i) for i = 1:nvars(R)]
 
     Gb = fractal_recursiv_lookahead(G, S, T, PVecs, 1)
-    println("Cones crossed: ", getCounter())
+    println("Cones crossed: ", deleteCounterFr())
     return Gb
 end
 
@@ -554,10 +528,12 @@ function fractal_recursiv_lookahead(
         w = nextw_fr(G, cweight, PVecs[p])
         if (w == [0])
             if inCone(G, T, PVecs[p])
-                #@info "Incone Gröbnerbase: " G "in depth: " p
-                return G
+                if raiseCounterFr()
+                println(PVecs[p], " in depth", p)
+            end
+            return G
             else
-                global PVecs = [pert_Vectors(G, T, i) for i = 1:nvars(R)]
+                global PVecs = [pert_Vectors(G, T, 10, i) for i = 1:nvars(R)]
                 #checkPvecs()
                 continue
             end
@@ -570,12 +546,10 @@ function fractal_recursiv_lookahead(
                 Singular.Ideal(Rn, [change_ring(x, Rn) for x in Gw]),
                 complete_reduction = true,
             )
-            println(w, " in depth: ", p)
-            global counter = getCounter() + 1
-            #@info "Computed Gröbnerbase: " Gnew "in depth: " p
-            #println("Computed Gröbnerbase: ", w, "in depth: ", p)
-
+            println(w, " in depth", p)
+            raiseCounterFr(true)
         else
+            resetCounterFr()
             Gnew = fractal_recursiv_lookahead(
                 Singular.Ideal(R, [x for x in Gw]),
                 S,
@@ -583,8 +557,6 @@ function fractal_recursiv_lookahead(
                 PVecs,
                 p + 1,
             )
-            #println("Computed Gröbnerbase: ", w, "in depth: ", p)
-
         end
 
         G = liftGWfr(G, Gnew, R, Rn)

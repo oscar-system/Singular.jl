@@ -184,9 +184,8 @@ function ordering_as_matrix(ord::Symbol, nvars::Int64)
 end
 
 function pert_Vectors(G::Singular.sideal, Mo::MonomialOrder{Matrix{Int64}}, t::Vector{Int64}, p::Integer)
-    if t == Mo.m[1,size(Mo.m)[1]]
-        println("testtest")
-    M = T.m
+    if t == Mo.m[1,:]
+    M = Mo.m
 else
     M = insert_weight_vector(t, Mo.m)
 end
@@ -254,8 +253,7 @@ function pert_Vectors(G::Singular.sideal, M::Matrix{Int64}, p::Integer)
 end
 function pert_Vectors(G::Singular.sideal, T::MonomialOrder{Matrix{Int64}, Vector{Int64}}, p::Integer)
     m = []
-    if T.t == T.m[1,size(T.m)[1]]
-        println("testtest")
+    if T.t == T.m[1,:]
     M = T.m
 else
     M = insert_weight_vector(T.t, T.m)
@@ -283,6 +281,42 @@ end
         end
     end
     e = maxtdeg * msum + 1
+    w = M[1, :] * e^(p - 1)
+    for i = 2:p
+        w = w + e^(p - i) * M[i, :]
+    end
+    return w
+end
+function pert_Vectors(G::Singular.sideal, T::MonomialOrder{Matrix{Int64}, Vector{Int64}}, mult::Int64, p::Integer)
+    m = []
+    if T.t == T.m[1,:]
+    M = T.m
+else
+    M = insert_weight_vector(T.t, T.m)
+end
+    n = size(M)[1]
+    for i = 1:p
+        max = M[i, 1]
+        for j = 2:n
+            temp = abs(M[i, j])
+            if temp > max
+                max = temp
+            end
+        end
+        push!(m, max)
+    end
+    msum = 0
+    for i = 2:p
+        msum = msum + m[i]
+    end
+    maxtdeg = 0
+    for g in gens(G)
+        td = tdeg(g)
+        if (td > maxtdeg)
+            maxtdeg = td
+        end
+    end
+    e = maxtdeg * msum + 1 * mult
     w = M[1, :] * e^(p - 1)
     for i = 2:p
         w = w + e^(p - i) * M[i, :]

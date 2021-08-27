@@ -21,7 +21,6 @@ function nextw(
     tweight::Array{K,1},
 ) where {T<:Number,K<:Number}
     tv = []
-
     for v in diff_vectors(G)
         cw = dot(cweight, v)
         tw = dot(tweight, v)
@@ -32,8 +31,8 @@ function nextw(
         end
         end
     end
-    #tv = [dot(cweight, v) < 0 ? dot(cweight, v) / (dot(cweight, v) - dot(tweight, v)) : nothing for v = V ]
     push!(tv, 1)
+    filter!(x -> numerator(x)!=0, tv)
     t = minimum(tv)
     w = (1 - t) * cweight + t * tweight
     return convertBoundingVector(w)
