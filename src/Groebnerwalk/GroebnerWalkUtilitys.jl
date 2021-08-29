@@ -207,7 +207,7 @@ m = []
     end
     maxtdeg = 0
     for g in gens(G)
-        td = tdeg(g)
+        td = tdeg(g,n)
         if (td > maxtdeg)
             maxtdeg = td
         end
@@ -239,7 +239,7 @@ function pert_Vectors(G::Singular.sideal, M::Matrix{Int64}, p::Integer)
     end
     maxtdeg = 0
     for g in gens(G)
-        td = tdeg(g)
+        td = tdeg(g,n)
         if (td > maxtdeg)
             maxtdeg = td
         end
@@ -275,7 +275,7 @@ end
     end
     maxtdeg = 0
     for g in gens(G)
-        td = tdeg(g)
+        td = tdeg(g,n)
         if (td > maxtdeg)
             maxtdeg = td
         end
@@ -311,7 +311,7 @@ end
     end
     maxtdeg = 0
     for g in gens(G)
-        td = tdeg(g)
+        td = tdeg(g,n)
         if (td > maxtdeg)
             maxtdeg = td
         end
@@ -324,13 +324,15 @@ end
     return w
 end
 
-function tdeg(p::Singular.spoly)
+function tdeg(p::Singular.spoly, n::Int64)
     max = 0
     for mon in monomials(p)
         ev = collect(exponent_vectors(mon))
         sum = 0
         for e in ev
-            sum = e[1] + sum
+            for i in 1:n
+            sum = e[i] + sum
+        end
         end
         if (max < sum)
             max = sum

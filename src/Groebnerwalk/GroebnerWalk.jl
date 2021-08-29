@@ -3,6 +3,8 @@ include("GroebnerWalkUtilitys.jl")
 include("FractalWalkUtilitys.jl")
 include("GenericWalkUtilitys.jl")
 include("StandardWalkUtilitys.jl")
+include("TranWalkUtilitys.jl")
+
 
 
 export groebnerwalk
@@ -17,10 +19,6 @@ export groebnerwalk
 ###############################################################
 #Top-Level
 #TODO: Implement input checks
-#Fragen:
-#Singular.reduce für f % G selbst programmieren?
-#Für divrem in Oscar-Ideal: sinnvoller möglich? reduce liefert nur den rest
-#Arithmetik von Polynomen -> Immer MPolyBuildCTX?
 ###############################################################
 
 counter = 0
@@ -52,6 +50,8 @@ function groebnerwalk(
         walk = (x, y, z) -> fractal_walk3(x, y, z)
     elseif grwalktype == :fractal4
         walk = (x, y, z) -> fractal_walk_lookahead(x, y, z)
+    elseif grwalktype == :tran
+        walk = (x, y, z) -> tran_walk(x, y, z)
         #error("Choose a strategy from: :generic, :standard ...")
         # fill the list or implement a functionality to choose the best
         # way w.r.t. the type of the ideal
@@ -186,6 +186,7 @@ function pertubed_walk(
 )
     p = k
     sweight = pert_Vectors(G, S, p)
+    #sweight = S[1,:]
     println(sweight)
     Gnew = G
     #loop
@@ -247,17 +248,24 @@ function checkPvecs()
     global PVecs
     println(PVecs)
 end
+
+sigma = []
+
+function getSigma()
+    global sigma
+    return sigma
+end
 function fractal_walk(
     G::Singular.sideal,
     S::MonomialOrder{Matrix{Int64},Vector{Int64}},
     T::MonomialOrder{Matrix{Int64},Vector{Int64}},
 )
 global PVecs = [pert_Vectors(G, T, i) for i = 1:nvars(R)]
-
+global sigma = S.w
 println("FacrtalWalk_standard results")
 println("Crossed Cones in: ")
 Gb = fractal_recursiv(G, S, T, PVecs, 1)
-println("Cones crossed: ", deleteCounterFr())
+println("Cones crossed: ", deleteCounterFr(), " and ", getCounter())
 return Gb
 end
 
@@ -271,10 +279,10 @@ function fractal_recursiv(
     R = base_ring(G)
     term = false
     G.isGB = true
-    cweight = S.w
+    cweight = getSigma()
 
     while !term
-        w = nextw_fr(G, cweight, PVecs[p])
+        w = nextW_2(G, cweight, PVecs[p])
         if (w == [0])
             if inCone(G, T, PVecs[p])
                 if raiseCounterFr()
@@ -282,7 +290,7 @@ function fractal_recursiv(
             end
                 return G
             else
-                global PVecs = [pert_Vectors(G, T, 10, i) for i = 1:nvars(R)]
+                global PVecs = [pert_Vectors(G, T, 2, i) for i = 1:nvars(R)]
                 println(PVecs)
                 continue
             end
@@ -300,6 +308,7 @@ function fractal_recursiv(
             raiseCounterFr(true)
         else
             resetCounterFr()
+            println("up in: ", p, " with: ", w)
 
             Gnew = fractal_recursiv(
                 Singular.Ideal(R, [x for x in Gw]),
@@ -308,8 +317,11 @@ function fractal_recursiv(
                 PVecs,
                 p + 1,
             )
+            resetCounterFr()
+
         end
 
+        global counter = getCounter() + 1
         G = liftGWfr(G, Gnew, R, Rn)
 
         G = Singular.std(G, complete_reduction = true)
@@ -333,7 +345,7 @@ function fractal_walk2(
     T::MonomialOrder{Matrix{Int64},Vector{Int64}},
 )
 global PVecs = [pert_Vectors(G, T, i) for i = 1:nvars(R)]
-
+global sigma = S.w
 println("FractalWalk_withStartorder results")
 println("Crossed Cones in: ")
 Gb = fractal_recursiv2(G, S, T, PVecs, 1)
@@ -361,11 +373,11 @@ function fractal_recursiv2(
     if firstStepMode
         cweight = cwPert[p]
     else
-        cweight = S.w
+        cweight = getSigma()
     end
 
     while !term
-        w = nextw_fr(G, cweight, PVecs[p])
+        w = nextW_2(G, cweight, PVecs[p])
         if w == [0]
 
             if inCone(G, T, PVecs[p])
@@ -374,7 +386,7 @@ function fractal_recursiv2(
             end
                 return G
             else
-                global PVecs = [pert_Vectors(G, T, 10, i) for i = 1:nvars(R)]
+                global PVecs = [pert_Vectors(G, T, 2, i) for i = 1:nvars(R)]
                 continue
             end
         end
@@ -391,7 +403,6 @@ function fractal_recursiv2(
             #println("Computed Gröbnerbase: ", w, "in depth: ", p)
 
         else
-            resetCounterFr()
             Gnew = fractal_recursiv2(
                 Singular.Ideal(R, [x for x in Gw]),
                 S,
@@ -399,6 +410,8 @@ function fractal_recursiv2(
                 PVecs,
                 p + 1,
             )
+            resetCounterFr()
+
             global firstStepMode = false
         end
 
@@ -461,7 +474,7 @@ function fractal_recursiv3(
             end
                 return G
             else
-                global PVecs = [pert_Vectors(G, T, 10, i) for i = 1:nvars(R)]
+                global PVecs = [pert_Vectors(G, T, 2, i) for i = 1:nvars(R)]
                 continue
             end
         end
@@ -525,7 +538,7 @@ function fractal_recursiv_lookahead(
 
 
     while !term
-        w = nextw_fr(G, cweight, PVecs[p])
+        w = nextW_2(G, cweight, PVecs[p])
         if (w == [0])
             if inCone(G, T, PVecs[p])
                 if raiseCounterFr()
@@ -533,7 +546,7 @@ function fractal_recursiv_lookahead(
             end
             return G
             else
-                global PVecs = [pert_Vectors(G, T, 10, i) for i = 1:nvars(R)]
+                global PVecs = [pert_Vectors(G, T, 2, i) for i = 1:nvars(R)]
                 #checkPvecs()
                 continue
             end
@@ -549,6 +562,8 @@ function fractal_recursiv_lookahead(
             println(w, " in depth", p)
             raiseCounterFr(true)
         else
+            println("up in: ", p, " with: ", w)
+
             resetCounterFr()
             Gnew = fractal_recursiv_lookahead(
                 Singular.Ideal(R, [x for x in Gw]),
@@ -566,4 +581,35 @@ function fractal_recursiv_lookahead(
         cweight = w
     end
     return G
+end
+
+###############################################################
+#Tran-version of the groebner walk by Tran (2002)
+###############################################################
+
+function tran_walk(G::Singular.sideal, S::Matrix{Int64}, T::Matrix{Int64})
+    cweight = S[1, :]
+    tweight = T[1, :]
+    println("Tranwalk results")
+    println("Crossed Cones in: ")
+
+    #loop
+    term = false
+    while !term
+        w = nextw(G, cweight, tweight)
+        println(cweight, tweight)
+        if w == tweight
+            if inCone(G, T, cweight)
+                return G
+            else
+                #TODO: Implement: if in several cones
+                tweight = representationVector(G, T)
+                continue
+            end
+        end
+        G = standard_step(G, w, tweight, T)
+        global counter = getCounter() + 1
+        println(w)
+        cweight = w
+        end
 end

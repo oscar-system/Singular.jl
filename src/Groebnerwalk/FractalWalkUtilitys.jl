@@ -87,7 +87,6 @@ end
             push!(tv, dot(cweight, v) // (dot(cweight, v) - tw))
         end
     end
-    #tv = [dot(cweight, v) < 0 ? dot(cweight, v) / (dot(cweight, v) - dot(tweight, v)) : nothing for v = V ]
     push!(tv, 1)
     t = minimum(tv)
     if (0 == numerator(t))
@@ -105,3 +104,49 @@ end
 
     return convertBoundingVector(w)
 end
+
+function diff_vectors_lt(I::Singular.sideal)
+    zip = []
+    v = []
+    for g in gens(I)
+        ltu = Singular.leading_exponent_vector(g)
+        for e in Singular.exponent_vectors(tail(g))
+            push!(v, (ltu .- e))
+        end
+        push!(zip, (unique(v), ltu))
+        v = []
+    end
+    return zip
+end
+
+function nextW_2(G::Singular.sideal,
+    w::Array{T,1},
+    sigma::Array{K,1},
+    ) where {T<:Number,K<:Number}
+    if (w == sigma)
+        return [0]
+    end
+
+tmin = 2
+t = 0
+    for g in gens(G)
+        a = Singular.leading_exponent_vector(g)
+        d = Singular.exponent_vectors(tail(g))
+        for v in d
+            frac = (dot(w,a)- dot(w,v) + dot(sigma,v) - dot(sigma, a))
+            if frac != 0
+            t = (dot(w,a) - dot(w,v)) // frac
+        end
+            if t > 0 && t < tmin
+                tmin = t
+            end
+        end
+    end
+
+    if tmin <= 1
+    w = w + tmin * (sigma - w)
+else
+    return [0]
+end
+    return convertBoundingVector(w)
+        end
