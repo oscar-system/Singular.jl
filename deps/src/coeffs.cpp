@@ -214,6 +214,10 @@ void singular_define_coeffs(jlcxx::Module & Singular)
        return bool(nCoeff_is_Q(n));
     });
 
+    Singular.method("nCoeff_is_Z", [](coeffs n) {
+       return bool(nCoeff_is_Z(n));
+    });
+
     Singular.method("nCoeff_is_GF", [](coeffs n) {
         return bool(nCoeff_is_GF(n));
     });
