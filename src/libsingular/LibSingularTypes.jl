@@ -43,6 +43,7 @@ const ideal_ref = CxxRef{ideal}
 
 const matrix_ptr = CxxPtr{ip_smatrix}
 const matrix_ref = CxxRef{ip_smatrix}
+const bigintmat_ptr = CxxPtr{bigintmat}
 
 ###############################################################################
 #

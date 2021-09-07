@@ -41,3 +41,23 @@ function _smatrix_clear_fn(I::smatrix)
    libSingular.mp_Delete(I.ptr, I.base_ring.ptr)
 end
 
+
+###############################################################################
+#
+#   sbigintmat: just a plain array of bigint's (coeffs_BIGINT)
+#
+###############################################################################
+
+mutable struct sbigintmat
+    ptr::libSingular.bigintmat_ptr
+
+    function sbigintmat(ptr::libSingular.bigintmat_ptr)
+        z = new(ptr)
+        finalizer(_sbigintmat_clear_fn, z)
+        return z
+    end
+end
+
+function _sbigintmat_clear_fn(m::sbigintmat)
+   libSingular.bigintmat_clear(m.ptr)
+end

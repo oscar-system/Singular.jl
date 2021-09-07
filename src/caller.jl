@@ -107,17 +107,14 @@ function create_casting_functions()
         ,
         mapping_types_reversed[:BIGINT_CMD] =>
             function (vptr, R)
-                error("unable to return a bigint from a singular library procedure")
-#                cast = libSingular.NUMBER_CMD_CASTER(vptr)
-#                return libSingular.n_GetMPZ(cast, libSingular.get_coeffs_BIGINT())
+                cast = libSingular.NUMBER_CMD_CASTER(vptr)
+                return libSingular.n_GetMPZ(cast, libSingular.get_coeffs_BIGINT())
             end
         ,
         mapping_types_reversed[:BIGINTMAT_CMD] =>
             function (vptr, R)
-                error("unable to return a bigintmat from a singular library procedure")
                 cast = libSingular.BIGINTMAT_CMD_CASTER(vptr)
-                # TODO this leak cannot possibly be useful
-                return cast
+                return sbigintmat(cast)
             end
         ,
         mapping_types_reversed[:MAP_CMD] =>
@@ -263,6 +260,20 @@ function prepare_argument(x::sideal)
                              R)
 end
 
+function prepare_argument(x::sbigintmat)
+    GC.@preserve x return (Any[mapping_types_reversed[:BIGINTMAT_CMD],
+                                 libSingular.copy_bigintmatptr_to_void(x.ptr)],
+                           false)
+end
+
+function prepare_argument(x::Union{
+                          Matrix{ <: Union{Nemo.Integer, Nemo.fmpz}},
+                          Nemo.MatElem{ <: Union{Nemo.Integer, Nemo.fmpz}},
+                          Nemo.MatAlgElem{ <: Union{Nemo.Integer, Nemo.fmpz}}})
+    return prepare_argument(sbigintmat(x))
+end
+
+
 function prepare_argument(x::Vector{Any}, R::PolyRing)
     args = Vector{Any}()
     types = Vector{Int}()
@@ -301,6 +312,11 @@ function prepare_argument(x::smatrix)
                               R)
 end
 
+function prepare_argument(x::BigInt)
+    y = libSingular.number_ptr(x, libSingular.get_coeffs_BIGINT())
+    return Any[mapping_types_reversed[:BIGINT_CMD], y.cpp_object], nothing
+end
+
 function prepare_argument(x::Any)
     :ptr in fieldnames(typeof(x)) || error("unrecognized argument $x")
     if x.ptr isa libSingular.number_ptr
@@ -308,12 +324,8 @@ function prepare_argument(x::Any)
         rng = parent(x)
         new_ptr = libSingular.n_Copy(ptr, rng.ptr)
         return Any[mapping_types_reversed[:NUMBER_CMD], new_ptr.cpp_object], nothing
-    elseif x.ptr isa libSingular.__mpz_struct
-        return Any[mapping_types_reversed[:BIGINT_CMD], x.ptr.cpp_object], nothing
     elseif x.ptr isa libSingular.map_ptr
         return Any[mapping_types_reversed[:MAP_CMD], x.ptr.cpp_object], nothing
-    elseif x.ptr isa libSingular.bigintmat
-        return Any[mapping_types_reversed[:BIGINTMAT_CMD], x.ptr.cpp_object], nothing
     end
     error("unrecognized argument $x")
 end
@@ -347,4 +359,15 @@ function low_level_caller(lib::String, name::String, args...)
     rng_ptr = (rng == nothing) ? C_NULL : rng.ptr
     return_value = libSingular.call_singular_library_procedure(name, rng_ptr, arguments)
     return convert_return(return_value, rng)
+end
+
+function lookup_library_symbol(pack::String, name::String)
+    (err::Int, res) = libSingular.lookup_singular_library_symbol_wo_rng(pack, name)
+    if err == 0
+        return convert_return(res, nothing)
+    elseif err == 1
+        error("Singular symbol "*pack*"::"*name*" does not exist")
+    else
+        error("Singular package "*pack*" does not exist")
+    end
 end
