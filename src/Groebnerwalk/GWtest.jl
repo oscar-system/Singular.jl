@@ -4,7 +4,7 @@ include("GroebnerWalk.jl")
 using Oscar
 
 
-case = 3
+case = 1
 success = true
 
 if case == 1 || case == 99
@@ -180,13 +180,13 @@ if case == 3 || case == 99
     I = Singular.Ideal(R, [f1, f2, f3])
     I = Oscar.Singular.std(I, complete_reduction = true)
 
-    @time L = groebnerwalk(
+    @time H = groebnerwalk(
         I,
         ordering_as_matrix(:degrevlex, 6),
         ordering_as_matrix(:lex, 6),
         :standard,
     )
-    @time J = fractal_walk(
+#=    @time J = fractal_walk(
         I,
         MonomialOrder(
             ordering_as_matrix(:degrevlex, 6),
@@ -198,7 +198,7 @@ if case == 3 || case == 99
             [1, 0, 0, 0, 0, 0],
             [1, 0, 0, 0, 0, 0],
         ),
-    )
+    ) =#
     @time JJ = fractal_walk_lookahead(
         I,
         MonomialOrder(
@@ -243,7 +243,7 @@ if case == 3 || case == 99
         Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(I)]),
         complete_reduction = true,
     )
-    T1 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(J)])
+#    T1 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(J)])
     T2 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(K)])
     T3 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(L)])
     T4 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(M)])
@@ -252,13 +252,13 @@ if case == 3 || case == 99
 
     println("test tran: ", equalitytest(T0, T6))
     println("test fractal2: ", equalitytest(T0, T5))
-    println("test fractal: ", equalitytest(T0, T1))
+    #println("test fractal: ", equalitytest(T0, T1))
     println("test pertubed: ", equalitytest(T2, T0))
     println("test standard: ", equalitytest(T3, T0))
     println("test generic: ", equalitytest(T4, T0))
 
 
-    if !(equalitytest(T2, T1) && equalitytest(T3, T4) && equalitytest(T0, T5))
+    if !(equalitytest(T2, T0) && equalitytest(T3, T4) && equalitytest(T0, T5))
         success = false
     end
 
@@ -297,7 +297,7 @@ if case == 4 || case == 99
     I = Singular.Ideal(R, [f1, f2, f3, f4])
     I = Oscar.Singular.std(I, complete_reduction = true)
 
-    @time L = groebnerwalk(
+    @time H = groebnerwalk(
         I,
         ordering_as_matrix(:degrevlex, 4),
         ordering_as_matrix(:lex, 4),
@@ -331,7 +331,7 @@ if case == 4 || case == 99
         I,
         ordering_as_matrix(:degrevlex, 4),
         ordering_as_matrix(:lex, 4),
-        :standard,
+        :generic,
     )
 
 
@@ -415,7 +415,7 @@ if case == 5 || case == 99
         I,
         ordering_as_matrix(:degrevlex, 3),
         ordering_as_matrix(:lex, 3),
-        :standard,
+        :generic,
     )
     T1 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(J)])
     T2 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(K)])
