@@ -39,7 +39,7 @@ function isparallel(u::Vector{Int64}, v::Vector{Int64})
     #TODO: maybe false this way
     count = 1
     x = 0
-    for i in 1:length(u)
+    for i = 1:length(u)
         if u[i] == 0
             if v[count] == 0
                 count = count + 1
@@ -74,7 +74,16 @@ function liftgeneric(
     liftArray = Array{Singular.spoly{Singular.n_FieldElem{fmpq}},1}(undef, 0)
     for g in gens(I)
         diff =
-            change_ring(g, S) - first(gens(Oscar.Singular.Ideal(S, S(reducegeneric_recursiv(change_ring(g, S), G, Lm)))))
+            subtractTerms(change_ring(g, S),
+            S(reducegeneric_recursiv2(change_ring(g, S), G, Lm)), nvars(S))
+    #=    println("red 2:",
+            change_ring(g, S) -
+            S(reducegeneric_recursiv2(change_ring(g, S), G, Lm)),
+        )
+        println("red 1:",
+            change_ring(g, S) -
+            S(reducegeneric_recursiv(change_ring(g, S), G, Lm)),
+        ) =#
         if diff != 0
             push!(Newlm, Singular.leading_monomial(g))
             push!(liftArray, diff)
@@ -195,7 +204,129 @@ function less_facet(
     end
     return false
 end
+function reduce_modulo(
+    p::Singular.spoly{Singular.n_FieldElem{fmpq}},
+    lm::Singular.spoly{Singular.n_FieldElem{fmpq}},
+    S::MPolyRing,
+)
+    a = []
+    r = 0
+    div = false
+    newpoly = Singular.MPolyBuildCtx(S)
+    for term in Singular.terms(p)
+        #println(term, "and p", lm)
+        (b, c) = Singular.divides(change_ring(term, S), change_ring(lm, S))
+        #println("mult ",c)
+        if b
+            #=    if c == 1
+                    push_term!(newpoly, 1, zeros(Int64, 1, nvars(S)))
+                else =#
+            push_term!(
+                newpoly,
+                collect(Singular.coefficients(c))[1],
+                collect(Singular.exponent_vectors(c))[1],
+            )
+            #    end
+            div = true
+        end
+    end
+    if div
+        np = finish(newpoly)
+        return (np, true)
+    end
+    return (nothing, false)
+end
+changedInReduction = false
+function hasChangedInReduction()
+    global changedInReduction
+    temp = changedInReduction
+    global changedInReduction = false
+    return temp
+end
+function reducegeneric_recursiv2(
+    p::Singular.spoly,
+    G::Singular.sideal,
+    Lm::Vector{Singular.spoly{Singular.n_FieldElem{fmpq}}},
+) where {T<:RingElement}
+    R = base_ring(G)
 
+    S, V = Singular.PolynomialRing(
+        base_ring(R).base_ring,
+        [String(s) for s in symbols(R)],
+        ordering = :lex,
+    )
+        Gh = []
+    for i = 1:ngens(G)
+        (q, b) = reduce_modulo(change_ring(p, S), change_ring(Lm[i], S), S)
+        if b
+            push!(Gh, (i, q))
+            break
+        end
+    end
+    if !isempty(Gh)
+        mul = [x for x in gens(G)]
+        global changedInReduction = true
+        for (i, q) in Gh
+        #=    println("pretet ", p, "and", q * change_ring(mul[i], S))
+            println(
+                "test ",
+                subtractTerms(change_ring(p, S), (q * change_ring(mul[i],S)), nvars(S)),
+            ) =#
+            return reducegeneric_recursiv2(
+                subtractTerms(change_ring(p, S), (q * change_ring(mul[i],S)), nvars(S)),
+                G,
+                Lm,
+            )
+        end
+    else
+        return p
+    end
+end
+function subtractTerms(p::Singular.spoly, q::Singular.spoly, dim::Int64)
+    sol = MPolyBuildCtx(R)
+    ep = collect(Singular.exponent_vectors(p))
+    eq = collect(Singular.exponent_vectors(q))
+    cp = collect(Singular.coefficients(p))
+    cq = collect(Singular.coefficients(q))
+    dummy = zeros(Int64, dim)
+    dummy[1] = -1
+    for j = 1:length(ep)
+        fin = false
+        for k = 1:length(eq)
+            equals = true
+            for i = 1:dim
+                if ep[j][i] != eq[k][i]
+                    equals = false
+                    break
+                end
+            end
+            if equals
+                diff = cp[j] - cq[k]
+                if diff != 0
+                push_term!(
+                    sol,
+                    diff,
+                    ep[j],
+                )
+            end
+                fin = true
+                eq[k] = dummy #delete Vector if equal
+                break
+            end
+        end
+        if !fin
+            push_term!(sol, cp[j], ep[j])
+        end
+    end
+        for i in 1:length(eq)
+            if eq[i][1] != -1
+        push_term!(sol, - cq[i], eq[i])
+end
+    end
+    h = finish(sol)
+    return h
+end
+#=
 function reducegeneric_recursiv(
     p::T,
     G::Singular.sideal,
@@ -211,8 +342,10 @@ function reducegeneric_recursiv(
     for i = 1:ngens(G)
         for mon in terms(first(gens(ideal(S, [p]))))
             (q, r) = divrem(mon, gens(ideal(S, Lm))[i])
+            #printn("q ",q,"r ", r, "mon", mon, "p ", p)
             if r == 0
                 push!(Gh, (i, q))
+                #println(q)
                 break
             end
         end
@@ -230,7 +363,7 @@ function reducegeneric_recursiv(
         return p
     end
 end
-
+=#
 function interreduce_new(
     G::Singular.sideal,
     Lm::Vector{Singular.spoly{Singular.n_FieldElem{fmpq}}},
@@ -244,7 +377,8 @@ function interreduce_new(
             #gensrest = filter(x -> x != gens[i], gens)
             gensrest =
                 Array{Singular.spoly{Singular.n_FieldElem{fmpq}},1}(undef, 0)
-            Lmrest = Array{Singular.spoly{Singular.n_FieldElem{fmpq}},1}(undef, 0)
+            Lmrest =
+                Array{Singular.spoly{Singular.n_FieldElem{fmpq}},1}(undef, 0)
             ## New function
             for j = 1:ngens(G)
                 if i != j
@@ -253,14 +387,24 @@ function interreduce_new(
                 end
             end
             #Lmrest = filter(x -> x != Lm[i], Lm)
-            gen = reducegeneric_recursiv(
+            gen = reducegeneric_recursiv2(
                 gens[i],
                 Singular.Ideal(R, gensrest),
                 Lmrest,
             )
-            if gens[i] != gen
+        #=    println("interred 2 :", reducegeneric_recursiv2(
+                            gens[i],
+                            Singular.Ideal(R, gensrest),
+                            Lmrest,
+                        ))
+            println("interred 1 :", reducegeneric_recursiv(
+                                        gens[i],
+                                        Singular.Ideal(R, gensrest),
+                                        Lmrest,
+                                    )) =#
+            if hasChangedInReduction()
                 changed = true
-                gens[i] = first(Singular.gens(Singular.Ideal(R, R(gen))))
+                gens[i] = first(Singular.gens(Singular.Ideal(R, change_ring(gen, R))))
                 break
             end
         end

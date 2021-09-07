@@ -167,8 +167,8 @@ function generic_step(
 
     liftArray, Newlm = liftgeneric(G, lm, facet_Ideal)
     Gnew = Oscar.Singular.Ideal(S, [x for x in liftArray])
-
     Gnew = interreduce_new(Gnew, Newlm)
+
     Gnew = Oscar.Singular.Ideal(R, [change_ring(x, R) for x in gens(Gnew)])
     Gnew.isGB = true
     return Gnew, Newlm
@@ -187,7 +187,6 @@ function pertubed_walk(
     p = k
     sweight = pert_Vectors(G, S, p)
     #sweight = S[1,:]
-    println(sweight)
     Gnew = G
     #loop
     term = false
