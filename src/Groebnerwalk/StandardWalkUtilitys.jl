@@ -1,4 +1,3 @@
-using Oscar
 include("GroebnerWalkUtilitys.jl")
 
 ###############################################################

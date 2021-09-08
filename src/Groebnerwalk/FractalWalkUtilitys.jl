@@ -13,8 +13,8 @@ end
 
 function inCone(G::Singular.sideal, T::MonomialOrder{Matrix{Int64}, Vector{Int64}},t::Vector{Int64})
     R, V = change_order(G, T.t, T.m)
-    I = Oscar.Singular.Ideal(R, [change_ring(x, R) for x in gens(G)])
-    cvzip = zip(gens(I), initials(R, gens(I), t))
+    I = Singular.Ideal(R, [change_ring(x, R) for x in Singular.gens(G)])
+    cvzip = zip(Singular.gens(I), initials(R, Singular.gens(I), t))
     for (g, ing) in cvzip
         if !isequal(Singular.leading_term(g), Singular.leading_term(ing))
             return false
@@ -30,17 +30,17 @@ function change_order(
     R = I.base_ring
     G = Singular.gens(I.base_ring)
     Gstrich = string.(G)
-        S, H = Oscar.Singular.PolynomialRing(
+        S, H = Singular.PolynomialRing(
             R.base_ring,
             Gstrich,
-            ordering = Oscar.Singular.ordering_a(T.w)*
-                       Oscar.Singular.ordering_M(T.m),
+            ordering = Singular.ordering_a(T.w)*
+                       Singular.ordering_M(T.m),
         )
-#=    S, H = Oscar.Singular.PolynomialRing(
+#=    S, H = Singular.PolynomialRing(
         R.base_ring,
         Gstrich,
-        ordering = Oscar.Singular.ordering_a(T.t) *Oscar.Singular.ordering_a(T.w)*
-                   Oscar.Singular.ordering_M(T.m)
+        ordering = Singular.ordering_a(T.t) *Singular.ordering_a(T.w)*
+                   Singular.ordering_M(T.m)
     )
     return S, H
     =#
@@ -48,10 +48,10 @@ end
 
 function liftGWfr(G::Singular.sideal, Gw::Singular.sideal, R::Singular.PolyRing, S::Singular.PolyRing)
 rest = [
-    change_ring(gen, S) - change_ring(Oscar.Singular.reduce(change_ring(gen, R), G), S)
-    for gen in gens(Gw)
+    change_ring(gen, S) - change_ring(Singular.reduce(change_ring(gen, R), G), S)
+    for gen in Singular.gens(Gw)
 ]
-G = Oscar.Singular.Ideal(S, [S(x) for x in rest])
+G = Singular.Ideal(S, [S(x) for x in rest])
 G.isGB = true
 return G
 end

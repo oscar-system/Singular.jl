@@ -1,4 +1,3 @@
-using Oscar
 ###############################################################
 #Utilitys for Groebnerwalks
 ###############################################################
@@ -6,10 +5,10 @@ using Oscar
 #Returns the initials of polynomials w.r.t. a weight vector.
 #The ordering doesn´t affect this.
 function initials(
-    R::MPolyRing,
-    G::Array{T,1},
-    w::Array{K,1},
-) where {T<:RingElement,K<:Number}
+    R::Singular.PolyRing,
+    G::Vector{spoly{n_Q}},
+    w::Vector{Int64}
+)
     inits = []
     for g in G
         maxw = 0
@@ -28,7 +27,7 @@ function initials(
         end
         inw = MPolyBuildCtx(R)
         for (k, j) in indexw
-            push_term!(inw, collect(Singular.coefficients(g))[k], j)
+            Singular.push_term!(inw, collect(Singular.coefficients(g))[k], j)
         end
         h = finish(inw)
         push!(inits, h)
@@ -43,8 +42,8 @@ end
 
 function diff_vectors(
     I::Singular.sideal,
-    Lm::Vector{Singular.spoly{Singular.n_FieldElem{fmpq}}},
-)
+    Lm::Vector{spoly{L}},
+) where L <: Nemo.RingElem
     v = []
     for i = 1:ngens(I)
         ltu = Singular.leading_exponent_vector(Lm[i])
@@ -80,11 +79,11 @@ function change_order(
     R = I.base_ring
     G = Singular.gens(I.base_ring)
     Gstrich = string.(G)
-    S, H = Oscar.Singular.PolynomialRing(
+    S, H = Singular.PolynomialRing(
         R.base_ring,
         Gstrich,
-        ordering = Oscar.Singular.ordering_a(cweight) *
-                   Oscar.Singular.ordering_M(T),
+        ordering = Singular.ordering_a(cweight) *
+                   Singular.ordering_M(T),
     )
     return S, H
 end
@@ -97,28 +96,28 @@ function change_order(
     R = I.base_ring
     G = Singular.gens(I.base_ring)
     Gstrich = string.(G)
-    S, H = Oscar.Singular.PolynomialRing(
+    S, H = Singular.PolynomialRing(
         R.base_ring,
         Gstrich,
-        ordering = Oscar.Singular.ordering_M(M),
+        ordering = Singular.ordering_M(M),
     )
     #@error("Not implemented yet")
     return S, H
 end
 
 function change_ring(p::Singular.spoly, R::Singular.PolyRing)
-    cvzip = zip(coefficients(p), exponent_vectors(p))
+    cvzip = zip(Singular.coefficients(p), Singular.exponent_vectors(p))
     M = MPolyBuildCtx(R)
     for (c, v) in cvzip
-        push_term!(M, c, v)
+        Singular.push_term!(M, c, v)
     end
     return finish(M)
 end
-function change_ring(p::Singular.spoly, R::MPolyRing)
-    cvzip = zip(coefficients(p), exponent_vectors(p))
+function change_ring(p::Singular.spoly, R::Singular.PolyRing)
+    cvzip = zip(Singular.coefficients(p), Singular.exponent_vectors(p))
     M = MPolyBuildCtx(R)
     for (c, v) in cvzip
-        push_term!(M, c, v)
+        Singular.push_term!(M, c, v)
     end
     return finish(M)
 end
@@ -326,8 +325,8 @@ end
 
 function tdeg(p::Singular.spoly, n::Int64)
     max = 0
-    for mon in monomials(p)
-        ev = collect(exponent_vectors(mon))
+    for mon in Singular.monomials(p)
+        ev = collect(Singular.exponent_vectors(mon))
         sum = 0
         for e in ev
             for i in 1:n
@@ -343,8 +342,8 @@ end
 
 function inCone(G::Singular.sideal, T::Matrix{Int64},t::Vector{Int64})
     R, V = change_order(G, T)
-    I = Oscar.Singular.Ideal(R, [change_ring(x, R) for x in gens(G)])
-    cvzip = zip(gens(I), initials(R, gens(I), t))
+    I = Singular.Ideal(R, [change_ring(x, R) for x in gens(G)])
+    cvzip = zip(Singular.gens(I), initials(R, Singular.gens(I), t))
     for (g, ing) in cvzip
         if !isequal(Singular.leading_term(g), Singular.leading_term(ing))
             return false
@@ -356,10 +355,10 @@ end
 function liftGW(G::Singular.sideal, InG::Singular.sideal, R::Singular.PolyRing, S::Singular.PolyRing)
     G.isGB = true
     rest = [
-        gen - change_ring(Oscar.Singular.reduce(change_ring(gen, R), G), S)
+        gen - change_ring(Singular.reduce(change_ring(gen, R), G), S)
         for gen in gens(InG)
     ]
-    Gnew = Oscar.Singular.Ideal(S, [S(x) for x in rest])
+    Gnew = Singular.Ideal(S, [S(x) for x in rest])
     Gnew.isGB = true
     return Gnew
 end
@@ -369,7 +368,7 @@ end
 #############################################
 
 #Use MPolybuildCTX
-function vec_sum(p::Vector{fmpq_mpoly}, q::Vector{fmpq_mpoly})
+function vec_sum(p::Vector{spoly{n_Q}}, q::Vector{spoly{n_Q}})
     poly = 0
     for i = 1:length(p)
         poly = poly + p[i] * q[i]
@@ -395,17 +394,26 @@ end
 
 # Singular.isequal depends on order of generators
 function equalitytest(G::Singular.sideal, K::Singular.sideal)
-    generators = gens(G)
+    generators = Singular.gens(G)
     count = 0
     for gen in generators
-        for r in gens(K)
+        for r in Singular.gens(K)
             if gen - r == 0
                 count = count + 1
             end
         end
     end
-    if count == ngens(G)
+    if count == Singular.ngens(G)
         return true
     end
     return false
+end
+
+function dot(v::Vector{Int64}, w::Vector{Int64})
+    n = length(v)
+    sum = 0
+    for i in 1:n
+        sum = sum + v[i] * w[i]
+    end
+    return sum
 end

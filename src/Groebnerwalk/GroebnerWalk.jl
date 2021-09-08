@@ -1,4 +1,3 @@
-using Oscar
 include("GroebnerWalkUtilitys.jl")
 include("FractalWalkUtilitys.jl")
 include("GenericWalkUtilitys.jl")
@@ -58,14 +57,14 @@ function groebnerwalk(
     end
 
     ######TODO:Check the parameter#####
-    R = singular_ring(base_ring(G))
+    R = base_ring(G)
     I = Singular.Ideal(R, [R(x) for x in gens(G)])
 
     Gb = walk(I, S, T)
     println("Cones crossed: ", getCounter())
 
     S, V = change_order(Gb, T)
-    return Oscar.Singular.Ideal(S, [change_ring(gen, S) for gen in gens(Gb)])
+    return Singular.Ideal(S, [change_ring(gen, S) for gen in gens(Gb)])
 end
 
 
@@ -117,7 +116,7 @@ function standard_step(
     inwG = initials(S, gens(G), cw)
     #Initial Ideal
     IinwG = Singular.std(
-        Oscar.Singular.Ideal(S, [S(x) for x in inwG]),
+        Singular.Ideal(S, [S(x) for x in inwG]),
         complete_reduction = true,
     )
 
@@ -125,7 +124,7 @@ function standard_step(
     Gnew = liftGW(G, IinwG, R, S)
 
     #Interreduce
-    return Oscar.Singular.std(Gnew, complete_reduction = true)
+    return Singular.std(Gnew, complete_reduction = true)
 end
 
 ###############################################################
@@ -137,7 +136,9 @@ function generic_walk(G::Singular.sideal, S::Matrix{Int64}, T::Matrix{Int64})
     R, V = change_order(G, T)
 
     v = nextV(G, [0], S, T)
-    lm = [Oscar.Singular.leading_monomial(g) for g in gens(G)]
+    lm = [change_ring(Singular.leading_term(g), R) for g in gens(G)]
+    G = Singular.Ideal(R, [change_ring(x, R) for x in gens(G)])
+
     println("GenericWalk results")
     println("Crossed Cones with facetNormal: ")
     while !isempty(v)
@@ -152,24 +153,24 @@ end
 
 function generic_step(
     G::Singular.sideal,
-    S::MPolyRing,
+    S::Singular.PolyRing,
     v::Vector{Int64},
     T::Matrix{Int64},
-    lm::Vector{Singular.spoly{Singular.n_FieldElem{fmpq}}},
-)
-    R = base_ring(G)
+    lm::Vector{Singular.spoly{L}}) where L <: Nemo.RingElem
+
+    R = Singular.base_ring(G)
     facet_Generators = facet_initials(S, G, v, lm)
 
     facet_Ideal = Singular.std(
-        Oscar.Singular.Ideal(S, [S(x) for x in facet_Generators]),
+        Singular.Ideal(S, [S(x) for x in facet_Generators]),
         complete_reduction = true,
     )
 
     liftArray, Newlm = liftgeneric(G, lm, facet_Ideal)
-    Gnew = Oscar.Singular.Ideal(S, [x for x in liftArray])
+    Gnew = Singular.Ideal(S, [x for x in liftArray])
     Gnew = interreduce_new(Gnew, Newlm)
 
-    Gnew = Oscar.Singular.Ideal(R, [change_ring(x, R) for x in gens(Gnew)])
+    Gnew = Singular.Ideal(R, [change_ring(x, R) for x in gens(Gnew)])
     Gnew.isGB = true
     return Gnew, Newlm
 end
@@ -202,7 +203,7 @@ function pertubed_walk(
         else
             if k == 1
                 R, V = change_order(Gnew, T)
-                Gnew = Oscar.Singular.Ideal(
+                Gnew = Singular.Ideal(
                     R,
                     [change_ring(x, R) for x in gens(Gnew)],
                 )
@@ -359,11 +360,11 @@ function fractal_recursiv2(
     PVecs::Vector{Vector{Int64}},
     p::Int64,
 )
-    R = base_ring(G)
+    R = Singular.base_ring(G)
     term = false
     G.isGB = true
     if (p == 1)
-        if !ismonomial(initials(R, gens(G), S.w))
+        if !ismonomial(initials(R, Singular.gens(G), S.w))
             println("nomonomial")
             global cwPert = [pert_Vectors(G, S, S.w, i) for i = 1:nvars(R)]
             global firstStepMode = true
@@ -392,7 +393,7 @@ function fractal_recursiv2(
         T.w = w
         Rn, V = change_order(G, T)
         Gw = initials(R, gens(G), w)
-        if p == nvars(R)
+        if p == Singular.nvars(R)
             Gnew = Singular.std(
                 Singular.Ideal(Rn, [change_ring(x, Rn) for x in Gw]),
                 complete_reduction = true,
@@ -442,12 +443,12 @@ function fractal_recursiv3(
     PVecs::Vector{Vector{Int64}},
     p::Int64,
 )
-    R = base_ring(G)
+    R = Singular.base_ring(G)
     term = false
     G.isGB = true
     if (p == 1)
-        if !ismonomial(initials(R, gens(G), S.w))
-            global cwPert = [pert_Vectors(G, S, S.w, i) for i = 1:nvars(R)]
+        if !ismonomial(initials(R, Singular.gens(G), S.w))
+            global cwPert = [pert_Vectors(G, S, S.w, i) for i = 1:Singular.nvars(R)]
             global firstStepMode = true
         end
     end
@@ -473,14 +474,14 @@ function fractal_recursiv3(
             end
                 return G
             else
-                global PVecs = [pert_Vectors(G, T, 2, i) for i = 1:nvars(R)]
+                global PVecs = [pert_Vectors(G, T, 2, i) for i = 1:Singular.nvars(R)]
                 continue
             end
         end
         T.w = w
         Rn, V = change_order(G, T)
-        Gw = initials(R, gens(G), w)
-        if p == nvars(R)
+        Gw = initials(R, Singular.gens(G), w)
+        if p == Singular.nvars(R)
             Gnew = Singular.std(
                 Singular.Ideal(Rn, [change_ring(x, Rn) for x in Gw]),
                 complete_reduction = true,
@@ -530,7 +531,7 @@ function fractal_recursiv_lookahead(
     PVecs::Vector{Vector{Int64}},
     p::Int64,
 )
-    R = base_ring(G)
+    R = Singular.base_ring(G)
     term = false
     G.isGB = true
     cweight = S.w
@@ -552,8 +553,8 @@ function fractal_recursiv_lookahead(
         end
         T.w = w
         Rn, V = change_order(G, T)
-        Gw = initials(R, gens(G), w)
-        if (p == nvars(R) || isBinomial(Gw))
+        Gw = initials(R, Singular.gens(G), w)
+        if (p == Singular.nvars(R) || isBinomial(Gw))
             Gnew = Singular.std(
                 Singular.Ideal(Rn, [change_ring(x, Rn) for x in Gw]),
                 complete_reduction = true,
@@ -596,7 +597,6 @@ function tran_walk(G::Singular.sideal, S::Matrix{Int64}, T::Matrix{Int64})
     term = false
     while !term
         w = nextw(G, cweight, tweight)
-        println(cweight, tweight)
         if w == tweight
             if inCone(G, T, cweight)
                 return G

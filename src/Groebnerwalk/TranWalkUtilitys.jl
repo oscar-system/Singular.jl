@@ -2,7 +2,7 @@ include("GroebnerWalkUtilitys.jl")
 
 
 function representationVector(G::Singular.sideal, T::Matrix{Int64})
-    n = Singular.ncols(T)
+    n = size(T)[1]
     M = 0
     for i in 1:n
         for j in 1:n
@@ -14,7 +14,7 @@ end
 end
 
     d0 = 0
-    for g in gens(G)
+    for g in Singular.gens(G)
 #        println(g, " in tedeg", tdeg(g))
     temp = tdeg(g,n)
     if d0 < temp

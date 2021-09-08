@@ -1,15 +1,11 @@
-using Pkg
 include("GroebnerWalk.jl")
 
-using Oscar
-
-
-case = 1
+case = 3
 success = true
 
 if case == 1 || case == 99
-    R, (x, y) = Oscar.Singular.PolynomialRing(
-        QQ,
+    R, (x, y) = Singular.PolynomialRing(
+        Singular.QQ,
         ["x", "y"],
         ordering = Singular.ordering_M(ordering_as_matrix(:degrevlex, 2)),
     )
@@ -18,9 +14,9 @@ if case == 1 || case == 99
     f2 = x^3 - y^2 - x
     I = Singular.Ideal(R, [f1, f2])
 
-    I = Oscar.Singular.std(I, complete_reduction = true)
+    I = Singular.std(I, complete_reduction = true)
 
-    S, V = Oscar.Singular.PolynomialRing(QQ, ["x", "y"], ordering = :lex)
+    S, V = Singular.PolynomialRing(Singular.QQ, ["x", "y"], ordering = :lex)
 
     @time H = groebnerwalk(
         I,
@@ -61,15 +57,15 @@ if case == 1 || case == 99
     )
 
     T0 = Singular.std(
-        Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(I)]),
+        Singular.Ideal(S, [change_ring(x, S) for x in gens(I)]),
         complete_reduction = true,
     )
-    T1 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(J)])
-    T2 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(K)])
-    T3 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(L)])
-    T4 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(M)])
-    T5 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(JJ)])
-    T6 = Oscar.Singular.Ideal(S, [change_ring(x,S) for x in gens(H)])
+    T1 = Singular.Ideal(S, [change_ring(x, S) for x in gens(J)])
+    T2 = Singular.Ideal(S, [change_ring(x, S) for x in gens(K)])
+    T3 = Singular.Ideal(S, [change_ring(x, S) for x in gens(L)])
+    T4 = Singular.Ideal(S, [change_ring(x, S) for x in gens(M)])
+    T5 = Singular.Ideal(S, [change_ring(x, S) for x in gens(JJ)])
+    T6 = Singular.Ideal(S, [change_ring(x,S) for x in gens(H)])
 
     println("test tran: ", equalitytest(T0, T6))
     println("test fractal2: ", equalitytest(T0, T5))
@@ -86,8 +82,8 @@ end
 
 if case == 2 || case == 99
 
-    R, (x, y, z) = Oscar.Singular.PolynomialRing(
-        QQ,
+    R, (x, y, z) = Singular.PolynomialRing(
+        Singular.QQ,
         ["x", "y", "z"],
         ordering = Singular.ordering_M(ordering_as_matrix([5, 4, 1], :deglex)),
     )
@@ -96,7 +92,7 @@ if case == 2 || case == 99
     f2 = y^2 - x * z - y * z
     I = Singular.Ideal(R, [f1, f2])
 
-    I = Oscar.Singular.std(I, complete_reduction = true)
+    I = Singular.std(I, complete_reduction = true)
 
     @time H = groebnerwalk(
         I,
@@ -134,23 +130,23 @@ if case == 2 || case == 99
         :generic,
     )
 
-    S, V = Oscar.Singular.PolynomialRing(
-        QQ,
+    S, V = Singular.PolynomialRing(
+        Singular.QQ,
         ["x", "y", "z"],
         ordering = Singular.ordering_M(ordering_as_matrix([6, 1, 3], :lex)),
     )
 
 
     T0 = Singular.std(
-        Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(I)]),
+        Singular.Ideal(S, [change_ring(x, S) for x in gens(I)]),
         complete_reduction = true,
     )
-    T1 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(J)])
-    T2 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(K)])
-    T3 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(L)])
-    T4 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(M)])
-    T5 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(JJ)])
-    T6 = Oscar.Singular.Ideal(S, [change_ring(x,S) for x in gens(H)])
+    T1 = Singular.Ideal(S, [change_ring(x, S) for x in gens(J)])
+    T2 = Singular.Ideal(S, [change_ring(x, S) for x in gens(K)])
+    T3 = Singular.Ideal(S, [change_ring(x, S) for x in gens(L)])
+    T4 = Singular.Ideal(S, [change_ring(x, S) for x in gens(M)])
+    T5 = Singular.Ideal(S, [change_ring(x, S) for x in gens(JJ)])
+    T6 = Singular.Ideal(S, [change_ring(x,S) for x in gens(H)])
 
     println("test tran: ", equalitytest(T0, T6))
     println("test fractal2: ", equalitytest(T0, T5))
@@ -167,8 +163,8 @@ end
 
 
 if case == 3 || case == 99
-    R, (x, y, z, u, v, w) = Oscar.Singular.PolynomialRing(
-        QQ,
+    R, (x, y, z, u, v, w) = Singular.PolynomialRing(
+        Singular.QQ,
         ["x", "y", "z", "u", "v", "w"],
         ordering = Singular.ordering_M(ordering_as_matrix(:degrevlex, 6)),
     )
@@ -178,7 +174,7 @@ if case == 3 || case == 99
     f2 = 2 * x^2 * y + x^3 * w * u^2 + x
     f3 = 2 - 3 * x^2 * v * z^4 * w
     I = Singular.Ideal(R, [f1, f2, f3])
-    I = Oscar.Singular.std(I, complete_reduction = true)
+    I = Singular.std(I, complete_reduction = true)
 
     @time H = groebnerwalk(
         I,
@@ -234,38 +230,37 @@ if case == 3 || case == 99
     )
 
 
-    S, V = Oscar.Singular.PolynomialRing(
-        QQ,
+    S, V = Singular.PolynomialRing(
+        Singular.QQ,
         ["x", "y", "z", "u", "v", "w"],
-        ordering = Oscar.Singular.ordering_M(ordering_as_matrix(:lex, 6)),
+        ordering = Singular.ordering_M(ordering_as_matrix(:lex, 6)),
     )
     T0 = Singular.std(
-        Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(I)]),
+        Singular.Ideal(S, [change_ring(x, S) for x in gens(I)]),
         complete_reduction = true,
     )
-#    T1 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(J)])
-    T2 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(K)])
-    T3 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(L)])
-    T4 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(M)])
-    T5 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(JJ)])
-    T6 = Oscar.Singular.Ideal(S, [change_ring(x,S) for x in gens(H)])
-
+#    T1 = Singular.Ideal(S, [change_ring(x, S) for x in gens(J)])
+    T2 = Singular.Ideal(S, [change_ring(x, S) for x in gens(K)])
+    T3 = Singular.Ideal(S, [change_ring(x, S) for x in gens(L)])
+    T4 = Singular.Ideal(S, [change_ring(x, S) for x in gens(M)])
+    T5 = Singular.Ideal(S, [change_ring(x, S) for x in gens(JJ)])
+    T6 = Singular.Ideal(S, [change_ring(x,S) for x in gens(H)])
+    println(T0)
     println("test tran: ", equalitytest(T0, T6))
     println("test fractal2: ", equalitytest(T0, T5))
     #println("test fractal: ", equalitytest(T0, T1))
     println("test pertubed: ", equalitytest(T2, T0))
     println("test standard: ", equalitytest(T3, T0))
-    println("test generic: ", equalitytest(T4, T0))
+    println("test generic: ", equal(T4, T0))
 
-
-    if !(equalitytest(T2, T0) && equalitytest(T3, T4) && equalitytest(T0, T5))
+    if !(equalitytest(T2, T0) && equalitytest(T3, T0) && equalitytest(T0, T5) && Singular.equal(T0, T4))
         success = false
     end
 
 end
 if case == 4 || case == 99
-    R, (q, c, p, d) = Oscar.Singular.PolynomialRing(
-        QQ,
+    R, (q, c, p, d) = Singular.PolynomialRing(
+        Singular.QQ,
         ["q", "c", "p", "d"],
         ordering = Singular.ordering_M(ordering_as_matrix(:degrevlex, 4)),
     )
@@ -295,7 +290,7 @@ if case == 4 || case == 99
         12 * c * d * q +
         12 * c * d * p * q - 12 * c * d
     I = Singular.Ideal(R, [f1, f2, f3, f4])
-    I = Oscar.Singular.std(I, complete_reduction = true)
+    I = Singular.std(I, complete_reduction = true)
 
     @time H = groebnerwalk(
         I,
@@ -335,38 +330,38 @@ if case == 4 || case == 99
     )
 
 
-    S, V = Oscar.Singular.PolynomialRing(
-        QQ,
+    S, V = Singular.PolynomialRing(
+        Singular.QQ,
         ["q", "c", "p", "d"],
-        ordering = Oscar.Singular.ordering_M(ordering_as_matrix(:lex, 4)),
+        ordering = Singular.ordering_M(ordering_as_matrix(:lex, 4)),
     )
     T0 = Singular.std(
-        Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(I)]),
+        Singular.Ideal(S, [change_ring(x, S) for x in gens(I)]),
         complete_reduction = true,
     )
-    T1 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(J)])
-    T2 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(K)])
-    T3 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(L)])
-    T4 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(M)])
-    T5 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(JJ)])
-    T6 = Oscar.Singular.Ideal(S, [change_ring(x,S) for x in gens(H)])
+    T1 = Singular.Ideal(S, [change_ring(x, S) for x in gens(J)])
+    T2 = Singular.Ideal(S, [change_ring(x, S) for x in gens(K)])
+    T3 = Singular.Ideal(S, [change_ring(x, S) for x in gens(L)])
+    T4 = Singular.Ideal(S, [change_ring(x, S) for x in gens(M)])
+    T5 = Singular.Ideal(S, [change_ring(x, S) for x in gens(JJ)])
+    T6 = Singular.Ideal(S, [change_ring(x,S) for x in gens(H)])
 
     println("test tran: ", equalitytest(T0, T6))
     println("test fractal: ", equalitytest(T0, T1))
     println("test fractal2: ", equalitytest(T0, T1))
     println("test pertubed: ", equalitytest(T2, T0))
     println("test standard: ", equalitytest(T3, T0))
-    println("test generic: ", equalitytest(T4, T0))
+    println("test generic: ", Singular.equal(T4, T0))
 
 
-    if !(equalitytest(T2, T1) && equalitytest(T3, T4) && equalitytest(T0, T5))
+    if !(equalitytest(T2, T1) && equalitytest(T3, T0) && equalitytest(T0, T5) && Singular.equal(T0, T4))
         success = false
     end
 
 end
 if case == 5 || case == 99
-    R, (x, y, z) = Oscar.Singular.PolynomialRing(
-        QQ,
+    R, (x, y, z) = Singular.PolynomialRing(
+        Singular.QQ,
         ["x", "y", "z"],
         ordering = Singular.ordering_M(ordering_as_matrix(:degrevlex, 3)),
     )
@@ -376,9 +371,9 @@ if case == 5 || case == 99
     f3 = -2x^2*y + x* y^4 + y *z^4 - 3
     I = Singular.Ideal(R, [f1, f2, f3])
 
-    I = Oscar.Singular.std(I, complete_reduction = true)
+    I = Singular.std(I, complete_reduction = true)
 
-    S, V = Oscar.Singular.PolynomialRing(QQ, ["x", "y", "z"], ordering = :lex)
+    S, V = Singular.PolynomialRing(Singular.QQ, ["x", "y", "z"], ordering = :lex)
 
     @time H = groebnerwalk(
         I,
@@ -417,27 +412,27 @@ if case == 5 || case == 99
         ordering_as_matrix(:lex, 3),
         :generic,
     )
-    T1 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(J)])
-    T2 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(K)])
-    T3 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(L)])
-    T4 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(M)])
-    T5 = Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(JJ)])
+    T1 = Singular.Ideal(S, [change_ring(x, S) for x in gens(J)])
+    T2 = Singular.Ideal(S, [change_ring(x, S) for x in gens(K)])
+    T3 = Singular.Ideal(S, [change_ring(x, S) for x in gens(L)])
+    T4 = Singular.Ideal(S, [change_ring(x, S) for x in gens(M)])
+    T5 = Singular.Ideal(S, [change_ring(x, S) for x in gens(JJ)])
 
     @time T0 = Singular.std(
-        Oscar.Singular.Ideal(S, [change_ring(x, S) for x in gens(I)]),
+        Singular.Ideal(S, [change_ring(x, S) for x in gens(I)]),
         complete_reduction = true,
     )
-    T6 = Oscar.Singular.Ideal(S, [change_ring(x,S) for x in gens(H)])
+    T6 = Singular.Ideal(S, [change_ring(x,S) for x in gens(H)])
 
     println("test tran: ", equalitytest(T0, T6))
     println("test fractal2: ", equalitytest(T0, T5))
     println("test fractal: ", equalitytest(T0, T1))
     println("test pertubed: ", equalitytest(T2, T0))
     println("test standard: ", equalitytest(T3, T0))
-    println("test generic: ", equalitytest(T4, T0))
+    println("test generic: ", Singular.equal(T4, T0))
 
 
-    if !(equalitytest(T2, T1) && equalitytest(T3, T4) && equalitytest(T0, T5))
+    if !(equalitytest(T2, T1) && equalitytest(T3, T0) && equalitytest(T0, T5) && Singular.equal(T0, T4))
         success = false
     end
 

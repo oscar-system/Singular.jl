@@ -1,4 +1,3 @@
-using Oscar
 include("GroebnerWalkUtilitys.jl")
 
 ###############################################################
@@ -6,22 +5,22 @@ include("GroebnerWalkUtilitys.jl")
 ###############################################################
 
 function facet_initials(
-    R::MPolyRing,
+    R::Singular.PolyRing,
     G::Singular.sideal,
     v::Vector{Int64},
-    lm::Vector{Singular.spoly{Singular.n_FieldElem{fmpq}}},
+    lm::Vector{spoly{n_Q}},
 )
     inits = []
     count = 1
-    for g in gens(G)
-        inw = MPolyBuildCtx(R)
+    for g in Singular.gens(G)
+        inw = Singular.MPolyBuildCtx(R)
         #V = filter(x -> less_facet(S, x), diff_vectors(G)
         el = collect(Singular.exponent_vectors(lm[count]))[1]
 
         for i = 1:length(g)
             e = collect(Singular.exponent_vectors(g))[i]
             if el == e || isparallel(el - e, v)
-                push_term!(inw, collect(Singular.coefficients(g))[i], e)
+                Singular.push_term!(inw, collect(Singular.coefficients(g))[i], e)
             end
         end
 
@@ -65,17 +64,17 @@ end
 
 function liftgeneric(
     G::Singular.sideal,
-    Lm::Vector{Singular.spoly{Singular.n_FieldElem{fmpq}}},
-    I::Singular.sideal,
-)
-    S = base_ring(G)
+    Lm::Vector{Singular.spoly{L}},
+    H::Singular.sideal,
+) where L <: Nemo.RingElem
+S = base_ring(G)
     count = 1
-    Newlm = Array{Singular.spoly{Singular.n_FieldElem{fmpq}},1}(undef, 0)
-    liftArray = Array{Singular.spoly{Singular.n_FieldElem{fmpq}},1}(undef, 0)
-    for g in gens(I)
+    Newlm = Array{Singular.elem_type(R),1}(undef, 0)
+    liftArray = Array{Singular.elem_type(R),1}(undef, 0)
+    for g in Singular.gens(H)
         diff =
-            subtractTerms(change_ring(g, S),
-            S(reducegeneric_recursiv2(change_ring(g, S), G, Lm)), nvars(S))
+            subtractTerms(g,
+            reducegeneric_recursiv2(g, G, Lm), Singular.nvars(S))
     #=    println("red 2:",
             change_ring(g, S) -
             S(reducegeneric_recursiv2(change_ring(g, S), G, Lm)),
@@ -85,7 +84,7 @@ function liftgeneric(
             S(reducegeneric_recursiv(change_ring(g, S), G, Lm)),
         ) =#
         if diff != 0
-            push!(Newlm, Singular.leading_monomial(g))
+            push!(Newlm, Singular.leading_term(g))
             push!(liftArray, diff)
         end
     end
@@ -93,9 +92,9 @@ function liftgeneric(
 end
 
 function check_zeros(
-    G::Vector{Singular.spoly{Singular.n_FieldElem{fmpq}}},
-    Lm::Vector{Singular.spoly{Singular.n_FieldElem{fmpq}}},
-)
+    G::Vector{spoly{L}},
+    Lm::Vector{spoly{L}},
+) where L <: Nemo.RingElem
     Lm = filter(x -> x != 0, Lm)
     G = filter(x -> x != 0, G)
     return G, Lm
@@ -103,11 +102,11 @@ end
 
 function nextV(
     G::Singular.sideal,
-    Lm::Vector{Singular.spoly{Singular.n_FieldElem{fmpq}}},
+    Lm::Vector{spoly{L}},
     w::Vector{Int64},
     S::Matrix{Int64},
     T::Matrix{Int64},
-)
+) where L <: Nemo.RingElem
     V = filter(x -> bigger_than_zero(S, x), diff_vectors(G, Lm))
     #@info "#1 Current V: " V
 
@@ -205,17 +204,16 @@ function less_facet(
     return false
 end
 function reduce_modulo(
-    p::Singular.spoly{Singular.n_FieldElem{fmpq}},
-    lm::Singular.spoly{Singular.n_FieldElem{fmpq}},
-    S::MPolyRing,
+    p::Singular.spoly,
+    lm::Singular.spoly,
+    S::Singular.PolyRing,
 )
     a = []
     r = 0
     div = false
     newpoly = Singular.MPolyBuildCtx(S)
     for term in Singular.terms(p)
-        #println(term, "and p", lm)
-        (b, c) = Singular.divides(change_ring(term, S), change_ring(lm, S))
+        (b, c) = Singular.divides(term, lm)
         #println("mult ",c)
         if b
             #=    if c == 1
@@ -246,34 +244,30 @@ end
 function reducegeneric_recursiv2(
     p::Singular.spoly,
     G::Singular.sideal,
-    Lm::Vector{Singular.spoly{Singular.n_FieldElem{fmpq}}},
-) where {T<:RingElement}
-    R = base_ring(G)
+    Lm::Vector{spoly{L}},
+) where L <: Nemo.RingElem
+    R = Singular.base_ring(G)
 
-    S, V = Singular.PolynomialRing(
-        base_ring(R).base_ring,
-        [String(s) for s in symbols(R)],
-        ordering = :lex,
-    )
+
         Gh = []
-    for i = 1:ngens(G)
-        (q, b) = reduce_modulo(change_ring(p, S), change_ring(Lm[i], S), S)
+    for i in 1:Singular.ngens(G)
+        (q, b) = reduce_modulo(p, Lm[i], R)
         if b
             push!(Gh, (i, q))
             break
         end
     end
     if !isempty(Gh)
-        mul = [x for x in gens(G)]
+        mul = [x for x in Singular.gens(G)]
         global changedInReduction = true
         for (i, q) in Gh
-        #=    println("pretet ", p, "and", q * change_ring(mul[i], S))
+    #=        println("pretet ", p, "and", q , "and", change_ring(mul[i], S))
             println(
                 "test ",
                 subtractTerms(change_ring(p, S), (q * change_ring(mul[i],S)), nvars(S)),
-            ) =#
+            )=#
             return reducegeneric_recursiv2(
-                subtractTerms(change_ring(p, S), (q * change_ring(mul[i],S)), nvars(S)),
+                subtractTerms(p, (q * mul[i]), Singular.nvars(R)),
                 G,
                 Lm,
             )
@@ -282,8 +276,8 @@ function reducegeneric_recursiv2(
         return p
     end
 end
-function subtractTerms(p::Singular.spoly, q::Singular.spoly, dim::Int64)
-    sol = MPolyBuildCtx(R)
+function subtractTerms(p::Singular.spoly{L}, q::Singular.spoly{L}, dim::Int64) where L <: Nemo.RingElem
+    sol = MPolyBuildCtx(parent(p))
     ep = collect(Singular.exponent_vectors(p))
     eq = collect(Singular.exponent_vectors(q))
     cp = collect(Singular.coefficients(p))
@@ -303,7 +297,7 @@ function subtractTerms(p::Singular.spoly, q::Singular.spoly, dim::Int64)
             if equals
                 diff = cp[j] - cq[k]
                 if diff != 0
-                push_term!(
+                Singular.push_term!(
                     sol,
                     diff,
                     ep[j],
@@ -315,22 +309,22 @@ function subtractTerms(p::Singular.spoly, q::Singular.spoly, dim::Int64)
             end
         end
         if !fin
-            push_term!(sol, cp[j], ep[j])
+            Singular.push_term!(sol, cp[j], ep[j])
         end
     end
         for i in 1:length(eq)
             if eq[i][1] != -1
-        push_term!(sol, - cq[i], eq[i])
+        Singular.push_term!(sol, - cq[i], eq[i])
 end
     end
-    h = finish(sol)
+    h = Singular.finish(sol)
     return h
 end
 #=
 function reducegeneric_recursiv(
     p::T,
     G::Singular.sideal,
-    Lm::Vector{Singular.spoly{Singular.n_FieldElem{fmpq}}},
+    Lm::Vector{spoly{n_Q}},
 ) where {T<:RingElement}
     R = base_ring(G)
     S, V = PolynomialRing(
@@ -366,21 +360,21 @@ end
 =#
 function interreduce_new(
     G::Singular.sideal,
-    Lm::Vector{Singular.spoly{Singular.n_FieldElem{fmpq}}},
-)
-    R = base_ring(G)
+    Lm::Vector{spoly{L}},
+) where L <: Nemo.RingElem
+    R = Singular.base_ring(G)
     gens = collect(Singular.gens(G))
     changed = true
     while changed
         changed = false
-        for i = 1:ngens(G)
+        for i in 1:Singular.ngens(G)
             #gensrest = filter(x -> x != gens[i], gens)
             gensrest =
-                Array{Singular.spoly{Singular.n_FieldElem{fmpq}},1}(undef, 0)
+                Array{Singular.elem_type(R),1}(undef, 0)
             Lmrest =
-                Array{Singular.spoly{Singular.n_FieldElem{fmpq}},1}(undef, 0)
+                Array{Singular.elem_type(R),1}(undef, 0)
             ## New function
-            for j = 1:ngens(G)
+            for j = 1:Singular.ngens(G)
                 if i != j
                     push!(gensrest, gens[j])
                     push!(Lmrest, Lm[j])
@@ -404,10 +398,11 @@ function interreduce_new(
                                     )) =#
             if hasChangedInReduction()
                 changed = true
-                gens[i] = first(Singular.gens(Singular.Ideal(R, change_ring(gen, R))))
+                gens[i] = first(Singular.gens(Singular.Ideal(R, gen)))
                 break
             end
         end
     end
-    return Oscar.Singular.Ideal(R, [R(p) for p in gens])
+
+    return Singular.Ideal(R, [R(p) for p in gens])
 end
