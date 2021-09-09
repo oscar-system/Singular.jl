@@ -100,6 +100,40 @@ function check_zeros(
     return G, Lm
 end
 
+function filter_btz(S::Matrix{Int64},
+    V::Vector{Any})
+    btz = Set()
+    for v in V
+        if bigger_than_zero(S,v)
+            push!(btz, v)
+        end
+    end
+    return btz
+end
+
+function filter_ltz(S::Matrix{Int64},
+    V::Set{Any})
+    btz = Set()
+    for v in V
+        if less_than_zero(S,v)
+            push!(btz, v)
+        end
+    end
+    return btz
+end
+function filter_lf(    w::Vector{Int64},
+    S::Matrix{Int64},
+    T::Matrix{Int64},
+    V::Set{Any},
+)
+    btz = Set()
+    for v in V
+        if less_facet(w, v, S, T)
+            push!(btz, v)
+        end
+    end
+    return btz
+end
 function nextV(
     G::Singular.sideal,
     Lm::Vector{spoly{L}},
@@ -107,14 +141,14 @@ function nextV(
     S::Matrix{Int64},
     T::Matrix{Int64},
 ) where L <: Nemo.RingElem
-    V = filter(x -> bigger_than_zero(S, x), diff_vectors(G, Lm))
+    V = sort_btz(S, diff_vectors(G, Lm))
     #@info "#1 Current V: " V
 
-    filter!(x -> less_than_zero(T, x), V)
+    V = filter_ltz(T,V)
     #@info "#2 Current V: " V
 
     if (w != [0])
-        filter!(x -> less_facet(w, x, S, T), V)
+        V = filter_lf(w, S, T, V)
     end
     #@info "#3 Current V: " V
     if isempty(V)
@@ -122,10 +156,10 @@ function nextV(
     end
 
 
-    minV = V[1]
-    for i = 2:length(V)
-        if less_facet(V[i], minV, S, T)
-            minV = V[i]
+    minV = first(V)
+    for v in V
+        if less_facet(v, minV, S, T)
+            minV = v
         end
     end
 
@@ -138,27 +172,27 @@ function nextV(
     S::Matrix{Int64},
     T::Matrix{Int64},
 )
-    V = filter(x -> bigger_than_zero(S, x), diff_vectors(G))
-    #@info "#1 Current V: " V
+V = sort_btz(S, diff_vectors(G))
+#@info "#1 Current V: " V
 
-    filter!(x -> less_than_zero(T, x), V)
-    #@info "#2 Current V: " V
+V = filter_ltz(T,V)
+#@info "#2 Current V: " V
 
-    if (w != [0])
-        filter!(x -> less_facet(w, x, S, T), V)
+if (w != [0])
+    V = filter_lf(w, S, T, V)
+end
+#@info "#3 Current V: " V
+if isempty(V)
+    return V
+end
+
+
+minV = first(V)
+for v in V
+    if less_facet(v, minV, S, T)
+        minV = v
     end
-    #@info "#3 Current V: " V
-    if isempty(V)
-        return V
-    end
-
-
-    minV = V[1]
-    for i = 2:length(V)
-        if less_facet(V[i], minV, S, T)
-            minV = V[i]
-        end
-    end
+end
 
     #@info "#4 Current V: " minV
     return minV
@@ -168,7 +202,7 @@ end
 function bigger_than_zero(M::Matrix{Int64}, v::Vector{Int64})
     for i = 1:size(M)[1]
         d = dot(M[i, :], v)
-        if (d != 0)
+        if d != 0
             return d > 0
         end
     end
@@ -179,7 +213,7 @@ end
 function less_than_zero(M::Matrix{Int64}, v::Vector{Int64})
     for i = 1:size(M)[1]
         d = dot(M[i, :], v)
-        if (d != 0)
+        if d != 0
             return d < 0
         end
     end
