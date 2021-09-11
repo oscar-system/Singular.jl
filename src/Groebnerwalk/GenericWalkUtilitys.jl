@@ -88,17 +88,30 @@ S = base_ring(G)
             push!(liftArray, diff)
         end
     end
-    return check_zeros(liftArray, Newlm)
+    return check_zeros(liftArray, Newlm, S)
 end
 
 function check_zeros(
     G::Vector{spoly{L}},
     Lm::Vector{spoly{L}},
+    S::Singular.PolyRing,
 ) where L <: Nemo.RingElem
-    Lm = filter(x -> x != 0, Lm)
-    G = filter(x -> x != 0, G)
-    return G, Lm
+
+lmfin = Array{Singular.elem_type(S),1}(undef, 0)
+Gfin =  Array{Singular.elem_type(S),1}(undef, 0)
+for lm in Lm
+    if lm != 0
+        push!(lmfin, lm)
+    end
 end
+for g in G
+    if g != 0
+        push!(Gfin, g)
+    end
+end
+    return Gfin, lmfin
+end
+
 
 function filter_btz(S::Matrix{Int64},
     V::Vector{Any})
@@ -141,7 +154,7 @@ function nextV(
     S::Matrix{Int64},
     T::Matrix{Int64},
 ) where L <: Nemo.RingElem
-    V = sort_btz(S, diff_vectors(G, Lm))
+    V = filter_btz(S, diff_vectors(G, Lm))
     #@info "#1 Current V: " V
 
     V = filter_ltz(T,V)
@@ -172,7 +185,7 @@ function nextV(
     S::Matrix{Int64},
     T::Matrix{Int64},
 )
-V = sort_btz(S, diff_vectors(G))
+V = filter_btz(S, diff_vectors(G))
 #@info "#1 Current V: " V
 
 V = filter_ltz(T,V)

@@ -47,6 +47,7 @@ function change_order(
 end
 
 function liftGWfr(G::Singular.sideal, Gw::Singular.sideal, R::Singular.PolyRing, S::Singular.PolyRing)
+    G.isGB = true
 rest = [
     change_ring(gen, S) - change_ring(Singular.reduce(change_ring(gen, R), G), S)
     for gen in Singular.gens(Gw)
