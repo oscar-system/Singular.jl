@@ -13,21 +13,21 @@ function initials(
     for g in G
         maxw = 0
         indexw = []
-        e = collect(Singular.exponent_vectors(g))
-        for i = 1:length(g)
-            tmpw = dot(w, e[i])
+        eczip = zip(Singular.exponent_vectors(g), Singular.coefficients(g))
+        for (e,c) in eczip
+            tmpw = dot(w, e)
             if maxw == tmpw
-                push!(indexw, (i, e[i]))
+                push!(indexw, (e, c))
                 #rethink this. gens are preordered
             elseif maxw < tmpw
                 indexw = []
-                push!(indexw, (i, e[i]))
+                push!(indexw, (e,c))
                 maxw = tmpw
             end
         end
         inw = MPolyBuildCtx(R)
-        for (k, j) in indexw
-            Singular.push_term!(inw, collect(Singular.coefficients(g))[k], j)
+        for (e, c) in indexw
+            Singular.push_term!(inw, c, e)
         end
         h = finish(inw)
         push!(inits, h)
@@ -47,13 +47,12 @@ function diff_vectors(
     v = []
     for i = 1:ngens(I)
         ltu = Singular.leading_exponent_vector(Lm[i])
-        for e in filter(
-            x -> ltu != x,
-            collect(Singular.exponent_vectors(gens(I)[i])),
-        )
+    for e in Singular.exponent_vectors(gens(I)[i])
+            if ltu != e
             push!(v, ltu .- e)
-        end
     end
+end
+end
     return unique!(v)
 end
 
@@ -326,7 +325,7 @@ end
 function tdeg(p::Singular.spoly, n::Int64)
     max = 0
     for mon in Singular.monomials(p)
-        ev = collect(Singular.exponent_vectors(mon))
+        ev = Singular.exponent_vectors(mon)
         sum = 0
         for e in ev
             for i in 1:n
@@ -368,12 +367,21 @@ end
 #############################################
 
 #Use MPolybuildCTX
-function vec_sum(p::Vector{spoly{n_Q}}, q::Vector{spoly{n_Q}})
+function vec_sum(p::Vector{spoly{n_Q}}, q::Vector{spoly{n_Q}}, S::Singular.PolyRing)
     poly = 0
+    fin = Singular.MPolyBuildCtx(S)
     for i = 1:length(p)
-        poly = poly + p[i] * q[i]
+        cp = Singular.coefficients(p[i])
+        cq = Singular.coefficients(q[i])
+        ep = exponent_vectors(p[i])
+        eq = exponent_vectors(q[i])
+        for k in 1:length(cp)
+            for j in 1:length(cq)
+        push_term!(fin, cp[k] * cq[j], ep[k] + eq[j] )
     end
-    return poly
+end
+    end
+    return finish(fin)
 end
 
 function ident_matrix(n::Int64)
