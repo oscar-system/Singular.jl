@@ -124,6 +124,20 @@ function filter_btz(S::Matrix{Int64},
     return btz
 end
 
+<<<<<<< HEAD
+=======
+function filter_btz(S::Matrix{Int64},
+    V::Vector{Any})
+    btz = Set()
+    for v in V
+        if bigger_than_zero(S,v)
+            push!(btz, v)
+        end
+    end
+    return btz
+end
+
+>>>>>>> 7167e2267ad3dc009e5a2be9d02ce0d8e4131609
 function filter_ltz(S::Matrix{Int64},
     V::Set{Any})
     btz = Set()
@@ -154,7 +168,11 @@ function nextV(
     S::Matrix{Int64},
     T::Matrix{Int64},
 ) where L <: Nemo.RingElem
+<<<<<<< HEAD
     V = filter_btz(S, diff_vectors(G, Lm))
+=======
+    V = sort_btz(S, diff_vectors(G, Lm))
+>>>>>>> 7167e2267ad3dc009e5a2be9d02ce0d8e4131609
     #@info "#1 Current V: " V
 
     V = filter_ltz(T,V)
@@ -185,7 +203,11 @@ function nextV(
     S::Matrix{Int64},
     T::Matrix{Int64},
 )
+<<<<<<< HEAD
 V = filter_btz(S, diff_vectors(G))
+=======
+V = sort_btz(S, diff_vectors(G))
+>>>>>>> 7167e2267ad3dc009e5a2be9d02ce0d8e4131609
 #@info "#1 Current V: " V
 
 V = filter_ltz(T,V)
