@@ -403,6 +403,45 @@ void singular_define_ideals(jlcxx::Module & Singular)
         }
         rChangeCurrRing(origin);
     });
+    Singular.method("scDegree", [](ideal I, ring R)
+    {
+        const ring origin = currRing;
+        rChangeCurrRing(R);
+        SPrintStart();
+        scDegree(I, NULL, R->qideal);
+        char *s = SPrintEnd();
+        s[strlen(s)-1]='\0';
+        std::string res(s);
+        omFree(s);
+        rChangeCurrRing(origin);
+        return res;
+    });
+    Singular.method("scDegree", [](ideal I, ring R, jlcxx::ArrayRef<int> w)
+    {
+        const ring origin = currRing;
+        rChangeCurrRing(R);
+        int sz = w.size();
+        intvec * module_w = new intvec(sz);
+        int * wi = module_w->ivGetVec();
+        for (int i=0; i<sz; i++)
+            wi[i] = w[i];
+        SPrintStart();
+        scDegree(I, module_w, R->qideal);
+        // cleanup module_w ???
+        char *s = SPrintEnd();
+        s[strlen(s)-1]='\0';
+        std::string res(s);
+        omFree(s);
+        rChangeCurrRing(origin);
+        return res;
+    });
+    Singular.method("scMultInt", [](ideal I, ring R) {
+        const ring origin = currRing;
+        rChangeCurrRing(R);
+        int k = scMultInt(I, R->qideal);
+        rChangeCurrRing(origin);
+        return k;
+    });
     Singular.method("scDimInt", [](ideal I, ring R) {
         const ring origin = currRing;
         rChangeCurrRing(R);
