@@ -78,28 +78,39 @@ function all_symbols(R::Union{N_FField, PolyRing})
    return vcat(all_symbols(base_ring(R)), symbols(R))
 end
 
+function isbad_name(x::String)
+   if !occursin(r"\A[@a-zA-Z\']([@a-zA-Z\']*[0-9]*_*)*\Z", x)
+      return true
+   end
+   # insert list of reserved identifier names here
+   return x == "minpoly"
+end
+
 # return an appropriate Symbol version of x that avoids
 # bad singular interpreter names and does not conflict with prev.
 # gensym generates truly awful names, so cannot use that
 function rename_symbol(prev::Base.Set{String}, x::String, def::String)
-   # insert list of reserved identifier names here
-   bad = !occursin(r"\A[@a-zA-Z\']([@a-zA-Z\']*[0-9]*_*)*\Z", x) ||
-            x == "minpoly"
-   if bad
-      x = def
+   if isbad_name(x)
+      x = replace(replace(replace(x, "[" => "_"), "]" => ""), "," => "_")
+      if isbad_name(x)
+         x = replace(replace(replace(x, "(" => "_"), ")" => ""), "-" => "m")
+         if isbad_name(x)
+            x = def
+         end
+      end
    end
 
    x in prev || return Symbol(x)
 
    i = 0
    while (i += 1) < 10000
-      xi = x*string(i)
+      xi = x*"@"*string(i)
       xi in prev || return Symbol(xi)
    end
 
    i = BigInt(i)
    while true
-      xi = x*string(i)
+      xi = x*"@"*string(i)
       xi in prev || return Symbol(xi)
    end
 end
