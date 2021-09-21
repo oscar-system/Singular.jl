@@ -158,18 +158,6 @@ function number(j::T, line_number) where {T <: Nemo.RingElem}
 end
 =#
 
-# singular requires a method to print coefficient objects as string without any
-# precedence information. TODO move this to AA
-function stringify_wrt_times(n)
-   prec = AbstractAlgebra.prec_inf_Times
-   obj = AbstractAlgebra.canonicalize(AbstractAlgebra.expressify(n))
-   io = IOBuffer()
-   S = AbstractAlgebra.printer(io)
-   AbstractAlgebra.print_obj(S, MIME("text/plain"), obj, prec, prec)
-   AbstractAlgebra.finish(S)
-   return String(take!(io))
-end
-
 ###############################################################################
 #
 #   Includes
