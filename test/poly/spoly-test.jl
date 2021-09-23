@@ -118,17 +118,25 @@ end
 end
 
 @testset "spoly.rename" begin
-   R, x = PolynomialRing(QQ, ["x[1]", "x[2]", "x[3]"])
-   @test map(String, symbols(R)) == ["x_1", "x_2", "x_3"]
+   s = ["x[1]", "x[2]", "x[3]"]
+   R, x = PolynomialRing(QQ, s)
+   @test String.(symbols(R)) == s
+   @test String.(Singular.singular_symbols(R)) == ["x_1", "x_2", "x_3"]
 
-   R, x = PolynomialRing(QQ, ["x[1][2]", "\$", "x[2][3]", "x[3][4]"])
-   @test map(String, symbols(R)) == ["x_1_2", "x", "x_2_3", "x_3_4"]
+   s = ["x[1][2]", "\$", "x[2][3]", "x[3][4]"]
+   R, x = PolynomialRing(QQ, s)
+   @test String.(symbols(R)) == s
+   @test String.(Singular.singular_symbols(R)) == ["x_1_2", "x", "x_2_3", "x_3_4"]
 
-   F, t = FunctionField(QQ, ["t[1]", "\$", "t[2]", "t[3]", "t[1]"])
-   @test map(String, symbols(F)) == ["t_1", "t", "t_2", "t_3", "t_1@1"]
+   s = ["t[1]", "\$", "t[2]", "t[3]", "t[1]"]
+   F, t = FunctionField(QQ, s)
+   @test String.(symbols(F)) == s
+   @test String.(Singular.singular_symbols(F)) == ["t_1", "t", "t_2", "t_3", "t_1@1"]
 
-   R, x = PolynomialRing(F, ["t[1]", "\$", "t[2]", "t[3]", "t[1]"])
-   @test map(String, symbols(R)) == ["t_1@2", "x", "t_2@1", "t_3@1", "t_1@3"]
+   s = ["t[1]", "\$", "t[2]", "t[3]", "t[1]"]
+   R, x = PolynomialRing(F, s)
+   @test String.(symbols(R)) == s
+   @test String.(Singular.singular_symbols(R)) == ["t_1@2", "x", "t_2@1", "t_3@1", "t_1@3"]
 end
 
 @testset "spoly.manipulation" begin

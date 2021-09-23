@@ -42,6 +42,10 @@ function symbols(R::N_FField)
    return R.S
 end
 
+function singular_symbols(R::N_FField)
+   return R.singular_S
+end
+
 function deepcopy_internal(a::n_transExt, dict::IdDict)
    c = parent(a)
    GC.@preserve a c return c(libSingular.n_Copy(a.ptr, c.ptr))
@@ -373,7 +377,7 @@ function FunctionField(F::Singular.Field, S::Vector{String}; cached::Bool=true)
    isa(F, Rationals) || isa(F, N_ZpField) ||
              error("Only transcendental extensions of Q and Fp are supported.")
    isempty(S) && throw(ArgumentError("array must be non-empty"))
-   R = N_FField(F, rename_symbols(all_symbols(F), S, "t"), cached)
+   R = N_FField(F, Symbol.(S), cached)
    return tuple(R, transcendence_basis(R))
 end
 

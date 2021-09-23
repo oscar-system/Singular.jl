@@ -294,13 +294,15 @@ mutable struct N_FField <: Field
    base_ring::Field
    refcount::Int
    S::Vector{Symbol}
+   singular_S::Vector{Symbol}
 
    function N_FField(F::Field, S::Vector{Symbol}, cached::Bool = true)
       return AbstractAlgebra.get_cached!(N_FFieldID, (F, S), cached) do
-         v = [pointer(Base.Vector{UInt8}(string(str)*"\0")) for str in S]
+         singular_S = rename_symbols(all_symbols(F), String.(S), "t")
+         v = [pointer(Base.Vector{UInt8}(string(str)*"\0")) for str in singular_S]
          cf = libSingular.nCopyCoeff(F.ptr)
          ptr = libSingular.transExt_helper(cf, v)
-         d = new(ptr, F, 1, S)
+         d = new(ptr, F, 1, S, singular_S)
          finalizer(_Ring_finalizer, d)
          return d
       end::N_FField

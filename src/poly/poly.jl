@@ -106,6 +106,15 @@ end
 Return symbols for the generators of the polynomial ring $R$.
 """
 function symbols(R::PolyRing)
+   return R.S
+end
+
+function singular_symbols(r::libSingular.ring_ptr)
+   n = Int(libSingular.rVar(r))
+   return [Symbol(libSingular.rRingVar(Cshort(i - 1), r)) for i in 1:n]
+end
+
+function singular_symbols(R::PolyRing)
    GC.@preserve R return [Symbol(libSingular.rRingVar(Cshort(i - 1), R.ptr)) for i in 1:nvars(R)]
 end
 
@@ -1773,7 +1782,6 @@ end
 ###############################################################################
 
 function _PolynomialRing(R, s::Vector{String}, ordering, ordering2, cached, degree_bound)
-   S = rename_symbols(all_symbols(R), s, "x")
    T = elem_type(R)
    if isa(ordering, Symbol)
       ord1 = sym2ringorder[ordering]
@@ -1791,7 +1799,7 @@ function _PolynomialRing(R, s::Vector{String}, ordering, ordering2, cached, degr
    else
       error("ordering must be a Symbol or an sordering")
    end
-   parent_obj = PolyRing{T}(R, S, fancy_ordering, cached, degree_bound)
+   parent_obj = PolyRing{T}(R, Symbol.(s), fancy_ordering, cached, degree_bound)
    return tuple(parent_obj, gens(parent_obj))
 end
 

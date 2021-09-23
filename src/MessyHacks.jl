@@ -75,7 +75,7 @@ function all_symbols(R::N_AlgExtField)
 end
 
 function all_symbols(R::Union{N_FField, PolyRing})
-   return vcat(all_symbols(base_ring(R)), symbols(R))
+   return vcat(all_symbols(base_ring(R)), singular_symbols(R))
 end
 
 function isbad_name(x::String)
