@@ -137,6 +137,16 @@ end
    R, x = PolynomialRing(F, s)
    @test String.(symbols(R)) == s
    @test String.(Singular.singular_symbols(R)) == ["t_1@2", "x", "t_2@1", "t_3@1", "t_1@3"]
+
+   F, a = FiniteField(3, 1, "\$")
+   @test String.(Singular.singular_symbols(F)) == []
+
+   F, a = FiniteField(3, 2, "\$")
+   s = ["a", "\$", "t[1]", "t[2]", "t[1]"]
+   R, x = PolynomialRing(F, s)
+   @test String.(Singular.singular_symbols(F)) == ["a"]
+   @test String.(symbols(R)) == s
+   @test String.(Singular.singular_symbols(R)) == ["a@1", "x", "t_1", "t_2", "t_1@1"]
 end
 
 @testset "spoly.manipulation" begin

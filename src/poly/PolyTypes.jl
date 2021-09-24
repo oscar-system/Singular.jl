@@ -53,7 +53,7 @@ function PolyRing{T}(R::Union{Ring, Field}, s::Vector{Symbol},
    deg_bound_fix = Int(libSingular.rGetExpSize(bitmask, Cint(nvars)))
    sord = serialize_ordering(nvars, ord)
    return get!(PolyRingID, (R, s, sord, deg_bound_fix)) do
-      ss = rename_symbols(all_symbols(R), String.(s), "x")
+      ss = rename_symbols(all_singular_symbols(R), String.(s), "x")
       v = [pointer(Base.Vector{UInt8}(string(str)*"\0")) for str in ss]
       r = libSingular.nCopyCoeff(R.ptr)
       ptr = libSingular.rDefault_wvhdl_helper(r, v, sord, bitmask)

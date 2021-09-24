@@ -43,7 +43,8 @@ function symbols(R::N_FField)
 end
 
 function singular_symbols(R::N_FField)
-   return R.singular_S
+   n = transcendence_degree(R)
+   GC.@preserve R return [Symbol(libSingular.n_ParameterName(Cint(i - 1), R.ptr)) for i = 1:n]
 end
 
 function deepcopy_internal(a::n_transExt, dict::IdDict)

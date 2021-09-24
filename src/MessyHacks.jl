@@ -62,20 +62,20 @@ end
 =#
 
 # return an array of all symbols used for printing objects in the ring
-function all_symbols(R::Nemo.Ring)
+function all_singular_symbols(R::Nemo.Ring)
    return Symbol[]
 end
 
-function all_symbols(R::N_GField)
-   return Symbol[R.S]
+function all_singular_symbols(R::N_GField)
+   return singular_symbols(R)
 end
 
-function all_symbols(R::N_AlgExtField)
-   return all_symbols(parent(R.minpoly))
+function all_singular_symbols(R::N_AlgExtField)
+   return all_singular_symbols(parent(R.minpoly))
 end
 
-function all_symbols(R::Union{N_FField, PolyRing})
-   return vcat(all_symbols(base_ring(R)), singular_symbols(R))
+function all_singular_symbols(R::Union{N_FField, PolyRing})
+   return vcat(all_singular_symbols(base_ring(R)), singular_symbols(R))
 end
 
 function isbad_name(x::String)

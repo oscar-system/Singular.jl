@@ -22,6 +22,11 @@ end
 
 _characteristic(R::N_GField) = Int(libSingular.n_GetChar(R.ptr))
 
+function singular_symbols(R::N_GField)
+   degree(R) == 1 && return Symbol[]
+   GC.@preserve R return [Symbol(libSingular.n_ParameterName(0, R.ptr))]
+end
+
 @doc Markdown.doc"""
     degree(R::N_GField)
 
@@ -114,11 +119,8 @@ function AbstractAlgebra.expressify(a::n_GF; context = nothing)::Any
    end
 end
 
-function show(io::IO, n::n_GF)
-   libSingular.StringSetS("")
-   c = parent(n)
-   GC.@preserve n c libSingular.n_Write(n.ptr, c.ptr, false)
-   print(io, libSingular.StringEndS())
+function Base.show(io::IO, a::n_GF)
+   print(io, AbstractAlgebra.obj_to_string(a, context = io))
 end
 
 ###############################################################################
@@ -348,6 +350,6 @@ function FiniteField(p::Int, n::Int, S::String; cached=true)
    !Nemo.isprime(Nemo.fmpz(p)) && throw(DomainError(p, "p must be prime"))
    (n*log(p) >= 20*log(2) || p^n >= 2^16) &&
       throw(DomainError("p^n must be < 2^16"))
-   par = N_GField(p, n, rename_symbol(S, "a"), cached)
+   par = N_GField(p, n, Symbol(S), cached)
    return par, gen(par)
 end
