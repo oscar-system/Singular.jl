@@ -41,7 +41,7 @@ end
 
 function fqWrite(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n = julia(a)::Nemo.fq
-   libSingular.StringAppendS(libSingular.stringify_wrt_times(n))
+   libSingular.StringAppendS(AbstractAlgebra.obj_to_string_wrt_times(n))
    nothing
 end
 
