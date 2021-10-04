@@ -62,44 +62,55 @@ end
 =#
 
 # return an array of all symbols used for printing objects in the ring
-function all_symbols(R::Nemo.Ring)
+function all_singular_symbols(R::Nemo.Ring)
    return Symbol[]
 end
 
-function all_symbols(R::N_GField)
-   return Symbol[R.S]
+function all_singular_symbols(R::N_GField)
+   return singular_symbols(R)
 end
 
-function all_symbols(R::N_AlgExtField)
-   return all_symbols(parent(R.minpoly))
+function all_singular_symbols(R::N_AlgExtField)
+   return all_singular_symbols(parent(R.minpoly))
 end
 
-function all_symbols(R::Union{N_FField, PolyRing})
-   return vcat(all_symbols(base_ring(R)), symbols(R))
+function all_singular_symbols(R::Union{N_FField, PolyRing})
+   return vcat(all_singular_symbols(base_ring(R)), singular_symbols(R))
+end
+
+function isbad_name(x::String)
+   if !occursin(r"\A[@a-zA-Z\']([@a-zA-Z\']*[0-9]*_*)*\Z", x)
+      return true
+   end
+   # insert list of reserved identifier names here
+   return x == "minpoly"
 end
 
 # return an appropriate Symbol version of x that avoids
 # bad singular interpreter names and does not conflict with prev.
 # gensym generates truly awful names, so cannot use that
 function rename_symbol(prev::Base.Set{String}, x::String, def::String)
-   # insert list of reserved identifier names here
-   bad = !occursin(r"\A[@a-zA-Z\']([@a-zA-Z\']*[0-9]*_*)*\Z", x) ||
-            x == "minpoly"
-   if bad
-      x = def
+   if isbad_name(x)
+      x = replace(replace(replace(x, "[" => "_"), "]" => ""), "," => "_")
+      if isbad_name(x)
+         x = replace(replace(replace(x, "(" => "_"), ")" => ""), "-" => "m")
+         if isbad_name(x)
+            x = def
+         end
+      end
    end
 
    x in prev || return Symbol(x)
 
    i = 0
    while (i += 1) < 10000
-      xi = x*string(i)
+      xi = x*"@"*string(i)
       xi in prev || return Symbol(xi)
    end
 
    i = BigInt(i)
    while true
-      xi = x*string(i)
+      xi = x*"@"*string(i)
       xi in prev || return Symbol(xi)
    end
 end

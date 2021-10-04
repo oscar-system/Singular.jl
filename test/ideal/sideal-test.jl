@@ -74,6 +74,18 @@ end
    @test 1 == dimension(std(Ideal(R, x - y, R(2))))
    @test 2 == dimension(std(Ideal(R, R(5))))
    @test 2 == dimension(std(Ideal(R, R(35))))
+
+   R, (x, y, z) = PolynomialRing(Fp(32003), ["x", "y", "z"], ordering = ordering_ds())
+   a, b, c, t = 11, 10, 3, 1
+   f = x^a+y^b+z^(3*c)+x^(c+2)*y^(c-1)+x^(c-1)*y^(c-1)*z^3+x^(c-2)*y^c*(y^2+t*x)^2
+   i = jacobian_ideal(f)
+   i0 = std(i)
+   @test degree(i0) == (0, 314)
+
+   R, (x, y) = PolynomialRing(Fp(32003), ["x", "y"], ordering = ordering_ds())
+   f = (x^3+y^5)^2+x^2*y^7
+   @test mult(std(jacobian_ideal(f))) == 46
+   @test mult(std(Ideal(R, f))) == 6
 end
 
 @testset "sideal.binary_ops" begin

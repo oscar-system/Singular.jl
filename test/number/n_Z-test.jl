@@ -191,3 +191,9 @@ end
    rs = rand(make(ZZ, 1:9), 2, 3)
    @test rs isa Matrix{n_Z}
 end
+
+@testset "n_Z.recognition" begin
+   r, _ = PolynomialRing(ZZ, ["x", "y"])
+   l = Singular.LibRing.addvarsTo(r, r, Any["a", "b"], 0)
+   @test l[1] isa Singular.PolyRing{n_Z}
+end
