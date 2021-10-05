@@ -1,6 +1,6 @@
 include("GroebnerWalk.jl")
 
-case = 3
+case = 5
 success = true
 
 if case == 1 || case == 99
@@ -56,7 +56,7 @@ if case == 1 || case == 99
         :generic,
     )
 
-    T0 = Singular.std(
+    @time T0 = Singular.std(
         Singular.Ideal(S, [change_ring(x, S) for x in gens(I)]),
         complete_reduction = true,
     )
@@ -65,7 +65,7 @@ if case == 1 || case == 99
     T3 = Singular.Ideal(S, [change_ring(x, S) for x in gens(L)])
     T4 = Singular.Ideal(S, [change_ring(x, S) for x in gens(M)])
     T5 = Singular.Ideal(S, [change_ring(x, S) for x in gens(JJ)])
-    T6 = Singular.Ideal(S, [change_ring(x,S) for x in gens(H)])
+    T6 = Singular.Ideal(S, [change_ring(x, S) for x in gens(H)])
 
     println("test tran: ", equalitytest(T0, T6))
     println("test fractal2: ", equalitytest(T0, T5))
@@ -146,7 +146,7 @@ if case == 2 || case == 99
     T3 = Singular.Ideal(S, [change_ring(x, S) for x in gens(L)])
     T4 = Singular.Ideal(S, [change_ring(x, S) for x in gens(M)])
     T5 = Singular.Ideal(S, [change_ring(x, S) for x in gens(JJ)])
-    T6 = Singular.Ideal(S, [change_ring(x,S) for x in gens(H)])
+    T6 = Singular.Ideal(S, [change_ring(x, S) for x in gens(H)])
 
     println("test tran: ", equalitytest(T0, T6))
     println("test fractal2: ", equalitytest(T0, T5))
@@ -182,19 +182,19 @@ if case == 3 || case == 99
         ordering_as_matrix(:lex, 6),
         :standard,
     )
-#=    @time J = fractal_walk(
-        I,
-        MonomialOrder(
-            ordering_as_matrix(:degrevlex, 6),
-            [1, 1, 1, 1, 1, 1],
-            [0],
-        ),
-        MonomialOrder(
-            ordering_as_matrix(:lex, 6),
-            [1, 0, 0, 0, 0, 0],
-            [1, 0, 0, 0, 0, 0],
-        ),
-    ) =#
+    #=    @time J = fractal_walk(
+            I,
+            MonomialOrder(
+                ordering_as_matrix(:degrevlex, 6),
+                [1, 1, 1, 1, 1, 1],
+                [0],
+            ),
+            MonomialOrder(
+                ordering_as_matrix(:lex, 6),
+                [1, 0, 0, 0, 0, 0],
+                [1, 0, 0, 0, 0, 0],
+            ),
+        ) =#
     @time JJ = fractal_walk_lookahead(
         I,
         MonomialOrder(
@@ -239,12 +239,12 @@ if case == 3 || case == 99
         Singular.Ideal(S, [change_ring(x, S) for x in gens(I)]),
         complete_reduction = true,
     )
-#    T1 = Singular.Ideal(S, [change_ring(x, S) for x in gens(J)])
+    #    T1 = Singular.Ideal(S, [change_ring(x, S) for x in gens(J)])
     T2 = Singular.Ideal(S, [change_ring(x, S) for x in gens(K)])
     T3 = Singular.Ideal(S, [change_ring(x, S) for x in gens(L)])
     T4 = Singular.Ideal(S, [change_ring(x, S) for x in gens(M)])
     T5 = Singular.Ideal(S, [change_ring(x, S) for x in gens(JJ)])
-    T6 = Singular.Ideal(S, [change_ring(x,S) for x in gens(H)])
+    T6 = Singular.Ideal(S, [change_ring(x, S) for x in gens(H)])
     println(T0)
     println("test tran: ", equalitytest(T0, T6))
     println("test fractal2: ", equalitytest(T0, T5))
@@ -253,7 +253,12 @@ if case == 3 || case == 99
     println("test standard: ", equalitytest(T3, T0))
     println("test generic: ", equal(T4, T0))
 
-    if !(equalitytest(T2, T0) && equalitytest(T3, T0) && equalitytest(T0, T5) && Singular.equal(T0, T4))
+    if !(
+        equalitytest(T2, T0) &&
+        equalitytest(T3, T0) &&
+        equalitytest(T0, T5) &&
+        Singular.equal(T0, T4)
+    )
         success = false
     end
 
@@ -280,7 +285,7 @@ if case == 4 || case == 99
         3 * p * q * c + 4 * c
     f3 = -2 * p^2 + 8 * p - 2 - 2 * p * q - 2 * q
     f4 =
-        4 - 4 * p - 4 * q^2 + 3*c^2 * q^2 - 6 * c^2 * q +
+        4 - 4 * p - 4 * q^2 + 3 * c^2 * q^2 - 6 * c^2 * q +
         3 * c^2 +
         9 * p^2 * d^2 +
         6 * d^2 * p * q - 3d^2 * q^2 - 24 * p * d^2 +
@@ -335,7 +340,7 @@ if case == 4 || case == 99
         ["q", "c", "p", "d"],
         ordering = Singular.ordering_M(ordering_as_matrix(:lex, 4)),
     )
-    T0 = Singular.std(
+    @time T0 = Singular.std(
         Singular.Ideal(S, [change_ring(x, S) for x in gens(I)]),
         complete_reduction = true,
     )
@@ -344,7 +349,7 @@ if case == 4 || case == 99
     T3 = Singular.Ideal(S, [change_ring(x, S) for x in gens(L)])
     T4 = Singular.Ideal(S, [change_ring(x, S) for x in gens(M)])
     T5 = Singular.Ideal(S, [change_ring(x, S) for x in gens(JJ)])
-    T6 = Singular.Ideal(S, [change_ring(x,S) for x in gens(H)])
+    T6 = Singular.Ideal(S, [change_ring(x, S) for x in gens(H)])
 
     println("test tran: ", equalitytest(T0, T6))
     println("test fractal: ", equalitytest(T0, T1))
@@ -354,7 +359,12 @@ if case == 4 || case == 99
     println("test generic: ", Singular.equal(T4, T0))
 
 
-    if !(equalitytest(T2, T1) && equalitytest(T3, T0) && equalitytest(T0, T5) && Singular.equal(T0, T4))
+    if !(
+        equalitytest(T2, T1) &&
+        equalitytest(T3, T0) &&
+        equalitytest(T0, T5) &&
+        Singular.equal(T0, T4)
+    )
         success = false
     end
 
@@ -366,20 +376,21 @@ if case == 5 || case == 99
         ordering = Singular.ordering_M(ordering_as_matrix(:degrevlex, 3)),
     )
 
-    f1 = x^2 +x*y^2 *z - 2x * y +y^4 + y^2 + z^2
-    f2 = -x^3 *y^2 + x*y^2 * z + x *y * z^3 -2x*y + y^4
-    f3 = -2x^2*y + x* y^4 + y *z^4 - 3
+    f1 = x^2 + x * y^2 * z - 2x * y + y^4 + y^2 + z^2
+    f2 = -x^3 * y^2 + x * y^2 * z + x * y * z^3 - 2x * y + y^4
+    f3 = -2x^2 * y + x * y^4 + y * z^4 - 3
     I = Singular.Ideal(R, [f1, f2, f3])
 
     I = Singular.std(I, complete_reduction = true)
 
-    S, V = Singular.PolynomialRing(Singular.QQ, ["x", "y", "z"], ordering = :lex)
+    S, V =
+        Singular.PolynomialRing(Singular.QQ, ["x", "y", "z"], ordering = :lex)
 
     @time H = groebnerwalk(
         I,
         ordering_as_matrix(:degrevlex, 3),
         ordering_as_matrix(:lex, 3),
-        )
+    )
 
     @time J = fractal_walk(
         I,
@@ -422,7 +433,7 @@ if case == 5 || case == 99
         Singular.Ideal(S, [change_ring(x, S) for x in gens(I)]),
         complete_reduction = true,
     )
-    T6 = Singular.Ideal(S, [change_ring(x,S) for x in gens(H)])
+    T6 = Singular.Ideal(S, [change_ring(x, S) for x in gens(H)])
 
     println("test tran: ", equalitytest(T0, T6))
     println("test fractal2: ", equalitytest(T0, T5))
@@ -432,7 +443,12 @@ if case == 5 || case == 99
     println("test generic: ", Singular.equal(T4, T0))
 
 
-    if !(equalitytest(T2, T1) && equalitytest(T3, T0) && equalitytest(T0, T5) && Singular.equal(T0, T4))
+    if !(
+        equalitytest(T2, T1) &&
+        equalitytest(T3, T0) &&
+        equalitytest(T0, T5) &&
+        Singular.equal(T0, T4)
+    )
         success = false
     end
 

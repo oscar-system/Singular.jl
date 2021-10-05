@@ -2,26 +2,21 @@
 #Utilitys for Groebnerwalks
 ###############################################################
 
-#Returns the initials of polynomials w.r.t. a weight vector.
-#The ordering doesn´t affect this.
-function initials(
-    R::Singular.PolyRing,
-    G::Vector{spoly{n_Q}},
-    w::Vector{Int64}
-)
+#Return the initials of polynomials w.r.t. a weight vector.
+function initials(R::Singular.PolyRing, G::Vector{spoly{n_Q}}, w::Vector{Int64})
     inits = []
     for g in G
         maxw = 0
         indexw = []
         eczip = zip(Singular.exponent_vectors(g), Singular.coefficients(g))
-        for (e,c) in eczip
+        for (e, c) in eczip
             tmpw = dot(w, e)
             if maxw == tmpw
                 push!(indexw, (e, c))
                 #rethink this. gens are preordered
             elseif maxw < tmpw
                 indexw = []
-                push!(indexw, (e,c))
+                push!(indexw, (e, c))
                 maxw = tmpw
             end
         end
@@ -34,28 +29,37 @@ function initials(
     end
     return inits
 end
-mutable struct MonomialOrder{T<:Matrix{Int64},v<:Vector{Int64}, tv<:Vector{Int64}}
+#Structure which is used to define a MonomialOrdering a(v)*a(tv)*ordering_M(T)
+mutable struct MonomialOrder{
+    T<:Matrix{Int64},
+    v<:Vector{Int64},
+    tv<:Vector{Int64},
+}
     m::T
     w::v
     t::tv
 end
 
+#Return the difference of the exponents of the leading terms (Lm) and the
+#exponent vectors of the tail of all polynomials of the ideal.
 function diff_vectors(
     I::Singular.sideal,
     Lm::Vector{spoly{L}},
-) where L <: Nemo.RingElem
+) where {L<:Nemo.RingElem}
     v = []
     for i = 1:ngens(I)
         ltu = Singular.leading_exponent_vector(Lm[i])
-    for e in Singular.exponent_vectors(gens(I)[i])
+        for e in Singular.exponent_vectors(gens(I)[i])
             if ltu != e
-            push!(v, ltu .- e)
+                push!(v, ltu .- e)
+            end
+        end
     end
-end
-end
     return unique!(v)
 end
 
+#Return the difference of the exponents of the leading terms (Lm) and the
+#exponent vectors of the tail of all polynomials of the ideal.
 function diff_vectors(I::Singular.sideal)
     v = []
     for g in gens(I)
@@ -67,38 +71,35 @@ function diff_vectors(I::Singular.sideal)
     return unique!(v)
 end
 
-###############################################################
-#TODO: Change T instead of using a()
-###############################################################
+#return a copy of the PolynomialRing I, equipped with the ordering a(cweight)*ordering_M(T)
 function change_order(
-    I::Singular.sideal,
+    I::Singular.PolyRing,
     cweight::Array{L,1},
     T::Matrix{Int64},
 ) where {L<:Number,K<:Number}
-    R = I.base_ring
-    G = Singular.gens(I.base_ring)
+    G = Singular.gens(I)
     Gstrich = string.(G)
     S, H = Singular.PolynomialRing(
         R.base_ring,
         Gstrich,
-        ordering = Singular.ordering_a(cweight) *
-                   Singular.ordering_M(T),
+        ordering = Singular.ordering_a(cweight) * Singular.ordering_M(T),
+        cached = false,
     )
     return S, H
 end
 
-
+#return a copy of the PolynomialRing I, equipped with the ordering ordering_M(T)
 function change_order(
-    I::Singular.sideal,
+    I::Singular.PolyRing,
     M::Matrix{Int64},
 ) where {T<:Number,K<:Number}
-    R = I.base_ring
-    G = Singular.gens(I.base_ring)
+    G = Singular.gens(I)
     Gstrich = string.(G)
     S, H = Singular.PolynomialRing(
         R.base_ring,
         Gstrich,
         ordering = Singular.ordering_M(M),
+        cached = false,
     )
     #@error("Not implemented yet")
     return S, H
@@ -181,13 +182,18 @@ function ordering_as_matrix(ord::Symbol, nvars::Int64)
     end
 end
 
-function pert_Vectors(G::Singular.sideal, Mo::MonomialOrder{Matrix{Int64}}, t::Vector{Int64}, p::Integer)
-    if t == Mo.m[1,:]
-    M = Mo.m
-else
-    M = insert_weight_vector(t, Mo.m)
-end
-m = []
+function pert_Vectors(
+    G::Singular.sideal,
+    Mo::MonomialOrder{Matrix{Int64}},
+    t::Vector{Int64},
+    p::Integer,
+)
+    if t == Mo.m[1, :]
+        M = Mo.m
+    else
+        M = insert_weight_vector(t, Mo.m)
+    end
+    m = []
     n = size(M)[1]
     for i = 1:p
         max = M[i, 1]
@@ -201,11 +207,11 @@ m = []
     end
     msum = 0
     for i = 2:p
-        msum = msum + m[i]
+        msum += m[i]
     end
     maxtdeg = 0
     for g in gens(G)
-        td = tdeg(g,n)
+        td = tdeg(g, n)
         if (td > maxtdeg)
             maxtdeg = td
         end
@@ -213,7 +219,7 @@ m = []
     e = maxtdeg * msum + 1
     w = M[1, :] * e^(p - 1)
     for i = 2:p
-        w = w + e^(p - i) * M[i, :]
+        w += e^(p - i) * M[i, :]
     end
     return w
 end
@@ -233,11 +239,11 @@ function pert_Vectors(G::Singular.sideal, M::Matrix{Int64}, p::Integer)
     end
     msum = 0
     for i = 2:p
-        msum = msum + m[i]
+        msum += m[i]
     end
     maxtdeg = 0
     for g in gens(G)
-        td = tdeg(g,n)
+        td = tdeg(g, n)
         if (td > maxtdeg)
             maxtdeg = td
         end
@@ -245,17 +251,21 @@ function pert_Vectors(G::Singular.sideal, M::Matrix{Int64}, p::Integer)
     e = maxtdeg * msum + 1
     w = M[1, :] * e^(p - 1)
     for i = 2:p
-        w = w + e^(p - i) * M[i, :]
+        w += e^(p - i) * M[i, :]
     end
     return w
 end
-function pert_Vectors(G::Singular.sideal, T::MonomialOrder{Matrix{Int64}, Vector{Int64}}, p::Integer)
+function pert_Vectors(
+    G::Singular.sideal,
+    T::MonomialOrder{Matrix{Int64},Vector{Int64}},
+    p::Integer,
+)
     m = []
-    if T.t == T.m[1,:]
-    M = T.m
-else
-    M = insert_weight_vector(T.t, T.m)
-end
+    if T.t == T.m[1, :]
+        M = T.m
+    else
+        M = insert_weight_vector(T.t, T.m)
+    end
     n = size(M)[1]
     for i = 1:p
         max = M[i, 1]
@@ -269,11 +279,11 @@ end
     end
     msum = 0
     for i = 2:p
-        msum = msum + m[i]
+        msum += m[i]
     end
     maxtdeg = 0
     for g in gens(G)
-        td = tdeg(g,n)
+        td = tdeg(g, n)
         if (td > maxtdeg)
             maxtdeg = td
         end
@@ -281,17 +291,22 @@ end
     e = maxtdeg * msum + 1
     w = M[1, :] * e^(p - 1)
     for i = 2:p
-        w = w + e^(p - i) * M[i, :]
+        w += e^(p - i) * M[i, :]
     end
     return w
 end
-function pert_Vectors(G::Singular.sideal, T::MonomialOrder{Matrix{Int64}, Vector{Int64}}, mult::Int64, p::Integer)
+function pert_Vectors(
+    G::Singular.sideal,
+    T::MonomialOrder{Matrix{Int64},Vector{Int64}},
+    mult::Int64,
+    p::Integer,
+)
     m = []
-    if T.t == T.m[1,:]
-    M = T.m
-else
-    M = insert_weight_vector(T.t, T.m)
-end
+    if T.t == T.m[1, :]
+        M = T.m
+    else
+        M = insert_weight_vector(T.t, T.m)
+    end
     n = size(M)[1]
     for i = 1:p
         max = M[i, 1]
@@ -305,11 +320,11 @@ end
     end
     msum = 0
     for i = 2:p
-        msum = msum + m[i]
+        msum += m[i]
     end
     maxtdeg = 0
     for g in gens(G)
-        td = tdeg(g,n)
+        td = tdeg(g, n)
         if (td > maxtdeg)
             maxtdeg = td
         end
@@ -317,7 +332,7 @@ end
     e = maxtdeg * msum + 1 * mult
     w = M[1, :] * e^(p - 1)
     for i = 2:p
-        w = w + e^(p - i) * M[i, :]
+        w += e^(p - i) * M[i, :]
     end
     return w
 end
@@ -328,9 +343,9 @@ function tdeg(p::Singular.spoly, n::Int64)
         ev = Singular.exponent_vectors(mon)
         sum = 0
         for e in ev
-            for i in 1:n
-            sum = e[i] + sum
-        end
+            for i = 1:n
+                sum += e[i]
+            end
         end
         if (max < sum)
             max = sum
@@ -339,8 +354,8 @@ function tdeg(p::Singular.spoly, n::Int64)
     return max
 end
 
-function inCone(G::Singular.sideal, T::Matrix{Int64},t::Vector{Int64})
-    R, V = change_order(G, T)
+function inCone(G::Singular.sideal, T::Matrix{Int64}, t::Vector{Int64})
+    R, V = change_order(G.base_ring, T)
     I = Singular.Ideal(R, [change_ring(x, R) for x in gens(G)])
     cvzip = zip(Singular.gens(I), initials(R, Singular.gens(I), t))
     for (g, ing) in cvzip
@@ -351,11 +366,16 @@ function inCone(G::Singular.sideal, T::Matrix{Int64},t::Vector{Int64})
     return true
 end
 
-function liftGW(G::Singular.sideal, InG::Singular.sideal, R::Singular.PolyRing, S::Singular.PolyRing)
+function liftGW(
+    G::Singular.sideal,
+    InG::Singular.sideal,
+    R::Singular.PolyRing,
+    S::Singular.PolyRing,
+)
     G.isGB = true
     rest = [
-        gen - change_ring(Singular.reduce(change_ring(gen, R), G), S)
-        for gen in gens(InG)
+        gen - change_ring(Singular.reduce(change_ring(gen, R), G), S) for
+        gen in gens(InG)
     ]
     Gnew = Singular.Ideal(S, [S(x) for x in rest])
     Gnew.isGB = true
@@ -367,7 +387,11 @@ end
 #############################################
 
 #Use MPolybuildCTX
-function vec_sum(p::Vector{spoly{n_Q}}, q::Vector{spoly{n_Q}}, S::Singular.PolyRing)
+function vec_sum(
+    p::Vector{spoly{n_Q}},
+    q::Vector{spoly{n_Q}},
+    S::Singular.PolyRing,
+)
     poly = 0
     fin = Singular.MPolyBuildCtx(S)
     for i = 1:length(p)
@@ -375,11 +399,11 @@ function vec_sum(p::Vector{spoly{n_Q}}, q::Vector{spoly{n_Q}}, S::Singular.PolyR
         cq = Singular.coefficients(q[i])
         ep = exponent_vectors(p[i])
         eq = exponent_vectors(q[i])
-        for k in 1:length(cp)
-            for j in 1:length(cq)
-        push_term!(fin, cp[k] * cq[j], ep[k] + eq[j] )
-    end
-end
+        for k = 1:length(cp)
+            for j = 1:length(cq)
+                push_term!(fin, cp[k] * cq[j], ep[k] + eq[j])
+            end
+        end
     end
     return finish(fin)
 end
@@ -407,7 +431,7 @@ function equalitytest(G::Singular.sideal, K::Singular.sideal)
     for gen in generators
         for r in Singular.gens(K)
             if gen - r == 0
-                count = count + 1
+                count += 1
             end
         end
     end
@@ -420,8 +444,8 @@ end
 function dot(v::Vector{Int64}, w::Vector{Int64})
     n = length(v)
     sum = 0
-    for i in 1:n
-        sum = sum + v[i] * w[i]
+    for i = 1:n
+        sum += v[i] * w[i]
     end
     return sum
 end

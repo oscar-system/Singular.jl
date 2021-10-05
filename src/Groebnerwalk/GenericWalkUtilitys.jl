@@ -4,6 +4,7 @@ include("GroebnerWalkUtilitys.jl")
 #Utilitys for generic_walk
 ###############################################################
 
+#Return the facet_initials of polynomials w.r.t. a weight vector.
 function facet_initials(
     R::Singular.PolyRing,
     G::Singular.sideal,
@@ -17,7 +18,7 @@ function facet_initials(
         #V = filter(x -> less_facet(S, x), diff_vectors(G)
         el = first(Singular.exponent_vectors(lm[count]))
         mzip = zip(Singular.exponent_vectors(g), Singular.coefficients(g))
-            for (e, c) in mzip
+        for (e, c) in mzip
             if el == e || isparallel(el - e, v)
                 Singular.push_term!(inw, c, e)
             end
@@ -25,27 +26,27 @@ function facet_initials(
         #push_term!(inw, collect(Singular.coefficients(lm[count]))[1], collect(Singular.exponent_vectors(lm[count]))[1])
         h = finish(inw)
         push!(inits, h)
-        count = count + 1
+        count += 1
 
     end
     #@info "Facet Initials: " inits
     return inits
 end
 
+#
 function isparallel(u::Vector{Int64}, v::Vector{Int64})
-    #TODO: maybe false this way
     count = 1
     x = 0
     for i = 1:length(u)
         if u[i] == 0
             if v[count] == 0
-                count = count + 1
+                count += +1
             else
                 return false
             end
         else
             x = v[count] // u[i]
-            count = count + 1
+            count += 1
             break
         end
     end
@@ -60,27 +61,29 @@ function isparallel(u::Vector{Int64}, v::Vector{Int64})
     return true
 end
 
+#lifting step of the generic_walk
 function liftgeneric(
     G::Singular.sideal,
     Lm::Vector{Singular.spoly{L}},
     H::Singular.sideal,
-) where L <: Nemo.RingElem
-S = base_ring(G)
-    count = 1
+) where {L<:Nemo.RingElem}
+    S = base_ring(G)
     Newlm = Array{Singular.elem_type(R),1}(undef, 0)
     liftArray = Array{Singular.elem_type(R),1}(undef, 0)
     for g in Singular.gens(H)
-        diff =
-            subtractTerms(g,
-            reducegeneric_recursiv2(g, G, Lm), Singular.nvars(S))
-    #=    println("red 2:",
-            change_ring(g, S) -
-            S(reducegeneric_recursiv2(change_ring(g, S), G, Lm)),
+        diff = subtractTerms(
+            g,
+            reducegeneric_recursiv(g, G, Lm),
+            Singular.nvars(S),
         )
-        println("red 1:",
-            change_ring(g, S) -
-            S(reducegeneric_recursiv(change_ring(g, S), G, Lm)),
-        ) =#
+        #=    println("red 2:",
+                change_ring(g, S) -
+                S(reducegeneric_recursiv2(change_ring(g, S), G, Lm)),
+            )
+            println("red 1:",
+                change_ring(g, S) -
+                S(reducegeneric_recursiv(change_ring(g, S), G, Lm)),
+            ) =#
         if diff != 0
             push!(Newlm, Singular.leading_term(g))
             push!(liftArray, diff)
@@ -89,50 +92,50 @@ S = base_ring(G)
     return check_zeros(liftArray, Newlm, S)
 end
 
+#removes polynomials with zero coefficients.
 function check_zeros(
     G::Vector{spoly{L}},
     Lm::Vector{spoly{L}},
     S::Singular.PolyRing,
-) where L <: Nemo.RingElem
+) where {L<:Nemo.RingElem}
 
-lmfin = Array{Singular.elem_type(S),1}(undef, 0)
-Gfin =  Array{Singular.elem_type(S),1}(undef, 0)
-for lm in Lm
-    if lm != 0
-        push!(lmfin, lm)
+    lmfin = Array{Singular.elem_type(S),1}(undef, 0)
+    Gfin = Array{Singular.elem_type(S),1}(undef, 0)
+    for lm in Lm
+        if lm != 0
+            push!(lmfin, lm)
+        end
     end
-end
-for g in G
-    if g != 0
-        push!(Gfin, g)
+    for g in G
+        if g != 0
+            push!(Gfin, g)
+        end
     end
-end
     return Gfin, lmfin
 end
 
 
-function filter_btz(S::Matrix{Int64},
-    V::Vector{Any})
+function filter_btz(S::Matrix{Int64}, V::Vector{Any})
     btz = Set()
     for v in V
-        if bigger_than_zero(S,v)
+        if bigger_than_zero(S, v)
             push!(btz, v)
         end
     end
     return btz
 end
 
-function filter_ltz(S::Matrix{Int64},
-    V::Set{Any})
+function filter_ltz(S::Matrix{Int64}, V::Set{Any})
     btz = Set()
     for v in V
-        if less_than_zero(S,v)
+        if less_than_zero(S, v)
             push!(btz, v)
         end
     end
     return btz
 end
-function filter_lf(    w::Vector{Int64},
+function filter_lf(
+    w::Vector{Int64},
     S::Matrix{Int64},
     T::Matrix{Int64},
     V::Set{Any},
@@ -145,17 +148,19 @@ function filter_lf(    w::Vector{Int64},
     end
     return btz
 end
+
+#return the next facet_normal.
 function nextV(
     G::Singular.sideal,
     Lm::Vector{spoly{L}},
     w::Vector{Int64},
     S::Matrix{Int64},
     T::Matrix{Int64},
-) where L <: Nemo.RingElem
+) where {L<:Nemo.RingElem}
     V = filter_btz(S, diff_vectors(G, Lm))
     #@info "#1 Current V: " V
 
-    V = filter_ltz(T,V)
+    V = filter_ltz(T, V)
     #@info "#2 Current V: " V
 
     if (w != [0])
@@ -165,7 +170,6 @@ function nextV(
     if isempty(V)
         return V
     end
-
 
     minV = first(V)
     for v in V
@@ -177,38 +181,38 @@ function nextV(
     #@info "#4 Current V: " minV
     return minV
 end
+
+#return the next facet_normal.
 function nextV(
     G::Singular.sideal,
     w::Vector{Int64},
     S::Matrix{Int64},
     T::Matrix{Int64},
 )
-V = filter_btz(S, diff_vectors(G))
-#@info "#1 Current V: " V
+    V = filter_btz(S, diff_vectors(G))
+    #@info "#1 Current V: " V
 
-V = filter_ltz(T,V)
-#@info "#2 Current V: " V
+    V = filter_ltz(T, V)
+    #@info "#2 Current V: " V
 
-if (w != [0])
-    V = filter_lf(w, S, T, V)
-end
-#@info "#3 Current V: " V
-if isempty(V)
-    return V
-end
-
-
-minV = first(V)
-for v in V
-    if less_facet(v, minV, S, T)
-        minV = v
+    if (w != [0])
+        V = filter_lf(w, S, T, V)
     end
-end
+    #@info "#3 Current V: " V
+    if isempty(V)
+        return V
+    end
+
+    minV = first(V)
+    for v in V
+        if less_facet(v, minV, S, T)
+            minV = v
+        end
+    end
 
     #@info "#4 Current V: " minV
     return minV
 end
-
 
 function bigger_than_zero(M::Matrix{Int64}, v::Vector{Int64})
     for i = 1:size(M)[1]
@@ -219,7 +223,6 @@ function bigger_than_zero(M::Matrix{Int64}, v::Vector{Int64})
     end
     return false
 end
-
 
 function less_than_zero(M::Matrix{Int64}, v::Vector{Int64})
     for i = 1:size(M)[1]
@@ -248,6 +251,8 @@ function less_facet(
     end
     return false
 end
+
+#returns p mod lm
 function reduce_modulo(
     p::Singular.spoly,
     lm::Singular.spoly,
@@ -279,6 +284,8 @@ function reduce_modulo(
     end
     return (nothing, false)
 end
+
+#reducing a poylinomal
 changedInReduction = false
 function hasChangedInReduction()
     global changedInReduction
@@ -286,16 +293,14 @@ function hasChangedInReduction()
     global changedInReduction = false
     return temp
 end
-function reducegeneric_recursiv2(
+function reducegeneric_recursiv(
     p::Singular.spoly,
     G::Singular.sideal,
     Lm::Vector{spoly{L}},
-) where L <: Nemo.RingElem
+) where {L<:Nemo.RingElem}
     R = Singular.base_ring(G)
-
-
-        Gh = []
-    for i in 1:Singular.ngens(G)
+    Gh = []
+    for i = 1:Singular.ngens(G)
         (q, b) = reduce_modulo(p, Lm[i], R)
         if b
             push!(Gh, (i, q))
@@ -306,12 +311,12 @@ function reducegeneric_recursiv2(
         mul = [x for x in Singular.gens(G)]
         global changedInReduction = true
         for (i, q) in Gh
-    #=        println("pretet ", p, "and", q , "and", change_ring(mul[i], S))
-            println(
-                "test ",
-                subtractTerms(change_ring(p, S), (q * change_ring(mul[i],S)), nvars(S)),
-            )=#
-            return reducegeneric_recursiv2(
+            #=        println("pretet ", p, "and", q , "and", change_ring(mul[i], S))
+                    println(
+                        "test ",
+                        subtractTerms(change_ring(p, S), (q * change_ring(mul[i],S)), nvars(S)),
+                    )=#
+            return reducegeneric_recursiv(
                 subtractTerms(p, (q * mul[i]), Singular.nvars(R)),
                 G,
                 Lm,
@@ -321,7 +326,11 @@ function reducegeneric_recursiv2(
         return p
     end
 end
-function subtractTerms(p::Singular.spoly{L}, q::Singular.spoly{L}, dim::Int64) where L <: Nemo.RingElem
+function subtractTerms(
+    p::Singular.spoly{L},
+    q::Singular.spoly{L},
+    dim::Int64,
+) where {L<:Nemo.RingElem}
     sol = MPolyBuildCtx(parent(p))
     ep = collect(Singular.exponent_vectors(p))
     eq = collect(Singular.exponent_vectors(q))
@@ -342,12 +351,8 @@ function subtractTerms(p::Singular.spoly{L}, q::Singular.spoly{L}, dim::Int64) w
             if equals
                 diff = cp[j] - cq[k]
                 if diff != 0
-                Singular.push_term!(
-                    sol,
-                    diff,
-                    ep[j],
-                )
-            end
+                    Singular.push_term!(sol, diff, ep[j])
+                end
                 fin = true
                 eq[k] = dummy #delete Vector if equal
                 break
@@ -357,10 +362,10 @@ function subtractTerms(p::Singular.spoly{L}, q::Singular.spoly{L}, dim::Int64) w
             Singular.push_term!(sol, cp[j], ep[j])
         end
     end
-        for i in 1:length(eq)
-            if eq[i][1] != -1
-        Singular.push_term!(sol, - cq[i], eq[i])
-end
+    for i = 1:length(eq)
+        if eq[i][1] != -1
+            Singular.push_term!(sol, -cq[i], eq[i])
+        end
     end
     h = Singular.finish(sol)
     return h
@@ -403,21 +408,19 @@ function reducegeneric_recursiv(
     end
 end
 =#
-function interreduce_new(
+function interreduce(
     G::Singular.sideal,
     Lm::Vector{spoly{L}},
-) where L <: Nemo.RingElem
+) where {L<:Nemo.RingElem}
     R = Singular.base_ring(G)
     gens = collect(Singular.gens(G))
     changed = true
     while changed
         changed = false
-        for i in 1:Singular.ngens(G)
+        for i = 1:Singular.ngens(G)
             #gensrest = filter(x -> x != gens[i], gens)
-            gensrest =
-                Array{Singular.elem_type(R),1}(undef, 0)
-            Lmrest =
-                Array{Singular.elem_type(R),1}(undef, 0)
+            gensrest = Array{Singular.elem_type(R),1}(undef, 0)
+            Lmrest = Array{Singular.elem_type(R),1}(undef, 0)
             ## New function
             for j = 1:Singular.ngens(G)
                 if i != j
@@ -426,21 +429,21 @@ function interreduce_new(
                 end
             end
             #Lmrest = filter(x -> x != Lm[i], Lm)
-            gen = reducegeneric_recursiv2(
+            gen = reducegeneric_recursiv(
                 gens[i],
                 Singular.Ideal(R, gensrest),
                 Lmrest,
             )
-        #=    println("interred 2 :", reducegeneric_recursiv2(
-                            gens[i],
-                            Singular.Ideal(R, gensrest),
-                            Lmrest,
-                        ))
-            println("interred 1 :", reducegeneric_recursiv(
-                                        gens[i],
-                                        Singular.Ideal(R, gensrest),
-                                        Lmrest,
-                                    )) =#
+            #=    println("interred 2 :", reducegeneric_recursiv2(
+                                gens[i],
+                                Singular.Ideal(R, gensrest),
+                                Lmrest,
+                            ))
+                println("interred 1 :", reducegeneric_recursiv(
+                                            gens[i],
+                                            Singular.Ideal(R, gensrest),
+                                            Lmrest,
+                                        )) =#
             if hasChangedInReduction()
                 changed = true
                 gens[i] = first(Singular.gens(Singular.Ideal(R, gen)))

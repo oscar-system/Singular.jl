@@ -14,6 +14,8 @@ function convertBoundingVector(wtemp::Vector{T}) where {T<:Number}
     return w
 end
 
+#Computes next weight vector. Version used in Cox O´shea and Fukuda et al.
+#This Version is used by the standard_walk, pertubed_walk and tran_walk.
 function nextw(
     G::Singular.sideal,
     cweight::Array{T,1},
@@ -26,12 +28,12 @@ function nextw(
         ctw = cw - tw
         if tw < 0
             if ctw != 0
-            push!(tv, cw // ctw)
-        end
+                push!(tv, cw // ctw)
+            end
         end
     end
     push!(tv, 1)
-    filter!(x -> numerator(x)!=0, tv)
+    filter!(x -> numerator(x) != 0, tv)
     t = minimum(tv)
     w = (1 - t) * cweight + t * tweight
     return convertBoundingVector(w)

@@ -3,16 +3,15 @@ include("GroebnerWalkUtilitys.jl")
 #Solves problems with weight vectors of floats.
 function convertBoundingVector(wtemp::Vector{T}) where {T<:Number}
     w = Vector{Int64}()
-
     for i = 1:length(wtemp)
         push!(w, float(divexact(wtemp[i], gcd(wtemp))))
     end
     return w
 end
 
-
+#Checks if a weight vector t is in the cone of the ordering T w.r.t. an ideal.
 function inCone(G::Singular.sideal, T::MonomialOrder{Matrix{Int64}, Vector{Int64}},t::Vector{Int64})
-    R, V = change_order(G, T.t, T.m)
+    R, V = change_order(G.base_ring, T.t, T.m)
     I = Singular.Ideal(R, [change_ring(x, R) for x in Singular.gens(G)])
     cvzip = zip(Singular.gens(I), initials(R, Singular.gens(I), t))
     for (g, ing) in cvzip
@@ -23,12 +22,12 @@ function inCone(G::Singular.sideal, T::MonomialOrder{Matrix{Int64}, Vector{Int64
     return true
 end
 
+#return a copy of the PolynomialRing I, equipped with the ordering represented by T.
 function change_order(
-    I::Singular.sideal,
+    I::Singular.PolyRing,
     T::MonomialOrder{Matrix{Int64}, Vector{Int64}},
 ) where {L<:Number,K<:Number}
-    R = I.base_ring
-    G = Singular.gens(I.base_ring)
+    G = Singular.gens(I)
     Gstrich = string.(G)
         S, H = Singular.PolynomialRing(
             R.base_ring,
@@ -46,6 +45,7 @@ function change_order(
     =#
 end
 
+
 function liftGWfr(G::Singular.sideal, Gw::Singular.sideal, R::Singular.PolyRing, S::Singular.PolyRing)
     G.isGB = true
 rest = [
@@ -57,6 +57,7 @@ G.isGB = true
 return G
 end
 
+#returns ´true´ if all polynomials of the array are monomials.
 function ismonomial(Gw::Vector{Any})
     for g in Gw
         if size(collect(Singular.coefficients(g)))[1] > 1
@@ -65,6 +66,8 @@ function ismonomial(Gw::Vector{Any})
     end
     return true
 end
+
+#returns ´true´ if all polynomials of the array are binomial.
 function isBinomial(Gw::Vector{Any})
     for g in Gw
         if size(collect(Singular.coefficients(g)))[1] > 2
@@ -73,6 +76,10 @@ function isBinomial(Gw::Vector{Any})
     end
     return true
 end
+
+#=
+The version of Cox, O´shea and Fukuda et al. is limited because it returns 1,
+if there are no more cones to cross and when the target vector lays on a facet.
 function nextw_fr(
     G::Singular.sideal,
     cweight::Array{T,1},
@@ -102,9 +109,9 @@ end
         return tweight
     end
     w = (1 - t) * cweight + t * tweight
-
     return convertBoundingVector(w)
 end
+=#
 
 function diff_vectors_lt(I::Singular.sideal)
     zip = []
@@ -120,6 +127,7 @@ function diff_vectors_lt(I::Singular.sideal)
     return zip
 end
 
+#Computes next weight vector. Version used in Amrhein Gloor.
 function nextW_2(G::Singular.sideal,
     w::Array{T,1},
     sigma::Array{K,1},
