@@ -164,7 +164,7 @@ end
 
 
 function ordering_as_matrix(ord::Symbol, nvars::Int64)
-    if ord == :lex || ord == Symbol("Singular(lp)")
+    if ord == :lex
         #return [w'; ident_matrix(length(w))[1:length(w)-1,:]]
         return ident_matrix(nvars)
     end
@@ -174,7 +174,7 @@ function ordering_as_matrix(ord::Symbol, nvars::Int64)
             ident_matrix(nvars)[1:nvars-1, :]
         ]
     end
-    if ord == :degrevlex || ord == Symbol("Singular(dp)")
+    if ord == :degrevlex
         return [
             ones(Int64, nvars)'
             anti_diagonal_matrix(nvars)[1:nvars-1, :]
@@ -329,6 +329,7 @@ function pert_Vectors(
             maxtdeg = td
         end
     end
+    #TODO: rethink * mult
     e = maxtdeg * msum + 1 * mult
     w = M[1, :] * e^(p - 1)
     for i = 2:p

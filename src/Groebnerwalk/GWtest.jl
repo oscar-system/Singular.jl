@@ -1,7 +1,7 @@
 include("GroebnerWalk.jl")
 
-case = 5
-success = true
+case = 99
+test_successfull = true
 
 if case == 1 || case == 99
     R, (x, y) = Singular.PolynomialRing(
@@ -24,15 +24,17 @@ if case == 1 || case == 99
         ordering_as_matrix(:lex, 2),
         :tran,
     )
-    @time J = fractal_walk(
+    @time J = groebnerwalk(
         I,
-        MonomialOrder(ordering_as_matrix(:degrevlex, 2), [1, 1], [0]),
-        MonomialOrder(ordering_as_matrix(:lex, 2), [1, 0], [1, 0]),
+        ordering_as_matrix(:degrevlex, 2),
+        ordering_as_matrix(:lex, 2),
+        :fractal
     )
-    @time JJ = fractal_walk_lookahead(
+    @time JJ = groebnerwalk(
         I,
-        MonomialOrder(ordering_as_matrix(:degrevlex, 2), [1, 1], [0]),
-        MonomialOrder(ordering_as_matrix(:lex, 2), [1, 0], [1, 0]),
+        ordering_as_matrix(:degrevlex, 2),
+        ordering_as_matrix(:lex, 2),
+        :fractal_walk_lookahead,
     )
 
     @time L = groebnerwalk(
@@ -68,7 +70,7 @@ if case == 1 || case == 99
     T6 = Singular.Ideal(S, [change_ring(x, S) for x in gens(H)])
 
     println("test tran: ", equalitytest(T0, T6))
-    println("test fractal2: ", equalitytest(T0, T5))
+    println("test fractal: ", equalitytest(T0, T5))
     println("test fractal: ", equalitytest(T0, T1))
     println("test pertubed: ", equalitytest(T2, T0))
     println("test standard: ", equalitytest(T3, T0))
@@ -76,7 +78,7 @@ if case == 1 || case == 99
 
 
     if !(equalitytest(T2, T1) && equalitytest(T3, T4) && equalitytest(T0, T5))
-        success = false
+        test_successfull = false
     end
 end
 
@@ -100,15 +102,17 @@ if case == 2 || case == 99
         ordering_as_matrix([6, 1, 3], :lex),
         :tran,
     )
-    @time J = fractal_walk(
+    @time J = groebnerwalk(
         I,
-        MonomialOrder(ordering_as_matrix(:deglex, 3), [5, 4, 1], [0]),
-        MonomialOrder(ordering_as_matrix(:lex, 3), [6, 1, 3], [6, 1, 3]),
+        ordering_as_matrix([5, 4, 1], :deglex),
+        ordering_as_matrix([6, 1, 3], :lex),
+        :fractal,
     )
-    @time JJ = fractal_walk_lookahead(
+    @time JJ = groebnerwalk(
         I,
-        MonomialOrder(ordering_as_matrix(:deglex, 3), [5, 4, 1], [0]),
-        MonomialOrder(ordering_as_matrix(:lex, 3), [6, 1, 3], [6, 1, 3]),
+        ordering_as_matrix([5, 4, 1], :deglex),
+        ordering_as_matrix([6, 1, 3], :lex),
+        :fractal_walk_lookahead,
     )
     @time K = groebnerwalk(
         I,
@@ -157,7 +161,7 @@ if case == 2 || case == 99
 
 
     if !(equalitytest(T2, T1) && equalitytest(T3, T4) && equalitytest(T0, T5))
-        success = false
+        test_successfull = false
     end
 end
 
@@ -195,18 +199,11 @@ if case == 3 || case == 99
                 [1, 0, 0, 0, 0, 0],
             ),
         ) =#
-    @time JJ = fractal_walk_lookahead(
+    @time JJ = groebnerwalk(
         I,
-        MonomialOrder(
-            ordering_as_matrix(:degrevlex, 6),
-            [1, 1, 1, 1, 1, 1],
-            [0],
-        ),
-        MonomialOrder(
-            ordering_as_matrix(:lex, 6),
-            [1, 0, 0, 0, 0, 0],
-            [1, 0, 0, 0, 0, 0],
-        ),
+        ordering_as_matrix(:degrevlex, 6),
+        ordering_as_matrix(:lex, 6),
+        :fractal_walk_lookahead,
     )
 
     @time K = groebnerwalk(
@@ -245,7 +242,7 @@ if case == 3 || case == 99
     T4 = Singular.Ideal(S, [change_ring(x, S) for x in gens(M)])
     T5 = Singular.Ideal(S, [change_ring(x, S) for x in gens(JJ)])
     T6 = Singular.Ideal(S, [change_ring(x, S) for x in gens(H)])
-    println(T0)
+
     println("test tran: ", equalitytest(T0, T6))
     println("test fractal2: ", equalitytest(T0, T5))
     #println("test fractal: ", equalitytest(T0, T1))
@@ -259,7 +256,7 @@ if case == 3 || case == 99
         equalitytest(T0, T5) &&
         Singular.equal(T0, T4)
     )
-        success = false
+        test_successfull = false
     end
 
 end
@@ -303,15 +300,17 @@ if case == 4 || case == 99
         ordering_as_matrix(:lex, 4),
         :tran,
     )
-    @time J = fractal_walk(
+    @time J = groebnerwalk(
         I,
-        MonomialOrder(ordering_as_matrix(:degrevlex, 4), [1, 1, 1, 1], [0]),
-        MonomialOrder(ordering_as_matrix(:lex, 4), [1, 0, 0, 0], [1, 0, 0, 0]),
+        ordering_as_matrix(:degrevlex, 4),
+        ordering_as_matrix(:lex, 4),
+        :fractal,
     )
-    @time JJ = fractal_walk_lookahead(
+    @time JJ = groebnerwalk(
         I,
-        MonomialOrder(ordering_as_matrix(:degrevlex, 4), [1, 1, 1, 1], [0]),
-        MonomialOrder(ordering_as_matrix(:lex, 4), [1, 0, 0, 0], [1, 0, 0, 0]),
+        ordering_as_matrix(:degrevlex, 4),
+        ordering_as_matrix(:lex, 4),
+        :fractal_walk_lookahead,
     )
 
     @time K = groebnerwalk(
@@ -353,7 +352,7 @@ if case == 4 || case == 99
 
     println("test tran: ", equalitytest(T0, T6))
     println("test fractal: ", equalitytest(T0, T1))
-    println("test fractal2: ", equalitytest(T0, T1))
+    println("test fractal2: ", equalitytest(T0, T5))
     println("test pertubed: ", equalitytest(T2, T0))
     println("test standard: ", equalitytest(T3, T0))
     println("test generic: ", Singular.equal(T4, T0))
@@ -365,10 +364,10 @@ if case == 4 || case == 99
         equalitytest(T0, T5) &&
         Singular.equal(T0, T4)
     )
-        success = false
+        test_successfull = false
     end
-
 end
+
 if case == 5 || case == 99
     R, (x, y, z) = Singular.PolynomialRing(
         Singular.QQ,
@@ -392,15 +391,17 @@ if case == 5 || case == 99
         ordering_as_matrix(:lex, 3),
     )
 
-    @time J = fractal_walk(
+    @time J = groebnerwalk(
         I,
-        MonomialOrder(ordering_as_matrix(:degrevlex, 3), [1, 1, 1], [0]),
-        MonomialOrder(ordering_as_matrix(:lex, 3), [1, 0, 0], [1, 0, 0]),
+        ordering_as_matrix(:degrevlex, 3),
+        ordering_as_matrix(:lex, 3),
+        :fractal,
     )
-    @time JJ = fractal_walk_lookahead(
+    @time JJ = groebnerwalk(
         I,
-        MonomialOrder(ordering_as_matrix(:degrevlex, 3), [1, 1, 1], [0]),
-        MonomialOrder(ordering_as_matrix(:lex, 3), [1, 0, 0], [1, 0, 0]),
+        ordering_as_matrix(:degrevlex, 3),
+        ordering_as_matrix(:lex, 3),
+        :fractal_walk_lookahead,
     )
 
     @time L = groebnerwalk(
@@ -449,9 +450,9 @@ if case == 5 || case == 99
         equalitytest(T0, T5) &&
         Singular.equal(T0, T4)
     )
-        success = false
+        test_successfull = false
     end
 
 end
 
-println("All tests were: ", success)
+println("All tests were: ", test_successfull)

@@ -15,7 +15,6 @@ function facet_initials(
     count = 1
     for g in Singular.gens(G)
         inw = Singular.MPolyBuildCtx(R)
-        #V = filter(x -> less_facet(S, x), diff_vectors(G)
         el = first(Singular.exponent_vectors(lm[count]))
         mzip = zip(Singular.exponent_vectors(g), Singular.coefficients(g))
         for (e, c) in mzip
@@ -23,7 +22,6 @@ function facet_initials(
                 Singular.push_term!(inw, c, e)
             end
         end
-        #push_term!(inw, collect(Singular.coefficients(lm[count]))[1], collect(Singular.exponent_vectors(lm[count]))[1])
         h = finish(inw)
         push!(inits, h)
         count += 1
@@ -71,25 +69,14 @@ function liftgeneric(
     Newlm = Array{Singular.elem_type(R),1}(undef, 0)
     liftArray = Array{Singular.elem_type(R),1}(undef, 0)
     for g in Singular.gens(H)
-        diff = subtractTerms(
-            g,
-            reducegeneric_recursiv(g, G, Lm),
-            Singular.nvars(S),
-        )
-        #=    println("red 2:",
-                change_ring(g, S) -
-                S(reducegeneric_recursiv2(change_ring(g, S), G, Lm)),
-            )
-            println("red 1:",
-                change_ring(g, S) -
-                S(reducegeneric_recursiv(change_ring(g, S), G, Lm)),
-            ) =#
+        r, b = reducegeneric_recursiv(g, gens(G), Lm, S)
+        diff = g - r
         if diff != 0
             push!(Newlm, Singular.leading_term(g))
             push!(liftArray, diff)
         end
     end
-    return check_zeros(liftArray, Newlm, S)
+    return liftArray, Newlm, S
 end
 
 #removes polynomials with zero coefficients.
@@ -258,23 +245,16 @@ function reduce_modulo(
     lm::Singular.spoly,
     S::Singular.PolyRing,
 )
-    a = []
-    r = 0
     div = false
     newpoly = Singular.MPolyBuildCtx(S)
     for term in Singular.terms(p)
         (b, c) = Singular.divides(term, lm)
-        #println("mult ",c)
         if b
-            #=    if c == 1
-                    push_term!(newpoly, 1, zeros(Int64, 1, nvars(S)))
-                else =#
             push_term!(
                 newpoly,
                 first(Singular.coefficients(c)),
                 first(Singular.exponent_vectors(c)),
             )
-            #    end
             div = true
         end
     end
@@ -285,45 +265,33 @@ function reduce_modulo(
     return (nothing, false)
 end
 
-#reducing a poylinomal
-changedInReduction = false
-function hasChangedInReduction()
-    global changedInReduction
-    temp = changedInReduction
-    global changedInReduction = false
-    return temp
-end
 function reducegeneric_recursiv(
     p::Singular.spoly,
-    G::Singular.sideal,
+    G::Vector{spoly{L}},
     Lm::Vector{spoly{L}},
+    R::Singular.PolyRing,
+    c::Bool = false,
 ) where {L<:Nemo.RingElem}
-    R = Singular.base_ring(G)
-    Gh = []
-    for i = 1:Singular.ngens(G)
+    I = 0
+    Q = spoly{Nemo.RingElem}
+    for i = 1:length(G)
         (q, b) = reduce_modulo(p, Lm[i], R)
         if b
-            push!(Gh, (i, q))
+            I = i
+            Q = q
             break
         end
     end
-    if !isempty(Gh)
-        mul = [x for x in Singular.gens(G)]
-        global changedInReduction = true
-        for (i, q) in Gh
-            #=        println("pretet ", p, "and", q , "and", change_ring(mul[i], S))
-                    println(
-                        "test ",
-                        subtractTerms(change_ring(p, S), (q * change_ring(mul[i],S)), nvars(S)),
-                    )=#
-            return reducegeneric_recursiv(
-                subtractTerms(p, (q * mul[i]), Singular.nvars(R)),
-                G,
-                Lm,
-            )
-        end
+    if I != 0
+        r, b = reducegeneric_recursiv(
+            p - (Q * G[I]),
+            G,
+            Lm,
+            R,
+        )
+        return r, true
     else
-        return p
+        return p, false
     end
 end
 function subtractTerms(
@@ -336,29 +304,24 @@ function subtractTerms(
     eq = collect(Singular.exponent_vectors(q))
     cp = collect(Singular.coefficients(p))
     cq = collect(Singular.coefficients(q))
-    dummy = zeros(Int64, dim)
-    dummy[1] = -1
     for j = 1:length(ep)
-        fin = false
+        fin = true
         for k = 1:length(eq)
             equals = true
-            for i = 1:dim
-                if ep[j][i] != eq[k][i]
-                    equals = false
-                    break
-                end
+            if ep[j] != eq[k]
+                equals = false
             end
             if equals
                 diff = cp[j] - cq[k]
                 if diff != 0
                     Singular.push_term!(sol, diff, ep[j])
                 end
-                fin = true
-                eq[k] = dummy #delete Vector if equal
+                fin = false
+                eq[k][1] = -1 #delete Vector if equal
                 break
             end
         end
-        if !fin
+        if fin
             Singular.push_term!(sol, cp[j], ep[j])
         end
     end
@@ -370,44 +333,7 @@ function subtractTerms(
     h = Singular.finish(sol)
     return h
 end
-#=
-function reducegeneric_recursiv(
-    p::T,
-    G::Singular.sideal,
-    Lm::Vector{spoly{n_Q}},
-) where {T<:RingElement}
-    R = base_ring(G)
-    S, V = PolynomialRing(
-        base_ring(R).base_ring,
-        [String(s) for s in symbols(R)],
-        ordering = :lex,
-    )
-    Gh = []
-    for i = 1:ngens(G)
-        for mon in terms(first(gens(ideal(S, [p]))))
-            (q, r) = divrem(mon, gens(ideal(S, Lm))[i])
-            #printn("q ",q,"r ", r, "mon", mon, "p ", p)
-            if r == 0
-                push!(Gh, (i, q))
-                #println(q)
-                break
-            end
-        end
-    end
-    mul = gens(ideal(S, gens(G)))
-    if !isempty(Gh)
-        for (i, q) in Gh
-            return reducegeneric_recursiv(
-                first(gens(ideal(S, [p]))) - (q * mul[i]),
-                G,
-                Lm,
-            )
-        end
-    else
-        return p
-    end
-end
-=#
+
 function interreduce(
     G::Singular.sideal,
     Lm::Vector{spoly{L}},
@@ -418,35 +344,18 @@ function interreduce(
     while changed
         changed = false
         for i = 1:Singular.ngens(G)
-            #gensrest = filter(x -> x != gens[i], gens)
             gensrest = Array{Singular.elem_type(R),1}(undef, 0)
             Lmrest = Array{Singular.elem_type(R),1}(undef, 0)
-            ## New function
             for j = 1:Singular.ngens(G)
                 if i != j
                     push!(gensrest, gens[j])
                     push!(Lmrest, Lm[j])
                 end
             end
-            #Lmrest = filter(x -> x != Lm[i], Lm)
-            gen = reducegeneric_recursiv(
-                gens[i],
-                Singular.Ideal(R, gensrest),
-                Lmrest,
-            )
-            #=    println("interred 2 :", reducegeneric_recursiv2(
-                                gens[i],
-                                Singular.Ideal(R, gensrest),
-                                Lmrest,
-                            ))
-                println("interred 1 :", reducegeneric_recursiv(
-                                            gens[i],
-                                            Singular.Ideal(R, gensrest),
-                                            Lmrest,
-                                        )) =#
-            if hasChangedInReduction()
+            r, b = reducegeneric_recursiv(gens[i], gensrest, Lmrest, R)
+            if b
                 changed = true
-                gens[i] = first(Singular.gens(Singular.Ideal(R, gen)))
+                gens[i] = r
                 break
             end
         end

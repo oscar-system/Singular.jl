@@ -10,16 +10,9 @@ export groebnerwalk
 
 ###############################################################
 #Implementation of the gröbner walk.
-#TODO: Improve pertubed version.
-#TODO: Improve GenWalk algorithm
-#TODO: Improve fractal version.
 ###############################################################
 
-###############################################################
-#Top-Level
-#TODO: Implement input checks
-###############################################################
-
+#for counting the steps of the groebnerwalk.
 counter = 0
 function getCounter()
     global counter
@@ -27,6 +20,8 @@ function getCounter()
     counter = 0
     return temp
 end
+
+#Top-level function
 function groebnerwalk(
     G::Singular.sideal,
     S::Matrix{Int64},
@@ -42,18 +37,35 @@ function groebnerwalk(
     elseif grwalktype == :pertubed
         walk = (x, y, z) -> pertubed_walk(x, y, z, k)
     elseif grwalktype == :fractal
-        walk = (x, y, z) -> fractal_walk(x, y, z)
+        walk =
+            (x, y, z) -> fractal_walk(
+                x,
+                MonomialOrder(S, S[1, :], [0]),
+                MonomialOrder(T, T[1, :], T[1, :]),
+            )
     elseif grwalktype == :fractal2
-        walk = (x, y, z) -> fractal_walk2(x, y, z)
+        walk =
+            (x, y, z) -> fractal_walk2(
+                x,
+                MonomialOrder(S, S[1, :], [0]),
+                MonomialOrder(T, T[1, :], T[1, :]),
+            )
     elseif grwalktype == :fractal3
-        walk = (x, y, z) -> fractal_walk3(x, y, z)
-    elseif grwalktype == :fractal4
-        walk = (x, y, z) -> fractal_walk_lookahead(x, y, z)
+        walk =
+            (x, y, z) -> fractal_walk3(
+                x,
+                MonomialOrder(S, S[1, :], [0]),
+                MonomialOrder(T, T[1, :], T[1, :]),
+            )
+    elseif grwalktype == :fractal_walk_lookahead
+        walk =
+            (x, y, z) -> fractal_walk_lookahead(
+                x,
+                MonomialOrder(S, S[1, :], [0]),
+                MonomialOrder(T, T[1, :], T[1, :]),
+            )
     elseif grwalktype == :tran
         walk = (x, y, z) -> tran_walk(x, y, z)
-        #error("Choose a strategy from: :generic, :standard ...")
-        # fill the list or implement a functionality to choose the best
-        # way w.r.t. the type of the ideal
     end
 
     ######TODO:Check the parameter#####
@@ -146,7 +158,8 @@ function generic_walk(G::Singular.sideal, S::Matrix{Int64}, T::Matrix{Int64})
         println(v)
         G, lm = generic_step(G, R, v, T, lm)
         #@info "Current Gröbnerbase: " G
-        v = nextV(G, lm, v, S, T)
+        #println("nextv")
+         v = nextV(G, lm, v, S, T)
     end
     return G
 end
@@ -160,15 +173,21 @@ function generic_step(
 ) where {L<:Nemo.RingElem}
 
     R = Singular.base_ring(G)
+
+    #println("initials")
     facet_Generators = facet_initials(S, G, v, lm)
 
+    #println("std")
     facet_Ideal = Singular.std(
         Singular.Ideal(S, [S(x) for x in facet_Generators]),
         complete_reduction = true,
     )
 
+    #println("liftgeneric")
     liftArray, Newlm = liftgeneric(G, lm, facet_Ideal)
     Gnew = Singular.Ideal(S, [x for x in liftArray])
+
+    #println("interred")
     Gnew = interreduce(Gnew, Newlm)
 
     Gnew = Singular.Ideal(R, [change_ring(x, R) for x in gens(Gnew)])
@@ -187,8 +206,8 @@ function pertubed_walk(
     k::Int64,
 )
     p = k
-    sweight = pert_Vectors(G, S, p)
-    #sweight = S[1,:]
+    #sweight = pert_Vectors(G, S, p)
+    sweight = S[1,:]
     Gnew = G
     #loop
     term = false

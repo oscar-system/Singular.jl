@@ -1,35 +1,83 @@
-using Pkg
+include("GroebnerWalk.jl")
 
-using Oscar
-import Oscar: MPolyIdeal, singular_ring
-import Oscar.Singular: std, Ideal, ordering_ws
-import AbstractAlgebra
-
-S, (x, y) = Oscar.Singular.PolynomialRing(
-    QQ,
-    ["x", "y"],
-    ordering = Oscar.Singular.ordering_wp([1, 1]),
-)
-R, (x, y) = Oscar.Singular.PolynomialRing(
-    QQ,
-    ["x", "y"],
-    ordering = Oscar.Singular.ordering_wp([100, 17]),
-)
+    R, (q, c, p, d) = Singular.PolynomialRing(
+        Singular.QQ,
+        ["q", "c", "p", "d"],
+        ordering = Singular.ordering_M(ordering_as_matrix(:degrevlex, 4)),
+    )
 
 
+    f1 =
+        2 * c * d * p * q - 4 * c * d + 2 * p * q + 4 * p * q * c -
+        4 * d^2 * q - 2 * d^2 * p * q + p^2 * d^2 - 2 * c^2 * q +
+        c^2 * q^2 +
+        2 * c * d * q - 2 * c * d * q^2 + d^2 * q^2 - 2 * c * d * p - 8 * p +
+        c^2 +
+        4 * d^2 - 2 * q +
+        10 * p^2 +
+        2
+    f2 =
+        2 * d * p * q + 4 * d * p^2 + d * p - 7 * d * p + c * p -
+        3 * p * q * c + 4 * c
+    f3 = -2 * p^2 + 8 * p - 2 - 2 * p * q - 2 * q
+    f4 =
+        4 - 4 * p - 4 * q^2 + 3 * c^2 * q^2 - 6 * c^2 * q +
+        3 * c^2 +
+        9 * p^2 * d^2 +
+        6 * d^2 * p * q - 3d^2 * q^2 - 24 * p * d^2 +
+        12 * d^2 +
+        4 * p^2 +
+        12 * c * d * p +
+        12 * c * d * q +
+        12 * c * d * p * q - 12 * c * d
+    I = Singular.Ideal(R, [f1, f2, f3, f4])
+    I = Singular.std(I, complete_reduction = true)
+
+    @time JJ = groebnerwalk(
+        I,
+        ordering_as_matrix(:degrevlex, 4),
+        ordering_as_matrix(:lex, 4),
+        :fractal_walk_lookahead,
+    )
+
+    @time L = I
+#=     groebnerwalk(
+        I,
+        ordering_as_matrix(:degrevlex, 4),
+        ordering_as_matrix(:lex, 4),
+        :standard,
+    )=#
+
+    @time M = groebnerwalk(
+        I,
+        ordering_as_matrix(:degrevlex, 4),
+        ordering_as_matrix(:lex, 4),
+        :generic,
+    )
 
 
+    S, V = Singular.PolynomialRing(
+        Singular.QQ,
+        ["q", "c", "p", "d"],
+        ordering = Singular.ordering_M(ordering_as_matrix(:lex, 4)),
+    )
+    @time T0 = Singular.std(
+        Singular.Ideal(S, [change_ring(x, S) for x in gens(I)]),
+        complete_reduction = true,
+    )
+    T3 = Singular.Ideal(S, [change_ring(x, S) for x in gens(L)])
+    T4 = Singular.Ideal(S, [change_ring(x, S) for x in gens(M)])
+    T5 = Singular.Ideal(S, [change_ring(x, S) for x in gens(JJ)])
+
+    println("test frl: ", equalitytest(T0, T5))
+    println("test standard: ", equalitytest(T3, T0))
+    println("test generic: ", Singular.equal(T4, T0))
 
 
-#R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"], ordering =:deglex)
-
-#R, (x, y) = PolynomialRing(QQ, ["x", "y"], ordering= :degrevlex)
-f1 = -x*y^2 + y^6 - y^3
-f2 = x*y^3 - x - y^2
-f3 = x^2 - y^3
-lm = y^6, x*y^3, x^2]
-#f1= x*y^3+y^4+y*z^2 -u^2*y*x*w^3
-#f2= 2*x^2*y+x^3*y+2*x*y^2*z + u*x*v^4
-#f3=2 - 3*x^2*y+ w^2*y + v^3
-#I = ideal(R, [f1,f2]);
-I = Singular.Ideal(S, f1, f2, f3)
+    if !(
+        equalitytest(T3, T0) &&
+        equalitytest(T0, T5) &&
+        Singular.equal(T0, T4)
+    )
+    println(false)
+    end
