@@ -1,7 +1,8 @@
 include("GroebnerWalk.jl")
 
-case = 99
-test_successfull = true
+function test(case::Int)
+
+    test_successfull = true
 
 if case == 1 || case == 99
     R, (x, y) = Singular.PolynomialRing(
@@ -232,11 +233,11 @@ if case == 3 || case == 99
         ["x", "y", "z", "u", "v", "w"],
         ordering = Singular.ordering_M(ordering_as_matrix(:lex, 6)),
     )
-    T0 = Singular.std(
+    @time T0 = Singular.std(
         Singular.Ideal(S, [change_ring(x, S) for x in gens(I)]),
         complete_reduction = true,
     )
-    #    T1 = Singular.Ideal(S, [change_ring(x, S) for x in gens(J)])
+    #    T1test(4) = Singular.Ideal(S, [change_ring(x, S) for x in gens(J)])
     T2 = Singular.Ideal(S, [change_ring(x, S) for x in gens(K)])
     T3 = Singular.Ideal(S, [change_ring(x, S) for x in gens(L)])
     T4 = Singular.Ideal(S, [change_ring(x, S) for x in gens(M)])
@@ -389,6 +390,7 @@ if case == 5 || case == 99
         I,
         ordering_as_matrix(:degrevlex, 3),
         ordering_as_matrix(:lex, 3),
+        :tran
     )
 
     @time J = groebnerwalk(
@@ -456,3 +458,4 @@ if case == 5 || case == 99
 end
 
 println("All tests were: ", test_successfull)
+end

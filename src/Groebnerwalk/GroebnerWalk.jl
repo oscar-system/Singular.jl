@@ -134,7 +134,6 @@ function standard_step(
 
     #Lifting to GB of new cone
     Gnew = liftGW(G, IinwG, R, S)
-
     #Interreduce
     return Singular.std(Gnew, complete_reduction = true)
 end
@@ -176,7 +175,6 @@ function generic_step(
 
     #println("initials")
     facet_Generators = facet_initials(S, G, v, lm)
-
     #println("std")
     facet_Ideal = Singular.std(
         Singular.Ideal(S, [S(x) for x in facet_Generators]),
@@ -185,11 +183,11 @@ function generic_step(
 
     #println("liftgeneric")
     liftArray, Newlm = liftgeneric(G, lm, facet_Ideal)
+
     Gnew = Singular.Ideal(S, [x for x in liftArray])
 
     #println("interred")
-    Gnew = interreduce(Gnew, Newlm)
-
+    Gnew = interreduce_generic(Gnew, Newlm)
     Gnew = Singular.Ideal(R, [change_ring(x, R) for x in gens(Gnew)])
     Gnew.isGB = true
     return Gnew, Newlm
@@ -203,9 +201,8 @@ function pertubed_walk(
     G::Singular.sideal,
     S::Matrix{Int64},
     T::Matrix{Int64},
-    k::Int64,
+    p::Int64,
 )
-    p = k
     #sweight = pert_Vectors(G, S, p)
     sweight = S[1,:]
     Gnew = G
@@ -215,13 +212,13 @@ function pertubed_walk(
     println("Crossed Cones in: ")
 
     while !term
+        #test = [pert_Vectors(Gnew, T, i) for i = 1:p]
         tweight = pert_Vectors(Gnew, T, p)
         Gnew = standard_walk(Gnew, S, T, sweight, tweight)
-
         if inCone(Gnew, T, tweight)
             term = true
         else
-            if k == 1
+            if p == 1
                 R, V = change_order(Gnew.base_ring, T)
                 Gnew =
                     Singular.Ideal(R, [change_ring(x, R) for x in gens(Gnew)])
@@ -292,6 +289,7 @@ function fractal_walk(
     S::MonomialOrder{Matrix{Int64},Vector{Int64}},
     T::MonomialOrder{Matrix{Int64},Vector{Int64}},
 )
+R= base_ring(G)
     global PVecs = [pert_Vectors(G, T, i) for i = 1:nvars(R)]
     println("FacrtalWalk_standard results")
     println("Crossed Cones in: ")
@@ -316,6 +314,7 @@ function fractal_recursiv(
     while !term
         w = nextW_2(G, cweight, PVecs[p])
         if (w == [0])
+            #Look up if inCone is special for a deeper step
             if inCone(G, T, PVecs[p])
                 if raiseCounterFr()
                     println(PVecs[p], " in depth", p)
@@ -332,7 +331,7 @@ function fractal_recursiv(
         Gw = initials(R, gens(G), w)
 
         if p == nvars(R)
-            Gnew = Singular.std(
+             Gnew = Singular.std(
                 Singular.Ideal(Rn, [change_ring(x, Rn) for x in Gw]),
                 complete_reduction = true,
             )
@@ -342,7 +341,7 @@ function fractal_recursiv(
             resetCounterFr()
             println("up in: ", p, " with: ", w)
 
-            Gnew = fractal_recursiv(
+             Gnew = fractal_recursiv(
                 Singular.Ideal(R, [x for x in Gw]),
                 S,
                 T,
@@ -551,6 +550,7 @@ function fractal_walk_lookahead(
 )
     println("FractalWalk_lookahead results")
     println("Crossed Cones in: ")
+    R = base_ring(G)
     global PVecs = [pert_Vectors(G, T, i) for i = 1:nvars(R)]
 
     Gb = fractal_recursiv_lookahead(G, S, T, PVecs, 1)

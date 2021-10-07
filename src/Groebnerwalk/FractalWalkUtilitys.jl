@@ -21,13 +21,25 @@ function inCone(G::Singular.sideal, T::MonomialOrder{Matrix{Int64}, Vector{Int64
     end
     return true
 end
+#=
+function inCone(G::Singular.sideal, T::MonomialOrder{Matrix{Int64}, Vector{Int64}},t::Vector{Int64},c::Vector{Int64})
+    R, V = change_order(G.base_ring, t, T.m)
+    I = Singular.Ideal(R, [change_ring(x, R) for x in Singular.gens(G)])
+    cvzip = zip(Singular.gens(I), initials(R, Singular.gens(I), c))
+    for (g, ing) in cvzip
+        if !isequal(Singular.leading_term(g), Singular.leading_term(ing))
+            return false
+        end
+    end
+    return true
+end=#
 
 #return a copy of the PolynomialRing I, equipped with the ordering represented by T.
 function change_order(
-    I::Singular.PolyRing,
+    R::Singular.PolyRing,
     T::MonomialOrder{Matrix{Int64}, Vector{Int64}},
 ) where {L<:Number,K<:Number}
-    G = Singular.gens(I)
+    G = Singular.gens(R)
     Gstrich = string.(G)
         S, H = Singular.PolynomialRing(
             R.base_ring,

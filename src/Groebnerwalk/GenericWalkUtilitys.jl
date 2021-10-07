@@ -66,8 +66,8 @@ function liftgeneric(
     H::Singular.sideal,
 ) where {L<:Nemo.RingElem}
     S = base_ring(G)
-    Newlm = Array{Singular.elem_type(R),1}(undef, 0)
-    liftArray = Array{Singular.elem_type(R),1}(undef, 0)
+    Newlm = Array{Singular.elem_type(S),1}(undef, 0)
+    liftArray = Array{Singular.elem_type(S),1}(undef, 0)
     for g in Singular.gens(H)
         r, b = reducegeneric_recursiv(g, gens(G), Lm, S)
         diff = g - r
@@ -212,8 +212,13 @@ function bigger_than_zero(M::Matrix{Int64}, v::Vector{Int64})
 end
 
 function less_than_zero(M::Matrix{Int64}, v::Vector{Int64})
-    for i = 1:size(M)[1]
-        d = dot(M[i, :], v)
+    nrows, ncols = size(M)
+    for i = 1:nrows
+        d = 0
+        for j = 1:ncols
+            @inbounds d += M[i, j] * v[j]
+            #d = dot(M[i, :], v)
+        end
         if d != 0
             return d < 0
         end
@@ -258,11 +263,7 @@ function reduce_modulo(
             div = true
         end
     end
-    if div
-        np = finish(newpoly)
-        return (np, true)
-    end
-    return (nothing, false)
+    return (finish(newpoly), div)
 end
 
 function reducegeneric_recursiv(
@@ -273,7 +274,7 @@ function reducegeneric_recursiv(
     c::Bool = false,
 ) where {L<:Nemo.RingElem}
     I = 0
-    Q = spoly{Nemo.RingElem}
+    Q = zero(R)
     for i = 1:length(G)
         (q, b) = reduce_modulo(p, Lm[i], R)
         if b
@@ -283,12 +284,7 @@ function reducegeneric_recursiv(
         end
     end
     if I != 0
-        r, b = reducegeneric_recursiv(
-            p - (Q * G[I]),
-            G,
-            Lm,
-            R,
-        )
+        r, b = reducegeneric_recursiv(p - (Q * G[I]), G, Lm, R)
         return r, true
     else
         return p, false
@@ -334,7 +330,7 @@ function subtractTerms(
     return h
 end
 
-function interreduce(
+function interreduce_generic(
     G::Singular.sideal,
     Lm::Vector{spoly{L}},
 ) where {L<:Nemo.RingElem}

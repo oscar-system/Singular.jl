@@ -5,9 +5,10 @@
 #Return the initials of polynomials w.r.t. a weight vector.
 function initials(R::Singular.PolyRing, G::Vector{spoly{n_Q}}, w::Vector{Int64})
     inits = []
+    indexw = Tuple{Vector{Int}, elem_type(base_ring(R))}[]
     for g in G
+        empty!(indexw)
         maxw = 0
-        indexw = []
         eczip = zip(Singular.exponent_vectors(g), Singular.coefficients(g))
         for (e, c) in eczip
             tmpw = dot(w, e)
@@ -15,7 +16,7 @@ function initials(R::Singular.PolyRing, G::Vector{spoly{n_Q}}, w::Vector{Int64})
                 push!(indexw, (e, c))
                 #rethink this. gens are preordered
             elseif maxw < tmpw
-                indexw = []
+                empty!(indexw)
                 push!(indexw, (e, c))
                 maxw = tmpw
             end
@@ -73,11 +74,11 @@ end
 
 #return a copy of the PolynomialRing I, equipped with the ordering a(cweight)*ordering_M(T)
 function change_order(
-    I::Singular.PolyRing,
+    R::Singular.PolyRing,
     cweight::Array{L,1},
     T::Matrix{Int64},
 ) where {L<:Number,K<:Number}
-    G = Singular.gens(I)
+    G = Singular.gens(R)
     Gstrich = string.(G)
     S, H = Singular.PolynomialRing(
         R.base_ring,
@@ -90,10 +91,10 @@ end
 
 #return a copy of the PolynomialRing I, equipped with the ordering ordering_M(T)
 function change_order(
-    I::Singular.PolyRing,
+    R::Singular.PolyRing,
     M::Matrix{Int64},
 ) where {T<:Number,K<:Number}
-    G = Singular.gens(I)
+    G = Singular.gens(R)
     Gstrich = string.(G)
     S, H = Singular.PolynomialRing(
         R.base_ring,
@@ -330,7 +331,7 @@ function pert_Vectors(
         end
     end
     #TODO: rethink * mult
-    e = maxtdeg * msum + 1 * mult
+    e = maxtdeg * msum + 1
     w = M[1, :] * e^(p - 1)
     for i = 2:p
         w += e^(p - i) * M[i, :]
