@@ -75,21 +75,9 @@ function Base.show(io::IO, ::MIME"text/plain", a::n_Zp)
   print(io, AbstractAlgebra.obj_to_string(a, context = io))
 end
 
-if VERSION >= v"1.5"
-  function AbstractAlgebra.expressify(n::n_Zp; context = nothing)::Any
-    nn = rem(Int(n), Int(characteristic(parent(n))), RoundNearest)
-    return AbstractAlgebra.expressify(nn, context = context)
-  end
-else
-  function AbstractAlgebra.expressify(n::n_Zp; context = nothing)::Any
-    p = Int(characteristic(parent(n)))
-    nn = Int(n)
-    if 2*nn > p
-      nn = nn - p
-    end
-
-    return AbstractAlgebra.expressify(nn, context = context)
-  end
+function AbstractAlgebra.expressify(n::n_Zp; context = nothing)::Any
+  nn = rem(Int(n), Int(characteristic(parent(n))), RoundNearest)
+  return AbstractAlgebra.expressify(nn, context = context)
 end
 
 function show(io::IO, n::n_Zp)

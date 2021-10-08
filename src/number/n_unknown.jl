@@ -495,10 +495,8 @@ function CoefficientRing(R::Nemo.Ring)
 
    if VERSION >= v"1.8"
       ok = ismutabletype(T)
-   elseif VERSION >= v"1.5"
-      ok = ismutable(R())
    else
-      ok = !isimmutable(R())
+      ok = ismutable(R())
    end
 
    if R isa Nemo.Field
