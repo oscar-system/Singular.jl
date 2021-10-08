@@ -174,10 +174,6 @@ FB Mathematik der Universitaet, D-67653 Kaiserslautern      \\
    end
 end
 
-# pkgdir was added in Julia 1.4
-if VERSION < v"1.4"
-   pkgdir(m::Core.Module) = abspath(Base.pathof(Base.moduleroot(m)), "..", "..")
-end
 pkgproject(m::Core.Module) = Pkg.Operations.read_project(Pkg.Types.projectfile_path(pkgdir(m)))
 pkgversion(m::Core.Module) = pkgproject(m).version
 const VERSION_NUMBER = pkgversion(@__MODULE__)
