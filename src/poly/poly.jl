@@ -416,9 +416,16 @@ function show(io::IO, R::PolyRing)
    end
 end
 
-function Base.show(io::IO, a::polyalg)
+function Base.show(io::IO, a::spoly)
    AbstractAlgebra.show_via_expressify(io, a)
 end
+
+# expressify is not defined for the non-commutative stuff
+function Base.show(io::IO, a::polyalg)
+   s = libSingular.p_String(a.ptr, parent(a).ptr)
+   print(io, s)
+end
+
 
 isnegative(x::spoly) = isconstant(x) && !iszero(x) && isnegative(leading_coefficient(x))
 
