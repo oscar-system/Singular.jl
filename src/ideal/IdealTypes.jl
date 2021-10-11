@@ -57,7 +57,6 @@ mutable struct sideal{T <: AbstractAlgebra.NCRingElem} <: Set
       finalizer(_sideal_clear_fn, z)
       return z
    end
-   return z
 end
 
 function _sideal_clear_fn(I::sideal{spoly{T}}) where T
