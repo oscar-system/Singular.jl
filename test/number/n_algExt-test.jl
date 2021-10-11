@@ -35,6 +35,8 @@ end
 
    @test sprint(show, "text/plain", q) == "(a + 1)*x^2"
    @test string(q) ==  "(a + 1)*x^2"
+
+   @test string(F(BigInt(3)^100)) == string(BigInt(3)^100)
 end
 
 @testset "n_algExt.manipulation" begin
@@ -58,6 +60,32 @@ end
    d[a] = 3
    @test d[a + 1] == 2
    @test d[a] == 3
+end
+
+@testset "n_algExt.conversion" begin
+   F1, (a,) = FunctionField(QQ, ["a"])
+   K1, a = AlgebraicExtensionField(F1, a^4 + 1)
+
+   F2, b = Singular.Nemo.PolynomialRing(Singular.Nemo.QQ, "b")
+   K2, b = Singular.Nemo.NumberField(b^4 + 1, "b")
+
+   @assert K1(1//2) == 1//2
+   @assert K1(1//2) == big(1//2)
+   @assert K1(1//2) == QQ(1//2)
+   @assert K1(1//2) == Singular.Nemo.QQ(1//2)
+
+   @assert K1(b) isa Singular.n_algExt
+   @assert K2(a) isa Singular.Nemo.nf_elem
+   @assert a == K1(K2(a))
+   @assert b == K2(K1(b))
+   @assert 0*a == K1(K2(0*a))
+   @assert 0*b == K2(K1(0*b))
+   @assert 0*a+1 == K1(K2(0*a+1))
+   @assert 0*b+1 == K2(K1(0*b+1))
+   @assert a^2 == K1(K2(a^2))
+   @assert b^2 == K2(K1(b^2))
+   @assert a^3//3 == K1(K2(a^3//3))
+   @assert b^3//3 == K2(K1(b^3//3))
 end
 
 @testset "n_algExt.unary_ops" begin

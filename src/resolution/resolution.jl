@@ -94,19 +94,19 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    minres{T <: AbstractAlgebra.RingElem}(r::sresolution{T})
+    minres{T <: Nemo.FieldElem}(r::sresolution{spoly{T}})
 
 Return a minimal free resolution, given any free resolution. In the graded
 case, there exists a uniquely determined minimal resolution. If the supplied
 resolution is already minimal, it may be returned without making a copy.
 """
-function minres(r::sresolution{T}) where T <: AbstractAlgebra.RingElem
+function minres(r::sresolution{spoly{T}}) where T <: Nemo.FieldElem
    if r.minimal
       return r
    end
    R = base_ring(r)
    ptr = GC.@preserve r R libSingular.syMinimize(r.ptr, R.ptr)
-   return sresolution{T}(R, ptr, true)
+   return sresolution{spoly{T}}(R, ptr, true)
 end
 
 ###############################################################################
@@ -135,7 +135,7 @@ function show(io::IO, r::sresolution)
          if ptr.cpp_object == C_NULL
             break
          end
-         print(io, " <- R^", libSingular.ngens(ptr))
+         print(io, " <- R^", libSingular.idElem(ptr))
       end
    end
 end
@@ -146,12 +146,14 @@ end
 #
 ###############################################################################
 
-function (S::ResolutionSet{T})(ptr::libSingular.syStrategy_ptr, len::Int = 0) where T <: AbstractAlgebra.RingElem
+function (S::ResolutionSet)(ptr::libSingular.syStrategy_ptr, len::Int = 0)
    R = base_ring(S)
+   T = elem_type(R)
    return sresolution{T}(R, ptr)
 end
 
-function (R::PolyRing{T})(ptr::libSingular.syStrategy_ptr, ::Val{:resolution}) where T <: AbstractAlgebra.RingElement
+function (R::PolyRing)(ptr::libSingular.syStrategy_ptr, ::Val{:resolution})
+    T = elem_type(R)
     return sresolution{T}(R, ptr, libSingular.get_minimal_res(ptr) != C_NULL )
 end
 
@@ -162,14 +164,14 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    Resolution(C::Array{smodule{T}, 1}) where T <: AbstractAlgebra.RingElem
+    Resolution(C::Vector{smodule{T}}) where T <: AbstractAlgebra.RingElem
 
 Create a new resolution whose maps are given by the elements of an array C of
 modules. Note that it is not checked that the maps are actually composable
 and that their pairwise composition is the zero map, that is, that the
 created resolution is a complex.
 """
-function Resolution(C::Array{smodule{T}, 1}) where T <: AbstractAlgebra.RingElem
+function Resolution(C::Vector{smodule{T}}) where T <: AbstractAlgebra.RingElem
     len = size(C, 1)+1
     len > 1 || error("no module specified")
     R = base_ring(C[1])

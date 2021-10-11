@@ -41,7 +41,7 @@ end
 
 function fqWrite(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n = julia(a)::Nemo.fq
-   libSingular.StringAppendS(libSingular.stringify_wrt_times(n))
+   libSingular.StringAppendS(AbstractAlgebra.obj_to_string_wrt_times(n))
    nothing
 end
 
@@ -191,7 +191,7 @@ function fqInitChar(cf::Ptr{Cvoid}, p::Ptr{Cvoid})
     ring_struct.has_simple_inverse = 0
     ring_struct.is_field = 1
     ring_struct.is_domain = 1
-    ring_struct.ch = Cint(BigInt(Nemo.characteristic(R)))
+    ring_struct.ch = Cint(min(typemax(Cint), BigInt(Nemo.characteristic(R))))
     ring_struct.data = p
     ring_struct.cfInit = @cfunction(fqInit, Ptr{Cvoid}, (Clong, Ptr{Cvoid}))
     ring_struct.cfInt = @cfunction(fqInt, Clong, (Ptr{Ptr{Cvoid}}, Ptr{Cvoid}))

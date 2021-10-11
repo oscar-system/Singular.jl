@@ -47,7 +47,7 @@ over a polynomial ring, as described in the relevant sections of the
 documentation, or they can be created by the following constructor:
 
 ```@docs
-Resolution(::Array{smodule{T}, 1}) where T <: AbstractAlgebra.RingElem
+Resolution(::Vector{smodule{T}}) where T <: AbstractAlgebra.FieldElem
 ```
 
 **Example**
@@ -114,7 +114,7 @@ B = betti(M)
 ### Minimal resolutions
 
 ```@docs
-minres{T <: AbstractAlgebra.RingElem}(::sresolution{T})
+minres{T <: Nemo.FieldElem}(::sresolution{spoly{T}})
 ```
 
 **Examples**

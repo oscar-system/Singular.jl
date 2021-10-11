@@ -65,6 +65,27 @@ end
    @test isvar_generated(Ideal(R, x, y))
    @test !isvar_generated(Ideal(R, R(1)))
    @test !isvar_generated(Ideal(R, x + y))
+
+   R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+   @test -1 == dimension(std(Ideal(R, R(-1))))
+   @test -1 == dimension(std(Ideal(R, x, R(1))))
+   @test 0 == dimension(std(Ideal(R, x, y, R(3))))
+   @test 1 == dimension(std(Ideal(R, x, R(3))))
+   @test 1 == dimension(std(Ideal(R, x - y, R(2))))
+   @test 2 == dimension(std(Ideal(R, R(5))))
+   @test 2 == dimension(std(Ideal(R, R(35))))
+
+   R, (x, y, z) = PolynomialRing(Fp(32003), ["x", "y", "z"], ordering = ordering_ds())
+   a, b, c, t = 11, 10, 3, 1
+   f = x^a+y^b+z^(3*c)+x^(c+2)*y^(c-1)+x^(c-1)*y^(c-1)*z^3+x^(c-2)*y^c*(y^2+t*x)^2
+   i = jacobian_ideal(f)
+   i0 = std(i)
+   @test degree(i0) == (0, 314)
+
+   R, (x, y) = PolynomialRing(Fp(32003), ["x", "y"], ordering = ordering_ds())
+   f = (x^3+y^5)^2+x^2*y^7
+   @test mult(std(jacobian_ideal(f))) == 46
+   @test mult(std(Ideal(R, f))) == 6
 end
 
 @testset "sideal.binary_ops" begin
@@ -220,6 +241,16 @@ end
    @test B.isGB == true
 end
 
+@testset "sideal.interreduce" begin
+   R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"])
+
+   I = Ideal(R, z*x + y^3, z + y^3, z + x*y)
+
+   A = interreduce(I)
+
+   @test isequal(A, Ideal(R, x*z - z, x*y + z, y^3 + x*z))
+end
+
 @testset "sideal.fglm" begin
    R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"], ordering = :lex)
    I = Ideal(R, y^3+x^2, x^2*y+x^2, x^3-x^2, z^4-x^2-y)
@@ -356,8 +387,8 @@ end
    @test L1 == [x, y, u]
    @test L2 == [[x, y, u], [y, u, v], [x, u, w], [u, v, w]]
    @test L3 == [[x, y, u], [y, u, v], [x, u, w], [u, v, w], [y, w]]
-   @test typeof(L1) == Array{spoly{n_Q}, 1}
-   @test typeof(L2) == Array{Array{spoly{n_Q}, 1}, 1}
+   @test typeof(L1) == Vector{spoly{n_Q}}
+   @test typeof(L2) == Vector{Vector{spoly{n_Q}}}
 end
 
 @testset "sideal.lift_std" begin

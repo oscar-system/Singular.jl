@@ -106,6 +106,47 @@ end
 
    R, (x, ) = PolynomialRing(FiniteField(5, 3, "a")[1], ["x", ])
    @test string(x) == "x"
+
+   # the answers should be printed in reduced form.
+   R, (x,) = PolynomialRing(QQ, ["x"])
+   @test string((QQ(1//2) + QQ(3//2)*x)(1)) == "2"
+
+   Qa, (a,) = FunctionField(QQ, ["a"])
+   R, (x,) = PolynomialRing(Qa, ["x"])
+   @test string((1//a + (1)//(a-1)*x + (a-1)//a*x^2)(1)) == "a//(a - 1)"
+   @test string((1//a + (1)//(a-1)*x + (a^2-3*a+1)//(a^2-a)*x^2)(1)) == "1"
+end
+
+@testset "spoly.rename" begin
+   s = ["x[1]", "x[2]", "x[3]"]
+   R, x = PolynomialRing(QQ, s)
+   @test String.(symbols(R)) == s
+   @test String.(Singular.singular_symbols(R)) == ["x_1", "x_2", "x_3"]
+
+   s = ["x[1][2]", "\$", "x[2][3]", "x[3][4]"]
+   R, x = PolynomialRing(QQ, s)
+   @test String.(symbols(R)) == s
+   @test String.(Singular.singular_symbols(R)) == ["x_1_2", "x", "x_2_3", "x_3_4"]
+
+   s = ["t[1]", "\$", "t[2]", "t[3]", "t[1]"]
+   F, t = FunctionField(QQ, s)
+   @test String.(symbols(F)) == s
+   @test String.(Singular.singular_symbols(F)) == ["t_1", "t", "t_2", "t_3", "t_1@1"]
+
+   s = ["t[1]", "\$", "t[2]", "t[3]", "t[1]"]
+   R, x = PolynomialRing(F, s)
+   @test String.(symbols(R)) == s
+   @test String.(Singular.singular_symbols(R)) == ["t_1@2", "x", "t_2@1", "t_3@1", "t_1@3"]
+
+   F, a = FiniteField(3, 1, "\$")
+   @test String.(Singular.singular_symbols(F)) == []
+
+   F, a = FiniteField(3, 2, "\$")
+   s = ["a", "\$", "t[1]", "t[2]", "t[1]"]
+   R, x = PolynomialRing(F, s)
+   @test String.(Singular.singular_symbols(F)) == ["a"]
+   @test String.(symbols(R)) == s
+   @test String.(Singular.singular_symbols(R)) == ["a@1", "x", "t_1", "t_2", "t_1@1"]
 end
 
 @testset "spoly.manipulation" begin
@@ -295,34 +336,50 @@ end
    @test divexact(2a, BigInt(2)//3) == 3a
 end
 
+@testset "spoly.adhoc_binary_operation" begin
+   R, (x, ) = PolynomialRing(QQ, ["x", ])
+
+   a = x^2 + 3x + 1
+
+   @test Nemo.QQ(2)*a == 2*a
+   @test a*Nemo.QQ(2) == 2*a
+   @test Nemo.QQ(2) + a == 2 + a
+   @test a + Nemo.QQ(2) == 2 + a
+   @test divexact(2a, Nemo.QQ(2)) == a
+end
+
 @testset "spoly.euclidean_division" begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   for k in [QQ, Nemo.QQ]
+      R, (x, y) = PolynomialRing(k, ["x", "y"])
 
-   a = x^2*y^2 + 3x + 1
-   b = x*y + 1
+      a = x^2*y^2 + 3x + 1
+      b = x*y + 1
 
-   q, r = divrem(a, b)
-   @test a == b*q + r
+      q, r = divrem(a, b)
+      @test a == b*q + r
 
-   q2 = div(a, b)
-   @test q2 == q
+      q2 = div(a, b)
+      @test q2 == q
+   end
 end
 
 @testset "spoly.divides" begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   for k in [QQ, Nemo.QQ]
+      R, (x, y) = PolynomialRing(k, ["x", "y"])
 
-   a = x^2 + 3x + 1
-   b = x*y + 1
+      a = x^2 + 3x + 1
+      b = x*y + 1
 
-   flag, q = divides(a*b, b)
-   @test flag && q == a
+      flag, q = divides(a*b, b)
+      @test flag && q == a
 
-   flag, q = divides(a, y)
-   @test !flag
+      flag, q = divides(a, y)
+      @test !flag
 
-   val, q = remove(a*b^3, b)
-   @test val == 3 && q == a
-   @test valuation(a*b^3, b) == 3
+      val, q = remove(a*b^3, b)
+      @test val == 3 && q == a
+      @test valuation(a*b^3, b) == 3
+   end
 end
 
 @testset "spoly.gcd_lcm" begin
@@ -341,14 +398,20 @@ end
 end
 
 @testset "spoly.extended_gcd" begin
-   R, (x, ) = PolynomialRing(QQ, ["x", ])
+   for k in [QQ, Nemo.QQ]
+      R, (x, ) = PolynomialRing(k, ["x", ])
 
-   a = x^2 + 3x + 1
-   b = 2x + 4
+      a = x^2 + 3x + 1
+      b = 2x + 4
 
-   g, s, t = gcdx(a, b)
-
-   @test s*a + t*b == g
+      if k == Nemo.QQ
+         @test_throws Exception gcdx(a, b)
+      else
+         g, s, t = gcdx(a, b)
+         @test !iszero(g)
+         @test s*a + t*b == g
+      end
+   end
 end
 
 @testset "spoly.evaluate" begin
@@ -415,7 +478,7 @@ end
 @testset "spoly.convert_Nemo.MPoly_to_Singular.spoly" begin
    R, (x, y, z) = Nemo.PolynomialRing(Nemo.QQ, ["x", "y", "z"])
    S, (a, b, c) = PolynomialRing(QQ, ["a", "b", "c"])
-   
+
    f = x^2+y^3+z^5
 
    @test S(f) == a^2+b^3+c^5
@@ -515,4 +578,25 @@ end
    R, (x,) = PolynomialRing(QQ, ["x"])
    @test_throws Exception div(R(), R())
    @test !iszero(std(Ideal(R, R(1))))
+end
+
+@testset "spoly.to_univariate" begin
+
+   touni = Singular.AbstractAlgebra.to_univariate
+
+   S, t = Singular.AbstractAlgebra.PolynomialRing(Singular.QQ, "t")
+
+   R,(x,y) = PolynomialRing(QQ, ["x", "y"], ordering=:deglex)
+   @test touni(S, 0*x) == zero(S)
+   @test touni(S, 1+0*x) == one(S)
+   @test touni(S, y+2*y^2+3*y^3) == t+2*t^2+3*t^3
+   @test touni(S, x+2*x^2+3*x^3) == t+2*t^2+3*t^3
+   @test_throws Exception touni(S, (1+x)*(1+y))
+
+   R,(x,y) = PolynomialRing(QQ, ["x", "y"], ordering=:neglex)
+   @test touni(S, 0*x) == zero(S)
+   @test touni(S, 1+0*x) == one(S)
+   @test touni(S, (1+2*y)^6) == (1+2*t)^6
+   @test touni(S, (1+2*x)^6) == (1+2*t)^6
+   @test_throws Exception touni(S, (1+x)*(1+y))
 end

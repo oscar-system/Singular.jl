@@ -16,7 +16,9 @@ base_ring(a::n_Zp) = Union{}
 
 base_ring(a::N_ZpField) = Union{}
 
-characteristic(R::N_ZpField) = ZZ(libSingular.n_GetChar(R.ptr))
+function characteristic(R::N_ZpField)
+   return ZZ(libSingular.n_GetChar(R.ptr))
+end
 
 function deepcopy_internal(a::n_Zp, dict::IdDict)
    c = parent(a)
@@ -49,11 +51,6 @@ function iszero(n::n_Zp)
    GC.@preserve n return libSingular.n_IsZero(n.ptr, c.ptr)
 end
 
-@doc Markdown.doc"""
-    isunit(n::n_Zp)
-
-Return `true` if $n$ is a unit in the field, i.e. nonzero.
-"""
 isunit(n::n_Zp) = !iszero(n)
 
 ###############################################################################
@@ -78,21 +75,9 @@ function Base.show(io::IO, ::MIME"text/plain", a::n_Zp)
   print(io, AbstractAlgebra.obj_to_string(a, context = io))
 end
 
-if VERSION >= v"1.5"
-  function AbstractAlgebra.expressify(n::n_Zp; context = nothing)::Any
-    nn = rem(Int(n), Int(characteristic(parent(n))), RoundNearest)
-    return AbstractAlgebra.expressify(nn, context = context)
-  end
-else
-  function AbstractAlgebra.expressify(n::n_Zp; context = nothing)::Any
-    p = Int(characteristic(parent(n)))
-    nn = Int(n)
-    if 2*nn > p
-      nn = nn - p
-    end
-
-    return AbstractAlgebra.expressify(nn, context = context)
-  end
+function AbstractAlgebra.expressify(n::n_Zp; context = nothing)::Any
+  nn = rem(Int(n), Int(characteristic(parent(n))), RoundNearest)
+  return AbstractAlgebra.expressify(nn, context = context)
 end
 
 function show(io::IO, n::n_Zp)
@@ -198,7 +183,7 @@ function inv(x::n_Zp)
    return c(p)
 end
 
-function divexact(x::n_Zp, y::n_Zp)
+function divexact(x::n_Zp, y::n_Zp; check::Bool=true)
    c = parent(x)
    p = GC.@preserve x y c libSingular.n_Div(x.ptr, y.ptr, c.ptr)
    return c(p)

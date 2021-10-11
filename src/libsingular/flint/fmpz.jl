@@ -40,7 +40,7 @@ end
 
 function fmpzWrite(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n = julia(a)::Nemo.fmpz
-   libSingular.StringAppendS(libSingular.stringify_wrt_times(n))
+   libSingular.StringAppendS(AbstractAlgebra.obj_to_string_wrt_times(n))
    nothing
 end
 

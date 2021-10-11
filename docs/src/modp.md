@@ -22,12 +22,12 @@ all the parent object types belong to the abstract type `Field`.
 
 ## Integer mod $p$ functionality
 
-Singular.jl integers modulo $p$ implement the Field and Residue Ring interfaces of
-AbstractAlgebra.jl.
+Singular.jl integers modulo $p$ provides the field and residue ring functionality of
+AbstractAlgebra.
 
-<https://nemocas.github.io/AbstractAlgebra.jl/fields.html>
+<https://nemocas.github.io/AbstractAlgebra.jl/latest/field>
 
-<https://nemocas.github.io/AbstractAlgebra.jl/residue_rings.html>
+<https://nemocas.github.io/AbstractAlgebra.jl/latest/residue>
 
 Below, we describe the functionality that is specific to the Singular integers mod $p$
 field and not already listed at the given links.
@@ -57,14 +57,6 @@ R(n::fmpz)
 Coerce a Singular or Flint integer value into the field.
 
 ### Basic manipulation
-
-```@docs
-isunit(::n_Zp)
-```
-
-```@docs
-Singular.characteristic(::N_ZpField)
-```
 
 **Examples**
 

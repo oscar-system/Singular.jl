@@ -11,10 +11,13 @@
    @test F1 != F2
 
    @test_throws ArgumentError FunctionField(QQ, String[])
-   @test_throws ArgumentError FunctionField(QQ, ["", "b"])
-   @test_throws ArgumentError FunctionField(QQ, ["a", ""])
-   @test_throws ArgumentError FunctionField(QQ, [""])
-   @test_throws ArgumentError FunctionField(QQ, ["a", "b", "a"])
+
+   K1, _ = FunctionField(QQ, ["a1", "a2", "a3"])
+   K2, _ = FunctionField(QQ, 3)
+   K3, _ = FunctionField(QQ, 3, cached = false)
+
+   @test K1 === K2
+   @test K1 !== K3
 end
 
 @testset "n_transExt.printing" begin
@@ -63,6 +66,14 @@ end
 
    @test deepcopy(F(2)) == F(2)
    @test n_transExt_to_spoly(x, parent_ring = R) == p
+
+   @test F(1//2) == F(3)
+   @test F(1//2) == 1//2
+   @test F(1//2) == big(1//2)
+   @test F(1//2) == QQ(1//2)
+   @test F(1//2) == Nemo.QQ(1//2)
+   @test F(Nemo.GF(5)(3)) == 1//2
+   @test_throws Exception F(Nemo.GF(7)(3))
 end
 
 @testset "n_transExt.unary_ops" begin

@@ -11,21 +11,20 @@ mutable struct FreeMod{T <: Nemo.RingElem} <: Module{T}
    rank::Int
 
    function FreeMod{T}(R::PolyRing, r::Int) where T
-      if haskey(FreeModID, (R, r))
-         return FreeModID[R, r]::FreeMod{T}
-      else
-         return FreeModID[R, r] = new(R, r)
+      return get!(FreeModID, (R, r)) do
+         new(R, r)
       end
    end
 end
 
 mutable struct svector{T <: Nemo.RingElem} <: Nemo.ModuleElem{T}
+   base_ring::PolyRing
    ptr::libSingular.poly_ptr # not really a polynomial
    rank::Int
-   base_ring::PolyRing
 
    function svector{T}(R::PolyRing, r::Int, p::libSingular.poly_ptr) where T
-      z = new(p, r, R)
+      T === elem_type(R) || error("type mismatch")
+      z = new(R, p, r)
       R.refcount += 1
       finalizer(_svector_clear_fn, z)
       return z
@@ -62,21 +61,20 @@ mutable struct ModuleClass{T <: Nemo.RingElem} <: Set
    base_ring::PolyRing
 
    function ModuleClass{T}(R::PolyRing) where T
-      if haskey(ModuleClassID, R)
-         return ModuleClassID[R]
-      else
-         return ModuleClassID[R] = new(R)
+      return get!(ModuleClassID, R) do
+         new(R)
       end
    end
 end
 
 mutable struct smodule{T <: Nemo.RingElem} <: Module{T}
-   ptr::libSingular.ideal_ptr # ideal and module types are the same in Singular
    base_ring::PolyRing
+   ptr::libSingular.ideal_ptr # ideal and module types are the same in Singular
    isGB::Bool
 
    function smodule{T}(R::PolyRing, m::libSingular.ideal_ptr) where T
-      z = new(m, R, false)
+      T === elem_type(R) || error("type mismatch")
+      z = new(R, m, false)
       R.refcount += 1
       finalizer(_smodule_clear_fn, z)
       return z
@@ -112,7 +110,8 @@ Val(:module), it will interpret the ideal pointer as a module.
 This needs to be indicated due to the fact that Singular's
 modules and ideals are both stored in the ideal data structure.
 """
-function (R::PolyRing{T})(m::libSingular.ideal_ptr, ::Val{:module}) where T
+function (R::PolyRing)(m::libSingular.ideal_ptr, ::Val{:module})
+   T = elem_type(R)
    return smodule{T}(R,m)
 end
 

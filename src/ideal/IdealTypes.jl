@@ -10,10 +10,8 @@ mutable struct IdealSet{T <: AbstractAlgebra.NCRingElem} <: Set
    base_ring::Union{PolyRing, WeylAlgebra, ExteriorAlgebra}
 
    function IdealSet{T}(R::PolyRing) where T
-      if haskey(IdealSetID, R)
-         return IdealSetID[R]
-      else
-         return IdealSetID[R] = new(R)
+      return get!(IdealSetID, R) do
+         new(R)
       end
    end
 end
@@ -43,10 +41,6 @@ mutable struct sideal{T <: AbstractAlgebra.NCRingElem} <: Set
       z = new(id, R, false, false)
       R.refcount += 1
       finalizer(_sideal_clear_fn, z)
-      for i = 1:n
-         p = libSingular.p_Copy(ids[i].ptr, R.ptr)
-         libSingular.setindex_internal(id, p, Cint(i - 1))
-      end
       return z
    end
 
@@ -63,6 +57,7 @@ mutable struct sideal{T <: AbstractAlgebra.NCRingElem} <: Set
       finalizer(_sideal_clear_fn, z)
       return z
    end
+   return z
 end
 
 function _sideal_clear_fn(I::sideal{spoly{T}}) where T

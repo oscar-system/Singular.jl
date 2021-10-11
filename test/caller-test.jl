@@ -11,6 +11,8 @@
     @test 1 == Singular.LibSets.isEqualInt(R, Singular.QQ(1), Singular.QQ(1))
     @test 1 == Singular.LibSets.isEqualInt(R, [1,2,3], [1,2,3])
     @test 1 == Singular.LibSets.isEqualInt(R, [1 2; 3 4], [1 2; 3 4])
+    @test 1 == Singular.LibSets.isEqualInt(R, BigInt[1 2; 3 4],
+                                              Nemo.matrix(Nemo.ZZ, [1 2; 3 4]))
 
     R, (x,y,z) = PolynomialRing(Singular.QQ, ["x", "y", "z"])
 
@@ -42,24 +44,14 @@
 
     @test Singular.LibNormal.normal(i1, "withDelta", "prim") isa Array
 
-    # for 4ti2 tests:
-    # m = matrix(R, [0 1 2; 2 1 0]) does not work
-    # furthermore, matrices are not implemented properly in caller.jl
-    # so we pass in a module and let singular do the conversion to a matrix
-
     R, (x, y, z) = PolynomialRing(Singular.QQ, ["x", "y", "z"])
-    m = Singular.smodule{n_Q}(R, vector(R, R(0), R(2)),
-                                 vector(R, R(1), R(1)),
-                                 vector(R, R(2), R(0)))
+    m = Singular.Matrix(R, [0 1 2; 2 1 0])
     id = Singular.LibSing4ti2.markov4ti2(m)
     id = std(id)
     @test 0 == reduce(x*z-y^2, id)
 
     R, (x, y, z, w) = PolynomialRing(Singular.QQ, ["x", "y", "z", "w"])
-    m = Singular.smodule{n_Q}(R, vector(R, R(0), R(3)),
-                                 vector(R, R(1), R(2)),
-                                 vector(R, R(2), R(1)),
-                                 vector(R, R(3), R(0)))
+    m = Singular.Matrix(R, [0 1 2 3; 3 2 1 0])
     id = Singular.LibSing4ti2.graver4ti2(m)
     id = std(id)
     @test 0 == reduce(x*z-y^2, id)
@@ -70,16 +62,13 @@
 
     R, (x1, x2, x3, x4, x5, x6, x7, x8, x9) =
                       PolynomialRing(Singular.QQ, ["x"*string(i) for i in 1:9])
-    m = Singular.smodule{n_Q}(R,
-                        vector(R, R(1), R(1), R(0), R(1), R(1), R(0), R(1)),
-                        vector(R, R(1), R(1), R(1), R(0), R(1), R(1), R(1)),
-                        vector(R, R(1), R(1), R(1), R(1), R(0), R(1), R(0)),
-                        vector(R, R(-1),R(0), R(-1),R(0), R(0), R(0), R(0)),
-                        vector(R, R(-1),R(0), R(0), R(-1),R(0), R(-1),R(-1)),
-                        vector(R, R(-1),R(0), R(0), R(0), R(-1),R(0), R(0)),
-                        vector(R, R(0), R(-1),R(-1),R(0), R(0), R(0), R(-1)),
-                        vector(R, R(0), R(-1),R(0), R(-1),R(0), R(0), R(0)),
-                        vector(R, R(0), R(-1),R(0), R(0), R(-1),R(-1),R(0)))
+    m = Singular.Matrix(R, [1  1  1 -1 -1 -1  0  0  0;
+                            1  1  1  0  0  0 -1 -1 -1;
+                            0  1  1 -1  0  0 -1  0  0;
+                            1  0  1  0 -1  0  0 -1  0;
+                            1  1  0  0  0 -1  0  0 -1;
+                            0  1  1  0 -1  0  0  0 -1;
+                            1  1  0  0 -1  0 -1  0  0])
     id = Singular.LibSing4ti2.hilbert4ti2(m)
     id = std(id)
     @test 0 == reduce(x1^2*x3*x5*x6^2*x7*x8^2 - 1, id)
@@ -89,11 +78,24 @@
     @test 0 == reduce(x1*x2*x3*x4*x5*x6*x7*x8*x9 - 1, id)
 end
 
+@testset "caller.LibFinvar" begin
+   Qw, (w,) = FunctionField(QQ, ["w"])
+   K, w = AlgebraicExtensionField(Qw, w^2+w+1)
+   R, (x, y, z) = PolynomialRing(K, ["x","y","z"])
+   M1 = Matrix(R, [0 1 0; 0 0 1; 1 0 0])
+   M2 = Matrix(R, [1 0 0; 0 w 0; 0 0 w^2])
+   P, S, IS = Singular.LibFinvar.invariant_ring(M1, M2)
+   @test P isa Singular.smatrix{Singular.spoly{Singular.n_algExt}}
+   @test typeof(P) == typeof(S) == typeof(IS)
+   @test nrows(P) == 1
+   @test ncols(P) == 3
+end
+
 @testset "caller.LibSolve" begin
    R, (x,) = PolynomialRing(Singular.QQ, ["s"])
    l = Singular.LibSolve.solve(Ideal(R, [x^5+1]), "nodisplay")
    S = l[1]
-   @test isa(S, Singular.PolyRing{Singular.n_unknownsingularcoefficient})
+   @test S isa Singular.PolyRing{Singular.n_unknownsingularcoefficient}
    for y in l[2][:SOL]
       @test isa(y^5+1, Singular.n_unknownsingularcoefficient)
    end
@@ -104,7 +106,7 @@ end
    I = Ideal(R, z-x^4, z-y^6)
    l = Singular.LibNormal.normal(I)
    S = l[1][1][1]
-   @test isa(S, Singular.PolyRing{n_Q})
+   @test S isa Singular.PolyRing{n_Q}
    @test base_ring(gens(l[1][1][2][:norid])[1]*gens(S)[1]) == QQ
 
    F, a = FiniteField(5, 3, "b")
@@ -112,14 +114,14 @@ end
    I = Ideal(R, a*z-x^4, z-y^6)
    l = Singular.LibNormal.normal(I)
    S = l[1][1][1]
-   @test isa(S, Singular.PolyRing{n_GF})
+   @test S isa Singular.PolyRing{n_GF}
    @test base_ring(gens(l[1][1][2][:norid])[1]*gens(S)[1]*a) == F
 
    R, (x, y, z) = PolynomialRing(Fp(17), ["x", "y", "z"])
    I = Ideal(R, z-x^4, z-y^6)
    l = Singular.LibNormal.normal(I)
    S = l[1][1][1]
-   @test isa(S, Singular.PolyRing{n_Zp})
+   @test S isa Singular.PolyRing{n_Zp}
    @test base_ring(gens(l[1][1][2][:norid])[1]*gens(S)[1]) == Fp(17)
 
    F, (a, b, c) = FunctionField(Fp(17), ["a", "b", "c"])
@@ -127,7 +129,7 @@ end
    I = Ideal(R, a*z-x^4, b*c*z-y^6)
    l = Singular.LibNormal.normal(I)
    S = l[1][1][1]
-   @test isa(S, Singular.PolyRing{n_transExt})
+   @test S isa Singular.PolyRing{n_transExt}
    @test base_ring(gens(l[1][1][2][:norid])[1]*gens(S)[1]*a) == F
 
    F, (a, b, c) = FunctionField(QQ, ["a", "b", "c"])
@@ -135,7 +137,7 @@ end
    I = Ideal(R, a*z-x^4, b*c*z-y^6)
    l = Singular.LibNormal.normal(I)
    S = l[1][1][1]
-   @test isa(S, Singular.PolyRing{n_transExt})
+   @test S isa Singular.PolyRing{n_transExt}
    @test base_ring(gens(l[1][1][2][:norid])[1]) == F
    @test base_ring(gens(l[1][1][2][:norid])[1]*gens(S)[1]*a) == F
 
@@ -145,7 +147,7 @@ end
    I = Ideal(R, a*z-x^4, z-y^6)
    l = Singular.LibNormal.normal(I)
    S = l[1][1][1]
-   @test isa(S, Singular.PolyRing{n_algExt})
+   @test S isa Singular.PolyRing{n_algExt}
    @test base_ring(gens(l[1][1][2][:norid])[1]*gens(S)[1]*a) == K
 
    F, (Fa,) = FunctionField(Fp(7), ["a"])
@@ -154,7 +156,7 @@ end
    I = Ideal(R, a*z-x^4, z-y^6)
    l = Singular.LibNormal.normal(I)
    S = l[1][1][1]
-   @test isa(S, Singular.PolyRing{n_algExt})
+   @test S isa Singular.PolyRing{n_algExt}
    @test base_ring(gens(l[1][1][2][:norid])[1]*gens(S)[1]*a) == K
 end
 
@@ -186,4 +188,19 @@ end
     @test length(findall(P->P== y, M[1])) == 1
     @test length(findall(P->P== x, M[1])) == 1
     @test M[2] == x
+end
+
+@testset "caller.lookup_library_symbol" begin
+    F = FiniteField(3, 1, "a")[1]
+    R, (x, y, z) = PolynomialRing(F, ["x", "y", "z" ])
+    A = Matrix(R, [0 1 0; -1 0 0; 0 0 -1])
+    Singular.LibFinvar.reynolds_molien(A, "")
+
+    x = Singular.lookup_library_symbol("Finvar", "newring")
+    @test length(x) == 2
+    @test x[1] isa PolyRing
+    @test x[2][:M] isa smatrix
+
+    @test_throws Exception Singular.lookup_library_symbol("Finvar", "meiyou")
+    @test_throws Exception Singular.lookup_library_symbol("blah", "bluh")
 end

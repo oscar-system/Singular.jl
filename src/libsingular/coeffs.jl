@@ -22,7 +22,7 @@ function n_Write(n::number_ptr, cf::coeffs_ptr, bShortOut::Bool = false)
    n_Write_internal(n, cf, d);
 end
 
-function n_ChineseRemainderSym(a::Array{number_ptr, 1}, b::Array{number_ptr, 1}, n::Cint, signed::Cint, cf::coeffs_ptr)
+function n_ChineseRemainderSym(a::Vector{number_ptr}, b::Vector{number_ptr}, n::Cint, signed::Cint, cf::coeffs_ptr)
    p1 = reinterpret(Ptr{Nothing}, pointer(a))
    p2 = reinterpret(Ptr{Nothing}, pointer(b))
    return n_ChineseRemainderSym_internal(p1, p2, n, signed, cf)
@@ -35,8 +35,7 @@ end
 
 # omalloc free
 function omFree(m :: Ptr{T}) where {T}
-   mp = reinterpret(Ptr{Nothing}, m)
-   omFree_internal(m)
+   omFree_internal(reinterpret(Ptr{Nothing}, m))
 end
 
 ###############################################################################
@@ -60,7 +59,7 @@ import Nemo
 
 mutable struct live_cache
    num::Int
-   A::Array{Nemo.RingElem, 1}
+   A::Vector{Nemo.RingElem}
 end
 
 const nemoNumberID = Base.Dict{UInt, live_cache}()
@@ -158,18 +157,6 @@ function number(j::T, line_number) where {T <: Nemo.RingElem}
     return reinterpret(Ptr{Cvoid},ptr)
 end
 =#
-
-# singular requires a method to print coefficient objects as string without any
-# precedence information. TODO move this to AA
-function stringify_wrt_times(n)
-   prec = AbstractAlgebra.prec_inf_Times
-   obj = AbstractAlgebra.canonicalize(AbstractAlgebra.expressify(n))
-   io = IOBuffer()
-   S = AbstractAlgebra.printer(io)
-   AbstractAlgebra.print_obj(S, MIME("text/plain"), obj, prec, prec)
-   AbstractAlgebra.finish(S)
-   return String(take!(io))
-end
 
 ###############################################################################
 #

@@ -58,7 +58,7 @@ mutable struct SAlgHom{T} <: AbstractAlgebra.Map{PolyRing, PolyRing,
 
    function SAlgHom{T}(domain::PolyRing, codomain::PolyRing,
              V::Vector) where T <: Union{Ring, Field}
-
+      # TODO: verify that V has the right type, and contains elements of the domain
       n = length(V)
       ptr = libSingular.idInit(Cint(n), 1)
       z = new(domain, codomain, V, ptr)

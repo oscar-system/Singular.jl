@@ -21,9 +21,10 @@ all the parent object types belong to the abstract type `Field`.
 
 ## Function field functionality
 
-Singular.jl function fields implement the Field interface of AbstractAlgebra.jl.
+Singular.jl function fields provide all the functionality for fields described by
+AbstractAlgebra.jl.
 
-<https://nemocas.github.io/AbstractAlgebra.jl/fields.html>
+<https://nemocas.github.io/AbstractAlgebra.jl/latest/field>
 
 Below, we describe the functionality that is specific to Singular function field and not
 already listed at the given link.
@@ -33,7 +34,7 @@ already listed at the given link.
 The following constructors are available to create function fields and their elements.
 
 ```@docs
-Singular.FunctionField(::Field, ::Array{String, 1}; ::Bool)
+Singular.FunctionField(::Field, ::Vector{String}; ::Bool)
 ```
 
 In case the user does not want to specify a transcendence basis the following
@@ -80,14 +81,6 @@ Singular.transcendence_degree(::N_FField)
 
 ```@docs
 Singular.transcendence_basis(::N_FField)
-```
-
-```@docs
-Singular.characteristic(::N_FField)
-```
-
-```@docs
-isunit(::n_transExt)
 ```
 
 ```@docs

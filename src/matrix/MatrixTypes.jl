@@ -12,10 +12,8 @@ mutable struct MatrixSpace{T <: Nemo.RingElem} <: Set
    ncols::Int
 
    function MatrixSpace{T}(R::PolyRing, r::Int, c::Int) where T
-      if haskey(MatrixSpaceID, (R, r, c))
-         return MatrixSpaceID[R, r, c]
-      else
-         return MatrixSpaceID[R, r, c] = new{T}(R, r, c)
+      return get!(MatrixSpaceID, (R, r, c)) do
+         new{T}(R, r, c)
       end
    end
 end
@@ -25,6 +23,7 @@ mutable struct smatrix{T <: Nemo.RingElem} <: Nemo.SetElem
    base_ring::PolyRing
 
    function smatrix{T}(R::PolyRing, ptr::libSingular.matrix_ptr) where {T}
+      T === elem_type(R) || error("type mismatch")
       z = new(ptr, R)
       finalizer(_smatrix_clear_fn, z)
       return z
@@ -42,3 +41,23 @@ function _smatrix_clear_fn(I::smatrix)
    libSingular.mp_Delete(I.ptr, I.base_ring.ptr)
 end
 
+
+###############################################################################
+#
+#   sbigintmat: just a plain array of bigint's (coeffs_BIGINT)
+#
+###############################################################################
+
+mutable struct sbigintmat
+    ptr::libSingular.bigintmat_ptr
+
+    function sbigintmat(ptr::libSingular.bigintmat_ptr)
+        z = new(ptr)
+        finalizer(_sbigintmat_clear_fn, z)
+        return z
+    end
+end
+
+function _sbigintmat_clear_fn(m::sbigintmat)
+   libSingular.bigintmat_clear(m.ptr)
+end

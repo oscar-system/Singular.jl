@@ -34,17 +34,17 @@ function transcendence_basis(F::N_FField)
    GC.@preserve F return [F(libSingular.n_Param(Cint(i), F.ptr)) for i = 1:n]
 end
 
-@doc Markdown.doc"""
-    characteristic(R::N_FField)
-
-Return the characteristic of the field.
-"""
 function characteristic(R::N_FField)
    GC.@preserve R return ZZ(libSingular.n_GetChar(R.ptr))
 end
 
 function symbols(R::N_FField)
    return R.S
+end
+
+function singular_symbols(R::N_FField)
+   n = transcendence_degree(R)
+   GC.@preserve R return [Symbol(libSingular.n_ParameterName(Cint(i - 1), R.ptr)) for i = 1:n]
 end
 
 function deepcopy_internal(a::n_transExt, dict::IdDict)
@@ -73,7 +73,7 @@ zero(R::N_FField) = R(0)
 @doc Markdown.doc"""
     numerator(x::n_transExt)
 
-Return the numerator of the given fraction.
+Return the numerator of $x$.
 """
 function numerator(x::n_transExt)
    c = parent(x)
@@ -88,7 +88,7 @@ end
 @doc Markdown.doc"""
     denominator(x::n_transExt)
 
-Return the denominator of the given fraction.
+Return the denominator of $x$.
 """
 function denominator(x::n_transExt)
    c = parent(x)
@@ -110,10 +110,6 @@ function iszero(n::n_transExt)
    GC.@preserve n c return libSingular.n_IsZero(n.ptr, c.ptr)
 end
 
-@doc Markdown.doc"""
-   isunit(n::n_transExt)
-Return `true` if $n$ is a unit in the field, i.e. nonzero.
-"""
 isunit(n::n_transExt) = !iszero(n)
 
 function _tExt_to_poly(R::N_FField, cached)
@@ -259,7 +255,7 @@ function inv(x::n_transExt)
    return c(p)
 end
 
-function divexact(x::n_transExt, y::n_transExt)
+function divexact(x::n_transExt, y::n_transExt; check::Bool=true)
    c = parent(x)
    p = GC.@preserve x y c libSingular.n_Div(x.ptr, y.ptr, c.ptr)
    return c(p)
@@ -330,9 +326,15 @@ end
 
 promote_rule(C::Type{n_transExt}, ::Type{T}) where T <: Integer = n_transExt
 
+promote_rule(C::Type{n_transExt}, ::Type{T}) where T <: Rational = n_transExt
+
 promote_rule(C::Type{n_transExt}, ::Type{Nemo.fmpz}) = n_transExt
 
+promote_rule(C::Type{n_transExt}, ::Type{Nemo.fmpq}) = n_transExt
+
 promote_rule(C::Type{n_transExt}, ::Type{n_Z}) = n_transExt
+
+promote_rule(C::Type{n_transExt}, ::Type{n_Q}) = n_transExt
 
 ###############################################################################
 #
@@ -345,6 +347,17 @@ promote_rule(C::Type{n_transExt}, ::Type{n_Z}) = n_transExt
 function (R::N_FField)(n::n_transExt)
    R != parent(n) && error("Parent ring does not match.")
    return n
+end
+
+function (F::Singular.N_FField)(x::gfp_elem)
+   if characteristic(F) != characteristic(parent(x))
+      throw(ArgumentError("wrong characteristic"))
+   end
+   return n_transExt(F, x.data)
+end
+
+function (F::Singular.N_FField)(x::Union{n_Q, Nemo.fmpq, Rational})
+   return F(numerator(x)) // F(denominator(x))
 end
 
 (R::N_FField)(n::libSingular.number_ptr) = n_transExt(R, n)
@@ -365,8 +378,6 @@ function FunctionField(F::Singular.Field, S::Vector{String}; cached::Bool=true)
    isa(F, Rationals) || isa(F, N_ZpField) ||
              error("Only transcendental extensions of Q and Fp are supported.")
    isempty(S) && throw(ArgumentError("array must be non-empty"))
-   any(isempty, S) && throw(ArgumentError("strings in array must be non-empty"))
-   allunique(S) || throw(ArgumentError("strings in array must be pairwise different"))
    R = N_FField(F, Symbol.(S), cached)
    return tuple(R, transcendence_basis(R))
 end
@@ -379,5 +390,5 @@ with transcendence degree $n$ and transcendence basis $a1, ..., an$.
 """
 function FunctionField(F::Singular.Field, n::Int; cached::Bool=true)
    S = ["a$i" for i in 1:n]
-   return FunctionField(F, S, cached)
+   return FunctionField(F, S, cached = cached)
 end

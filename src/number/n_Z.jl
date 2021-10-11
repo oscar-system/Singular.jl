@@ -47,11 +47,6 @@ function iszero(n::n_Z)
    GC.@preserve n c return libSingular.n_IsZero(n.ptr, c.ptr)
 end
 
-@doc Markdown.doc"""
-    isunit(n::n_Z)
-
-Return `true` if $n$ is $\pm 1$.
-"""
 isunit(n::n_Z) = n == 1 || n == -1
 
 @doc Markdown.doc"""
@@ -74,11 +69,6 @@ function denominator(n::n_Z)
    return one(parent(n))
 end
 
-@doc Markdown.doc"""
-    abs(n::n_Z)
-
-Return the absolute value of $n$.
-"""
 function abs(n::n_Z)
    c = parent(n)
    GC.@preserve n c begin
@@ -230,7 +220,7 @@ function div(x::n_Z, y::n_Z)
    return c(p)
 end
 
-function divexact(x::n_Z, y::n_Z)
+function divexact(x::n_Z, y::n_Z; check::Bool=true)
    c = parent(x)
    p = GC.@preserve x y c libSingular.n_ExactDiv(x.ptr, y.ptr, c.ptr)
    return c(p)
