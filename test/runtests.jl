@@ -12,6 +12,7 @@ using Test
 
 include("../test/number-test.jl")
 include("../test/poly-test.jl")
+include("../test/exterior-test.jl")
 include("../test/ideal-test.jl")
 include("../test/map-test.jl")
 include("../test/matrix-test.jl")

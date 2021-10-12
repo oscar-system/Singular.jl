@@ -150,13 +150,13 @@ zero(R::PolyRing) = R()
 
 one(R::PolyRing) = R(1)
 
-iszero(p::spoly) = p.ptr.cpp_object == C_NULL
+iszero(p::polyalg) = p.ptr.cpp_object == C_NULL
 
-function isone(p::spoly)
+function isone(p::polyalg)
    GC.@preserve p return Bool(libSingular.p_IsOne(p.ptr, parent(p).ptr))
 end
 
-function isgen(p::spoly)
+function isgen(p::Union{spoly, pexterior, pweyl})
    R = parent(p)
    GC.@preserve R p begin
       if p.ptr.cpp_object == C_NULL || libSingular.pNext(p.ptr).cpp_object != C_NULL ||
@@ -197,7 +197,14 @@ function isconstant(p::spoly)
    end
 end
 
-function isunit(p::spoly)
+function isterm(p::polyalg)
+   GC.@preserve p begin
+      return p.ptr.cpp_object != C_NULL &&
+             libSingular.pNext(p.ptr).cpp_object == C_NULL
+   end
+end
+
+function isunit(p::polyalg)
    GC.@preserve p begin
       return p.ptr.cpp_object != C_NULL &&
              libSingular.pNext(p.ptr).cpp_object == C_NULL &&
@@ -205,7 +212,8 @@ function isunit(p::spoly)
    end
 end
 
-length(p::spoly) = Int(libSingular.pLength(p.ptr))
+
+length(p::polyalg) = Int(libSingular.pLength(p.ptr))
 
 @doc Markdown.doc"""
     total_degree(p::spoly)
@@ -249,7 +257,7 @@ Return the exponent vector of the leading term of the given polynomial. The retu
 value is a Julia 1-dimensional array giving the exponent for each variable of the
 leading term.
 """
-function leading_exponent_vector(p::spoly)
+function leading_exponent_vector(p::Union{spoly, pexterior, pweyl})
    R = parent(p)
    n = nvars(R)
    A = Array{Int}(undef, n)
@@ -259,7 +267,7 @@ end
 
 @deprecate lead_exponent(p::spoly) leading_exponent_vector(p)
 
-function leading_coefficient(p::spoly)
+function leading_coefficient(p::polyalg)
    R = base_ring(p)
    if p.ptr.cpp_object == C_NULL
       return zero(R)
@@ -268,7 +276,61 @@ function leading_coefficient(p::spoly)
    end
 end
 
-function deepcopy_internal(p::spoly, dict::IdDict)
+function trailing_coefficient(p::polyalg)
+   R = base_ring(p)
+   GC.@preserve p R begin
+      P = p.ptr
+      while P.cpp_object != C_NULL
+         Q = libSingular.pNext(P)
+         if Q.cpp_object == C_NULL
+            return R(libSingular.n_Copy(libSingular.pGetCoeff(P), R.ptr))
+         end
+         P = Q
+      end
+      return zero(R)
+   end
+end
+
+function leading_term(p::polyalg)
+   R = parent(p)
+   GC.@preserve p R begin
+      P = p.ptr
+      return P.cpp_object == C_NULL ? zero(R) : R(libSingular.p_Head(P, R.ptr))
+   end
+end
+
+function leading_monomial(p::polyalg)
+   R = parent(p)
+   GC.@preserve p R begin
+      P = p.ptr
+      if P.cpp_object == C_NULL
+         return zero(R)
+      else
+         B = base_ring(R)
+         t = one(B)
+         GC.@preserve B t begin
+            mptr = libSingular.p_Head(P, R.ptr)
+            n = libSingular.n_Copy(t.ptr, B.ptr)
+            libSingular.p_SetCoeff0(mptr, n, R.ptr)
+            return R(mptr)
+         end
+      end
+   end
+end
+
+function tail(p::polyalg)
+   R = parent(p)
+   GC.@preserve p R begin
+      P = p.ptr
+      if P.cpp_object == C_NULL
+         return zero(R)
+      else
+         return R(libSingular.p_Copy(libSingular.pNext(P), R.ptr))
+      end
+   end
+end
+
+function deepcopy_internal(p::polyalg, dict::IdDict)
    R = parent(p)
    p2 = GC.@preserve p R libSingular.p_Copy(p.ptr, R.ptr)
    return R(p2)
@@ -298,7 +360,51 @@ end
 #
 ###############################################################################
 
-function Base.iterate(x::Nemo.Generic.MPolyCoeffs{<:polyalg{T}}) where T <: Nemo.RingElem
+function Base.length(x::Union{PolyAlgCoeffs, PolyAlgExponentVectors, PolyAlgExponentWords, PolyAlgTerms, PolyAlgMonomials})
+   return length(x.poly)
+end
+
+function Base.eltype(x::PolyAlgCoeffs{T}) where T <: polyalg{S} where S
+   return S
+end
+
+function Base.eltype(x::PolyAlgExponentVectors)
+   return Vector{Int}
+end
+
+function Base.eltype(x::PolyAlgExponentWords)
+   return Vector{Int}
+end
+
+function Base.eltype(x::PolyAlgMonomials{T}) where T
+   return T
+end
+
+function Base.eltype(x::PolyAlgTerms{T}) where T
+   return T
+end
+
+function coefficients(x::polyalg)
+   return PolyAlgCoeffs(x)
+end
+
+function exponent_vectors(x::polyalg)
+   return PolyAlgExponentVectors(x)
+end
+
+function exponent_words(x::polyalg)
+   return PolyAlgExponentWords(x)
+end
+
+function terms(x::polyalg)
+   return PolyAlgTerms(x)
+end
+
+function monomials(x::polyalg)
+   return PolyAlgMonomials(x)
+end
+
+function Base.iterate(x::PolyAlgCoeffs{<:polyalg{T}}) where T <: Nemo.RingElem
    p = x.poly
    ptr = p.ptr
    if ptr.cpp_object == C_NULL
@@ -309,7 +415,7 @@ function Base.iterate(x::Nemo.Generic.MPolyCoeffs{<:polyalg{T}}) where T <: Nemo
    end
 end
 
-function Base.iterate(x::Nemo.Generic.MPolyCoeffs{<:polyalg{T}}, state) where T <: Nemo.RingElem
+function Base.iterate(x::PolyAlgCoeffs{<:polyalg{T}}, state) where T <: Nemo.RingElem
    state = libSingular.pNext(state)
    if state.cpp_object == C_NULL
       return nothing
@@ -319,7 +425,7 @@ function Base.iterate(x::Nemo.Generic.MPolyCoeffs{<:polyalg{T}}, state) where T 
    end
 end
 
-function Base.iterate(x::Nemo.Generic.MPolyExponentVectors{<:polyalg{T}}) where T <: Nemo.RingElem
+function Base.iterate(x::PolyAlgExponentVectors{<:polyalg{T}}) where T <: Nemo.RingElem
    p = x.poly
    ptr = p.ptr
    if ptr.cpp_object == C_NULL
@@ -332,7 +438,7 @@ function Base.iterate(x::Nemo.Generic.MPolyExponentVectors{<:polyalg{T}}) where 
    end
 end
 
-function Base.iterate(x::Nemo.Generic.MPolyExponentVectors{<:polyalg{T}}, state) where T <: Nemo.RingElem
+function Base.iterate(x::PolyAlgExponentVectors{<:polyalg{T}}, state) where T <: Nemo.RingElem
    state = libSingular.pNext(state)
    if state.cpp_object == C_NULL
       return nothing
@@ -344,7 +450,7 @@ function Base.iterate(x::Nemo.Generic.MPolyExponentVectors{<:polyalg{T}}, state)
    end
 end
 
-function Base.iterate(x::Nemo.Generic.MPolyTerms{<:polyalg{T}}) where T <: Nemo.RingElem
+function Base.iterate(x::PolyAlgTerms{<:polyalg{T}}) where T <: Nemo.RingElem
    p = x.poly
    ptr = p.ptr
    if ptr.cpp_object == C_NULL
@@ -355,7 +461,7 @@ function Base.iterate(x::Nemo.Generic.MPolyTerms{<:polyalg{T}}) where T <: Nemo.
    end
 end
 
-function Base.iterate(x::Nemo.Generic.MPolyTerms{<:polyalg{T}}, state) where T <: Nemo.RingElem
+function Base.iterate(x::PolyAlgTerms{<:polyalg{T}}, state) where T <: Nemo.RingElem
    state = libSingular.pNext(state)
    if state.cpp_object == C_NULL
       return nothing
@@ -365,7 +471,7 @@ function Base.iterate(x::Nemo.Generic.MPolyTerms{<:polyalg{T}}, state) where T <
    end
 end
 
-function Base.iterate(x::Nemo.Generic.MPolyMonomials{<:polyalg{T}}) where T <: Nemo.RingElem
+function Base.iterate(x::PolyAlgMonomials{<:polyalg{T}}) where T <: Nemo.RingElem
    p = x.poly
    ptr = p.ptr
    if ptr.cpp_object == C_NULL
@@ -383,7 +489,7 @@ function Base.iterate(x::Nemo.Generic.MPolyMonomials{<:polyalg{T}}) where T <: N
    end
 end
 
-function Base.iterate(x::Nemo.Generic.MPolyMonomials{<:polyalg{T}}, state) where T <: Nemo.RingElem
+function Base.iterate(x::PolyAlgMonomials{<:polyalg{T}}, state) where T <: Nemo.RingElem
    state = libSingular.pNext(state)
    if state.cpp_object == C_NULL
       return nothing

@@ -121,3 +121,29 @@ function _spoly_clear_fn(p::spoly)
    _PolyRing_clear_fn(R)
 end
 
+###############################################################################
+#
+# Iterators
+#
+###############################################################################
+
+struct PolyAlgCoeffs{T}
+   poly::T
+end
+
+struct PolyAlgExponentVectors{T}
+   poly::T
+end
+
+struct PolyAlgExponentWords{T}
+   poly::T
+end
+
+struct PolyAlgTerms{T}
+   poly::T
+end
+
+struct PolyAlgMonomials{T}
+   poly::T
+end
+
