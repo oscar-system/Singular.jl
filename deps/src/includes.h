@@ -27,6 +27,7 @@
 #include <polys/clapsing.h>
 #include <polys/monomials/ring.h>
 #include <polys/monomials/p_polys.h>
+#include <polys/prCopy.h>
 #include <polys/simpleideals.h>
 #include "polys/ext_fields/algext.h"
 #include "polys/ext_fields/transext.h"

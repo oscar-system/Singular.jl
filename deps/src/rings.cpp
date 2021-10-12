@@ -142,11 +142,130 @@ auto rDefault_Weyl_helper(coeffs                   cf,
                      unsigned long                 bitmask)
 {
     auto r = rDefault_long_helper(cf, vars, ord, blk0, blk1, bitmask);
-    poly p=p_One(r);
-    nc_CallPlural(NULL,NULL,p,p,r,true,false,true,r);
-    p_Delete(&p,r);
-    return r;
+
+    // vars = indeterminates x1, ..., xn and then partials Dx1, ..., Dxn
+    int n = r->N/2;
+    assume(2*n == r->N);
+    matrix C = mpNew(2*n, 2*n);
+    matrix D = mpNew(2*n, 2*n);
+
+    for (int i = 1; i <= n; i++)
+    for (int j = 1; j <= n; j++)
+    {
+        if (i < j)
+        {
+            // xj*xi = xi*xj
+            MATELEM(C,i,j) = p_One(r);
+
+            // Dxj*Dxi = Dxi*Dxj
+            MATELEM(C,n+i,n+j) = p_One(r);
+        }
+
+        // Dxj*xi = xi*Dxj + bool(i == j)
+        MATELEM(C,i,n+j) = p_One(r);
+        if (i == j)
+            MATELEM(D,i,n+j) = p_One(r);
+    }
+
+    ring R = rCopy(r);
+    nc_CallPlural(C,D,NULL,NULL,R,true,false,true,r);
+
+    // nc_CallPlural seems to take ownership of the matrices
+    //mp_Delete(&C, r);
+    //mp_Delete(&D, r);
+
+    rDelete(r);
+    return R;
 }
+
+// adapted from jiA_RING in ipassign.cc
+static ring make_qring(ring r, ideal id)
+{
+    const ring origin = currRing;
+    rChangeCurrRing(r);
+
+    coeffs newcf = currRing->cf;
+
+    const int cpos = idPosConstant(id);
+    if (rField_is_Ring(currRing))
+    {
+        if (cpos >= 0)
+        {
+            newcf = n_CoeffRingQuot1(p_GetCoeff(id->m[cpos], currRing), currRing->cf);
+            if (newcf == NULL)
+            {
+                rChangeCurrRing(origin);
+                return NULL;
+            }
+        }
+    }
+
+    ring qr = rCopy(currRing);
+    assume(qr->cf == currRing->cf);
+
+    if (qr->cf != newcf)
+    {
+        nKillChar(qr->cf); // ???
+        qr->cf = newcf;
+    }
+
+    ideal qid;
+
+    if((rField_is_Ring(currRing)) && (cpos != -1))
+    {
+        int i, j;
+        int *perm = (int *)omAlloc0((qr->N+1)*sizeof(int));
+
+        for(i=qr->N;i>0;i--)
+            perm[i]=i;
+
+        nMapFunc nMap = n_SetMap(currRing->cf, newcf);
+        qid = idInit(IDELEMS(id)-1,1);
+        for (i = 0, j = 0; i<IDELEMS(id); i++)
+            if (i != cpos)
+                qid->m[j++] = p_PermPoly(id->m[i], perm, currRing, qr, nMap, NULL, 0);
+    }
+    else
+    {
+        qid = idrCopyR(id,currRing,qr);
+    }
+
+    idSkipZeroes(qid);
+
+    if (currRing->qideal!=NULL) /* we are already in a qring! */
+    {
+        ideal tmp=idSimpleAdd(qid,currRing->qideal);
+        // both ideals should be GB, so dSimpleAdd is sufficient
+        idDelete(&qid);
+        qid=tmp;
+        // delete the qr copy of quotient ideal!!!
+        idDelete(&qr->qideal);
+    }
+    if (idElem(qid)==0)
+    {
+        qr->qideal = NULL;
+        id_Delete(&qid,currRing);
+    }
+    else
+    {
+        qr->qideal = qid;
+    }
+
+    // qr is a copy of currRing with the new qideal!
+    #ifdef HAVE_PLURAL
+    if (rIsPluralRing(currRing) &&(qr->qideal!=NULL))
+    {
+        if (nc_SetupQuotient(qr, currRing))
+        {
+            //WarnS("error in nc_SetupQuotient");
+        }
+    }
+    #endif
+
+    rChangeCurrRing(origin);
+    return qr;
+}
+
 
 auto rDefault_Exterior_helper(coeffs               cf,
                      jlcxx::ArrayRef<uint8_t *>    vars,
@@ -156,11 +275,21 @@ auto rDefault_Exterior_helper(coeffs               cf,
                      unsigned long                 bitmask)
 {
     auto r = rDefault_long_helper(cf, vars, ord, blk0, blk1, bitmask);
-    poly p=p_One(r);
-    p=p_Neg(p,r);
-    nc_CallPlural(NULL,NULL,p,NULL,r,true,false,true,r);
-    p_Delete(&p,r);
-    return r;
+    int n = rVar(r);
+    // first construct relations xj*xi = -xi*xj
+    poly p = p_Neg(p_One(r), r);
+    ring R = rCopy(r);
+    nc_CallPlural(NULL,NULL,p,NULL,R,true,false,true,r);
+    // then add xi^2 = 0
+    ideal q = idInit(n,1);
+    for (int i = 1; i <= n; i++)
+        q->m[i-1] = p_Power(rGetVar(i, R), 2, R);
+    ring S = make_qring(R, q);
+    id_Delete(&q, R);
+    p_Delete(&p, r);
+    rDelete(R);
+    rDelete(r);
+    return S;
 }
 
 void singular_define_rings(jlcxx::Module & Singular)
@@ -168,6 +297,7 @@ void singular_define_rings(jlcxx::Module & Singular)
     Singular.method("toPolyRef", [](void * ptr) {
        return reinterpret_cast<spolyrec*>(ptr);
     });
+    Singular.method("freeAlgebra", &freeAlgebra);
     Singular.method("rDefault_helper", &rDefault_helper);
     Singular.method("rDefault_wvhdl_helper", &rDefault_wvhdl_helper);
     Singular.method("rOrdering_helper", &rOrdering_helper); // inverse of rDefault_wvhdl_helper
