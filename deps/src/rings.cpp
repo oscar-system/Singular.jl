@@ -426,6 +426,9 @@ void singular_define_rings(jlcxx::Module & Singular)
        return std::make_tuple(reinterpret_cast<void *>(q), reinterpret_cast<void *>(rest));
     });
     Singular.method("p_Div_nn", p_Div_nn);
+    Singular.method("p_Mult_nn", [](poly p, number n, ring r) {
+       return p_Mult_nn(p, n, r);
+    });
     Singular.method("p_IsDivisibleBy", [](spolyrec * p, spolyrec * q, ip_sring * r) {
        poly res;
        ideal I = idInit(1, 1);
