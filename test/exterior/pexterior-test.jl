@@ -143,6 +143,11 @@ end
 end
 
 @testset "pexterior.binary_ops" begin
+   R, (x, y, z, w) = ExteriorAlgebra(QQ, ["x", "y", "z", "w"])
+   @test y*x == -x*y
+   @test y*x*y == 0
+   @test 0 == x^2
+   @test (x*y + y*z)*(w + x) == x*y*w + y*z*w + y*z*x
 end
 
 @testset "pexterior.comparison" begin

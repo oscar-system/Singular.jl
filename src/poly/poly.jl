@@ -556,7 +556,7 @@ end
 #
 ###############################################################################
 
-function (a::polyalg{T} + b::polyalg{T}) where T <: Nemo.RingElem
+function +(a::polyalg{T}, b::polyalg{T}) where T <: Nemo.RingElem
    check_parent(a, b)
    R = parent(a)
    GC.@preserve a b R begin
@@ -567,7 +567,23 @@ function (a::polyalg{T} + b::polyalg{T}) where T <: Nemo.RingElem
    end
 end
 
-function (a::polyalg{T} - b::polyalg{T}) where T <: Nemo.RingElem
+function +(a::polyalg{T}, b::T) where T <: Nemo.RingElem
+   R = parent(a)
+   S = base_ring(a)
+   S != parent(b) && error("Incompatible rings")
+   GC.@preserve a b R S begin
+      a1 = libSingular.p_Copy(a.ptr, R.ptr)
+      b1 = libSingular.p_NSet(libSingular.n_Copy(b.ptr, S.ptr), R.ptr)
+      z = libSingular.p_Add_q(a1, b1, R.ptr)
+      return R(z)
+   end
+end
+
+function +(a::T, b::polyalg{T}) where T <: Nemo.RingElem
+   return b + a
+end
+
+function -(a::polyalg{T}, b::polyalg{T}) where T <: Nemo.RingElem
    check_parent(a, b)
    R = parent(a)
    GC.@preserve a b R begin
@@ -578,11 +594,49 @@ function (a::polyalg{T} - b::polyalg{T}) where T <: Nemo.RingElem
    end
 end
 
-function (a::polyalg{T} * b::polyalg{T}) where T <: Nemo.RingElem
+function -(a::polyalg{T}, b::T) where T <: Nemo.RingElem
+   R = parent(a)
+   S = base_ring(a)
+   S != parent(b) && error("Incompatible rings")
+   GC.@preserve a b R S begin
+      a1 = libSingular.p_Copy(a.ptr, R.ptr)
+      b1 = libSingular.p_NSet(libSingular.n_Copy(b.ptr, S.ptr), R.ptr)
+      z = libSingular.p_Sub(a1, b1, R.ptr)
+      return R(z)
+   end
+end
+
+function -(a::T, b::polyalg{T}) where T <: Nemo.RingElem
+   R = parent(b)
+   S = base_ring(b)
+   S != parent(a) && error("Incompatible rings")
+   GC.@preserve a b R S begin
+      b1 = libSingular.p_Copy(b.ptr, R.ptr)
+      a1 = libSingular.p_NSet(libSingular.n_Copy(a.ptr, S.ptr), R.ptr)
+      z = libSingular.p_Sub(a1, b1, R.ptr)
+      return R(z)
+   end
+end
+
+function *(a::polyalg{T}, b::polyalg{T}) where T <: Nemo.RingElem
    check_parent(a, b)
    R = parent(a)
    s = GC.@preserve a b R libSingular.pp_Mult_qq(a.ptr, b.ptr, R.ptr)
    return R(s)
+end
+
+function *(a::polyalg{T}, b::T) where T <: Nemo.RingElem
+   R = parent(a)
+   base_ring(a) != parent(b) && error("Incompatible rings")
+   GC.@preserve a b R begin
+      a1 = libSingular.p_Copy(a.ptr, R.ptr)
+      p = libSingular.p_Mult_nn(a1, b.ptr, R.ptr)
+      return R(p)
+   end
+end
+
+function *(a::T, b::polyalg{T}) where T <: Nemo.RingElem
+   return b*a  # multiplication by coeffs should be commutative
 end
 
 ###############################################################################
@@ -624,6 +678,22 @@ function Base.isless(x::polyalg{T}, y::polyalg{T}) where T <: Nemo.RingElem
    check_parent(x, y)
    R = parent(x)
    GC.@preserve x y R return libSingular.p_Compare(x.ptr, y.ptr, R.ptr) < 0
+end
+
+function ==(a::polyalg{T}, b::T) where T <: Nemo.RingElem
+   return a == parent(a)(b)
+end
+
+function ==(a::T, b::polyalg{T}) where T <: Nemo.RingElem
+   return parent(b)(a) == a
+end
+
+function ==(a::polyalg, b::Union{Integer, fmpz, Rational, fmpq})
+   return a == parent(a)(b)
+end
+
+function ==(a::Union{Integer, fmpz, Rational, fmpq}, b::polyalg)
+   return parent(b)(a) == a
 end
 
 ###############################################################################
@@ -691,12 +761,6 @@ function divexact(x::polyalg, y::Int; check::Bool=true)
    end
 end
 
-divexact(x::polyalg, y::Integer; check::Bool=true) = divexact(x, base_ring(x)(y), check=check)
-
-function divexact(x::polyalg, y::Rational; check::Bool=true)
-   return divexact(x, base_ring(x)(y), check=check)
-end
-
 ################################################################################
 #
 #   Ad hoc binary
@@ -706,24 +770,34 @@ end
 # We cannot use the promote_rule mechanism, since n_Q and fmpq have no and
 # should not have a promote_rule
 
-function +(x::spoly, y::fmpq)
-  return x + parent(x)(y)
+# cast the integers/rationals to just the coefficient ring, as more efficient
+# scalar binary operators are available
+function +(x::polyalg, y::Union{Integer, fmpz, Rational, fmpq})
+  return x + base_ring(x)(y)
 end
 
-function +(x::fmpq, y::spoly)
-  return parent(y)(x) + y
+function +(x::Union{Integer, fmpz, Rational, fmpq}, y::polyalg)
+  return base_ring(y)(x) + y
 end
 
-function *(x::spoly, y::fmpq)
-  return x * parent(x)(y)
+function -(x::polyalg, y::Union{Integer, fmpz, Rational, fmpq})
+  return x - base_ring(x)(y)
 end
 
-function *(x::fmpq, y::spoly)
-  return parent(y)(x) * y
+function -(x::Union{Integer, fmpz, Rational, fmpq}, y::polyalg)
+  return base_ring(y)(x) - y
 end
 
-function divexact(x::spoly, y::fmpq; check::Bool=true)
-  return divexact(x, parent(x)(y), check=check)
+function *(x::polyalg, y::Union{Integer, fmpz, Rational, fmpq})
+  return x * base_ring(x)(y)
+end
+
+function *(x::Union{Integer, fmpz, Rational, fmpq}, y::polyalg)
+  return base_ring(y)(x) * y
+end
+
+function divexact(x::polyalg, y::Union{Integer, fmpz, Rational, fmpq}; check::Bool=true)
+  return divexact(x, base_ring(x)(y), check=check)
 end
 
 ###############################################################################
@@ -1386,6 +1460,10 @@ function (R::PolyRing)(n::n_Z)
    ptr = GC.@preserve n libSingular.n_Copy(n.ptr, parent(n).ptr)
    T = elem_type(base_ring(R))
    return spoly{T}(R, ptr)
+end
+
+function (R::PolyRing)(n::Rational)
+   return R(base_ring(R)(n))
 end
 
 function (R::PolyRing)(n::libSingular.poly_ptr)
