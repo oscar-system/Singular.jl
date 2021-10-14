@@ -304,6 +304,11 @@ void singular_define_rings(jlcxx::Module & Singular)
     Singular.method("rDefault_long_helper", &rDefault_long_helper);
     Singular.method("rDefault_Weyl_helper", &rDefault_Weyl_helper);
     Singular.method("rDefault_Exterior_helper", &rDefault_Exterior_helper);
+    Singular.method("nc_CallPlural", [](matrix C, matrix D, ring r) {
+        ring R = rCopy(r);
+        nc_CallPlural(mp_Copy(C,r), mp_Copy(D,r), NULL, NULL, R, true, false, true, r);
+        return R;
+    });
     Singular.method("rDelete", &rDelete);
     Singular.method("rString", [](ip_sring * r) {
         auto s = rString(r);
