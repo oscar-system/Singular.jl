@@ -1,5 +1,4 @@
-export pweyl,
-       WeylAlgebra
+export sweylpoly, WeylPolyRing, WeylAlgebra
 
 ###############################################################################
 #
@@ -7,72 +6,72 @@ export pweyl,
 #
 ###############################################################################
 
-base_ring(R::WeylAlgebra{T}) where T <: Nemo.RingElem = R.base_ring
+base_ring(R::WeylPolyRing{T}) where T <: Nemo.RingElem = R.base_ring
 
-base_ring(p::pweyl) = base_ring(parent(p))
+base_ring(p::sweylpoly) = base_ring(parent(p))
 
-elem_type(::Type{WeylAlgebra{T}}) where T <: Nemo.RingElem = pweyl{T}
+elem_type(::Type{WeylPolyRing{T}}) where T <: Nemo.RingElem = sweylpoly{T}
 
-parent_type(::Type{pweyl{T}}) where T <: Nemo.RingElem = WeylAlgebra{T}
+parent_type(::Type{sweylpoly{T}}) where T <: Nemo.RingElem = WeylPolyRing{T}
 
 @doc Markdown.doc"""
-    nvars(R::WeylAlgebra)
+    nvars(R::WeylPolyRing)
 > Return the number of variables in the given Weyl algebra.
 """
-nvars(R::WeylAlgebra) = Int(libSingular.rVar(R.ptr))
+nvars(R::WeylPolyRing) = Int(libSingular.rVar(R.ptr))
 
 @doc Markdown.doc"""
-    has_global_ordering(R::WeylAlgebra)
+    has_global_ordering(R::WeylPolyRing)
 > Return `true` if the given algebra has a global ordering, i.e. if $1 < x$ for
 > each variable $x$ in the ring. This include `:lex`, `:deglex` and `:degrevlex`
 > orderings.
 """
-has_global_ordering(R::WeylAlgebra) = Bool(libSingular.rHasGlobalOrdering(R.ptr))
+has_global_ordering(R::WeylPolyRing) = Bool(libSingular.rHasGlobalOrdering(R.ptr))
 
 @doc Markdown.doc"""
-    has_mixed_ordering(R::WeylAlgebra)
+    has_mixed_ordering(R::WeylPolyRing)
 > Return `true` if the given algebra has a mixed ordering, i.e. if $1 < x_i$ for
 > a variable $x_i$ and $1>x_j$ for another variable $x_j$.
 """
-has_mixed_ordering(R::WeylAlgebra) = Bool(libSingular.rHasMixedOrdering(R.ptr))
+has_mixed_ordering(R::WeylPolyRing) = Bool(libSingular.rHasMixedOrdering(R.ptr))
 
 @doc Markdown.doc"""
-    has_local_ordering(R::WeylAlgebra)
+    has_local_ordering(R::WeylPolyRing)
 > Return `true` if the given algebra has a local ordering, i.e. if $1 > x$ for
 > all variables $x$.
 """
-function has_local_ordering(R::WeylAlgebra)
+function has_local_ordering(R::WeylPolyRing)
    return !has_global_ordering(R) && !has_mixed_ordering(R)
 end
 
 @doc Markdown.doc"""
-    isquotient_ring(R::WeylAlgebra)
+    isquotient_ring(R::WeylPolyRing)
 > Return `true` if the given algebra is the quotient of a polynomial ring with
 > a non - zero ideal.
 """
-isquotient_ring(R::WeylAlgebra) = Bool(Singular.libSingular.rIsQuotientRing(R.ptr))
+isquotient_ring(R::WeylPolyRing) = Bool(Singular.libSingular.rIsQuotientRing(R.ptr))
 
 @doc Markdown.doc"""
-    characteristic(R::WeylAlgebra)
+    characteristic(R::WeylPolyRing)
 > Return the characteristic of the Weyl algebra, i.e. the characteristic of the
 > coefficient ring.
 """
-characteristic(R::WeylAlgebra) = Int(libSingular.rChar(R.ptr))
+characteristic(R::WeylPolyRing) = Int(libSingular.rChar(R.ptr))
 
-function gens(R::WeylAlgebra)
+function gens(R::WeylPolyRing)
    n = nvars(R)
    return [R(libSingular.rGetVar(Cint(i), R.ptr)) for i = 1:n]
 end
 
-function gen(R::WeylAlgebra, i::Int)
+function gen(R::WeylPolyRing, i::Int)
    return R(libSingular.rGetVar(Cint(i), R.ptr))
 end
 
 @doc Markdown.doc"""
-    symbols(R::WeylAlgebra)
+    symbols(R::WeylPolyRing)
 > Return symbols for the generators of the Weyl algebra $R$.
 """
-function symbols(R::WeylAlgebra)
+function symbols(R::WeylPolyRing)
    io = IOBuffer();
    symbols = Array{Symbol,1}(undef, 0)
    for g in gens(R)
@@ -82,24 +81,24 @@ function symbols(R::WeylAlgebra)
    return symbols
 end
 
-ordering(R::WeylAlgebra) = R.ord
+ordering(R::WeylPolyRing) = R.ord
 
 @doc Markdown.doc"""
-    degree_bound(R::WeylAlgebra)
+    degree_bound(R::WeylPolyRing)
 > Return the internal degree bound in each variable, enforced by Singular. This is the
 > largest positive value any degree can have before an overflow will occur. This
 > internal bound may be higher than the bound requested by the user via the
-> `degree_bound` parameter of the `WeylAlgebra` constructor.
+> `degree_bound` parameter of the `WeylPolyRing` constructor.
 """
-function degree_bound(R::WeylAlgebra)
+function degree_bound(R::WeylPolyRing)
    return Int(libSingular.rBitmask(R.ptr))
 end
 
-zero(R::WeylAlgebra) = R()
+zero(R::WeylPolyRing) = R()
 
-one(R::WeylAlgebra) = R(1)
+one(R::WeylPolyRing) = R(1)
 
-function Base.hash(p::pweyl{T}, h::UInt) where T <: Nemo.RingElem
+function Base.hash(p::sweylpoly{T}, h::UInt) where T <: Nemo.RingElem
    v = 0xa4c406868a7c20c5%UInt
    v = xor(hash(collect(exponent_vectors(p)), h), v)
    for c in coefficients(p)
@@ -114,7 +113,7 @@ end
 #   String I/O
 #
 ###############################################################################          
-function show(io::IO, R::WeylAlgebra)
+function show(io::IO, R::WeylPolyRing)
    s = libSingular.rString(R.ptr)
    if libSingular.rIsQuotientRing(R.ptr)
      print(io, "Singular Weyl Algebra Quotient Ring ", s)
@@ -123,11 +122,11 @@ function show(io::IO, R::WeylAlgebra)
    end
 end
 
-show_minus_one(::Type{pweyl{T}}) where T <: Nemo.RingElem = show_minus_one(T)
+show_minus_one(::Type{sweylpoly{T}}) where T <: Nemo.RingElem = show_minus_one(T)
 
-needs_parentheses(x::pweyl) = length(x) > 1
+needs_parentheses(x::sweylpoly) = length(x) > 1
 
-isnegative(x::pweyl) = isconstant(x) && !iszero(x) && isnegative(coeff(x, 0))
+isnegative(x::sweylpoly) = isconstant(x) && !iszero(x) && isnegative(coeff(x, 0))
 
 ###############################################################################
 #
@@ -135,10 +134,10 @@ isnegative(x::pweyl) = isconstant(x) && !iszero(x) && isnegative(coeff(x, 0))
 #
 ###############################################################################
 
-promote_rule(::Type{pweyl{T}}, ::Type{pweyl{T}}) where T <: Nemo.RingElem = pweyl{T}
+promote_rule(::Type{sweylpoly{T}}, ::Type{sweylpoly{T}}) where T <: Nemo.RingElem = sweylpoly{T}
 
-function promote_rule(::Type{pweyl{T}}, ::Type{U}) where {T <: Nemo.RingElem, U <: Nemo.RingElem}
-   promote_rule(T, U) == T ? pweyl{T} : Union{}
+function promote_rule(::Type{sweylpoly{T}}, ::Type{U}) where {T <: Nemo.RingElem, U <: Nemo.RingElem}
+   promote_rule(T, U) == T ? sweylpoly{T} : Union{}
 end
 
 ###############################################################################
@@ -147,7 +146,7 @@ end
 #
 ###############################################################################
 
-function MPolyBuildCtx(R::WeylAlgebra)
+function MPolyBuildCtx(R::WeylPolyRing)
    return MPolyBuildCtx(R, R().ptr)
 end
 
@@ -157,60 +156,60 @@ end
 #
 ###############################################################################
 
-function (R::WeylAlgebra)()
+function (R::WeylPolyRing)()
    T = elem_type(base_ring(R))
-   z = pweyl{T}(R)
+   z = sweylpoly{T}(R)
    z.parent = R
    return z
 end
 
-function (R::WeylAlgebra)(n::Int)
+function (R::WeylPolyRing)(n::Int)
    T = elem_type(base_ring(R))
-   z = pweyl{T}(R, n)
+   z = sweylpoly{T}(R, n)
    z.parent = R
    return z
 end
 
-function (R::WeylAlgebra)(n::Integer)
+function (R::WeylPolyRing)(n::Integer)
    T = elem_type(base_ring(R))
-   z = pweyl{T}(R, BigInt(n))
+   z = sweylpoly{T}(R, BigInt(n))
    z.parent = R
    return z
 end
 
-function (R::WeylAlgebra)(n::n_Z)
+function (R::WeylPolyRing)(n::n_Z)
    n = base_ring(R)(n)
    ptr = libSingular.n_Copy(n.ptr, parent(n).ptr)
    T = elem_type(base_ring(R))
-   z = pweyl{T}(R, ptr)
+   z = sweylpoly{T}(R, ptr)
    z.parent = R
    return z
 end
 
-function (R::WeylAlgebra)(n::libSingular.poly_ptr)
+function (R::WeylPolyRing)(n::libSingular.poly_ptr)
    T = elem_type(base_ring(R))
-   z = pweyl{T}(R, n)
+   z = sweylpoly{T}(R, n)
    z.parent = R
    return z
 end
 
-function (R::WeylAlgebra{T})(n::T) where T <: Nemo.RingElem
+function (R::WeylPolyRing{T})(n::T) where T <: Nemo.RingElem
    parent(n) != base_ring(R) && error("Unable to coerce into Weyl algebra")
-   z = pweyl{T}(R, n.ptr)
+   z = sweylpoly{T}(R, n.ptr)
    z.parent = R
    return z
 end
 
-function (R::WeylAlgebra{S})(n::T) where {S <: Nemo.RingElem, T <: Nemo.RingElem}
+function (R::WeylPolyRing{S})(n::T) where {S <: Nemo.RingElem, T <: Nemo.RingElem}
    return R(base_ring(R)(n))
 end
 
-function (R::WeylAlgebra)(p::pweyl)
+function (R::WeylPolyRing)(p::sweylpoly)
    parent(p) != R && error("Unable to coerce")
    return p
 end
 
-function(R::WeylAlgebra)(n::libSingular.number_ptr)
+function(R::WeylPolyRing)(n::libSingular.number_ptr)
     return R.base_ring(n)
 end
 ###############################################################################
@@ -225,7 +224,7 @@ function WeylAlgebra(R::Union{Ring, Field}, s1::Array{String, 1};
    s = vcat(s1, ["d"*sym for sym in s1])
    U = [Symbol(v) for v in s]
    T = elem_type(R)
-   parent_obj = WeylAlgebra{T}(R, U, ordering, cached, sym2ringorder[ordering],
+   parent_obj = WeylPolyRing{T}(R, U, ordering, cached, sym2ringorder[ordering],
          sym2ringorder[ordering2], degree_bound)
    return tuple(parent_obj, gens(parent_obj))
 end
@@ -237,7 +236,7 @@ function WeylAlgebra(R::Union{Ring, Field}, s2::Array{String, 2};
    s = vcat(s2[1, :], s2[2, :])
    U = [Symbol(v) for v in s]
    T = elem_type(R)
-   parent_obj = WeylAlgebra{T}(R, U, ordering, cached, sym2ringorder[ordering],
+   parent_obj = WeylPolyRing{T}(R, U, ordering, cached, sym2ringorder[ordering],
          sym2ringorder[ordering2], degree_bound)
    return tuple(parent_obj, gens(parent_obj))
 end
@@ -249,7 +248,7 @@ function WeylAlgebra(R::Nemo.Ring, s1::Array{String, 1}; cached::Bool = true,
    S = CoefficientRing(R)
    U = [Symbol(v) for v in s]
    T = elem_type(S)
-   parent_obj = WeylAlgebra{T}(S, U, ordering, cached, sym2ringorder[ordering],
+   parent_obj = WeylPolyRing{T}(S, U, ordering, cached, sym2ringorder[ordering],
          sym2ringorder[ordering2], degree_bound)
    return tuple(parent_obj, gens(parent_obj))
 end
@@ -262,7 +261,7 @@ function WeylAlgebra(R::Nemo.Ring, s2::Array{String, 2}; cached::Bool = true,
    S = CoefficientRing(R)
    U = [Symbol(v) for v in s]
    T = elem_type(S)
-   parent_obj = WeylAlgebra{T}(S, U, ordering, cached, sym2ringorder[ordering],
+   parent_obj = WeylPolyRing{T}(S, U, ordering, cached, sym2ringorder[ordering],
          sym2ringorder[ordering2], degree_bound)
    return tuple(parent_obj, gens(parent_obj))
 end

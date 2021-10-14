@@ -1,10 +1,10 @@
-@testset "pweyl.constructors" begin
+@testset "sextpoly.constructors" begin
 
-   R, (x, y, z, dx, dy, dz) = WeylAlgebra(QQ, ["x", "y", "z"])
+   R, (x, y, z) = ExteriorAlgebra(QQ, ["x", "y", "z"])
 
-   @test elem_type(R) == pweyl{n_Q}
-   @test elem_type(WeylAlgebra{n_Q}) == pweyl{n_Q}
-   @test parent_type(pweyl{n_Q}) == WeylAlgebra{n_Q}
+   @test elem_type(R) == sextpoly{n_Q}
+   @test elem_type(ExtPolyRing{n_Q}) == sextpoly{n_Q}
+   @test parent_type(sextpoly{n_Q}) == ExtPolyRing{n_Q}
    @test base_ring(R) == QQ
 
    @test R isa Nemo.AbstractAlgebra.NCRing
@@ -14,27 +14,27 @@
    @test base_ring(a) == QQ
    @test parent(a) == R
 
-   @test isa(a, pweyl)
+   @test isa(a, sextpoly)
 
    b = R(123)
 
-   @test isa(b, pweyl)
+   @test isa(b, sextpoly)
 
    c = R(BigInt(123))
 
-   @test isa(c, pweyl)
+   @test isa(c, sextpoly)
 
    d = R(c)
 
-   @test isa(d, pweyl)
+   @test isa(d, sextpoly)
 
    f = R(Nemo.ZZ(123))
 
-   @test isa(f, pweyl)
+   @test isa(f, sextpoly)
 
    g = R(ZZ(123))
 
-   @test isa(g, pweyl)
+   @test isa(g, sextpoly)
 
 
    @test isgen(x)
@@ -49,17 +49,18 @@
    @test !has_local_ordering(R)
    @test !has_mixed_ordering(R)
 
-   @test symbols(R) == [:x, :y, :z, :dx, :dy, :dz]
+   @test length(symbols(R)) == 3
+   @test symbols(R) == [:x, :y, :z]
 end
 
-@testset "pweyl.printing" begin
+@testset "sextpoly.printing" begin
 end
 
-@testset "pweyl.rename" begin
+@testset "sextpoly.rename" begin
 end
 
-@testset "pweyl.manipulation" begin
-   R, (x, dx) = WeylAlgebra(QQ, ["x"])
+@testset "sextpoly.manipulation" begin
+   R, (x, ) = ExteriorAlgebra(QQ, ["x", ])
 
    @test isone(one(R))
    @test iszero(zero(R))
@@ -79,7 +80,7 @@ end
 
    @test characteristic(R) == 0
 
-   @test nvars(R) == 2
+   @test nvars(R) == 1
    pol = x^5 + 3x + 2
 
    @test length(collect(coefficients(pol))) == length(pol)
@@ -93,11 +94,11 @@ end
    end
    @test pol == r
 
-   R, (x, dx) = WeylAlgebra(Fp(5), ["x"; "dx"])
+   R, (x, ) = ExteriorAlgebra(Fp(5), ["x", ])
 
    @test characteristic(R) == 5
 
-   R, (x, y, dx, dy) = WeylAlgebra(QQ, ["x", "y"])
+   R, (x, y) = ExteriorAlgebra(QQ, ["x", "y"])
    p = x + y
    q = x
 
@@ -117,59 +118,58 @@ end
    #@test degrees(x^2*y^3) == [2, 3]
    #@test vars(x^2 + 3x + 1) == [x]
    #@test var_index(x) == 1 && var_index(y) == 2
-   @test tail(3x^2*y + 2x*y + y + 7) == 2x*y + y + 7
+   @test tail(3x^2*y + 2x*y + y + 7) == y + 7
    @test tail(R(1)) == 0
    @test tail(R()) == 0
    @test leading_coefficient(zero(R)) == 0
-   @test leading_coefficient(3x^2 + 2x + 1) == 3
+   @test leading_coefficient(3x^2 + 2x + 1) == 2
    #@test constant_coefficient(x^2*y + 2x + 3) == 3
    #@test constant_coefficient(x^2 + y) == 0
-   @test leading_monomial(3x^2 + 2x + 1) == x^2
-   @test leading_term(3x^2 + 2x + 1) == 3x^2
+   @test leading_monomial(3x^2 + 2x + 1) == x
+   @test leading_term(3x^2 + 2x + 1) == 2x
    @test trailing_coefficient(3x^2*y + 2x + 7y + 9) == 9
    @test trailing_coefficient(5x) == 5
    @test trailing_coefficient(R(3)) == 3
    @test trailing_coefficient(R()) == 0
 end
 
-@testset "pweyl.change_base_ring" begin
+@testset "sextpoly.change_base_ring" begin
 end
 
-@testset "pweyl.multivariate_coeff" begin
+@testset "sextpoly.multivariate_coeff" begin
 end
 
-@testset "pweyl.unary_ops" begin
+@testset "sextpoly.unary_ops" begin
 end
 
-@testset "pweyl.binary_ops" begin
-   R, (x, y, dx, dy) = WeylAlgebra(QQ, ["x" "y"; "dx" "dy"])
-   @test y*x == x*y
-   @test dy*dx == dx*dy
-   @test dy*y == y*dy + 1
-   @test dx*x == x*dx + 1
-   @test dx^2*(x^2 + y) == 2 + 4*x*dx + (x^2 + y)*dx^2
+@testset "sextpoly.binary_ops" begin
+   R, (x, y, z, w) = ExteriorAlgebra(QQ, ["x", "y", "z", "w"])
+   @test y*x == -x*y
+   @test y*x*y == 0
+   @test 0 == x^2
+   @test (x*y + y*z)*(w + x) == x*y*w + y*z*w + y*z*x
 end
 
-@testset "pweyl.comparison" begin
+@testset "sextpoly.comparison" begin
 end
 
-@testset "pweyl.powering" begin
+@testset "sextpoly.powering" begin
 end
 
-@testset "pweyl.exact_division" begin
+@testset "sextpoly.exact_division" begin
 end
 
-@testset "pweyl.adhoc_exact_division" begin
+@testset "sextpoly.adhoc_exact_division" begin
 end
 
-@testset "pweyl.adhoc_binary_operation" begin
+@testset "sextpoly.adhoc_binary_operation" begin
 end
 
-@testset "pweyl.divides" begin
+@testset "sextpoly.divides" begin
 end
 
-@testset "pweyl.hash" begin
-   R, (x, y) = WeylAlgebra(QQ, ["x", "y"])
+@testset "sextpoly.hash" begin
+   R, (x, y) = ExteriorAlgebra(QQ, ["x", "y"])
 
    @test hash(x) == hash(x+y-y)
    @test hash(x,zero(UInt)) == hash(x+y-y,zero(UInt))

@@ -732,43 +732,43 @@ function MaximalIdeal(R::PolyRing{T}, d::Int) where T <: Nemo.RingElem
    return sideal{S}(R, ptr)
 end
 
-function Ideal(R::WeylAlgebra{T}, ids::pweyl{T}...) where T <: Nemo.RingElem
+function Ideal(R::WeylPolyRing{T}, ids::sweylpoly{T}...) where T <: Nemo.RingElem
    S = elem_type(R)
    length(ids) == 0 && return sideal{S}(R, R(0))
    return sideal{S}(R, ids...)
 end
 
-function Ideal(R::WeylAlgebra{T}, ids::Array{pweyl{T}, 1}) where T <: Nemo.RingElem
+function Ideal(R::WeylPolyRing{T}, ids::Array{sweylpoly{T}, 1}) where T <: Nemo.RingElem
    S = elem_type(R)
    return sideal{S}(R, ids...)
 end
 
-function Ideal(R::WeylAlgebra{T}, id::libSingular.ideal_ptr) where T <: Nemo.RingElem
+function Ideal(R::WeylPolyRing{T}, id::libSingular.ideal_ptr) where T <: Nemo.RingElem
    S = elem_type(R)
    return sideal{S}(R, id)
 end
 
-function (R::WeylAlgebra{T})(id::libSingular.ideal_ptr) where T <: Nemo.RingElem
+function (R::WeylPolyRing{T})(id::libSingular.ideal_ptr) where T <: Nemo.RingElem
    return Ideal(R,id)
 end
 
-function Ideal(R::ExteriorAlgebra{T}, ids::pexterior{T}...) where T <: Nemo.RingElem
+function Ideal(R::ExtPolyRing{T}, ids::sextpoly{T}...) where T <: Nemo.RingElem
    S = elem_type(R)
    length(ids) == 0 && return sideal{S}(R, R(0))
    return sideal{S}(R, ids...)
 end
 
-function Ideal(R::ExteriorAlgebra{T}, ids::Array{pexterior{T}, 1}) where T <: Nemo.RingElem
+function Ideal(R::ExtPolyRing{T}, ids::Array{sextpoly{T}, 1}) where T <: Nemo.RingElem
    S = elem_type(R)
    return sideal{S}(R, ids...)
 end
 
-function Ideal(R::ExteriorAlgebra{T}, id::libSingular.ideal_ptr) where T <: Nemo.RingElem
+function Ideal(R::ExtPolyRing{T}, id::libSingular.ideal_ptr) where T <: Nemo.RingElem
    S = elem_type(R)
    return sideal{S}(R, id)
 end
 
-function (R::ExteriorAlgebra{T})(id::libSingular.ideal_ptr) where T <: Nemo.RingElem
+function (R::ExtPolyRing{T})(id::libSingular.ideal_ptr) where T <: Nemo.RingElem
    return Ideal(R,id)
 end
 

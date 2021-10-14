@@ -212,7 +212,7 @@ include("poly/WeylPolyTypes.jl")
 
 include("poly/ExtPolyTypes.jl")
 
-const polyalg{T} = Union{spoly{T}, sgpoly{T}, pweyl{T}, pexterior{T}} where T <: Nemo.RingElem
+const polyalg{T} = Union{spoly{T}, sgpoly{T}, sweylpoly{T}, sextpoly{T}} where T <: Nemo.RingElem
 
 include("poly/poly.jl")
 

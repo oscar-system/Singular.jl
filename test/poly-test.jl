@@ -1,3 +1,5 @@
 include("poly/PolyRing-test.jl")
 include("poly/spoly-test.jl")
 include("poly/sgpoly-test.jl")
+include("poly/sweylpoly-test.jl")
+include("poly/sextpoly-test.jl")

@@ -1,5 +1,4 @@
-export pexterior,
-       ExteriorAlgebra
+export sextpoly, ExtPolyRing, ExteriorAlgebra
 
 ###############################################################################
 #
@@ -7,72 +6,72 @@ export pexterior,
 #
 ###############################################################################
 
-base_ring(R::ExteriorAlgebra{T}) where T <: Nemo.RingElem = R.base_ring
+base_ring(R::ExtPolyRing{T}) where T <: Nemo.RingElem = R.base_ring
 
-base_ring(p::pexterior) = base_ring(parent(p))
+base_ring(p::sextpoly) = base_ring(parent(p))
 
-elem_type(::Type{ExteriorAlgebra{T}}) where T <: Nemo.RingElem = pexterior{T}
+elem_type(::Type{ExtPolyRing{T}}) where T <: Nemo.RingElem = sextpoly{T}
 
-parent_type(::Type{pexterior{T}}) where T <: Nemo.RingElem = ExteriorAlgebra{T}
+parent_type(::Type{sextpoly{T}}) where T <: Nemo.RingElem = ExtPolyRing{T}
 
 @doc Markdown.doc"""
-    nvars(R::ExteriorAlgebra)
+    nvars(R::ExtPolyRing)
 > Return the number of variables in the given Exterior algebra.
 """
-nvars(R::ExteriorAlgebra) = Int(libSingular.rVar(R.ptr))
+nvars(R::ExtPolyRing) = Int(libSingular.rVar(R.ptr))
 
 @doc Markdown.doc"""
-    has_global_ordering(R::ExteriorAlgebra)
+    has_global_ordering(R::ExtPolyRing)
 > Return `true` if the given algebra has a global ordering, i.e. if $1 < x$ for
 > each variable $x$ in the ring. This include `:lex`, `:deglex` and `:degrevlex`
 > orderings.
 """
-has_global_ordering(R::ExteriorAlgebra) = Bool(libSingular.rHasGlobalOrdering(R.ptr))
+has_global_ordering(R::ExtPolyRing) = Bool(libSingular.rHasGlobalOrdering(R.ptr))
 
 @doc Markdown.doc"""
-    has_mixed_ordering(R::ExteriorAlgebra)
+    has_mixed_ordering(R::ExtPolyRing)
 > Return `true` if the given algebra has a mixed ordering, i.e. if $1 < x_i$ for
 > a variable $x_i$ and $1>x_j$ for another variable $x_j$.
 """
-has_mixed_ordering(R::ExteriorAlgebra) = Bool(libSingular.rHasMixedOrdering(R.ptr))
+has_mixed_ordering(R::ExtPolyRing) = Bool(libSingular.rHasMixedOrdering(R.ptr))
 
 @doc Markdown.doc"""
-    has_local_ordering(R::ExteriorAlgebra)
+    has_local_ordering(R::ExtPolyRing)
 > Return `true` if the given algebra has a local ordering, i.e. if $1 > x$ for
 > all variables $x$.
 """
-function has_local_ordering(R::ExteriorAlgebra)
+function has_local_ordering(R::ExtPolyRing)
    return !has_global_ordering(R) && !has_mixed_ordering(R)
 end
 
 @doc Markdown.doc"""
-    isquotient_ring(R::ExteriorAlgebra)
+    isquotient_ring(R::ExtPolyRing)
 > Return `true` if the given algebra is the quotient of a polynomial ring with
 > a non - zero ideal.
 """
-isquotient_ring(R::ExteriorAlgebra) = Bool(Singular.libSingular.rIsQuotientRing(R.ptr))
+isquotient_ring(R::ExtPolyRing) = Bool(Singular.libSingular.rIsQuotientRing(R.ptr))
 
 @doc Markdown.doc"""
-    characteristic(R::ExteriorAlgebra)
+    characteristic(R::ExtPolyRing)
 > Return the characteristic of the Exterior algebra, i.e. the characteristic of the
 > coefficient ring.
 """
-characteristic(R::ExteriorAlgebra) = Int(libSingular.rChar(R.ptr))
+characteristic(R::ExtPolyRing) = Int(libSingular.rChar(R.ptr))
 
-function gens(R::ExteriorAlgebra)
+function gens(R::ExtPolyRing)
    n = nvars(R)
    return [R(libSingular.rGetVar(Cint(i), R.ptr)) for i = 1:n]
 end
 
-function gen(R::ExteriorAlgebra, i::Int)
+function gen(R::ExtPolyRing, i::Int)
    return R(libSingular.rGetVar(Cint(i), R.ptr))
 end
 
 @doc Markdown.doc"""
-    symbols(R::ExteriorAlgebra)
+    symbols(R::ExtPolyRing)
 > Return symbols for the generators of the Exterior algebra $R$.
 """
-function symbols(R::ExteriorAlgebra)
+function symbols(R::ExtPolyRing)
    io = IOBuffer();
    symbols = Array{Symbol,1}(undef, 0)
    for g in gens(R)
@@ -82,25 +81,25 @@ function symbols(R::ExteriorAlgebra)
    return symbols
 end
 
-ordering(R::ExteriorAlgebra) = R.ord
+ordering(R::ExtPolyRing) = R.ord
 
 @doc Markdown.doc"""
-    degree_bound(R::ExteriorAlgebra)
+    degree_bound(R::ExtPolyRing)
 > Return the internal degree bound in each variable, enforced by Singular. This is the
 > largest positive value any degree can have before an overflow will occur. This
 > internal bound may be higher than the bound requested by the user via the
-> `degree_bound` parameter of the `ExteriorAlgebra` constructor.
+> `degree_bound` parameter of the `ExtPolyRing` constructor.
 """
-function degree_bound(R::ExteriorAlgebra)
+function degree_bound(R::ExtPolyRing)
    return Int(libSingular.rBitmask(R.ptr))
 end
 
-zero(R::ExteriorAlgebra) = R()
+zero(R::ExtPolyRing) = R()
 
-one(R::ExteriorAlgebra) = R(1)
+one(R::ExtPolyRing) = R(1)
 
 
-function Base.hash(p::pexterior{T}, h::UInt) where T <: Nemo.RingElem
+function Base.hash(p::sextpoly{T}, h::UInt) where T <: Nemo.RingElem
    v = 0xaf708b07f940b4d2%UInt
    v = xor(hash(collect(exponent_vectors(p)), h), v)
    for c in coefficients(p)
@@ -115,7 +114,7 @@ end
 #   String I/O
 #
 ###############################################################################          
-function show(io::IO, R::ExteriorAlgebra)
+function show(io::IO, R::ExtPolyRing)
    s = libSingular.rString(R.ptr)
    if libSingular.rIsQuotientRing(R.ptr)
      print(io, "Singular Exterior Algebra Quotient Ring ", s)
@@ -124,11 +123,11 @@ function show(io::IO, R::ExteriorAlgebra)
    end
 end
 
-show_minus_one(::Type{pexterior{T}}) where T <: Nemo.RingElem = show_minus_one(T)
+show_minus_one(::Type{sextpoly{T}}) where T <: Nemo.RingElem = show_minus_one(T)
 
-needs_parentheses(x::pexterior) = length(x) > 1
+needs_parentheses(x::sextpoly) = length(x) > 1
 
-isnegative(x::pexterior) = isconstant(x) && !iszero(x) && isnegative(coeff(x, 0))
+isnegative(x::sextpoly) = isconstant(x) && !iszero(x) && isnegative(coeff(x, 0))
 
 ###############################################################################
 #
@@ -136,10 +135,10 @@ isnegative(x::pexterior) = isconstant(x) && !iszero(x) && isnegative(coeff(x, 0)
 #
 ###############################################################################
 
-promote_rule(::Type{pexterior{T}}, ::Type{pexterior{T}}) where T <: Nemo.RingElem = pexterior{T}
+promote_rule(::Type{sextpoly{T}}, ::Type{sextpoly{T}}) where T <: Nemo.RingElem = sextpoly{T}
 
-function promote_rule(::Type{pexterior{T}}, ::Type{U}) where {T <: Nemo.RingElem, U <: Nemo.RingElem}
-   promote_rule(T, U) == T ? pexterior{T} : Union{}
+function promote_rule(::Type{sextpoly{T}}, ::Type{U}) where {T <: Nemo.RingElem, U <: Nemo.RingElem}
+   promote_rule(T, U) == T ? sextpoly{T} : Union{}
 end
 
 ###############################################################################
@@ -148,7 +147,7 @@ end
 #
 ###############################################################################
 
-function MPolyBuildCtx(R::ExteriorAlgebra)
+function MPolyBuildCtx(R::ExtPolyRing)
    return MPolyBuildCtx(R, R().ptr)
 end
 
@@ -158,65 +157,65 @@ end
 #
 ###############################################################################
 
-function (R::ExteriorAlgebra)()
+function (R::ExtPolyRing)()
    T = elem_type(base_ring(R))
-   z = pexterior{T}(R)
+   z = sextpoly{T}(R)
    z.parent = R
    return z
 end
 
-function (R::ExteriorAlgebra)(n::Int)
+function (R::ExtPolyRing)(n::Int)
    T = elem_type(base_ring(R))
-   z = pexterior{T}(R, n)
+   z = sextpoly{T}(R, n)
    z.parent = R
    return z
 end
 
-function (R::ExteriorAlgebra)(n::Integer)
+function (R::ExtPolyRing)(n::Integer)
    T = elem_type(base_ring(R))
-   z = pexterior{T}(R, BigInt(n))
+   z = sextpoly{T}(R, BigInt(n))
    z.parent = R
    return z
 end
 
-function (R::ExteriorAlgebra)(n::n_Z)
+function (R::ExtPolyRing)(n::n_Z)
    n = base_ring(R)(n)
    ptr = libSingular.n_Copy(n.ptr, parent(n).ptr)
    T = elem_type(base_ring(R))
-   z = pexterior{T}(R, ptr)
+   z = sextpoly{T}(R, ptr)
    z.parent = R
    return z
 end
 
-function (R::ExteriorAlgebra)(n::libSingular.poly_ptr)
+function (R::ExtPolyRing)(n::libSingular.poly_ptr)
    T = elem_type(base_ring(R))
-   z = pexterior{T}(R, n)
+   z = sextpoly{T}(R, n)
    z.parent = R
    return z
 end
 
-function (R::ExteriorAlgebra{T})(n::T) where T <: Nemo.RingElem
+function (R::ExtPolyRing{T})(n::T) where T <: Nemo.RingElem
    parent(n) != base_ring(R) && error("Unable to coerce into Exterior algebra")
-   z = pexterior{T}(R, n.ptr)
+   z = sextpoly{T}(R, n.ptr)
    z.parent = R
    return z
 end
 
-function (R::ExteriorAlgebra{S})(n::T) where {S <: Nemo.RingElem, T <: Nemo.RingElem}
+function (R::ExtPolyRing{S})(n::T) where {S <: Nemo.RingElem, T <: Nemo.RingElem}
    return R(base_ring(R)(n))
 end
 
-function (R::ExteriorAlgebra)(p::pexterior)
+function (R::ExtPolyRing)(p::sextpoly)
    parent(p) != R && error("Unable to coerce")
    return p
 end
 
-function(R::ExteriorAlgebra)(n::libSingular.number_ptr)
+function(R::ExtPolyRing)(n::libSingular.number_ptr)
     return R.base_ring(n)
 end
 ###############################################################################
 #
-#   ExteriorAlgebra constructor
+#   ExtPolyRing constructor
 #
 ###############################################################################
 
@@ -225,7 +224,7 @@ function ExteriorAlgebra(R::Union{Ring, Field}, s::Array{String, 1};
       ordering2::Symbol = :comp1min, degree_bound::Int = 0)
    U = [Symbol(v) for v in s]
    T = elem_type(R)
-   parent_obj = ExteriorAlgebra{T}(R, U, ordering, cached, sym2ringorder[ordering],
+   parent_obj = ExtPolyRing{T}(R, U, ordering, cached, sym2ringorder[ordering],
          sym2ringorder[ordering2], degree_bound)
    return tuple(parent_obj, gens(parent_obj))
 end
@@ -236,7 +235,7 @@ function ExteriorAlgebra(R::Nemo.Ring, s::Array{String, 1}; cached::Bool = true,
    S = CoefficientRing(R)
    U = [Symbol(v) for v in s]
    T = elem_type(S)
-   parent_obj = ExteriorAlgebra{T}(S, U, ordering, cached, sym2ringorder[ordering],
+   parent_obj = ExtPolyRing{T}(S, U, ordering, cached, sym2ringorder[ordering],
          sym2ringorder[ordering2], degree_bound)
    return tuple(parent_obj, gens(parent_obj))
 end
@@ -245,7 +244,7 @@ macro ExteriorAlgebra(R, s, n, o)
    S = gensym()
    y = gensym()
    v0 = [s*string(i) for i in 1:n]
-   exp1 = :(($S, $y) = ExteriorAlgebra($R, $v0; ordering=$o))
+   exp1 = :(($S, $y) = ExtPolyRing($R, $v0; ordering=$o))
    v = [:($(Symbol(s, i)) = $y[$i]) for i in 1:n]
    v1 = Expr(:block, exp1, v..., S)
    return esc(v1)
@@ -255,7 +254,7 @@ macro ExteriorAlgebra(R, s, n)
    S = gensym()
    y = gensym()
    v0 = [s*string(i) for i in 1:n]
-   exp1 = :(($S, $y) = ExteriorAlgebra($R, $v0))
+   exp1 = :(($S, $y) = ExtPolyRing($R, $v0))
    v = [:($(Symbol(s, i)) = $y[$i]) for i in 1:n]
    v1 = Expr(:block, exp1, v..., S)
    return esc(v1)

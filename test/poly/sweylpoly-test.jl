@@ -1,10 +1,10 @@
-@testset "pexterior.constructors" begin
+@testset "sweylpoly.constructors" begin
 
-   R, (x, y, z) = ExteriorAlgebra(QQ, ["x", "y", "z"])
+   R, (x, y, z, dx, dy, dz) = WeylAlgebra(QQ, ["x", "y", "z"])
 
-   @test elem_type(R) == pexterior{n_Q}
-   @test elem_type(ExteriorAlgebra{n_Q}) == pexterior{n_Q}
-   @test parent_type(pexterior{n_Q}) == ExteriorAlgebra{n_Q}
+   @test elem_type(R) == sweylpoly{n_Q}
+   @test elem_type(WeylPolyRing{n_Q}) == sweylpoly{n_Q}
+   @test parent_type(sweylpoly{n_Q}) == WeylPolyRing{n_Q}
    @test base_ring(R) == QQ
 
    @test R isa Nemo.AbstractAlgebra.NCRing
@@ -14,27 +14,27 @@
    @test base_ring(a) == QQ
    @test parent(a) == R
 
-   @test isa(a, pexterior)
+   @test isa(a, sweylpoly)
 
    b = R(123)
 
-   @test isa(b, pexterior)
+   @test isa(b, sweylpoly)
 
    c = R(BigInt(123))
 
-   @test isa(c, pexterior)
+   @test isa(c, sweylpoly)
 
    d = R(c)
 
-   @test isa(d, pexterior)
+   @test isa(d, sweylpoly)
 
    f = R(Nemo.ZZ(123))
 
-   @test isa(f, pexterior)
+   @test isa(f, sweylpoly)
 
    g = R(ZZ(123))
 
-   @test isa(g, pexterior)
+   @test isa(g, sweylpoly)
 
 
    @test isgen(x)
@@ -49,18 +49,17 @@
    @test !has_local_ordering(R)
    @test !has_mixed_ordering(R)
 
-   @test length(symbols(R)) == 3
-   @test symbols(R) == [:x, :y, :z]
+   @test symbols(R) == [:x, :y, :z, :dx, :dy, :dz]
 end
 
-@testset "pexterior.printing" begin
+@testset "sweylpoly.printing" begin
 end
 
-@testset "pexterior.rename" begin
+@testset "sweylpoly.rename" begin
 end
 
-@testset "pexterior.manipulation" begin
-   R, (x, ) = ExteriorAlgebra(QQ, ["x", ])
+@testset "sweylpoly.manipulation" begin
+   R, (x, dx) = WeylAlgebra(QQ, ["x"])
 
    @test isone(one(R))
    @test iszero(zero(R))
@@ -80,7 +79,7 @@ end
 
    @test characteristic(R) == 0
 
-   @test nvars(R) == 1
+   @test nvars(R) == 2
    pol = x^5 + 3x + 2
 
    @test length(collect(coefficients(pol))) == length(pol)
@@ -94,11 +93,11 @@ end
    end
    @test pol == r
 
-   R, (x, ) = ExteriorAlgebra(Fp(5), ["x", ])
+   R, (x, dx) = WeylAlgebra(Fp(5), ["x"; "dx"])
 
    @test characteristic(R) == 5
 
-   R, (x, y) = ExteriorAlgebra(QQ, ["x", "y"])
+   R, (x, y, dx, dy) = WeylAlgebra(QQ, ["x", "y"])
    p = x + y
    q = x
 
@@ -118,58 +117,59 @@ end
    #@test degrees(x^2*y^3) == [2, 3]
    #@test vars(x^2 + 3x + 1) == [x]
    #@test var_index(x) == 1 && var_index(y) == 2
-   @test tail(3x^2*y + 2x*y + y + 7) == y + 7
+   @test tail(3x^2*y + 2x*y + y + 7) == 2x*y + y + 7
    @test tail(R(1)) == 0
    @test tail(R()) == 0
    @test leading_coefficient(zero(R)) == 0
-   @test leading_coefficient(3x^2 + 2x + 1) == 2
+   @test leading_coefficient(3x^2 + 2x + 1) == 3
    #@test constant_coefficient(x^2*y + 2x + 3) == 3
    #@test constant_coefficient(x^2 + y) == 0
-   @test leading_monomial(3x^2 + 2x + 1) == x
-   @test leading_term(3x^2 + 2x + 1) == 2x
+   @test leading_monomial(3x^2 + 2x + 1) == x^2
+   @test leading_term(3x^2 + 2x + 1) == 3x^2
    @test trailing_coefficient(3x^2*y + 2x + 7y + 9) == 9
    @test trailing_coefficient(5x) == 5
    @test trailing_coefficient(R(3)) == 3
    @test trailing_coefficient(R()) == 0
 end
 
-@testset "pexterior.change_base_ring" begin
+@testset "sweylpoly.change_base_ring" begin
 end
 
-@testset "pexterior.multivariate_coeff" begin
+@testset "sweylpoly.multivariate_coeff" begin
 end
 
-@testset "pexterior.unary_ops" begin
+@testset "sweylpoly.unary_ops" begin
 end
 
-@testset "pexterior.binary_ops" begin
-   R, (x, y, z, w) = ExteriorAlgebra(QQ, ["x", "y", "z", "w"])
-   @test y*x == -x*y
-   @test y*x*y == 0
-   @test 0 == x^2
-   @test (x*y + y*z)*(w + x) == x*y*w + y*z*w + y*z*x
+@testset "sweylpoly.binary_ops" begin
+   R, (x, y, dx, dy) = WeylAlgebra(QQ, ["x" "y"; "dx" "dy"])
+   @test y*x == x*y
+   @test dy*dx == dx*dy
+   @test dy*y == y*dy + 1
+   @test dx*x == x*dx + 1
+   @test dx^2*(x^2 + y) == 2 + 4*x*dx + (x^2 + y)*dx^2
 end
 
-@testset "pexterior.comparison" begin
+@testset "sweylpoly.comparison" begin
 end
 
-@testset "pexterior.powering" begin
+@testset "sweylpoly.powering" begin
 end
 
-@testset "pexterior.exact_division" begin
+@testset "sweylpoly.exact_division" begin
 end
 
-@testset "pexterior.adhoc_exact_division" begin
+@testset "sweylpoly.adhoc_exact_division" begin
 end
 
-@testset "pexterior.adhoc_binary_operation" begin
+@testset "sweylpoly.adhoc_binary_operation" begin
 end
 
-@testset "pexterior.divides" begin
+@testset "sweylpoly.divides" begin
 end
 
-@testset "pexterior.hash" begin
-   R, (x, y) = ExteriorAlgebra(QQ, ["x", "y"])
+@testset "sweylpoly.hash" begin
+   R, (x, y) = WeylAlgebra(QQ, ["x", "y"])
 
    @test hash(x) == hash(x+y-y)
    @test hash(x,zero(UInt)) == hash(x+y-y,zero(UInt))

@@ -156,7 +156,7 @@ function isone(p::polyalg)
    GC.@preserve p return Bool(libSingular.p_IsOne(p.ptr, parent(p).ptr))
 end
 
-function isgen(p::Union{spoly, sgpoly, pexterior, pweyl})
+function isgen(p::Union{spoly, sgpoly, sextpoly, sweylpoly})
    R = parent(p)
    GC.@preserve R p begin
       if p.ptr.cpp_object == C_NULL || libSingular.pNext(p.ptr).cpp_object != C_NULL ||
@@ -257,7 +257,7 @@ Return the exponent vector of the leading term of the given polynomial. The retu
 value is a Julia 1-dimensional array giving the exponent for each variable of the
 leading term.
 """
-function leading_exponent_vector(p::Union{spoly, pexterior, pweyl})
+function leading_exponent_vector(p::Union{spoly, sgpoly, sextpoly, sweylpoly})
    R = parent(p)
    n = nvars(R)
    A = Array{Int}(undef, n)
