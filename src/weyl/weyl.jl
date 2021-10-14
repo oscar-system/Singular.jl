@@ -102,7 +102,7 @@ one(R::WeylAlgebra) = R(1)
 function Base.hash(p::pweyl{T}, h::UInt) where T <: Nemo.RingElem
    v = 0xa4c406868a7c20c5%UInt
    v = xor(hash(collect(exponent_vectors(p)), h), v)
-   for c in coeffs(p)
+   for c in coefficients(p)
       v = xor(hash(c, h), v)
       v = (v << 1) | (v >> (sizeof(Int)*8 - 1))
    end

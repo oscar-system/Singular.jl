@@ -156,7 +156,7 @@ function isone(p::polyalg)
    GC.@preserve p return Bool(libSingular.p_IsOne(p.ptr, parent(p).ptr))
 end
 
-function isgen(p::Union{spoly, pexterior, pweyl})
+function isgen(p::Union{spoly, sgpoly, pexterior, pweyl})
    R = parent(p)
    GC.@preserve R p begin
       if p.ptr.cpp_object == C_NULL || libSingular.pNext(p.ptr).cpp_object != C_NULL ||

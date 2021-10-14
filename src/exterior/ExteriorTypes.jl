@@ -18,6 +18,11 @@ mutable struct ExteriorAlgebra{T <: Nemo.RingElem} <: AbstractAlgebra.NCRing
          ordering::libSingular.rRingOrder_t = ringorder_dp,
          ordering2::libSingular.rRingOrder_t = ringorder_C,
          degree_bound::Int = 0) where T
+
+      if isempty(s)
+         error("ExteriorAlgebra requires at least one symbol")
+      end
+
       # check ordering: accept exactly one of ringorder_c, ringorder_C
       if (((ordering == ringorder_c || ordering == ringorder_C)
                && (ordering2 == ringorder_c || ordering2 == ringorder_C))

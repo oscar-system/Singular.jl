@@ -62,7 +62,8 @@ function PolyRing{T}(R::Union{Ring, Field}, s::Vector{Symbol},
    end::PolyRing{T}
 end
 
-function _PolyRing_clear_fn(R::PolyRing)
+# for various types of PolyRings, which all wrap a ring_ptr in .ptr
+function _PolyRing_clear_fn(R)
    R.refcount -= 1
    if R.refcount == 0
       libSingular.rDelete(R.ptr)
@@ -79,6 +80,14 @@ mutable struct spoly{T <: Nemo.RingElem} <: Nemo.MPolyElem{T}
       finalizer(_spoly_clear_fn, z)
       return z
    end
+end
+
+# for various types of polys, which all have a parent and a .ptr
+# TODO: this is technically dirty because we can't assume that R is a valid object
+function _spoly_clear_fn(p)
+   R = parent(p)
+   libSingular.p_Delete(p.ptr, R.ptr)
+   _PolyRing_clear_fn(R)
 end
 
 function spoly{T}(R::PolyRing{T}) where T <: Nemo.RingElem
@@ -112,13 +121,6 @@ function spoly{T}(R::PolyRing{T}, b::BigInt) where T <: Nemo.RingElem
    n = libSingular.n_InitMPZ(b, R.base_ring.ptr)
    p = libSingular.p_NSet(n, R.ptr)
    return spoly{T}(R, p)
-end
-
-
-function _spoly_clear_fn(p::spoly)
-   R = parent(p)
-   libSingular.p_Delete(p.ptr, R.ptr)
-   _PolyRing_clear_fn(R)
 end
 
 ###############################################################################

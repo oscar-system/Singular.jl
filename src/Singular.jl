@@ -195,13 +195,37 @@ include("LibSingular.jl")
 
 include("Number.jl")
 
-include("PolyAlg.jl")
+include("poly/PolyTypes.jl")
 
-include("Module.jl")
+include("matrix/MatrixTypes.jl")
 
-include("Ideal.jl")
+include("module/ModuleTypes.jl")
 
-include("Matrix.jl")
+include("poly/GPolyTypes.jl")
+
+include("weyl/WeylTypes.jl")
+
+include("exterior/ExteriorTypes.jl")
+
+const polyalg{T} = Union{spoly{T}, sgpoly{T}, pweyl{T}, pexterior{T}} where T <: Nemo.RingElem
+
+include("poly/poly.jl")
+
+include("poly/gpoly.jl")
+
+include("weyl/weyl.jl")
+
+include("exterior/exterior.jl")
+
+include("ideal/IdealTypes.jl")
+
+include("matrix/matrix.jl")
+
+include("matrix/bigintmat.jl")
+
+include("module/module.jl")
+
+include("ideal/ideal.jl")
 
 include("Vector.jl")
 
