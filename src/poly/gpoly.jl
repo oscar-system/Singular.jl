@@ -149,6 +149,7 @@ end
 function (R::GPolyRing)(n::libSingular.number_ptr)
     return R.base_ring(n)
 end
+
 ###############################################################################
 #
 #   GAlgebra constructor

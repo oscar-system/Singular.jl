@@ -2,7 +2,7 @@ export spoly, PolyRing, change_base_ring, coeff, coefficients,
        constant_coefficient, content, deflation, deflate,
        degree, degrees, degree_bound,
        derivative, div, divides, evaluate, exponent,
-       exponent_vectors, factor, factor_squarefree, finish, gen,
+       exponent_vectors, exponent_words, factor, factor_squarefree, finish, gen,
        has_global_ordering, has_mixed_ordering, has_local_ordering,
        inflate, isgen,
        ismonomial, isordering_symbolic, isquotient_ring, isterm,
@@ -392,10 +392,6 @@ function exponent_vectors(x::polyalg)
    return PolyAlgExponentVectors(x)
 end
 
-function exponent_words(x::polyalg)
-   return PolyAlgExponentWords(x)
-end
-
 function terms(x::polyalg)
    return PolyAlgTerms(x)
 end
@@ -622,7 +618,11 @@ function *(a::polyalg{T}, b::polyalg{T}) where T <: Nemo.RingElem
    check_parent(a, b)
    R = parent(a)
    s = GC.@preserve a b R libSingular.pp_Mult_qq(a.ptr, b.ptr, R.ptr)
-   return R(s)
+   z = R(s)
+   if a isa slppoly
+      libSingular.check_error()
+   end
+   return z
 end
 
 function *(a::polyalg{T}, b::T) where T <: Nemo.RingElem
@@ -659,7 +659,11 @@ function ^(x::polyalg, y::Int)
    GC.@preserve x R begin
       x1 = libSingular.p_Copy(x.ptr, R.ptr)
       p = libSingular.p_Power(x1, Cint(y), R.ptr)
-      return R(p)
+      z = R(p)
+      if x isa slppoly
+         libSingular.check_error()
+      end
+      return z
    end
 end
 

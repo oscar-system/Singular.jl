@@ -139,6 +139,7 @@ end
 
 struct PolyAlgExponentWords{T}
    poly::T
+   tmp::Vector{Int}
 end
 
 struct PolyAlgTerms{T}

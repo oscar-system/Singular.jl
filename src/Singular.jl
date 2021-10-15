@@ -184,7 +184,7 @@ const VERSION_NUMBER = pkgversion(@__MODULE__)
 ###############################################################################
 #
 #   Load Singular Rings/Fields/etc
-#     There is slightly circular dependency: in order to create a G-Algebra
+#     There is a slight circular dependency: in order to create a G-Algebra
 #     you need a PolyRing R and matrices over R. The matrix code requires some
 #     module code, which requires some ideal code, which requies some poly code.
 #     Therefore, we include all of the poly/matrix/module/ideal types before
@@ -212,7 +212,10 @@ include("poly/WeylPolyTypes.jl")
 
 include("poly/ExtPolyTypes.jl")
 
-const polyalg{T} = Union{spoly{T}, sgpoly{T}, sweylpoly{T}, sextpoly{T}} where T <: Nemo.RingElem
+include("poly/LPPolyTypes.jl")
+
+const polyalg{T} = Union{spoly{T}, sgpoly{T}, sweylpoly{T},
+                         sextpoly{T}, slppoly{T}} where T <: Nemo.RingElem
 
 include("poly/poly.jl")
 
@@ -221,6 +224,8 @@ include("poly/gpoly.jl")
 include("poly/weylpoly.jl")
 
 include("poly/extpoly.jl")
+
+include("poly/lppoly.jl")
 
 include("ideal/IdealTypes.jl")
 

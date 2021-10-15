@@ -33,14 +33,14 @@ function GPolyRing{T}(R::PolyRing{T}, C::smatrix{spoly{T}}, D::smatrix{spoly{T}}
       return GPolyRingID[R, C, D, s]::GPolyRing{T}
    else
       GC.@preserve R C D begin
-         r = libSingular.nc_CallPlural(C.ptr, D.ptr, R.ptr)
+         ptr = libSingular.nc_CallPlural(C.ptr, D.ptr, R.ptr)
          if libSingular.have_error()
-            libSingular.rDelete(r)
+            libSingular.rDelete(ptr)
             error("could not construct G-Algebra from $R, $C, $D: "*
                    libSingular.get_and_clear_error())
          end
-         @assert r.cpp_object != C_NULL
-         return GPolyRing{T}(r, base_ring(R), s)
+         @assert ptr.cpp_object != C_NULL
+         return GPolyRing{T}(ptr, base_ring(R), s)
       end
    end
 end
@@ -89,5 +89,4 @@ function sgpoly{T}(R::GPolyRing{T}, b::BigInt) where T <: Nemo.RingElem
    p = libSingular.p_NSet(n, R.ptr)
    return sgpoly{T}(R, p)
 end
-
 
