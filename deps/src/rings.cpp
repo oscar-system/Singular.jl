@@ -114,13 +114,13 @@ auto rDefault_long_helper(coeffs                        cf,
                           int *                         blk1,
                           unsigned long                 bitmask)
 {
-    auto    len = vars.size();
+    auto len = vars.size();
     char ** vars_ptr = new char *[len];
     for (int i = 0; i < len; i++) {
         vars_ptr[i] = reinterpret_cast<char *>(vars[i]);
         // std::strcpy(vars_ptr[i],vars[i].c_str());
     }
-    auto           len_ord = ord.size();
+    auto len_ord = ord.size();
     rRingOrder_t * ord_ptr =
         (rRingOrder_t *)omAlloc0(len_ord * sizeof(rRingOrder_t));
     for (int i = 0; i < len_ord; i++) {
@@ -564,12 +564,12 @@ void singular_define_rings(jlcxx::Module & Singular)
            par_perm.push_back(par_perm1[j]);
         }
     });
-   Singular.method("p_Jet",
+    Singular.method("p_Jet",
                    [](poly p, int i, ring r) {
                        poly p_cp = p_Copy(p, r);
                        return p_Jet(p_cp, i, r);
     });
-   Singular.method("p_Diff",
+    Singular.method("p_Diff",
                    [](poly p, int i, ring r) {
                        poly p_cp = p_Copy(p, r);
                        return p_Diff(p_cp, i, r);
