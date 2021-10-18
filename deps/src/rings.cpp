@@ -434,6 +434,12 @@ void singular_define_rings(jlcxx::Module & Singular)
     Singular.method("p_Mult_nn", [](poly p, number n, ring r) {
        return p_Mult_nn(p, n, r);
     });
+    Singular.method("p_LmIsConstant", [](poly p, ring r) {
+       return p_LmIsConstant(p, r) != 0;
+    });
+    Singular.method("p_LmIsConstantComp", [](poly p, ring r) {
+       return p_LmIsConstantComp(p, r) != 0;
+    });
     Singular.method("p_IsDivisibleBy", [](spolyrec * p, spolyrec * q, ip_sring * r) {
        poly res;
        ideal I = idInit(1, 1);
