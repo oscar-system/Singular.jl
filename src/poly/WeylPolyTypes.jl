@@ -20,9 +20,7 @@ mutable struct WeylPolyRing{T <: Nemo.RingElem} <: AbstractAlgebra.NCRing
          ordering2::libSingular.rRingOrder_t = ringorder_C,
          degree_bound::Int = 0) where T
 
-      if iszero(length(s)) || !iseven(length(s))
-         error("WeylPolyRing requires an even number of symbols")
-      end
+      length(s) > 0 && iseven(length(s)) || error("need an even number of indeterminates")
 
       # check ordering: accept exactly one of ringorder_c, ringorder_C
       if (((ordering == ringorder_c || ordering == ringorder_C)

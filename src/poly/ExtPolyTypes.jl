@@ -19,9 +19,7 @@ mutable struct ExtPolyRing{T <: Nemo.RingElem} <: AbstractAlgebra.NCRing
          ordering2::libSingular.rRingOrder_t = ringorder_C,
          degree_bound::Int = 0) where T
 
-      if isempty(s)
-         error("ExtPolyRing requires at least one symbol")
-      end
+      length(s) >= 2 || error("need at least two indeterminates")
 
       # check ordering: accept exactly one of ringorder_c, ringorder_C
       if (((ordering == ringorder_c || ordering == ringorder_C)

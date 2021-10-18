@@ -92,6 +92,17 @@ end
    end
    @test pol == r
 
+   B = MPolyBuildCtx(R)
+   push_term!(B, QQ(2), [1,2])
+   push_term!(B, QQ(3), Int[])
+   @test finish(B) == 2*x*y + 3
+   @test finish(B) == 0
+   push_term!(B, QQ(-1), [1,2,2,1])
+   @test finish(B) == -x*y*y*x
+   @test finish(B) == 0
+   @test_throws Exception push_term!(B, QQ(2), [3,2])
+   @test_throws Exception push_term!(B, QQ(2), [1,1,1,1,1,1])
+
    R, (x, ) = FreeAlgebra(Fp(5), ["x", ], 1)
 
    @test characteristic(R) == 5
@@ -108,14 +119,6 @@ end
    end
    @test gen(R, 1) == x
 
-   #@test isordering_symbolic(R)
-   #@test ordering_as_symbol(R) == :degrevlex
-   #@test degree(x^2*y^3 + 1, 1) == 2
-   #@test degree(x^2*y^3 + 1, y) == 3
-   #@test degree(R(), 1) == -1
-   #@test degrees(x^2*y^3) == [2, 3]
-   #@test vars(x^2 + 3x + 1) == [x]
-   #@test var_index(x) == 1 && var_index(y) == 2
    @test tail(3x^2*y + 2x*y + y + 7) == 2x*y + y + 7
    @test tail(R(1)) == 0
    @test tail(R()) == 0
@@ -151,6 +154,8 @@ end
 end
 
 @testset "slppoly.powering" begin
+   R, (x, y, z) = FreeAlgebra(Fp(5), ["x", "y", "z"], 10)
+   @test length((x + y + z)^5) == 3^5
 end
 
 @testset "slppoly.exact_division" begin

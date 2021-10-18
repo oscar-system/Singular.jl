@@ -60,7 +60,7 @@ end
 end
 
 @testset "sextpoly.manipulation" begin
-   R, (x, ) = ExteriorAlgebra(QQ, ["x", ])
+   R, (x, y) = ExteriorAlgebra(QQ, ["x", "y"])
 
    @test isone(one(R))
    @test iszero(zero(R))
@@ -74,17 +74,17 @@ end
    @test !isgen(x + 1)
    @test isterm(2x)
    @test !isterm(x + 1)
-   @test length(x^2 + 2x + 1) == 3
+   @test length(x^2 + 2x + 1) == 2
 
    @test deepcopy(x + 2) == x + 2
 
    @test characteristic(R) == 0
 
-   @test nvars(R) == 1
+   @test nvars(R) == 2
    pol = x^5 + 3x + 2
 
-   @test length(collect(coefficients(pol))) == length(pol)
-   @test length(collect(exponent_vectors(pol))) == length(pol)
+   @test collect(coefficients(pol)) == [QQ(3), QQ(2)]
+   @test collect(exponent_vectors(pol)) == [[1, 0], [0,0]]
 
    polzip = zip(coefficients(pol), monomials(pol), terms(pol))
    r = R()
@@ -94,7 +94,25 @@ end
    end
    @test pol == r
 
-   R, (x, ) = ExteriorAlgebra(Fp(5), ["x", ])
+   B = MPolyBuildCtx(R)
+   push_term!(B, QQ(3), [0,0])
+   push_term!(B, QQ(2), [1,0])
+   @test finish(B) == 2*x + 3
+   B = MPolyBuildCtx(R)
+   @test finish(B) == 0
+   B = MPolyBuildCtx(R)
+   push_term!(B, QQ(-1), [10,0])
+   @test finish(B) == 0
+   B = MPolyBuildCtx(R)
+   @test finish(B) == 0
+   B = MPolyBuildCtx(R)
+   push_term!(B, QQ(1), [1,0])
+   push_term!(B, QQ(-1), [0,1])
+   @test finish(B) == x - y
+   B = MPolyBuildCtx(R)
+   @test_throws Exception push_term!(B, QQ(2), [0,0,0])
+
+   R, (x, ) = ExteriorAlgebra(Fp(5), ["x", "y", "z", "w"])
 
    @test characteristic(R) == 5
 
@@ -110,14 +128,6 @@ end
    end
    @test gen(R, 1) == x
 
-   #@test isordering_symbolic(R)
-   #@test ordering_as_symbol(R) == :degrevlex
-   #@test degree(x^2*y^3 + 1, 1) == 2
-   #@test degree(x^2*y^3 + 1, y) == 3
-   #@test degree(R(), 1) == -1
-   #@test degrees(x^2*y^3) == [2, 3]
-   #@test vars(x^2 + 3x + 1) == [x]
-   #@test var_index(x) == 1 && var_index(y) == 2
    @test tail(3x^2*y + 2x*y + y + 7) == y + 7
    @test tail(R(1)) == 0
    @test tail(R()) == 0

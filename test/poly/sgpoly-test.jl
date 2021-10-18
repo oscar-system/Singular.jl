@@ -116,14 +116,6 @@ end
    end
    @test gen(R, 1) == x
 
-   #@test isordering_symbolic(R)
-   #@test ordering_as_symbol(R) == :degrevlex
-   #@test degree(x^2*y^3 + 1, 1) == 2
-   #@test degree(x^2*y^3 + 1, y) == 3
-   #@test degree(R(), 1) == -1
-   #@test degrees(x^2*y^3) == [2, 3]
-   #@test vars(x^2 + 3x + 1) == [x]
-   #@test var_index(x) == 1 && var_index(y) == 2
    @test tail(3x^2*y + 2x*y + y + 7) == 2x*y + y + 7
    @test tail(R(1)) == 0
    @test tail(R()) == 0

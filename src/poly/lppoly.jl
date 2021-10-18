@@ -79,10 +79,6 @@ function isgen(p::slppoly)
    end
 end
 
-isquotient_ring(R::GPolyRing) = Bool(Singular.libSingular.rIsQuotientRing(R.ptr))
-
-characteristic(R::GPolyRing) = Int(libSingular.rChar(R.ptr))
-
 function isquotient_ring(R::LPPolyRing)
    GC.@preserve R return Bool(Singular.libSingular.rIsQuotientRing(R.ptr))
 end
@@ -129,12 +125,12 @@ end
 #
 ###############################################################################
 
-function _lpvec_to_exponent_word(A::Vector{Int}, R::LPPolyRing)
+function _lpvec_to_exponent_word(v::Vector{Int}, R::LPPolyRing)
    n = nvars(R)
    z = Int[]
    for d in 0:degree_bound(R)-1
       for i in 1:n
-         if A[i + d*n] != 0
+         if v[i + d*n] != 0
             push!(z, i)
             break
          end
@@ -181,6 +177,64 @@ function Base.hash(p::slppoly{T}, h::UInt) where T <: Nemo.RingElem
       v = (v << 1) | (v >> (sizeof(Int)*8 - 1))
    end
    return v
+end
+
+function _exponent_word_to_lp_vec!(v::Vector{Int}, w::Vector{Int},
+                                   nvars::Int, deg_bound::Int)
+   length(w) <= deg_bound || error("monomial length exceeds degree bound $deg_bound")
+   @assert length(v) >= nvars*deg_bound
+   for i in 1:nvars*deg_bound
+      v[i] = 0
+   end
+   for d in 0:length(w)-1
+      j = w[1 + d]
+      1 <= j <= nvars || error("variable index out of range")
+      v[j + d*nvars] = 1
+   end
+end
+
+function MPolyBuildCtx(R::LPPolyRing{T}) where T<: Nemo.RingElem
+   t = zero(R)
+   GC.@preserve t begin
+      z = MPolyBuildCtx(R, t.ptr)
+      z.state = z.poly.ptr
+      return z
+   end
+end
+
+function push_term!(M::MPolyBuildCtx{<:slppoly{T}, U}, c::T, w::Vector{Int}) where {U, T <: Nemo.RingElem}
+   R = parent(M.poly)
+   RR = base_ring(R)
+   GC.@preserve c R M begin
+      n = nvars(R)
+      d = degree_bound(R)
+      v = zeros(Int, n*d)
+      _exponent_word_to_lp_vec!(v, w, n, d)
+      if iszero(c)
+         return M.poly
+      end
+      ptr = libSingular.p_Init(R.ptr)
+      libSingular.p_SetCoeff0(ptr, libSingular.n_Copy(c.ptr, RR.ptr), R.ptr)
+      for i = 1:n*d
+         libSingular.p_SetExp(ptr, i, v[i], R.ptr)
+      end
+      libSingular.p_Setm(ptr, R.ptr)
+      if M.state.cpp_object == C_NULL
+         @assert M.poly.ptr.cpp_object == C_NULL
+         M.poly.ptr = ptr
+      else
+         libSingular.p_SetNext(M.state, ptr)
+      end
+      M.state = ptr
+      return M.poly
+   end
+end
+
+function finish(M::MPolyBuildCtx{<:slppoly{T}, U}) where {U, T <: Nemo.RingElem}
+   p = sort_terms!(M.poly)
+   M.poly = zero(parent(p))
+   M.state = M.poly.ptr
+   return p
 end
 
 ###############################################################################

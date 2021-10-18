@@ -1402,20 +1402,20 @@ end
 #
 ###############################################################################
 
-function MPolyBuildCtx(R::PolyRing)
+function MPolyBuildCtx(R::Union{PolyRing, GPolyRing, WeylPolyRing, ExtPolyRing})
    t = R()
    GC.@preserve t return MPolyBuildCtx(R, t.ptr)
 end
 
-function push_term!(M::MPolyBuildCtx{<:polyalg{S}, U}, c::S, expv::Vector{Int}) where {U, S <: Nemo.RingElem}
-   if c == 0
-      return
-   end
+function push_term!(M::MPolyBuildCtx{S, U}, c::T, expv::Vector{Int}) where {U, T <: Nemo.RingElem, S <: epolyalg{T}}
    R = parent(M.poly)
    RR = base_ring(R)
    GC.@preserve c R begin
       nv = nvars(R)
-      nv != length(expv) && error("Incorrect number of exponents in push_term!")
+      nv == length(expv) || error("Incorrect number of exponents in push_term!")
+      if iszero(c) || (S <: sextpoly && any(x->x>1, expv))
+         return M.poly
+      end
       p = M.poly
       ptr = libSingular.p_Init(R.ptr)
       libSingular.p_SetCoeff0(ptr, libSingular.n_Copy(c.ptr, RR.ptr), R.ptr)
@@ -1433,7 +1433,7 @@ function push_term!(M::MPolyBuildCtx{<:polyalg{S}, U}, c::S, expv::Vector{Int}) 
    end
 end
 
-function finish(M::MPolyBuildCtx{<:polyalg{S}, U}) where {S, U}
+function finish(M::MPolyBuildCtx{<:epolyalg{S}, U}) where {S, U}
    p = sort_terms!(M.poly)
    return p
 end

@@ -214,6 +214,11 @@ include("poly/ExtPolyTypes.jl")
 
 include("poly/LPPolyTypes.jl")
 
+# poly types where the exponent vector interface make sense
+const epolyalg{T} = Union{spoly{T}, sgpoly{T}, sweylpoly{T},
+                          sextpoly{T}} where T <: Nemo.RingElem
+
+# all poly types
 const polyalg{T} = Union{spoly{T}, sgpoly{T}, sweylpoly{T},
                          sextpoly{T}, slppoly{T}} where T <: Nemo.RingElem
 

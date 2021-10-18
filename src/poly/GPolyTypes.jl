@@ -26,9 +26,7 @@ end
 
 function GPolyRing{T}(R::PolyRing{T}, C::smatrix{spoly{T}}, D::smatrix{spoly{T}},
                       s::Array{Symbol, 1}, cached::Bool = true) where T <: Nemo.RingElem
-   if isempty(s)
-      error("GPolyRing requires at least one symbol")
-   end
+   isempty(s) && error("need at least one indeterminate")
    if cached && haskey(GPolyRingID, (R, C, D, s))
       return GPolyRingID[R, C, D, s]::GPolyRing{T}
    else
