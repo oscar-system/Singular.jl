@@ -124,8 +124,9 @@ end
    @test tail(R()) == 0
    @test leading_coefficient(zero(R)) == 0
    @test leading_coefficient(3x^2 + 2x + 1) == 3
-   #@test constant_coefficient(x^2*y + 2x + 3) == 3
-   #@test constant_coefficient(x^2 + y) == 0
+   @test constant_coefficient(x^2*y + 2x + 3) == 3
+   @test constant_coefficient(x^2 + y) == 0
+   @test constant_coefficient(zero(R)) == 0
    @test leading_monomial(3x^2 + 2x + 1) == x^2
    @test leading_term(3x^2 + 2x + 1) == 3x^2
    @test trailing_coefficient(3x^2*y + 2x + 7y + 9) == 9

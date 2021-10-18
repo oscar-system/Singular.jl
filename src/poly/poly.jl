@@ -291,6 +291,21 @@ function trailing_coefficient(p::SPolyUnion)
    end
 end
 
+function constant_coefficient(p::SPolyUnion)
+   R = base_ring(p)
+   S = parent(p)
+   GC.@preserve p R S begin
+      P = p.ptr
+      while P.cpp_object != C_NULL
+         if libSingular.p_LmIsConstant(P, S.ptr)
+            return R(libSingular.n_Copy(libSingular.pGetCoeff(P), R.ptr))
+         end
+         P = libSingular.pNext(P)
+      end
+      return zero(R)
+   end
+end
+
 function leading_term(p::SPolyUnion)
    R = parent(p)
    GC.@preserve p R begin
