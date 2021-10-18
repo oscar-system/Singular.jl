@@ -125,12 +125,11 @@ end
 #
 ###############################################################################
 
-function _lpvec_to_exponent_word(v::Vector{Int}, R::LPPolyRing)
-   n = nvars(R)
+function _lpvec_to_exponent_word(v::Vector{Int}, nvars::Int, deg_bound::Int)
    z = Int[]
-   for d in 0:degree_bound(R)-1
-      for i in 1:n
-         if v[i + d*n] != 0
+   for d in 0:deg_bound-1
+      for i in 1:nvars
+         if v[i + d*nvars] != 0
             push!(z, i)
             break
          end
@@ -142,15 +141,15 @@ end
 function _exponent_word(p::libSingular.poly_ptr, R::LPPolyRing, tmp::Vector{Int})
    @assert length(tmp) >= nvars(R)*degree_bound(R)
    GC.@preserve R libSingular.p_GetExpVL(p, tmp, R.ptr)
-   return _lpvec_to_exponent_word(tmp, R)
+   return _lpvec_to_exponent_word(tmp, nvars(R), degree_bound(R))
 end
 
 function exponent_words(x::slppoly)
    R = parent(x)
-   return PolyAlgExponentWords(x, zeros(Int, nvars(R)*degree_bound(R)))
+   return SPolyExponentWords(x, zeros(Int, nvars(R)*degree_bound(R)))
 end
 
-function Base.iterate(x::PolyAlgExponentWords{<:slppoly{T}}) where T <: Nemo.RingElem
+function Base.iterate(x::SPolyExponentWords{<:slppoly{T}}) where T <: Nemo.RingElem
    p = x.poly
    ptr = p.ptr
    if ptr.cpp_object == C_NULL
@@ -160,7 +159,7 @@ function Base.iterate(x::PolyAlgExponentWords{<:slppoly{T}}) where T <: Nemo.Rin
    end
 end
 
-function Base.iterate(x::PolyAlgExponentWords{<:slppoly{T}}, state) where T <: Nemo.RingElem
+function Base.iterate(x::SPolyExponentWords{<:slppoly{T}}, state) where T <: Nemo.RingElem
    state = libSingular.pNext(state)
    if state.cpp_object == C_NULL
       return nothing

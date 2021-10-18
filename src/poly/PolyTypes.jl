@@ -129,24 +129,24 @@ end
 #
 ###############################################################################
 
-struct PolyAlgCoeffs{T}
+struct SPolyCoeffs{T}
    poly::T
 end
 
-struct PolyAlgExponentVectors{T}
+struct SPolyExponentVectors{T}
    poly::T
 end
 
-struct PolyAlgExponentWords{T}
+struct SPolyExponentWords{T}
    poly::T
    tmp::Vector{Int}
 end
 
-struct PolyAlgTerms{T}
+struct SPolyTerms{T}
    poly::T
 end
 
-struct PolyAlgMonomials{T}
+struct SPolyMonomials{T}
    poly::T
 end
 
