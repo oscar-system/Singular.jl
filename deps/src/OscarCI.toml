@@ -5,7 +5,7 @@ os = [ "ubuntu-latest", "macos-latest" ]
 # 1.6 is done with some extra combinations in include
 # also to avoid some weird behaviour by github actions which seems to merge
 # the includes with the normal matrix entries
-julia-version = [ "1.3", "1.4", "1.5", "nightly" ]
+julia-version = [ "nightly" ]
 branches = [ "<matching>" ]
 
 [pkgs]
