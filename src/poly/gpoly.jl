@@ -14,8 +14,6 @@ elem_type(::Type{GPolyRing{T}}) where T <: Nemo.RingElem = sgpoly{T}
 
 parent_type(::Type{sgpoly{T}}) where T <: Nemo.RingElem = GPolyRing{T}
 
-nvars(R::GPolyRing) = Int(libSingular.rVar(R.ptr))
-
 has_global_ordering(R::GPolyRing) = Bool(libSingular.rHasGlobalOrdering(R.ptr))
 
 has_mixed_ordering(R::GPolyRing) = Bool(libSingular.rHasMixedOrdering(R.ptr))
@@ -27,14 +25,6 @@ end
 isquotient_ring(R::GPolyRing) = Bool(Singular.libSingular.rIsQuotientRing(R.ptr))
 
 characteristic(R::GPolyRing) = Int(libSingular.rChar(R.ptr))
-
-function gens(R::GPolyRing)
-   return [R(libSingular.rGetVar(Cint(i), R.ptr)) for i in 1:nvars(R)]
-end
-
-function gen(R::GPolyRing, i::Int)
-   return R(libSingular.rGetVar(Cint(i), R.ptr))
-end
 
 ordering(R::GPolyRing) = R.ord
 

@@ -14,8 +14,6 @@ elem_type(::Type{ExtPolyRing{T}}) where T <: Nemo.RingElem = sextpoly{T}
 
 parent_type(::Type{sextpoly{T}}) where T <: Nemo.RingElem = ExtPolyRing{T}
 
-nvars(R::ExtPolyRing) = Int(libSingular.rVar(R.ptr))
-
 has_global_ordering(R::ExtPolyRing) = Bool(libSingular.rHasGlobalOrdering(R.ptr))
 
 has_mixed_ordering(R::ExtPolyRing) = Bool(libSingular.rHasMixedOrdering(R.ptr))
@@ -27,15 +25,6 @@ end
 isquotient_ring(R::ExtPolyRing) = Bool(Singular.libSingular.rIsQuotientRing(R.ptr))
 
 characteristic(R::ExtPolyRing) = Int(libSingular.rChar(R.ptr))
-
-function gens(R::ExtPolyRing)
-   n = nvars(R)
-   return [R(libSingular.rGetVar(Cint(i), R.ptr)) for i = 1:n]
-end
-
-function gen(R::ExtPolyRing, i::Int)
-   return R(libSingular.rGetVar(Cint(i), R.ptr))
-end
 
 ordering(R::ExtPolyRing) = R.ord
 

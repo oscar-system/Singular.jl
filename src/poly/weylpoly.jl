@@ -14,8 +14,6 @@ elem_type(::Type{WeylPolyRing{T}}) where T <: Nemo.RingElem = sweylpoly{T}
 
 parent_type(::Type{sweylpoly{T}}) where T <: Nemo.RingElem = WeylPolyRing{T}
 
-nvars(R::WeylPolyRing) = Int(libSingular.rVar(R.ptr))
-
 has_global_ordering(R::WeylPolyRing) = Bool(libSingular.rHasGlobalOrdering(R.ptr))
 
 has_mixed_ordering(R::WeylPolyRing) = Bool(libSingular.rHasMixedOrdering(R.ptr))
@@ -27,15 +25,6 @@ end
 isquotient_ring(R::WeylPolyRing) = Bool(Singular.libSingular.rIsQuotientRing(R.ptr))
 
 characteristic(R::WeylPolyRing) = Int(libSingular.rChar(R.ptr))
-
-function gens(R::WeylPolyRing)
-   n = nvars(R)
-   return [R(libSingular.rGetVar(Cint(i), R.ptr)) for i = 1:n]
-end
-
-function gen(R::WeylPolyRing, i::Int)
-   return R(libSingular.rGetVar(Cint(i), R.ptr))
-end
 
 ordering(R::WeylPolyRing) = R.ord
 

@@ -64,10 +64,12 @@ end
 end
 
 @testset "slppoly.rename" begin
-   s = ["x[1]", "x[2]", "x[3]"]
-   R, x = FreeAlgebra(QQ, s, 1)
-   @test String.(symbols(R)) == s
-   @test String.(Singular.singular_symbols(R)) == ["x_1", "x_2", "x_3"]
+   for n in 1:5, d in 1:5
+      s = ["x[$i]" for i in 1:n]
+      R, x = FreeAlgebra(QQ, s, d)
+      @test String.(symbols(R)) == s
+      @test String.(Singular.singular_symbols(R)) == ["x_$i" for i in 1:n]
+   end
 end
 
 @testset "slppoly.manipulation" begin

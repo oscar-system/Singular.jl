@@ -70,11 +70,6 @@ function degree_bound(R::LPPolyRing)
    return R.deg_bound
 end
 
-function nvars(R::LPPolyRing)
-   # note libSingular.rVar returns nvars*deg_bound
-   return length(R.S)
-end
-
 has_global_ordering(R::LPPolyRing) = Bool(libSingular.rHasGlobalOrdering(R.ptr))
 
 has_mixed_ordering(R::LPPolyRing) = Bool(libSingular.rHasMixedOrdering(R.ptr))
@@ -114,19 +109,6 @@ end
 
 function characteristic(R::LPPolyRing)
    GC.@preserve R return Int(libSingular.rChar(R.ptr))
-end
-
-function gens(R::LPPolyRing)
-   n = nvars(R)
-   GC.@preserve R return [R(libSingular.rGetVar(Cint(i), R.ptr)) for i = 1:n]
-end
-
-function gen(R::LPPolyRing, i::Int)
-   GC.@preserve R return R(libSingular.rGetVar(Cint(i), R.ptr))
-end
-
-function singular_symbols(R::LPPolyRing)
-   GC.@preserve R return singular_symbols(R.ptr, nvars(R))
 end
 
 ordering(R::LPPolyRing) = R.ord

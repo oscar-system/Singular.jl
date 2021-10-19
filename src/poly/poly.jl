@@ -37,10 +37,6 @@ elem_type(::Type{PolyRing{T}}) where T <: Nemo.RingElem = spoly{T}
 
 parent_type(::Type{spoly{T}}) where T <: Nemo.RingElem = PolyRing{T}
 
-function nvars(R::PolyRing)
-   GC.@preserve R return Int(libSingular.rVar(R.ptr))
-end
-
 @doc Markdown.doc"""
     has_global_ordering(R::PolyRing)
 
@@ -86,12 +82,17 @@ function characteristic(R::PolyRing)
    GC.@preserve R return Int(libSingular.rChar(R.ptr))
 end
 
-function gens(R::PolyRing)
+function nvars(R::PolyRingUnion)
+   return length(R.S)
+end
+
+function gens(R::PolyRingUnion)
    n = nvars(R)
    GC.@preserve R return [R(libSingular.rGetVar(Cint(i), R.ptr)) for i = 1:n]
 end
 
-function gen(R::PolyRing, i::Int)
+function gen(R::PolyRingUnion, i::Int)
+   1 <= i <= nvars(R) || error("index out of range")
    GC.@preserve R return R(libSingular.rGetVar(Cint(i), R.ptr))
 end
 
@@ -99,11 +100,13 @@ function symbols(R::PolyRingUnion)
    return R.S
 end
 
-function singular_symbols(r::libSingular.ring_ptr, n::Int = Int(libSingular.rVar(r)))
+function singular_symbols(r::libSingular.ring_ptr)
+   n = Int(libSingular.rIsLPRing(r))
+   n = n > 0 ? n : Int(libSingular.rVar(r))
    return [Symbol(libSingular.rRingVar(Cshort(i - 1), r)) for i in 1:n]
 end
 
-function singular_symbols(R::Union{PolyRing, GPolyRing, WeylPolyRing, ExtPolyRing})
+function singular_symbols(R::PolyRingUnion)
    GC.@preserve R return singular_symbols(R.ptr)
 end
 
@@ -525,13 +528,12 @@ end
 function expressify(a::Union{spoly, sgpoly, sweylpoly, sextpoly},
                                     x = symbols(parent(a)); context = nothing)
    sum = Expr(:call, :+)
-   n = nvars(parent(a))
    for (c, v) in zip(coefficients(a), exponent_vectors(a))
       prod = Expr(:call, :*)
       if !isone(c)
          push!(prod.args, expressify(c, context = context))
       end
-      for i in 1:n
+      for i in 1:length(v)
          if v[i] > 1
             push!(prod.args, Expr(:call, :^, x[i], v[i]))
          elseif v[i] == 1
