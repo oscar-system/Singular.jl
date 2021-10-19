@@ -53,6 +53,13 @@
 end
 
 @testset "sweylpoly.printing" begin
+   r, (x, y, dx, dy) = WeylAlgebra(QQ, ["x", "y"], ordering = :degrevlex)
+
+   @test string(x) == "x"
+   @test string(y) == "y"
+   @test string(dx) == "dx"
+   @test string(dy) == "dy"
+   @test string(x^2*dy + 2*y + 3) == "x^2*dy + 2*y + 3"
 end
 
 @testset "sweylpoly.rename" begin

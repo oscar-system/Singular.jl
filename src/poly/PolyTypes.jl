@@ -29,16 +29,16 @@ const PolyRingID = Dict{Tuple{Union{Ring, Field}, Vector{Symbol},
 
 mutable struct PolyRing{T <: Nemo.RingElem} <: Nemo.MPolyRing{T}
    ptr::libSingular.ring_ptr
+   refcount::Int
    base_ring::Union{Ring, Field}
    ord::sordering
-   refcount::Int
    S::Vector{Symbol}
 
    # take ownership of a ring ptr
    function PolyRing{T}(r::libSingular.ring_ptr, R, s::Vector{Symbol}=singular_symbols(r)) where T
       ord = Cint[]
       libSingular.rOrdering_helper(ord, r)
-      d = new(r, R, deserialize_ordering(ord), 1, s)
+      d = new(r, 1, R, deserialize_ordering(ord), s)
       finalizer(_PolyRing_clear_fn, d)
       return d
    end

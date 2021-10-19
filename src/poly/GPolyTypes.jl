@@ -9,16 +9,16 @@ const GPolyRingID = Dict{Tuple{PolyRing, smatrix, smatrix, Array{Symbol, 1}},
 
 mutable struct GPolyRing{T <: Nemo.RingElem} <: AbstractAlgebra.NCRing
    ptr::libSingular.ring_ptr
+   refcount::Int
    base_ring::Union{Ring, Field}
    ord::sordering
-   refcount::Int
    S::Vector{Symbol}
 
    # take ownership of a ring_ptr
    function GPolyRing{T}(r::libSingular.ring_ptr, R, s::Vector{Symbol}=singular_symbols(r)) where T <: Nemo.RingElem
       ord = Cint[]
       libSingular.rOrdering_helper(ord, r)
-      d = new(r, R, deserialize_ordering(ord), 1, s)
+      d = new(r, 1, R, deserialize_ordering(ord), s)
       finalizer(_PolyRing_clear_fn, d)
       return d
    end

@@ -53,10 +53,13 @@
    @test symbols(R) == [:x, :y, :z]
 end
 
-@testset "sextpoly.printing" begin
-end
+@testset "sweylpoly.printing" begin
+   r, (dx, dy, dz) = ExteriorAlgebra(QQ, ["dx", "dy", "dz"], ordering = :degrevlex)
 
-@testset "sextpoly.rename" begin
+   @test string(dx) == "dx"
+   @test string(dy) == "dy"
+   @test string(dz) == "dz"
+   @test string(2*dx*dy*dz - 1) == "2*dx*dy*dz - 1"
 end
 
 @testset "sextpoly.manipulation" begin
@@ -139,39 +142,12 @@ end
    @test trailing_coefficient(R()) == 0
 end
 
-@testset "sextpoly.change_base_ring" begin
-end
-
-@testset "sextpoly.multivariate_coeff" begin
-end
-
-@testset "sextpoly.unary_ops" begin
-end
-
 @testset "sextpoly.binary_ops" begin
    R, (x, y, z, w) = ExteriorAlgebra(QQ, ["x", "y", "z", "w"])
    @test y*x == -x*y
    @test y*x*y == 0
    @test 0 == x^2
    @test (x*y + y*z)*(w + x) == x*y*w + y*z*w + y*z*x
-end
-
-@testset "sextpoly.comparison" begin
-end
-
-@testset "sextpoly.powering" begin
-end
-
-@testset "sextpoly.exact_division" begin
-end
-
-@testset "sextpoly.adhoc_exact_division" begin
-end
-
-@testset "sextpoly.adhoc_binary_operation" begin
-end
-
-@testset "sextpoly.divides" begin
 end
 
 @testset "sextpoly.hash" begin

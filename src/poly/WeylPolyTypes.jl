@@ -10,9 +10,10 @@ const WeylPolyRingID = Dict{Tuple{Union{Ring, Field}, Array{Symbol, 1},
 
 mutable struct WeylPolyRing{T <: Nemo.RingElem} <: AbstractAlgebra.NCRing
    ptr::libSingular.ring_ptr
+   refcount::Int
    base_ring::Union{Ring, Field}
    ord::Symbol
-   refcount::Int
+   S::Vector{Symbol}
 
    function WeylPolyRing{T}(R::Union{Ring, Field}, s::Array{Symbol, 1},
          ord_sym::Symbol, cached::Bool = true,
@@ -60,7 +61,7 @@ mutable struct WeylPolyRing{T <: Nemo.RingElem} <: AbstractAlgebra.NCRing
          ptr = libSingular.rWeyl(r, v, ord, blk0, blk1, bitmask)
          @assert degree_bound_adjusted == Int(libSingular.rBitmask(ptr))
          d = WeylPolyRingID[R, s, ordering, ordering2, degree_bound_adjusted] =
-               new(ptr, R, ord_sym, 1)
+               new(ptr, 1, R, ord_sym, s)
          finalizer(_WeylPolyRing_clear_fn, d)
          return d
       end

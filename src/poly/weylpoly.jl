@@ -37,16 +37,6 @@ function gen(R::WeylPolyRing, i::Int)
    return R(libSingular.rGetVar(Cint(i), R.ptr))
 end
 
-function symbols(R::WeylPolyRing)
-   io = IOBuffer();
-   symbols = Array{Symbol,1}(undef, 0)
-   for g in gens(R)
-      show(io,g)
-      push!(symbols, Symbol(String(take!(io))))
-   end
-   return symbols
-end
-
 ordering(R::WeylPolyRing) = R.ord
 
 @doc Markdown.doc"""

@@ -98,8 +98,8 @@ function show(io::IO, c::Integers)
    print(io, "Integer Ring")
 end
 
-function AbstractAlgebra.expressify(n::n_Z; context = nothing)::Any
-  return AbstractAlgebra.expressify(BigInt(n), context = context)
+function expressify(n::n_Z; context = nothing)::Any
+  return BigInt(n)
 end
 
 function show(io::IO, n::n_Z)

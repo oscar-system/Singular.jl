@@ -117,16 +117,11 @@ function show(io::IO, c::Rationals)
    print(io, "Rational Field")
 end
 
-function AbstractAlgebra.expressify(n::n_Q; context = nothing)::Any
-   return AbstractAlgebra.expressify(Rational{BigInt}(n), context = context)
+function expressify(n::n_Q; context = nothing)::Any
+   return expressify(Rational{BigInt}(n), context = context)
 end
 
-function show(io::IO, a::n_Q)
-   AbstractAlgebra.show_via_expressify(io, a)
-end
-
-isnegative(x::n_Q) = !libSingular.n_GreaterZero(x.ptr, parent(x).ptr) &&
-                      !iszero(x)
+AbstractAlgebra.@enable_all_show_via_expressify n_Q
 
 ###############################################################################
 #

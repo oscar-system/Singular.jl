@@ -10,9 +10,10 @@ const ExtPolyRingID = Dict{Tuple{Union{Ring, Field}, Array{Symbol, 1},
 
 mutable struct ExtPolyRing{T <: Nemo.RingElem} <: AbstractAlgebra.NCRing
    ptr::libSingular.ring_ptr
+   refcount::Int
    base_ring::Union{Ring, Field}
    ord::Symbol
-   refcount::Int
+   S::Vector{Symbol}
 
    function ExtPolyRing{T}(R::Union{Ring, Field}, s::Array{Symbol, 1},
          ord_sym::Symbol, cached::Bool = true,
@@ -53,7 +54,7 @@ mutable struct ExtPolyRing{T <: Nemo.RingElem} <: AbstractAlgebra.NCRing
          ord[2] = ordering2
          ord[3] = ringorder_no
          ptr = libSingular.rExterior(r, v, ord, blk0, blk1, Culong(0)) # TODO remove the useless degbound parameter
-         d = ExtPolyRingID[R, s, ordering, ordering2] = new(ptr, R, ord_sym, 1)
+         d = ExtPolyRingID[R, s, ordering, ordering2] = new(ptr, 1, R, ord_sym, s)
          finalizer(_ExtPolyRing_clear_fn, d)
          return d
       end

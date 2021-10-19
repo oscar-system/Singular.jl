@@ -37,16 +37,6 @@ function gen(R::ExtPolyRing, i::Int)
    return R(libSingular.rGetVar(Cint(i), R.ptr))
 end
 
-function symbols(R::ExtPolyRing)
-   io = IOBuffer();
-   symbols = Array{Symbol,1}(undef, 0)
-   for g in gens(R)
-      show(io,g)
-      push!(symbols, Symbol(String(take!(io))))
-   end
-   return symbols
-end
-
 ordering(R::ExtPolyRing) = R.ord
 
 function degree_bound(R::ExtPolyRing)

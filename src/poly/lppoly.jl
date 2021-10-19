@@ -15,11 +15,34 @@ function show(io::IO, R::LPPolyRing)
    end
 end
 
-function show(io::IO, a::slppoly)
-   R = parent(a)
-   GC.@preserve a R s = libSingular.p_String(a.ptr, R.ptr)
-   print(io, s)
+function expressify(a::slppoly, x = symbols(parent(a)); context = nothing)
+   sum = Expr(:call, :+)
+   for (c, v) in zip(coefficients(a), exponent_words(a))
+      prod = Expr(:call, :*)
+      if !isone(c)
+         push!(prod.args, expressify(c, context = context))
+      end
+      j = -1
+      e = 0
+      for i in v
+         if j != i
+            if j > 0 && !iszero(e)
+               push!(prod.args, e == 1 ? x[j] : Expr(:call, :^, x[j], e))
+            end
+            e = 0
+         end
+         j = i
+         e += 1
+      end
+      if j > 0 && !iszero(e)
+         push!(prod.args, e == 1 ? x[j] : Expr(:call, :^, x[j], e))
+      end
+      push!(sum.args, prod)
+   end
+   return sum
 end
+
+AbstractAlgebra.@enable_all_show_via_expressify slppoly
 
 ###############################################################################
 #
@@ -100,10 +123,6 @@ end
 
 function gen(R::LPPolyRing, i::Int)
    GC.@preserve R return R(libSingular.rGetVar(Cint(i), R.ptr))
-end
-
-function symbols(R::LPPolyRing)
-   return R.S
 end
 
 function singular_symbols(R::LPPolyRing)

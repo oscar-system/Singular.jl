@@ -55,13 +55,16 @@
 end
 
 @testset "sgpoly.printing" begin
-end
+   r, (x, y) = PolynomialRing(QQ, ["x", "y"], ordering = :degrevlex)
+   R, (x, y) = GAlgebra(r, Singular.Matrix(r, [1 1; 0 1]),
+                           Singular.Matrix(r, [0 x; 0 0]))
 
-@testset "sgpoly.rename" begin
+   @test string(x) == "x"
+   @test string(y) == "y"
+   @test string(x^2 + 2*y + 3) == "x^2 + 2*y + 3"
 end
 
 @testset "sgpoly.manipulation" begin
-
    r, (x, y) = PolynomialRing(QQ, ["x", "y"], ordering = :degrevlex)
    R, (x, y) = GAlgebra(r, Singular.Matrix(r, [1 1; 0 1]),
                            Singular.Matrix(r, [0 x; 0 0]))
@@ -159,24 +162,6 @@ end
    @test x * QQ(2) == QQ(2) * x
    @test x * 2 == 2 * x
    @test y*x == x*y + x + 1
-end
-
-@testset "sgpoly.comparison" begin
-end
-
-@testset "sgpoly.powering" begin
-end
-
-@testset "sgpoly.exact_division" begin
-end
-
-@testset "sgpoly.adhoc_exact_division" begin
-end
-
-@testset "sgpoly.adhoc_binary_operation" begin
-end
-
-@testset "sgpoly.divides" begin
 end
 
 @testset "sgpoly.hash" begin

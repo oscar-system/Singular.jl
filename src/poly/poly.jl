@@ -95,7 +95,7 @@ function gen(R::PolyRing, i::Int)
    GC.@preserve R return R(libSingular.rGetVar(Cint(i), R.ptr))
 end
 
-function symbols(R::PolyRing)
+function symbols(R::PolyRingUnion)
    return R.S
 end
 
@@ -523,18 +523,31 @@ function show(io::IO, R::PolyRing)
    end
 end
 
-function Base.show(io::IO, a::spoly)
-   AbstractAlgebra.show_via_expressify(io, a)
+function expressify(a::Union{spoly, sgpoly, sweylpoly, sextpoly},
+                                    x = symbols(parent(a)); context = nothing)
+   sum = Expr(:call, :+)
+   n = nvars(parent(a))
+   for (c, v) in zip(coefficients(a), exponent_vectors(a))
+      prod = Expr(:call, :*)
+      if !isone(c)
+         push!(prod.args, expressify(c, context = context))
+      end
+      for i in 1:n
+         if v[i] > 1
+            push!(prod.args, Expr(:call, :^, x[i], v[i]))
+         elseif v[i] == 1
+            push!(prod.args, x[i])
+         end
+      end
+      push!(sum.args, prod)
+   end
+   return sum
 end
 
-# expressify is not defined for the non-commutative stuff
-function Base.show(io::IO, a::SPolyUnion)
-   s = libSingular.p_String(a.ptr, parent(a).ptr)
-   print(io, s)
-end
-
-
-isnegative(x::spoly) = isconstant(x) && !iszero(x) && isnegative(leading_coefficient(x))
+AbstractAlgebra.@enable_all_show_via_expressify spoly
+AbstractAlgebra.@enable_all_show_via_expressify sgpoly
+AbstractAlgebra.@enable_all_show_via_expressify sweylpoly
+AbstractAlgebra.@enable_all_show_via_expressify sextpoly
 
 ###############################################################################
 #

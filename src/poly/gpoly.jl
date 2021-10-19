@@ -36,10 +36,6 @@ function gen(R::GPolyRing, i::Int)
    return R(libSingular.rGetVar(Cint(i), R.ptr))
 end
 
-function symbols(R::GPolyRing)
-   return R.S
-end
-
 ordering(R::GPolyRing) = R.ord
 
 @doc Markdown.doc"""

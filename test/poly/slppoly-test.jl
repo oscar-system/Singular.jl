@@ -52,9 +52,14 @@
 end
 
 @testset "slppoly.printing" begin
-end
+   R, (x, y) = FreeAlgebra(QQ, ["x", "y"], 4, ordering = :degrevlex)
 
-@testset "slppoly.rename" begin
+   @test string(x) == "x"
+   @test string(y) == "y"
+   @test string(zero(R)) == "0"
+   @test string(one(R)) == "1"
+   @test string(x^2 + 2*y + 3) == "x^2 + 2*y + 3"
+   @test string(2*y^2*x^2 + y*x^2*y + x + 3) == "2*y^2*x^2 + y*x^2*y + x + 3"
 end
 
 @testset "slppoly.manipulation" begin
@@ -135,15 +140,6 @@ end
    @test trailing_coefficient(R()) == 0
 end
 
-@testset "slppoly.change_base_ring" begin
-end
-
-@testset "slppoly.multivariate_coeff" begin
-end
-
-@testset "slppoly.unary_ops" begin
-end
-
 @testset "slppoly.binary_ops" begin
    R, (x, y, z, w) = FreeAlgebra(QQ, ["x", "y", "z", "w"], 5)
    @test y*x != x*y
@@ -151,24 +147,9 @@ end
    @test !iszero(y*x - x*y)
 end
 
-@testset "slppoly.comparison" begin
-end
-
 @testset "slppoly.powering" begin
    R, (x, y, z) = FreeAlgebra(Fp(5), ["x", "y", "z"], 10)
    @test length((x + y + z)^5) == 3^5
-end
-
-@testset "slppoly.exact_division" begin
-end
-
-@testset "slppoly.adhoc_exact_division" begin
-end
-
-@testset "slppoly.adhoc_binary_operation" begin
-end
-
-@testset "slppoly.divides" begin
 end
 
 @testset "slppoly.hash" begin

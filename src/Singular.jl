@@ -32,7 +32,7 @@ using RandomExtensions: RandomExtensions, make, Make2
 
 import AbstractAlgebra: AbstractAlgebra, diagonal_matrix, factor,
                         identity_matrix, kernel, lead, ncols, ngens, nrows, order,
-                        preimage, zero_matrix
+                        preimage, zero_matrix, expressify
 
 import Nemo: add!, addeq!, base_ring, canonical_unit,
              change_base_ring, characteristic, check_parent, codomain,
@@ -215,6 +215,10 @@ include("poly/ExtPolyTypes.jl")
 include("poly/LPPolyTypes.jl")
 
 # all poly types
+
+const PolyRingUnion{T} = Union{PolyRing{T}, GPolyRing{T}, WeylPolyRing{T},
+                        ExtPolyRing{T}, LPPolyRing{T}} where T <: Nemo.RingElem
+
 const SPolyUnion{T} = Union{spoly{T}, sgpoly{T}, sweylpoly{T},
                             sextpoly{T}, slppoly{T}} where T <: Nemo.RingElem
 
