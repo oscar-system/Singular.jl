@@ -14,48 +14,18 @@ elem_type(::Type{WeylPolyRing{T}}) where T <: Nemo.RingElem = sweylpoly{T}
 
 parent_type(::Type{sweylpoly{T}}) where T <: Nemo.RingElem = WeylPolyRing{T}
 
-@doc Markdown.doc"""
-    nvars(R::WeylPolyRing)
-> Return the number of variables in the given Weyl algebra.
-"""
 nvars(R::WeylPolyRing) = Int(libSingular.rVar(R.ptr))
 
-@doc Markdown.doc"""
-    has_global_ordering(R::WeylPolyRing)
-> Return `true` if the given algebra has a global ordering, i.e. if $1 < x$ for
-> each variable $x$ in the ring. This include `:lex`, `:deglex` and `:degrevlex`
-> orderings.
-"""
 has_global_ordering(R::WeylPolyRing) = Bool(libSingular.rHasGlobalOrdering(R.ptr))
 
-@doc Markdown.doc"""
-    has_mixed_ordering(R::WeylPolyRing)
-> Return `true` if the given algebra has a mixed ordering, i.e. if $1 < x_i$ for
-> a variable $x_i$ and $1>x_j$ for another variable $x_j$.
-"""
 has_mixed_ordering(R::WeylPolyRing) = Bool(libSingular.rHasMixedOrdering(R.ptr))
 
-@doc Markdown.doc"""
-    has_local_ordering(R::WeylPolyRing)
-> Return `true` if the given algebra has a local ordering, i.e. if $1 > x$ for
-> all variables $x$.
-"""
 function has_local_ordering(R::WeylPolyRing)
    return !has_global_ordering(R) && !has_mixed_ordering(R)
 end
 
-@doc Markdown.doc"""
-    isquotient_ring(R::WeylPolyRing)
-> Return `true` if the given algebra is the quotient of a polynomial ring with
-> a non - zero ideal.
-"""
 isquotient_ring(R::WeylPolyRing) = Bool(Singular.libSingular.rIsQuotientRing(R.ptr))
 
-@doc Markdown.doc"""
-    characteristic(R::WeylPolyRing)
-> Return the characteristic of the Weyl algebra, i.e. the characteristic of the
-> coefficient ring.
-"""
 characteristic(R::WeylPolyRing) = Int(libSingular.rChar(R.ptr))
 
 function gens(R::WeylPolyRing)
@@ -67,10 +37,6 @@ function gen(R::WeylPolyRing, i::Int)
    return R(libSingular.rGetVar(Cint(i), R.ptr))
 end
 
-@doc Markdown.doc"""
-    symbols(R::WeylPolyRing)
-> Return symbols for the generators of the Weyl algebra $R$.
-"""
 function symbols(R::WeylPolyRing)
    io = IOBuffer();
    symbols = Array{Symbol,1}(undef, 0)
@@ -85,10 +51,11 @@ ordering(R::WeylPolyRing) = R.ord
 
 @doc Markdown.doc"""
     degree_bound(R::WeylPolyRing)
-> Return the internal degree bound in each variable, enforced by Singular. This is the
-> largest positive value any degree can have before an overflow will occur. This
-> internal bound may be higher than the bound requested by the user via the
-> `degree_bound` parameter of the `WeylPolyRing` constructor.
+
+Return the internal degree bound in each variable, enforced by Singular. This is the
+largest positive value any degree can have before an overflow will occur. This
+internal bound may be higher than the bound requested by the user via the
+`degree_bound` parameter of the `WeylAlgebra` constructor.
 """
 function degree_bound(R::WeylPolyRing)
    return Int(libSingular.rBitmask(R.ptr))

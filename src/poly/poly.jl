@@ -37,11 +37,6 @@ elem_type(::Type{PolyRing{T}}) where T <: Nemo.RingElem = spoly{T}
 
 parent_type(::Type{spoly{T}}) where T <: Nemo.RingElem = PolyRing{T}
 
-@doc Markdown.doc"""
-    nvars(R::PolyRing)
-
-Return the number of variables in the given polynomial ring.
-"""
 function nvars(R::PolyRing)
    GC.@preserve R return Int(libSingular.rVar(R.ptr))
 end
@@ -100,11 +95,6 @@ function gen(R::PolyRing, i::Int)
    GC.@preserve R return R(libSingular.rGetVar(Cint(i), R.ptr))
 end
 
-@doc Markdown.doc"""
-    symbols(R::PolyRing)
-
-Return symbols for the generators of the polynomial ring $R$.
-"""
 function symbols(R::PolyRing)
    return R.S
 end
@@ -1046,11 +1036,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    factor_squarefree(x::spoly)
-
-Returns a squarefree factorization of $x$.
-"""
 function factor_squarefree(x::spoly)
   R = parent(x)
   br_type = typeof(base_ring(R))
@@ -1075,11 +1060,6 @@ function factor_squarefree(x::spoly)
   return Fac(I[1], D)
 end
 
-@doc Markdown.doc"""
-    factor(x::spoly)
-
-Returns the factorization of $x$.
-"""
 function factor(x::spoly)
   R = parent(x)
   br_type = typeof(base_ring(R))
@@ -1376,11 +1356,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-   change_base_ring(C::T, p::spoly) where T <: Union{Ring, Field}
-   > Return a polynomial ring, whose coefficient ring is subsituted by the ring
-   > $C$.
-   """
 function change_base_ring(C::T, p::spoly) where T <: Union{Ring, Field}
    S, = Singular.PolynomialRing(C, [String(v) for v in symbols(parent(p))],
 				             ordering = parent(p).ord)

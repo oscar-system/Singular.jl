@@ -5,7 +5,8 @@
 ###############################################################################
 
 const ExtPolyRingID = Dict{Tuple{Union{Ring, Field}, Array{Symbol, 1},
-         libSingular.rRingOrder_t, libSingular.rRingOrder_t, Int}, AbstractAlgebra.NCRing}()
+                                 libSingular.rRingOrder_t, libSingular.rRingOrder_t},
+                           AbstractAlgebra.NCRing}()
 
 mutable struct ExtPolyRing{T <: Nemo.RingElem} <: AbstractAlgebra.NCRing
    ptr::libSingular.ring_ptr
@@ -16,8 +17,7 @@ mutable struct ExtPolyRing{T <: Nemo.RingElem} <: AbstractAlgebra.NCRing
    function ExtPolyRing{T}(R::Union{Ring, Field}, s::Array{Symbol, 1},
          ord_sym::Symbol, cached::Bool = true,
          ordering::libSingular.rRingOrder_t = ringorder_dp,
-         ordering2::libSingular.rRingOrder_t = ringorder_C,
-         degree_bound::Int = 0) where T
+         ordering2::libSingular.rRingOrder_t = ringorder_C) where T
 
       length(s) >= 2 || error("need at least two indeterminates")
 
@@ -28,13 +28,9 @@ mutable struct ExtPolyRing{T <: Nemo.RingElem} <: AbstractAlgebra.NCRing
                && (ordering2 != ringorder_c && ordering2 != ringorder_C)))
          error("wrong ordering")
       end
-      bitmask = Culong(degree_bound)
       n_vars = Cint(length(s));
-      # internally in libSingular, degree_bound is set to
-      degree_bound_adjusted = Int(libSingular.rGetExpSize(bitmask, n_vars))
-      if haskey(ExtPolyRingID, (R, s, ordering, ordering2, degree_bound_adjusted))
-         return ExtPolyRingID[R, s, ordering, ordering2,
-               degree_bound_adjusted]::ExtPolyRing{T}
+      if haskey(ExtPolyRingID, (R, s, ordering, ordering2))
+         return ExtPolyRingID[R, s, ordering, ordering2]::ExtPolyRing{T}
       else
          v = [pointer(Base.Vector{UInt8}(string(str)*"\0")) for str in s]
          r = libSingular.nCopyCoeff(R.ptr)
@@ -56,10 +52,8 @@ mutable struct ExtPolyRing{T <: Nemo.RingElem} <: AbstractAlgebra.NCRing
          ord[1] = ordering
          ord[2] = ordering2
          ord[3] = ringorder_no
-         ptr = libSingular.rExterior(r, v, ord, blk0, blk1, bitmask)
-         @assert degree_bound_adjusted == Int(libSingular.rBitmask(ptr))
-         d = ExtPolyRingID[R, s, ordering, ordering2, degree_bound_adjusted] =
-               new(ptr, R, ord_sym, 1)
+         ptr = libSingular.rExterior(r, v, ord, blk0, blk1, Culong(0)) # TODO remove the useless degbound parameter
+         d = ExtPolyRingID[R, s, ordering, ordering2] = new(ptr, R, ord_sym, 1)
          finalizer(_ExtPolyRing_clear_fn, d)
          return d
       end

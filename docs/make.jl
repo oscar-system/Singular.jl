@@ -18,8 +18,7 @@ makedocs(
                   "nemo.md"
              ],
             "polynomial.md",
-            "weyl.md",
-            "exterior.md",
+            "noncommutative.md",
             "ideal.md",
             "Modules" => [
                   "module.md",

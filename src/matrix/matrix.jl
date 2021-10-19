@@ -6,17 +6,8 @@ export identity_matrix, MatrixSpace, nrows, ncols, smatrix, zero_matrix
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    nrows(M::smatrix)
-
-Return the number of rows of $M$.
-"""
 nrows(M::smatrix) = Int(libSingular.nrows(M.ptr))
 
-@doc Markdown.doc"""
-   nrows(M::smatrix)
-Return the number of colums of $M$.
-"""
 ncols(M::smatrix) = Int(libSingular.ncols(M.ptr))
 
 function parent(M::smatrix{T}) where T <: AbstractAlgebra.RingElem
@@ -33,10 +24,6 @@ elem_type(::MatrixSpace{T}) where T <: AbstractAlgebra.RingElem = smatrix{T}
 
 parent_type(::Type{smatrix{T}}) where T <: AbstractAlgebra.RingElem = MatrixSpace{T}
 
-@doc Markdown.doc"""
-   getindex(M::smatrix{T}, i::Int, j::Int) where T <: AbstractAlgebra.RingElem
-Given a matrix $M = (m_{ij})_{i, j}$, return the entry $m_{ij}$.
-"""
 function getindex(M::smatrix{T}, i::Int, j::Int) where T <: AbstractAlgebra.RingElem
    (i > nrows(M) || j > ncols(M)) && error("Incompatible dimensions")
    R = base_ring(M)
@@ -46,10 +33,6 @@ function getindex(M::smatrix{T}, i::Int, j::Int) where T <: AbstractAlgebra.Ring
    end
 end
 
-@doc Markdown.doc"""
-   setindex!(M::smatrix, p::spoly i::Int, j::Int)
-Given a matrix $M = (m_{ij})_{i, j}$, set the entry $m_{ij}$ to the value $p$.
-"""
 function setindex!(M::smatrix, p::spoly, i::Int, j::Int)
    (i > nrows(M) || j > ncols(M)) && error("Incompatible dimensions")
    R = base_ring(M)
@@ -57,11 +40,6 @@ function setindex!(M::smatrix, p::spoly, i::Int, j::Int)
    GC.@preserve M p R libSingular.setindex(M.ptr, p.ptr, Cint(i), Cint(j), R.ptr)
 end
 
-"""
-    iszero(M::smatrix)
-
-Return whether the supplied matrix `M` is the zero matrix.
-"""
 function iszero(M::smatrix)
    for i = 1:nrows(M)
       for j = 1:ncols(M)
@@ -73,10 +51,6 @@ function iszero(M::smatrix)
    return true
 end
 
-@doc Markdown.doc"""
-   transpose(M::smatrix{T}) where T <: AbstractAlgebra.RingElem
-Given a matrix $M=(m_{ij})_{i, j}$, return the matrix $M^T=(m_{ji})_{j, i}$.
-"""
 function transpose(M::smatrix{T}) where T <: AbstractAlgebra.RingElem
    R = base_ring(M)
    ptr = GC.@preserve M R libSingular.mp_Transp(M.ptr, R.ptr)
@@ -246,19 +220,11 @@ function Module(vecs::smatrix{spoly{T}}) where T <: Nemo.RingElem
    GC.@preserve vecs return smodule{S}(R, vecs.ptr)
 end
 
-@doc Markdown.doc"""
-   identity_matrix(R::PolyRing, n::Int)
-Returns the $n \times n$ identity matrix over $R.$
-"""
 function identity_matrix(R::PolyRing, n::Int)
    p = R(1)
    GC.@preserve p R return smatrix{elem_type(R)}(R, libSingular.mp_InitP(n, p.ptr, R.ptr))
 end
 
-@doc Markdown.doc"""
-   zero_matrix(R::PolyRing, r::Int, c::Int)
-Returns the $r \times c$ zero matrix over $R.$
-"""
 function zero_matrix(R::PolyRing, r::Int, c::Int)
    return smatrix{elem_type(R)}(R, libSingular.mpNew(r, c))
 end

@@ -42,6 +42,12 @@ end
 
 ordering(R::GPolyRing) = R.ord
 
+@doc Markdown.doc"""
+    degree_bound(R::GPolyRing)
+
+Return the internal degree bound in each variable, enforced by Singular. This is the
+largest positive value any degree can have before an overflow will occur.
+"""
 function degree_bound(R::GPolyRing)
    return Int(libSingular.rBitmask(R.ptr))
 end

@@ -37,6 +37,12 @@ elem_type(::Type{LPPolyRing{T}}) where T <: Nemo.RingElem = slppoly{T}
 
 parent_type(::Type{slppoly{T}}) where T <: Nemo.RingElem = LPPolyRing{T}
 
+@doc Markdown.doc"""
+    degree_bound(R::LPPolyRing)
+
+Return the maximum length of a monomial word as requested by the user via the
+`degree_bound` parameter of the `FreeAlgebra` constructor.
+"""
 function degree_bound(R::LPPolyRing)
    return R.deg_bound
 end
