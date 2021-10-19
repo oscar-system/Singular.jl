@@ -319,6 +319,14 @@ void singular_define_rings(jlcxx::Module & Singular)
     Singular.method("rChar", &rChar);
     Singular.method("rGetVar", &rGetVar);
     Singular.method("rVar", &rVar);
+    Singular.method("rIsLPRing", [](const ring r) {
+        // return is 0 for not LP Ring, otherwise the number of variables for this ring
+        #ifdef HAVE_SHIFTBBA
+            return r->isLPring;
+        #else
+            return short(0);
+        #endif
+    });
     Singular.method("rRingVar", [](short i, const ring r) {
         return std::string(rRingVar(i, r));
     });
