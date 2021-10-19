@@ -1417,29 +1417,39 @@ end
 #
 ###############################################################################
 
-function MPolyBuildCtx(R::Union{PolyRing, GPolyRing, WeylPolyRing, ExtPolyRing})
-   t = R()
-   GC.@preserve t return MPolyBuildCtx(R, t.ptr)
+function MPolyBuildCtx(R::Union{PolyRing, GPolyRing, WeylPolyRing, ExtPolyRing, LPPolyRing})
+   # MPolyBuildCtx's inner constructor is too uncomfortable to use
+   t = zero(R)
+   M = Nemo.@new_struct(MPolyBuildCtx{typeof(t), typeof(t.ptr)}, t, t.ptr)
+   return M
 end
 
-function push_term!(M::MPolyBuildCtx{S, U}, c::T, expv::Vector{Int}) where {U, T <: Nemo.RingElem, S <: ExpPolyUnion{T}}
+function push_term!(M::MPolyBuildCtx{S, U}, c::T, e::Vector{Int}) where {U,
+                                        T <: Nemo.RingElem, S <: SPolyUnion{T}}
    R = parent(M.poly)
    RR = base_ring(R)
-   GC.@preserve c R begin
-      nv = nvars(R)
-      nv == length(expv) || error("Incorrect number of exponents in push_term!")
-      if iszero(c) || (S <: sextpoly && any(x->x>1, expv))
+   GC.@preserve c R RR begin
+      if S <: slppoly
+         nv = nvars(R)*degree_bound(R)
+         v = zeros(Int, nv)
+         _exponent_word_to_lp_vec!(v, e, nvars(R), degree_bound(R))
+      else
+         nv = nvars(R)
+         v = e
+         nv == length(e) || error("Incorrect number of exponents in push_term!")
+      end
+      if iszero(c) || (S <: sextpoly && any(x->x>1, e))
          return M.poly
       end
-      p = M.poly
       ptr = libSingular.p_Init(R.ptr)
       libSingular.p_SetCoeff0(ptr, libSingular.n_Copy(c.ptr, RR.ptr), R.ptr)
       for i = 1:nv
-         libSingular.p_SetExp(ptr, i, expv[i], R.ptr)
+         libSingular.p_SetExp(ptr, i, v[i], R.ptr)
       end
       libSingular.p_Setm(ptr, R.ptr)
-      if iszero(p)
-         p.ptr = ptr
+      if M.state.cpp_object == C_NULL
+         @assert M.poly.ptr.cpp_object == C_NULL
+         M.poly.ptr = ptr
       else
          libSingular.p_SetNext(M.state, ptr)
       end
@@ -1448,9 +1458,10 @@ function push_term!(M::MPolyBuildCtx{S, U}, c::T, expv::Vector{Int}) where {U, T
    end
 end
 
-function finish(M::MPolyBuildCtx{<:ExpPolyUnion{S}, U}) where {S, U}
+function finish(M::MPolyBuildCtx{<:SPolyUnion{T}, U}) where {U, T <: Nemo.RingElem}
    p = sort_terms!(M.poly)
-   # TODO zero! M.poly
+   M.poly = zero(parent(p))
+   M.state = M.poly.ptr
    return p
 end
 

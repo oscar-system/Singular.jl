@@ -87,8 +87,8 @@ end
    @test nvars(R) == 2
    pol = x^5 + 3x + 2
 
-   @test length(collect(coefficients(pol))) == length(pol)
-   @test length(collect(exponent_vectors(pol))) == length(pol)
+   @test collect(coefficients(pol)) == [QQ(1), QQ(3), QQ(2)]
+   @test collect(exponent_vectors(pol)) == [[5,0], [1,0], [0,0]]
 
    polzip = zip(coefficients(pol), monomials(pol), terms(pol))
    r = R()
@@ -104,12 +104,17 @@ end
 
    @test characteristic(R) == 5
 
-   R, (x, y, dx, dy) = WeylAlgebra(QQ, ["x", "y"])
-   p = x + y
-   q = x
+   F = base_ring(R)
 
-   @test x * QQ(2) == QQ(2) * x
-   @test x * 2 == 2 * x
+   B = MPolyBuildCtx(R)
+   push_term!(B, F(2), [1,2])
+   push_term!(B, F(3), [0,0])
+   @test finish(B) == 2*x*y^2 + 3
+   @test finish(B) == 0
+   push_term!(B, F(-1), [10,0])
+   @test finish(B) == -x^10
+   @test finish(B) == 0
+   @test_throws Exception push_term!(B, F(2), [0,0,0])
 
    for i = 1:nvars(R)
       @test gen(R, i) == gens(R)[i]
@@ -126,7 +131,7 @@ end
    @test leading_monomial(3x^2 + 2x + 1) == x^2
    @test leading_term(3x^2 + 2x + 1) == 3x^2
    @test trailing_coefficient(3x^2*y + 2x + 7y + 9) == 9
-   @test trailing_coefficient(5x) == 5
+   @test trailing_coefficient(4x) == 4
    @test trailing_coefficient(R(3)) == 3
    @test trailing_coefficient(R()) == 0
 end
@@ -145,8 +150,15 @@ end
    r, (x, y) = PolynomialRing(QQ, ["x", "y"], ordering = :degrevlex)
    R, (x, y) = GAlgebra(r, Singular.Matrix(r, [1 1; 0 1]),
                            Singular.Matrix(r, [0 x; 0 0]))
-
    @test y*x == x*y + x
+
+   r, (x, y) = PolynomialRing(QQ, ["x", "y"], ordering = :degrevlex)
+   R, (x, y) = GAlgebra(r, Singular.Matrix(r, [1 1; 0 1]),
+                           Singular.Matrix(r, [0 x+1; 0 0]))
+
+   @test x * QQ(2) == QQ(2) * x
+   @test x * 2 == 2 * x
+   @test y*x == x*y + x + 1
 end
 
 @testset "sgpoly.comparison" begin

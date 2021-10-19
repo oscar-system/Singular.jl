@@ -98,18 +98,13 @@ end
    push_term!(B, QQ(3), [0,0])
    push_term!(B, QQ(2), [1,0])
    @test finish(B) == 2*x + 3
-   B = MPolyBuildCtx(R)
    @test finish(B) == 0
-   B = MPolyBuildCtx(R)
    push_term!(B, QQ(-1), [10,0])
    @test finish(B) == 0
-   B = MPolyBuildCtx(R)
    @test finish(B) == 0
-   B = MPolyBuildCtx(R)
    push_term!(B, QQ(1), [1,0])
    push_term!(B, QQ(-1), [0,1])
    @test finish(B) == x - y
-   B = MPolyBuildCtx(R)
    @test_throws Exception push_term!(B, QQ(2), [0,0,0])
 
    R, (x, ) = ExteriorAlgebra(Fp(5), ["x", "y", "z", "w"])

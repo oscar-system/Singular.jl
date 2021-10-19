@@ -192,50 +192,6 @@ function _exponent_word_to_lp_vec!(v::Vector{Int}, w::Vector{Int},
    end
 end
 
-function MPolyBuildCtx(R::LPPolyRing{T}) where T<: Nemo.RingElem
-   t = zero(R)
-   GC.@preserve t begin
-      z = MPolyBuildCtx(R, t.ptr)
-      z.state = z.poly.ptr
-      return z
-   end
-end
-
-function push_term!(M::MPolyBuildCtx{<:slppoly{T}, U}, c::T, w::Vector{Int}) where {U, T <: Nemo.RingElem}
-   R = parent(M.poly)
-   RR = base_ring(R)
-   GC.@preserve c R M begin
-      n = nvars(R)
-      d = degree_bound(R)
-      v = zeros(Int, n*d)
-      _exponent_word_to_lp_vec!(v, w, n, d)
-      if iszero(c)
-         return M.poly
-      end
-      ptr = libSingular.p_Init(R.ptr)
-      libSingular.p_SetCoeff0(ptr, libSingular.n_Copy(c.ptr, RR.ptr), R.ptr)
-      for i = 1:n*d
-         libSingular.p_SetExp(ptr, i, v[i], R.ptr)
-      end
-      libSingular.p_Setm(ptr, R.ptr)
-      if M.state.cpp_object == C_NULL
-         @assert M.poly.ptr.cpp_object == C_NULL
-         M.poly.ptr = ptr
-      else
-         libSingular.p_SetNext(M.state, ptr)
-      end
-      M.state = ptr
-      return M.poly
-   end
-end
-
-function finish(M::MPolyBuildCtx{<:slppoly{T}, U}) where {U, T <: Nemo.RingElem}
-   p = sort_terms!(M.poly)
-   M.poly = zero(parent(p))
-   M.state = M.poly.ptr
-   return p
-end
-
 ###############################################################################
 #
 #   Parent call overloads

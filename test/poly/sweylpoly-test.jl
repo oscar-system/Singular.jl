@@ -97,14 +97,10 @@ end
    push_term!(B, QQ(2), [1,2])
    push_term!(B, QQ(3), [0,0])
    @test finish(B) == 2*x*dx^2 + 3
-   B = MPolyBuildCtx(R)
    @test finish(B) == 0
-   B = MPolyBuildCtx(R)
    push_term!(B, QQ(-1), [10,0])
    @test finish(B) == -x^10
-   B = MPolyBuildCtx(R)
    @test finish(B) == 0
-   B = MPolyBuildCtx(R)
    @test_throws Exception push_term!(B, QQ(2), [0,0,0])
 
    R, (x, dx) = WeylAlgebra(Fp(5), ["x"; "dx"])
