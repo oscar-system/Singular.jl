@@ -38,33 +38,33 @@ elem_type(::Type{PolyRing{T}}) where T <: Nemo.RingElem = spoly{T}
 parent_type(::Type{spoly{T}}) where T <: Nemo.RingElem = PolyRing{T}
 
 @doc Markdown.doc"""
-    has_global_ordering(R::PolyRing)
+    has_global_ordering(R::PolyRingUnion)
 
 Return `true` if the given ring has a global ordering, i.e. if $1 < x$ for
 each variable $x$ in the ring. This include `:lex`, `:deglex` and `:degrevlex`
 orderings.
 """
-function has_global_ordering(R::PolyRing)
+function has_global_ordering(R::PolyRingUnion)
    GC.@preserve R return Bool(libSingular.rHasGlobalOrdering(R.ptr))
 end
 
 @doc Markdown.doc"""
-    has_mixed_ordering(R::PolyRing)
+    has_mixed_ordering(R::PolyRingUnion)
 
 Return `true` if the given ring has a mixed ordering, i.e. if $1 < x_i$ for
 a variable $x_i$ and $1>x_j$ for another variable $x_j$.
 """
-function has_mixed_ordering(R::PolyRing)
+function has_mixed_ordering(R::PolyRingUnion)
    GC.@preserve R return Bool(libSingular.rHasMixedOrdering(R.ptr))
 end
 
 @doc Markdown.doc"""
-    has_local_ordering(R::PolyRing)
+    has_local_ordering(R::PolyRingUnion)
 
 Return `true` if the given ring has a local ordering, i.e. if $1 > x$ for
 all variables $x$.
 """
-function has_local_ordering(R::PolyRing)
+function has_local_ordering(R::PolyRingUnion)
    return !has_global_ordering(R) && !has_mixed_ordering(R)
 end
 
@@ -74,11 +74,11 @@ end
 Return `true` if the given ring is the quotient of a polynomial ring with
 a non - zero ideal.
 """
-function isquotient_ring(R::PolyRing)
+function isquotient_ring(R::PolyRingUnion)
    GC.@preserve R return Bool(Singular.libSingular.rIsQuotientRing(R.ptr))
 end
 
-function characteristic(R::PolyRing)
+function characteristic(R::PolyRingUnion)
    GC.@preserve R return Int(libSingular.rChar(R.ptr))
 end
 
@@ -110,7 +110,9 @@ function singular_symbols(R::PolyRingUnion)
    GC.@preserve R return singular_symbols(R.ptr)
 end
 
-ordering(R::PolyRing) = R.ord
+function ordering(R::PolyRingUnion)
+   return R.ord
+end
 
 @doc Markdown.doc"""
     isordering_symbolic(R::PolyRing)
@@ -138,14 +140,21 @@ function degree_bound(R::PolyRing)
    GC.@preserve R return Int(libSingular.rBitmask(R.ptr))
 end
 
-zero(R::PolyRing) = R()
+function zero(R::PolyRingUnion)
+   return R()
+end
 
-one(R::PolyRing) = R(1)
+function one(R::PolyRingUnion)
+   return R(1)
+end
 
-iszero(p::SPolyUnion) = p.ptr.cpp_object == C_NULL
+function iszero(p::SPolyUnion)
+   GC.@preserve p p.ptr.cpp_object == C_NULL
+end
 
 function isone(p::SPolyUnion)
-   GC.@preserve p return Bool(libSingular.p_IsOne(p.ptr, parent(p).ptr))
+   R = parent(p)
+   GC.@preserve R p return Bool(libSingular.p_IsOne(p.ptr, R.ptr))
 end
 
 function isgen(p::Union{spoly, sgpoly, sextpoly, sweylpoly})
@@ -351,14 +360,15 @@ function canonical_unit(a::SPolyUnion{T}) where T <: Nemo.RingElem
   return iszero(a) ? one(base_ring(a)) : canonical_unit(leading_coefficient(a))
 end
 
-function Base.hash(p::spoly{T}, h::UInt) where T <: Nemo.RingElem
-   v = 0x37eec82e994ab710%UInt
-   v = xor(hash(collect(exponent_vectors(p)), h), v)
-   for c in coefficients(p)
-      v = xor(hash(c, h), v)
-      v = (v << 1) | (v >> (sizeof(Int)*8 - 1))
+function Base.hash(p::SPolyUnion, h::UInt)
+   z = 0xaf708b07f940b4d2%UInt
+   z = bitrotate(xor(z, hash(parent(p), h)), 1)
+   es = p isa slppoly ? exponent_words(p) : exponent_vectors(p)
+   for (c, e) in zip(coefficients(p), es)
+      z = bitrotate(xor(z, hash(e, h)), 1)
+      z = bitrotate(xor(z, hash(c, h)), 1)
    end
-   return v
+   return z
 end
 
 ###############################################################################

@@ -14,37 +14,8 @@ elem_type(::Type{ExtPolyRing{T}}) where T <: Nemo.RingElem = sextpoly{T}
 
 parent_type(::Type{sextpoly{T}}) where T <: Nemo.RingElem = ExtPolyRing{T}
 
-has_global_ordering(R::ExtPolyRing) = Bool(libSingular.rHasGlobalOrdering(R.ptr))
-
-has_mixed_ordering(R::ExtPolyRing) = Bool(libSingular.rHasMixedOrdering(R.ptr))
-
-function has_local_ordering(R::ExtPolyRing)
-   return !has_global_ordering(R) && !has_mixed_ordering(R)
-end
-
-isquotient_ring(R::ExtPolyRing) = Bool(Singular.libSingular.rIsQuotientRing(R.ptr))
-
-characteristic(R::ExtPolyRing) = Int(libSingular.rChar(R.ptr))
-
-ordering(R::ExtPolyRing) = R.ord
-
 function degree_bound(R::ExtPolyRing)
    return Int(libSingular.rBitmask(R.ptr))
-end
-
-zero(R::ExtPolyRing) = R()
-
-one(R::ExtPolyRing) = R(1)
-
-
-function Base.hash(p::sextpoly{T}, h::UInt) where T <: Nemo.RingElem
-   v = 0xaf708b07f940b4d2%UInt
-   v = xor(hash(collect(exponent_vectors(p)), h), v)
-   for c in coefficients(p)
-      v = xor(hash(c, h), v)
-      v = (v << 1) | (v >> (sizeof(Int)*8 - 1))
-   end
-   return v
 end
 
 ###############################################################################
@@ -52,6 +23,7 @@ end
 #   String I/O
 #
 ###############################################################################          
+
 function show(io::IO, R::ExtPolyRing)
    s = libSingular.rString(R.ptr)
    if libSingular.rIsQuotientRing(R.ptr)
@@ -60,12 +32,6 @@ function show(io::IO, R::ExtPolyRing)
      print(io, "Singular Exterior Algebra ", s)
    end
 end
-
-show_minus_one(::Type{sextpoly{T}}) where T <: Nemo.RingElem = show_minus_one(T)
-
-needs_parentheses(x::sextpoly) = length(x) > 1
-
-isnegative(x::sextpoly) = isconstant(x) && !iszero(x) && isnegative(coeff(x, 0))
 
 ###############################################################################
 #

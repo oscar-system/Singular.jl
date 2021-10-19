@@ -70,14 +70,6 @@ function degree_bound(R::LPPolyRing)
    return R.deg_bound
 end
 
-has_global_ordering(R::LPPolyRing) = Bool(libSingular.rHasGlobalOrdering(R.ptr))
-
-has_mixed_ordering(R::LPPolyRing) = Bool(libSingular.rHasMixedOrdering(R.ptr))
-
-function has_local_ordering(R::LPPolyRing)
-   return !has_global_ordering(R) && !has_mixed_ordering(R)
-end
-
 function isgen(p::slppoly)
    R = parent(p)
    GC.@preserve R p begin
@@ -101,29 +93,6 @@ function isgen(p::slppoly)
       end
       return true
    end
-end
-
-function isquotient_ring(R::LPPolyRing)
-   GC.@preserve R return Bool(Singular.libSingular.rIsQuotientRing(R.ptr))
-end
-
-function characteristic(R::LPPolyRing)
-   GC.@preserve R return Int(libSingular.rChar(R.ptr))
-end
-
-ordering(R::LPPolyRing) = R.ord
-
-zero(R::LPPolyRing) = R()
-
-one(R::LPPolyRing) = R(1)
-
-function iszero(p::slppoly)
-   GC.@preserve p p.ptr.cpp_object == C_NULL
-end
-
-function isone(p::slppoly)
-   R = parent(p)
-   GC.@preserve R p return Bool(libSingular.p_IsOne(p.ptr, R.ptr))
 end
 
 ###############################################################################
@@ -173,16 +142,6 @@ function Base.iterate(x::SPolyExponentWords{<:slppoly{T}}, state) where T <: Nem
    else
       return _exponent_word(state, parent(x.poly), x.tmp), state
    end
-end
-
-function Base.hash(p::slppoly{T}, h::UInt) where T <: Nemo.RingElem
-   v = 0xaf708b07f940b4d2%UInt
-   for (c, e) in zip(coefficients(p), exponent_words(p))
-      v = xor(hash(e, h), v)
-      v = xor(hash(c, h), v)
-      v = (v << 1) | (v >> (sizeof(Int)*8 - 1))
-   end
-   return v
 end
 
 function _exponent_word_to_lp_vec!(v::Vector{Int}, w::Vector{Int},

@@ -14,20 +14,6 @@ elem_type(::Type{WeylPolyRing{T}}) where T <: Nemo.RingElem = sweylpoly{T}
 
 parent_type(::Type{sweylpoly{T}}) where T <: Nemo.RingElem = WeylPolyRing{T}
 
-has_global_ordering(R::WeylPolyRing) = Bool(libSingular.rHasGlobalOrdering(R.ptr))
-
-has_mixed_ordering(R::WeylPolyRing) = Bool(libSingular.rHasMixedOrdering(R.ptr))
-
-function has_local_ordering(R::WeylPolyRing)
-   return !has_global_ordering(R) && !has_mixed_ordering(R)
-end
-
-isquotient_ring(R::WeylPolyRing) = Bool(Singular.libSingular.rIsQuotientRing(R.ptr))
-
-characteristic(R::WeylPolyRing) = Int(libSingular.rChar(R.ptr))
-
-ordering(R::WeylPolyRing) = R.ord
-
 @doc Markdown.doc"""
     degree_bound(R::WeylPolyRing)
 
@@ -40,25 +26,13 @@ function degree_bound(R::WeylPolyRing)
    return Int(libSingular.rBitmask(R.ptr))
 end
 
-zero(R::WeylPolyRing) = R()
-
-one(R::WeylPolyRing) = R(1)
-
-function Base.hash(p::sweylpoly{T}, h::UInt) where T <: Nemo.RingElem
-   v = 0xa4c406868a7c20c5%UInt
-   v = xor(hash(collect(exponent_vectors(p)), h), v)
-   for c in coefficients(p)
-      v = xor(hash(c, h), v)
-      v = (v << 1) | (v >> (sizeof(Int)*8 - 1))
-   end
-   return v
-end
 
 ###############################################################################
 #
 #   String I/O
 #
 ###############################################################################          
+
 function show(io::IO, R::WeylPolyRing)
    s = libSingular.rString(R.ptr)
    if libSingular.rIsQuotientRing(R.ptr)
@@ -67,12 +41,6 @@ function show(io::IO, R::WeylPolyRing)
      print(io, "Singular Weyl Algebra ", s)
    end
 end
-
-show_minus_one(::Type{sweylpoly{T}}) where T <: Nemo.RingElem = show_minus_one(T)
-
-needs_parentheses(x::sweylpoly) = length(x) > 1
-
-isnegative(x::sweylpoly) = isconstant(x) && !iszero(x) && isnegative(coeff(x, 0))
 
 ###############################################################################
 #

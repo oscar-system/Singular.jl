@@ -14,20 +14,6 @@ elem_type(::Type{GPolyRing{T}}) where T <: Nemo.RingElem = sgpoly{T}
 
 parent_type(::Type{sgpoly{T}}) where T <: Nemo.RingElem = GPolyRing{T}
 
-has_global_ordering(R::GPolyRing) = Bool(libSingular.rHasGlobalOrdering(R.ptr))
-
-has_mixed_ordering(R::GPolyRing) = Bool(libSingular.rHasMixedOrdering(R.ptr))
-
-function has_local_ordering(R::GPolyRing)
-   return !has_global_ordering(R) && !has_mixed_ordering(R)
-end
-
-isquotient_ring(R::GPolyRing) = Bool(Singular.libSingular.rIsQuotientRing(R.ptr))
-
-characteristic(R::GPolyRing) = Int(libSingular.rChar(R.ptr))
-
-ordering(R::GPolyRing) = R.ord
-
 @doc Markdown.doc"""
     degree_bound(R::GPolyRing)
 
@@ -36,20 +22,6 @@ largest positive value any degree can have before an overflow will occur.
 """
 function degree_bound(R::GPolyRing)
    return Int(libSingular.rBitmask(R.ptr))
-end
-
-zero(R::GPolyRing) = R()
-
-one(R::GPolyRing) = R(1)
-
-function Base.hash(p::sgpoly{T}, h::UInt) where T <: Nemo.RingElem
-   v = 0xaf708b07f940b4d2%UInt
-   v = xor(hash(collect(exponent_vectors(p)), h), v)
-   for c in coefficients(p)
-      v = xor(hash(c, h), v)
-      v = (v << 1) | (v >> (sizeof(Int)*8 - 1))
-   end
-   return v
 end
 
 ###############################################################################
