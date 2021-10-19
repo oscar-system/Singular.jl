@@ -56,35 +56,50 @@ mutable struct sgpoly{T <: Nemo.RingElem} <: AbstractAlgebra.NCRingElem
 end
 
 function sgpoly{T}(R::GPolyRing{T}) where T <: Nemo.RingElem
-   p = libSingular.p_ISet(0, R.ptr)
-   return sgpoly{T}(R, p)
+   GC.@preserve R begin
+      p = libSingular.p_ISet(0, R.ptr)
+      return sgpoly{T}(R, p)
+   end
 end
 
 function sgpoly{T}(R::GPolyRing{T}, p::T) where T <: Nemo.RingElem
-   n = libSingular.n_Copy(p.ptr, parent(p).ptr)
-   r = libSingular.p_NSet(n, R.ptr)
-   return sgpoly{T}(R, r)
+   S = parent(p)
+   GC.@preserve R S p begin
+      n = libSingular.n_Copy(p.ptr, S.ptr)
+      r = libSingular.p_NSet(n, R.ptr)
+      return sgpoly{T}(R, r)
+   end
 end
 
 function sgpoly{T}(R::GPolyRing{T}, n::libSingular.number_ptr) where T <: Nemo.RingElem
-   nn = libSingular.n_Copy(n, base_ring(R).ptr)
-   p = libSingular.p_NSet(nn, R.ptr)
-   return sgpoly{T}(R, p)
+   S = base_ring(R)
+   GC.@preserve R S begin
+      nn = libSingular.n_Copy(n, S.ptr)
+      p = libSingular.p_NSet(nn, R.ptr)
+      return sgpoly{T}(R, p)
+   end
 end
 
 function sgpoly{T}(R::GPolyRing{T}, n::Ptr{Cvoid}) where T <: Nemo.RingElem
-   p = libSingular.p_NSet(n, R.ptr)
-   return sgpoly{T}(R, p)
+   GC.@preserve R begin
+      p = libSingular.p_NSet(n, R.ptr)
+      return sgpoly{T}(R, p)
+   end
 end
 
 function sgpoly{T}(R::GPolyRing{T}, b::Int) where T <: Nemo.RingElem
-   p = libSingular.p_ISet(b, R.ptr)
-   return sgpoly{T}(R, p)
+   GC.@preserve R begin
+      p = libSingular.p_ISet(b, R.ptr)
+      return sgpoly{T}(R, p)
+   end
 end
 
 function sgpoly{T}(R::GPolyRing{T}, b::BigInt) where T <: Nemo.RingElem
-   n = libSingular.n_InitMPZ(b, R.base_ring.ptr)
-   p = libSingular.p_NSet(n, R.ptr)
-   return sgpoly{T}(R, p)
+   S = base_ring(R)
+   GC.@preserve R S begin
+      n = libSingular.n_InitMPZ(b, S.ptr)
+      p = libSingular.p_NSet(n, R.ptr)
+      return sgpoly{T}(R, p)
+   end
 end
 

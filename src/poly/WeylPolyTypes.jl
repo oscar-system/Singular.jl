@@ -80,68 +80,59 @@ mutable struct sweylpoly{T <: Nemo.RingElem} <: AbstractAlgebra.NCRingElem
    ptr::libSingular.poly_ptr
    parent::WeylPolyRing{T}
 
-   function sweylpoly{T}(R::WeylPolyRing{T}) where T <: Nemo.RingElem
-      p = libSingular.p_ISet(0, R.ptr)
-      z = new{T}(p, R)
-      R.refcount += 1
-      finalizer(_sweylpoly_clear_fn, z)
-      return z
-   end
-    
    function sweylpoly{T}(R::WeylPolyRing{T}, p::libSingular.poly_ptr) where T <: Nemo.RingElem
       z = new{T}(p, R)
       R.refcount += 1
-      finalizer(_sweylpoly_clear_fn, z)
-      return z
-   end
-    
-   function sweylpoly{T}(R::WeylPolyRing{T}, p::T) where T <: Nemo.RingElem
-      n = libSingular.n_Copy(p.ptr, parent(p).ptr)
-      r = libSingular.p_NSet(n, R.ptr)
-      z = new{T}(r, R)
-      R.refcount += 1
-      finalizer(_sweylpoly_clear_fn, z)
-      return z
-   end
-    
-   function sweylpoly{T}(R::WeylPolyRing{T}, n::libSingular.number_ptr) where T <: Nemo.RingElem
-      nn = libSingular.n_Copy(n, base_ring(R).ptr)
-      p = libSingular.p_NSet(nn, R.ptr)
-      z = new{T}(p, R)
-      R.refcount += 1
-      finalizer(_sweylpoly_clear_fn, z)
-      return z
-   end
-
-   function sweylpoly{T}(R::WeylPolyRing{T}, n::Ptr{Cvoid}) where T <: Nemo.RingElem
-      p = libSingular.p_NSet(n, R.ptr)
-      z = new(p, R)
-      R.refcount += 1
-      finalizer(_sweylpoly_clear_fn, z)
-      return z
-   end
-
-   function sweylpoly{T}(R::WeylPolyRing{T}, b::Int) where T <: Nemo.RingElem
-      p = libSingular.p_ISet(b, R.ptr)
-      z = new{T}(p, R)
-      R.refcount += 1
-      finalizer(_sweylpoly_clear_fn, z)
-      return z
-   end
-
-   function sweylpoly{T}(R::WeylPolyRing{T}, b::BigInt) where T <: Nemo.RingElem
-      n = libSingular.n_InitMPZ(b, R.base_ring.ptr)
-      p = libSingular.p_NSet(n, R.ptr)
-      z = new{T}(p, R)
-      R.refcount += 1
-      finalizer(_sweylpoly_clear_fn, z)
+      finalizer(_spoly_clear_fn, z)
       return z
    end
 end
 
-function _sweylpoly_clear_fn(p::sweylpoly)
-   R = parent(p)
-   libSingular.p_Delete(p.ptr, R.ptr)
-   _PolyRing_clear_fn(R)
+function sweylpoly{T}(R::WeylPolyRing{T}) where T <: Nemo.RingElem
+   GC.@preserve R begin
+      p = libSingular.p_ISet(0, R.ptr)
+      return sweylpoly{T}(R, p)
+   end
+end
+
+function sweylpoly{T}(R::WeylPolyRing{T}, p::T) where T <: Nemo.RingElem
+   S = parent(p)
+   GC.@preserve R S p begin
+      n = libSingular.n_Copy(p.ptr, S.ptr)
+      r = libSingular.p_NSet(n, R.ptr)
+      return sweylpoly{T}(R, r)
+   end
+end
+
+function sweylpoly{T}(R::WeylPolyRing{T}, n::libSingular.number_ptr) where T <: Nemo.RingElem
+   S = base_ring(R)
+   GC.@preserve R S begin
+      nn = libSingular.n_Copy(n, S.ptr)
+      p = libSingular.p_NSet(nn, R.ptr)
+      return sweylpoly{T}(R, p)
+   end
+end
+
+function sweylpoly{T}(R::WeylPolyRing{T}, n::Ptr{Cvoid}) where T <: Nemo.RingElem
+   GC.@preserve R begin
+      p = libSingular.p_NSet(n, R.ptr)
+      return sweylpoly{T}(R, p)
+   end
+end
+
+function sweylpoly{T}(R::WeylPolyRing{T}, b::Int) where T <: Nemo.RingElem
+   GC.@preserve R begin
+      p = libSingular.p_ISet(b, R.ptr)
+      return sweylpoly{T}(R, p)
+   end
+end
+
+function sweylpoly{T}(R::WeylPolyRing{T}, b::BigInt) where T <: Nemo.RingElem
+   S = base_ring(R)
+   GC.@preserve R S begin
+      n = libSingular.n_InitMPZ(b, S.ptr)
+      p = libSingular.p_NSet(n, R.ptr)
+      return sweylpoly{T}(R, p)
+   end
 end
 

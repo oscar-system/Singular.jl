@@ -75,68 +75,59 @@ mutable struct sextpoly{T <: Nemo.RingElem} <: AbstractAlgebra.NCRingElem
    ptr::libSingular.poly_ptr
    parent::ExtPolyRing{T}
 
-   function sextpoly{T}(R::ExtPolyRing{T}) where T <: Nemo.RingElem
-      p = libSingular.p_ISet(0, R.ptr)
-      z = new{T}(p, R)
-      R.refcount += 1
-      finalizer(_sextpoly_clear_fn, z)
-      return z
-   end
-    
    function sextpoly{T}(R::ExtPolyRing{T}, p::libSingular.poly_ptr) where T <: Nemo.RingElem
       z = new{T}(p, R)
       R.refcount += 1
-      finalizer(_sextpoly_clear_fn, z)
-      return z
-   end
-    
-   function sextpoly{T}(R::ExtPolyRing{T}, p::T) where T <: Nemo.RingElem
-      n = libSingular.n_Copy(p.ptr, parent(p).ptr)
-      r = libSingular.p_NSet(n, R.ptr)
-      z = new{T}(r, R)
-      R.refcount += 1
-      finalizer(_sextpoly_clear_fn, z)
-      return z
-   end
-    
-   function sextpoly{T}(R::ExtPolyRing{T}, n::libSingular.number_ptr) where T <: Nemo.RingElem
-      nn = libSingular.n_Copy(n, base_ring(R).ptr)
-      p = libSingular.p_NSet(nn, R.ptr)
-      z = new{T}(p, R)
-      R.refcount += 1
-      finalizer(_sextpoly_clear_fn, z)
-      return z
-   end
-
-   function sextpoly{T}(R::ExtPolyRing{T}, n::Ptr{Cvoid}) where T <: Nemo.RingElem
-      p = libSingular.p_NSet(n, R.ptr)
-      z = new(p, R)
-      R.refcount += 1
-      finalizer(_sextpoly_clear_fn, z)
-      return z
-   end
-
-   function sextpoly{T}(R::ExtPolyRing{T}, b::Int) where T <: Nemo.RingElem
-      p = libSingular.p_ISet(b, R.ptr)
-      z = new{T}(p, R)
-      R.refcount += 1
-      finalizer(_sextpoly_clear_fn, z)
-      return z
-   end
-
-   function sextpoly{T}(R::ExtPolyRing{T}, b::BigInt) where T <: Nemo.RingElem
-      n = libSingular.n_InitMPZ(b, R.base_ring.ptr)
-      p = libSingular.p_NSet(n, R.ptr)
-      z = new{T}(p, R)
-      R.refcount += 1
-      finalizer(_sextpoly_clear_fn, z)
+      finalizer(_spoly_clear_fn, z)
       return z
    end
 end
+    
+function sextpoly{T}(R::ExtPolyRing{T}) where T <: Nemo.RingElem
+   GC.@preserve R begin
+      p = libSingular.p_ISet(0, R.ptr)
+      return sextpoly{T}(R, p)
+   end
+end
 
-function _sextpoly_clear_fn(p::sextpoly)
-   R = parent(p)
-   libSingular.p_Delete(p.ptr, R.ptr)
-   _PolyRing_clear_fn(R)
+function sextpoly{T}(R::ExtPolyRing{T}, p::T) where T <: Nemo.RingElem
+   S = parent(p)
+   GC.@preserve R S p begin
+      n = libSingular.n_Copy(p.ptr, S.ptr)
+      r = libSingular.p_NSet(n, R.ptr)
+      return sextpoly{T}(R, r)
+   end
+end
+
+function sextpoly{T}(R::ExtPolyRing{T}, n::libSingular.number_ptr) where T <: Nemo.RingElem
+   S = base_ring(R)
+   GC.@preserve R S begin
+      nn = libSingular.n_Copy(n, S.ptr)
+      p = libSingular.p_NSet(nn, R.ptr)
+      return sextpoly{T}(R, p)
+   end
+end
+
+function sextpoly{T}(R::ExtPolyRing{T}, n::Ptr{Cvoid}) where T <: Nemo.RingElem
+   GC.@preserve R begin
+      p = libSingular.p_NSet(n, R.ptr)
+      return sextpoly{T}(R, p)
+   end
+end
+
+function sextpoly{T}(R::ExtPolyRing{T}, b::Int) where T <: Nemo.RingElem
+   GC.@preserve R begin
+      p = libSingular.p_ISet(b, R.ptr)
+      return sextpoly{T}(R, p)
+   end
+end
+
+function sextpoly{T}(R::ExtPolyRing{T}, b::BigInt) where T <: Nemo.RingElem
+   S = base_ring(R)
+   GC.@preserve R S begin
+      n = libSingular.n_InitMPZ(b, S.ptr)
+      p = libSingular.p_NSet(n, R.ptr)
+      return sextpoly{T}(R, p)
+   end
 end
 
