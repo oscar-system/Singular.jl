@@ -15,63 +15,59 @@ mutable struct ExtPolyRing{T <: Nemo.RingElem} <: AbstractAlgebra.NCRing
    ord::Symbol
    S::Vector{Symbol}
 
-   function ExtPolyRing{T}(R::Union{Ring, Field}, s::Array{Symbol, 1},
-         ord_sym::Symbol, cached::Bool = true,
-         ordering::libSingular.rRingOrder_t = ringorder_dp,
-         ordering2::libSingular.rRingOrder_t = ringorder_C) where T
-
-      length(s) >= 2 || error("need at least two indeterminates")
-
-      # check ordering: accept exactly one of ringorder_c, ringorder_C
-      if (((ordering == ringorder_c || ordering == ringorder_C)
-               && (ordering2 == ringorder_c || ordering2 == ringorder_C))
-            || ((ordering != ringorder_c && ordering != ringorder_C)
-               && (ordering2 != ringorder_c && ordering2 != ringorder_C)))
-         error("wrong ordering")
-      end
-      n_vars = Cint(length(s));
-      if haskey(ExtPolyRingID, (R, s, ordering, ordering2))
-         return ExtPolyRingID[R, s, ordering, ordering2]::ExtPolyRing{T}
-      else
-         v = [pointer(Base.Vector{UInt8}(string(str)*"\0")) for str in s]
-         r = libSingular.nCopyCoeff(R.ptr)
-         
-         blk0 = unsafe_wrap(Array, Ptr{Cint}(libSingular.omAlloc0(Csize_t(3*sizeof(Cint)))), 3; own=false)
-         blk1 = unsafe_wrap(Array, Ptr{Cint}(libSingular.omAlloc0(Csize_t(3*sizeof(Cint)))), 3; own=false)
-         if (ordering == ringorder_c || ordering == ringorder_C)
-            blk0[1] = Cint(0)
-            blk1[1] = Cint(0)
-            blk0[2] = Cint(1)
-            blk1[2] = Cint(length(v))
-         else
-            blk0[1] = Cint(1)
-            blk1[1] = Cint(length(v))
-            blk0[2] = Cint(0)
-            blk1[2] = Cint(0)
-         end
-         ord = Array{libSingular.rRingOrder_t, 1}(undef, 3)
-         ord[1] = ordering
-         ord[2] = ordering2
-         ord[3] = ringorder_no
-         ptr = libSingular.rExterior(r, v, ord, blk0, blk1, Culong(0)) # TODO remove the useless degbound parameter
-         d = ExtPolyRingID[R, s, ordering, ordering2] = new(ptr, 1, R, ord_sym, s)
-         finalizer(_ExtPolyRing_clear_fn, d)
-         return d
-      end
+   # take ownership of a ring_ptr
+   function ExtPolyRing{T}(r::libSingular.ring_ptr, R, ord::Symbol,
+                           s::Vector{Symbol}=singular_symbols(r)) where T <: Nemo.RingElem
+      d = new(r, 1, R, ord, s)
+      finalizer(_PolyRing_clear_fn, d)
+      return d
    end
 end
 
-function (R::ExtPolyRing{T})(r::libSingular.ring_ptr) where T
-    new_r = deepcopy(R)
-    new_ptr = new_r.ptr
-    new_r.ptr = r
-    return new_r
-end
+# TODO clean up this mess and support fancy orderings
+function ExtPolyRing{T}(R::Union{Ring, Field}, s::Array{Symbol, 1},
+                        ord_sym::Symbol, cached::Bool = true,
+                        ordering::libSingular.rRingOrder_t = ringorder_dp,
+                        ordering2::libSingular.rRingOrder_t = ringorder_C) where T
 
-function _ExtPolyRing_clear_fn(R::ExtPolyRing)
-   R.refcount -= 1
-   if R.refcount == 0
-      libSingular.rDelete(R.ptr)
+   length(s) >= 2 || error("need at least two indeterminates")
+
+   # check ordering: accept exactly one of ringorder_c, ringorder_C
+   if (((ordering == ringorder_c || ordering == ringorder_C)
+            && (ordering2 == ringorder_c || ordering2 == ringorder_C))
+         || ((ordering != ringorder_c && ordering != ringorder_C)
+            && (ordering2 != ringorder_c && ordering2 != ringorder_C)))
+      error("wrong ordering")
+   end
+   n_vars = Cint(length(s));
+   if cached && haskey(ExtPolyRingID, (R, s, ordering, ordering2))
+      return ExtPolyRingID[R, s, ordering, ordering2]::ExtPolyRing{T}
+   else
+      ss = rename_symbols(all_singular_symbols(R), String.(s), "x")
+      v = [pointer(Base.Vector{UInt8}(string(str)*"\0")) for str in ss]
+      r = libSingular.nCopyCoeff(R.ptr)
+
+      blk0 = unsafe_wrap(Array, Ptr{Cint}(libSingular.omAlloc0(Csize_t(3*sizeof(Cint)))), 3; own=false)
+      blk1 = unsafe_wrap(Array, Ptr{Cint}(libSingular.omAlloc0(Csize_t(3*sizeof(Cint)))), 3; own=false)
+      if (ordering == ringorder_c || ordering == ringorder_C)
+         blk0[1] = Cint(0)
+         blk1[1] = Cint(0)
+         blk0[2] = Cint(1)
+         blk1[2] = Cint(length(v))
+      else
+         blk0[1] = Cint(1)
+         blk1[1] = Cint(length(v))
+         blk0[2] = Cint(0)
+         blk1[2] = Cint(0)
+      end
+      ord = Array{libSingular.rRingOrder_t, 1}(undef, 3)
+      ord[1] = ordering
+      ord[2] = ordering2
+      ord[3] = ringorder_no
+      ptr = libSingular.rExterior(r, v, ord, blk0, blk1, Culong(0)) # TODO remove the useless degbound parameter
+      z = ExtPolyRing{T}(ptr, R, ord_sym, s)
+      ExtPolyRingID[R, s, ordering, ordering2] = z
+      return z
    end
 end
 
@@ -141,6 +137,6 @@ end
 function _sextpoly_clear_fn(p::sextpoly)
    R = parent(p)
    libSingular.p_Delete(p.ptr, R.ptr)
-   _ExtPolyRing_clear_fn(R)
+   _PolyRing_clear_fn(R)
 end
 

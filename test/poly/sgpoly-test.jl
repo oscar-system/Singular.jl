@@ -52,6 +52,7 @@
    @test !has_mixed_ordering(R)
 
    @test symbols(R) == [:x, :y]
+   @test Singular.singular_symbols(R) == symbols(R)
 end
 
 @testset "sgpoly.printing" begin
@@ -62,6 +63,15 @@ end
    @test string(x) == "x"
    @test string(y) == "y"
    @test string(x^2 + 2*y + 3) == "x^2 + 2*y + 3"
+end
+
+@testset "sglpoly.rename" begin
+   s = ["x[1]", "x[2]"]
+   r, x = PolynomialRing(QQ, s, ordering = :degrevlex)
+   R, x = GAlgebra(r, Singular.Matrix(r, [1 1; 0 1]),
+                      Singular.Matrix(r, [0 x[1]; 0 0]))
+   @test String.(symbols(R)) == s
+   @test String.(Singular.singular_symbols(R)) == ["x_1", "x_2"]
 end
 
 @testset "sgpoly.manipulation" begin
@@ -137,15 +147,6 @@ end
    @test trailing_coefficient(4x) == 4
    @test trailing_coefficient(R(3)) == 3
    @test trailing_coefficient(R()) == 0
-end
-
-@testset "sgpoly.change_base_ring" begin
-end
-
-@testset "sgpoly.multivariate_coeff" begin
-end
-
-@testset "sgpoly.unary_ops" begin
 end
 
 @testset "sgpoly.binary_ops" begin

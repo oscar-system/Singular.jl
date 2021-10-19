@@ -49,6 +49,7 @@
    @test !has_mixed_ordering(R)
 
    @test symbols(R) == [:x, :y, :z]
+   @test Singular.singular_symbols(R) == symbols(R)
 end
 
 @testset "slppoly.printing" begin
@@ -60,6 +61,13 @@ end
    @test string(one(R)) == "1"
    @test string(x^2 + 2*y + 3) == "x^2 + 2*y + 3"
    @test string(2*y^2*x^2 + y*x^2*y + x + 3) == "2*y^2*x^2 + y*x^2*y + x + 3"
+end
+
+@testset "slppoly.rename" begin
+   s = ["x[1]", "x[2]", "x[3]"]
+   R, x = FreeAlgebra(QQ, s, 1)
+   @test String.(symbols(R)) == s
+   @test String.(Singular.singular_symbols(R)) == ["x_1", "x_2", "x_3"]
 end
 
 @testset "slppoly.manipulation" begin

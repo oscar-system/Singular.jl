@@ -99,13 +99,12 @@ function symbols(R::PolyRingUnion)
    return R.S
 end
 
-function singular_symbols(r::libSingular.ring_ptr)
-   n = Int(libSingular.rVar(r))
+function singular_symbols(r::libSingular.ring_ptr, n::Int = Int(libSingular.rVar(r)))
    return [Symbol(libSingular.rRingVar(Cshort(i - 1), r)) for i in 1:n]
 end
 
-function singular_symbols(R::PolyRing)
-   GC.@preserve R return [Symbol(libSingular.rRingVar(Cshort(i - 1), R.ptr)) for i in 1:nvars(R)]
+function singular_symbols(R::Union{PolyRing, GPolyRing, WeylPolyRing, ExtPolyRing})
+   GC.@preserve R return singular_symbols(R.ptr)
 end
 
 ordering(R::PolyRing) = R.ord

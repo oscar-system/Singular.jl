@@ -12,7 +12,7 @@ and elements thereof are given in the following table.
 -----------------|-----------------|--------------------|-----------
 GAlgebra         | `sgpoly{T}`     | `GPolyRing{T}`     | PLURAL
 WeylAlgebra      | `sweylpoly{T}`  | `WeylPolyRing{T}`  | PLURAL
-ExteriourAlgebra | `sextpoly{T}`   | `ExtPolyRing{T}`   | PLURAL + quotient
+ExteriorAlgebra  | `sextpoly{T}`   | `ExtPolyRing{T}`   | PLURAL + quotient
 FreeAlgebra      | `slppoly{T}`    | `LPPolyRing{T}`    | LETTERPLACE
 
 These types are parameterized by the type of elements in the coefficient ring
@@ -131,7 +131,7 @@ FreeAlgebra(R::Union{Ring, Field}, x::Vector{String}, degree_bound::Int;
 Construct the free associative algebra $R \langle x_1,\dots,x_n \rangle$.
 
 !!! note
-    Since this uses the LETTERPLACE backend, a `degree_bound`, which is the
+    Since this uses the LETTERPLACE backend, the `degree_bound`, which is the
     maximum length on any monomial word in the algebra, must be specified.
     Multiplication is checked and throws when the resulting degree exceeds this
     bound.

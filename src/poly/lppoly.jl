@@ -126,7 +126,7 @@ function gen(R::LPPolyRing, i::Int)
 end
 
 function singular_symbols(R::LPPolyRing)
-   GC.@preserve R return singular_symbols(R.ptr)
+   GC.@preserve R return singular_symbols(R.ptr, nvars(R))
 end
 
 ordering(R::LPPolyRing) = R.ord

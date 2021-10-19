@@ -50,6 +50,7 @@
    @test !has_mixed_ordering(R)
 
    @test symbols(R) == [:x, :y, :z, :dx, :dy, :dz]
+   @test Singular.singular_symbols(R) == symbols(R)
 end
 
 @testset "sweylpoly.printing" begin
@@ -63,6 +64,9 @@ end
 end
 
 @testset "sweylpoly.rename" begin
+   R, x = WeylAlgebra(QQ, ["x[1]", "x[2]", "x[3]"])
+   @test String.(symbols(R)) == ["x[1]", "x[2]", "x[3]", "dx[1]", "dx[2]", "dx[3]"]
+   @test String.(Singular.singular_symbols(R)) == ["x_1", "x_2", "x_3", "dx_1", "dx_2", "dx_3"]
 end
 
 @testset "sweylpoly.manipulation" begin
@@ -141,15 +145,6 @@ end
    @test trailing_coefficient(R()) == 0
 end
 
-@testset "sweylpoly.change_base_ring" begin
-end
-
-@testset "sweylpoly.multivariate_coeff" begin
-end
-
-@testset "sweylpoly.unary_ops" begin
-end
-
 @testset "sweylpoly.binary_ops" begin
    R, (x, y, dx, dy) = WeylAlgebra(QQ, ["x" "y"; "dx" "dy"])
    @test y*x == x*y
@@ -157,24 +152,6 @@ end
    @test dy*y == y*dy + 1
    @test dx*x == x*dx + 1
    @test dx^2*(x^2 + y) == 2 + 4*x*dx + (x^2 + y)*dx^2
-end
-
-@testset "sweylpoly.comparison" begin
-end
-
-@testset "sweylpoly.powering" begin
-end
-
-@testset "sweylpoly.exact_division" begin
-end
-
-@testset "sweylpoly.adhoc_exact_division" begin
-end
-
-@testset "sweylpoly.adhoc_binary_operation" begin
-end
-
-@testset "sweylpoly.divides" begin
 end
 
 @testset "sweylpoly.hash" begin

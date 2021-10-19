@@ -51,6 +51,7 @@
 
    @test length(symbols(R)) == 3
    @test symbols(R) == [:x, :y, :z]
+   @test Singular.singular_symbols(R) == symbols(R)
 end
 
 @testset "sweylpoly.printing" begin
@@ -60,6 +61,13 @@ end
    @test string(dy) == "dy"
    @test string(dz) == "dz"
    @test string(2*dx*dy*dz - 1) == "2*dx*dy*dz - 1"
+end
+
+@testset "sweylpoly.rename" begin
+   s = ["x[1]", "x[2]", "x[3]"]
+   R, x = ExteriorAlgebra(QQ, s)
+   @test String.(symbols(R)) == s
+   @test String.(Singular.singular_symbols(R)) == ["x_1", "x_2", "x_3"]
 end
 
 @testset "sextpoly.manipulation" begin
