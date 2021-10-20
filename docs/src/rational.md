@@ -34,51 +34,16 @@ QQ(n::fmpz)
 
 Construct a Singular rational from the given integer $n$.
 
-### Basic manipulation
-
-```@docs
-numerator(::n_Q)
-```
-
-```@docs
-denominator(::n_Q)
-```
-
-```@docs
-abs(::n_Q)
-```
-
-```julia
-f = QQ(-12, 7)
-
-h = numerator(QQ)
-k = denominator(QQ)
-m = abs(f)
-```
-
-### Comparison
-
-Here is a list of the comparison functions implemented, with the understanding
-that `isless` provides all the usual comparison operators.
-
-Function                   |
----------------------------|
-`isless(a::n_Q, b::n_Q)`   |
-
-We also provide the following ad hoc comparisons which again provide all of the
-comparison operators mentioned above.
-
-Function                     |
------------------------------|
-`isless(a::n_Q, b::Integer)` |
-`isless(a::Integer, b::n_Q)` |
-
 **Examples**
 
 ```julia
+f = QQ(-12, 7)
+h = numerator(QQ)
+k = denominator(QQ)
+m = abs(f)
+
 a = QQ(12, 7)
 b = QQ(-3, 5)
-
 a > b
 a != b
 a > 1

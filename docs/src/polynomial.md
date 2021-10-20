@@ -238,14 +238,6 @@ T = @PolynomialRing(QQ, "y", 10)
 ### Basic manipulation
 
 ```@docs
-nvars(::PolyRing)
-```
-
-```@docs
-symbols(::PolyRing)
-```
-
-```@docs
 has_global_ordering(R::PolyRing)
 ```
 
@@ -365,10 +357,6 @@ c = content(f)
 For the Singular base fields `QQ` and `Fp` a function to compute a
 squarefree factorization is available.
 
-```@docs
-Singular.factor_squarefree(p::spoly)
-```
-
 **Examples**
 
 ```julia
@@ -382,10 +370,6 @@ Fac = factor(f)
 For the Singular base rings `QQ`, `ZZ` and `Fp` a function to compute the
 multivariate factorization is available.
 
-```@docs
-Singular.factor(p::spoly)
-```
-
 **Examples**
 
 ```julia
@@ -395,14 +379,11 @@ f = 123*(57*x2^3 + x4^5)^3*(x1^2 + x1+1)^2*(x1 + x2*x3)^2
 
 Fac = factor(f)
 ```
+
 ### Change of coefficient rings
 
 It is possible to change the coefficient ring of a given polynomial $p$ via
 the function 'change_base_ring'.
-
-```@docs
-Singular.change_base_ring(C::Union{Ring, Field}, p::spoly)
-```
 
 **Examples**
 
@@ -414,9 +395,8 @@ p = x^5 + y^3+1
 change_base_ring(QQ, p)
 ```
 
-It also possible to work with Nemo rings, if a type conversion for the
-Singular coefficients is implemented. One has to cast the Nemo ring via
-'CoefficientRing' to a suitable Singular type.
+It also possible to work with Nemo rings by casting to a suitable Singular type
+via `CoefficientRing`.
 
 **Examples**
 

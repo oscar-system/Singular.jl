@@ -45,7 +45,7 @@ GAlgebra(R::PolyRing{T}, C::smatrix{spoly{T}}, D::smatrix{spoly{T}};
 ```
 
 Construct the G-algebra from a commutative polynomial ring $R$ and matrices $C$,
-$D$ over $R$. If the variables of $R$ are $x_1,\dots,x_n$ then the noncommutative
+$D$ over $R$. If the variables of $R$ are $x_1,\dots,x_n$, then the noncommutative
 algebra is constructed with relations $x_j x_i = c_{i,j} x_i x_j + d_{i,j}$ for
 $1 \le i < j \le n$. The $c_{i,j}$ must be constant polynomials and the monomial
 ordering of the ring $R$ must be a global ordering with
@@ -72,13 +72,13 @@ julia> y*x
 ### WeylAlgebra
 
 ```julia
-function WeylAlgebra(R::Union{Ring, Field}, x::Vector{String};
-                     cached::Bool = true, ordering::Symbol = :degrevlex,
-                     ordering2::Symbol = :comp1min, degree_bound::Int = 0)
+function WeylAlgebra(R::Union{Ring, Field}, s::Vector{String};
+                     ordering = :degrevlex, ordering2::Symbol = :comp1min,
+                     cached::Bool = true, degree_bound::Int = 0)
 
-function WeylAlgebra(R::Union{Ring, Field}, x::Matrix{String};
-                     cached::Bool = true, ordering::Symbol = :degrevlex,
-                     ordering2::Symbol = :comp1min, degree_bound::Int = 0)
+function WeylAlgebra(R::Union{Ring, Field}, s::Matrix{String};
+                     ordering = :degrevlex, ordering2::Symbol = :comp1min,
+                     cached::Bool = true, degree_bound::Int = 0)
 ```
 
 Construct the ring of differential operators $\partial_1, \dots, \partial_n$
@@ -101,15 +101,14 @@ julia> (dx*x, dx*y, dy*x, dy*y)
 ### ExteriorAlgebra
 
 ```julia
-ExteriorAlgebra(R::Union{Ring, Field}, x::Vector{String}; cached::Bool = true,
-                ordering::Symbol = :degrevlex, ordering2::Symbol = :comp1min)
+ExteriorAlgebra(R::Union{Ring, Field}, s::Vector{String};
+                ordering = :degrevlex, ordering2::Symbol = :comp1min,
+                cached::Bool = true)
 ```
 
 Construct the Exterior algebra as the quotient of the G-algebra with relations
-$x_j x_i = -x_i x_j$ by the relations $x_i^2 = 0$.
-
-!!! note
-    We currently require at least two variables for this algebra.
+$x_j x_i = -x_i x_j$ by the relations $x_i^2 = 0$. We currently require at least
+two variables for this algebra.
 
 **Examples**
 
@@ -124,8 +123,9 @@ julia> x*y + y*x
 ### FreeAlgebra
 
 ```julia
-FreeAlgebra(R::Union{Ring, Field}, x::Vector{String}, degree_bound::Int;
-            cached::Bool = true, ordering = :degrevlex, ordering2::Symbol = :comp1min)
+FreeAlgebra(R::Field, s::Vector{String}, degree_bound::Int;
+            ordering = :degrevlex, ordering2::Symbol = :comp1min,
+            cached::Bool = true)
 ```
 
 Construct the free associative algebra $R \langle x_1,\dots,x_n \rangle$.
