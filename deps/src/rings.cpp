@@ -134,15 +134,10 @@ auto rDefault_long_helper(coeffs                        cf,
     return r;
 }
 
-auto rDefault_Weyl_helper(coeffs                   cf,
-                     jlcxx::ArrayRef<uint8_t *>    vars,
-                     jlcxx::ArrayRef<rRingOrder_t> ord,
-                     int *                         blk0,
-                     int *                         blk1,
-                     unsigned long                 bitmask)
+// turn a normal commutative ring into WeylAlgebra
+// ownership of r is taken, so the caller doesn't have to clean up r
+ring weylAlgebra(ring r)
 {
-    auto r = rDefault_long_helper(cf, vars, ord, blk0, blk1, bitmask);
-
     // vars = indeterminates x1, ..., xn and then partials Dx1, ..., Dxn
     int n = r->N/2;
     assume(2*n == r->N);
@@ -179,7 +174,7 @@ auto rDefault_Weyl_helper(coeffs                   cf,
 }
 
 // adapted from jiA_RING in ipassign.cc
-static ring make_qring(ring r, ideal id)
+ring make_qring(ring r, ideal id)
 {
     const ring origin = currRing;
     rChangeCurrRing(r);
@@ -266,15 +261,10 @@ static ring make_qring(ring r, ideal id)
     return qr;
 }
 
-
-auto rDefault_Exterior_helper(coeffs               cf,
-                     jlcxx::ArrayRef<uint8_t *>    vars,
-                     jlcxx::ArrayRef<rRingOrder_t> ord,
-                     int *                         blk0,
-                     int *                         blk1,
-                     unsigned long                 bitmask)
+// turn a normal commutative ring into ExteriorAlgebra
+// ownership of r is taken, so the caller doesn't have to clean up r
+ring exteriorAlgebra(ring r)
 {
-    auto r = rDefault_long_helper(cf, vars, ord, blk0, blk1, bitmask);
     int n = rVar(r);
     // first construct relations xj*xi = -xi*xj
     poly p = p_Neg(p_One(r), r);
@@ -298,12 +288,12 @@ void singular_define_rings(jlcxx::Module & Singular)
        return reinterpret_cast<spolyrec*>(ptr);
     });
     Singular.method("freeAlgebra", &freeAlgebra);
+    Singular.method("weylAlgebra", &weylAlgebra);
+    Singular.method("exteriorAlgebra", &exteriorAlgebra);
     Singular.method("rDefault_helper", &rDefault_helper);
     Singular.method("rDefault_wvhdl_helper", &rDefault_wvhdl_helper);
     Singular.method("rOrdering_helper", &rOrdering_helper); // inverse of rDefault_wvhdl_helper
     Singular.method("rDefault_long_helper", &rDefault_long_helper);
-    Singular.method("rDefault_Weyl_helper", &rDefault_Weyl_helper);
-    Singular.method("rDefault_Exterior_helper", &rDefault_Exterior_helper);
     Singular.method("nc_CallPlural", [](matrix C, matrix D, ring r) {
         ring R = rCopy(r);
         nc_CallPlural(mp_Copy(C,r), mp_Copy(D,r), NULL, NULL, R, true, false, true, r);
@@ -320,7 +310,8 @@ void singular_define_rings(jlcxx::Module & Singular)
     Singular.method("rGetVar", &rGetVar);
     Singular.method("rVar", &rVar);
     Singular.method("rIsLPRing", [](const ring r) {
-        // return is 0 for not LP Ring, otherwise the number of variables for this ring
+        // return is 0 for not letterplace Ring
+        // otherwise the number of variables for this letterplace ring
         #ifdef HAVE_SHIFTBBA
             return r->isLPring;
         #else
@@ -345,10 +336,12 @@ void singular_define_rings(jlcxx::Module & Singular)
     });
     Singular.method("rCopy", rCopy);
     Singular.method("rQuotientRing", [](ideal i, ring r) {
+        // This looks too simple, try make_qring if it doesn't work.
         ring Q = rCopy(r);
         Q->qideal = id_Copy(i, r);
         return Q;
     });
+    Singular.method("make_qring", &make_qring);
     Singular.method("rBitmask",
                     [](ip_sring * r) { return (unsigned int)r->bitmask; });
     Singular.method("rPar", [](coeffs cf){
