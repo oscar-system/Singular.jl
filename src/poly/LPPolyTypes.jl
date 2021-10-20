@@ -20,6 +20,7 @@ mutable struct LPPolyRing{T <: Nemo.RingElem} <: AbstractAlgebra.NCRing
    # take ownership of a ring ptr
    function LPPolyRing{T}(r::libSingular.ring_ptr, R, deg_bound::Int,
                           s::Vector{Symbol}=singular_symbols(r)) where T
+      @assert r.cpp_object != C_NULL
       ord = Cint[]
       libSingular.rOrdering_helper(ord, r)
       z = new(r, R, deserialize_ordering(ord), deg_bound, 1, s)
@@ -48,7 +49,6 @@ function LPPolyRing{T}(R::Union{Ring, Field}, s::Vector{Symbol},
          error("could not construct LPPolyRing from $R, $ord: "*
                libSingular.get_and_clear_error())
       end
-      @assert ptr2.cpp_object != C_NULL
       z = LPPolyRing{T}(ptr2, R, deg_bound, s)
       LPPolyRingID[R, s, sord, deg_bound] = z
       return z

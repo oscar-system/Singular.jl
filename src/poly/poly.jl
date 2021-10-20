@@ -2027,9 +2027,9 @@ end
 #
 ###############################################################################
 
-function _PolynomialRing(R, s::Vector{String}, ordering, ordering2, cached, degree_bound)
-   T = elem_type(R)
-   if isa(ordering, Symbol)
+# turn user input into an sordering
+function get_fancy_ordering(ordering, ordering2)
+   if ordering isa Symbol
       ord1 = sym2ringorder[ordering]
       ord2 = sym2ringorder[ordering2]
       if (Int(ord1 == ringorder_c || ord1 == ringorder_C) +
@@ -2040,13 +2040,18 @@ function _PolynomialRing(R, s::Vector{String}, ordering, ordering2, cached, degr
       if ord2 != ringorder_C
          push!(fancy_ordering.data, sorder_block(ord2, 0, Int[]))
       end
-   elseif isa(ordering, sordering)
+   elseif ordering isa sordering
       fancy_ordering = ordering
    else
       error("ordering must be a Symbol or an sordering")
    end
-   parent_obj = PolyRing{T}(R, Symbol.(s), fancy_ordering, cached, degree_bound)
-   return tuple(parent_obj, gens(parent_obj))
+   return fancy_ordering::sordering
+end
+
+function _PolynomialRing(R, s::Vector{String}, ordering, ordering2, cached, degree_bound)
+   sord = get_fancy_ordering(ordering, ordering2)
+   z = PolyRing{elem_type(R)}(R, Symbol.(s), sord, cached, degree_bound)
+   return (z, gens(z))
 end
 
 # keyword arguments do not participate in dispatch
@@ -2056,9 +2061,9 @@ function PolynomialRing(R::Union{Ring, Field}, s::Vector{String};
    return _PolynomialRing(R, s, ordering, ordering2, cached, degree_bound)
 end
 
-function PolynomialRing(R::Nemo.Ring, s::Vector{String}; cached::Bool = true,
-      ordering = :degrevlex, ordering2::Symbol = :comp1min,
-      degree_bound::Int = 0)
+function PolynomialRing(R::Nemo.Ring, s::Vector{String};
+                        ordering = :degrevlex, ordering2::Symbol = :comp1min,
+                        cached::Bool = true, degree_bound::Int = 0)
    R = CoefficientRing(R)
    return _PolynomialRing(R, s, ordering, ordering2, cached, degree_bound)
 end

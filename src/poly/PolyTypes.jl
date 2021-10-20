@@ -36,6 +36,7 @@ mutable struct PolyRing{T <: Nemo.RingElem} <: Nemo.MPolyRing{T}
 
    # take ownership of a ring ptr
    function PolyRing{T}(r::libSingular.ring_ptr, R, s::Vector{Symbol}=singular_symbols(r)) where T
+      @assert r.cpp_object != C_NULL
       ord = Cint[]
       libSingular.rOrdering_helper(ord, r)
       d = new(r, 1, R, deserialize_ordering(ord), s)
@@ -49,6 +50,7 @@ function PolyRing{T}(R::Union{Ring, Field}, s::Vector{Symbol},
                      degree_bound::Int = 0) where T
    bitmask = Culong(degree_bound)
    nvars = length(s)
+   nvars > 0 || error("need at least one indeterminate")
    # internally in libSingular, degree_bound is set to
    deg_bound_fix = Int(libSingular.rGetExpSize(bitmask, Cint(nvars)))
    sord = serialize_ordering(nvars, ord)

@@ -54,16 +54,19 @@
    @test Singular.singular_symbols(R) == symbols(R)
 end
 
-@testset "sweylpoly.printing" begin
+@testset "sextpoly.printing" begin
    r, (dx, dy, dz) = ExteriorAlgebra(QQ, ["dx", "dy", "dz"], ordering = :degrevlex)
 
    @test string(dx) == "dx"
    @test string(dy) == "dy"
    @test string(dz) == "dz"
    @test string(2*dx*dy*dz - 1) == "2*dx*dy*dz - 1"
+
+   r, (a, b, c, d) = ExteriorAlgebra(QQ, ["a", "b", "c", "d"], ordering = :lex)
+   @test string(a - b*c*d) == "a - b*c*d"
 end
 
-@testset "sweylpoly.rename" begin
+@testset "sextpoly.rename" begin
    s = ["x[1]", "x[2]", "x[3]"]
    R, x = ExteriorAlgebra(QQ, s)
    @test String.(symbols(R)) == s

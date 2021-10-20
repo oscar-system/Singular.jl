@@ -51,6 +51,8 @@
 
    @test symbols(R) == [:x, :y, :z, :dx, :dy, :dz]
    @test Singular.singular_symbols(R) == symbols(R)
+
+   @test_throws Exception WeylAlgebra(QQ, ["x", "y"], ordering = :neglex)
 end
 
 @testset "sweylpoly.printing" begin

@@ -1,27 +1,3 @@
-function rDefault(cf::coeffs_ptr, vars::Vector{T}, ord::Vector{rRingOrder_t},
-   blk0::Vector{Cint}, blk1::Vector{Cint}, bitmask::Culong) where {T}
-   blk0ptr = pointer(blk0)
-   blk1ptr = pointer(blk1)
-   r = rDefault_long_helper(cf, vars, ord, blk0ptr, blk1ptr, bitmask);
-   return r
-end
-
-function rWeyl(cf::coeffs_ptr, vars::Vector{T}, ord::Vector{rRingOrder_t},
-   blk0::Vector{Cint}, blk1::Vector{Cint}, bitmask::Culong) where {T}
-   blk0ptr = pointer(blk0)
-   blk1ptr = pointer(blk1)
-   r = rDefault_Weyl_helper(cf, vars, ord, blk0ptr, blk1ptr, bitmask);
-   return r
-end
-
-function rExterior(cf::coeffs_ptr, vars::Vector{T}, ord::Vector{rRingOrder_t},
-   blk0::Vector{Cint}, blk1::Vector{Cint}, bitmask::Culong) where {T}
-   blk0ptr = pointer(blk0)
-   blk1ptr = pointer(blk1)
-   r = rDefault_Exterior_helper(cf, vars, ord, blk0ptr, blk1ptr, bitmask);
-   return r
-end
-
 function p_GetExpVL(p::poly_ptr, ev::Vector{Clong}, r::ring_ptr)
    ptr = pointer(ev)
    p_GetExpVL_internal(p, ptr, r)

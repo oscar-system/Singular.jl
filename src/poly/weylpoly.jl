@@ -113,61 +113,50 @@ function (R::WeylPolyRing)(p::sweylpoly)
    return p
 end
 
-function(R::WeylPolyRing)(n::libSingular.number_ptr)
+function (R::WeylPolyRing)(n::libSingular.number_ptr)
     return R.base_ring(n)
 end
+
 ###############################################################################
 #
 #   WeylAlgebra constructor
 #
 ###############################################################################
 
-function WeylAlgebra(R::Union{Ring, Field}, s1::Array{String, 1};
-      cached::Bool = true, ordering::Symbol = :degrevlex,
-      ordering2::Symbol = :comp1min, degree_bound::Int = 0)
-   s = vcat(s1, ["d"*sym for sym in s1])
-   U = [Symbol(v) for v in s]
-   T = elem_type(R)
-   parent_obj = WeylPolyRing{T}(R, U, ordering, cached, sym2ringorder[ordering],
-         sym2ringorder[ordering2], degree_bound)
-   return tuple(parent_obj, gens(parent_obj))
+function _WeylAlgebra(R, s::Vector{String}, ordering, ordering2, cached, degree_bound)
+   sord = get_fancy_ordering(ordering, ordering2)
+   z = WeylPolyRing{elem_type(R)}(R, Symbol.(s), sord, cached, degree_bound)
+   return (z, gens(z))
 end
 
-function WeylAlgebra(R::Union{Ring, Field}, s2::Array{String, 2};
-      cached::Bool = true, ordering::Symbol = :degrevlex,
-      ordering2::Symbol = :comp1min, degree_bound::Int = 0)
-   size(s2)[1] != 2 && error("Array of symbols should have two rows")
-   s = vcat(s2[1, :], s2[2, :])
-   U = [Symbol(v) for v in s]
-   T = elem_type(R)
-   parent_obj = WeylPolyRing{T}(R, U, ordering, cached, sym2ringorder[ordering],
-         sym2ringorder[ordering2], degree_bound)
-   return tuple(parent_obj, gens(parent_obj))
+function WeylAlgebra(R::Union{Ring, Field}, s::Vector{String};
+                     ordering = :degrevlex, ordering2::Symbol = :comp1min,
+                     cached::Bool = true, degree_bound::Int = 0)
+   s = vcat(s, ["d"*sym for sym in s])
+   return _WeylAlgebra(R, s, ordering, ordering2, cached, degree_bound)
 end
 
-function WeylAlgebra(R::Nemo.Ring, s1::Array{String, 1}; cached::Bool = true,
-      ordering::Symbol = :degrevlex, ordering2::Symbol = :comp1min,
-      degree_bound::Int = 0)
-   s = vcat(s1, ["d"*sym for sym in s1])
-   S = CoefficientRing(R)
-   U = [Symbol(v) for v in s]
-   T = elem_type(S)
-   parent_obj = WeylPolyRing{T}(S, U, ordering, cached, sym2ringorder[ordering],
-         sym2ringorder[ordering2], degree_bound)
-   return tuple(parent_obj, gens(parent_obj))
+function WeylAlgebra(R::Union{Ring, Field}, s::Matrix{String};
+                     ordering = :degrevlex, ordering2::Symbol = :comp1min,
+                     cached::Bool = true, degree_bound::Int = 0)
+   s = vcat(view(s, 1, :), view(s, 2, :))
+   return _WeylAlgebra(R, s, ordering, ordering2, cached, degree_bound)
 end
 
-function WeylAlgebra(R::Nemo.Ring, s2::Array{String, 2}; cached::Bool = true,
-      ordering::Symbol = :degrevlex, ordering2::Symbol = :comp1min,
-      degree_bound::Int = 0)
-   size(s2)[1] != 2 && error("Array of symbols should have two rows")
-   s = vcat(s2[1, :], s2[2, :])
-   S = CoefficientRing(R)
-   U = [Symbol(v) for v in s]
-   T = elem_type(S)
-   parent_obj = WeylPolyRing{T}(S, U, ordering, cached, sym2ringorder[ordering],
-         sym2ringorder[ordering2], degree_bound)
-   return tuple(parent_obj, gens(parent_obj))
+function WeylAlgebra(R::Nemo.Ring, s::Vector{String};
+                     ordering = :degrevlex, ordering2::Symbol = :comp1min,
+                     cached::Bool = true, degree_bound::Int = 0)
+   R = CoefficientRing(R)
+   s = vcat(s, ["d"*sym for sym in s])
+   return _WeylAlgebra(R, s, ordering, ordering2, cached, degree_bound)
+end
+
+function WeylAlgebra(R::Nemo.Ring, s2::Matrix{String};
+                     ordering = :degrevlex, ordering2::Symbol = :comp1min,
+                     cached::Bool = true, degree_bound::Int = 0)
+   R = CoefficientRing(R)
+   s = vcat(view(s, 1, :), view(s, 2, :))
+   return _WeylAlgebra(R, s, ordering, ordering2, cached, degree_bound)
 end
 
 macro WeylAlgebra(R, s, n, o)

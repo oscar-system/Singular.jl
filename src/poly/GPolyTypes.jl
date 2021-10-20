@@ -16,11 +16,12 @@ mutable struct GPolyRing{T <: Nemo.RingElem} <: AbstractAlgebra.NCRing
 
    # take ownership of a ring_ptr
    function GPolyRing{T}(r::libSingular.ring_ptr, R, s::Vector{Symbol}=singular_symbols(r)) where T <: Nemo.RingElem
+      @assert r.cpp_object != C_NULL
       ord = Cint[]
       libSingular.rOrdering_helper(ord, r)
-      d = new(r, 1, R, deserialize_ordering(ord), s)
-      finalizer(_PolyRing_clear_fn, d)
-      return d
+      z = new(r, 1, R, deserialize_ordering(ord), s)
+      finalizer(_PolyRing_clear_fn, z)
+      return z
    end
 end
 

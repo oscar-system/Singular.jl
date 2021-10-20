@@ -4,76 +4,48 @@
 #
 ###############################################################################
 
-const WeylPolyRingID = Dict{Tuple{Union{Ring, Field}, Array{Symbol, 1},
-         libSingular.rRingOrder_t, libSingular.rRingOrder_t, Int},
-                                                      AbstractAlgebra.NCRing}()
+const WeylPolyRingID = Dict{Tuple{Union{Ring, Field}, Vector{Symbol},
+                                  Vector{Cint}, Int}, AbstractAlgebra.NCRing}()
 
 mutable struct WeylPolyRing{T <: Nemo.RingElem} <: AbstractAlgebra.NCRing
    ptr::libSingular.ring_ptr
    refcount::Int
    base_ring::Union{Ring, Field}
-   ord::Symbol
+   ord::sordering
    S::Vector{Symbol}
 
    # take ownership of a ring_ptr
-   function WeylPolyRing{T}(r::libSingular.ring_ptr, R, ord::Symbol,
-                            s::Vector{Symbol}=singular_symbols(r)) where T <: Nemo.RingElem
-      d = new(r, 1, R, ord, s)
-      finalizer(_PolyRing_clear_fn, d)
-      return d
+   function WeylPolyRing{T}(r::libSingular.ring_ptr, R, s::Vector{Symbol}=singular_symbols(r)) where T
+      @assert r.cpp_object != C_NULL
+      ord = Cint[]
+      libSingular.rOrdering_helper(ord, r)
+      z = new(r, 1, R, deserialize_ordering(ord), s)
+      finalizer(_PolyRing_clear_fn, z)
+      return z
    end
 end
 
-# TODO cleanup this mess and support fancy orderings
 function WeylPolyRing{T}(R::Union{Ring, Field}, s::Vector{Symbol},
-                         ord_sym::Symbol, cached::Bool = true,
-                         ordering::libSingular.rRingOrder_t = ringorder_dp,
-                         ordering2::libSingular.rRingOrder_t = ringorder_C,
+                         ord::sordering, cached::Bool = true,
                          degree_bound::Int = 0) where T
-
-   length(s) > 0 && iseven(length(s)) || error("need an even number of indeterminates")
-
-   # check ordering: accept exactly one of ringorder_c, ringorder_C
-   if (((ordering == ringorder_c || ordering == ringorder_C)
-            && (ordering2 == ringorder_c || ordering2 == ringorder_C))
-         || ((ordering != ringorder_c && ordering != ringorder_C)
-            && (ordering2 != ringorder_c && ordering2 != ringorder_C)))
-      error("wrong ordering")
-   end
    bitmask = Culong(degree_bound)
-   n_vars = Cint(length(s));
-   # internally in libSingular, degree_bound is set to
-   deg_bound_adj = Int(libSingular.rGetExpSize(bitmask, n_vars))
-   if cached && haskey(WeylPolyRingID, (R, s, ordering, ordering2, deg_bound_adj))
-      return WeylPolyRingID[R, s, ordering, ordering2, deg_bound_adj]::WeylPolyRing{T}
-   else
+   nvars = length(s)
+   nvars > 0 && iseven(nvars) || error("need an even number of indeterminates")
+   deg_bound_fix = Int(libSingular.rGetExpSize(bitmask, Cint(nvars)))
+   sord = serialize_ordering(nvars, ord)
+   return get!(WeylPolyRingID, (R, s, sord, deg_bound_fix)) do
       ss = rename_symbols(all_singular_symbols(R), String.(s), "x")
       v = [pointer(Base.Vector{UInt8}(string(str)*"\0")) for str in ss]
       r = libSingular.nCopyCoeff(R.ptr)
-
-      blk0 = unsafe_wrap(Array, Ptr{Cint}(libSingular.omAlloc0(Csize_t(3*sizeof(Cint)))), 3; own=false)
-      blk1 = unsafe_wrap(Array, Ptr{Cint}(libSingular.omAlloc0(Csize_t(3*sizeof(Cint)))), 3; own=false)
-      if (ordering == ringorder_c || ordering == ringorder_C)
-         blk0[1] = Cint(0)
-         blk1[1] = Cint(0)
-         blk0[2] = Cint(1)
-         blk1[2] = Cint(length(v))
-      else
-         blk0[1] = Cint(1)
-         blk1[1] = Cint(length(v))
-         blk0[2] = Cint(0)
-         blk1[2] = Cint(0)
+      ptr = libSingular.rDefault_wvhdl_helper(r, v, sord, bitmask)
+      ptr2 = libSingular.weylAlgebra(ptr)
+      if libSingular.have_error()
+         libSingular.rDelete(ptr2)
+         error("could not construct WeylPolyRing from $ord: "*
+               libSingular.get_and_clear_error())
       end
-      ord = Array{libSingular.rRingOrder_t, 1}(undef, 3)
-      ord[1] = ordering
-      ord[2] = ordering2
-      ord[3] = ringorder_no
-      ptr = libSingular.rWeyl(r, v, ord, blk0, blk1, bitmask)
-      @assert deg_bound_adj == Int(libSingular.rBitmask(ptr))
-      z = WeylPolyRing{T}(ptr, R, ord_sym, s)
-      WeylPolyRingID[R, s, ordering, ordering2, deg_bound_adj] = z
-      return z
-   end
+      return WeylPolyRing{T}(ptr2, R, s)
+   end::WeylPolyRing{T}
 end
 
 mutable struct sweylpoly{T <: Nemo.RingElem} <: AbstractAlgebra.NCRingElem

@@ -104,7 +104,7 @@ function (R::ExtPolyRing)(p::sextpoly)
    return p
 end
 
-function(R::ExtPolyRing)(n::libSingular.number_ptr)
+function (R::ExtPolyRing)(n::libSingular.number_ptr)
     return R.base_ring(n)
 end
 
@@ -114,25 +114,23 @@ end
 #
 ###############################################################################
 
-function ExteriorAlgebra(R::Union{Ring, Field}, s::Array{String, 1};
-                         cached::Bool = true,
-                         ordering::Symbol = :degrevlex, ordering2::Symbol = :comp1min)
-   U = [Symbol(v) for v in s]
-   T = elem_type(R)
-   z = ExtPolyRing{T}(R, U, ordering, cached, sym2ringorder[ordering],
-                                              sym2ringorder[ordering2])
-   return z, gens(z)
+function _ExteriorAlgebra(R, s::Vector{String}, ordering, ordering2, cached)
+   sord = get_fancy_ordering(ordering, ordering2)
+   z = ExtPolyRing{elem_type(R)}(R, Symbol.(s), sord, cached)
+   return (z, gens(z))
 end
 
-function ExteriorAlgebra(R::Nemo.Ring, s::Array{String, 1};
-                         cached::Bool = true,
-                         ordering::Symbol = :degrevlex, ordering2::Symbol = :comp1min)
-   S = CoefficientRing(R)
-   U = [Symbol(v) for v in s]
-   T = elem_type(S)
-   z = ExtPolyRing{T}(S, U, ordering, cached, sym2ringorder[ordering],
-                                              sym2ringorder[ordering2])
-   return z, gens(z)
+function ExteriorAlgebra(R::Union{Ring, Field}, s::Vector{String};
+                         ordering = :degrevlex, ordering2::Symbol = :comp1min,
+                         cached::Bool = true)
+   return _ExteriorAlgebra(R, s, ordering, ordering2, cached)
+end
+
+function ExteriorAlgebra(R::Nemo.Ring, s::Vector{String};
+                         ordering = :degrevlex, ordering2::Symbol = :comp1min,
+                         cached::Bool = true)
+   R = CoefficientRing(R)
+   return _ExteriorAlgebra(R, s, ordering, ordering2, cached)
 end
 
 macro ExteriorAlgebra(R, s, n, o)
