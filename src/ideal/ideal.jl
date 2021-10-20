@@ -772,6 +772,26 @@ function (R::ExtPolyRing{T})(id::libSingular.ideal_ptr) where T <: Nemo.RingElem
    return Ideal(R,id)
 end
 
+function Ideal(R::LPPolyRing{T}, ids::slppoly{T}...) where T <: Nemo.RingElem
+   S = elem_type(R)
+   length(ids) == 0 && return sideal{S}(R, R(0))
+   return sideal{S}(R, ids...)
+end
+
+function Ideal(R::LPPolyRing{T}, ids::Array{slppoly{T}, 1}) where T <: Nemo.RingElem
+   S = elem_type(R)
+   return sideal{S}(R, ids...)
+end
+
+function Ideal(R::LPPolyRing{T}, id::libSingular.ideal_ptr) where T <: Nemo.RingElem
+   S = elem_type(R)
+   return sideal{S}(R, id)
+end
+
+function (R::LPPolyRing{T})(id::libSingular.ideal_ptr) where T <: Nemo.RingElem
+   return Ideal(R,id)
+end
+
 ###############################################################################
 #
 #   Differential functions

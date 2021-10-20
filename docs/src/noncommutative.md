@@ -98,6 +98,23 @@ julia> (dx*x, dx*y, dy*x, dy*y)
 (x*dx + 1, y*dx, x*dy, y*dy + 1)
 ```
 
+The ideals are left ideals by default for this Algebra.
+
+```julia
+julia> R, (x1, x2, x3, d1, d2, d3) = WeylAlgebra(QQ, ["x1" "x2" "x3"; "d1" "d2" "d3"])
+(Singular Weyl Algebra (QQ),(x1,x2,x3,d1,d2,d3),(dp(6),C), sweylpoly{n_Q}[x1, x2, x3, d1, d2, d3])
+
+julia> gens(std(Ideal(R, x1^2*d2^2 + x2^2*d3^2, x1*d2 + x3)))
+7-element Vector{sweylpoly{n_Q}}:
+ x1*d2 + x3
+ x3^2
+ x2*x3 - x1
+ x1*x3
+ x2^2
+ x1*x2
+ x1^2
+```
+
 ### ExteriorAlgebra
 
 ```julia
@@ -147,6 +164,23 @@ x*y*x*y
 
 julia> (x*y)^3
     singular error: degree bound of Letterplace ring is 5, but at least 6 is needed for this multiplication
+```
+
+The ideals are two-sided by default for this Algebra.
+
+```julia
+julia> R, (x, y, z) = FreeAlgebra(QQ, ["x", "y", "z"], 4)
+
+julia> gens(std(Ideal(R, x*y + y*z, x*x + x*y - y*x - y*y)))
+8-element Vector{slppoly{n_Q}}:
+ x*y + y*z
+ x^2 - y*x - y^2 - y*z
+ y^3 + y*z*y - y^2*z - y*z^2
+ y^2*x + y*z*x + y^2*z + y*z^2
+ y^2*z*y + y*z^2*y - y^2*z^2 - y*z^3
+ y*z*y^2 + y*z^2*y - y*z*y*z - y*z^3
+ y^2*z*x + y*z^2*x + y^2*z^2 + y*z^3
+ y*z*y*x + y*z^2*x + y*z*y*z + y*z^3
 ```
 
 ## Polynomial Term Iterators
