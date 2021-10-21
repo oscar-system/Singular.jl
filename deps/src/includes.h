@@ -33,6 +33,7 @@
 #include "polys/ext_fields/transext.h"
 #include <kernel/fglm/fglm.h>
 #include <kernel/GBEngine/kstd1.h>
+#include <kernel/GBEngine/nc.h>
 #include <kernel/GBEngine/syz.h>
 #include <kernel/GBEngine/tgb.h>
 #include <kernel/ideals.h>
