@@ -26,7 +26,8 @@ an array $x$ of variables from which elements of the algebra can be constructed.
 
 For constructors taking an ordering, two orderings can be specified by symbol,
 one for term ordering, and a second one for ordering of module components. The
-first ordering can also be specified by a non-symbol as with `PolynomialRing`.
+first ordering can also be specified by a non-symbol as with `PolynomialRing`,
+in which case the second ordering is ignored.
 
 By default there will only be one parent object in the system for each
 combination of arguments. This is accomplished by making use of a global cache.
@@ -42,9 +43,9 @@ GAlgebra(R::PolyRing{T}, C::smatrix{spoly{T}}, D::smatrix{spoly{T}};
 Construct the G-algebra from a commutative polynomial ring $R$ and matrices $C$,
 $D$ over $R$. If the variables of $R$ are $x_1,\dots,x_n$, then the noncommutative
 algebra is constructed with relations $x_j x_i = c_{i,j} x_i x_j + d_{i,j}$ for
-$1 \le i < j \le n$. The $c_{i,j}$ must be constant polynomials and the monomial
-ordering of the ring $R$ must be a global ordering with
-$x_i x_j > \mathrm{lm}(d_{i,j})$. The entries of the matrices $C$ and $D$ on or
+$1 \le i < j \le n$. The $c_{i,j}$ must be nonzero constant polynomials and the
+relations $x_i x_j > \mathrm{lm}(d_{i,j})$ must hold in the monomial ordering
+of the ring $R$. The entries of the matrices $C$ and $D$ on or
 below the main diagonal are ignored.
 
 !!! note
@@ -93,7 +94,9 @@ differential operators are named by simply appending the letter "d" to each of
 the strings in `x`. The second variant takes the names of the $x_i$ from the
 first row of the matrix and the names of the $\partial_i$ from the second row
 of the matrix. Note that the functionality of this constructor can be achieved
-with the `GAlgebra` constructor: it is provided only for convience.
+with the `GAlgebra` constructor: it is provided only for convience. Note also
+that due to the ordering constraint on G-algebras, the orderings `:neglex`,
+`:negdeglex`, `:negdevrevlex` are excluded.
 
 **Examples**
 
@@ -130,7 +133,8 @@ FreeAlgebra(R::Field, s::Vector{String}, degree_bound::Int;
             cached::Bool = true)
 ```
 
-Construct the free associative algebra $R \langle x_1,\dots,x_n \rangle$.
+Construct the free associative algebra $R \langle x_1,\dots,x_n \rangle$. The
+ordering must be global.
 
 !!! note
     Since this uses the LETTERPLACE backend, the `degree_bound`, which is the
