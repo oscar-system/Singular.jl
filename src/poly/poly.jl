@@ -4,8 +4,7 @@ export spoly, PolyRing, change_base_ring, coeff, coefficients,
        derivative, div, divides, evaluate, exponent,
        exponent_vectors, exponent_words, factor, factor_squarefree, finish, gen,
        has_global_ordering, has_mixed_ordering, has_local_ordering,
-       inflate, isgen,
-       ismonomial, isordering_symbolic, isquotient_ring, isterm,
+       inflate, isgen, ismonomial, isordering_symbolic, isterm,
        jacobian_ideal, jacobian_matrix, jet,
        leading_coefficient, leading_exponent_vector, leading_term,
        leading_monomial, lead_exponent,
@@ -66,16 +65,6 @@ all variables $x$.
 """
 function has_local_ordering(R::PolyRingUnion)
    return !has_global_ordering(R) && !has_mixed_ordering(R)
-end
-
-@doc Markdown.doc"""
-    isquotient_ring(R::PolyRing)
-
-Return `true` if the given ring is the quotient of a polynomial ring with
-a non - zero ideal.
-"""
-function isquotient_ring(R::PolyRingUnion)
-   GC.@preserve R return Bool(Singular.libSingular.rIsQuotientRing(R.ptr))
 end
 
 function characteristic(R::PolyRingUnion)
@@ -2019,7 +2008,6 @@ function deserialize_ordering(b::Vector{Cint})
     end
     return sordering(data)
 end
-
 
 ###############################################################################
 #

@@ -185,10 +185,11 @@ const VERSION_NUMBER = pkgversion(@__MODULE__)
 #
 #   Load Singular Rings/Fields/etc
 #     There is a slight circular dependency: in order to create a G-Algebra
-#     you need a PolyRing R and matrices over R. The matrix code requires some
-#     module code, which requires some ideal code, which requies some poly code.
-#     Therefore, we include all of the poly/matrix/module/ideal types before
-#     including the methods.
+#     you need a PolyRing R and matrices over R, and in order to create a 
+#     quotient ring you need the polynomial ring and an ideal.
+#     The matrix code requires some module code, which requires some ideal
+#     code, which requies some poly code. Therefore, we include all of the
+#     poly/matrix/module/ideal types before including the methods.
 #
 ###############################################################################
 
@@ -237,6 +238,8 @@ include("ideal/IdealTypes.jl")
 include("matrix/matrix.jl")
 
 include("matrix/bigintmat.jl")
+
+include("poly/quotient.jl")
 
 include("module/module.jl")
 

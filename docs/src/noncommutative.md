@@ -61,12 +61,23 @@ below the main diagonal are ignored.
 ```julia
 julia> R, (x, y) = PolynomialRing(QQ, ["x", "y"]);
 
-julia> R, (x, y) = GAlgebra(R, Singular.Matrix(R, [0 2; 0 0]),
+julia> G, (x, y) = GAlgebra(R, Singular.Matrix(R, [0 2; 0 0]),
                                Singular.Matrix(R, [0 x; 0 0]))
 (Singular G-Algebra (QQ),(x,y),(dp(2),C), sgpoly{n_Q}[x, y])
 
 julia> y*x
 2*x*y + x
+```
+
+The construction of a GR-algebra proceeds by taking the quotient of a G-algebra
+by a two-sided ideal. Continuing with the above example:
+
+```
+I = Ideal(R, [x^2 + y^2], twosided = true)
+Singular two-sided ideal over Singular G-Algebra (QQ),(x,y),(dp(2),C) with generators (x^2 + y^2)
+
+Q, (x, y) = QuotientRing(R, std(I))
+(Singular G-Algebra Quotient Ring (QQ),(x,y),(dp(2),C), sgpoly{n_Q}[x, y])
 ```
 
 ### WeylAlgebra

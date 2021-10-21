@@ -190,9 +190,13 @@ function show(io::IO, S::IdealSet)
    show(io, base_ring(S))
 end
 
-function show(io::IO, I::sideal)
+function show(io::IO, I::sideal{T}) where T <: SPolyUnion
    n = ngens(I)
-   print(io, "Singular Ideal over ")
+   if !isdefault_twosided_ideal(T) && I.isTwoSided
+      print(io, "Singular two-sided ideal over ")
+   else
+      print(io, "Singular ideal over ")
+   end
    show(io, base_ring(I))
    print(io, " with generators (")
    for i = 1:n
@@ -451,13 +455,15 @@ only have unique leading terms (up to permutation and multiplication by
 constants). If `complete_reduction` is set to `true` (and the ordering is
 a global ordering) then the Groebner basis is unique.
 """
-function std(I::sideal; complete_reduction::Bool=false)
+function std(I::sideal{T}; complete_reduction::Bool=false) where T <: SPolyUnion
    R = base_ring(I)
-   ptr = GC.@preserve I R libSingular.id_Std(I.ptr, R.ptr, complete_reduction)
+   if !isdefault_twosided_ideal(T) && I.isTwoSided
+      ptr = GC.@preserve I R libSingular.id_TwoStd(I.ptr, R.ptr)
+   else
+      ptr = GC.@preserve I R libSingular.id_Std(I.ptr, R.ptr, complete_reduction)
+   end
    libSingular.idSkipZeroes(ptr)
-   z = Ideal(R, ptr)
-   z.isGB = true
-   return z
+   return sideal{T}(R, ptr, true, I.isTwoSided)
 end
 
 @doc Markdown.doc"""
@@ -723,6 +729,40 @@ function (R::PolyRing{T})(id::libSingular.ideal_ptr) where T <: Nemo.RingElem
     return Ideal(R,id)
 end
 
+function Ideal(R::GPolyRing{T}, ids::sgpoly{T}...) where T <: Nemo.RingElem
+   length(ids) == 0 && return sideal{elem_type(R)}(R, R(0))
+   return sideal{elem_type(R)}(R, ids...)
+end
+
+function Ideal(R::GPolyRing{T}, ids::Vector{sgpoly{T}}; twosided=false) where T <: Nemo.RingElem
+   return sideal{elem_type(R)}(R, ids, twosided)
+end
+
+function Ideal(R::GPolyRing{T}, id::libSingular.ideal_ptr) where T <: Nemo.RingElem
+   return sideal{elem_type(R)}(R, id)
+end
+
+function (R::GPolyRing{T})(id::libSingular.ideal_ptr) where T <: Nemo.RingElem
+   return Ideal(R, id)
+end
+
+function Ideal(R::LPPolyRing{T}, ids::slppoly{T}...) where T <: Nemo.RingElem
+   length(ids) == 0 && return sideal{elem_type(R)}(R, R(0))
+   return sideal{elem_type(R)}(R, ids...)
+end
+
+function Ideal(R::LPPolyRing{T}, ids::Vector{slppoly{T}}; twosided=true) where T <: Nemo.RingElem
+   return sideal{elem_type(R)}(R, ids, twosided)
+end
+
+function Ideal(R::LPPolyRing{T}, id::libSingular.ideal_ptr) where T <: Nemo.RingElem
+   return sideal{elem_type(R)}(R, id)
+end
+
+function (R::LPPolyRing{T})(id::libSingular.ideal_ptr) where T <: Nemo.RingElem
+   return Ideal(elem_type(R), id)
+end
+
 # maximal ideal in degree d
 function MaximalIdeal(R::PolyRing{T}, d::Int) where T <: Nemo.RingElem
    (d > typemax(Cint) || d < 0) &&
@@ -738,7 +778,7 @@ function Ideal(R::WeylPolyRing{T}, ids::sweylpoly{T}...) where T <: Nemo.RingEle
    return sideal{S}(R, ids...)
 end
 
-function Ideal(R::WeylPolyRing{T}, ids::Array{sweylpoly{T}, 1}) where T <: Nemo.RingElem
+function Ideal(R::WeylPolyRing{T}, ids::Vector{sweylpoly{T}}; twosided=false) where T <: Nemo.RingElem
    S = elem_type(R)
    return sideal{S}(R, ids...)
 end
@@ -758,7 +798,7 @@ function Ideal(R::ExtPolyRing{T}, ids::sextpoly{T}...) where T <: Nemo.RingElem
    return sideal{S}(R, ids...)
 end
 
-function Ideal(R::ExtPolyRing{T}, ids::Array{sextpoly{T}, 1}) where T <: Nemo.RingElem
+function Ideal(R::ExtPolyRing{T}, ids::Vector{sextpoly{T}}; twosided=false) where T <: Nemo.RingElem
    S = elem_type(R)
    return sideal{S}(R, ids...)
 end
@@ -769,26 +809,6 @@ function Ideal(R::ExtPolyRing{T}, id::libSingular.ideal_ptr) where T <: Nemo.Rin
 end
 
 function (R::ExtPolyRing{T})(id::libSingular.ideal_ptr) where T <: Nemo.RingElem
-   return Ideal(R,id)
-end
-
-function Ideal(R::LPPolyRing{T}, ids::slppoly{T}...) where T <: Nemo.RingElem
-   S = elem_type(R)
-   length(ids) == 0 && return sideal{S}(R, R(0))
-   return sideal{S}(R, ids...)
-end
-
-function Ideal(R::LPPolyRing{T}, ids::Array{slppoly{T}, 1}) where T <: Nemo.RingElem
-   S = elem_type(R)
-   return sideal{S}(R, ids...)
-end
-
-function Ideal(R::LPPolyRing{T}, id::libSingular.ideal_ptr) where T <: Nemo.RingElem
-   S = elem_type(R)
-   return sideal{S}(R, id)
-end
-
-function (R::LPPolyRing{T})(id::libSingular.ideal_ptr) where T <: Nemo.RingElem
    return Ideal(R,id)
 end
 

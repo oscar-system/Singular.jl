@@ -36,9 +36,30 @@ function _sideal_clear_fn(I::sideal{T}) where T <: SPolyUnion
    _PolyRing_clear_fn(R)
 end
 
+isdefault_twosided_ideal(R::PolyRing) = true
+isdefault_twosided_ideal(R::LPPolyRing) = true
+isdefault_twosided_ideal(R::GPolyRing) = false
+isdefault_twosided_ideal(R::WeylPolyRing) = false
+isdefault_twosided_ideal(R::ExtPolyRing) = false
+
+isdefault_twosided_ideal(::Type{<:spoly}) = true
+isdefault_twosided_ideal(::Type{<:slppoly}) = true
+isdefault_twosided_ideal(::Type{<:sgpoly}) = false
+isdefault_twosided_ideal(::Type{<:sweylpoly}) = false
+isdefault_twosided_ideal(::Type{<:sextpoly}) = false
+
 function sideal{T}(R::PolyRingUnion, id::libSingular.ideal_ptr) where T
-   istwosided = R isa PolyRing || R isa LPPolyRing
-   return sideal{T}(R, id, false, istwosided)
+   return sideal{T}(R, id, false, isdefault_twosided_ideal(R))
+end
+
+function sideal{T}(R::PolyRingUnion, ids::Vector{<:SPolyUnion}, isTwoSided::Bool) where T
+   n = length(ids)
+   id = libSingular.idInit(Cint(n), 1)
+   for i = 1:n
+      p = libSingular.p_Copy(ids[i].ptr, R.ptr)
+      libSingular.setindex_internal(id, p, Cint(i - 1))
+   end
+   return sideal{T}(R, id, false, isTwoSided)
 end
 
 function sideal{T}(R::PolyRingUnion, ids::SPolyUnion...) where T
@@ -48,6 +69,6 @@ function sideal{T}(R::PolyRingUnion, ids::SPolyUnion...) where T
       p = libSingular.p_Copy(ids[i].ptr, R.ptr)
       libSingular.setindex_internal(id, p, Cint(i - 1))
    end
-   return sideal{T}(R, id)
+   return sideal{T}(R, id, false, isdefault_twosided_ideal(R))
 end
 
