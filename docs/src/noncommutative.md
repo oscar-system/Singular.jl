@@ -12,7 +12,6 @@ and elements thereof are given in the following table.
 -----------------|-----------------|--------------------|-----------
 GAlgebra         | `sgpoly{T}`     | `GPolyRing{T}`     | PLURAL
 WeylAlgebra      | `sweylpoly{T}`  | `WeylPolyRing{T}`  | PLURAL
-ExteriorAlgebra  | `sextpoly{T}`   | `ExtPolyRing{T}`   | PLURAL + quotient
 FreeAlgebra      | `slppoly{T}`    | `LPPolyRing{T}`    | LETTERPLACE
 
 These types are parameterized by the type of elements in the coefficient ring
@@ -126,28 +125,6 @@ julia> gens(std(Ideal(R, x1^2*d2^2 + x2^2*d3^2, x1*d2 + x3)))
  x1^2
 ```
 
-### ExteriorAlgebra
-
-```julia
-ExteriorAlgebra(R::Union{Ring, Field}, s::Vector{String};
-                ordering = :degrevlex, ordering2::Symbol = :comp1min,
-                cached::Bool = true)
-```
-
-Construct the Exterior algebra as the quotient of the G-algebra with relations
-$x_j x_i = -x_i x_j$ by the relations $x_i^2 = 0$. We currently require at least
-two variables for this algebra.
-
-**Examples**
-
-```julia
-julia> R, (x, y) = ExteriorAlgebra(ZZ, ["x", "y"])
-(Singular Exterior Algebra Quotient Ring (ZZ),(x,y),(dp(2),C), sextpoly{n_Z}[x, y])
-
-julia> x*y + y*x
-0
-```
-
 ### FreeAlgebra
 
 ```julia
@@ -196,21 +173,21 @@ julia> gens(std(Ideal(R, x*y + y*z, x*x + x*y - y*x - y*y)))
 
 ## Polynomial Term Iterators
 
-For `GAlgebra`, `WeylAlgebra` and `ExteriorAlgebra`, the polynomials elements
+For `GAlgebra`, `WeylAlgebra`, the polynomials elements
 can be and are represented using commutative data structures, and the function
 `exponent_vectors` is repurposed for access to the individual exponents.
 
 **Examples**
 
 ```julia
-julia> R, (x, y, z, w) = ExteriorAlgebra(QQ, ["x", "y", "z", "w"])
-(Singular Exterior Algebra Quotient Ring (QQ),(x,y,z,w),(dp(4),C), sextpoly{n_Q}[x, y, z, w])
+julia> R, (x, y, dx, dy) = WeylAlgebra(QQ, ["x", "y"])
+(Singular Weyl Algebra (QQ),(x,y,dx,dy),(dp(4),C), sweylpoly{n_Q}[x, y, dx, dy])
 
-julia> p = (1 + x + y*z)*(1 + w + x*w)
-x*y*z*w + y*z*w + y*z + 2*x*w + x + w + 1
+julia> p = (dx + dy)*(x + y)
+x*dx + y*dx + x*dy + y*dy + 2
 
 julia> show(collect(exponent_vectors(p)))
-[[1, 1, 1, 1], [0, 1, 1, 1], [0, 1, 1, 0], [1, 0, 0, 1], [1, 0, 0, 0], [0, 0, 0, 1], [0, 0, 0, 0]]
+[[1, 0, 1, 0], [0, 1, 1, 0], [1, 0, 0, 1], [0, 1, 0, 1], [0, 0, 0, 0]]
 ```
 
 For `FreeAlgebra`, the function `exponent_vectors` is undefined on polynomial

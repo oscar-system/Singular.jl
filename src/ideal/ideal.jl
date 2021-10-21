@@ -768,17 +768,6 @@ function Ideal(R::WeylPolyRing{T}, ids::Vector{sweylpoly{T}}; twosided=false) wh
    return sideal{S}(R, ids...)
 end
 
-function Ideal(R::ExtPolyRing{T}, ids::sextpoly{T}...) where T <: Nemo.RingElem
-   S = elem_type(R)
-   length(ids) == 0 && return sideal{S}(R, R(0))
-   return sideal{S}(R, ids...)
-end
-
-function Ideal(R::ExtPolyRing{T}, ids::Vector{sextpoly{T}}; twosided=false) where T <: Nemo.RingElem
-   S = elem_type(R)
-   return sideal{S}(R, ids...)
-end
-
 ###############################################################################
 #
 #   Differential functions

@@ -7,7 +7,7 @@
 const IdealSetID = Dict{PolyRing, Set}()
 
 mutable struct IdealSet{T <: AbstractAlgebra.NCRingElem} <: Set
-   base_ring::Union{PolyRing, GPolyRing, WeylPolyRing, ExtPolyRing}
+   base_ring::PolyRingUnion
 
    function IdealSet{T}(R::PolyRing) where T
       return get!(IdealSetID, R) do
@@ -40,13 +40,11 @@ isdefault_twosided_ideal(R::PolyRing) = true
 isdefault_twosided_ideal(R::LPPolyRing) = true
 isdefault_twosided_ideal(R::GPolyRing) = false
 isdefault_twosided_ideal(R::WeylPolyRing) = false
-isdefault_twosided_ideal(R::ExtPolyRing) = false
 
 isdefault_twosided_ideal(::Type{<:spoly}) = true
 isdefault_twosided_ideal(::Type{<:slppoly}) = true
 isdefault_twosided_ideal(::Type{<:sgpoly}) = false
 isdefault_twosided_ideal(::Type{<:sweylpoly}) = false
-isdefault_twosided_ideal(::Type{<:sextpoly}) = false
 
 function sideal{T}(R::PolyRingUnion, id::libSingular.ideal_ptr) where T
    return sideal{T}(R, id, false, isdefault_twosided_ideal(R))

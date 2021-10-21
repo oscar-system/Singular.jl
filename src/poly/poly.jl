@@ -146,7 +146,7 @@ function isone(p::SPolyUnion)
    GC.@preserve R p return Bool(libSingular.p_IsOne(p.ptr, R.ptr))
 end
 
-function isgen(p::Union{spoly, sgpoly, sextpoly, sweylpoly})
+function isgen(p::Union{spoly, sgpoly, sweylpoly})
    R = parent(p)
    GC.@preserve R p begin
       if p.ptr.cpp_object == C_NULL || libSingular.pNext(p.ptr).cpp_object != C_NULL ||
@@ -247,7 +247,7 @@ Return the exponent vector of the leading term of the given polynomial. The retu
 value is a Julia 1-dimensional array giving the exponent for each variable of the
 leading term.
 """
-function leading_exponent_vector(p::Union{spoly, sgpoly, sextpoly, sweylpoly})
+function leading_exponent_vector(p::Union{spoly, sgpoly, sweylpoly})
    R = parent(p)
    n = nvars(R)
    A = Array{Int}(undef, n)
@@ -524,7 +524,7 @@ function show(io::IO, R::PolyRing)
    end
 end
 
-function expressify(a::Union{spoly, sgpoly, sweylpoly, sextpoly},
+function expressify(a::Union{spoly, sgpoly, sweylpoly},
                                     x = symbols(parent(a)); context = nothing)
    sum = Expr(:call, :+)
    for (c, v) in zip(coefficients(a), exponent_vectors(a))
@@ -547,7 +547,6 @@ end
 AbstractAlgebra.@enable_all_show_via_expressify spoly
 AbstractAlgebra.@enable_all_show_via_expressify sgpoly
 AbstractAlgebra.@enable_all_show_via_expressify sweylpoly
-AbstractAlgebra.@enable_all_show_via_expressify sextpoly
 
 ###############################################################################
 #
@@ -1405,7 +1404,7 @@ end
 #
 ###############################################################################
 
-function MPolyBuildCtx(R::Union{PolyRing, GPolyRing, WeylPolyRing, ExtPolyRing, LPPolyRing})
+function MPolyBuildCtx(R::Union{PolyRing, GPolyRing, WeylPolyRing, LPPolyRing})
    # MPolyBuildCtx's inner constructor is too uncomfortable to use
    t = zero(R)
    M = Nemo.@new_struct(MPolyBuildCtx{typeof(t), typeof(t.ptr)}, t, t.ptr)
@@ -1426,7 +1425,7 @@ function push_term!(M::MPolyBuildCtx{S, U}, c::T, e::Vector{Int}) where {U,
          v = e
          nv == length(e) || error("Incorrect number of exponents in push_term!")
       end
-      if iszero(c) || (S <: sextpoly && any(x->x>1, e))
+      if iszero(c)
          return M.poly
       end
       ptr = libSingular.p_Init(R.ptr)
