@@ -757,17 +757,6 @@ function MaximalIdeal(R::PolyRing{T}, d::Int) where T <: Nemo.RingElem
    return sideal{S}(R, ptr)
 end
 
-function Ideal(R::WeylPolyRing{T}, ids::sweylpoly{T}...) where T <: Nemo.RingElem
-   S = elem_type(R)
-   length(ids) == 0 && return sideal{S}(R, R(0))
-   return sideal{S}(R, ids...)
-end
-
-function Ideal(R::WeylPolyRing{T}, ids::Vector{sweylpoly{T}}; twosided=false) where T <: Nemo.RingElem
-   S = elem_type(R)
-   return sideal{S}(R, ids...)
-end
-
 ###############################################################################
 #
 #   Differential functions

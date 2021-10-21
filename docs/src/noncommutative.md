@@ -11,7 +11,7 @@ and elements thereof are given in the following table.
  Constructor     | Element type    | Parent type        | SINGULAR kernel subsystem
 -----------------|-----------------|--------------------|-----------
 GAlgebra         | `sgpoly{T}`     | `GPolyRing{T}`     | PLURAL
-WeylAlgebra      | `sweylpoly{T}`  | `WeylPolyRing{T}`  | PLURAL
+WeylAlgebra      | `sgpoly{T}`     | `GPolyRing{T}`     | PLURAL
 FreeAlgebra      | `slppoly{T}`    | `LPPolyRing{T}`    | LETTERPLACE
 
 These types are parameterized by the type of elements in the coefficient ring
@@ -24,13 +24,9 @@ parent object types belong to the abstract type `AbstractAlgebra.NCRing`.
 All constructors returns a tuple, $R, x$ consisting of a parent object $R$ and
 an array $x$ of variables from which elements of the algebra can be constructed.
 
-For constructors taking an ordering, two orderings can be specified, one for
-term ordering, and another for ordering of module components. They can occur in
-either order, the first taking precedence over the other, when the algebra
-elements are used to represent module generators. If either is not specified,
-the indicated default is used. The options for term ordering are the symbols
-`:lex`, `:deglex`, `:degrevlex`,`:neglex`, `:negdeglex` and `:negdegrevlex`,
-and the options for module component ordering are `comp1min` and `comp1max`.
+For constructors taking an ordering, two orderings can be specified by symbol,
+one for term ordering, and a second one for ordering of module components. The
+first ordering can also be specified by a non-symbol as with `PolynomialRing`.
 
 By default there will only be one parent object in the system for each
 combination of arguments. This is accomplished by making use of a global cache.
@@ -96,25 +92,26 @@ with coefficients in $R[x_1, \dots, x_n]$. In the first variant, the
 differential operators are named by simply appending the letter "d" to each of
 the strings in `x`. The second variant takes the names of the $x_i$ from the
 first row of the matrix and the names of the $\partial_i$ from the second row
-of the matrix.
+of the matrix. Note that the functionality of this constructor can be achieved
+with the `GAlgebra` constructor: it is provided only for convience.
 
 **Examples**
 
 ```julia
 julia> R, (x, y, dx, dy) = WeylAlgebra(ZZ, ["x", "y"])
-(Singular Weyl Algebra (ZZ),(x,y,dx,dy),(dp(4),C), sweylpoly{n_Z}[x, y, dx, dy])
+(Singular G-Algebra (ZZ),(x,y,dx,dy),(dp(4),C), sgpoly{n_Z}[x, y, dx, dy]
 
 julia> (dx*x, dx*y, dy*x, dy*y)
 (x*dx + 1, y*dx, x*dy, y*dy + 1)
 ```
 
-The ideals are left ideals by default for this Algebra.
+The ideals of G-algebras are left ideals by default.
 
 ```julia
 julia> R, (x1, x2, x3, d1, d2, d3) = WeylAlgebra(QQ, ["x1" "x2" "x3"; "d1" "d2" "d3"])
-(Singular Weyl Algebra (QQ),(x1,x2,x3,d1,d2,d3),(dp(6),C), sweylpoly{n_Q}[x1, x2, x3, d1, d2, d3])
+(Singular G-Algebra (QQ),(x1,x2,x3,d1,d2,d3),(dp(6),C), sgpoly{n_Q}[x1, x2, x3, d1, d2, d3])
 
-julia> gens(std(Ideal(R, x1^2*d2^2 + x2^2*d3^2, x1*d2 + x3)))
+julia> gens(std(Ideal(R, [x1^2*d2^2 + x2^2*d3^2, x1*d2 + x3])))
 7-element Vector{sweylpoly{n_Q}}:
  x1*d2 + x3
  x3^2
@@ -159,7 +156,7 @@ The ideals are two-sided by default for this Algebra.
 ```julia
 julia> R, (x, y, z) = FreeAlgebra(QQ, ["x", "y", "z"], 4)
 
-julia> gens(std(Ideal(R, x*y + y*z, x*x + x*y - y*x - y*y)))
+julia> gens(std(Ideal(R, [x*y + y*z, x*x + x*y - y*x - y*y])))
 8-element Vector{slppoly{n_Q}}:
  x*y + y*z
  x^2 - y*x - y^2 - y*z
@@ -173,8 +170,8 @@ julia> gens(std(Ideal(R, x*y + y*z, x*x + x*y - y*x - y*y)))
 
 ## Polynomial Term Iterators
 
-For `GAlgebra`, `WeylAlgebra`, the polynomials elements
-can be and are represented using commutative data structures, and the function
+For `GAlgebra`, `WeylAlgebra`, the polynomials elements can be and are
+represented using commutative data structures, and the function
 `exponent_vectors` is repurposed for access to the individual exponents.
 
 **Examples**

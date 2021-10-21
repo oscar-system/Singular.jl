@@ -2,9 +2,10 @@
 
    R, (x, y, z, dx, dy, dz) = WeylAlgebra(QQ, ["x", "y", "z"])
 
-   @test elem_type(R) == sweylpoly{n_Q}
-   @test elem_type(WeylPolyRing{n_Q}) == sweylpoly{n_Q}
-   @test parent_type(sweylpoly{n_Q}) == WeylPolyRing{n_Q}
+   @test typeof(R) == GPolyRing{n_Q}
+   @test elem_type(R) == sgpoly{n_Q}
+   @test elem_type(GPolyRing{n_Q}) == sgpoly{n_Q}
+   @test parent_type(sgpoly{n_Q}) == GPolyRing{n_Q}
    @test base_ring(R) == QQ
 
    @test R isa Nemo.AbstractAlgebra.NCRing
@@ -14,27 +15,27 @@
    @test base_ring(a) == QQ
    @test parent(a) == R
 
-   @test isa(a, sweylpoly)
+   @test isa(a, sgpoly)
 
    b = R(123)
 
-   @test isa(b, sweylpoly)
+   @test isa(b, sgpoly)
 
    c = R(BigInt(123))
 
-   @test isa(c, sweylpoly)
+   @test isa(c, sgpoly)
 
    d = R(c)
 
-   @test isa(d, sweylpoly)
+   @test isa(d, sgpoly)
 
    f = R(Nemo.ZZ(123))
 
-   @test isa(f, sweylpoly)
+   @test isa(f, sgpoly)
 
    g = R(ZZ(123))
 
-   @test isa(g, sweylpoly)
+   @test isa(g, sgpoly)
 
 
    @test isgen(x)

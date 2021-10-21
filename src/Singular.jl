@@ -209,17 +209,13 @@ include("module/ModuleTypes.jl")
 
 include("poly/GPolyTypes.jl")
 
-include("poly/WeylPolyTypes.jl")
-
 include("poly/LPPolyTypes.jl")
 
 # all poly types
 
-const PolyRingUnion{T} = Union{PolyRing{T}, GPolyRing{T}, WeylPolyRing{T},
-                               LPPolyRing{T}} where T <: Nemo.RingElem
+const PolyRingUnion{T} = Union{PolyRing{T}, GPolyRing{T}, LPPolyRing{T}} where T <: Nemo.RingElem
 
-const SPolyUnion{T} = Union{spoly{T}, sgpoly{T}, sweylpoly{T},
-                            slppoly{T}} where T <: Nemo.RingElem
+const SPolyUnion{T} = Union{spoly{T}, sgpoly{T}, slppoly{T}} where T <: Nemo.RingElem
 
 include("poly/poly.jl")
 

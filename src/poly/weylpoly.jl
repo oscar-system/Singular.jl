@@ -1,131 +1,30 @@
-export sweylpoly, WeylPolyRing, WeylAlgebra
+export WeylAlgebra
 
-###############################################################################
-#
-#   Basic manipulation
-#
-###############################################################################
-
-base_ring(R::WeylPolyRing{T}) where T <: Nemo.RingElem = R.base_ring
-
-base_ring(p::sweylpoly) = base_ring(parent(p))
-
-elem_type(::Type{WeylPolyRing{T}}) where T <: Nemo.RingElem = sweylpoly{T}
-
-parent_type(::Type{sweylpoly{T}}) where T <: Nemo.RingElem = WeylPolyRing{T}
-
-@doc Markdown.doc"""
-    degree_bound(R::WeylPolyRing)
-
-Return the internal degree bound in each variable, enforced by Singular. This is the
-largest positive value any degree can have before an overflow will occur. This
-internal bound may be higher than the bound requested by the user via the
-`degree_bound` parameter of the `WeylAlgebra` constructor.
-"""
-function degree_bound(R::WeylPolyRing)
-   return Int(libSingular.rBitmask(R.ptr))
-end
-
-
-###############################################################################
-#
-#   String I/O
-#
-###############################################################################          
-
-function show(io::IO, R::WeylPolyRing)
-   s = libSingular.rString(R.ptr)
-   if libSingular.rIsQuotientRing(R.ptr)
-     print(io, "Singular Weyl Algebra Quotient Ring ", s)
-   else
-     print(io, "Singular Weyl Algebra ", s)
-   end
-end
-
-###############################################################################
-#
-#   Promote rules
-#
-###############################################################################
-
-promote_rule(::Type{sweylpoly{T}}, ::Type{sweylpoly{T}}) where T <: Nemo.RingElem = sweylpoly{T}
-
-function promote_rule(::Type{sweylpoly{T}}, ::Type{U}) where {T <: Nemo.RingElem, U <: Nemo.RingElem}
-   promote_rule(T, U) == T ? sweylpoly{T} : Union{}
-end
-
-###############################################################################
-#
-#   Parent call overloads
-#
-###############################################################################
-
-function (R::WeylPolyRing)()
-   T = elem_type(base_ring(R))
-   z = sweylpoly{T}(R)
-   z.parent = R
-   return z
-end
-
-function (R::WeylPolyRing)(n::Int)
-   T = elem_type(base_ring(R))
-   z = sweylpoly{T}(R, n)
-   z.parent = R
-   return z
-end
-
-function (R::WeylPolyRing)(n::Integer)
-   T = elem_type(base_ring(R))
-   z = sweylpoly{T}(R, BigInt(n))
-   z.parent = R
-   return z
-end
-
-function (R::WeylPolyRing)(n::n_Z)
-   n = base_ring(R)(n)
-   ptr = libSingular.n_Copy(n.ptr, parent(n).ptr)
-   T = elem_type(base_ring(R))
-   z = sweylpoly{T}(R, ptr)
-   z.parent = R
-   return z
-end
-
-function (R::WeylPolyRing)(n::libSingular.poly_ptr)
-   T = elem_type(base_ring(R))
-   z = sweylpoly{T}(R, n)
-   z.parent = R
-   return z
-end
-
-function (R::WeylPolyRing{T})(n::T) where T <: Nemo.RingElem
-   parent(n) != base_ring(R) && error("Unable to coerce into Weyl algebra")
-   z = sweylpoly{T}(R, n.ptr)
-   z.parent = R
-   return z
-end
-
-function (R::WeylPolyRing{S})(n::T) where {S <: Nemo.RingElem, T <: Nemo.RingElem}
-   return R(base_ring(R)(n))
-end
-
-function (R::WeylPolyRing)(p::sweylpoly)
-   parent(p) != R && error("Unable to coerce")
-   return p
-end
-
-function (R::WeylPolyRing)(n::libSingular.number_ptr)
-    return R.base_ring(n)
-end
-
-###############################################################################
-#
-#   WeylAlgebra constructor
-#
-###############################################################################
+const WeylPolyRingID = Dict{Tuple{Union{Ring, Field}, Vector{Symbol},
+                                  Vector{Cint}, Int}, AbstractAlgebra.NCRing}()
 
 function _WeylAlgebra(R, s::Vector{String}, ordering, ordering2, cached, degree_bound)
-   sord = get_fancy_ordering(ordering, ordering2)
-   z = WeylPolyRing{elem_type(R)}(R, Symbol.(s), sord, cached, degree_bound)
+   bitmask = Culong(degree_bound)
+   nvars = length(s)
+   nvars > 0 && iseven(nvars) || error("need an even number of indeterminates")
+   ord = get_fancy_ordering(ordering, ordering2)
+   s = Symbol.(s)
+   deg_bound_fix = Int(libSingular.rGetExpSize(bitmask, Cint(nvars)))
+   sord = serialize_ordering(nvars, ord)
+   T = elem_type(R)
+   z = get!(WeylPolyRingID, (R, s, sord, deg_bound_fix)) do
+            ss = rename_symbols(all_singular_symbols(R), String.(s), "x")
+            v = [pointer(Base.Vector{UInt8}(string(str)*"\0")) for str in ss]
+            r = libSingular.nCopyCoeff(R.ptr)
+            ptr = libSingular.rDefault_wvhdl_helper(r, v, sord, bitmask)
+            ptr2 = libSingular.weylAlgebra(ptr)
+            if libSingular.have_error()
+               libSingular.rDelete(ptr2)
+               error("could not construct WeylPolyRing from $ord: "*
+                     libSingular.get_and_clear_error())
+            end
+            return GPolyRing{T}(ptr2, R, s)
+         end::GPolyRing{T}
    return (z, gens(z))
 end
 
@@ -178,3 +77,4 @@ macro WeylAlgebra(R, s, n)
    v1 = Expr(:block, exp1, v..., S)
    return esc(v1)
 end
+
