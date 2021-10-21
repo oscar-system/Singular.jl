@@ -4,6 +4,8 @@ export sideal, IdealSet, syz, lead, normalize!, isconstant, iszerodim, fglm,
        quotient, reduce, eliminate, kernel, equal, contains, isvar_generated,
        saturation, satstd, slimgb, std, vdim, interreduce, degree, mult
 
+#TODO!!!! the type stability is atrocious here. culprit "return Ideal(R, ptr)"
+
 ###############################################################################
 #
 #   Basic manipulation
@@ -709,6 +711,14 @@ end
 #
 ###############################################################################
 
+function Ideal(R::PolyRingUnion, id::libSingular.ideal_ptr)
+   return sideal{elem_type(R)}(R, id)
+end
+
+function (R::PolyRingUnion)(id::libSingular.ideal_ptr)
+    return Ideal(R, id)
+end
+
 function Ideal(R::PolyRing{T}, ids::spoly{T}...) where T <: Nemo.RingElem
    S = elem_type(R)
    length(ids) == 0 && return sideal{S}(R, R(0))
@@ -720,15 +730,6 @@ function Ideal(R::PolyRing{T}, ids::Vector{spoly{T}}) where T <: Nemo.RingElem
    return sideal{S}(R, ids...)
 end
 
-function Ideal(R::PolyRing{T}, id::libSingular.ideal_ptr) where T <: Nemo.RingElem
-   S = elem_type(R)
-   return sideal{S}(R, id)
-end
-
-function (R::PolyRing{T})(id::libSingular.ideal_ptr) where T <: Nemo.RingElem
-    return Ideal(R,id)
-end
-
 function Ideal(R::GPolyRing{T}, ids::sgpoly{T}...) where T <: Nemo.RingElem
    length(ids) == 0 && return sideal{elem_type(R)}(R, R(0))
    return sideal{elem_type(R)}(R, ids...)
@@ -738,14 +739,6 @@ function Ideal(R::GPolyRing{T}, ids::Vector{sgpoly{T}}; twosided=false) where T 
    return sideal{elem_type(R)}(R, ids, twosided)
 end
 
-function Ideal(R::GPolyRing{T}, id::libSingular.ideal_ptr) where T <: Nemo.RingElem
-   return sideal{elem_type(R)}(R, id)
-end
-
-function (R::GPolyRing{T})(id::libSingular.ideal_ptr) where T <: Nemo.RingElem
-   return Ideal(R, id)
-end
-
 function Ideal(R::LPPolyRing{T}, ids::slppoly{T}...) where T <: Nemo.RingElem
    length(ids) == 0 && return sideal{elem_type(R)}(R, R(0))
    return sideal{elem_type(R)}(R, ids...)
@@ -753,14 +746,6 @@ end
 
 function Ideal(R::LPPolyRing{T}, ids::Vector{slppoly{T}}; twosided=true) where T <: Nemo.RingElem
    return sideal{elem_type(R)}(R, ids, twosided)
-end
-
-function Ideal(R::LPPolyRing{T}, id::libSingular.ideal_ptr) where T <: Nemo.RingElem
-   return sideal{elem_type(R)}(R, id)
-end
-
-function (R::LPPolyRing{T})(id::libSingular.ideal_ptr) where T <: Nemo.RingElem
-   return Ideal(elem_type(R), id)
 end
 
 # maximal ideal in degree d
@@ -783,15 +768,6 @@ function Ideal(R::WeylPolyRing{T}, ids::Vector{sweylpoly{T}}; twosided=false) wh
    return sideal{S}(R, ids...)
 end
 
-function Ideal(R::WeylPolyRing{T}, id::libSingular.ideal_ptr) where T <: Nemo.RingElem
-   S = elem_type(R)
-   return sideal{S}(R, id)
-end
-
-function (R::WeylPolyRing{T})(id::libSingular.ideal_ptr) where T <: Nemo.RingElem
-   return Ideal(R,id)
-end
-
 function Ideal(R::ExtPolyRing{T}, ids::sextpoly{T}...) where T <: Nemo.RingElem
    S = elem_type(R)
    length(ids) == 0 && return sideal{S}(R, R(0))
@@ -801,15 +777,6 @@ end
 function Ideal(R::ExtPolyRing{T}, ids::Vector{sextpoly{T}}; twosided=false) where T <: Nemo.RingElem
    S = elem_type(R)
    return sideal{S}(R, ids...)
-end
-
-function Ideal(R::ExtPolyRing{T}, id::libSingular.ideal_ptr) where T <: Nemo.RingElem
-   S = elem_type(R)
-   return sideal{S}(R, id)
-end
-
-function (R::ExtPolyRing{T})(id::libSingular.ideal_ptr) where T <: Nemo.RingElem
-   return Ideal(R,id)
 end
 
 ###############################################################################
