@@ -27,11 +27,13 @@
 #include <polys/clapsing.h>
 #include <polys/monomials/ring.h>
 #include <polys/monomials/p_polys.h>
+#include <polys/prCopy.h>
 #include <polys/simpleideals.h>
 #include "polys/ext_fields/algext.h"
 #include "polys/ext_fields/transext.h"
 #include <kernel/fglm/fglm.h>
 #include <kernel/GBEngine/kstd1.h>
+#include <kernel/GBEngine/nc.h>
 #include <kernel/GBEngine/syz.h>
 #include <kernel/GBEngine/tgb.h>
 #include <kernel/ideals.h>

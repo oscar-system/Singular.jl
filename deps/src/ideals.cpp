@@ -146,6 +146,15 @@ auto id_Std_helper(ideal a, ring b, bool complete_reduction = false)
     return id;
 }
 
+auto id_TwoStd_helper(ideal a, ring b)
+{
+    const ring origin = currRing;
+    rChangeCurrRing(b);
+    ideal id = twostd(a);
+    rChangeCurrRing(origin);
+    return id;
+}
+
 void singular_define_ideals(jlcxx::Module & Singular)
 {
     Singular.method("id_Delete",
@@ -232,6 +241,7 @@ void singular_define_ideals(jlcxx::Module & Singular)
 
     Singular.method("id_Slimgb", &id_Slimgb_helper);
 
+    Singular.method("id_TwoStd", &id_TwoStd_helper);
     Singular.method("id_Std", &id_Std_helper);
     Singular.method("id_StdHilb", &id_StdHilb_helper);
 
