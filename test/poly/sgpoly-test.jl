@@ -174,3 +174,14 @@ end
    @test hash(x,zero(UInt)) == hash(x+y-y,zero(UInt))
    @test hash(x,one(UInt)) == hash(x+y-y,one(UInt))
 end
+
+@testset "sgpoly.recognition" begin
+   r, (x, y) = PolynomialRing(QQ, ["x", "y"], ordering = :degrevlex)
+   R, (x, y) = GAlgebra(r, Singular.Matrix(r, [1 1; 0 1]),
+                           Singular.Matrix(r, [0 x; 0 0]))
+
+   S = Singular.create_ring_from_singular_ring(Singular.libSingular.rCopy(R.ptr))
+   @test S isa GPolyRing{n_Q}
+   @test nvars(S) == 2
+end
+

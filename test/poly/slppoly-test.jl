@@ -169,3 +169,12 @@ end
    @test hash(x,zero(UInt)) == hash(x+y-y,zero(UInt))
    @test hash(x,one(UInt)) == hash(x+y-y,one(UInt))
 end
+
+@testset "slppoly.recognition" begin
+   R, (x, y) = FreeAlgebra(QQ, ["x", "y"], 5)
+   S = Singular.create_ring_from_singular_ring(Singular.libSingular.rCopy(R.ptr))
+   @test S isa LPPolyRing{n_Q}
+   @test degree_bound(S) == 5
+   @test nvars(S) == 2
+end
+

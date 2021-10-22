@@ -20,6 +20,7 @@ mutable struct LPPolyRing{T <: Nemo.RingElem} <: AbstractAlgebra.NCRing
    # take ownership of a ring ptr
    function LPPolyRing{T}(r::libSingular.ring_ptr, R, deg_bound::Int,
                           s::Vector{Symbol}=singular_symbols(r)) where T
+      @assert deg_bound > 0
       @assert r.cpp_object != C_NULL
       ord = Cint[]
       libSingular.rOrdering_helper(ord, r)
@@ -29,8 +30,7 @@ mutable struct LPPolyRing{T <: Nemo.RingElem} <: AbstractAlgebra.NCRing
    end
 end
 
-function LPPolyRing{T}(R::Union{Ring, Field}, s::Vector{Symbol},
-                       deg_bound::Int,
+function LPPolyRing{T}(R::Union{Ring, Field}, s::Vector{Symbol}, deg_bound::Int,
                        ord::sordering, cached::Bool = true) where T
    nvars = length(s)
    nvars > 0     || error("LPPolyRing requires at least one symbol")
