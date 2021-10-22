@@ -309,6 +309,14 @@ void singular_define_rings(jlcxx::Module & Singular)
     Singular.method("rChar", &rChar);
     Singular.method("rGetVar", &rGetVar);
     Singular.method("rVar", &rVar);
+    Singular.method("rIsPluralRing", [](const ring r) {
+        // return is an honest bool
+        #ifdef HAVE_PLURAL
+            return r->GetNC() != NULL;
+        #else
+            return false;
+        #endif
+    });
     Singular.method("rIsLPRing", [](const ring r) {
         // return is 0 for not letterplace Ring
         // otherwise the number of variables for this letterplace ring
