@@ -402,12 +402,12 @@ void singular_define_rings(jlcxx::Module & Singular)
     Singular.method("p_Setm", p_Setm);
     Singular.method("p_Neg", p_Neg);
     Singular.method("pGetCoeff", [](spolyrec * p) { return pGetCoeff(p); });
-    Singular.method("pSetCoeff", [](spolyrec * p, long c, ip_sring * r) {
-        number n = n_Init(c, r);
+    Singular.method("pSetCoeff", [](poly p, long c, ring r) {
+        number n = n_Init(c, r->cf);
         return p_SetCoeff(p, n, r);
     });
-    Singular.method("pSetCoeff0", [](spolyrec * p, long c, ip_sring * r) {
-        number n = n_Init(c, r);
+    Singular.method("pSetCoeff0", [](poly p, long c, ring r) {
+        number n = n_Init(c, r->cf);
         return p_SetCoeff0(p, n, r);
     });
     Singular.method("pLDeg", [](spolyrec * a, ip_sring * r) {
