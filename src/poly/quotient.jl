@@ -31,7 +31,7 @@ function QuotientRing(R::PolyRing{T}, I::sideal{spoly{T}}) where T <: Nemo.RingE
    end
 end
 
-function QuotientRing(R::GPolyRing{T}, I::sideal{sgpoly{T}}) where T <: Nemo.RingElem
+function QuotientRing(R::PluralRing{T}, I::sideal{spluralg{T}}) where T <: Nemo.RingElem
    R == base_ring(I) || error("parent mismatch")
    I.isGB || error("ideal must be a Groebner basis")
    I.isTwoSided || error("ideal must be two-sided")
@@ -42,12 +42,12 @@ function QuotientRing(R::GPolyRing{T}, I::sideal{sgpoly{T}}) where T <: Nemo.Rin
          error("could not construct quotient of $R by $I: "*
                  libSingular.get_and_clear_error())
       end
-      S = GPolyRing{T}(ptr, base_ring(R), symbols(R))
+      S = PluralRing{T}(ptr, base_ring(R), symbols(R))
       return (S, gens(S))
    end
 end
 
-function QuotientRing(R::LPPolyRing{T}, I::sideal{slppoly{T}}) where T <: Nemo.RingElem
+function QuotientRing(R::LPRing{T}, I::sideal{slpalg{T}}) where T <: Nemo.RingElem
    R == base_ring(I) || error("parent mismatch")
    I.isGB || error("ideal must be a Groebner basis")
    I.isTwoSided || error("ideal must be two-sided")
@@ -58,7 +58,7 @@ function QuotientRing(R::LPPolyRing{T}, I::sideal{slppoly{T}}) where T <: Nemo.R
          error("could not construct quotient of $R by $I: "*
                  libSingular.get_and_clear_error())
       end
-      S = LPPolyRing{T}(ptr, base_ring(R), degree_bound(R), symbols(R))
+      S = LPRing{T}(ptr, base_ring(R), degree_bound(R), symbols(R))
       return (S, gens(S))
    end
 end

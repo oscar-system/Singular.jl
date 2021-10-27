@@ -1,6 +1,6 @@
 export WeylAlgebra
 
-const WeylPolyRingID = Dict{Tuple{Union{Ring, Field}, Vector{Symbol},
+const WeylAlgebraID = Dict{Tuple{Union{Ring, Field}, Vector{Symbol},
                                   Vector{Cint}, Int}, AbstractAlgebra.NCRing}()
 
 function _WeylAlgebra(R, s::Vector{String}, ordering, ordering2, cached, degree_bound)
@@ -12,7 +12,7 @@ function _WeylAlgebra(R, s::Vector{String}, ordering, ordering2, cached, degree_
    deg_bound_fix = Int(libSingular.rGetExpSize(bitmask, Cint(nvars)))
    sord = serialize_ordering(nvars, ord)
    T = elem_type(R)
-   z = get!(WeylPolyRingID, (R, s, sord, deg_bound_fix)) do
+   z = get!(WeylAlgebraID, (R, s, sord, deg_bound_fix)) do
             ss = rename_symbols(all_singular_symbols(R), String.(s), "x")
             v = [pointer(Base.Vector{UInt8}(string(str)*"\0")) for str in ss]
             r = libSingular.nCopyCoeff(R.ptr)
@@ -20,11 +20,11 @@ function _WeylAlgebra(R, s::Vector{String}, ordering, ordering2, cached, degree_
             ptr2 = libSingular.weylAlgebra(ptr)
             if libSingular.have_error()
                libSingular.rDelete(ptr2)
-               error("could not construct WeylPolyRing from $ord: "*
+               error("could not construct WeylAlgebra from $ord: "*
                      libSingular.get_and_clear_error())
             end
-            return GPolyRing{T}(ptr2, R, s)
-         end::GPolyRing{T}
+            return PluralRing{T}(ptr2, R, s)
+         end::PluralRing{T}
    return (z, gens(z))
 end
 

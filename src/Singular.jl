@@ -207,23 +207,23 @@ include("matrix/MatrixTypes.jl")
 
 include("module/ModuleTypes.jl")
 
-include("poly/GPolyTypes.jl")
+include("poly/PluralTypes.jl")
 
-include("poly/LPPolyTypes.jl")
+include("poly/LPTypes.jl")
 
-# all poly types
+# all "poly" types
 
-const PolyRingUnion{T} = Union{PolyRing{T}, GPolyRing{T}, LPPolyRing{T}} where T <: Nemo.RingElem
+const PolyRingUnion{T} = Union{PolyRing{T}, PluralRing{T}, LPRing{T}} where T <: Nemo.RingElem
 
-const SPolyUnion{T} = Union{spoly{T}, sgpoly{T}, slppoly{T}} where T <: Nemo.RingElem
+const SPolyUnion{T} = Union{spoly{T}, spluralg{T}, slpalg{T}} where T <: Nemo.RingElem
 
 include("poly/poly.jl")
 
-include("poly/gpoly.jl")
+include("poly/plural.jl")
 
-include("poly/weylpoly.jl")
+include("poly/weyl.jl")
 
-include("poly/lppoly.jl")
+include("poly/lp.jl")
 
 include("ideal/IdealTypes.jl")
 

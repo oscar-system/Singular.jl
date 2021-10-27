@@ -1,4 +1,4 @@
-export slppoly, LPPolyRing, FreeAlgebra
+export slpalg, LPRing, FreeAlgebra
 
 ###############################################################################
 #
@@ -6,7 +6,7 @@ export slppoly, LPPolyRing, FreeAlgebra
 #
 ###############################################################################
 
-function show(io::IO, R::LPPolyRing)
+function show(io::IO, R::LPRing)
    GC.@preserve R s = libSingular.rString(R.ptr)
    if libSingular.rIsQuotientRing(R.ptr)
       print(io, "Singular letterplace Quotient Ring ", s)
@@ -15,7 +15,7 @@ function show(io::IO, R::LPPolyRing)
    end
 end
 
-function expressify(a::slppoly, x = symbols(parent(a)); context = nothing)
+function expressify(a::slpalg, x = symbols(parent(a)); context = nothing)
    sum = Expr(:call, :+)
    for (c, v) in zip(coefficients(a), exponent_words(a))
       prod = Expr(:call, :*)
@@ -42,7 +42,7 @@ function expressify(a::slppoly, x = symbols(parent(a)); context = nothing)
    return sum
 end
 
-AbstractAlgebra.@enable_all_show_via_expressify slppoly
+AbstractAlgebra.@enable_all_show_via_expressify slpalg
 
 ###############################################################################
 #
@@ -50,27 +50,27 @@ AbstractAlgebra.@enable_all_show_via_expressify slppoly
 #
 ###############################################################################
 
-parent(p::slppoly) = p.parent
+parent(p::slpalg) = p.parent
 
-base_ring(R::LPPolyRing{T}) where T <: Nemo.RingElem = R.base_ring::parent_type(T)
+base_ring(R::LPRing{T}) where T <: Nemo.RingElem = R.base_ring::parent_type(T)
 
-base_ring(p::slppoly) = base_ring(parent(p))
+base_ring(p::slpalg) = base_ring(parent(p))
 
-elem_type(::Type{LPPolyRing{T}}) where T <: Nemo.RingElem = slppoly{T}
+elem_type(::Type{LPRing{T}}) where T <: Nemo.RingElem = slpalg{T}
 
-parent_type(::Type{slppoly{T}}) where T <: Nemo.RingElem = LPPolyRing{T}
+parent_type(::Type{slpalg{T}}) where T <: Nemo.RingElem = LPRing{T}
 
 @doc Markdown.doc"""
-    degree_bound(R::LPPolyRing)
+    degree_bound(R::LPRing)
 
 Return the maximum length of a monomial word as requested by the user via the
 `degree_bound` parameter of the `FreeAlgebra` constructor.
 """
-function degree_bound(R::LPPolyRing)
+function degree_bound(R::LPRing)
    return R.deg_bound
 end
 
-function isgen(p::slppoly)
+function isgen(p::slpalg)
    R = parent(p)
    GC.@preserve R p begin
       if p.ptr.cpp_object == C_NULL || libSingular.pNext(p.ptr).cpp_object != C_NULL ||
@@ -114,18 +114,18 @@ function _lpvec_to_exponent_word(v::Vector{Int}, nvars::Int, deg_bound::Int)
    return z
 end
 
-function _exponent_word(p::libSingular.poly_ptr, R::LPPolyRing, tmp::Vector{Int})
+function _exponent_word(p::libSingular.poly_ptr, R::LPRing, tmp::Vector{Int})
    @assert length(tmp) >= nvars(R)*degree_bound(R)
    GC.@preserve R libSingular.p_GetExpVL(p, tmp, R.ptr)
    return _lpvec_to_exponent_word(tmp, nvars(R), degree_bound(R))
 end
 
-function exponent_words(x::slppoly)
+function exponent_words(x::slpalg)
    R = parent(x)
    return SPolyExponentWords(x, zeros(Int, nvars(R)*degree_bound(R)))
 end
 
-function Base.iterate(x::SPolyExponentWords{<:slppoly{T}}) where T <: Nemo.RingElem
+function Base.iterate(x::SPolyExponentWords{<:slpalg{T}}) where T <: Nemo.RingElem
    p = x.poly
    ptr = p.ptr
    if ptr.cpp_object == C_NULL
@@ -135,7 +135,7 @@ function Base.iterate(x::SPolyExponentWords{<:slppoly{T}}) where T <: Nemo.RingE
    end
 end
 
-function Base.iterate(x::SPolyExponentWords{<:slppoly{T}}, state) where T <: Nemo.RingElem
+function Base.iterate(x::SPolyExponentWords{<:slpalg{T}}, state) where T <: Nemo.RingElem
    state = libSingular.pNext(state)
    if state.cpp_object == C_NULL
       return nothing
@@ -164,47 +164,47 @@ end
 #
 ###############################################################################
 
-function (R::LPPolyRing{T})() where T <: Nemo.RingElem
-   return slppoly{T}(R)
+function (R::LPRing{T})() where T <: Nemo.RingElem
+   return slpalg{T}(R)
 end
 
-function (R::LPPolyRing{T})(n::Int) where T <: Nemo.RingElem
-   return slppoly{T}(R, n)
+function (R::LPRing{T})(n::Int) where T <: Nemo.RingElem
+   return slpalg{T}(R, n)
 end
 
-function (R::LPPolyRing{T})(n::Integer) where T <: Nemo.RingElem
-   return slppoly{T}(R, BigInt(n))
+function (R::LPRing{T})(n::Integer) where T <: Nemo.RingElem
+   return slpalg{T}(R, BigInt(n))
 end
 
-function (R::LPPolyRing{T})(n::n_Z) where T <: Nemo.RingElem
+function (R::LPRing{T})(n::n_Z) where T <: Nemo.RingElem
    n = base_ring(R)(n)
    ptr = libSingular.n_Copy(n.ptr, parent(n).ptr)
-   return slppoly{T}(R, ptr)
+   return slpalg{T}(R, ptr)
 end
 
-function (R::LPPolyRing)(n::Rational)
+function (R::LPRing)(n::Rational)
    return R(base_ring(R)(n))
 end
 
-function (R::LPPolyRing{T})(n::libSingular.poly_ptr) where T <: Nemo.RingElem
-   return slppoly{T}(R, n)
+function (R::LPRing{T})(n::libSingular.poly_ptr) where T <: Nemo.RingElem
+   return slpalg{T}(R, n)
 end
 
-function (R::LPPolyRing{T})(n::T) where T <: Nemo.RingElem
+function (R::LPRing{T})(n::T) where T <: Nemo.RingElem
    parent(n) != base_ring(R) && error("Unable to coerce into Exterior algebra")
-   return slppoly{T}(R, n.ptr)
+   return slpalg{T}(R, n.ptr)
 end
 
-function (R::LPPolyRing{S})(n::T) where {S <: Nemo.RingElem, T <: Nemo.RingElem}
+function (R::LPRing{S})(n::T) where {S <: Nemo.RingElem, T <: Nemo.RingElem}
    return R(base_ring(R)(n))
 end
 
-function (R::LPPolyRing)(p::slppoly)
+function (R::LPRing)(p::slpalg)
    parent(p) != R && error("Unable to coerce")
    return p
 end
 
-function (R::LPPolyRing)(n::libSingular.number_ptr)
+function (R::LPRing)(n::libSingular.number_ptr)
     return R.base_ring(n)
 end
 
@@ -232,7 +232,7 @@ function _FreeAlgebra(R, s::Vector{String}, degree_bound, ordering, ordering2, c
    else
       error("ordering must be a Symbol or an sordering")
    end
-   parent_obj = LPPolyRing{T}(R, Symbol.(s), degree_bound, fancy_ordering, cached)
+   parent_obj = LPRing{T}(R, Symbol.(s), degree_bound, fancy_ordering, cached)
    return (parent_obj, gens(parent_obj))
 end
 

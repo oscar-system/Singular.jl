@@ -1,11 +1,11 @@
-@testset "sweylpoly.constructors" begin
+@testset "weyl.constructors" begin
 
    R, (x, y, z, dx, dy, dz) = WeylAlgebra(QQ, ["x", "y", "z"])
 
-   @test typeof(R) == GPolyRing{n_Q}
-   @test elem_type(R) == sgpoly{n_Q}
-   @test elem_type(GPolyRing{n_Q}) == sgpoly{n_Q}
-   @test parent_type(sgpoly{n_Q}) == GPolyRing{n_Q}
+   @test typeof(R) == PluralRing{n_Q}
+   @test elem_type(R) == spluralg{n_Q}
+   @test elem_type(PluralRing{n_Q}) == spluralg{n_Q}
+   @test parent_type(spluralg{n_Q}) == PluralRing{n_Q}
    @test base_ring(R) == QQ
 
    @test R isa Nemo.AbstractAlgebra.NCRing
@@ -15,27 +15,27 @@
    @test base_ring(a) == QQ
    @test parent(a) == R
 
-   @test isa(a, sgpoly)
+   @test isa(a, spluralg)
 
    b = R(123)
 
-   @test isa(b, sgpoly)
+   @test isa(b, spluralg)
 
    c = R(BigInt(123))
 
-   @test isa(c, sgpoly)
+   @test isa(c, spluralg)
 
    d = R(c)
 
-   @test isa(d, sgpoly)
+   @test isa(d, spluralg)
 
    f = R(Nemo.ZZ(123))
 
-   @test isa(f, sgpoly)
+   @test isa(f, spluralg)
 
    g = R(ZZ(123))
 
-   @test isa(g, sgpoly)
+   @test isa(g, spluralg)
 
 
    @test isgen(x)
@@ -56,7 +56,7 @@
    @test_throws Exception WeylAlgebra(QQ, ["x", "y"], ordering = :neglex)
 end
 
-@testset "sweylpoly.printing" begin
+@testset "weyl.printing" begin
    r, (x, y, dx, dy) = WeylAlgebra(QQ, ["x", "y"], ordering = :degrevlex)
 
    @test string(x) == "x"
@@ -66,13 +66,13 @@ end
    @test string(x^2*dy + 2*y + 3) == "x^2*dy + 2*y + 3"
 end
 
-@testset "sweylpoly.rename" begin
+@testset "weyl.rename" begin
    R, x = WeylAlgebra(QQ, ["x[1]", "x[2]", "x[3]"])
    @test String.(symbols(R)) == ["x[1]", "x[2]", "x[3]", "dx[1]", "dx[2]", "dx[3]"]
    @test String.(Singular.singular_symbols(R)) == ["x_1", "x_2", "x_3", "dx_1", "dx_2", "dx_3"]
 end
 
-@testset "sweylpoly.manipulation" begin
+@testset "weyl.manipulation" begin
    R, (x, dx) = WeylAlgebra(QQ, ["x"])
 
    @test isone(one(R))
@@ -148,7 +148,7 @@ end
    @test trailing_coefficient(R()) == 0
 end
 
-@testset "sweylpoly.binary_ops" begin
+@testset "weyl.binary_ops" begin
    R, (x, y, dx, dy) = WeylAlgebra(QQ, ["x" "y"; "dx" "dy"])
    @test y*x == x*y
    @test dy*dx == dx*dy
@@ -157,7 +157,7 @@ end
    @test dx^2*(x^2 + y) == 2 + 4*x*dx + (x^2 + y)*dx^2
 end
 
-@testset "sweylpoly.hash" begin
+@testset "weyl.hash" begin
    R, (x, y) = WeylAlgebra(QQ, ["x", "y"])
 
    @test hash(x) == hash(x+y-y)

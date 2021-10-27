@@ -1,4 +1,4 @@
-export sgpoly, GPolyRing, GAlgebra
+export spluralg, PluralRing, GAlgebra
 
 ###############################################################################
 #
@@ -6,21 +6,21 @@ export sgpoly, GPolyRing, GAlgebra
 #
 ###############################################################################
 
-base_ring(R::GPolyRing{T}) where T <: Nemo.RingElem = R.base_ring
+base_ring(R::PluralRing{T}) where T <: Nemo.RingElem = R.base_ring
 
-base_ring(p::sgpoly) = base_ring(parent(p))
+base_ring(p::spluralg) = base_ring(parent(p))
 
-elem_type(::Type{GPolyRing{T}}) where T <: Nemo.RingElem = sgpoly{T}
+elem_type(::Type{PluralRing{T}}) where T <: Nemo.RingElem = spluralg{T}
 
-parent_type(::Type{sgpoly{T}}) where T <: Nemo.RingElem = GPolyRing{T}
+parent_type(::Type{spluralg{T}}) where T <: Nemo.RingElem = PluralRing{T}
 
 @doc Markdown.doc"""
-    degree_bound(R::GPolyRing)
+    degree_bound(R::PluralRing)
 
 Return the internal degree bound in each variable, enforced by Singular. This is the
 largest positive value any degree can have before an overflow will occur.
 """
-function degree_bound(R::GPolyRing)
+function degree_bound(R::PluralRing)
    return Int(libSingular.rBitmask(R.ptr))
 end
 
@@ -30,7 +30,7 @@ end
 #
 ###############################################################################
 
-function show(io::IO, R::GPolyRing)
+function show(io::IO, R::PluralRing)
    s = libSingular.rString(R.ptr)
    if libSingular.rIsQuotientRing(R.ptr)
      print(io, "Singular G-Algebra Quotient Ring ", s)
@@ -45,10 +45,10 @@ end
 #
 ###############################################################################
 
-promote_rule(::Type{sgpoly{T}}, ::Type{sgpoly{T}}) where T <: Nemo.RingElem = sgpoly{T}
+promote_rule(::Type{spluralg{T}}, ::Type{spluralg{T}}) where T <: Nemo.RingElem = spluralg{T}
 
-function promote_rule(::Type{sgpoly{T}}, ::Type{U}) where {T <: Nemo.RingElem, U <: Nemo.RingElem}
-   promote_rule(T, U) == T ? sgpoly{T} : Union{}
+function promote_rule(::Type{spluralg{T}}, ::Type{U}) where {T <: Nemo.RingElem, U <: Nemo.RingElem}
+   promote_rule(T, U) == T ? spluralg{T} : Union{}
 end
 
 ###############################################################################
@@ -57,60 +57,60 @@ end
 #
 ###############################################################################
 
-function (R::GPolyRing)()
+function (R::PluralRing)()
    T = elem_type(base_ring(R))
-   z = sgpoly{T}(R)
+   z = spluralg{T}(R)
    z.parent = R
    return z
 end
 
-function (R::GPolyRing)(n::Int)
+function (R::PluralRing)(n::Int)
    T = elem_type(base_ring(R))
-   z = sgpoly{T}(R, n)
+   z = spluralg{T}(R, n)
    z.parent = R
    return z
 end
 
-function (R::GPolyRing)(n::Integer)
+function (R::PluralRing)(n::Integer)
    T = elem_type(base_ring(R))
-   z = sgpoly{T}(R, BigInt(n))
+   z = spluralg{T}(R, BigInt(n))
    z.parent = R
    return z
 end
 
-function (R::GPolyRing)(n::n_Z)
+function (R::PluralRing)(n::n_Z)
    n = base_ring(R)(n)
    ptr = libSingular.n_Copy(n.ptr, parent(n).ptr)
    T = elem_type(base_ring(R))
-   z = sgpoly{T}(R, ptr)
+   z = spluralg{T}(R, ptr)
    z.parent = R
    return z
 end
 
-function (R::GPolyRing)(n::libSingular.poly_ptr)
+function (R::PluralRing)(n::libSingular.poly_ptr)
    T = elem_type(base_ring(R))
-   z = sgpoly{T}(R, n)
+   z = spluralg{T}(R, n)
    z.parent = R
    return z
 end
 
-function (R::GPolyRing{T})(n::T) where T <: Nemo.RingElem
+function (R::PluralRing{T})(n::T) where T <: Nemo.RingElem
    parent(n) != base_ring(R) && error("Unable to coerce into Exterior algebra")
-   z = sgpoly{T}(R, n.ptr)
+   z = spluralg{T}(R, n.ptr)
    z.parent = R
    return z
 end
 
-function (R::GPolyRing{S})(n::T) where {S <: Nemo.RingElem, T <: Nemo.RingElem}
+function (R::PluralRing{S})(n::T) where {S <: Nemo.RingElem, T <: Nemo.RingElem}
    return R(base_ring(R)(n))
 end
 
-function (R::GPolyRing)(p::sgpoly)
+function (R::PluralRing)(p::spluralg)
    parent(p) != R && error("Unable to coerce")
    return p
 end
 
-function (R::GPolyRing)(n::libSingular.number_ptr)
+function (R::PluralRing)(n::libSingular.number_ptr)
     return R.base_ring(n)
 end
 
@@ -122,7 +122,7 @@ end
 
 function GAlgebra(R::PolyRing{T}, C::smatrix{spoly{T}}, D::smatrix{spoly{T}};
                   cached::Bool = true) where T <: Nemo.RingElem
-   parent_obj = GPolyRing{T}(R, C, D, R.S)
+   parent_obj = PluralRing{T}(R, C, D, R.S)
    return (parent_obj, gens(parent_obj))
 end
 

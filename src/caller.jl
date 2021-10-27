@@ -190,12 +190,12 @@ function create_ring_from_singular_ring(r::libSingular.ring_ptr)
       T = n_unknownsingularcoefficient
    end
    if libSingular.rIsPluralRing(r)
-      return GPolyRing{T}(r, basering)
+      return PluralRing{T}(r, basering)
    else
       n = Int(libSingular.rIsLPRing(r))
       if n > 0
          deg_bound = divexact(Int(libSingular.rVar(r)), n)
-         return LPPolyRing{T}(r, basering, deg_bound)
+         return LPRing{T}(r, basering, deg_bound)
       else
          return PolyRing{T}(r, basering)
       end

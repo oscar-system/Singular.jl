@@ -37,12 +37,12 @@ function _sideal_clear_fn(I::sideal{T}) where T <: SPolyUnion
 end
 
 isdefault_twosided_ideal(R::PolyRing) = true
-isdefault_twosided_ideal(R::LPPolyRing) = true
-isdefault_twosided_ideal(R::GPolyRing) = false
+isdefault_twosided_ideal(R::LPRing) = true
+isdefault_twosided_ideal(R::PluralRing) = false
 
 isdefault_twosided_ideal(::Type{<:spoly}) = true
-isdefault_twosided_ideal(::Type{<:slppoly}) = true
-isdefault_twosided_ideal(::Type{<:sgpoly}) = false
+isdefault_twosided_ideal(::Type{<:slpalg}) = true
+isdefault_twosided_ideal(::Type{<:spluralg}) = false
 
 function sideal{T}(R::PolyRingUnion, id::libSingular.ideal_ptr) where T
    return sideal{T}(R, id, false, isdefault_twosided_ideal(R))

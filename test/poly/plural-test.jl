@@ -1,12 +1,12 @@
-@testset "sgpoly.constructors" begin
+@testset "plural.constructors" begin
 
    r, (x, y) = PolynomialRing(QQ, ["x", "y"], ordering = :degrevlex)
    R, (x, y) = GAlgebra(r, Singular.Matrix(r, [1 1; 0 1]),
                            Singular.Matrix(r, [0 x; 0 0]))
 
-   @test elem_type(R) == sgpoly{n_Q}
-   @test elem_type(GPolyRing{n_Q}) == sgpoly{n_Q}
-   @test parent_type(sgpoly{n_Q}) == GPolyRing{n_Q}
+   @test elem_type(R) == spluralg{n_Q}
+   @test elem_type(PluralRing{n_Q}) == spluralg{n_Q}
+   @test parent_type(spluralg{n_Q}) == PluralRing{n_Q}
    @test base_ring(R) == QQ
 
    @test R isa Nemo.AbstractAlgebra.NCRing
@@ -16,27 +16,27 @@
    @test base_ring(a) == QQ
    @test parent(a) == R
 
-   @test isa(a, sgpoly)
+   @test isa(a, spluralg)
 
    b = R(123)
 
-   @test isa(b, sgpoly)
+   @test isa(b, spluralg)
 
    c = R(BigInt(123))
 
-   @test isa(c, sgpoly)
+   @test isa(c, spluralg)
 
    d = R(c)
 
-   @test isa(d, sgpoly)
+   @test isa(d, spluralg)
 
    f = R(Nemo.ZZ(123))
 
-   @test isa(f, sgpoly)
+   @test isa(f, spluralg)
 
    g = R(ZZ(123))
 
-   @test isa(g, sgpoly)
+   @test isa(g, spluralg)
 
 
    @test isgen(x)
@@ -55,7 +55,7 @@
    @test Singular.singular_symbols(R) == symbols(R)
 end
 
-@testset "sgpoly.printing" begin
+@testset "plural.printing" begin
    r, (x, y) = PolynomialRing(QQ, ["x", "y"], ordering = :degrevlex)
    R, (x, y) = GAlgebra(r, Singular.Matrix(r, [1 1; 0 1]),
                            Singular.Matrix(r, [0 x; 0 0]))
@@ -74,7 +74,7 @@ end
    @test String.(Singular.singular_symbols(R)) == ["x_1", "x_2"]
 end
 
-@testset "sgpoly.manipulation" begin
+@testset "plural.manipulation" begin
    r, (x, y) = PolynomialRing(QQ, ["x", "y"], ordering = :degrevlex)
    R, (x, y) = GAlgebra(r, Singular.Matrix(r, [1 1; 0 1]),
                            Singular.Matrix(r, [0 x; 0 0]))
@@ -149,7 +149,7 @@ end
    @test trailing_coefficient(R()) == 0
 end
 
-@testset "sgpoly.binary_ops" begin
+@testset "plural.binary_ops" begin
 
    r, (x, y) = PolynomialRing(QQ, ["x", "y"], ordering = :degrevlex)
    R, (x, y) = GAlgebra(r, Singular.Matrix(r, [1 1; 0 1]),
@@ -165,7 +165,7 @@ end
    @test y*x == x*y + x + 1
 end
 
-@testset "sgpoly.hash" begin
+@testset "plural.hash" begin
    r, (x, y) = PolynomialRing(QQ, ["x", "y"], ordering = :degrevlex)
    R, (x, y) = GAlgebra(r, Singular.Matrix(r, [1 1; 0 1]),
                            Singular.Matrix(r, [0 x; 0 0]))
@@ -175,13 +175,13 @@ end
    @test hash(x,one(UInt)) == hash(x+y-y,one(UInt))
 end
 
-@testset "sgpoly.recognition" begin
+@testset "plural.recognition" begin
    r, (x, y) = PolynomialRing(QQ, ["x", "y"], ordering = :degrevlex)
    R, (x, y) = GAlgebra(r, Singular.Matrix(r, [1 1; 0 1]),
                            Singular.Matrix(r, [0 x; 0 0]))
 
    S = Singular.create_ring_from_singular_ring(Singular.libSingular.rCopy(R.ptr))
-   @test S isa GPolyRing{n_Q}
+   @test S isa PluralRing{n_Q}
    @test nvars(S) == 2
 end
 

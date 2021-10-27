@@ -146,7 +146,7 @@ function isone(p::SPolyUnion)
    GC.@preserve R p return Bool(libSingular.p_IsOne(p.ptr, R.ptr))
 end
 
-function isgen(p::Union{spoly, sgpoly})
+function isgen(p::Union{spoly, spluralg})
    R = parent(p)
    GC.@preserve R p begin
       if p.ptr.cpp_object == C_NULL || libSingular.pNext(p.ptr).cpp_object != C_NULL ||
@@ -247,7 +247,7 @@ Return the exponent vector of the leading term of the given polynomial. The retu
 value is a Julia 1-dimensional array giving the exponent for each variable of the
 leading term.
 """
-function leading_exponent_vector(p::Union{spoly, sgpoly})
+function leading_exponent_vector(p::Union{spoly, spluralg})
    R = parent(p)
    n = nvars(R)
    A = Array{Int}(undef, n)
@@ -352,7 +352,7 @@ end
 function Base.hash(p::SPolyUnion, h::UInt)
    z = 0xaf708b07f940b4d2%UInt
    z = bitrotate(xor(z, hash(parent(p), h)), 1)
-   es = p isa slppoly ? exponent_words(p) : exponent_vectors(p)
+   es = p isa slpalg ? exponent_words(p) : exponent_vectors(p)
    for (c, e) in zip(coefficients(p), es)
       z = bitrotate(xor(z, hash(e, h)), 1)
       z = bitrotate(xor(z, hash(c, h)), 1)
@@ -524,7 +524,7 @@ function show(io::IO, R::PolyRing)
    end
 end
 
-function expressify(a::Union{spoly, sgpoly}, x = symbols(parent(a)); context = nothing)
+function expressify(a::Union{spoly, spluralg}, x = symbols(parent(a)); context = nothing)
    sum = Expr(:call, :+)
    for (c, v) in zip(coefficients(a), exponent_vectors(a))
       prod = Expr(:call, :*)
@@ -544,7 +544,7 @@ function expressify(a::Union{spoly, sgpoly}, x = symbols(parent(a)); context = n
 end
 
 AbstractAlgebra.@enable_all_show_via_expressify spoly
-AbstractAlgebra.@enable_all_show_via_expressify sgpoly
+AbstractAlgebra.@enable_all_show_via_expressify spluralg
 
 ###############################################################################
 #
@@ -634,7 +634,7 @@ function *(a::SPolyUnion{T}, b::SPolyUnion{T}) where T <: Nemo.RingElem
    R = parent(a)
    s = GC.@preserve a b R libSingular.pp_Mult_qq(a.ptr, b.ptr, R.ptr)
    z = R(s)
-   if a isa slppoly
+   if a isa slpalg
       libSingular.check_error()
    end
    return z
@@ -675,7 +675,7 @@ function ^(x::SPolyUnion, y::Int)
       x1 = libSingular.p_Copy(x.ptr, R.ptr)
       p = libSingular.p_Power(x1, Cint(y), R.ptr)
       z = R(p)
-      if x isa slppoly
+      if x isa slpalg
          libSingular.check_error()
       end
       return z
@@ -1402,7 +1402,7 @@ end
 #
 ###############################################################################
 
-function MPolyBuildCtx(R::Union{PolyRing, GPolyRing, LPPolyRing})
+function MPolyBuildCtx(R::Union{PolyRing, PluralRing, LPRing})
    # MPolyBuildCtx's inner constructor is too uncomfortable to use
    t = zero(R)
    M = Nemo.@new_struct(MPolyBuildCtx{typeof(t), typeof(t.ptr)}, t, t.ptr)
@@ -1414,7 +1414,7 @@ function push_term!(M::MPolyBuildCtx{S, U}, c::T, e::Vector{Int}) where {U,
    R = parent(M.poly)
    RR = base_ring(R)
    GC.@preserve c R RR begin
-      if S <: slppoly
+      if S <: slpalg
          nv = nvars(R)*degree_bound(R)
          v = zeros(Int, nv)
          _exponent_word_to_lp_vec!(v, e, nvars(R), degree_bound(R))

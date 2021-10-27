@@ -8,11 +8,11 @@ Singular.jl allows the creation of various noncommutative algebras over any of
 the coefficient rings described above. The constructors of the parent objects
 and elements thereof are given in the following table.
 
- Constructor     | Element type    | Parent type        | SINGULAR kernel subsystem
------------------|-----------------|--------------------|-----------
-GAlgebra         | `sgpoly{T}`     | `GPolyRing{T}`     | PLURAL
-WeylAlgebra      | `sgpoly{T}`     | `GPolyRing{T}`     | PLURAL
-FreeAlgebra      | `slppoly{T}`    | `LPPolyRing{T}`    | LETTERPLACE
+ Constructor   | Element type    | Parent type       | SINGULAR kernel subsystem
+---------------|-----------------|-------------------|--------------------------
+GAlgebra       | `spluralg{T}`   | `PluralRing{T}`   | PLURAL
+WeylAlgebra    | `spluralg{T}`   | `PluralRing{T}`   | PLURAL
+FreeAlgebra    | `slpalg{T}`     | `LPRing{T}`       | LETTERPLACE
 
 These types are parameterized by the type of elements in the coefficient ring
 of the algebra. All noncommutative algebra element types belong directly to the
@@ -59,7 +59,7 @@ julia> R, (x, y) = PolynomialRing(QQ, ["x", "y"]);
 
 julia> G, (x, y) = GAlgebra(R, Singular.Matrix(R, [0 2; 0 0]),
                                Singular.Matrix(R, [0 x; 0 0]))
-(Singular G-Algebra (QQ),(x,y),(dp(2),C), sgpoly{n_Q}[x, y])
+(Singular G-Algebra (QQ),(x,y),(dp(2),C), spluralg{n_Q}[x, y])
 
 julia> y*x
 2*x*y + x
@@ -69,11 +69,11 @@ The construction of a GR-algebra proceeds by taking the quotient of a G-algebra
 by a two-sided ideal. Continuing with the above example:
 
 ```
-I = Ideal(R, [x^2 + y^2], twosided = true)
+julia> I = Ideal(G, [x^2 + y^2], twosided = true)
 Singular two-sided ideal over Singular G-Algebra (QQ),(x,y),(dp(2),C) with generators (x^2 + y^2)
 
-Q, (x, y) = QuotientRing(R, std(I))
-(Singular G-Algebra Quotient Ring (QQ),(x,y),(dp(2),C), sgpoly{n_Q}[x, y])
+julia> Q, (x, y) = QuotientRing(G, std(I))
+(Singular G-Algebra Quotient Ring (QQ),(x,y),(dp(2),C), spluralg{n_Q}[x, y])
 ```
 
 ### WeylAlgebra
@@ -102,7 +102,7 @@ that due to the ordering constraint on G-algebras, the orderings `:neglex`,
 
 ```julia
 julia> R, (x, y, dx, dy) = WeylAlgebra(ZZ, ["x", "y"])
-(Singular G-Algebra (ZZ),(x,y,dx,dy),(dp(4),C), sgpoly{n_Z}[x, y, dx, dy]
+(Singular G-Algebra (ZZ),(x,y,dx,dy),(dp(4),C), spluralg{n_Z}[x, y, dx, dy])
 
 julia> (dx*x, dx*y, dy*x, dy*y)
 (x*dx + 1, y*dx, x*dy, y*dy + 1)
@@ -112,10 +112,10 @@ The ideals of G-algebras are left ideals by default.
 
 ```julia
 julia> R, (x1, x2, x3, d1, d2, d3) = WeylAlgebra(QQ, ["x1" "x2" "x3"; "d1" "d2" "d3"])
-(Singular G-Algebra (QQ),(x1,x2,x3,d1,d2,d3),(dp(6),C), sgpoly{n_Q}[x1, x2, x3, d1, d2, d3])
+(Singular G-Algebra (QQ),(x1,x2,x3,d1,d2,d3),(dp(6),C), spluralg{n_Q}[x1, x2, x3, d1, d2, d3])
 
 julia> gens(std(Ideal(R, [x1^2*d2^2 + x2^2*d3^2, x1*d2 + x3])))
-7-element Vector{sweylpoly{n_Q}}:
+7-element Vector{spluralg{n_Q}}:
  x1*d2 + x3
  x3^2
  x2*x3 - x1
@@ -146,7 +146,7 @@ ordering must be global.
 
 ```julia
 julia> R, (x, y) = FreeAlgebra(QQ, ["x", "y"], 5)
-(Singular letterplace Ring (QQ),(x,y,x,y,x,y,x,y,x,y),(dp(10),C,L(7)), slppoly{n_Q}[x, y])
+(Singular letterplace Ring (QQ),(x,y,x,y,x,y,x,y,x,y),(dp(10),C,L(3)), slpalg{n_Q}[x, y])
 
 julia> (x*y)^2
 x*y*x*y
@@ -159,9 +159,10 @@ The ideals are two-sided by default for this Algebra.
 
 ```julia
 julia> R, (x, y, z) = FreeAlgebra(QQ, ["x", "y", "z"], 4)
+(Singular letterplace Ring (QQ),(x,y,z,x,y,z,x,y,z,x,y,z),(dp(12),C,L(3)), slpalg{n_Q}[x, y, z])
 
 julia> gens(std(Ideal(R, [x*y + y*z, x*x + x*y - y*x - y*y])))
-8-element Vector{slppoly{n_Q}}:
+8-element Vector{slpalg{n_Q}}:
  x*y + y*z
  x^2 - y*x - y^2 - y*z
  y^3 + y*z*y - y^2*z - y*z^2
@@ -172,9 +173,9 @@ julia> gens(std(Ideal(R, [x*y + y*z, x*x + x*y - y*x - y*y])))
  y*z*y*x + y*z^2*x + y*z*y*z + y*z^3
 ```
 
-## Polynomial Term Iterators
+## Term Iterators
 
-For `GAlgebra`, `WeylAlgebra`, the polynomials elements can be and are
+For `GAlgebra` and `WeylAlgebra`, the elements can be and are
 represented using commutative data structures, and the function
 `exponent_vectors` is repurposed for access to the individual exponents.
 
@@ -182,7 +183,7 @@ represented using commutative data structures, and the function
 
 ```julia
 julia> R, (x, y, dx, dy) = WeylAlgebra(QQ, ["x", "y"])
-(Singular Weyl Algebra (QQ),(x,y,dx,dy),(dp(4),C), sweylpoly{n_Q}[x, y, dx, dy])
+(Singular G-Algebra (QQ),(x,y,dx,dy),(dp(4),C), spluralg{n_Q}[x, y, dx, dy])
 
 julia> p = (dx + dy)*(x + y)
 x*dx + y*dx + x*dy + y*dy + 2
@@ -191,7 +192,7 @@ julia> show(collect(exponent_vectors(p)))
 [[1, 0, 1, 0], [0, 1, 1, 0], [1, 0, 0, 1], [0, 1, 0, 1], [0, 0, 0, 0]]
 ```
 
-For `FreeAlgebra`, the function `exponent_vectors` is undefined on polynomial
+For `FreeAlgebra`, the function `exponent_vectors` is undefined on
 elements and replaced by `exponent_words` which reads off in order the indices
 of the variables in a monomial. Also, the monomials for the `MPolyBuildCtx` are
 specified by these exponent words. Other than these differences the term
@@ -201,7 +202,7 @@ iterators have the same behavior as in the commutative case.
 
 ```julia
 julia> R, (x, y, z) = FreeAlgebra(QQ, ["x", "y", "z"], 6)
-(Singular letterplace Ring (QQ),(x,y,z,x,y,z,x,y,z,x,y,z,x,y,z,x,y,z),(dp(18),C,L(7)), slppoly{n_Q}[x, y, z])
+(Singular letterplace Ring (QQ),(x,y,z,x,y,z,x,y,z,x,y,z,x,y,z,x,y,z),(dp(18),C,L(3)), slpalg{n_Q}[x, y, z])
 
 julia> p = (1 + x*z + y)^2
 x*z*x*z + x*z*y + y*x*z + y^2 + 2*x*z + 2*y + 1
@@ -210,16 +211,16 @@ julia> show(collect(coefficients(p)))
 n_Q[1, 1, 1, 1, 2, 2, 1]
 
 julia> show(collect(monomials(p)))
-slppoly{n_Q}[x*z*x*z, x*z*y, y*x*z, y*y, x*z, y, 1]
+slpalg{n_Q}[x*z*x*z, x*z*y, y*x*z, y^2, x*z, y, 1]
 
 julia> show(collect(terms(p)))
-slppoly{n_Q}[x*z*x*z, x*z*y, y*x*z, y*y, 2*x*z, 2*y, 1]
+slpalg{n_Q}[x*z*x*z, x*z*y, y*x*z, y^2, 2*x*z, 2*y, 1]
 
 julia> show(collect(exponent_words(p)))
 [[1, 3, 1, 3], [1, 3, 2], [2, 1, 3], [2, 2], [1, 3], [2], Int64[]]
 
 julia> B = MPolyBuildCtx(R)
-Builder for a polynomial in Singular letterplace Ring (QQ),(x,y,z,x,y,z,x,y,z,x,y,z,x,y,z,x,y,z),(dp(18),C,L(7))
+Builder for a polynomial in Singular letterplace Ring (QQ),(x,y,z,x,y,z,x,y,z,x,y,z,x,y,z,x,y,z),(dp(18),C,L(3))
 
 julia> push_term!(B, QQ(2), [3,2,1,3]);
 

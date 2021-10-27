@@ -1,10 +1,10 @@
-@testset "slppoly.constructors" begin
+@testset "lp.constructors" begin
 
    R, (x, y, z) = FreeAlgebra(QQ, ["x", "y", "z"], 2)
 
-   @test elem_type(R) == slppoly{n_Q}
-   @test elem_type(LPPolyRing{n_Q}) == slppoly{n_Q}
-   @test parent_type(slppoly{n_Q}) == LPPolyRing{n_Q}
+   @test elem_type(R) == slpalg{n_Q}
+   @test elem_type(LPRing{n_Q}) == slpalg{n_Q}
+   @test parent_type(slpalg{n_Q}) == LPRing{n_Q}
    @test base_ring(R) == QQ
 
    @test R isa Nemo.AbstractAlgebra.NCRing
@@ -14,27 +14,27 @@
    @test base_ring(a) == QQ
    @test parent(a) == R
 
-   @test isa(a, slppoly)
+   @test isa(a, slpalg)
 
    b = R(123)
 
-   @test isa(b, slppoly)
+   @test isa(b, slpalg)
 
    c = R(BigInt(123))
 
-   @test isa(c, slppoly)
+   @test isa(c, slpalg)
 
    d = R(c)
 
-   @test isa(d, slppoly)
+   @test isa(d, slpalg)
 
    f = R(Nemo.ZZ(123))
 
-   @test isa(f, slppoly)
+   @test isa(f, slpalg)
 
    g = R(ZZ(123))
 
-   @test isa(g, slppoly)
+   @test isa(g, slpalg)
 
    @test isgen(x)
    @test isgen(y)
@@ -52,7 +52,7 @@
    @test Singular.singular_symbols(R) == symbols(R)
 end
 
-@testset "slppoly.printing" begin
+@testset "lp.printing" begin
    R, (x, y) = FreeAlgebra(QQ, ["x", "y"], 4, ordering = :degrevlex)
 
    @test string(x) == "x"
@@ -63,7 +63,7 @@ end
    @test string(2*y^2*x^2 + y*x^2*y + x + 3) == "2*y^2*x^2 + y*x^2*y + x + 3"
 end
 
-@testset "slppoly.rename" begin
+@testset "lp.rename" begin
    for n in 1:5, d in 1:5
       s = ["x[$i]" for i in 1:n]
       R, x = FreeAlgebra(QQ, s, d)
@@ -72,7 +72,7 @@ end
    end
 end
 
-@testset "slppoly.manipulation" begin
+@testset "lp.manipulation" begin
    R, (x, y) = FreeAlgebra(QQ, ["x", "y"], 5)
 
    @test isone(one(R))
@@ -150,19 +150,19 @@ end
    @test trailing_coefficient(R()) == 0
 end
 
-@testset "slppoly.binary_ops" begin
+@testset "lp.binary_ops" begin
    R, (x, y, z, w) = FreeAlgebra(QQ, ["x", "y", "z", "w"], 5)
    @test y*x != x*y
    @test !iszero(y*x + x*y)
    @test !iszero(y*x - x*y)
 end
 
-@testset "slppoly.powering" begin
+@testset "lp.powering" begin
    R, (x, y, z) = FreeAlgebra(Fp(5), ["x", "y", "z"], 10)
    @test length((x + y + z)^5) == 3^5
 end
 
-@testset "slppoly.hash" begin
+@testset "lp.hash" begin
    R, (x, y) = FreeAlgebra(QQ, ["x", "y"], 5)
 
    @test hash(x) == hash(x+y-y)
@@ -170,10 +170,10 @@ end
    @test hash(x,one(UInt)) == hash(x+y-y,one(UInt))
 end
 
-@testset "slppoly.recognition" begin
+@testset "lp.recognition" begin
    R, (x, y) = FreeAlgebra(QQ, ["x", "y"], 5)
    S = Singular.create_ring_from_singular_ring(Singular.libSingular.rCopy(R.ptr))
-   @test S isa LPPolyRing{n_Q}
+   @test S isa LPRing{n_Q}
    @test degree_bound(S) == 5
    @test nvars(S) == 2
 end

@@ -432,7 +432,7 @@ end
 
    I = Ideal(G, [z^2, u^2, v^2, w^2, z*u*v - w]; twosided = true)
    Q, (z, u, v, w) = QuotientRing(G, std(I))
-   @test Q isa GPolyRing
+   @test Q isa PluralRing
 end
 
 @testset "sideal.FreeAlgebra" begin

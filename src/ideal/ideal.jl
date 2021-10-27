@@ -730,21 +730,21 @@ function Ideal(R::PolyRing{T}, ids::Vector{spoly{T}}) where T <: Nemo.RingElem
    return sideal{S}(R, ids...)
 end
 
-function Ideal(R::GPolyRing{T}, ids::sgpoly{T}...) where T <: Nemo.RingElem
+function Ideal(R::PluralRing{T}, ids::spluralg{T}...) where T <: Nemo.RingElem
    length(ids) == 0 && return sideal{elem_type(R)}(R, R(0))
    return sideal{elem_type(R)}(R, ids...)
 end
 
-function Ideal(R::GPolyRing{T}, ids::Vector{sgpoly{T}}; twosided=false) where T <: Nemo.RingElem
+function Ideal(R::PluralRing{T}, ids::Vector{spluralg{T}}; twosided=false) where T <: Nemo.RingElem
    return sideal{elem_type(R)}(R, ids, twosided)
 end
 
-function Ideal(R::LPPolyRing{T}, ids::slppoly{T}...) where T <: Nemo.RingElem
+function Ideal(R::LPRing{T}, ids::slpalg{T}...) where T <: Nemo.RingElem
    length(ids) == 0 && return sideal{elem_type(R)}(R, R(0))
    return sideal{elem_type(R)}(R, ids...)
 end
 
-function Ideal(R::LPPolyRing{T}, ids::Vector{slppoly{T}}; twosided=true) where T <: Nemo.RingElem
+function Ideal(R::LPRing{T}, ids::Vector{slpalg{T}}; twosided=true) where T <: Nemo.RingElem
    return sideal{elem_type(R)}(R, ids, twosided)
 end
 
