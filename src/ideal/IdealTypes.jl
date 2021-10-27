@@ -44,18 +44,22 @@ isdefault_twosided_ideal(::Type{<:spoly}) = true
 isdefault_twosided_ideal(::Type{<:slpalg}) = true
 isdefault_twosided_ideal(::Type{<:spluralg}) = false
 
-function sideal{T}(R::PolyRingUnion, id::libSingular.ideal_ptr) where T
-   return sideal{T}(R, id, false, isdefault_twosided_ideal(R))
+function sideal{S}(R::PolyRingUnion, id::libSingular.ideal_ptr, isGB::Bool) where S
+   return sideal{S}(R, id, isGB, isdefault_twosided_ideal(S))
 end
 
-function sideal{T}(R::PolyRingUnion, ids::Vector{<:SPolyUnion}, isTwoSided::Bool) where T
+function sideal{S}(R::PolyRingUnion, id::libSingular.ideal_ptr) where S
+   return sideal{S}(R, id, false, isdefault_twosided_ideal(S))
+end
+
+function sideal{S}(R::PolyRingUnion, ids::Vector{<:SPolyUnion}, isTwoSided::Bool) where S
    n = length(ids)
    id = libSingular.idInit(Cint(n), 1)
    for i = 1:n
       p = libSingular.p_Copy(ids[i].ptr, R.ptr)
       libSingular.setindex_internal(id, p, Cint(i - 1))
    end
-   return sideal{T}(R, id, false, isTwoSided)
+   return sideal{S}(R, id, false, isTwoSided)
 end
 
 function sideal{T}(R::PolyRingUnion, ids::SPolyUnion...) where T
