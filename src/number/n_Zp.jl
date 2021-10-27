@@ -71,21 +71,12 @@ function show(io::IO, c::N_ZpField)
    print(io, "Finite Field of Characteristic ", characteristic(c))
 end
 
-function Base.show(io::IO, ::MIME"text/plain", a::n_Zp)
-  print(io, AbstractAlgebra.obj_to_string(a, context = io))
-end
-
-function AbstractAlgebra.expressify(n::n_Zp; context = nothing)::Any
+function expressify(n::n_Zp; context = nothing)::Any
   nn = rem(Int(n), Int(characteristic(parent(n))), RoundNearest)
-  return AbstractAlgebra.expressify(nn, context = context)
+  return expressify(nn, context = context)
 end
 
-function show(io::IO, n::n_Zp)
-   libSingular.StringSetS("")
-   c = parent(n)
-   GC.@preserve n c libSingular.n_Write(n.ptr, c.ptr, false)
-   print(io, libSingular.StringEndS())
-end
+AbstractAlgebra.@enable_all_show_via_expressify n_Zp
 
 ###############################################################################
 #

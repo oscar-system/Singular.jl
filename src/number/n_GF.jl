@@ -97,11 +97,7 @@ function show(io::IO, c::N_GField)
    print(io, "Finite Field of Characteristic ", characteristic(c), " and degree ", degree(c))
 end
 
-function Base.show(io::IO, ::MIME"text/plain", a::n_GF)
-   print(io, AbstractAlgebra.obj_to_string(a, context = io))
-end
-
-function AbstractAlgebra.expressify(a::n_GF; context = nothing)::Any
+function expressify(a::n_GF; context = nothing)::Any
    F = parent(a)
    GC.@preserve a i = reinterpret(Int, a.ptr.cpp_object)
    p = Int(characteristic(parent(a)))
@@ -119,9 +115,7 @@ function AbstractAlgebra.expressify(a::n_GF; context = nothing)::Any
    end
 end
 
-function Base.show(io::IO, a::n_GF)
-   print(io, AbstractAlgebra.obj_to_string(a, context = io))
-end
+AbstractAlgebra.@enable_all_show_via_expressify n_GF
 
 ###############################################################################
 #

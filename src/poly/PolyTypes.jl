@@ -29,16 +29,17 @@ const PolyRingID = Dict{Tuple{Union{Ring, Field}, Vector{Symbol},
 
 mutable struct PolyRing{T <: Nemo.RingElem} <: Nemo.MPolyRing{T}
    ptr::libSingular.ring_ptr
+   refcount::Int
    base_ring::Union{Ring, Field}
    ord::sordering
-   refcount::Int
    S::Vector{Symbol}
 
    # take ownership of a ring ptr
    function PolyRing{T}(r::libSingular.ring_ptr, R, s::Vector{Symbol}=singular_symbols(r)) where T
+      @assert r.cpp_object != C_NULL
       ord = Cint[]
       libSingular.rOrdering_helper(ord, r)
-      d = new(r, R, deserialize_ordering(ord), 1, s)
+      d = new(r, 1, R, deserialize_ordering(ord), s)
       finalizer(_PolyRing_clear_fn, d)
       return d
    end
@@ -49,6 +50,7 @@ function PolyRing{T}(R::Union{Ring, Field}, s::Vector{Symbol},
                      degree_bound::Int = 0) where T
    bitmask = Culong(degree_bound)
    nvars = length(s)
+   nvars > 0 || error("need at least one indeterminate")
    # internally in libSingular, degree_bound is set to
    deg_bound_fix = Int(libSingular.rGetExpSize(bitmask, Cint(nvars)))
    sord = serialize_ordering(nvars, ord)
@@ -62,7 +64,8 @@ function PolyRing{T}(R::Union{Ring, Field}, s::Vector{Symbol},
    end::PolyRing{T}
 end
 
-function _PolyRing_clear_fn(R::PolyRing)
+# for various types of PolyRings, which all wrap a ring_ptr in .ptr
+function _PolyRing_clear_fn(R)
    R.refcount -= 1
    if R.refcount == 0
       libSingular.rDelete(R.ptr)
@@ -79,6 +82,14 @@ mutable struct spoly{T <: Nemo.RingElem} <: Nemo.MPolyElem{T}
       finalizer(_spoly_clear_fn, z)
       return z
    end
+end
+
+# for various types of polys, which all have a parent and a .ptr
+# TODO: this is technically dirty because we can't assume that R is a valid object
+function _spoly_clear_fn(p)
+   R = parent(p)
+   libSingular.p_Delete(p.ptr, R.ptr)
+   _PolyRing_clear_fn(R)
 end
 
 function spoly{T}(R::PolyRing{T}) where T <: Nemo.RingElem
@@ -114,10 +125,30 @@ function spoly{T}(R::PolyRing{T}, b::BigInt) where T <: Nemo.RingElem
    return spoly{T}(R, p)
 end
 
+###############################################################################
+#
+# Iterators
+#
+###############################################################################
 
-function _spoly_clear_fn(p::spoly)
-   R = parent(p)
-   libSingular.p_Delete(p.ptr, R.ptr)
-   _PolyRing_clear_fn(R)
+struct SPolyCoeffs{T}
+   poly::T
+end
+
+struct SPolyExponentVectors{T}
+   poly::T
+end
+
+struct SPolyExponentWords{T}
+   poly::T
+   tmp::Vector{Int}
+end
+
+struct SPolyTerms{T}
+   poly::T
+end
+
+struct SPolyMonomials{T}
+   poly::T
 end
 

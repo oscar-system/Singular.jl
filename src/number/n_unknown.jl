@@ -55,17 +55,12 @@ function show(io::IO, R::N_unknown)
    show(io, R.base_ring)
 end
 
-function show(io::IO, a::n_unknown)
-   libSingular.StringSetS("")
-   R = parent(a)
-   GC.@preserve a R libSingular.n_Write(a.ptr, R.ptr, false)
-   print(io, libSingular.StringEndS())
+function expressify(a::n_unknown; context = nothing)
+   n = GC.@preserve a libSingular.julia(libSingular.cast_number_to_void(a.ptr))
+   return expressify(n; context = context)
 end
 
-function AbstractAlgebra.expressify(a::n_unknown; context = nothing)
-   n = GC.@preserve a libSingular.julia(libSingular.cast_number_to_void(a.ptr))
-   return AbstractAlgebra.expressify(n; context = context)
-end
+AbstractAlgebra.@enable_all_show_via_expressify n_unknown
 
 ###############################################################################
 #

@@ -241,7 +241,7 @@ S = saturation(I, J)
 ### Standard basis
 
 ```@docs
-std(::sideal; ::Bool)
+std(::sideal{spoly}; ::Bool)
 ```
 
 ```@docs

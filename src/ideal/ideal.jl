@@ -4,6 +4,8 @@ export sideal, IdealSet, syz, lead, normalize!, isconstant, iszerodim, fglm,
        quotient, reduce, eliminate, kernel, equal, contains, isvar_generated,
        saturation, satstd, slimgb, std, vdim, interreduce, degree, mult
 
+#TODO!!!! the type stability is atrocious here. culprit "return Ideal(R, ptr)"
+
 ###############################################################################
 #
 #   Basic manipulation
@@ -167,7 +169,7 @@ function deepcopy_internal(I::sideal, dict::IdDict)
    return Ideal(R, ptr)
 end
 
-function check_parent(I::sideal{T}, J::sideal{T}) where T <: Nemo.RingElem
+function check_parent(I::sideal{T}, J::sideal{T}) where T <: AbstractAlgebra.NCRingElem
    base_ring(I) != base_ring(J) && error("Incompatible ideals")
 end
 
@@ -190,9 +192,13 @@ function show(io::IO, S::IdealSet)
    show(io, base_ring(S))
 end
 
-function show(io::IO, I::sideal)
+function show(io::IO, I::sideal{T}) where T <: SPolyUnion
    n = ngens(I)
-   print(io, "Singular Ideal over ")
+   if !isdefault_twosided_ideal(T) && I.isTwoSided
+      print(io, "Singular two-sided ideal over ")
+   else
+      print(io, "Singular ideal over ")
+   end
    show(io, base_ring(I))
    print(io, " with generators (")
    for i = 1:n
@@ -429,9 +435,9 @@ end
 Given an ideal $I$ this function computes a Groebner basis for it.
 Compared to `std`, `slimgb` uses different strategies for choosing
 a reducer.
->
+
 If the optional parameter `complete_reduction` is set to `true` the
-function computes a reduced Gröbner basis for $I$.
+function computes a reduced Groebner basis for $I$.
 """
 function slimgb(I::sideal; complete_reduction::Bool=false)
    R = base_ring(I)
@@ -451,13 +457,15 @@ only have unique leading terms (up to permutation and multiplication by
 constants). If `complete_reduction` is set to `true` (and the ordering is
 a global ordering) then the Groebner basis is unique.
 """
-function std(I::sideal; complete_reduction::Bool=false)
+function std(I::sideal{T}; complete_reduction::Bool=false) where T <: SPolyUnion
    R = base_ring(I)
-   ptr = GC.@preserve I R libSingular.id_Std(I.ptr, R.ptr, complete_reduction)
+   if !isdefault_twosided_ideal(T) && I.isTwoSided
+      ptr = GC.@preserve I R libSingular.id_TwoStd(I.ptr, R.ptr)
+   else
+      ptr = GC.@preserve I R libSingular.id_Std(I.ptr, R.ptr, complete_reduction)
+   end
    libSingular.idSkipZeroes(ptr)
-   z = Ideal(R, ptr)
-   z.isGB = true
-   return z
+   return sideal{T}(R, ptr, true, I.isTwoSided)
 end
 
 @doc Markdown.doc"""
@@ -703,6 +711,14 @@ end
 #
 ###############################################################################
 
+function Ideal(R::PolyRingUnion, id::libSingular.ideal_ptr)
+   return sideal{elem_type(R)}(R, id)
+end
+
+function (R::PolyRingUnion)(id::libSingular.ideal_ptr)
+    return Ideal(R, id)
+end
+
 function Ideal(R::PolyRing{T}, ids::spoly{T}...) where T <: Nemo.RingElem
    S = elem_type(R)
    length(ids) == 0 && return sideal{S}(R, R(0))
@@ -714,13 +730,22 @@ function Ideal(R::PolyRing{T}, ids::Vector{spoly{T}}) where T <: Nemo.RingElem
    return sideal{S}(R, ids...)
 end
 
-function Ideal(R::PolyRing{T}, id::libSingular.ideal_ptr) where T <: Nemo.RingElem
-   S = elem_type(R)
-   return sideal{S}(R, id)
+function Ideal(R::PluralRing{T}, ids::spluralg{T}...) where T <: Nemo.RingElem
+   length(ids) == 0 && return sideal{elem_type(R)}(R, R(0))
+   return sideal{elem_type(R)}(R, ids...)
 end
 
-function (R::PolyRing{T})(id::libSingular.ideal_ptr) where T <: Nemo.RingElem
-    return Ideal(R,id)
+function Ideal(R::PluralRing{T}, ids::Vector{spluralg{T}}; twosided=false) where T <: Nemo.RingElem
+   return sideal{elem_type(R)}(R, ids, twosided)
+end
+
+function Ideal(R::LPRing{T}, ids::slpalg{T}...) where T <: Nemo.RingElem
+   length(ids) == 0 && return sideal{elem_type(R)}(R, R(0))
+   return sideal{elem_type(R)}(R, ids...)
+end
+
+function Ideal(R::LPRing{T}, ids::Vector{slpalg{T}}; twosided=true) where T <: Nemo.RingElem
+   return sideal{elem_type(R)}(R, ids, twosided)
 end
 
 # maximal ideal in degree d
@@ -891,3 +916,4 @@ function maximal_independent_set(I::sideal{spoly{T}}; all::Bool = false) where T
       return P
    end
 end
+

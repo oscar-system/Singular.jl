@@ -157,21 +157,19 @@ function show(io::IO, F::N_FField)
    print(io, "Function Field over ", base_ring(F), " with transcendence basis ", transcendence_basis(F))
 end
 
-function AbstractAlgebra.expressify(a::n_transExt; context = nothing)::Any
+function expressify(a::n_transExt; context = nothing)::Any
    n = numerator(a)
-   n = AbstractAlgebra.expressify(n_transExt_to_spoly(n), context = context)
+   n = expressify(n_transExt_to_spoly(n), context = context)
    d = denominator(a)
    if isone(d)
       return n
    else
-      d = AbstractAlgebra.expressify(n_transExt_to_spoly(d), context = context)
+      d = expressify(n_transExt_to_spoly(d), context = context)
       return Expr(:call, ://, n, d)
    end
 end
 
-function Base.show(io::IO, a::n_transExt)
-   print(io, AbstractAlgebra.obj_to_string(a, context = io))
-end
+AbstractAlgebra.@enable_all_show_via_expressify n_transExt
 
 ###############################################################################
 #

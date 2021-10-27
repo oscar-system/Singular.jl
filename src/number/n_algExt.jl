@@ -92,14 +92,12 @@ function show(io::IO, F::N_AlgExtField)
          base_ring(F), " with defining equation ", modulus(F))
 end
 
-function AbstractAlgebra.expressify(a::n_algExt; context = nothing)::Any
+function expressify(a::n_algExt; context = nothing)::Any
    F = parent(modulus(parent(a)))
-   return AbstractAlgebra.expressify(F(a), context = context)
+   return expressify(F(a), context = context)
 end
 
-function Base.show(io::IO, a::n_algExt)
-   print(io, AbstractAlgebra.obj_to_string(a, context = io))
-end
+AbstractAlgebra.@enable_all_show_via_expressify n_algExt
 
 ###############################################################################
 #

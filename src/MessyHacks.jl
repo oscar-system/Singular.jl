@@ -63,6 +63,9 @@ end
 
 # return an array of all symbols used for printing objects in the ring
 function all_singular_symbols(R::Nemo.Ring)
+   # TODO not correct because AA doesn't have this notion (yet).
+   # Doesn't matter to Singular.jl because wrapped coeff rings don't work in
+   # the interpreter anyways
    return Symbol[]
 end
 
@@ -74,7 +77,11 @@ function all_singular_symbols(R::N_AlgExtField)
    return all_singular_symbols(parent(R.minpoly))
 end
 
-function all_singular_symbols(R::Union{N_FField, PolyRing})
+function all_singular_symbols(R::N_FField)
+   return vcat(all_singular_symbols(base_ring(R)), singular_symbols(R))
+end
+
+function all_singular_symbols(R::PolyRingUnion)
    return vcat(all_singular_symbols(base_ring(R)), singular_symbols(R))
 end
 

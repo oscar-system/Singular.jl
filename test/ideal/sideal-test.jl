@@ -12,7 +12,7 @@
    @test base_ring(I) == R
 
    @test S isa AbstractAlgebra.Set
-   @test I isa AbstractAlgebra.Module
+   @test I isa sideal
 
    I1 = Ideal(R)
    I2 = Ideal(R, x + y)
@@ -419,4 +419,29 @@ end
    # @test mI*T == mG
    # should be true, but there are additional (invisible) zeros in G
    # causing a dimension mismatch
+end
+
+@testset "sideal.GAlgebra" begin
+
+   R, (z, u, v, w) = PolynomialRing(QQ, ["z", "u", "v", "w"])
+   G, (z, u, v, w) = GAlgebra(R, Singular.Matrix(R, [0 -1 -1 -1; 0 0 -1 -1; 0 0 0 -1; 0 0 0 0]),
+                                 Singular.Matrix(R, [0 0 0 0; 0 0 0 0; 0 0 0 0; 0 0 0 0]))
+
+   @test_throws Exception QuotientRing(G, std(Ideal(R, [x])))
+   @test_throws Exception QuotientRing(G, Ideal(R, [x], twosided = true))
+
+   I = Ideal(G, [z^2, u^2, v^2, w^2, z*u*v - w]; twosided = true)
+   Q, (z, u, v, w) = QuotientRing(G, std(I))
+   @test Q isa PluralRing
+end
+
+@testset "sideal.FreeAlgebra" begin
+   R, (x, d) = FreeAlgebra(Fp(3), ["x", "d"], 5)
+   I = Ideal(R, [x^4, d^3, d*x - x*d - 1])
+   @test length(gens(std(I))) == 3
+
+   I = Ideal(R, [d*x - x*d - 1])
+   Q, (x, d) = QuotientRing(R, std(I))
+   @test length(gens(std(Ideal(Q, [x^4, d^3])))) == 2
+   @test length(gens(std(Ideal(Q, [x^2, d^3])))) == 1
 end

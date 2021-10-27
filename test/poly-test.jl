@@ -1,2 +1,5 @@
 include("poly/PolyRing-test.jl")
-include("poly/spoly-test.jl")
+include("poly/poly-test.jl")
+include("poly/plural-test.jl")
+include("poly/weyl-test.jl")
+include("poly/lp-test.jl")

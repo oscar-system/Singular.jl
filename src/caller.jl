@@ -153,24 +153,28 @@ end
 function create_ring_from_singular_ring(r::libSingular.ring_ptr)
    c = libSingular.rCoeffPtr(r)
    if libSingular.nCoeff_is_Q(c)
-      return PolyRing{n_Q}(r, QQ)
+      basering = QQ
+      T = n_Q
    elseif libSingular.nCoeff_is_Zp(c)
       p = Int(libSingular.n_GetChar(c))
-      return PolyRing{n_Zp}(r, N_ZpField(p))
+      basering = N_ZpField(p)
+      T = n_Zp
    elseif libSingular.nCoeff_is_Z(c)
-      return PolyRing{n_Z}(r, ZZ)
+      basering = ZZ
+      T = n_Z
    elseif libSingular.nCoeff_is_GF(c)
       p = Int(libSingular.n_GetChar(c))
       q = Int(libSingular.nfCharQ(c))
       d = round(Int, log(p, q))
       s = Symbol(libSingular.n_ParameterName(0, c))
-      return PolyRing{n_GF}(r, N_GField(p, d, s))
+      basering = N_GField(p, d, s)
+      T = n_GF
    elseif libSingular.nCoeff_is_transExt(c)
       p = Int(libSingular.n_GetChar(c))
       npars = libSingular.n_NumberOfParameters(c)
       S = [Symbol(libSingular.n_ParameterName(i-1, c)) for i in 1:npars]
-      F = N_FField(iszero(p) ? QQ : N_ZpField(p), S)
-      return PolyRing{n_transExt}(r, F)
+      basering = N_FField(iszero(p) ? QQ : N_ZpField(p), S)
+      T = n_transExt
    elseif libSingular.nCoeff_is_algExt(c)
       # first create the univariate transcendental extension
       p = Int(libSingular.n_GetChar(c))
@@ -179,11 +183,22 @@ function create_ring_from_singular_ring(r::libSingular.ring_ptr)
       F = N_FField(iszero(p) ? QQ : N_ZpField(p), S)
       # now create the extension
       minpoly = F(libSingular.algExt_GetMinpoly(c, F.ptr))
-      K = N_AlgExtField(libSingular.nCopyCoeff(c), minpoly)
-      return PolyRing{n_algExt}(r, K)
+      basering = N_AlgExtField(libSingular.nCopyCoeff(c), minpoly)
+      T = n_algExt
    else
       basering = N_UnknownSingularCoefficientRing(libSingular.nCopyCoeff(c))
-      return PolyRing{n_unknownsingularcoefficient}(r, basering)
+      T = n_unknownsingularcoefficient
+   end
+   if libSingular.rIsPluralRing(r)
+      return PluralRing{T}(r, basering)
+   else
+      n = Int(libSingular.rIsLPRing(r))
+      if n > 0
+         deg_bound = divexact(Int(libSingular.rVar(r)), n)
+         return LPRing{T}(r, basering, deg_bound)
+      else
+         return PolyRing{T}(r, basering)
+      end
    end
 end
 

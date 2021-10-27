@@ -12,7 +12,7 @@ funded by the DFG TRR 195 program.
 The features of Singular so far include:
 
   - Singular integers, rationals Z/nZ, Z/pZ, Galois fields
-  - Multivariate polynomials
+  - Multivariate polynomials, including several noncommutative variants
   - Ideals over polynomial rings
   - Free modules over polynomial rings and submodules given by a finite generating set
   - Groebner basis over a field

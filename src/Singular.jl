@@ -32,7 +32,7 @@ using RandomExtensions: RandomExtensions, make, Make2
 
 import AbstractAlgebra: AbstractAlgebra, diagonal_matrix, factor,
                         identity_matrix, kernel, lead, ncols, ngens, nrows, order,
-                        preimage, zero_matrix
+                        preimage, zero_matrix, expressify
 
 import Nemo: add!, addeq!, base_ring, canonical_unit,
              change_base_ring, characteristic, check_parent, codomain,
@@ -53,7 +53,9 @@ import Nemo: add!, addeq!, base_ring, canonical_unit,
 
 export base_ring, elem_type, parent_type, parent
 
-export ResidueRing, PolynomialRing, Ideal, MaximalIdeal, FreeModule
+export ResidueRing, PolynomialRing, ExteriorAlgebra, WeylAlgebra, Ideal,
+       MaximalIdeal, FreeModule, @PolynomialRing, @WeylAlgebra,
+       @ExteriorAlgebra
 
 export ZZ, QQ, FiniteField, FunctionField, CoefficientRing, Fp
 
@@ -182,6 +184,12 @@ const VERSION_NUMBER = pkgversion(@__MODULE__)
 ###############################################################################
 #
 #   Load Singular Rings/Fields/etc
+#     There is a slight circular dependency: in order to create a G-Algebra
+#     you need a PolyRing R and matrices over R, and in order to create a 
+#     quotient ring you need the polynomial ring and an ideal.
+#     The matrix code requires some module code, which requires some ideal
+#     code, which requies some poly code. Therefore, we include all of the
+#     poly/matrix/module/ideal types before including the methods.
 #
 ###############################################################################
 
@@ -193,13 +201,41 @@ include("LibSingular.jl")
 
 include("Number.jl")
 
-include("Poly.jl")
+include("poly/PolyTypes.jl")
 
-include("Module.jl")
+include("matrix/MatrixTypes.jl")
 
-include("Ideal.jl")
+include("module/ModuleTypes.jl")
 
-include("Matrix.jl")
+include("poly/PluralTypes.jl")
+
+include("poly/LPTypes.jl")
+
+# all "poly" types
+
+const PolyRingUnion{T} = Union{PolyRing{T}, PluralRing{T}, LPRing{T}} where T <: Nemo.RingElem
+
+const SPolyUnion{T} = Union{spoly{T}, spluralg{T}, slpalg{T}} where T <: Nemo.RingElem
+
+include("poly/poly.jl")
+
+include("poly/plural.jl")
+
+include("poly/weyl.jl")
+
+include("poly/lp.jl")
+
+include("ideal/IdealTypes.jl")
+
+include("matrix/matrix.jl")
+
+include("matrix/bigintmat.jl")
+
+include("poly/quotient.jl")
+
+include("module/module.jl")
+
+include("ideal/ideal.jl")
 
 include("Vector.jl")
 

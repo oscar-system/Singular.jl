@@ -6,8 +6,8 @@
 
 const IdealSetID = Dict{PolyRing, Set}()
 
-mutable struct IdealSet{T <: Nemo.RingElem} <: Set
-   base_ring::PolyRing
+mutable struct IdealSet{T <: AbstractAlgebra.NCRingElem} <: Set
+   base_ring::PolyRingUnion
 
    function IdealSet{T}(R::PolyRing) where T
       return get!(IdealSetID, R) do
@@ -16,33 +16,55 @@ mutable struct IdealSet{T <: Nemo.RingElem} <: Set
    end
 end
 
-mutable struct sideal{T <: Nemo.RingElem} <: Module{T}
-   base_ring::PolyRing
+mutable struct sideal{T <: AbstractAlgebra.NCRingElem} <: Set
    ptr::libSingular.ideal_ptr
+   base_ring::PolyRingUnion
    isGB::Bool
+   isTwoSided::Bool
 
-   function sideal{T}(R::PolyRing, id::libSingular.ideal_ptr) where T
-      T === elem_type(R) || error("type mismatch")
-      z = new(R, id, false)
+   function sideal{T}(R::PolyRingUnion, id::libSingular.ideal_ptr, isGB::Bool, isTwoSided::Bool) where T
+      z = new{T}(id, R, isGB, isTwoSided)
       R.refcount += 1
       finalizer(_sideal_clear_fn, z)
       return z
    end
 end
 
-function sideal{T}(R::PolyRing, ids::spoly...) where T
-   n = length(ids)
-   id = libSingular.idInit(Cint(n),1)
-   z = sideal{T}(R, id)
-   for i = 1:n
-      p = libSingular.p_Copy(ids[i].ptr, R.ptr)
-      libSingular.setindex_internal(id, p, Cint(i - 1))
-   end
-   return z
-end
-
-function _sideal_clear_fn(I::sideal)
+function _sideal_clear_fn(I::sideal{T}) where T <: SPolyUnion
    R = I.base_ring
    libSingular.id_Delete(I.ptr, R.ptr)
    _PolyRing_clear_fn(R)
 end
+
+isdefault_twosided_ideal(R::PolyRing) = true
+isdefault_twosided_ideal(R::LPRing) = true
+isdefault_twosided_ideal(R::PluralRing) = false
+
+isdefault_twosided_ideal(::Type{<:spoly}) = true
+isdefault_twosided_ideal(::Type{<:slpalg}) = true
+isdefault_twosided_ideal(::Type{<:spluralg}) = false
+
+function sideal{T}(R::PolyRingUnion, id::libSingular.ideal_ptr) where T
+   return sideal{T}(R, id, false, isdefault_twosided_ideal(R))
+end
+
+function sideal{T}(R::PolyRingUnion, ids::Vector{<:SPolyUnion}, isTwoSided::Bool) where T
+   n = length(ids)
+   id = libSingular.idInit(Cint(n), 1)
+   for i = 1:n
+      p = libSingular.p_Copy(ids[i].ptr, R.ptr)
+      libSingular.setindex_internal(id, p, Cint(i - 1))
+   end
+   return sideal{T}(R, id, false, isTwoSided)
+end
+
+function sideal{T}(R::PolyRingUnion, ids::SPolyUnion...) where T
+   n = length(ids)
+   id = libSingular.idInit(Cint(n), 1)
+   for i = 1:n
+      p = libSingular.p_Copy(ids[i].ptr, R.ptr)
+      libSingular.setindex_internal(id, p, Cint(i - 1))
+   end
+   return sideal{T}(R, id, false, isdefault_twosided_ideal(R))
+end
+

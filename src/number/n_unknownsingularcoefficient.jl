@@ -73,7 +73,7 @@ end
 #
 ###############################################################################
 
-function AbstractAlgebra.expressify(a::n_unknownsingularcoefficient; context = nothing)::Any
+function expressify(a::n_unknownsingularcoefficient; context = nothing)::Any
    # TODO this easy method might not be the best
    libSingular.StringSetS("")
    R = parent(a)
