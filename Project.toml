@@ -21,9 +21,9 @@ AbstractAlgebra = "0.22.0"
 CxxWrap = "0.11"
 Nemo = "0.27.0"
 RandomExtensions = "0.4.2"
-Singular_jll = "~402.100.101"
+Singular_jll = "~402.101.100"
 julia = "1.6"
-libsingular_julia_jll = "~0.18.0"
+libsingular_julia_jll = "~0.19.0"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
