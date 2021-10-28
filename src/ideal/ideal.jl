@@ -786,28 +786,27 @@ end
     vdim(I::sideal)
 
 Given a zero-dimensional ideal $I$ this function computes the
-dimension of the vector space $R/I$, where $R$ is the
-polynomial ring over which $I$ is an ideal. The ideal must be
-over a polynomial ring over a field, and a Groebner basis.
+dimension of the vector space `base_ring(I)/I`, where `base_ring(I)` must be
+a polynomial ring over a field, and $I$ must be a Groebner basis.
+The return is $-1$ if `!iszerodim(I)`.
 """
 function vdim(I::sideal)
    I.isGB || error("Not a Groebner basis")
-   iszerodim(I) || error("Ideal is not zero-dimensional")
    R = base_ring(I)
-   GC.@preserve I R return libSingular.id_vdim(I.ptr, R.ptr)
+   GC.@preserve I R return Int(libSingular.id_vdim(I.ptr, R.ptr))
 end
 
 @doc Markdown.doc"""
     kbase(I::sideal{spoly{T}}) where T <: Nemo.FieldElem
 
 Given a zero-dimensional ideal $I$ this function computes a
-vector space basis of the vector space $R/I$, where $R$ is the
-polynomial ring over which $I$ is an ideal. The ideal must be
-over a polynomial ring over a field, and a Groebner basis.
+vector space basis of the vector space `base_ring(I)/I`, where `base_ring(I)`
+must be a polynomial ring over a field, and $I$ must be a Groebner basis.
+The array of vector space basis elements is returned as a Singular ideal, and
+this array consists of one zero polynomial if `!iszerodim(I)`.
 """
 function kbase(I::sideal{spoly{T}}) where T <: Nemo.FieldElem
    I.isGB || error("Not a Groebner basis")
-   iszerodim(I) || error("Ideal is not zero-dimensional")
    R = base_ring(I)
    ptr = GC.@preserve I R libSingular.id_kbase(I.ptr, R.ptr)
    return sideal{spoly{T}}(R, ptr)
@@ -816,14 +815,14 @@ end
 @doc Markdown.doc"""
     highcorner(I::sideal{spoly{T}}) where T <: Nemo.FieldElem
 
-Given a zero-dimensional ideal $I$ this function computes a
-The highest corner of $I$. The output is a polynomial.
+Given a zero-dimensional ideal $I$ this function computes its highest corner,
+which is a polynomial.
 The ideal must be over a polynomial ring over a field, and
 a Groebner basis.
+The return is the zero polynomial if `!iszerodim(I)`.
 """
 function highcorner(I::sideal{spoly{T}}) where T <: Nemo.FieldElem
    I.isGB || error("Not a Groebner basis")
-   iszerodim(I) || error("Ideal is not zero-dimensional")
    R = base_ring(I)
    ptr = GC.@preserve I R libSingular.id_highcorner(I.ptr, R.ptr)
    return R(ptr)::spoly{T}
