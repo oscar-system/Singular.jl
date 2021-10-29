@@ -18,6 +18,13 @@ These types are parameterized by the type of elements in the coefficient ring
 of the algebra. All noncommutative algebra element types belong directly to the
 abstract type `AbstractAlgebra.NCRingElem` and all the noncommuative algebra
 parent object types belong to the abstract type `AbstractAlgebra.NCRing`.
+The following union types cover all of Singular polynomial rings and algebras.
+
+```julia
+const PolyRingUnion{T} = Union{PolyRing{T}, PluralRing{T}, LPRing{T}} where T <: Nemo.RingElem
+
+const SPolyUnion{T} = Union{spoly{T}, spluralg{T}, slpalg{T}} where T <: Nemo.RingElem
+```
 
 ## Constructors
 

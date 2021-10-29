@@ -152,11 +152,11 @@ requires computing Groebner bases. Therefore we do not overload the `==` operato
 ideals. Instead we have the following two functions.
 
 ```@docs
-isequal{T <: AbstractAlgebra.RingElem}(::sideal{T}, ::sideal{T})
+isequal(I1::sideal{S}, I2::sideal{S}) where S <: SPolyUnion
 ```
 
 ```@docs
-equal{T <: AbstractAlgebra.RingElem}(::sideal{T}, ::sideal{T})
+equal(I1::sideal{S}, I2::sideal{S}) where S <: SPolyUnion
 ```
 
 **Examples**
@@ -174,7 +174,7 @@ equal(I, J) == true
 ### Intersection
 
 ```@docs
-intersection{T <: Nemo.RingElem}(::sideal{T}, ::sideal{T})
+intersection(I::sideal{S}, J::sideal{S}) where S <: SPolyUnion
 ```
 
 **Examples**
@@ -191,7 +191,7 @@ V = intersection(I, J)
 ### Quotient
 
 ```@docs
-quotient{T <: Nemo.RingElem}(::sideal{T}, ::sideal{T})
+quotient(I::sideal{S}, J::sideal{S}) where S <: SPolyUnion
 ```
 
 **Examples**
@@ -208,7 +208,7 @@ V = quotient(I, J)
 ### Leading terms
 
 ```@docs
-lead(::sideal)
+lead(I::sideal{S}) where S <: SPolyUnion
 ```
 
 **Examples**
@@ -224,7 +224,7 @@ V = lead(I)
 ### Saturation
 
 ```@docs
-saturation{T <: Nemo.RingElem}(::sideal{T}, ::sideal{T})
+saturation(I::sideal{T}, J::sideal{T}) where T <: Nemo.RingElem
 ```
 
 **Examples**
@@ -241,23 +241,23 @@ S = saturation(I, J)
 ### Standard basis
 
 ```@docs
-std(::sideal{spoly}; ::Bool)
+std(I::sideal{S}; complete_reduction::Bool=false) where S <: SPolyUnion
 ```
 
 ```@docs
-fglm(::sideal, ::Symbol)
+fglm(I::sideal{spoly{T}}, ordering::Symbol) where T <: Nemo.RingElem
 ```
 
 ```@docs
-satstd{T <: Nemo.FieldElem}(::sideal{spoly{T}}, ::sideal{spoly{T}})
+satstd(I::sideal{spoly{T}}, J::sideal{spoly{T}}) where T <: Nemo.FieldElem
 ```
 
 ```@docs
-lift_std(::sideal; ::Bool)
+lift_std(M::sideal{S}; complete_reduction::Bool = false) where S <: spoly
 ```
 
 ```@docs
-lift_std_syz(::sideal; ::Bool)
+lift_std_syz(M::sideal{S}; complete_reduction::Bool = false) where S <: spoly
 ```
 
 **Examples**
@@ -285,7 +285,7 @@ J = fglm(I, :degrevlex)
 ### Reduction
 
 ```@docs
-reduce(::sideal, ::sideal)
+reduce(I::sideal{S}, G::sideal{S}) where S <: SPolyUnion
 ```
 
 ```@docs
@@ -313,7 +313,7 @@ h2 = reduce(h1, J)
 ### Elimination
 
 ```@docs
-eliminate(::sideal, ::spoly...)
+eliminate(I::sideal{S}, polys::S...) where S <: spoly
 ```
 
 **Examples**
@@ -372,7 +372,7 @@ F2 = sres(std(I), 2)
 ### Differential operations
 
 ```@docs
-jet(::sideal, ::Int)
+jet(I::sideal{S}, n::Int) where S <: spoly
 ```
 
 **Examples**
@@ -392,11 +392,11 @@ vdim(::sideal)
 ```
 
 ```@docs
-kbase(::sideal)
+kbase(I::sideal{spoly{T}}) where T <: Nemo.FieldElem
 ```
 
 ```@docs
-highcorner(::sideal)
+highcorner(I::sideal{spoly{T}}) where T <: Nemo.FieldElem
 ```
 
 **Examples**
@@ -419,7 +419,7 @@ If the base ring `R` is a local ring, a minimal generating set can be computed
 using the following function
 
 ```@docs
-minimal_generating_set(::sideal)
+minimal_generating_set(I::sideal{S}) where S <: spoly
 ```
 
 **Examples**
@@ -468,6 +468,5 @@ L1 = independent_sets(I)
 L2 = maximal_independent_set(I)
 
 L3 = maximal_independent_set(I, all = true)
-
 
 ```
