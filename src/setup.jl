@@ -1,55 +1,15 @@
 module Setup
 
 using Singular_jll
-using lib4ti2_jll
+import lib4ti2_jll
+using BinaryWrappers
 
-# add shell scripts that startup another julia for some lib4ti2 programs
-function regenerate_4ti2_wrapper(binpath, wrapperpath)
-    mkpath("$wrapperpath")
 
-    if Sys.iswindows()
-        LIBPATH_env = "PATH"
-    elseif Sys.isapple()
-        LIBPATH_env = "DYLD_FALLBACK_LIBRARY_PATH"
-    else
-        LIBPATH_env = "LD_LIBRARY_PATH"
-    end
-
-    function force_symlink(p::AbstractString, np::AbstractString)
-        rm(np; force = true)
-        symlink(p, np)
-    end
-
-    for tool in ("4ti2gmp", "4ti2int32", "4ti2int64", "zsolve")
-        force_symlink(joinpath(binpath, tool), joinpath(wrapperpath, tool))
-    end
-
-    for tool in ("graver", "hilbert", "markov")
-        toolpath = joinpath(wrapperpath, tool)
-        write(toolpath, """
-        #!/bin/sh
-        export $(LIBPATH_env)="$(lib4ti2_jll.LIBPATH[])"
-        . $(binpath)/$(tool) "\$@"
-        """)
-        chmod(toolpath, 0o777)
-    end
-end
-
-#
-# put the wrapper inside this package, but use different wrappers for each
-# minor Julia version as those may get different versions of the various JLLs
-#
-# TODO/FIXME: don't write into the package directory; instead use a scratch space
-# obtained via <https://github.com/JuliaPackaging/Scratch.jl> -- however, that
-# requires Julia >= 1.5; so we can't use it until we drop support for Julia 1.3 & 1.4.
-#
-const wrapperpath = abspath(@__DIR__, "..", "bin", "v$(VERSION.major).$(VERSION.minor)")
-@info "Regenerating 4ti2 wrappers in $(wrapperpath)"
-regenerate_4ti2_wrapper(joinpath(lib4ti2_jll.find_artifact_dir(), "bin"), wrapperpath)
+const lib4ti2_binpath = @generate_wrappers(lib4ti2_jll)
 
 # make sure Singular can find the wrappers
 function __init__()
-    ENV["PATH"] = wrapperpath * ":" * ENV["PATH"]
+    ENV["PATH"] = lib4ti2_binpath * ":" * ENV["PATH"]
 end
 
 #
