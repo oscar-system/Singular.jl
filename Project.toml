@@ -19,6 +19,7 @@ libsingular_julia_jll = "ae4fbd8f-ecdb-54f8-bbce-35570499b30e"
 
 [compat]
 AbstractAlgebra = "0.22.0"
+BinaryWrappers = "~0.1.1"
 CxxWrap = "0.11"
 Nemo = "0.27.0"
 RandomExtensions = "0.4.2"
