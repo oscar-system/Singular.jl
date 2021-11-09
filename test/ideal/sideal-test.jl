@@ -427,13 +427,28 @@ end
 
 @testset "sideal.GAlgebra" begin
 
-   R, (z, u, v, w) = @inferred PolynomialRing(QQ, ["z", "u", "v", "w"])
+   R, _ = @inferred PolynomialRing(QQ, ["z", "u", "v", "w"])
+
    G, (z, u, v, w) = @inferred GAlgebra(R, Singular.Matrix(R, [0 -1 -1 -1; 0 0 -1 -1; 0 0 0 -1; 0 0 0 0]),
                                            Singular.Matrix(R, [0 0 0 0; 0 0 0 0; 0 0 0 0; 0 0 0 0]))
 
-   @test_throws Exception QuotientRing(G, std(Ideal(R, [x])))
-   @test_throws Exception QuotientRing(G, Ideal(R, [x], twosided = true))
+   # error thrown if ideal is not a Gröbner basis (and not two sided)
+   I = Ideal(G, [u])
+   @test_throws ErrorException QuotientRing(G, I)
 
+   # error thrown if ideal is GB but not two sided
+   I = std(I)
+   @test_throws ErrorException QuotientRing(G, I)
+
+   # error thrown if ideal is two sided but not a GB
+   I = Ideal(G, [u], twosided = true)
+   @test_throws ErrorException QuotientRing(G, I)
+
+   # all good if two sided and GB
+   I = std(I)
+   @test QuotientRing(G, I)[1] isa PluralRing
+
+   # another test
    I = @inferred Ideal(G, [z^2, u^2, v^2, w^2, z*u*v - w]; twosided = true)
    Q, (z, u, v, w) = @inferred QuotientRing(G, std(I))
    @test Q isa PluralRing
