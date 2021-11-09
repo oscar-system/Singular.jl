@@ -61,7 +61,7 @@ end
     compose(f::AbstractAlgebra.Map(Singular.SAlgHom),
                          g::AbstractAlgebra.Map(Singular.SAlgHom))
 
-Returns an algebra homomorphism $h: domain(f) --> codomain(g)$,
+Returns an algebra homomorphism $h: domain(f) \to codomain(g)$,
 where $h = g(f)$.
 """
 function compose(f::Map(SAlgHom), g::Map(SAlgHom))
@@ -131,9 +131,9 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    Algebra_Homomorphism(D::PolyRing, C::PolyRing, V::Vector)
+    AlgebraHomomorphism(D::PolyRing, C::PolyRing, V::Vector)
 
-Constructs an algebra homomorphism $f: D --> C$, where the $i$-th variable of
+Constructs an algebra homomorphism $f: D \to C$, where the $i$-th variable of
 $D$ is mapped to the $i$-th entry of $V$. $D$ and $C$ must be polynomial
 rings over the same base ring.
 """
