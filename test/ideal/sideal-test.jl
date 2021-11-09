@@ -446,7 +446,7 @@ end
 
    # all good if two sided and GB
    I = std(I)
-   @test QuotientRing(G, I) isa PluralRing
+   @test QuotientRing(G, I)[1] isa PluralRing
 
    # another test
    I = @inferred Ideal(G, [z^2, u^2, v^2, w^2, z*u*v - w]; twosided = true)
