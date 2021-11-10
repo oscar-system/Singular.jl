@@ -317,13 +317,13 @@ function isordering_symbolic_with_symbol(a::sordering)
    elseif o == ringorder_Ds
       return (true, :negdeglex)
    elseif o == ringorder_wp
-      return (true, :weightedrevlex)
+      return (true, :wdegrevlex)
    elseif o == ringorder_Wp
-      return (true, :weightedlex)
+      return (true, :wdeglex)
    elseif o == ringorder_ws
-      return (false, :negweightedrevlex)
+      return (false, :negwdegrevlex)
    elseif o == ringorder_Ws
-      return (false, :negweightedlex)
+      return (false, :negwdeglex)
    elseif o == ringorder_a
       return (false, :extraweight)
    elseif o == ringorder_M
