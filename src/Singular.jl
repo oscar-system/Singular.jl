@@ -201,6 +201,8 @@ include("LibSingular.jl")
 
 include("Number.jl")
 
+include("poly/OrderingTypes.jl")
+
 include("poly/PolyTypes.jl")
 
 include("matrix/MatrixTypes.jl")
@@ -216,6 +218,8 @@ include("poly/LPTypes.jl")
 const PolyRingUnion{T} = Union{PolyRing{T}, PluralRing{T}, LPRing{T}} where T <: Nemo.RingElem
 
 const SPolyUnion{T} = Union{spoly{T}, spluralg{T}, slpalg{T}} where T <: Nemo.RingElem
+
+include("poly/orderings.jl")
 
 include("poly/poly.jl")
 
