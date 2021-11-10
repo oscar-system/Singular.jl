@@ -31,21 +31,26 @@ static void WarningS_for_julia(const char * s)
 
 /*
    This is the non-temporary callback for all errors (unless the temporary
-   ones are in use by call_interpreter). It is probably safest to log the error
-   to both singular_error and stderr, so that a missing libSingular.check_error
-   does not cause error to go completely unnoticed.
+   ones are in use by call_interpreter). We would like to simultaneously:
+    1. be able to check and report errors via libSingular.check_error()
+    2. know when errors have been generated but uncaught by the julia code so
+       that libSingular.check_error() can be inserted into the right place
+   Unfortunately, a single call to the Singular kernel can generate multiple
+   calls to WerrorS_callback, thus we don't know if previous errors were
+   generated as a result of a missing libSingular.check_error() or if Singular
+   has just called WerrorS_callback 10 times in the same function.
+   The compromise here is to keep the full backlog of unreported errors and
+   start complaining to stderr once the backlog gets too long.
 */
 static void WerrorS_and_reset(const char * s)
 {
     errorreported = 0;
-    if (!singular_error.empty())
-        singular_error += ".  ";
-    singular_error += s;
-    /* and, copied from WerrorS in Singular:*/
-    fwrite("    singular error: ", 1, 20, stderr);
-    fwrite(s, 1, strlen(s), stderr);
-    fwrite("\n", 1, 1, stderr);
-    fflush(stderr);
+    if (singular_error.length() > 99)
+    {
+        std::cerr << singular_error << std::endl;
+        std::cerr << "!!! Singular error(s) unhandled by julia !!!" << std::endl << std::endl;
+    }
+    singular_error.append(s);
 }
 
 JLCXX_MODULE define_julia_module(jlcxx::Module & Singular)
