@@ -144,7 +144,9 @@ function convert_normal_value(valueptr, typ, R)
                          "Note that if Singular.jl cannot interpret the type, "*
                          "it is doubtful that a interpreter procedure returning "*
                          "such a type can be useful to Singular.jl.\n"*
-                         "Note also that Singular.lookup_library_symbol can be "*
+                         "Note also that Singular.jl does not support the "*
+                         "attributes used by the interpreter.\n"*
+                         "Finally, Singular.lookup_library_symbol can be "*
                          "used to fetch the current value of global variables "*
                          "stored in the interpreter.")
                 end
