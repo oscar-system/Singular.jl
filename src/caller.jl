@@ -119,7 +119,7 @@ function create_casting_functions()
         ,
         mapping_types_reversed[:MAP_CMD] =>
             function (vptr, R)
-                @warn "returning a map from a singular library procedure as an ideal" maxlog=1
+                @warn "returning a map from a Singular library procedure as an ideal" maxlog=1
                 # punning in libpolys/polys/simpleideals.h: clear the preimage
                 # string of the map and replace it with the rank 1 of the ideal
                 libSingular.omFree(unsafe_load(reinterpret(Ptr{Ptr{UInt8}}, vptr), 2))
@@ -140,7 +140,13 @@ end
 # list are possible here, but they are still wrapped in the opaque valueptr
 function convert_normal_value(valueptr, typ, R)
     mapper = get(casting_functions, typ) do
-                    error("unrecognized return with singular type number $typ")
+                   error("unrecognized object with Singular type number $typ\n"*
+                         "Note that if Singular.jl cannot interpret the type, "*
+                         "it is doubtful that a interpreter procedure returning "*
+                         "such a type can be useful to Singular.jl.\n"*
+                         "Note also that Singular.lookup_library_symbol can be "*
+                         "used to fetch the current value of global variables "*
+                         "stored in the interpreter.")
                 end
     return mapper(valueptr, R)
 end
@@ -378,6 +384,12 @@ function low_level_caller(lib::String, name::String, args...)
     return convert_return(return_value, rng)
 end
 
+@doc Markdown.doc"""
+    lookup_library_symbol(package::String, name::String)
+
+Attempt to look up a symbol in a particular package and return its value as a
+usable Singular.jl object.
+"""
 function lookup_library_symbol(pack::String, name::String)
     (err::Int, res) = libSingular.lookup_singular_library_symbol_wo_rng(pack, name)
     if err == 0
