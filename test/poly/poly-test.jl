@@ -489,12 +489,14 @@ end
 
    f = x^3 + y^6
 
-   J1 = jacobian_ideal(f)
-   J2 = jacobian_matrix(f)
-   f1 = derivative(f, 1)
-   f2 = derivative(f, y)
-   jf = jet(f, 3)
-   J3 = jacobian_matrix([f, jf])
+   J1 = @inferred jacobian_ideal(f)
+   J2 = @inferred jacobian_matrix(f)
+   f1 = @inferred derivative(f, 1)
+   f2 = @inferred derivative(f, y)
+   jf = @inferred jet(f, 3)
+   J3 = @inferred jacobian_matrix([f, jf])
+
+   @test f == x^3 + y^6
 
    I = Ideal(R, x^2, y^5)
    Z1 = zero_matrix(R, 2, 1)

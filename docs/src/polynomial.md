@@ -285,27 +285,27 @@ Working over any coefficient ring, basic functionality involving
 differential operations is available.
 
 ```@docs
-Singular.jet(::spoly, ::Int)
+jet(::spoly{T}, ::Int) where T <: Nemo.RingElem
 ```
 
 ```@docs
-Singular.derivative(::spoly, ::Int)
+derivative(::spoly{T}, ::Int) where T <: Nemo.RingElem
 ```
 
 ```@docs
-Singular.derivative(::spoly, ::spoly)
+derivative(::spoly{T}, ::spoly{T}) where T <: Nemo.RingElem
 ```
 
 ```@docs
-Singular.jacobian_ideal(::spoly)
+jacobian_ideal(::spoly{T}) where T <: Nemo.RingElem
 ```
 
 ```@docs
-Singular.jacobian_matrix(::spoly)
+jacobian_matrix(p::spoly{T}) where T <: Nemo.RingElem
 ```
 
 ```@docs
-Singular.jacobian_matrix(A::Vector{spoly{T}}) where T <: Nemo.RingElem
+jacobian_matrix(A::Vector{spoly{T}}) where T <: Nemo.RingElem
 ```
 
 **Examples**

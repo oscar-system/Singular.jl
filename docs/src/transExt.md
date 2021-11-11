@@ -76,15 +76,15 @@ denominator(::n_transExt)
 ```
 
 ```@docs
-Singular.transcendence_degree(::N_FField)
+transcendence_degree(::N_FField)
 ```
 
 ```@docs
-Singular.transcendence_basis(::N_FField)
+transcendence_basis(::N_FField)
 ```
 
 ```@docs
-Singular.n_transExt_to_spoly(::n_transExt)
+n_transExt_to_spoly(x::n_transExt; parent::PolyRing)
 ```
 
 **Examples**
