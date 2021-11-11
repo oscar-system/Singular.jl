@@ -78,6 +78,10 @@ end
 @testset "n_Zp.exact_division" begin
    R = Fp(5)
 
+   @test_throws ErrorException inv(zero(R))
+   @test_throws ErrorException divexact(one(R), zero(R))
+   @test_throws ErrorException divexact(zero(R), zero(R))
+
    @test inv(R(2)) == R(3)
    @test divexact(R(2), R(3)) == R(4)
 end

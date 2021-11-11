@@ -99,6 +99,10 @@ end
 end
 
 @testset "n_Q.exact_division" begin
+   @test_throws ErrorException inv(zero(QQ))
+   @test_throws ErrorException divexact(one(QQ), zero(QQ))
+   @test_throws ErrorException divexact(zero(QQ), zero(QQ))
+
    @test divexact(QQ(12), QQ(2)) == 6
 end
 

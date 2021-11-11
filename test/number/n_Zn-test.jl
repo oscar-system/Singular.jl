@@ -105,6 +105,10 @@ end
 @testset "n_Zn.exact_division" begin
    R = ResidueRing(ZZ, 5)
 
+   @test_throws ErrorException inv(zero(R))
+   @test_throws ErrorException divexact(one(R), zero(R))
+   @test_throws ErrorException divexact(zero(R), zero(R))
+
    @test divexact(R(2), R(3)) == R(4)
 end
 

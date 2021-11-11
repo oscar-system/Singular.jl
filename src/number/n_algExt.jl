@@ -184,7 +184,8 @@ function ^(x::n_algExt, y::Int)
    elseif y == 1
       return x
    else
-      y < 0 && iszero(x) && throw(DivideError())
+      # low priority FIXME Singular still crashes upon division by zero here
+      y < 0 && iszero(x) && error("division by zero")
       c = parent(x)
       p = GC.@preserve x y c libSingular.n_Power(x.ptr, y, c.ptr)
       return c(p)
@@ -200,14 +201,18 @@ end
 function inv(x::n_algExt)
    c = parent(x)
    p = GC.@preserve x c libSingular.n_Invers(x.ptr, c.ptr)
-   return c(p)
+   z = c(p)
+   libSingular.check_error()
+   return z
 end
 
 function divexact(x::n_algExt, y::n_algExt; check::Bool=true)
    check_parent(x, y)
    c = parent(x)
    p = GC.@preserve x y c libSingular.n_Div(x.ptr, y.ptr, c.ptr)
-   return c(p)
+   z = c(p)
+   libSingular.check_error()
+   return z
 end
 
 ###############################################################################

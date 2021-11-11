@@ -83,6 +83,10 @@ end
 end
 
 @testset "n_Z.exact_division" begin
+   @test_throws ErrorException inv(zero(ZZ))
+   @test_throws ErrorException divexact(one(ZZ), zero(ZZ))
+   @test_throws ErrorException divexact(zero(ZZ), zero(ZZ))
+
    @test divexact(ZZ(12), ZZ(2)) == 6
 end
 
