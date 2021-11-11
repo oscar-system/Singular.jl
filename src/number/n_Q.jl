@@ -235,13 +235,17 @@ end
 function inv(x::n_Q)
    c = parent(x)
    p = GC.@preserve x c libSingular.n_Invers(x.ptr, c.ptr)
-   return c(p)
+   z = c(p)
+   libSingular.check_error()
+   return z
 end
 
 function divexact(x::n_Q, y::n_Q; check::Bool=true)
    c = parent(x)
    p = GC.@preserve x y c libSingular.n_Div(x.ptr, y.ptr, c.ptr)
-   return c(p)
+   z = c(p)
+   libSingular.check_error()
+   return z
 end
 
 ###############################################################################

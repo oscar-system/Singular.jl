@@ -223,7 +223,12 @@ end
 function divexact(x::n_Z, y::n_Z; check::Bool=true)
    c = parent(x)
    p = GC.@preserve x y c libSingular.n_ExactDiv(x.ptr, y.ptr, c.ptr)
-   return c(p)
+   z = c(p)
+   libSingular.check_error()
+   if check && (iszero(y) || z*y != x)
+      error("Not an exact division")
+   end
+   return z
 end
 
 ###############################################################################

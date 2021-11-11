@@ -126,12 +126,16 @@ end
    @test (a + 1)^3 == 2*a - 2
    @test -4*(a + 1)^-3 == a + 1
 
-   @test_throws DivideError (a - a)^-2
+   @test_throws Exception (a - a)^-2
 end
 
 @testset "n_algExt.exact_division" begin
    F, (a,) = FunctionField(QQ, ["a"])
    F, a = AlgebraicExtensionField(F, a^2 + 1)
+
+   @test_throws ErrorException inv(zero(F))
+   @test_throws ErrorException divexact(one(F), zero(F))
+   @test_throws ErrorException divexact(zero(F), zero(F))
 
    x = a^2 - 1
    y = a + 1

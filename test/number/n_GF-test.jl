@@ -180,6 +180,10 @@ end
 @testset "n_GF.exact_division" begin
    R, x = FiniteField(5, 2, "x")
 
+   @test_throws ErrorException inv(zero(R))
+   @test_throws ErrorException divexact(one(R), zero(R))
+   @test_throws ErrorException divexact(zero(R), zero(R))
+
    a = x + 1
    b = 2x + 1
 

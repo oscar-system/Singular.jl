@@ -117,6 +117,10 @@ end
 @testset "n_transExt.exact_division" begin
    F, (a, b, c) = FunctionField(Fp(5), ["a", "b", "c"])
 
+   @test_throws ErrorException inv(zero(F))
+   @test_throws ErrorException divexact(one(F), zero(F))
+   @test_throws ErrorException divexact(zero(F), zero(F))
+
    x = a^2 - 1
    y = a + 1
 

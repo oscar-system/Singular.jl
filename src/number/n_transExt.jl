@@ -250,13 +250,19 @@ end
 function inv(x::n_transExt)
    c = parent(x)
    p = GC.@preserve x c libSingular.n_Invers(x.ptr, c.ptr)
-   return c(p)
+   z = c(p)
+   libSingular.check_error()
+   return z
 end
 
 function divexact(x::n_transExt, y::n_transExt; check::Bool=true)
+   # low priority FIXME Singular still crashes upon division by zero here
+   isunit(y) || error("division by zero")
    c = parent(x)
    p = GC.@preserve x y c libSingular.n_Div(x.ptr, y.ptr, c.ptr)
-   return c(p)
+   z = c(p)
+   libSingular.check_error()
+   return z
 end
 
 ###############################################################################
