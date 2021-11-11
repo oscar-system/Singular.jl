@@ -119,11 +119,11 @@ function _tExt_to_poly(R::N_FField, cached)
 end
 
 @doc Markdown.doc"""
-   n_transExt_to_spoly(x::n_transExt; parent::PolyRing)
-Returns the numerator of $x$ as a polynomial in a polynomial
-ring with at least as many variables, as the
-transcendence degree of $parent(x)$. If a ring $parent_ring$ is
-given to the function, it will be the parent ring of the output.
+    n_transExt_to_spoly(x::n_transExt; parent::PolyRing)
+
+Returns the numerator of `x` as a polynomial in a polynomial ring with at least
+as many variables as the transcendence degree of `parent(x)`. If a ring `parent`
+is given to the function, it will be the parent ring of the output.
 """
 function n_transExt_to_spoly(x::n_transExt; cached = true,
      parent_ring::AbstractAlgebra.MPolyRing = _tExt_to_poly(parent(x), cached))
