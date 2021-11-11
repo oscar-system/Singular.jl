@@ -176,6 +176,7 @@ end
 #
 ###############################################################################
 
+# take ownership of the pointer - not for general users
 function (S::MatrixSpace{T})(ptr::libSingular.matrix_ptr) where T <: AbstractAlgebra.RingElem
    M = smatrix{T}(base_ring(S), ptr)
    (S.ncols != ncols(M) || S.nrows != nrows(M)) && error("Incompatible dimensions")

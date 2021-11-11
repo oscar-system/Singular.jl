@@ -114,6 +114,7 @@ function _lpvec_to_exponent_word(v::Vector{Int}, nvars::Int, deg_bound::Int)
    return z
 end
 
+# ownership of the pointer is NOT taken - not for general users
 function _exponent_word(p::libSingular.poly_ptr, R::LPRing, tmp::Vector{Int})
    @assert length(tmp) >= nvars(R)*degree_bound(R)
    GC.@preserve R libSingular.p_GetExpVL(p, tmp, R.ptr)
@@ -186,6 +187,7 @@ function (R::LPRing)(n::Rational)
    return R(base_ring(R)(n))
 end
 
+# take ownership of the pointer - not for general users
 function (R::LPRing{T})(n::libSingular.poly_ptr) where T <: Nemo.RingElem
    return slpalg{T}(R, n)
 end
@@ -204,6 +206,7 @@ function (R::LPRing)(p::slpalg)
    return p
 end
 
+# take ownership of the pointer - not for general users
 function (R::LPRing)(n::libSingular.number_ptr)
     return R.base_ring(n)
 end

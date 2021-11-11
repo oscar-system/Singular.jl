@@ -146,12 +146,14 @@ end
 #
 ###############################################################################
 
+# take ownership of the pointer - not for general users
 function (S::ResolutionSet)(ptr::libSingular.syStrategy_ptr, len::Int = 0)
    R = base_ring(S)
    T = elem_type(R)
    return sresolution{T}(R, ptr)
 end
 
+# take ownership of the pointer - not for general users
 function (R::PolyRing)(ptr::libSingular.syStrategy_ptr, ::Val{:resolution})
     T = elem_type(R)
     return sresolution{T}(R, ptr, libSingular.get_minimal_res(ptr) != C_NULL )

@@ -712,10 +712,12 @@ end
 #
 ###############################################################################
 
+# take ownership of the pointer - not for general users
 function Ideal(R::PolyRingUnion, id::libSingular.ideal_ptr)
    return sideal{elem_type(R)}(R, id)
 end
 
+# take ownership of the pointer - not for general users
 function (R::PolyRingUnion)(id::libSingular.ideal_ptr)
     return Ideal(R, id)
 end

@@ -87,6 +87,7 @@ function (R::PluralRing)(n::n_Z)
    return z
 end
 
+# take ownership of the pointer - not for general users
 function (R::PluralRing)(n::libSingular.poly_ptr)
    T = elem_type(base_ring(R))
    z = spluralg{T}(R, n)
@@ -110,6 +111,7 @@ function (R::PluralRing)(p::spluralg)
    return p
 end
 
+# take ownership of the pointer - not for general users
 function (R::PluralRing)(n::libSingular.number_ptr)
     return R.base_ring(n)
 end

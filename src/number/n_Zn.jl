@@ -285,6 +285,7 @@ promote_rule(C::Type{n_Zn}, ::Type{n_Z}) = n_Zn
 
 (R::N_ZnRing)(n::n_Zn) = n
 
+# take ownership of the pointer - not for general users
 (R::N_ZnRing)(n::libSingular.number_ptr) = n_Zn(R, n)
 
 (R::N_ZnRing)(n::Nemo.nmod) = n_Zn(R, lift(n))

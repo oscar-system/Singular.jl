@@ -364,6 +364,7 @@ function (F::Singular.N_FField)(x::Union{n_Q, Nemo.fmpq, Rational})
    return F(numerator(x)) // F(denominator(x))
 end
 
+# take ownership of the pointer - not for general users
 (R::N_FField)(n::libSingular.number_ptr) = n_transExt(R, n)
 
 ###############################################################################

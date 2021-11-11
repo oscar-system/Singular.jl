@@ -157,7 +157,7 @@ function convert_ring_content(value_list, R)
     return Dict(i[2] => convert_normal_value(i[3], i[1], R) for i in value_list)
 end
 
-# take ownership of r
+# take ownership of the pointer - not for general users
 function create_ring_from_singular_ring(r::libSingular.ring_ptr)
    c = libSingular.rCoeffPtr(r)
    if libSingular.nCoeff_is_Q(c)

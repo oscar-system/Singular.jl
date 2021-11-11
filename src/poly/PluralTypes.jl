@@ -14,7 +14,7 @@ mutable struct PluralRing{T <: Nemo.RingElem} <: AbstractAlgebra.NCRing
    ord::sordering
    S::Vector{Symbol}
 
-   # take ownership of a ring_ptr
+   # take ownership of the pointer - not for general users
    function PluralRing{T}(r::libSingular.ring_ptr, R, s::Vector{Symbol}=singular_symbols(r)) where T <: Nemo.RingElem
       @assert r.cpp_object != C_NULL
       ord = Cint[]
@@ -48,6 +48,7 @@ mutable struct spluralg{T <: Nemo.RingElem} <: AbstractAlgebra.NCRingElem
    ptr::libSingular.poly_ptr
    parent::PluralRing{T}
 
+   # take ownership of the pointer - not for general users
    function spluralg{T}(R::PluralRing{T}, p::libSingular.poly_ptr) where T <: Nemo.RingElem
       z = new(p, R)
       R.refcount += 1
@@ -72,6 +73,7 @@ function spluralg{T}(R::PluralRing{T}, p::T) where T <: Nemo.RingElem
    end
 end
 
+# ownership of the pointer is NOT taken - not for general users
 function spluralg{T}(R::PluralRing{T}, n::libSingular.number_ptr) where T <: Nemo.RingElem
    S = base_ring(R)
    GC.@preserve R S begin
@@ -81,6 +83,7 @@ function spluralg{T}(R::PluralRing{T}, n::libSingular.number_ptr) where T <: Nem
    end
 end
 
+# take ownership of the pointer - not for general users
 function spluralg{T}(R::PluralRing{T}, n::Ptr{Cvoid}) where T <: Nemo.RingElem
    GC.@preserve R begin
       p = libSingular.p_NSet(n, R.ptr)

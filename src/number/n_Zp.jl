@@ -294,6 +294,7 @@ promote_rule(C::Type{n_Zp}, ::Type{n_Z}) = n_Zp
 
 (R::N_ZpField)(n::n_Zp) = n
 
+# take ownership of the pointer - not for general users
 (R::N_ZpField)(n::libSingular.number_ptr) = n_Zp(R, n)
 
 ###############################################################################
