@@ -9,6 +9,7 @@
 static std::string singular_return;
 static std::string singular_error;
 static std::string singular_warning;
+static std::vector<std::string> singular_error_log;
 
 // Internal singular interpreter variable
 extern int         inerror;
@@ -45,12 +46,13 @@ static void WarningS_for_julia(const char * s)
 static void WerrorS_and_reset(const char * s)
 {
     errorreported = 0;
-    if (singular_error.length() > 99)
+    if (singular_error_log.size() > 9)
     {
-        std::cerr << singular_error << std::endl;
+        for (auto & si : singular_error_log)
+            std::cerr << si << std::endl;
         std::cerr << "!!! Singular error(s) unhandled by julia !!!" << std::endl << std::endl;
     }
-    singular_error.append(s);
+    singular_error_log.emplace_back(s);
 }
 
 JLCXX_MODULE define_julia_module(jlcxx::Module & Singular)
@@ -118,13 +120,15 @@ JLCXX_MODULE define_julia_module(jlcxx::Module & Singular)
     });
 
     Singular.method("have_error", []() {
-        return !singular_error.empty();
+        return !singular_error_log.empty();
     });
 
     Singular.method("get_and_clear_error", []() {
-        std::string s(std::move(singular_error));
-        singular_error.clear();
-        return s;
+        std::stringstream ss;
+        for (auto & si : singular_error_log)
+            ss << si << std::endl;
+        singular_error_log.clear();
+        return ss.str();
     });
 
 #define SETTER(A, B)                                    \
