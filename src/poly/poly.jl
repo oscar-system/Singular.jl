@@ -1458,46 +1458,44 @@ function (R::PolyRing)(n::Integer)
    return spoly{T}(R, BigInt(n))
 end
 
-# TODO looks leaky: the constructor doesn't take ownership but a copy is passed.
 function (R::PolyRing)(n::n_Z)
-   n = base_ring(R)(n)
-   ptr = GC.@preserve n libSingular.n_Copy(n.ptr, parent(n).ptr)
+   T = elem_type(base_ring(R))
+   return spoly{T}(R, base_ring(R)(n))
+end
+
+function (R::PolyRing)(n::Rational)
+   T = elem_type(base_ring(R))
+   return spoly{T}(R, base_ring(R)(n))
+end
+
+# take ownership of the pointer - not for general users
+function (R::PolyRing)(ptr::libSingular.poly_ptr)
    T = elem_type(base_ring(R))
    return spoly{T}(R, ptr)
 end
 
-function (R::PolyRing)(n::Rational)
-   return R(base_ring(R)(n))
-end
-
-# take ownership of the pointer - not for general users
-function (R::PolyRing)(n::libSingular.poly_ptr)
-   T = elem_type(base_ring(R))
-   return spoly{T}(R, n)
-end
-
 function (R::PolyRing{T})(n::T) where T <: Nemo.RingElem
    parent(n) != base_ring(R) && error("Unable to coerce into polynomial ring")
-   GC.@preserve n return spoly{T}(R, n.ptr)
+   return spoly{T}(R, n)
 end
 
 function (R::PolyRing{T})(n::T) where T <: Singular.n_unknown
    parent(n) != base_ring(R) && error("Unable to coerce into polynomial ring")
-   GC.@preserve n return spoly{T}(R, n.ptr)
+   return spoly{T}(R, n)
 end
 
 function (R::PolyRing{n_RingElem{RingElemWrapper{S, T}}})(
    n::n_RingElem{RingElemWrapper{S, T}}
 ) where {S, T}
    parent(n) != base_ring(R) && error("Unable to coerce into polynomial ring")
-   GC.@preserve n return spoly{n_RingElem{RingElemWrapper{S, T}}}(R, n.ptr)
+   return spoly{n_RingElem{RingElemWrapper{S, T}}}(R, n)
 end
 
 function (R::PolyRing{n_FieldElem{FieldElemWrapper{S, T}}})(
    n::n_FieldElem{FieldElemWrapper{S, T}}
 ) where {S, T}
    parent(n) != base_ring(R) && error("Unable to coerce into polynomial ring")
-   GC.@preserve n return spoly{n_FieldElem{FieldElemWrapper{S, T}}}(R, n.ptr)
+   return spoly{n_FieldElem{FieldElemWrapper{S, T}}}(R, n)
 end
 
 function (R::PolyRing)(f::T) where T <: Nemo.MPolyElem
@@ -1519,8 +1517,8 @@ function (R::PolyRing)(p::spoly)
    return p
 end
 
-# TODO looks wrong: why put the pointer into just the base ring?
 function (R::PolyRing)(n::libSingular.number_ptr)
+   error("this function should not be called, as it is wrong")
     return R.base_ring(n)
 end
 

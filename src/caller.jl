@@ -34,8 +34,7 @@ function create_casting_functions()
         mapping_types_reversed[:NUMBER_CMD] =>
             function (vptr, R)
                 cast = libSingular.NUMBER_CMD_CASTER(vptr)
-                # TODO hmm, the number should not be put into the poly ring
-                return R(cast)
+                return R.base_ring(cast)
             end
         ,
         mapping_types_reversed[:RING_CMD] =>

@@ -75,22 +75,12 @@ function slpalg{T}(R::LPRing{T}) where T <: Nemo.RingElem
    end
 end
 
-function slpalg{T}(R::LPRing{T}, p::T) where T <: Nemo.RingElem
-   S = parent(p)
-   GC.@preserve R S p begin
-      n = libSingular.n_Copy(p.ptr, S.ptr)
-      r = libSingular.p_NSet(n, R.ptr)
+function slpalg{T}(R::LPRing{T}, n::T) where T <: Nemo.RingElem
+   S = parent(n)
+   GC.@preserve R S n begin
+      n1 = libSingular.n_Copy(n.ptr, S.ptr)
+      r = libSingular.p_NSet(n1, R.ptr)
       return slpalg{T}(R, r)
-   end
-end
-
-# ownership of the pointer is NOT taken - not for general users
-function slpalg{T}(R::LPRing{T}, n::libSingular.number_ptr) where T <: Nemo.RingElem
-   S = base_ring(R)
-   GC.@preserve R S begin
-      nn = libSingular.n_Copy(n, S.ptr)
-      p = libSingular.p_NSet(nn, R.ptr)
-      return slpalg{T}(R, p)
    end
 end
 

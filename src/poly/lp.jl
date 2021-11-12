@@ -178,23 +178,21 @@ function (R::LPRing{T})(n::Integer) where T <: Nemo.RingElem
 end
 
 function (R::LPRing{T})(n::n_Z) where T <: Nemo.RingElem
-   n = base_ring(R)(n)
-   ptr = libSingular.n_Copy(n.ptr, parent(n).ptr)
-   return slpalg{T}(R, ptr)
+   return slpalg{T}(R, base_ring(R)(n))
 end
 
-function (R::LPRing)(n::Rational)
-   return R(base_ring(R)(n))
+function (R::LPRing{T})(n::Rational) where T <: Nemo.RingElem
+   return slpalg{T}(R, base_ring(R)(n))
 end
 
 # take ownership of the pointer - not for general users
-function (R::LPRing{T})(n::libSingular.poly_ptr) where T <: Nemo.RingElem
-   return slpalg{T}(R, n)
+function (R::LPRing{T})(ptr::libSingular.poly_ptr) where T <: Nemo.RingElem
+   return slpalg{T}(R, ptr)
 end
 
 function (R::LPRing{T})(n::T) where T <: Nemo.RingElem
-   parent(n) != base_ring(R) && error("Unable to coerce into Exterior algebra")
-   return slpalg{T}(R, n.ptr)
+   parent(n) != base_ring(R) && error("Unable to coerce into free algebra")
+   return slpalg{T}(R, n)
 end
 
 function (R::LPRing{S})(n::T) where {S <: Nemo.RingElem, T <: Nemo.RingElem}
@@ -202,12 +200,12 @@ function (R::LPRing{S})(n::T) where {S <: Nemo.RingElem, T <: Nemo.RingElem}
 end
 
 function (R::LPRing)(p::slpalg)
-   parent(p) != R && error("Unable to coerce")
+   parent(p) !== R && error("Unable to coerce into free algebra")
    return p
 end
 
-# take ownership of the pointer - not for general users
 function (R::LPRing)(n::libSingular.number_ptr)
+   error("this function should not be called, as it is wrong")
     return R.base_ring(n)
 end
 

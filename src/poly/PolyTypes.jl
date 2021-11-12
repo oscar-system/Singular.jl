@@ -75,38 +75,43 @@ function _spoly_clear_fn(p)
 end
 
 function spoly{T}(R::PolyRing{T}) where T <: Nemo.RingElem
-   p = libSingular.p_ISet(0, R.ptr)
-   return spoly{T}(R, p)
+   GC.@preserve R begin
+      p = libSingular.p_ISet(0, R.ptr)
+      return spoly{T}(R, p)
+   end
 end
 
-function spoly{T}(R::PolyRing{T}, p::T) where T <: Nemo.RingElem
-   n = libSingular.n_Copy(p.ptr, parent(p).ptr)
-   r = libSingular.p_NSet(n, R.ptr)
-   return spoly{T}(R, r)
-end
-
-# ownership of the pointer is NOT taken - not for general users
-function spoly{T}(R::PolyRing{T}, n::libSingular.number_ptr) where T <: Nemo.RingElem
-   nn = libSingular.n_Copy(n, base_ring(R).ptr)
-   p = libSingular.p_NSet(nn, R.ptr)
-   return spoly{T}(R, p)
+function spoly{T}(R::PolyRing{T}, n::T) where T <: Nemo.RingElem
+   S = parent(n)
+   GC.@preserve R S n begin
+      n1 = libSingular.n_Copy(n.ptr, S.ptr)
+      r = libSingular.p_NSet(n1, R.ptr)
+      return spoly{T}(R, r)
+   end
 end
 
 # take ownership of the pointer - not for general users
 function spoly{T}(R::PolyRing{T}, n::Ptr{Cvoid}) where T <: Nemo.RingElem
-   p = libSingular.p_NSet(n, R.ptr)
-   return spoly{T}(R, p)
+   GC.@preserve R begin
+      p = libSingular.p_NSet(n, R.ptr)
+      return spoly{T}(R, p)
+   end
 end
 
 function spoly{T}(R::PolyRing{T}, b::Int) where T <: Nemo.RingElem
-   p = libSingular.p_ISet(b, R.ptr)
-   return spoly{T}(R, p)
+   GC.@preserve R begin
+      p = libSingular.p_ISet(b, R.ptr)
+      return spoly{T}(R, p)
+   end
 end
 
 function spoly{T}(R::PolyRing{T}, b::BigInt) where T <: Nemo.RingElem
-   n = libSingular.n_InitMPZ(b, R.base_ring.ptr)
-   p = libSingular.p_NSet(n, R.ptr)
-   return spoly{T}(R, p)
+   S = base_ring(R)
+   GC.@preserve R S begin
+      n = libSingular.n_InitMPZ(b, S.ptr)
+      p = libSingular.p_NSet(n, R.ptr)
+      return spoly{T}(R, p)
+   end
 end
 
 ###############################################################################
