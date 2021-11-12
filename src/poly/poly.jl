@@ -1504,11 +1504,6 @@ function (R::PolyRing)(p::spoly)
    return p
 end
 
-function (R::PolyRing)(n::libSingular.number_ptr)
-   error("this function should not be called, as it is wrong")
-    return R.base_ring(n)
-end
-
 ###############################################################################
 #
 #   PolynomialRing constructor

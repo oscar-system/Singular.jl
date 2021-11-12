@@ -204,11 +204,6 @@ function (R::LPRing)(p::slpalg)
    return p
 end
 
-function (R::LPRing)(n::libSingular.number_ptr)
-   error("this function should not be called, as it is wrong")
-    return R.base_ring(n)
-end
-
 ###############################################################################
 #
 #   FreeAlgebra constructor
