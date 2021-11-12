@@ -51,6 +51,18 @@ function promote_rule(::Type{spluralg{T}}, ::Type{U}) where {T <: Nemo.RingElem,
    promote_rule(T, U) == T ? spluralg{T} : Union{}
 end
 
+function promote_rule(::Type{spluralg{T}}, ::Type{T}) where {T <: Nemo.RingElem}
+   return spluralg{T}
+end
+
+function promote_rule(::Type{spluralg{n_RingElem{RingElemWrapper{S, T}}}}, ::Type{U}) where {T <: Nemo.RingElem, U <: Nemo.RingElem, S}
+   return spluralg{n_RingElem{RingElemWrapper{S, T}}}
+end
+
+function promote_rule(::Type{spluralg{n_FieldElem{FieldElemWrapper{S, T}}}}, ::Type{U}) where {T <: Nemo.FieldElem, U <: Nemo.FieldElem, S}
+   return spluralg{n_FieldElem{FieldElemWrapper{S, T}}}
+end
+
 ###############################################################################
 #
 #   Parent call overloads

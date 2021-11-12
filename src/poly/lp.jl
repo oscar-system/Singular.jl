@@ -161,6 +161,30 @@ end
 
 ###############################################################################
 #
+#   Promote rules
+#
+###############################################################################
+
+promote_rule(::Type{slpalg{T}}, ::Type{slpalg{T}}) where T <: Nemo.RingElem = slpalg{T}
+
+function promote_rule(::Type{slpalg{T}}, ::Type{U}) where {T <: Nemo.RingElem, U <: Nemo.RingElem}
+   promote_rule(T, U) == T ? slpalg{T} : Union{}
+end
+
+function promote_rule(::Type{slpalg{T}}, ::Type{T}) where {T <: Nemo.RingElem}
+   return slpalg{T}
+end
+
+function promote_rule(::Type{slpalg{n_RingElem{RingElemWrapper{S, T}}}}, ::Type{U}) where {T <: Nemo.RingElem, U <: Nemo.RingElem, S}
+   return slpalg{n_RingElem{RingElemWrapper{S, T}}}
+end
+
+function promote_rule(::Type{slpalg{n_FieldElem{FieldElemWrapper{S, T}}}}, ::Type{U}) where {T <: Nemo.FieldElem, U <: Nemo.FieldElem, S}
+   return slpalg{n_FieldElem{FieldElemWrapper{S, T}}}
+end
+
+###############################################################################
+#
 #   Parent call overloads
 #
 ###############################################################################
@@ -232,9 +256,16 @@ function _FreeAlgebra(R, s::Vector{String}, degree_bound, ordering, ordering2, c
    return (parent_obj, gens(parent_obj))
 end
 
-function FreeAlgebra(R::Field, s::Vector{String}, degree_bound::Int;
+function FreeAlgebra(R::Union{Ring, Field}, s::Vector{String}, degree_bound::Int;
                      ordering = :degrevlex, ordering2::Symbol = :comp1min,
                      cached::Bool = true)
+   return _FreeAlgebra(R, s, degree_bound, ordering, ordering2, cached)
+end
+
+function FreeAlgebra(R::Nemo.Ring, s::Vector{String}, degree_bound::Int;
+                     ordering = :degrevlex, ordering2::Symbol = :comp1min,
+                     cached::Bool = true)
+   R = CoefficientRing(R)
    return _FreeAlgebra(R, s, degree_bound, ordering, ordering2, cached)
 end
 
