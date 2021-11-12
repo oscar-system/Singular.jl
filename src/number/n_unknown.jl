@@ -261,10 +261,12 @@ function (R::N_Field{T})(a::n_FieldElem{T}) where T <: Nemo.RingElem
    return a
 end
 
+# these pointers are complicated - not for general users
 function (R::N_Ring{T})(ptr::libSingular.number_ptr) where T <: Nemo.RingElem
    return n_RingElem{T}(ptr, R)
 end
 
+# these pointers are complicated - not for general users
 function (R::N_Field{T})(ptr::libSingular.number_ptr) where T <: Nemo.FieldElem
    return n_FieldElem{T}(ptr, R)
 end

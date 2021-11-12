@@ -16,7 +16,7 @@ mutable struct PolyRing{T <: Nemo.RingElem} <: Nemo.MPolyRing{T}
    ord::sordering
    S::Vector{Symbol}
 
-   # take ownership of a ring ptr
+   # take ownership of the ring ptr
    function PolyRing{T}(r::libSingular.ring_ptr, R, s::Vector{Symbol}=singular_symbols(r)) where T
       @assert r.cpp_object != C_NULL
       ord = Cint[]
@@ -85,12 +85,14 @@ function spoly{T}(R::PolyRing{T}, p::T) where T <: Nemo.RingElem
    return spoly{T}(R, r)
 end
 
+# ownership of the pointer is NOT taken - not for general users
 function spoly{T}(R::PolyRing{T}, n::libSingular.number_ptr) where T <: Nemo.RingElem
    nn = libSingular.n_Copy(n, base_ring(R).ptr)
    p = libSingular.p_NSet(nn, R.ptr)
    return spoly{T}(R, p)
 end
 
+# take ownership of the pointer - not for general users
 function spoly{T}(R::PolyRing{T}, n::Ptr{Cvoid}) where T <: Nemo.RingElem
    p = libSingular.p_NSet(n, R.ptr)
    return spoly{T}(R, p)

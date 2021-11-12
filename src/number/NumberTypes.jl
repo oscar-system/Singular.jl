@@ -45,14 +45,15 @@ mutable struct Integers <: Ring
 end
 
 mutable struct n_Z <: Nemo.RingElem
-    ptr::libSingular.number_ptr
+   ptr::libSingular.number_ptr
 
-    function n_Z(n::libSingular.number_ptr)
-        z = new(n)
-        parent(z).refcount += 1
-        finalizer(_Elem_finalizer, z)
-        return z
-    end
+   # take ownership of the pointer - not for general users
+   function n_Z(n::libSingular.number_ptr)
+      z = new(n)
+      parent(z).refcount += 1
+      finalizer(_Elem_finalizer, z)
+      return z
+   end
 end
 
 n_Z(n::n_Z) = n
@@ -87,14 +88,15 @@ mutable struct Rationals <: Field
 end
 
 mutable struct n_Q <: Nemo.FieldElem
-    ptr::libSingular.number_ptr
+   ptr::libSingular.number_ptr
 
-    function n_Q(n::libSingular.number_ptr)
-        z = new(n)
-        parent(z).refcount += 1
-        finalizer(_Elem_finalizer, z)
-        return z
-    end
+   # take ownership of the pointer - not for general users
+   function n_Q(n::libSingular.number_ptr)
+      z = new(n)
+      parent(z).refcount += 1
+      finalizer(_Elem_finalizer, z)
+      return z
+   end
 end
 
 n_Q(n::n_Q) = n
@@ -138,15 +140,16 @@ end
 
 
 mutable struct n_Zn <: Nemo.RingElem
-    ptr::libSingular.number_ptr
-    parent::N_ZnRing
+   ptr::libSingular.number_ptr
+   parent::N_ZnRing
 
-    function n_Zn(c::N_ZnRing, n::libSingular.number_ptr)
-        z = new(n, c)
-        c.refcount += 1
-        finalizer(_Elem_finalizer, z)
-        return z
-    end
+   # take ownership of the pointer - not for general users
+   function n_Zn(c::N_ZnRing, n::libSingular.number_ptr)
+      z = new(n, c)
+      c.refcount += 1
+      finalizer(_Elem_finalizer, z)
+      return z
+   end
 end
 
 n_Zn(c::N_ZnRing, n::Integer = 0) = n_Zn(c, libSingular.number_ptr(n, c.ptr))
@@ -180,15 +183,16 @@ mutable struct N_ZpField <: Field
 end
 
 mutable struct n_Zp <: Nemo.FieldElem
-    ptr::libSingular.number_ptr
-    parent::N_ZpField
+   ptr::libSingular.number_ptr
+   parent::N_ZpField
 
-    function n_Zp(c::N_ZpField, n::libSingular.number_ptr)
-        z = new(n, c)
-        c.refcount += 1
-        finalizer(_Elem_finalizer, z)
-        return z
-    end
+   # take ownership of the pointer - not for general users
+   function n_Zp(c::N_ZpField, n::libSingular.number_ptr)
+      z = new(n, c)
+      c.refcount += 1
+      finalizer(_Elem_finalizer, z)
+      return z
+   end
 end
 
 # FIXME: in Singular 4.2.0 the n_Zp constructors are broken for big integer
@@ -259,15 +263,16 @@ mutable struct N_GField <: Field
 end
 
 mutable struct n_GF <: Nemo.FieldElem
-    ptr::libSingular.number_ptr
-    parent::N_GField
+   ptr::libSingular.number_ptr
+   parent::N_GField
 
-    function n_GF(c::N_GField, n::libSingular.number_ptr)
-        z = new(n, c)
-        c.refcount += 1
-        finalizer(_Elem_finalizer, z)
-        return z
-    end
+   # take ownership of the pointer - not for general users
+   function n_GF(c::N_GField, n::libSingular.number_ptr)
+      z = new(n, c)
+      c.refcount += 1
+      finalizer(_Elem_finalizer, z)
+      return z
+   end
 end
 
 n_GF(c::N_GField, n::Integer = 0) = n_GF(c, libSingular.number_ptr(n, c.ptr))
@@ -310,15 +315,16 @@ mutable struct N_FField <: Field
 end
 
 mutable struct n_transExt <: Nemo.FieldElem
-    ptr::libSingular.number_ptr
-    parent::N_FField
+   ptr::libSingular.number_ptr
+   parent::N_FField
 
-    function n_transExt(c::N_FField, n::libSingular.number_ptr)
-        z = new(n, c)
-        c.refcount += 1
-        finalizer(_Elem_finalizer, z)
-        return z
-    end
+   # take ownership of the pointer - not for general users
+   function n_transExt(c::N_FField, n::libSingular.number_ptr)
+      z = new(n, c)
+      c.refcount += 1
+      finalizer(_Elem_finalizer, z)
+      return z
+   end
 end
 
 n_transExt(c::N_FField, n::Integer = 0) = n_transExt(c, libSingular.number_ptr(n, c.ptr))
@@ -341,7 +347,7 @@ mutable struct N_AlgExtField <: Field
    minpoly::n_transExt
    refcount::Int
 
-   # take ownership of a coeffs_ptr
+   # take ownership of the pointer - not for general users
    function N_AlgExtField(ptr::libSingular.coeffs_ptr, minpoly::n_transExt,
                                                           cached::Bool = true)
       if libSingular.nCoeff_is_algExt(ptr)
@@ -374,15 +380,16 @@ mutable struct N_AlgExtField <: Field
 end
 
 mutable struct n_algExt <: Nemo.FieldElem
-    ptr::libSingular.number_ptr
-    parent::N_AlgExtField
+   ptr::libSingular.number_ptr
+   parent::N_AlgExtField
 
-    function n_algExt(c::N_AlgExtField, n::libSingular.number_ptr)
-        z = new(n, c)
-        c.refcount += 1
-        finalizer(_Elem_finalizer, z)
-        return z
-    end
+   # take ownership of the pointer - not for general users
+   function n_algExt(c::N_AlgExtField, n::libSingular.number_ptr)
+      z = new(n, c)
+      c.refcount += 1
+      finalizer(_Elem_finalizer, z)
+      return z
+   end
 end
 
 n_algExt(c::N_AlgExtField, n::Integer = 0) = n_algExt(c, libSingular.number_ptr(n, c.ptr))
@@ -449,6 +456,8 @@ const n_unknown{T} = Union{n_RingElem{T}, n_FieldElem{T}}
 #
 #   N_UnknownSingularCoefficientRing
 #   singular coefficient rings with no identifiable julia object
+#   This is really the "misc" bin for coefficients rings, providing a fallback
+#   for when the ring cannot be identified.
 #
 ###############################################################################
 
@@ -456,7 +465,7 @@ mutable struct N_UnknownSingularCoefficientRing <: Ring
    ptr::libSingular.coeffs_ptr
    refcount::Int
 
-   # take ownership of the pointer
+   # take ownership of the pointer - not for general users
    function N_UnknownSingularCoefficientRing(ptr::libSingular.coeffs_ptr)
       a = new(ptr, 1)
       finalizer(_Ring_finalizer, a)
@@ -468,6 +477,7 @@ mutable struct n_unknownsingularcoefficient <: Nemo.RingElem
    ptr::libSingular.number_ptr
    parent::N_UnknownSingularCoefficientRing
 
+   # take ownership of the pointer - not for general users
    function n_unknownsingularcoefficient(R::N_UnknownSingularCoefficientRing, n::libSingular.number_ptr)
       a = new(n, R)
       finalizer(_Elem_finalizer, a)

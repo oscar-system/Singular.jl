@@ -72,6 +72,7 @@ mutable struct smodule{T <: Nemo.RingElem} <: Module{T}
    ptr::libSingular.ideal_ptr # ideal and module types are the same in Singular
    isGB::Bool
 
+   # take ownership of the pointer - not for general users
    function smodule{T}(R::PolyRing, m::libSingular.ideal_ptr) where T
       T === elem_type(R) || error("type mismatch")
       z = new(R, m, false)
@@ -81,6 +82,7 @@ mutable struct smodule{T <: Nemo.RingElem} <: Module{T}
    end
 end
 
+# ownership of the pointer is NOT taken - not for general users
 function smodule{T}(R::PolyRing, m::libSingular.matrix_ptr) where T
    ptr = libSingular.mp_Copy(m, R.ptr)
    ptr = libSingular.id_Matrix2Module(ptr, R.ptr)
@@ -109,6 +111,7 @@ If R is called with a low-level ideal pointer, along with
 Val(:module), it will interpret the ideal pointer as a module.
 This needs to be indicated due to the fact that Singular's
 modules and ideals are both stored in the ideal data structure.
+This takes ownership of the pointer and is not for general users.
 """
 function (R::PolyRing)(m::libSingular.ideal_ptr, ::Val{:module})
    T = elem_type(R)

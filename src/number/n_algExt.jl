@@ -352,6 +352,7 @@ function (K::Singular.N_AlgExtField)(a::Union{n_Q, Nemo.fmpq, Rational})
   return K(numerator(a))//K(denominator(a))
 end
 
+# take ownership of the pointer - not for general users
 function (K::N_AlgExtField)(n::libSingular.number_ptr)
   return n_algExt(K, n)
 end

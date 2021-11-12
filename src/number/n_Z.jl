@@ -398,4 +398,5 @@ rand(R::Integers, n) = rand(Random.GLOBAL_RNG, R, n)
 
 (::Integers)(n::n_Z) = n
 
+# take ownership of the pointer - not for general users
 (::Integers)(n::libSingular.number_ptr) = n_Z(n)

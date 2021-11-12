@@ -395,6 +395,7 @@ rand(R::Rationals, n) = rand(Random.GLOBAL_RNG, R, n)
 
 (R::Rationals)(n::Union{Integer,fmpz,n_Z}, m::Union{Integer,fmpz,n_Z}) = R(n) // R(m)
 
+# take ownership of the pointer - not for general users
 (::Rationals)(n::libSingular.number_ptr) = n_Q(n)
 
 # from integers

@@ -89,6 +89,7 @@ function symbols(R::PolyRingUnion)
    return R.S
 end
 
+# ownership of the pointer is NOT taken - not for general users
 function singular_symbols(r::libSingular.ring_ptr)
    n = Int(libSingular.rIsLPRing(r))
    n = n > 0 ? n : Int(libSingular.rVar(r))
@@ -1457,6 +1458,7 @@ function (R::PolyRing)(n::Integer)
    return spoly{T}(R, BigInt(n))
 end
 
+# TODO looks leaky: the constructor doesn't take ownership but a copy is passed.
 function (R::PolyRing)(n::n_Z)
    n = base_ring(R)(n)
    ptr = GC.@preserve n libSingular.n_Copy(n.ptr, parent(n).ptr)
@@ -1468,6 +1470,7 @@ function (R::PolyRing)(n::Rational)
    return R(base_ring(R)(n))
 end
 
+# take ownership of the pointer - not for general users
 function (R::PolyRing)(n::libSingular.poly_ptr)
    T = elem_type(base_ring(R))
    return spoly{T}(R, n)
@@ -1516,6 +1519,7 @@ function (R::PolyRing)(p::spoly)
    return p
 end
 
+# TODO looks wrong: why put the pointer into just the base ring?
 function (R::PolyRing)(n::libSingular.number_ptr)
     return R.base_ring(n)
 end

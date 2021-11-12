@@ -183,6 +183,7 @@ function (R::N_UnknownSingularCoefficientRing)(x::Integer)
    GC.@preserve R return n_unknownsingularcoefficient(R, libSingular.n_InitMPZ(BigInt(x), R.ptr))
 end
 
+# take ownership of the pointer - not for general users
 function (R::N_UnknownSingularCoefficientRing)(n::libSingular.number_ptr)
    return n_unknownsingularcoefficient(R, n)
 end

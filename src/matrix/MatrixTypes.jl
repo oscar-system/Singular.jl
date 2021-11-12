@@ -22,6 +22,7 @@ mutable struct smatrix{T <: Nemo.RingElem} <: Nemo.SetElem
    ptr::libSingular.matrix_ptr
    base_ring::PolyRing
 
+   # take ownership of the pointer - not for general users
    function smatrix{T}(R::PolyRing, ptr::libSingular.matrix_ptr) where {T}
       T === elem_type(R) || error("type mismatch")
       z = new(ptr, R)
@@ -31,6 +32,7 @@ mutable struct smatrix{T <: Nemo.RingElem} <: Nemo.SetElem
 end
 
 # really takes a Singular module, which has type ideal
+# ownership of the pointer is NOT taken - not for general users
 function smatrix{T}(R::PolyRing, m::libSingular.ideal_ptr) where T
    ptr = libSingular.id_Copy(m, R.ptr)
    ptr = libSingular.id_Module2Matrix(ptr, R.ptr)
@@ -51,11 +53,12 @@ end
 mutable struct sbigintmat
     ptr::libSingular.bigintmat_ptr
 
-    function sbigintmat(ptr::libSingular.bigintmat_ptr)
-        z = new(ptr)
-        finalizer(_sbigintmat_clear_fn, z)
-        return z
-    end
+   # take ownership of the pointer - not for general users
+   function sbigintmat(ptr::libSingular.bigintmat_ptr)
+      z = new(ptr)
+      finalizer(_sbigintmat_clear_fn, z)
+      return z
+   end
 end
 
 function _sbigintmat_clear_fn(m::sbigintmat)

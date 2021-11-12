@@ -17,7 +17,7 @@ mutable struct LPRing{T <: Nemo.RingElem} <: AbstractAlgebra.NCRing
    refcount::Int
    S::Vector{Symbol}
 
-   # take ownership of a ring ptr
+   # take ownership of the pointer - not for general users
    function LPRing{T}(r::libSingular.ring_ptr, R, deg_bound::Int,
                           s::Vector{Symbol}=singular_symbols(r)) where T
       @assert deg_bound > 0
@@ -59,6 +59,7 @@ mutable struct slpalg{T <: Nemo.RingElem} <: Nemo.NCRingElem
    ptr::libSingular.poly_ptr
    parent::LPRing{T}
 
+   # take ownership of the pointer - not for general users
    function slpalg{T}(R::LPRing{T}, p::libSingular.poly_ptr) where T <: Nemo.RingElem
       z = new(p, R)
       R.refcount += 1
@@ -83,6 +84,7 @@ function slpalg{T}(R::LPRing{T}, p::T) where T <: Nemo.RingElem
    end
 end
 
+# ownership of the pointer is NOT taken - not for general users
 function slpalg{T}(R::LPRing{T}, n::libSingular.number_ptr) where T <: Nemo.RingElem
    S = base_ring(R)
    GC.@preserve R S begin
@@ -92,6 +94,7 @@ function slpalg{T}(R::LPRing{T}, n::libSingular.number_ptr) where T <: Nemo.Ring
    end
 end
 
+# take ownership of the pointer - not for general users
 function slpalg{T}(R::LPRing{T}, n::Ptr{Cvoid}) where T <: Nemo.RingElem
    GC.@preserve R begin
       p = libSingular.p_NSet(n, R.ptr)

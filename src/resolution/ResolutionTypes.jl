@@ -22,6 +22,7 @@ mutable struct sresolution{T <: Nemo.RingElem} <: Nemo.SetElem
    minimal::Bool
 
    # really takes a Singular module, which has type ideal
+   # take ownership of the pointer - not for general users
    function sresolution{T}(R::PolyRing, ptr::libSingular.syStrategy_ptr, minimal::Bool=false) where T
       T === elem_type(R) || error("type mismatch")
       R.refcount += 1

@@ -22,6 +22,7 @@ mutable struct sideal{T <: AbstractAlgebra.NCRingElem} <: Set
    isGB::Bool
    isTwoSided::Bool
 
+   # take ownership of the pointer - not for general users
    function sideal{T}(R::PolyRingUnion, id::libSingular.ideal_ptr, isGB::Bool, isTwoSided::Bool) where T
       z = new{T}(id, R, isGB, isTwoSided)
       R.refcount += 1
@@ -44,10 +45,12 @@ isdefault_twosided_ideal(::Type{<:spoly}) = true
 isdefault_twosided_ideal(::Type{<:slpalg}) = true
 isdefault_twosided_ideal(::Type{<:spluralg}) = false
 
+# take ownership of the pointer - not for general users
 function sideal{S}(R::PolyRingUnion, id::libSingular.ideal_ptr, isGB::Bool) where S
    return sideal{S}(R, id, isGB, isdefault_twosided_ideal(S))
 end
 
+# take ownership of the pointer - not for general users
 function sideal{S}(R::PolyRingUnion, id::libSingular.ideal_ptr) where S
    return sideal{S}(R, id, false, isdefault_twosided_ideal(S))
 end

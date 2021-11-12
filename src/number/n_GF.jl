@@ -324,6 +324,7 @@ promote_rule(C::Type{n_GF}, ::Type{n_Z}) = n_GF
 
 (R::N_GField)(n::n_GF) = n
 
+# take ownership of the pointer - not for general users
 (R::N_GField)(n::libSingular.number_ptr) = n_GF(R, n)
 
 ###############################################################################
