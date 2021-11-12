@@ -1479,23 +1479,10 @@ function (R::PolyRing{T})(n::T) where T <: Nemo.RingElem
    return spoly{T}(R, n)
 end
 
-function (R::PolyRing{T})(n::T) where T <: Singular.n_unknown
+# needed only to prevent ambiguity with Oscar/src/Rings/mpoly.jl
+function (R::PolyRing{T})(n::T) where T <: n_unknown
    parent(n) != base_ring(R) && error("Unable to coerce into polynomial ring")
    return spoly{T}(R, n)
-end
-
-function (R::PolyRing{n_RingElem{RingElemWrapper{S, T}}})(
-   n::n_RingElem{RingElemWrapper{S, T}}
-) where {S, T}
-   parent(n) != base_ring(R) && error("Unable to coerce into polynomial ring")
-   return spoly{n_RingElem{RingElemWrapper{S, T}}}(R, n)
-end
-
-function (R::PolyRing{n_FieldElem{FieldElemWrapper{S, T}}})(
-   n::n_FieldElem{FieldElemWrapper{S, T}}
-) where {S, T}
-   parent(n) != base_ring(R) && error("Unable to coerce into polynomial ring")
-   return spoly{n_FieldElem{FieldElemWrapper{S, T}}}(R, n)
 end
 
 function (R::PolyRing)(f::T) where T <: Nemo.MPolyElem
@@ -1509,7 +1496,7 @@ function (R::PolyRing)(f::T) where T <: Nemo.MPolyElem
 end
 
 function (R::PolyRing{S})(n::T) where {S <: Nemo.RingElem, T <: Nemo.RingElem}
-   return R(base_ring(R)(n))
+   return spoly{S}(R, base_ring(R)(n))
 end
 
 function (R::PolyRing)(p::spoly)
