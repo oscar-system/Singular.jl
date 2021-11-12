@@ -1,5 +1,8 @@
 ```@meta
 CurrentModule = Singular
+DocTestSetup = quote
+  using Singular
+end
 ```
 
 # Ideals
@@ -175,17 +178,6 @@ equal(I, J) == true
 
 ```@docs
 intersection(I::sideal{S}, J::sideal{S}) where S <: SPolyUnion
-```
-
-**Examples**
-
-```julia
-R, (x , y) = PolynomialRing(QQ, ["x", "y"])
-
-I = Ideal(R, x^2 + 1, x*y)
-J = Ideal(R, x^2 + x*y + 1, x^2 - x*y + 1)
-
-V = intersection(I, J)
 ```
 
 ### Quotient

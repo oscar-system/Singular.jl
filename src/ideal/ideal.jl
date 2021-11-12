@@ -358,6 +358,21 @@ end
     intersection(I::sideal{S}, J::sideal{S}) where S <: SPolyUnion
 
 Returns the intersection of the two given ideals.
+
+# Examples
+```jldoctest
+julia> R, (x , y) = PolynomialRing(QQ, ["x", "y"])
+(Singular Polynomial Ring (QQ),(x,y),(dp(2),C), spoly{n_Q}[x, y])
+
+julia> I = Ideal(R, x^2 + 1, x*y)
+Singular Ideal over Singular Polynomial Ring (QQ),(x,y),(dp(2),C) with generators (x^2 + 1, x*y)
+
+julia> J = Ideal(R, x^2 + x*y + 1, x^2 - x*y + 1)
+Singular Ideal over Singular Polynomial Ring (QQ),(x,y),(dp(2),C) with generators (x^2 + x*y + 1, x^2 - x*y + 1)
+
+julia> V = intersection(I, J)
+Singular Ideal over Singular Polynomial Ring (QQ),(x,y),(dp(2),C) with generators (y, x^2 - x*y + 1)
+```
 """
 function intersection(I::sideal{S}, J::sideal{S}) where S <: SPolyUnion
    check_parent(I, J)
