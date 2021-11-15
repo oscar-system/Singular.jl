@@ -341,7 +341,7 @@ end
 
 function (K::N_AlgExtField)(a::n_algExt)
    K == parent(a) || error("Parents must coincide")
-   return n
+   return a
 end
 
 function (K::N_AlgExtField)(a::IntegerLikeTypes = 0)

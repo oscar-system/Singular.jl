@@ -161,6 +161,30 @@ end
 
 ###############################################################################
 #
+#   Promote rules
+#
+###############################################################################
+
+promote_rule(::Type{slpalg{T}}, ::Type{slpalg{T}}) where T <: Nemo.RingElem = slpalg{T}
+
+function promote_rule(::Type{slpalg{T}}, ::Type{U}) where {T <: Nemo.RingElem, U <: Nemo.RingElem}
+   promote_rule(T, U) == T ? slpalg{T} : Union{}
+end
+
+function promote_rule(::Type{slpalg{T}}, ::Type{T}) where {T <: Nemo.RingElem}
+   return slpalg{T}
+end
+
+function promote_rule(::Type{slpalg{n_RingElem{RingElemWrapper{S, T}}}}, ::Type{U}) where {T <: Nemo.RingElem, U <: Nemo.RingElem, S}
+   return slpalg{n_RingElem{RingElemWrapper{S, T}}}
+end
+
+function promote_rule(::Type{slpalg{n_FieldElem{FieldElemWrapper{S, T}}}}, ::Type{U}) where {T <: Nemo.FieldElem, U <: Nemo.FieldElem, S}
+   return slpalg{n_FieldElem{FieldElemWrapper{S, T}}}
+end
+
+###############################################################################
+#
 #   Parent call overloads
 #
 ###############################################################################
@@ -178,23 +202,21 @@ function (R::LPRing{T})(n::Integer) where T <: Nemo.RingElem
 end
 
 function (R::LPRing{T})(n::n_Z) where T <: Nemo.RingElem
-   n = base_ring(R)(n)
-   ptr = libSingular.n_Copy(n.ptr, parent(n).ptr)
-   return slpalg{T}(R, ptr)
+   return slpalg{T}(R, base_ring(R)(n))
 end
 
-function (R::LPRing)(n::Rational)
-   return R(base_ring(R)(n))
+function (R::LPRing{T})(n::Rational) where T <: Nemo.RingElem
+   return slpalg{T}(R, base_ring(R)(n))
 end
 
 # take ownership of the pointer - not for general users
-function (R::LPRing{T})(n::libSingular.poly_ptr) where T <: Nemo.RingElem
-   return slpalg{T}(R, n)
+function (R::LPRing{T})(ptr::libSingular.poly_ptr) where T <: Nemo.RingElem
+   return slpalg{T}(R, ptr)
 end
 
 function (R::LPRing{T})(n::T) where T <: Nemo.RingElem
-   parent(n) != base_ring(R) && error("Unable to coerce into Exterior algebra")
-   return slpalg{T}(R, n.ptr)
+   parent(n) != base_ring(R) && error("Unable to coerce into free algebra")
+   return slpalg{T}(R, n)
 end
 
 function (R::LPRing{S})(n::T) where {S <: Nemo.RingElem, T <: Nemo.RingElem}
@@ -202,13 +224,8 @@ function (R::LPRing{S})(n::T) where {S <: Nemo.RingElem, T <: Nemo.RingElem}
 end
 
 function (R::LPRing)(p::slpalg)
-   parent(p) != R && error("Unable to coerce")
+   parent(p) !== R && error("Unable to coerce into free algebra")
    return p
-end
-
-# take ownership of the pointer - not for general users
-function (R::LPRing)(n::libSingular.number_ptr)
-    return R.base_ring(n)
 end
 
 ###############################################################################
@@ -239,9 +256,16 @@ function _FreeAlgebra(R, s::Vector{String}, degree_bound, ordering, ordering2, c
    return (parent_obj, gens(parent_obj))
 end
 
-function FreeAlgebra(R::Field, s::Vector{String}, degree_bound::Int;
+function FreeAlgebra(R::Union{Ring, Field}, s::Vector{String}, degree_bound::Int;
                      ordering = :degrevlex, ordering2::Symbol = :comp1min,
                      cached::Bool = true)
+   return _FreeAlgebra(R, s, degree_bound, ordering, ordering2, cached)
+end
+
+function FreeAlgebra(R::Nemo.Ring, s::Vector{String}, degree_bound::Int;
+                     ordering = :degrevlex, ordering2::Symbol = :comp1min,
+                     cached::Bool = true)
+   R = CoefficientRing(R)
    return _FreeAlgebra(R, s, degree_bound, ordering, ordering2, cached)
 end
 
