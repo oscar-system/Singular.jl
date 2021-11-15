@@ -355,18 +355,20 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    intersection(I::sideal{S}, J::sideal{S}) where S <: SPolyUnion
+    intersection(I::sideal{S}, J::sideal{S}) where {T <: Nemo.RingElem, S <: Union{spoly{T}, spluralg{T}}}
 
 Returns the intersection of the two given ideals.
 """
-function intersection(I::sideal{S}, J::sideal{S}) where S <: SPolyUnion
+function intersection(I::sideal{S}, J::sideal{S}) where {T <: Nemo.RingElem,
+                                             S <: Union{spoly{T}, spluralg{T}}}
    check_parent(I, J)
    R = base_ring(I)
    ptr = GC.@preserve I J R libSingular.id_Intersection(I.ptr, J.ptr, R.ptr)
    return sideal{S}(R, ptr)
 end
 
-function intersection(I::sideal{S}, Js::sideal{S}...) where S <: SPolyUnion
+function intersection(I::sideal{S}, Js::sideal{S}...) where {T <: Nemo.RingElem,
+                                             S <: Union{spoly{T}, spluralg{T}}}
    R = base_ring(I)
    GC.@preserve I Js R begin
       CC = Ptr{Nothing}[I.ptr.cpp_object]

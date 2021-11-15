@@ -174,7 +174,7 @@ equal(I, J) == true
 ### Intersection
 
 ```@docs
-intersection(I::sideal{S}, J::sideal{S}) where S <: SPolyUnion
+intersection(I::sideal{S}, J::sideal{S}) where {T <: Nemo.RingElem, S <: Union{spoly{T}, spluralg{T}}}
 ```
 
 **Examples**

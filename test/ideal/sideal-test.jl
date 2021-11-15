@@ -283,6 +283,19 @@ end
 
    @test equal(I, @inferred intersection(intersection(I1, I2), I3))
    @test equal(I, @inferred intersection(I1, intersection(I2, I3)))
+
+   r, (x, y) = PolynomialRing(Fp(7), ["x", "y"], ordering = :degrevlex)
+   R, (x, y) = GAlgebra(r, Singular.Matrix(r, [1 1; 0 1]),
+                           Singular.Matrix(r, [0 x + y; 0 0]))
+
+   I1 = @inferred Ideal(R, x^2 + x*y + 1, 2y^2 + 3, R(7))
+   I2 = @inferred Ideal(R, x*y^2 + x + 1, 2x*y + 1, 7x + 1)
+   I3 = @inferred Ideal(R, x, y)
+
+   I = @inferred intersection(I1, I2)
+
+   @test contains(I1, I)
+   @test contains(I2, I)
 end
 
 @testset "sideal.quotient" begin
