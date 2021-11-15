@@ -47,6 +47,8 @@ end
    I2 = @inferred deepcopy(I1)
 
    @test isequal(I1, I2)
+   normalize!(I1)
+   @test isequal(I1, I2)
 
    @test I2[2] == y
    I2[2] = x^2 + 1
@@ -104,6 +106,8 @@ end
    I2 = @inferred deepcopy(I1)
 
    @test isequal(I1, I2)
+   normalize!(I1)
+   @test isequal(I1, I2)
 
    @test I2[2] == y
    I2[2] = x^2 + 1
@@ -118,7 +122,6 @@ end
    @test isvar_generated(Ideal(R, x, y))
    @test !isvar_generated(Ideal(R, R(1)))
    @test !isvar_generated(Ideal(R, x + y))
-
 
 end
 
@@ -135,6 +138,8 @@ end
 
    I2 = @inferred deepcopy(I1)
 
+   @test isequal(I1, I2)
+   normalize!(I1)
    @test isequal(I1, I2)
 
    @test I2[2] == y
