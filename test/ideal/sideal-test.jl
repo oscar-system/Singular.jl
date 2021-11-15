@@ -34,7 +34,7 @@
    end
 end
 
-@testset "sideal.manipulation" begin
+@testset "sideal.spoly.manipulation" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    I0 = Ideal(R)
@@ -86,6 +86,71 @@ end
    f = (x^3+y^5)^2+x^2*y^7
    @test mult(std(@inferred jacobian_ideal(f))) == 46
    @test mult(std(Ideal(R, f))) == 6
+end
+
+@testset "sideal.spluralg.manipulation" begin
+
+   r, (x, y) = PolynomialRing(QQ, ["x", "y"], ordering = :degrevlex)
+   R, (x, y) = GAlgebra(r, Singular.Matrix(r, [1 1; 0 1]),
+                           Singular.Matrix(r, [0 x + y; 0 0]))
+
+   I0 = Ideal(R)
+   I1 = Ideal(R, x, y)
+
+   @test ngens(I0) == 1
+   @test ngens(I1) == 2
+   @test x in gens(I1) && y in gens(I1)
+
+   I2 = @inferred deepcopy(I1)
+
+   @test isequal(I1, I2)
+
+   @test I2[2] == y
+   I2[2] = x^2 + 1
+   @test I2[2] == x^2 + 1
+
+   @test iszero(I0)
+
+   @test isconstant(Ideal(R, R(1), R(2)))
+
+   @test isvar_generated(Ideal(R, x))
+   @test isvar_generated(Ideal(R, y))
+   @test isvar_generated(Ideal(R, x, y))
+   @test !isvar_generated(Ideal(R, R(1)))
+   @test !isvar_generated(Ideal(R, x + y))
+
+
+end
+
+@testset "sideal.slpalg.manipulation" begin
+
+   R, (x, y) = FreeAlgebra(Fp(11), ["x", "y"], 9)
+
+   I0 = Ideal(R)
+   I1 = Ideal(R, x, y)
+
+   @test ngens(I0) == 1
+   @test ngens(I1) == 2
+   @test x in gens(I1) && y in gens(I1)
+
+   I2 = @inferred deepcopy(I1)
+
+   @test isequal(I1, I2)
+
+   @test I2[2] == y
+   I2[2] = x^2 + 1
+   @test I2[2] == x^2 + 1
+
+   @test iszero(I0)
+
+   @test isconstant(Ideal(R, R(1), R(2)))
+
+   @test isvar_generated(Ideal(R, x))
+   @test isvar_generated(Ideal(R, y))
+   @test isvar_generated(Ideal(R, x, y))
+   @test !isvar_generated(Ideal(R, R(1)))
+   @test !isvar_generated(Ideal(R, x + y))
+
 end
 
 @testset "sideal.binary_ops" begin
