@@ -239,11 +239,23 @@ end
    @test isequal(Ideal(R, x, y), Ideal(R, x, y))
 end
 
-@testset "sideal.leading_terms" begin
+@testset "sideal.lead" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
    i1 = @inferred lead(Ideal(R, x^2 + x*y + 1, 2y^2 + 3, R(7)))
    i2 = @inferred Ideal(R, x^2, 2y^2, R(7))
-   @test equal(i1, i2)
+   @test isequal(i1, i2) || equal(i1, i2)
+
+   r, (x, y) = PolynomialRing(Fp(7), ["x", "y"], ordering = :degrevlex)
+   R, (x, y) = GAlgebra(r, Singular.Matrix(r, [1 1; 0 1]),
+                           Singular.Matrix(r, [0 x + y; 0 0]))
+   i1 = @inferred lead(Ideal(R, x^2 + x*y + 1, 2y^2 + 3, R(7)))
+   i2 = @inferred Ideal(R, x^2, 2y^2, R(7))
+   @test isequal(i1, i2) || equal(i1, i2)
+
+   R, (x, y) = FreeAlgebra(QQ, ["x", "y"], 10)
+   i1 = @inferred lead(Ideal(R, x^2 + x*y + 1, 2y^2 + 3, R(7)))
+   i2 = @inferred Ideal(R, x^2, 2y^2, R(7))
+   @test isequal(i1, i2) || equal(i1, i2)
 end
 
 @testset "sideal.local" begin
