@@ -191,7 +191,11 @@ V = intersection(I, J)
 ### Quotient
 
 ```@docs
-quotient(I::sideal{S}, J::sideal{S}) where S <: SPolyUnion
+quotient(I::sideal{S}, J::sideal{S}) where S <: spoly
+```
+
+```@docs
+quotient(I::sideal{S}, J::sideal{S}) where S <: spluralg
 ```
 
 **Examples**

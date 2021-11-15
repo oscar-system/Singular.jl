@@ -391,17 +391,30 @@ end
 
 
 @doc Markdown.doc"""
-    quotient(I::sideal{S}, J::sideal{S}) where S <: SPolyUnion
+    quotient(I::sideal{S}, J::sideal{S}) where S <: spoly
 
 Returns the quotient of the two given ideals. Recall that the ideal quotient
 $(I:J)$ over a polynomial ring $R$ is defined by
 $\{r \in R \;|\; rJ \subseteq I\}$.
 """
-function quotient(I::sideal{S}, J::sideal{S}) where S <: SPolyUnion
+function quotient(I::sideal{S}, J::sideal{S}) where S <: spoly
    check_parent(I, J)
    R = base_ring(I)
    ptr = GC.@preserve I J R libSingular.id_Quotient(I.ptr, J.ptr, I.isGB, R.ptr)
    return sideal{S}(R, ptr)
+end
+
+@doc Markdown.doc"""
+    quotient(I::sideal{S}, J::sideal{S}) where S <: spluralg
+
+Returns the quotient of the two given ideals, where $J$ must be two-sided.
+"""
+function quotient(I::sideal{S}, J::sideal{S}) where S <: spluralg
+   J.isTwoSided || error("second ideal must be two-sided")
+   check_parent(I, J)
+   R = base_ring(I)
+   ptr = GC.@preserve I J R libSingular.id_Quotient(I.ptr, J.ptr, I.isGB, R.ptr)
+   return sideal{S}(R, ptr, false, I.isTwoSided)
 end
 
 ###############################################################################
@@ -544,11 +557,11 @@ ideal will have the same number of generators as $I$, even if they are zero.
 function reduce(I::sideal{S}, G::sideal{S}) where S <: SPolyUnion
    check_parent(I, G)
    if S <: slpalg
-      I.isTwoSided && G.isTwoSided || error("letterplace ideals must be two-sided")
+      I.isTwoSided && G.isTwoSided || error("letterplace reduce requires two-sided ideals")
    elseif S <: spluralg
       # TODO: How does this work when base_ring(I) is a quotient from
       #       a (necessarily) two-sided ideal?
-      !I.isTwoSided && !G.isTwoSided || error("plural ideals must be left")
+      !I.isTwoSided && !G.isTwoSided || error("plural reduce requires left ideals")
    end
    R = base_ring(I)
    G.isGB || error("Not a Groebner basis")
@@ -564,10 +577,10 @@ It is assumed that $G$ is a Groebner basis.
 """
 function reduce(p::S, G::sideal{S}) where S <: SPolyUnion
    if S <: slpalg
-      G.isTwoSided || error("letterplace ideals must be two-sided")
+      G.isTwoSided || error("letterplace reduce requires two-sided ideals")
    elseif S <: spluralg
       # TODO: ditto as with reduce(ideal,.) above
-      !G.isTwoSided || error("plural ideals must be left")
+      !G.isTwoSided || error("plural reduce requires left ideals")
    end
    R = parent(p)
    R == base_ring(G) || error("Incompatible base rings")

@@ -309,6 +309,17 @@ end
    B = @inferred intersection(quotient(I, J), quotient(I, K))
 
    @test equal(A, B)
+
+   F, (q,) = FunctionField(QQ, ["q"])
+
+   r, (x, y) = PolynomialRing(F, ["x", "y"], ordering = :degrevlex)
+   R, (x, y) = GAlgebra(r, Singular.Matrix(r, [0 q; 0 0]),
+                           Singular.Matrix(r, [0 0; 0 0]))
+
+   I = std(Ideal(R, [x^3 + 2*x*y^2 + 2*x^2*y, y], twosided = true))
+   J = std(Ideal(R, [x^2, x+ y], twosided = true))
+   # the "equal" check here doesn't work because reduce only works with left ideals
+   @test isequal(quotient(I, J), Ideal(R, [y, x^2]))
 end
 
 @testset "sideal.saturation" begin
