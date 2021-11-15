@@ -85,6 +85,10 @@ end
    @test isgen(x)
    @test !isgen(R(1))
    @test !isgen(x + 1)
+   @test isconstant(R(0))
+   @test isconstant(R(1))
+   @test !isconstant(x)
+   @test !isconstant(x + 1)
    @test isterm(2x)
    @test !isterm(x + 1)
    @test length(x^2 + 2x + 1) == 3
