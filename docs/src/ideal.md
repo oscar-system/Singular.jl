@@ -289,7 +289,7 @@ reduce(I::sideal{S}, G::sideal{S}) where S <: SPolyUnion
 ```
 
 ```@docs
-reduce(::spoly, ::sideal)
+reduce(p::S, G::sideal{S}) where S <: SPolyUnion
 ```
 
 **Examples**

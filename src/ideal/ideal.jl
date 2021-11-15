@@ -282,13 +282,13 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    contains{T <: AbstractAlgebra.RingElem}(I::sideal{T}, J::sideal{T})
+    contains(I::sideal{S}, J::sideal{S}) where S
 
 Returns `true` if the ideal $I$ contains the ideal $J$. This will be
 expensive if $I$ is not a Groebner ideal, since its standard basis must be
 computed.
 """
-function contains(I::sideal{T}, J::sideal{T}) where T <: AbstractAlgebra.RingElem
+function contains(I::sideal{S}, J::sideal{S}) where S
    check_parent(I, J)
    if !I.isGB
       I = std(I)
@@ -463,7 +463,7 @@ a global ordering) then the Groebner basis is unique.
 """
 function std(I::sideal{S}; complete_reduction::Bool=false) where S <: SPolyUnion
    R = base_ring(I)
-   if !isdefault_twosided_ideal(S) && I.isTwoSided
+   if S <: spluralg && I.isTwoSided
       ptr = GC.@preserve I R libSingular.id_TwoStd(I.ptr, R.ptr)
    else
       ptr = GC.@preserve I R libSingular.id_Std(I.ptr, R.ptr, complete_reduction)
@@ -541,6 +541,13 @@ ideal will have the same number of generators as $I$, even if they are zero.
 """
 function reduce(I::sideal{S}, G::sideal{S}) where S <: SPolyUnion
    check_parent(I, G)
+   if S <: slpalg
+      I.isTwoSided && G.isTwoSided || error("letterplace ideals must be two-sided")
+   elseif S <: spluralg
+      # TODO: How does this work when base_ring(I) is a quotient from
+      #       a (necessarily) two-sided ideal?
+      !I.isTwoSided && !G.isTwoSided || error("plural ideals must be left")
+   end
    R = base_ring(I)
    G.isGB || error("Not a Groebner basis")
    ptr = GC.@preserve I G R libSingular.p_Reduce(I.ptr, G.ptr, R.ptr)
@@ -548,18 +555,23 @@ function reduce(I::sideal{S}, G::sideal{S}) where S <: SPolyUnion
 end
 
 @doc Markdown.doc"""
-    reduce(p::spoly, G::sideal)
+    reduce(p::S, G::sideal{S}) where S <: SPolyUnion
 
 Return the polynomial which is $p$ reduced by the polynomials generating $G$.
 It is assumed that $G$ is a Groebner basis.
 """
-function reduce(p::spoly, G::sideal)
-   R = base_ring(G)
-   par = parent(p)
-   R != par && error("Incompatible base rings")
+function reduce(p::S, G::sideal{S}) where S <: SPolyUnion
+   if S <: slpalg
+      G.isTwoSided || error("letterplace ideals must be two-sided")
+   elseif S <: spluralg
+      # TODO: ditto as with reduce(ideal,.) above
+      !G.isTwoSided || error("plural ideals must be left")
+   end
+   R = parent(p)
+   R == base_ring(G) || error("Incompatible base rings")
    G.isGB || error("Not a Groebner basis")
    ptr = GC.@preserve p G R libSingular.p_Reduce(p.ptr, G.ptr, R.ptr)
-   return par(ptr)
+   return R(ptr)
 end
 
 ###############################################################################
@@ -748,7 +760,8 @@ function Ideal(R::LPRing{T}, ids::slpalg{T}...) where T <: Nemo.RingElem
 end
 
 function Ideal(R::LPRing{T}, ids::Vector{slpalg{T}}; twosided=true) where T <: Nemo.RingElem
-   return sideal{elem_type(R)}(R, ids, twosided)
+   twosided || error("letterplace ideals must currently be two-sided")
+   return sideal{elem_type(R)}(R, ids, true)
 end
 
 # maximal ideal in degree d

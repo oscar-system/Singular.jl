@@ -190,8 +190,20 @@ end
    end
 end
 
-@testset "sideal.containment" begin
+@testset "sideal.contains" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+
+   @test contains(Ideal(R, x, y), Ideal(R, x))
+   @test !contains(Ideal(R, x), Ideal(R, x, y))
+
+   r, (x, y) = PolynomialRing(QQ, ["x", "y"], ordering = :degrevlex)
+   R, (x, y) = GAlgebra(r, Singular.Matrix(r, [1 1; 0 1]),
+                           Singular.Matrix(r, [0 x + y; 0 0]))
+
+   @test contains(Ideal(R, x, y), Ideal(R, x))
+   @test !contains(Ideal(R, x), Ideal(R, x, y))
+
+   R, (x, y) = FreeAlgebra(QQ, ["x", "y"], 10)
 
    @test contains(Ideal(R, x, y), Ideal(R, x))
    @test !contains(Ideal(R, x), Ideal(R, x, y))
@@ -199,6 +211,22 @@ end
 
 @testset "sideal.comparison" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+
+   @test equal(Ideal(R, x, y, x - y), Ideal(R, x, y, x + y))
+   @test !equal(Ideal(R, x), Ideal(R, x, y))
+   @test !isequal(Ideal(R, x, y, x - y), Ideal(R, x, y, x + y))
+   @test isequal(Ideal(R, x, y), Ideal(R, x, y))
+
+   r, (x, y) = PolynomialRing(Fp(7), ["x", "y"], ordering = :degrevlex)
+   R, (x, y) = GAlgebra(r, Singular.Matrix(r, [1 1; 0 1]),
+                           Singular.Matrix(r, [0 x + y; 0 0]))
+
+   @test equal(Ideal(R, x, y, x - y), Ideal(R, x, y, x + y))
+   @test !equal(Ideal(R, x), Ideal(R, x, y))
+   @test !isequal(Ideal(R, x, y, x - y), Ideal(R, x, y, x + y))
+   @test isequal(Ideal(R, x, y), Ideal(R, x, y))
+
+   R, (x, y) = FreeAlgebra(QQ, ["x", "y"], 10)
 
    @test equal(Ideal(R, x, y, x - y), Ideal(R, x, y, x + y))
    @test !equal(Ideal(R, x), Ideal(R, x, y))

@@ -20,6 +20,11 @@ mutable struct sideal{T <: AbstractAlgebra.NCRingElem} <: Set
    ptr::libSingular.ideal_ptr
    base_ring::PolyRingUnion
    isGB::Bool
+   # Singular supports left ideals and two-sided ideals.
+   #    spoly: isTwoSided doesn't matter because is it commutative
+   # spluralg: isTwoSided = false is supported and means left ideal
+   #   slpalg: isTwoSided = false is currently NOT supported, that is all
+   #           letterplace ideals must be two-sided at this point in time.
    isTwoSided::Bool
 
    # take ownership of the pointer - not for general users
