@@ -118,8 +118,8 @@ end
 end
 
 @testset "n_Z.chinese_remainder" begin
-#    @test crt(ZZ(2), ZZ(3), ZZ(3), ZZ(7), true) == -4
-#    @test crt(ZZ(2), ZZ(3), ZZ(3), ZZ(7), false) == 17
+    @test crt(ZZ(2), ZZ(3), ZZ(3), ZZ(7), true) == -4
+    @test crt(ZZ(2), ZZ(3), ZZ(3), ZZ(7), false) == 17
 end
 
 @testset "n_Z.Polynomials" begin

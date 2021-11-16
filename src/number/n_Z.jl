@@ -297,15 +297,21 @@ end
 ###############################################################################
 
 function crt(r1::n_Z, m1::n_Z, r2::n_Z, m2::n_Z, signed=false)
-   par = parent(r1)
-   r = [r1.ptr, r2.ptr]
-   m = [m1.ptr, m2.ptr]
-   println("type par",typeof(par.ptr))
-   println("type r",typeof(r))
-   println("type m",typeof(m))
-   a = libSingular.n_ChineseRemainderSym(reinterpret(Ptr{Nothing},pointer(r)), reinterpret(Ptr{Nothing},pointer(m)), Cint(2), Cint(signed), par.ptr)
-   println("Got through")
-   return par(a)
+   # n_ChineseRemainderSym works in coeffs_BIGINT, and NOT in n_Z
+   # convert inputs from n_Z to coeffs_BIGINT
+   Z = libSingular.get_coeffs_BIGINT()
+   r1ptr = libSingular.number_ptr(BigInt(r1), Z)
+   m1ptr = libSingular.number_ptr(BigInt(m1), Z)
+   r2ptr = libSingular.number_ptr(BigInt(r2), Z)
+   m2ptr = libSingular.number_ptr(BigInt(m2), Z)
+   # do the crt in coeffs_BIGINT
+   r = [r1ptr, r2ptr]
+   m = [m1ptr, m2ptr]
+   ptr = libSingular.n_ChineseRemainderSym(reinterpret(Ptr{Nothing},pointer(r)),
+                                           reinterpret(Ptr{Nothing},pointer(m)),
+                                           Cint(2), Cint(signed), Z)
+   # convert output from coeffs_BIGINT to n_Z
+   return n_Z(libSingular.n_GetMPZ(ptr, Z))
 end
 
 ###############################################################################
