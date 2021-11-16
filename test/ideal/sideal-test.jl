@@ -311,7 +311,6 @@ end
    @test equal(A, B)
 
    F, (q,) = FunctionField(QQ, ["q"])
-
    r, (x, y) = PolynomialRing(F, ["x", "y"], ordering = :degrevlex)
    R, (x, y) = GAlgebra(r, Singular.Matrix(r, [0 q; 0 0]),
                            Singular.Matrix(r, [0 0; 0 0]))
@@ -382,11 +381,17 @@ end
 @testset "sideal.interreduce" begin
    R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"])
 
-   I = Ideal(R, z*x + y^3, z + y^3, z + x*y)
+   I = @inferred Ideal(R, z*x + y^3, z + y^3, z + x*y)
+   A = @inferred interreduce(I)
+   @test equal(A, I)
 
-   A = interreduce(I)
+   r, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"], ordering = :degrevlex)
+   R, (x, y, z) = GAlgebra(r, Singular.Matrix(r, [0 1 1; 0 0 1; 0 0 0]),
+                              Singular.Matrix(r, [0 x z; 0 0 y; 0 0 1]))
 
-   @test isequal(A, Ideal(R, x*z - z, x*y + z, y^3 + x*z))
+   I = @inferred Ideal(R, z*x + y^3, z + y^3, z + x*y)
+   A = @inferred interreduce(I)
+   @test equal(A, I)
 end
 
 @testset "sideal.fglm" begin

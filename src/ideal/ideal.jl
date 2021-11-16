@@ -494,16 +494,17 @@ function std(I::sideal{S}; complete_reduction::Bool=false) where S <: SPolyUnion
 end
 
 @doc Markdown.doc"""
-    interreduce(I::sideal)
+    interreduce(I::sideal{S}) where {T <: Nemo.RingElem, S <: Union{spoly{T}, spluralg{T}}}
 
 Interreduce the elements of I such that no leading term is divisible by another
-leading term
+leading term. This returns a new ideal and does not modify the input ideal.
 """
-function interreduce(I::sideal{S}) where S <: SPolyUnion
+function interreduce(I::sideal{S}) where {T <: Nemo.RingElem,
+                                          S <: Union{spoly{T}, spluralg{T}}}
    R = base_ring(I)
    ptr = GC.@preserve I R libSingular.id_InterRed(I.ptr, R.ptr)
    libSingular.idSkipZeroes(ptr)
-   return sideal{S}(R, ptr)
+   return sideal{S}(R, ptr, false, I.isTwoSided)
 end
 
 @doc Markdown.doc"""

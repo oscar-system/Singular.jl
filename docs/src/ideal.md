@@ -109,6 +109,10 @@ isvar_generated(::sideal)
 normalize!(::sideal)
 ```
 
+```@docs
+interreduce(I::sideal{S}) where {T <: Nemo.RingElem, S <: Union{spoly{T}, spluralg{T}}}
+```
+
 **Examples**
 
 ```
