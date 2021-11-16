@@ -321,7 +321,7 @@ h2 = reduce(h1, J)
 ### Elimination
 
 ```@docs
-eliminate(I::sideal{S}, polys::S...) where S <: spoly
+eliminate(I::sideal{S}, polys::S...) where {T <: Nemo.RingElem, S <: Union{spoly{T}, spluralg{T}}}
 ```
 
 **Examples**

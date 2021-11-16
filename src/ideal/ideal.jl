@@ -598,13 +598,14 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    eliminate(I::sideal{S}, polys::S...) where S <: spoly
+    eliminate(I::sideal{S}, polys::S...) where {T <: Nemo.RingElem, S <: Union{spoly{T}, spluralg{T}}}
 
 Given a list of polynomials which are variables, construct the ideal
 corresponding geometrically to the projection of the variety given by the
 ideal $I$ where those variables have been eliminated.
 """
-function eliminate(I::sideal{S}, polys::S...) where S <: spoly
+function eliminate(I::sideal{S}, polys::S...) where {T <: Nemo.RingElem,
+                                                     S <: Union{spoly{T}, spluralg{T}}}
    R = base_ring(I)
    p = one(R)
    for i = 1:length(polys)

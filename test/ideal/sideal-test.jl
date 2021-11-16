@@ -469,14 +469,18 @@ end
    R, (x, y, t) = PolynomialRing(QQ, ["x", "y", "t"])
 
    I = Ideal(R, x - t^2, y - t^3)
-
    J = @inferred eliminate(I, t)
-
    @test equal(J, Ideal(R, x^3 - y^2))
-
    K = @inferred eliminate(I, t, x)
-
    @test equal(K, Ideal(R))
+
+   r, (e, f, h, a) = PolynomialRing(QQ, ["e", "f", "h", "a"], ordering = :deglex)
+   R, (e, f, h, a) = GAlgebra(r, Singular.Matrix(r, [0 1 1 1; 0 0 1 1; 0 0 0 1; 0 0 0 0]),
+                                 Singular.Matrix(r, [0 -h 2*e 0; 0 0 -2*f 0; 0 0 0 0; 0 0 0 0]))
+
+   I = @inferred Ideal(R, [e^3, f^3, h^3 - 4*h, 4*e*f + h^2 - 2*h - a])
+   J = @inferred eliminate(I, e, f, h)
+   @test equal(J, Ideal(R, [a^3 - 32*a^2 + 192*a]))
 end
 
 @testset "sideal.jet" begin
