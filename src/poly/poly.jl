@@ -170,7 +170,7 @@ function isgen(p::Union{spoly, spluralg})
    end
 end
 
-function isconstant(p::spoly)
+function isconstant(p::SPolyUnion)
    R = parent(p)
    GC.@preserve R p begin
       if p.ptr.cpp_object == C_NULL

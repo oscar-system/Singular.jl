@@ -282,14 +282,20 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    contains{T <: AbstractAlgebra.RingElem}(I::sideal{T}, J::sideal{T})
+    contains(I::sideal{S}, J::sideal{S}) where S
 
 Returns `true` if the ideal $I$ contains the ideal $J$. This will be
 expensive if $I$ is not a Groebner ideal, since its standard basis must be
 computed.
 """
-function contains(I::sideal{T}, J::sideal{T}) where T <: AbstractAlgebra.RingElem
+function contains(I::sideal{S}, J::sideal{S}) where S
    check_parent(I, J)
+   if S <: spluralg
+      if I.isTwoSided || J.isTwoSided || isquotient_ring(base_ring(I))
+         # see restrictions in doc strings for reduce
+         error("Containment is not implemented for two-sided PLURAL ideals")
+      end
+   end
    if !I.isGB
       I = std(I)
    end
@@ -355,18 +361,20 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    intersection(I::sideal{S}, J::sideal{S}) where S <: SPolyUnion
+    intersection(I::sideal{S}, J::sideal{S}) where {T <: Nemo.RingElem, S <: Union{spoly{T}, spluralg{T}}}
 
 Returns the intersection of the two given ideals.
 """
-function intersection(I::sideal{S}, J::sideal{S}) where S <: SPolyUnion
+function intersection(I::sideal{S}, J::sideal{S}) where {T <: Nemo.RingElem,
+                                             S <: Union{spoly{T}, spluralg{T}}}
    check_parent(I, J)
    R = base_ring(I)
    ptr = GC.@preserve I J R libSingular.id_Intersection(I.ptr, J.ptr, R.ptr)
    return sideal{S}(R, ptr)
 end
 
-function intersection(I::sideal{S}, Js::sideal{S}...) where S <: SPolyUnion
+function intersection(I::sideal{S}, Js::sideal{S}...) where {T <: Nemo.RingElem,
+                                             S <: Union{spoly{T}, spluralg{T}}}
    R = base_ring(I)
    GC.@preserve I Js R begin
       CC = Ptr{Nothing}[I.ptr.cpp_object]
@@ -389,17 +397,30 @@ end
 
 
 @doc Markdown.doc"""
-    quotient(I::sideal{S}, J::sideal{S}) where S <: SPolyUnion
+    quotient(I::sideal{S}, J::sideal{S}) where S <: spoly
 
 Returns the quotient of the two given ideals. Recall that the ideal quotient
 $(I:J)$ over a polynomial ring $R$ is defined by
 $\{r \in R \;|\; rJ \subseteq I\}$.
 """
-function quotient(I::sideal{S}, J::sideal{S}) where S <: SPolyUnion
+function quotient(I::sideal{S}, J::sideal{S}) where S <: spoly
    check_parent(I, J)
    R = base_ring(I)
    ptr = GC.@preserve I J R libSingular.id_Quotient(I.ptr, J.ptr, I.isGB, R.ptr)
    return sideal{S}(R, ptr)
+end
+
+@doc Markdown.doc"""
+    quotient(I::sideal{S}, J::sideal{S}) where S <: spluralg
+
+Returns the quotient of the two given ideals, where $J$ must be two-sided.
+"""
+function quotient(I::sideal{S}, J::sideal{S}) where S <: spluralg
+   J.isTwoSided || error("second ideal must be two-sided")
+   check_parent(I, J)
+   R = base_ring(I)
+   ptr = GC.@preserve I J R libSingular.id_Quotient(I.ptr, J.ptr, I.isGB, R.ptr)
+   return sideal{S}(R, ptr, false, I.isTwoSided)
 end
 
 ###############################################################################
@@ -463,7 +484,7 @@ a global ordering) then the Groebner basis is unique.
 """
 function std(I::sideal{S}; complete_reduction::Bool=false) where S <: SPolyUnion
    R = base_ring(I)
-   if !isdefault_twosided_ideal(S) && I.isTwoSided
+   if S <: spluralg && I.isTwoSided
       ptr = GC.@preserve I R libSingular.id_TwoStd(I.ptr, R.ptr)
    else
       ptr = GC.@preserve I R libSingular.id_Std(I.ptr, R.ptr, complete_reduction)
@@ -473,16 +494,17 @@ function std(I::sideal{S}; complete_reduction::Bool=false) where S <: SPolyUnion
 end
 
 @doc Markdown.doc"""
-    interreduce(I::sideal)
+    interreduce(I::sideal{S}) where {T <: Nemo.RingElem, S <: Union{spoly{T}, spluralg{T}}}
 
 Interreduce the elements of I such that no leading term is divisible by another
-leading term
+leading term. This returns a new ideal and does not modify the input ideal.
 """
-function interreduce(I::sideal{S}) where S <: SPolyUnion
+function interreduce(I::sideal{S}) where {T <: Nemo.RingElem,
+                                          S <: Union{spoly{T}, spluralg{T}}}
    R = base_ring(I)
    ptr = GC.@preserve I R libSingular.id_InterRed(I.ptr, R.ptr)
    libSingular.idSkipZeroes(ptr)
-   return sideal{S}(R, ptr)
+   return sideal{S}(R, ptr, false, I.isTwoSided)
 end
 
 @doc Markdown.doc"""
@@ -538,28 +560,35 @@ end
 Return an ideal whose generators are the generators of $I$ reduced by the
 ideal $G$. The ideal $G$ is required to be a Groebner basis. The returned
 ideal will have the same number of generators as $I$, even if they are zero.
+For PLURAL rings (S <: spluralg, GAlgebra, WeylAlgebra), the reduction is only a
+left reduction, and hence cannot be used to test containment in a two-sided ideal.
+For LETTERPLACE rings (S <: slpalg, FreeAlgebra), the reduction is two-sided as
+only two-sided ideals can be constructed here.
 """
 function reduce(I::sideal{S}, G::sideal{S}) where S <: SPolyUnion
    check_parent(I, G)
    R = base_ring(I)
    G.isGB || error("Not a Groebner basis")
    ptr = GC.@preserve I G R libSingular.p_Reduce(I.ptr, G.ptr, R.ptr)
-   return sideal{S}(R, ptr)
+   return sideal{S}(R, ptr, false, I.isTwoSided)
 end
 
 @doc Markdown.doc"""
-    reduce(p::spoly, G::sideal)
+    reduce(p::S, G::sideal{S}) where S <: SPolyUnion
 
 Return the polynomial which is $p$ reduced by the polynomials generating $G$.
 It is assumed that $G$ is a Groebner basis.
+For PLURAL rings (S <: spluralg, GAlgebra, WeylAlgebra), the reduction is only a
+left reduction, and hence cannot be used to test membership in a two-sided ideal.
+For LETTERPLACE rings (S <: slpalg, FreeAlgebra), the reduction is the full
+two-sided reduction as only two-sided ideals can be constructed here.
 """
-function reduce(p::spoly, G::sideal)
-   R = base_ring(G)
-   par = parent(p)
-   R != par && error("Incompatible base rings")
+function reduce(p::S, G::sideal{S}) where S <: SPolyUnion
+   R = parent(p)
+   R == base_ring(G) || error("Incompatible base rings")
    G.isGB || error("Not a Groebner basis")
    ptr = GC.@preserve p G R libSingular.p_Reduce(p.ptr, G.ptr, R.ptr)
-   return par(ptr)
+   return R(ptr)
 end
 
 ###############################################################################
@@ -569,13 +598,14 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    eliminate(I::sideal{S}, polys::S...) where S <: spoly
+    eliminate(I::sideal{S}, polys::S...) where {T <: Nemo.RingElem, S <: Union{spoly{T}, spluralg{T}}}
 
 Given a list of polynomials which are variables, construct the ideal
 corresponding geometrically to the projection of the variety given by the
 ideal $I$ where those variables have been eliminated.
 """
-function eliminate(I::sideal{S}, polys::S...) where S <: spoly
+function eliminate(I::sideal{S}, polys::S...) where {T <: Nemo.RingElem,
+                                                     S <: Union{spoly{T}, spluralg{T}}}
    R = base_ring(I)
    p = one(R)
    for i = 1:length(polys)
@@ -748,7 +778,8 @@ function Ideal(R::LPRing{T}, ids::slpalg{T}...) where T <: Nemo.RingElem
 end
 
 function Ideal(R::LPRing{T}, ids::Vector{slpalg{T}}; twosided=true) where T <: Nemo.RingElem
-   return sideal{elem_type(R)}(R, ids, twosided)
+   twosided || error("letterplace ideals must currently be two-sided")
+   return sideal{elem_type(R)}(R, ids, true)
 end
 
 # maximal ideal in degree d
@@ -767,12 +798,13 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    jet(I::sideal{S}, n::Int) where S <: spoly
+    jet(I::sideal{S}, n::Int) where {T <: Nemo.RingElem, S <: Union{spoly{T}, spluralg{T}}}
 
 Given an ideal $I$ this function truncates the generators of $I$
 up to degree $n$.
 """
-function jet(I::sideal{S}, n::Int) where S <: spoly
+function jet(I::sideal{S}, n::Int) where {T <: Nemo.RingElem,
+                                          S <: Union{spoly{T}, spluralg{T}}}
    R = base_ring(I)
    ptr = GC.@preserve I R libSingular.id_Jet(I.ptr, Cint(n), R.ptr)
    return sideal{S}(R, ptr)
@@ -785,21 +817,22 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    vdim(I::sideal)
+    vdim(I::sideal{S}) where {T <: Nemo.FieldElem, S <: Union{spoly{T}, spluralg{T}}}
 
 Given a zero-dimensional ideal $I$ this function computes the
 dimension of the vector space `base_ring(I)/I`, where `base_ring(I)` must be
 a polynomial ring over a field, and $I$ must be a Groebner basis.
 The return is $-1$ if `!iszerodim(I)`.
 """
-function vdim(I::sideal)
+function vdim(I::sideal{S}) where {T <: Nemo.FieldElem,
+                                   S <: Union{spoly{T}, spluralg{T}}}
    I.isGB || error("Not a Groebner basis")
    R = base_ring(I)
    GC.@preserve I R return Int(libSingular.id_vdim(I.ptr, R.ptr))
 end
 
 @doc Markdown.doc"""
-    kbase(I::sideal{spoly{T}}) where T <: Nemo.FieldElem
+    kbase(I::sideal{S}) where {T <: Nemo.FieldElem, S <: Union{spoly{T}, spluralg{T}}}
 
 Given a zero-dimensional ideal $I$ this function computes a
 vector space basis of the vector space `base_ring(I)/I`, where `base_ring(I)`
@@ -807,27 +840,28 @@ must be a polynomial ring over a field, and $I$ must be a Groebner basis.
 The array of vector space basis elements is returned as a Singular ideal, and
 this array consists of one zero polynomial if `!iszerodim(I)`.
 """
-function kbase(I::sideal{spoly{T}}) where T <: Nemo.FieldElem
+function kbase(I::sideal{S}) where {T <: Nemo.FieldElem,
+                                    S <: Union{spoly{T}, spluralg{T}}}
    I.isGB || error("Not a Groebner basis")
    R = base_ring(I)
    ptr = GC.@preserve I R libSingular.id_kbase(I.ptr, R.ptr)
-   return sideal{spoly{T}}(R, ptr)
+   return sideal{S}(R, ptr)
 end
 
 @doc Markdown.doc"""
-    highcorner(I::sideal{spoly{T}}) where T <: Nemo.FieldElem
+    highcorner(I::sideal{S}) where {T <: Nemo.FieldElem, S <: Union{spoly{T}, spluralg{T}}}
 
 Given a zero-dimensional ideal $I$ this function computes its highest corner,
 which is a polynomial.
-The ideal must be over a polynomial ring over a field, and
-a Groebner basis.
+The ideal must be over a polynomial ring over a field, and a Groebner basis.
 The return is the zero polynomial if `!iszerodim(I)`.
 """
-function highcorner(I::sideal{spoly{T}}) where T <: Nemo.FieldElem
+function highcorner(I::sideal{S}) where {T <: Nemo.FieldElem,
+                                         S <: Union{spoly{T}, spluralg{T}}}
    I.isGB || error("Not a Groebner basis")
    R = base_ring(I)
    ptr = GC.@preserve I R libSingular.id_highcorner(I.ptr, R.ptr)
-   return R(ptr)::spoly{T}
+   return R(ptr)::S
 end
 
 ###############################################################################

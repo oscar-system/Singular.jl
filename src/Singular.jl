@@ -235,7 +235,7 @@ include("matrix/matrix.jl")
 
 include("matrix/bigintmat.jl")
 
-include("poly/quotient.jl")
+include("ideal/quotient.jl")
 
 include("module/module.jl")
 

@@ -109,6 +109,10 @@ isvar_generated(::sideal)
 normalize!(::sideal)
 ```
 
+```@docs
+interreduce(I::sideal{S}) where {T <: Nemo.RingElem, S <: Union{spoly{T}, spluralg{T}}}
+```
+
 **Examples**
 
 ```
@@ -174,7 +178,7 @@ equal(I, J) == true
 ### Intersection
 
 ```@docs
-intersection(I::sideal{S}, J::sideal{S}) where S <: SPolyUnion
+intersection(I::sideal{S}, J::sideal{S}) where {T <: Nemo.RingElem, S <: Union{spoly{T}, spluralg{T}}}
 ```
 
 **Examples**
@@ -191,7 +195,11 @@ V = intersection(I, J)
 ### Quotient
 
 ```@docs
-quotient(I::sideal{S}, J::sideal{S}) where S <: SPolyUnion
+quotient(I::sideal{S}, J::sideal{S}) where S <: spoly
+```
+
+```@docs
+quotient(I::sideal{S}, J::sideal{S}) where S <: spluralg
 ```
 
 **Examples**
@@ -289,7 +297,7 @@ reduce(I::sideal{S}, G::sideal{S}) where S <: SPolyUnion
 ```
 
 ```@docs
-reduce(::spoly, ::sideal)
+reduce(p::S, G::sideal{S}) where S <: SPolyUnion
 ```
 
 **Examples**
@@ -313,7 +321,7 @@ h2 = reduce(h1, J)
 ### Elimination
 
 ```@docs
-eliminate(I::sideal{S}, polys::S...) where S <: spoly
+eliminate(I::sideal{S}, polys::S...) where {T <: Nemo.RingElem, S <: Union{spoly{T}, spluralg{T}}}
 ```
 
 **Examples**
@@ -372,7 +380,7 @@ F2 = sres(std(I), 2)
 ### Differential operations
 
 ```@docs
-jet(I::sideal{S}, n::Int) where S <: spoly
+jet(I::sideal{S}, n::Int) where {T <: Nemo.RingElem, S <: Union{spoly{T}, spluralg{T}}}
 ```
 
 **Examples**
@@ -388,15 +396,15 @@ J1 = jet(I, 3)
 ### Operations on zero-dimensional ideals
 
 ```@docs
-vdim(::sideal)
+vdim(I::sideal{S}) where {T <: Nemo.FieldElem, S <: Union{spoly{T}, spluralg{T}}}
 ```
 
 ```@docs
-kbase(I::sideal{spoly{T}}) where T <: Nemo.FieldElem
+kbase(I::sideal{S}) where {T <: Nemo.FieldElem, S <: Union{spoly{T}, spluralg{T}}}
 ```
 
 ```@docs
-highcorner(I::sideal{spoly{T}}) where T <: Nemo.FieldElem
+highcorner(I::sideal{S}) where {T <: Nemo.FieldElem, S <: Union{spoly{T}, spluralg{T}}}
 ```
 
 **Examples**

@@ -34,7 +34,7 @@
    end
 end
 
-@testset "sideal.manipulation" begin
+@testset "sideal.spoly.manipulation" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
    I0 = Ideal(R)
@@ -46,6 +46,8 @@ end
 
    I2 = @inferred deepcopy(I1)
 
+   @test isequal(I1, I2)
+   normalize!(I1)
    @test isequal(I1, I2)
 
    @test I2[2] == y
@@ -88,6 +90,74 @@ end
    @test mult(std(Ideal(R, f))) == 6
 end
 
+@testset "sideal.spluralg.manipulation" begin
+
+   r, (x, y) = PolynomialRing(QQ, ["x", "y"], ordering = :degrevlex)
+   R, (x, y) = GAlgebra(r, Singular.Matrix(r, [1 1; 0 1]),
+                           Singular.Matrix(r, [0 x + y; 0 0]))
+
+   I0 = Ideal(R)
+   I1 = Ideal(R, x, y)
+
+   @test ngens(I0) == 1
+   @test ngens(I1) == 2
+   @test x in gens(I1) && y in gens(I1)
+
+   I2 = @inferred deepcopy(I1)
+
+   @test isequal(I1, I2)
+   normalize!(I1)
+   @test isequal(I1, I2)
+
+   @test I2[2] == y
+   I2[2] = x^2 + 1
+   @test I2[2] == x^2 + 1
+
+   @test iszero(I0)
+
+   @test isconstant(Ideal(R, R(1), R(2)))
+
+   @test isvar_generated(Ideal(R, x))
+   @test isvar_generated(Ideal(R, y))
+   @test isvar_generated(Ideal(R, x, y))
+   @test !isvar_generated(Ideal(R, R(1)))
+   @test !isvar_generated(Ideal(R, x + y))
+
+end
+
+@testset "sideal.slpalg.manipulation" begin
+
+   R, (x, y) = FreeAlgebra(Fp(11), ["x", "y"], 9)
+
+   I0 = Ideal(R)
+   I1 = Ideal(R, x, y)
+
+   @test ngens(I0) == 1
+   @test ngens(I1) == 2
+   @test x in gens(I1) && y in gens(I1)
+
+   I2 = @inferred deepcopy(I1)
+
+   @test isequal(I1, I2)
+   normalize!(I1)
+   @test isequal(I1, I2)
+
+   @test I2[2] == y
+   I2[2] = x^2 + 1
+   @test I2[2] == x^2 + 1
+
+   @test iszero(I0)
+
+   @test isconstant(Ideal(R, R(1), R(2)))
+
+   @test isvar_generated(Ideal(R, x))
+   @test isvar_generated(Ideal(R, y))
+   @test isvar_generated(Ideal(R, x, y))
+   @test !isvar_generated(Ideal(R, R(1)))
+   @test !isvar_generated(Ideal(R, x + y))
+
+end
+
 @testset "sideal.binary_ops" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
@@ -125,8 +195,20 @@ end
    end
 end
 
-@testset "sideal.containment" begin
+@testset "sideal.contains" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+
+   @test contains(Ideal(R, x, y), Ideal(R, x))
+   @test !contains(Ideal(R, x), Ideal(R, x, y))
+
+   r, (x, y) = PolynomialRing(QQ, ["x", "y"], ordering = :degrevlex)
+   R, (x, y) = GAlgebra(r, Singular.Matrix(r, [1 1; 0 1]),
+                           Singular.Matrix(r, [0 x + y; 0 0]))
+
+   @test contains(Ideal(R, x, y), Ideal(R, x))
+   @test !contains(Ideal(R, x), Ideal(R, x, y))
+
+   R, (x, y) = FreeAlgebra(QQ, ["x", "y"], 10)
 
    @test contains(Ideal(R, x, y), Ideal(R, x))
    @test !contains(Ideal(R, x), Ideal(R, x, y))
@@ -139,13 +221,41 @@ end
    @test !equal(Ideal(R, x), Ideal(R, x, y))
    @test !isequal(Ideal(R, x, y, x - y), Ideal(R, x, y, x + y))
    @test isequal(Ideal(R, x, y), Ideal(R, x, y))
+
+   r, (x, y) = PolynomialRing(Fp(7), ["x", "y"], ordering = :degrevlex)
+   R, (x, y) = GAlgebra(r, Singular.Matrix(r, [1 1; 0 1]),
+                           Singular.Matrix(r, [0 x + y; 0 0]))
+
+   @test equal(Ideal(R, x, y, x - y), Ideal(R, x, y, x + y))
+   @test !equal(Ideal(R, x), Ideal(R, x, y))
+   @test !isequal(Ideal(R, x, y, x - y), Ideal(R, x, y, x + y))
+   @test isequal(Ideal(R, x, y), Ideal(R, x, y))
+
+   R, (x, y) = FreeAlgebra(QQ, ["x", "y"], 10)
+
+   @test equal(Ideal(R, x, y, x - y), Ideal(R, x, y, x + y))
+   @test !equal(Ideal(R, x), Ideal(R, x, y))
+   @test !isequal(Ideal(R, x, y, x - y), Ideal(R, x, y, x + y))
+   @test isequal(Ideal(R, x, y), Ideal(R, x, y))
 end
 
-@testset "sideal.leading_terms" begin
+@testset "sideal.lead" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
    i1 = @inferred lead(Ideal(R, x^2 + x*y + 1, 2y^2 + 3, R(7)))
    i2 = @inferred Ideal(R, x^2, 2y^2, R(7))
-   @test equal(i1, i2)
+   @test isequal(i1, i2) || equal(i1, i2)
+
+   r, (x, y) = PolynomialRing(Fp(7), ["x", "y"], ordering = :degrevlex)
+   R, (x, y) = GAlgebra(r, Singular.Matrix(r, [1 1; 0 1]),
+                           Singular.Matrix(r, [0 x + y; 0 0]))
+   i1 = @inferred lead(Ideal(R, x^2 + x*y + 1, 2y^2 + 3, R(7)))
+   i2 = @inferred Ideal(R, x^2, 2y^2, R(7))
+   @test isequal(i1, i2) || equal(i1, i2)
+
+   R, (x, y) = FreeAlgebra(QQ, ["x", "y"], 10)
+   i1 = @inferred lead(Ideal(R, x^2 + x*y + 1, 2y^2 + 3, R(7)))
+   i2 = @inferred Ideal(R, x^2, 2y^2, R(7))
+   @test isequal(i1, i2) || equal(i1, i2)
 end
 
 @testset "sideal.local" begin
@@ -173,6 +283,19 @@ end
 
    @test equal(I, @inferred intersection(intersection(I1, I2), I3))
    @test equal(I, @inferred intersection(I1, intersection(I2, I3)))
+
+   r, (x, y) = PolynomialRing(Fp(7), ["x", "y"], ordering = :degrevlex)
+   R, (x, y) = GAlgebra(r, Singular.Matrix(r, [1 1; 0 1]),
+                           Singular.Matrix(r, [0 x + y; 0 0]))
+
+   I1 = @inferred Ideal(R, x^2 + x*y + 1, 2y^2 + 3, R(7))
+   I2 = @inferred Ideal(R, x*y^2 + x + 1, 2x*y + 1, 7x + 1)
+   I3 = @inferred Ideal(R, x, y)
+
+   I = @inferred intersection(I1, I2)
+
+   @test contains(I1, I)
+   @test contains(I2, I)
 end
 
 @testset "sideal.quotient" begin
@@ -186,6 +309,16 @@ end
    B = @inferred intersection(quotient(I, J), quotient(I, K))
 
    @test equal(A, B)
+
+   F, (q,) = FunctionField(QQ, ["q"])
+   r, (x, y) = PolynomialRing(F, ["x", "y"], ordering = :degrevlex)
+   R, (x, y) = GAlgebra(r, Singular.Matrix(r, [0 q; 0 0]),
+                           Singular.Matrix(r, [0 0; 0 0]))
+
+   I = std(Ideal(R, [x^3 + 2*x*y^2 + 2*x^2*y, y], twosided = true))
+   J = std(Ideal(R, [x^2, x+ y], twosided = true))
+   # the "equal" check here doesn't work because reduce only works with left ideals
+   @test isequal(quotient(I, J), Ideal(R, [y, x^2]))
 end
 
 @testset "sideal.saturation" begin
@@ -248,11 +381,17 @@ end
 @testset "sideal.interreduce" begin
    R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"])
 
-   I = Ideal(R, z*x + y^3, z + y^3, z + x*y)
+   I = @inferred Ideal(R, z*x + y^3, z + y^3, z + x*y)
+   A = @inferred interreduce(I)
+   @test equal(A, I)
 
-   A = interreduce(I)
+   r, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"], ordering = :degrevlex)
+   R, (x, y, z) = GAlgebra(r, Singular.Matrix(r, [0 1 1; 0 0 1; 0 0 0]),
+                              Singular.Matrix(r, [0 x z; 0 0 y; 0 0 1]))
 
-   @test isequal(A, Ideal(R, x*z - z, x*y + z, y^3 + x*z))
+   I = @inferred Ideal(R, z*x + y^3, z + y^3, z + x*y)
+   A = @inferred interreduce(I)
+   @test equal(A, I)
 end
 
 @testset "sideal.fglm" begin
@@ -330,24 +469,32 @@ end
    R, (x, y, t) = PolynomialRing(QQ, ["x", "y", "t"])
 
    I = Ideal(R, x - t^2, y - t^3)
-
    J = @inferred eliminate(I, t)
-
    @test equal(J, Ideal(R, x^3 - y^2))
-
    K = @inferred eliminate(I, t, x)
-
    @test equal(K, Ideal(R))
+
+   r, (e, f, h, a) = PolynomialRing(QQ, ["e", "f", "h", "a"], ordering = :deglex)
+   R, (e, f, h, a) = GAlgebra(r, Singular.Matrix(r, [0 1 1 1; 0 0 1 1; 0 0 0 1; 0 0 0 0]),
+                                 Singular.Matrix(r, [0 -h 2*e 0; 0 0 -2*f 0; 0 0 0 0; 0 0 0 0]))
+
+   I = @inferred Ideal(R, [e^3, f^3, h^3 - 4*h, 4*e*f + h^2 - 2*h - a])
+   J = @inferred eliminate(I, e, f, h)
+   @test equal(J, Ideal(R, [a^3 - 32*a^2 + 192*a]))
 end
 
 @testset "sideal.jet" begin
    R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"])
 
    I = Ideal(R, x^5 - y^2, y^3 - x^6 + z^3)
-
    J = @inferred jet(I, 3)
+   @test equal(J, Ideal(R, -y^2, y^3 + z^3))
 
-   @test equal(J, Ideal(R, - y^2, y^3 + z^3))
+   R, (x, y, dx, dy) = WeylAlgebra(QQ, ["x", "y"])
+
+   I = Ideal(R, x^5 - y^2, y^3 - x^6 + dx^3)
+   J = @inferred jet(I, 3)
+   @test equal(J, Ideal(R, -y^2, y^3 + dx^3))
 end
 
 @testset "sideal.zerodim" begin
@@ -425,42 +572,3 @@ end
    # causing a dimension mismatch
 end
 
-@testset "sideal.GAlgebra" begin
-
-   R, _ = @inferred PolynomialRing(QQ, ["z", "u", "v", "w"])
-
-   G, (z, u, v, w) = @inferred GAlgebra(R, Singular.Matrix(R, [0 -1 -1 -1; 0 0 -1 -1; 0 0 0 -1; 0 0 0 0]),
-                                           Singular.Matrix(R, [0 0 0 0; 0 0 0 0; 0 0 0 0; 0 0 0 0]))
-
-   # error thrown if ideal is not a Gröbner basis (and not two sided)
-   I = Ideal(G, [u])
-   @test_throws ErrorException QuotientRing(G, I)
-
-   # error thrown if ideal is GB but not two sided
-   I = std(I)
-   @test_throws ErrorException QuotientRing(G, I)
-
-   # error thrown if ideal is two sided but not a GB
-   I = Ideal(G, [u], twosided = true)
-   @test_throws ErrorException QuotientRing(G, I)
-
-   # all good if two sided and GB
-   I = std(I)
-   @test QuotientRing(G, I)[1] isa PluralRing
-
-   # another test
-   I = @inferred Ideal(G, [z^2, u^2, v^2, w^2, z*u*v - w]; twosided = true)
-   Q, (z, u, v, w) = @inferred QuotientRing(G, std(I))
-   @test Q isa PluralRing
-end
-
-@testset "sideal.FreeAlgebra" begin
-   R, (x, d) = FreeAlgebra(Fp(3), ["x", "d"], 5)
-   I = @inferred Ideal(R, [x^4, d^3, d*x - x*d - 1])
-   @test length(gens(std(I))) == 3
-
-   I = @inferred Ideal(R, [d*x - x*d - 1])
-   Q, (x, d) = @inferred QuotientRing(R, std(I))
-   @test length(@inferred gens(std(Ideal(Q, [x^4, d^3])))) == 2
-   @test length(@inferred gens(std(Ideal(Q, [x^2, d^3])))) == 1
-end
