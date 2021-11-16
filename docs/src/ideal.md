@@ -396,15 +396,15 @@ J1 = jet(I, 3)
 ### Operations on zero-dimensional ideals
 
 ```@docs
-vdim(::sideal)
+vdim(I::sideal{S}) where {T <: Nemo.FieldElem, S <: Union{spoly{T}, spluralg{T}}}
 ```
 
 ```@docs
-kbase(I::sideal{spoly{T}}) where T <: Nemo.FieldElem
+kbase(I::sideal{S}) where {T <: Nemo.FieldElem, S <: Union{spoly{T}, spluralg{T}}}
 ```
 
 ```@docs
-highcorner(I::sideal{spoly{T}}) where T <: Nemo.FieldElem
+highcorner(I::sideal{S}) where {T <: Nemo.FieldElem, S <: Union{spoly{T}, spluralg{T}}}
 ```
 
 **Examples**
