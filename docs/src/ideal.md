@@ -380,7 +380,7 @@ F2 = sres(std(I), 2)
 ### Differential operations
 
 ```@docs
-jet(I::sideal{S}, n::Int) where S <: spoly
+jet(I::sideal{S}, n::Int) where {T <: Nemo.RingElem, S <: Union{spoly{T}, spluralg{T}}}
 ```
 
 **Examples**

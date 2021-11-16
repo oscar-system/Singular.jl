@@ -487,10 +487,14 @@ end
    R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"])
 
    I = Ideal(R, x^5 - y^2, y^3 - x^6 + z^3)
-
    J = @inferred jet(I, 3)
+   @test equal(J, Ideal(R, -y^2, y^3 + z^3))
 
-   @test equal(J, Ideal(R, - y^2, y^3 + z^3))
+   R, (x, y, dx, dy) = WeylAlgebra(QQ, ["x", "y"])
+
+   I = Ideal(R, x^5 - y^2, y^3 - x^6 + dx^3)
+   J = @inferred jet(I, 3)
+   @test equal(J, Ideal(R, -y^2, y^3 + dx^3))
 end
 
 @testset "sideal.zerodim" begin

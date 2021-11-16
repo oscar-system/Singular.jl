@@ -798,12 +798,13 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    jet(I::sideal{S}, n::Int) where S <: spoly
+    jet(I::sideal{S}, n::Int) where {T <: Nemo.RingElem, S <: Union{spoly{T}, spluralg{T}}}
 
 Given an ideal $I$ this function truncates the generators of $I$
 up to degree $n$.
 """
-function jet(I::sideal{S}, n::Int) where S <: spoly
+function jet(I::sideal{S}, n::Int) where {T <: Nemo.RingElem,
+                                          S <: Union{spoly{T}, spluralg{T}}}
    R = base_ring(I)
    ptr = GC.@preserve I R libSingular.id_Jet(I.ptr, Cint(n), R.ptr)
    return sideal{S}(R, ptr)
