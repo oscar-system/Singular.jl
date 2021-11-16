@@ -159,10 +159,11 @@ julia> (x*y)^2
 x*y*x*y
 
 julia> (x*y)^3
-    singular error: degree bound of Letterplace ring is 5, but at least 6 is needed for this multiplication
+ERROR: degree bound of Letterplace ring is 5, but at least 6 is needed for this multiplication
 ```
 
-The ideals are two-sided by default for this Algebra.
+The ideals are two-sided by default for this algebra, and there is currently no
+possibility of constructing one-sided ideals.
 
 ```julia
 julia> R, (x, y, z) = FreeAlgebra(QQ, ["x", "y", "z"], 4)

@@ -290,6 +290,12 @@ computed.
 """
 function contains(I::sideal{S}, J::sideal{S}) where S
    check_parent(I, J)
+   if S <: spluralg
+      if I.isTwoSided || J.isTwoSided || isquotient_ring(base_ring(I))
+         # see restrictions in doc strings for reduce
+         error("Containment is not implemented for two-sided PLURAL ideals")
+      end
+   end
    if !I.isGB
       I = std(I)
    end
@@ -553,20 +559,17 @@ end
 Return an ideal whose generators are the generators of $I$ reduced by the
 ideal $G$. The ideal $G$ is required to be a Groebner basis. The returned
 ideal will have the same number of generators as $I$, even if they are zero.
+For PLURAL rings (S <: spluralg, GAlgebra, WeylAlgebra), the reduction is only a
+left reduction, and hence cannot be used to test containment in a two-sided ideal.
+For LETTERPLACE rings (S <: slpalg, FreeAlgebra), the reduction is two-sided as
+only two-sided ideals can be constructed here.
 """
 function reduce(I::sideal{S}, G::sideal{S}) where S <: SPolyUnion
    check_parent(I, G)
-   if S <: slpalg
-      I.isTwoSided && G.isTwoSided || error("letterplace reduce requires two-sided ideals")
-   elseif S <: spluralg
-      # TODO: How does this work when base_ring(I) is a quotient from
-      #       a (necessarily) two-sided ideal?
-      !I.isTwoSided && !G.isTwoSided || error("plural reduce requires left ideals")
-   end
    R = base_ring(I)
    G.isGB || error("Not a Groebner basis")
    ptr = GC.@preserve I G R libSingular.p_Reduce(I.ptr, G.ptr, R.ptr)
-   return sideal{S}(R, ptr)
+   return sideal{S}(R, ptr, false, I.isTwoSided)
 end
 
 @doc Markdown.doc"""
@@ -574,14 +577,12 @@ end
 
 Return the polynomial which is $p$ reduced by the polynomials generating $G$.
 It is assumed that $G$ is a Groebner basis.
+For PLURAL rings (S <: spluralg, GAlgebra, WeylAlgebra), the reduction is only a
+left reduction, and hence cannot be used to test membership in a two-sided ideal.
+For LETTERPLACE rings (S <: slpalg, FreeAlgebra), the reduction is the full
+two-sided reduction as only two-sided ideals can be constructed here.
 """
 function reduce(p::S, G::sideal{S}) where S <: SPolyUnion
-   if S <: slpalg
-      G.isTwoSided || error("letterplace reduce requires two-sided ideals")
-   elseif S <: spluralg
-      # TODO: ditto as with reduce(ideal,.) above
-      !G.isTwoSided || error("plural reduce requires left ideals")
-   end
    R = parent(p)
    R == base_ring(G) || error("Incompatible base rings")
    G.isGB || error("Not a Groebner basis")
