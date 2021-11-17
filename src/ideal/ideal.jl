@@ -236,19 +236,26 @@ function *(I::sideal{S}, J::sideal{S}) where S <: SPolyUnion
    return sideal{S}(R, ptr)
 end
 
-function *(p::spoly{T}, I::sideal{spoly{T}}) where T <: Nemo.RingElem
+function *(I::sideal{S}, p::S) where S <: SPolyUnion
    R = base_ring(I)
    R != parent(p) && error("Base rings do not match.")
    GC.@preserve I R p begin
       x = libSingular.id_Copy(I.ptr, R.ptr)
       y = libSingular.p_Copy(p.ptr, R.ptr)
       ptr = libSingular.id_MultP(x, y, R.ptr)
-      return sideal{spoly{T}}(R, ptr)
+      return sideal{S}(R, ptr, false, I.isTwoSided)
    end
 end
 
-function *(I::sideal{spoly{T}}, p::spoly{T}) where T <: Nemo.RingElem
-   return p*I
+function *(p::S, I::sideal{S}) where S <: SPolyUnion
+   R = base_ring(I)
+   R != parent(p) && error("Base rings do not match.")
+   GC.@preserve I R p begin
+      x = libSingular.id_Copy(I.ptr, R.ptr)
+      y = libSingular.p_Copy(p.ptr, R.ptr)
+      ptr = libSingular.pMultId(y, x, R.ptr)
+      return sideal{S}(R, ptr, false, I.isTwoSided)
+   end
 end
 
 function *(i::Int, I::sideal{T}) where T <: Nemo.RingElem
