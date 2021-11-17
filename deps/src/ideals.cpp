@@ -195,6 +195,10 @@ void singular_define_ideals(jlcxx::Module & Singular)
         return (ideal) mp_MultP((matrix) i, p, r);
     });
 
+    Singular.method("pMultId", [](poly p, ideal i, ring r) {
+        return (ideal) pMultMp(p, (matrix) i, r);
+    });
+
     Singular.method("id_Power", &id_Power);
 
     Singular.method("id_IsEqual", [](ideal m, ideal n, ring o) {

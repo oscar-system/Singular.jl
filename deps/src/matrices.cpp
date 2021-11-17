@@ -36,6 +36,8 @@ void singular_define_matrices(jlcxx::Module & Singular)
 
     Singular.method("mp_MultP", &mp_MultP);
 
+    Singular.method("pMultMp", &pMultMp);
+
     Singular.method("mp_Equal", &mp_Equal);
 
     Singular.method("mpNew", [](int r, int c) {
