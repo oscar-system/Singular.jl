@@ -463,7 +463,9 @@ end
    @test hash((x+y)^2) == hash(x^2+x*y+y^2+y*x)
    @test deepcopy(f1c[1]) == f1c[1]
 
-   # TODO add test for std once it works
+   R, (x, y) = FreeAlgebra(Singular.Nemo.QQ, ["x", "y"], 5)
+   I = @inferred Ideal(R, x*y+x^3+1, x*y^2+x^2+1)
+   @test ngens(std(I)) > 2
 end
 
 @testset "Nemo.NemoRing" begin
