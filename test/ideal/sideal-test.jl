@@ -173,6 +173,16 @@ end
    @test equal(y*I3, Ideal(R, y^2, y*x))
    @test equal(I3*2, I3)
    @test equal(2*I3, I3)
+
+   R, (x, dx) = WeylAlgebra(QQ, ["x"])
+
+   I1 = @inferred Ideal(R, x)
+   I2 = @inferred Ideal(R, dx)
+
+   @test equal(I1*x, x*I1)
+   @test !equal(I1*dx, dx*I1)
+   @test !equal(I2*x, x*I2)
+   @test equal(I2*dx, dx*I2)
 end
 
 @testset "sideal.powering" begin
