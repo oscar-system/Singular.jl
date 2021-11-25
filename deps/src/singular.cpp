@@ -133,9 +133,15 @@ JLCXX_MODULE define_julia_module(jlcxx::Module & Singular)
 
 #define SETTER(A, B)                                    \
     else if (opt == #B)                                 \
-        A = value ? (A | Sy_bit(B)) : (A & ~Sy_bit(B));
+    {                                                   \
+        old_value = (A & Sy_bit(B)) != 0;               \
+        A = value ? (A | Sy_bit(B)) : (A & ~Sy_bit(B)); \
+    }
 
-    Singular.method("set_option", [](std::string opt, bool value) {
+    // all of the global setters return the previous value
+    Singular.method("set_option", [](std::string opt, bool value)
+    {
+        bool old_value = false;
         if (false);
         SETTER(si_opt_2, V_QUIET)
         SETTER(si_opt_2, V_QRING)
@@ -185,12 +191,42 @@ JLCXX_MODULE define_julia_module(jlcxx::Module & Singular)
         SETTER(si_opt_1, OPT_SB_1)
         SETTER(si_opt_1, OPT_NOTREGULARITY)
         SETTER(si_opt_1, OPT_WEIGHTM)
+        else
+        {
+            std::cerr << "unknown option " << opt << std::endl;
+        }
+        return old_value;
     });
 
 #undef SETTER
 
+    // the "printlevel" system variable in Singular
     Singular.method("set_printlevel", [](int level) {
+        int old_level = printlevel;
         printlevel = level;
+        return old_level;
+    });
+
+    // the "degBound" system variable in Singular
+    Singular.method("set_degBound", [](int degb) {
+        int old_degb = Kstd1_deg;
+        Kstd1_deg = degb;
+        if (Kstd1_deg != 0)
+            si_opt_1 |= Sy_bit(OPT_DEGBOUND);
+        else
+            si_opt_1 &= ~Sy_bit(OPT_DEGBOUND);
+        return old_degb;
+    });
+
+    // the "multBound" system variable in Singular
+    Singular.method("set_multBound", [](int mu) {
+        int old_mu = Kstd1_mu;
+        Kstd1_mu = mu;
+        if (Kstd1_mu != 0)
+            si_opt_1 |= Sy_bit(OPT_MULTBOUND);
+        else
+            si_opt_1 &= ~Sy_bit(OPT_MULTBOUND);
+        return old_mu;
     });
 
     singular_define_coeffs(Singular);
