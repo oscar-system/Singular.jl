@@ -8,6 +8,7 @@ makedocs(
          doctest = false,
          pages    = [
              "index.md",
+             "interpreter.md",
              "Coefficient rings" => [
                   "integer.md",
                   "rational.md",

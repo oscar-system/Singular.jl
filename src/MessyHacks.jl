@@ -1,4 +1,50 @@
 #=
+   messy hack #0: (not really that messy)
+
+   provide wrappers for working with Singular's global variables
+=#
+
+export with_degBound, with_multBound
+
+@doc Markdown.doc"""
+    with_degBound(f, degb::Integer)
+
+Evaluate and return `f()` with the Singular global setting `degBound = degb`. The
+value of `degBound` is automatically restored upon return; the effect is only a
+local one on `f()`. The value `degBound = 0` corresponds to no degree bound in
+Singular and this is the starting value.
+"""
+function with_degBound(f, degb::Integer)
+   old_degb = libSingular.set_degBound(Cint(degb))
+   local g = nothing
+   try
+      g = f()
+   finally
+      libSingular.set_degBound(old_degb)
+   end
+   return g
+end
+
+@doc Markdown.doc"""
+    with_multBound(f, mu::Integer)
+
+Evaluate and return `f()` with the Singular global setting `multBound = mu`. The
+value of `multBound` is automatically restored upon return; the effect is only a
+local one on `f()`. The value `multBound = 0` corresponds to no multiplicity
+bound in Singular and this is the starting value.
+"""
+function with_multBound(f, mu::Integer)
+   old_mu = libSingular.set_multBound(Cint(mu))
+   local g = nothing
+   try
+      g = f()
+   finally
+      libSingular.set_multBound(old_mu)
+   end
+   return g
+end
+
+#=
    messy hack #1:
 
    Getting the nemo ring element out of the darn n_unknown struct:
