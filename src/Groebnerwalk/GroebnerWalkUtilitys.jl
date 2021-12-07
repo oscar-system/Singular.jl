@@ -4,8 +4,8 @@
 
 #Return the initials of polynomials w.r.t. a weight vector.
 function initials(R::Singular.PolyRing, G::Vector{spoly{n_Q}}, w::Vector{Int64})
-    inits = []
-    indexw = Tuple{Vector{Int}, elem_type(base_ring(R))}[]
+    inits = spoly{elem_type(base_ring(R))}[]
+    indexw = Tuple{Vector{Int},elem_type(base_ring(R))}[]
     for g in G
         empty!(indexw)
         maxw = 0
@@ -47,7 +47,7 @@ function diff_vectors(
     I::Singular.sideal,
     Lm::Vector{spoly{L}},
 ) where {L<:Nemo.RingElem}
-    v = []
+    v = Vector{Int}[]
     for i = 1:ngens(I)
         ltu = Singular.leading_exponent_vector(Lm[i])
         for e in Singular.exponent_vectors(gens(I)[i])
@@ -62,7 +62,7 @@ end
 #Return the difference of the exponents of the leading terms (Lm) and the
 #exponent vectors of the tail of all polynomials of the ideal.
 function diff_vectors(I::Singular.sideal)
-    v = []
+    v = Vector{Int}[]
     for g in gens(I)
         ltu = Singular.leading_exponent_vector(g)
         for e in Singular.exponent_vectors(tail(g))
@@ -138,11 +138,17 @@ function ordering_as_matrix(w::Vector{Int64}, ord::Symbol)
                 ident_matrix(length(w))[1:length(w)-2, :]
             ]
         end
-        if ord == :degrevlex || a.ord == Symbol("Singular(dp)")
+        if ord == :degrevlex
             return [
                 w'
                 ones(Int64, length(w))'
                 anti_diagonal_matrix(length(w))[1:length(w)-2, :]
+            ]
+        end
+        if ord == :revlex || a.ord == Symbol("Singular(dp)")
+            return [
+                w'
+                anti_diagonal_matrix(length(w))[1:length(w)-1, :]
             ]
         end
     else
@@ -179,6 +185,12 @@ function ordering_as_matrix(ord::Symbol, nvars::Int64)
         return [
             ones(Int64, nvars)'
             anti_diagonal_matrix(nvars)[1:nvars-1, :]
+        ]
+    end
+    if ord == :revlex || a.ord == Symbol("Singular(dp)")
+        return [
+            w'
+            anti_diagonal_matrix(length(w))[1:length(w)-1, :]
         ]
     end
 end
@@ -222,6 +234,8 @@ function pert_Vectors(
     for i = 2:p
         w += e^(p - i) * M[i, :]
     end
+    println(w)
+
     return w
 end
 
@@ -254,6 +268,7 @@ function pert_Vectors(G::Singular.sideal, M::Matrix{Int64}, p::Integer)
     for i = 2:p
         w += e^(p - i) * M[i, :]
     end
+    println(w)
     return w
 end
 function pert_Vectors(
@@ -294,6 +309,8 @@ function pert_Vectors(
     for i = 2:p
         w += e^(p - i) * M[i, :]
     end
+    println(w)
+
     return w
 end
 function pert_Vectors(
@@ -336,6 +353,7 @@ function pert_Vectors(
     for i = 2:p
         w += e^(p - i) * M[i, :]
     end
+    println(w)
     return w
 end
 
@@ -383,6 +401,7 @@ function liftGW(
     Gnew.isGB = true
     return Gnew
 end
+
 
 #############################################
 # unspecific help functions
@@ -450,4 +469,71 @@ function dot(v::Vector{Int64}, w::Vector{Int64})
         sum += v[i] * w[i]
     end
     return sum
+end
+
+
+
+
+
+
+
+#####test
+function initials2(
+    R::Singular.PolyRing,
+    G::Vector{spoly{n_Q}},
+    w::Vector{Int64},
+)
+    inits = spoly{elem_type(base_ring(R))}[]
+    indexw = Tuple{Vector{Int},elem_type(base_ring(R))}[]
+    for i = 1:length(G)
+        empty!(indexw)
+        maxw = 0
+        eczip =
+            zip(Singular.exponent_vectors(G[i]), Singular.coefficients(G[i]))
+        for (e, c) in eczip
+            tmpw = dot(w, e)
+            if maxw == tmpw
+                push!(indexw, (e, c))
+                #rethink this. gens are preordered
+            elseif maxw < tmpw
+                empty!(indexw)
+                push!(indexw, (e, c))
+                maxw = tmpw
+            end
+        end
+        inw = MPolyBuildCtx(R)
+        for (e, c) in indexw
+            Singular.push_term!(inw, c, e)
+        end
+        h = finish(inw)
+        push!(inits, h)
+    end
+    return inits
+end
+
+
+function liftGW2(
+    G::Singular.sideal,
+    inG::Vector{spoly{L}},
+    H::Singular.sideal,
+    R::Singular.PolyRing,
+    S::Singular.PolyRing,
+) where {L<:Nemo.RingElem}
+    H.isGB = true
+    gH = gens(H)
+    gG = gens(G)
+    new = []
+    for i = 1:length(gH)
+        rest = R(0)
+        for j = 1:length(inG)
+            b, pji = divides(change_ring(gH[i], R), inG[j])
+            if b
+                rest = rest + pji * gG[j]
+            end
+        end
+        push!(new, rest)
+    end
+    Gnew = Singular.Ideal(S, [change_ring(x, S) for x in new])
+    Gnew.isGB = true
+    return Gnew
 end

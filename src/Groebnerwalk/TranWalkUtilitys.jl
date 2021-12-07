@@ -28,3 +28,19 @@ function representationVector(G::Singular.sideal, T::Matrix{Int64})
     end
     return w
 end
+
+function inSeveralCones(Gw::Vector{spoly{L}}) where {L<:Nemo.RingElem}
+    counter = 0
+    for g in Gw
+        if size(collect(Singular.coefficients(g)))[1] > 2
+            return true
+        end
+        if size(collect(Singular.coefficients(g)))[1] == 2
+            counter = counter +1
+        end
+end
+    if counter > 1
+        return true
+    end
+    return false
+end

@@ -37,7 +37,6 @@ if case == 1 || case == 99
         ordering_as_matrix(:lex, 2),
         :fractal_walk_lookahead,
     )
-
     @time L = groebnerwalk(
         I,
         ordering_as_matrix(:degrevlex, 2),
@@ -58,7 +57,6 @@ if case == 1 || case == 99
         ordering_as_matrix(:lex, 2),
         :generic,
     )
-
     @time T0 = Singular.std(
         Singular.Ideal(S, [change_ring(x, S) for x in gens(I)]),
         complete_reduction = true,
@@ -96,7 +94,6 @@ if case == 2 || case == 99
     I = Singular.Ideal(R, [f1, f2])
 
     I = Singular.std(I, complete_reduction = true)
-
     @time H = groebnerwalk(
         I,
         ordering_as_matrix([5, 4, 1], :deglex),
@@ -200,13 +197,14 @@ if case == 3 || case == 99
                 [1, 0, 0, 0, 0, 0],
             ),
         ) =#
+
+
     @time JJ = groebnerwalk(
         I,
         ordering_as_matrix(:degrevlex, 6),
         ordering_as_matrix(:lex, 6),
         :fractal_walk_lookahead,
     )
-
     @time K = groebnerwalk(
         I,
         ordering_as_matrix(:degrevlex, 6),
@@ -237,6 +235,7 @@ if case == 3 || case == 99
         Singular.Ideal(S, [change_ring(x, S) for x in gens(I)]),
         complete_reduction = true,
     )
+
     #    T1test(4) = Singular.Ideal(S, [change_ring(x, S) for x in gens(J)])
     T2 = Singular.Ideal(S, [change_ring(x, S) for x in gens(K)])
     T3 = Singular.Ideal(S, [change_ring(x, S) for x in gens(L)])
@@ -386,13 +385,13 @@ if case == 5 || case == 99
     S, V =
         Singular.PolynomialRing(Singular.QQ, ["x", "y", "z"], ordering = :lex)
 
+
     @time H = groebnerwalk(
         I,
         ordering_as_matrix(:degrevlex, 3),
         ordering_as_matrix(:lex, 3),
         :tran
     )
-
     @time J = groebnerwalk(
         I,
         ordering_as_matrix(:degrevlex, 3),
@@ -419,7 +418,6 @@ if case == 5 || case == 99
         :pertubed,
         3,
     )
-
     @time M = groebnerwalk(
         I,
         ordering_as_matrix(:degrevlex, 3),
@@ -457,5 +455,105 @@ if case == 5 || case == 99
 
 end
 
+
+
+if case == 6 || case == 99
+    R, (x, y, z, u, v, w) = Singular.PolynomialRing(
+        Singular.QQ,
+        ["x", "y", "z", "u", "v", "w"],
+        ordering = Singular.ordering_M(ordering_as_matrix(:degrevlex, 6)),
+    )
+
+
+    f1 = 2*w*y + 2*v*z+u^2 + x^2+x
+    f2 = 2* w*z+2*v*u+2*y*x+y
+    f3 = 2*w*u + v^2 + 2*z*x+z+y^2
+    f4= 2*w*v + 2*u*x+u+2*z*y
+    f5= w^2 + 2*v*x + v + 2*u*y + z^2
+    f6=  2*w*x + w+2*v*y + 2*u*z
+    I = Singular.Ideal(R, [f1, f2, f3, f4,f5,f6])
+    I = Singular.std(I, complete_reduction = true)
+
+    @time H = groebnerwalk(
+        I,
+        ordering_as_matrix(:degrevlex, 6),
+        ordering_as_matrix(:lex, 6),
+        :standard,
+    )
+    #=    @time J = fractal_walk(
+            I,
+            MonomialOrder(
+                ordering_as_matrix(:degrevlex, 6),
+                [1, 1, 1, 1, 1, 1],
+                [0],
+            ),
+            MonomialOrder(
+                ordering_as_matrix(:lex, 6),
+                [1, 0, 0, 0, 0, 0],
+                [1, 0, 0, 0, 0, 0],
+            ),
+        ) =#
+    @time JJ = groebnerwalk(
+        I,
+        ordering_as_matrix(:degrevlex, 6),
+        ordering_as_matrix(:lex, 6),
+        :fractal_walk_lookahead,
+    )
+
+    @time K = groebnerwalk(
+        I,
+        ordering_as_matrix(:degrevlex, 6),
+        ordering_as_matrix(:lex, 6),
+        :pertubed,
+        6,
+    )
+    @time L = groebnerwalk(
+        I,
+        ordering_as_matrix(:degrevlex, 6),
+        ordering_as_matrix(:lex, 6),
+        :fractal2,
+    )
+    @time M = groebnerwalk(
+        I,
+        ordering_as_matrix(:degrevlex, 6),
+        ordering_as_matrix(:lex, 6),
+        :generic,
+    )
+    S, V = Singular.PolynomialRing(
+        Singular.QQ,
+        ["x", "y", "z", "u", "v", "w"],
+        ordering = Singular.ordering_M(ordering_as_matrix(:lex, 6)),
+    )
+    @time T0 = Singular.std(
+        Singular.Ideal(S, [change_ring(x, S) for x in gens(I)]),
+        complete_reduction = true,
+    )
+    #    T1test(4) = Singular.Ideal(S, [change_ring(x, S) for x in gens(J)])
+    T2 = Singular.Ideal(S, [change_ring(x, S) for x in gens(K)])
+    T3 = Singular.Ideal(S, [change_ring(x, S) for x in gens(L)])
+    T4 = Singular.Ideal(S, [change_ring(x, S) for x in gens(M)])
+    T5 = Singular.Ideal(S, [change_ring(x, S) for x in gens(JJ)])
+    T6 = Singular.Ideal(S, [change_ring(x, S) for x in gens(H)])
+
+    println("test standard: ", equalitytest(T0, T6))
+    println("test fractal2: ", equalitytest(T0, T5))
+    #println("test fractal: ", equalitytest(T0, T1))
+    println("test pertubed: ", equalitytest(T2, T0))
+    println("test standard: ", equalitytest(T3, T0))
+    println("test generic: ", equal(T4, T0))
+    println(T3)
+    println(T5)
+    println(T0)
+
+    if !(
+        equalitytest(T2, T0) &&
+        equalitytest(T3, T0) &&
+        equalitytest(T0, T5) &&
+        Singular.equal(T0, T4)
+    )
+        test_successfull = false
+    end
+
+end
 println("All tests were: ", test_successfull)
 end

@@ -9,15 +9,14 @@ function facet_initials(
     R::Singular.PolyRing,
     G::Singular.sideal,
     v::Vector{Int64},
-    lm::Vector{spoly{n_Q}},
-)
+    lm::Vector{spoly{L}},
+) where {L<:Nemo.RingElem}
     inits = []
     count = 1
     for g in Singular.gens(G)
         inw = Singular.MPolyBuildCtx(R)
         el = first(Singular.exponent_vectors(lm[count]))
-        mzip = zip(Singular.exponent_vectors(g), Singular.coefficients(g))
-        for (e, c) in mzip
+        for (e, c) in zip(Singular.exponent_vectors(g), Singular.coefficients(g))
             if el == e || isparallel(el - e, v)
                 Singular.push_term!(inw, c, e)
             end
@@ -102,8 +101,8 @@ function check_zeros(
 end
 
 
-function filter_btz(S::Matrix{Int64}, V::Vector{Any})
-    btz = Set()
+function filter_btz(S::Matrix{Int64}, V::Vector{Vector{Int64}})
+    btz = Set{Vector{Int64}}()
     for v in V
         if bigger_than_zero(S, v)
             push!(btz, v)
@@ -112,8 +111,8 @@ function filter_btz(S::Matrix{Int64}, V::Vector{Any})
     return btz
 end
 
-function filter_ltz(S::Matrix{Int64}, V::Set{Any})
-    btz = Set()
+function filter_ltz(S::Matrix{Int64}, V::Set{Vector{Int64}})
+    btz = Set{Vector{Int64}}()
     for v in V
         if less_than_zero(S, v)
             push!(btz, v)
@@ -125,9 +124,9 @@ function filter_lf(
     w::Vector{Int64},
     S::Matrix{Int64},
     T::Matrix{Int64},
-    V::Set{Any},
+    V::Set{Vector{Int64}},
 )
-    btz = Set()
+    btz = Set{Vector{Int64}}()
     for v in V
         if less_facet(w, v, S, T)
             push!(btz, v)
@@ -244,8 +243,8 @@ function less_facet(
     return false
 end
 
-#returns p mod lm
-function reduce_modulo(
+#returns divrem()
+function divrem_generic(
     p::Singular.spoly,
     lm::Singular.spoly,
     S::Singular.PolyRing,
@@ -276,7 +275,7 @@ function reducegeneric_recursiv(
     I = 0
     Q = zero(R)
     for i = 1:length(G)
-        (q, b) = reduce_modulo(p, Lm[i], R)
+        (q, b) = divrem_generic(p, Lm[i], R)
         if b
             I = i
             Q = q
@@ -356,6 +355,29 @@ function interreduce_generic(
             end
         end
     end
-
     return Singular.Ideal(R, [R(p) for p in gens])
 end
+ #=
+function interredLc(
+    p::Singular.spoly,
+    lm::Singular.spoly,
+    S::Singular.PolyRing,
+)
+    newpoly = Singular.MPolyBuildCtx(S)
+    newpoly2 = Singular.MPolyBuildCtx(S)
+    c = first(Singular.coefficients(lm))
+    if c != 1
+        println("after:", c)
+    for term in Singular.terms(p)
+        cp = first(Singular.coefficients(term))
+        push_term!(
+            newpoly,
+            div(cp,c),
+            first(Singular.exponent_vectors(term)),
+            )
+    end
+    return finish(newpoly)
+end
+return p
+end
+=#

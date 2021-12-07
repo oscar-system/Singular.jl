@@ -70,7 +70,7 @@ return G
 end
 
 #returns ´true´ if all polynomials of the array are monomials.
-function ismonomial(Gw::Vector{Any})
+function ismonomial(Gw::Vector{spoly{L}})where {L<:Nemo.RingElem}
     for g in Gw
         if size(collect(Singular.coefficients(g)))[1] > 1
             return false
@@ -79,8 +79,8 @@ function ismonomial(Gw::Vector{Any})
     return true
 end
 
-#returns ´true´ if all polynomials of the array are binomial.
-function isBinomial(Gw::Vector{Any})
+#returns ´true´ if all polynomials of the array are binomial or less.
+function isBinomial(Gw::Vector{spoly{L}}) where {L<:Nemo.RingElem}
     for g in Gw
         if size(collect(Singular.coefficients(g)))[1] > 2
             return false
@@ -90,7 +90,7 @@ function isBinomial(Gw::Vector{Any})
 end
 
 #=
-The version of Cox, O´shea and Fukuda et al. is limited because it returns 1,
+The version of Cox, O´shea and Fukuda et al. is limited because it returns 1
 if there are no more cones to cross and when the target vector lays on a facet.
 function nextw_fr(
     G::Singular.sideal,
@@ -142,9 +142,9 @@ end
 #Computes next weight vector. Version used in Amrhein Gloor.
 function nextW_2(G::Singular.sideal,
     w::Array{T,1},
-    sigma::Array{K,1},
+    tau::Array{K,1},
     ) where {T<:Number,K<:Number}
-    if (w == sigma)
+    if (w == tau)
         return [0]
     end
 
@@ -154,7 +154,7 @@ t = 0
         a = Singular.leading_exponent_vector(g)
         d = Singular.exponent_vectors(tail(g))
         for v in d
-            frac = (dot(w,a)- dot(w,v) + dot(sigma,v) - dot(sigma, a))
+            frac = (dot(w,a)- dot(w,v) + dot(tau,v) - dot(tau, a))
             if frac != 0
             t = (dot(w,a) - dot(w,v)) // frac
         end
@@ -165,9 +165,39 @@ t = 0
     end
 
     if tmin <= 1
-    w = w + tmin * (sigma - w)
+    w = w + tmin * (tau - w)
 else
     return [0]
 end
     return convertBoundingVector(w)
+        end
+        function nextT(G::Singular.sideal,
+            w::Array{T,1},
+            tau::Array{K,1},
+            ) where {T<:Number,K<:Number}
+            if (w == tau)
+                return [0]
+            end
+
+        tmin = 2
+        t = 0
+            for g in gens(G)
+                a = Singular.leading_exponent_vector(g)
+                d = Singular.exponent_vectors(tail(g))
+                for v in d
+                    frac = (dot(w,a)- dot(w,v) + dot(tau,v) - dot(tau, a))
+                    if frac != 0
+                    t = (dot(w,a) - dot(w,v)) // frac
+                end
+                    if t > 0 && t < tmin
+                        tmin = t
+                    end
+                end
+            end
+
+            if tmin <= 1
+                return tmin
+        else
+            return [0]
+        end
         end

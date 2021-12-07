@@ -3,6 +3,7 @@ include("FractalWalkUtilitys.jl")
 include("GenericWalkUtilitys.jl")
 include("StandardWalkUtilitys.jl")
 include("TranWalkUtilitys.jl")
+include("AlternativeAlgorithm.jl")
 
 
 
@@ -66,6 +67,12 @@ function groebnerwalk(
             )
     elseif grwalktype == :tran
         walk = (x, y, z) -> tran_walk(x, y, z)
+    elseif grwalktype == :alternative
+        walk = (x,y,z) -> alternative_algorithm_top(
+        x,
+        MonomialOrder(S, S[1, :], [0]),
+        MonomialOrder(T, T[1, :], T[1, :]),
+        )
     end
 
     ######TODO:Check the parameter#####
@@ -81,7 +88,7 @@ end
 
 
 ###############################################################
-#Standard-version of the groebner walk by Collart et al
+#Standard-version of the groebner walk by Collart et al.
 ###############################################################
 function standard_walk(G::Singular.sideal, S::Matrix{Int64}, T::Matrix{Int64})
     cweight = S[1, :]
@@ -104,8 +111,8 @@ function standard_walk(
     term = false
     while !term
         G = standard_step(G, cweight, tweight, T)
-        global counter = getCounter() + 1
         println(cweight)
+        global counter = getCounter() + 1
         if cweight == tweight
             term = true
         else
@@ -126,6 +133,8 @@ function standard_step(
 
     #taking initials
     inwG = initials(S, gens(G), cw)
+    inwG2 = initials2(R, gens(G), cw)
+
     #Initial Ideal
     IinwG = Singular.std(
         Singular.Ideal(S, [S(x) for x in inwG]),
@@ -133,7 +142,9 @@ function standard_step(
     )
 
     #Lifting to GB of new cone
-    Gnew = liftGW(G, IinwG, R, S)
+    #Gnew = liftGW(G, IinwG, R, S)
+    @time Gnew = liftGW2(G,inwG2, IinwG, R, S)
+
     #Interreduce
     return Singular.std(Gnew, complete_reduction = true)
 end
@@ -156,11 +167,12 @@ function generic_walk(G::Singular.sideal, S::Matrix{Int64}, T::Matrix{Int64})
         global counter = getCounter() + 1
         println(v)
         G, lm = generic_step(G, R, v, T, lm)
+        println(ngens(G))
         #@info "Current Gröbnerbase: " G
         #println("nextv")
          v = nextV(G, lm, v, S, T)
     end
-    return G
+    return interreduce(G)
 end
 
 function generic_step(
@@ -183,7 +195,6 @@ function generic_step(
 
     #println("liftgeneric")
     liftArray, Newlm = liftgeneric(G, lm, facet_Ideal)
-
     Gnew = Singular.Ideal(S, [x for x in liftArray])
 
     #println("interred")
@@ -242,7 +253,7 @@ end
 ###############################################################
 
 ########################################
-#Counter for the steps in a fractalwalk
+#Counter for the steps in the fractalwalk
 ########################################
 counterFr = 0
 counterFrFin = false
@@ -271,6 +282,7 @@ function resetCounterFr()
 end
 
 PVecs = []
+P = Singular.sideal
 function checkPvecs()
     global PVecs
     println(PVecs)
@@ -312,8 +324,12 @@ function fractal_recursiv(
     cweight = s
 
     while !term
-        w = nextW_2(G, cweight, PVecs[p])
-        if (w == [0])
+        if p == 1
+            global P = G
+        end
+         #w = nextW_2(G, cweight, PVecs[p])
+         t = nextT(G,cweight,PVecs[p])
+        if (t == [0])
             #Look up if inCone is special for a deeper step
             if inCone(G, T, PVecs[p])
                 if raiseCounterFr()
@@ -321,23 +337,29 @@ function fractal_recursiv(
                 end
                 return G
             else
-                global PVecs = [pert_Vectors(G, T, 2, i) for i = 1:nvars(R)]
+                global P
+                #global PVecs = [pert_Vectors(P, T, 2, i) for i = 1:nvars(R)]
+                global PVecs = [representationVector(G, T.m) for i = 1:nvars(R)]
+
                 println(PVecs)
                 continue
             end
         end
+        w = cweight + t * (PVecs[p] - cweight)
+        w = convertBoundingVector(w)
         T.w = w
         Rn, V = change_order(R, T)
-        Gw = initials(R, gens(G), w)
+         Gw = initials(R, gens(G), w)
 
         if p == nvars(R)
-             Gnew = Singular.std(
+            Gnew = Singular.std(
                 Singular.Ideal(Rn, [change_ring(x, Rn) for x in Gw]),
                 complete_reduction = true,
             )
             println(w, " in depth", p)
             raiseCounterFr(true)
         else
+            println("counter")
             resetCounterFr()
             println("up in: ", p, " with: ", w)
 
@@ -352,9 +374,7 @@ function fractal_recursiv(
             resetCounterFr()
 
         end
-
         G = liftGWfr(G, Gnew, R, Rn)
-
         G = Singular.std(G, complete_reduction = true)
         R = Rn
         S = T
@@ -375,7 +395,7 @@ function fractal_walk2(
     S::MonomialOrder{Matrix{Int64},Vector{Int64}},
     T::MonomialOrder{Matrix{Int64},Vector{Int64}},
 )
-    global PVecs = [pert_Vectors(G, T, i) for i = 1:nvars(R)]
+    global PVecs = [pert_Vectors(G, T, i) for i = 1:nvars(Singular.base_ring(G))]
     global sigma = S.w
     println("FractalWalk_withStartorder results")
     println("Crossed Cones in: ")
@@ -404,7 +424,7 @@ function fractal_recursiv2(
     if firstStepMode
         cweight = cwPert[p]
     else
-        cweight = getSigma()
+        cweight = S.w
     end
 
     while !term
@@ -459,7 +479,7 @@ function fractal_walk3(
     S::MonomialOrder{Matrix{Int64},Vector{Int64}},
     T::MonomialOrder{Matrix{Int64},Vector{Int64}},
 )
-    global PVecs = [pert_Vectors(G, T, i) for i = 1:nvars(R)]
+    global PVecs = [pert_Vectors(G, T, i) for i = 1:nvars(base_ring(G))]
     println("FractalWalk_withStartorderLex results")
     println("Crossed Cones in: ")
     Gb = fractal_recursiv3(G, S, T, PVecs, 1)
@@ -485,14 +505,15 @@ function fractal_recursiv3(
         end
     end
     if firstStepMode
-        cweight = cwPert[p]
+        #cweight = cwPert[p]
+        cweight = S.w
     else
         cweight = S.w
     end
 
     #println(cwPert)
     while !term
-        w = nextw_fr(G, cweight, PVecs[p])
+        w = nextW_2(G, cweight, PVecs[p])
         #println(cweight, w)
 
         if (p == 1 && w == PVecs[p])
@@ -634,9 +655,10 @@ function tran_walk(G::Singular.sideal, S::Matrix{Int64}, T::Matrix{Int64})
             if inCone(G, T, cweight)
                 return G
             else
-                #TODO: Implement: if in several cones
+                if inSeveralCones(initials(base_ring(G),gens(G), w))
                 tweight = representationVector(G, T)
                 continue
+            end
             end
         end
         G = standard_step(G, w, tweight, T)
