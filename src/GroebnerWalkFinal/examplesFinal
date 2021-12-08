@@ -269,7 +269,7 @@ function test(case::Int)
             I,
             ordering_as_matrix([1, 1, 1, 1, 1, 1], :lex),
             ordering_as_matrix(:lex, 6),
-            :generic,
+            :fractal_look_ahead,
         )
         S, V = Singular.PolynomialRing(
             Singular.QQ,

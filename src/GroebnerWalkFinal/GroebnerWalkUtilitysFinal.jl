@@ -3,7 +3,7 @@
 ###############################################################
 
 #Return the initials of polynomials w.r.t. a weight vector.
-function Initials(R::Singular.PolyRing, G::Vector{spoly{n_Q}}, w::Vector{Int64})
+function initials(R::Singular.PolyRing, G::Vector{spoly{n_Q}}, w::Vector{Int64})
     inits = spoly{elem_type(base_ring(R))}[]
     indexw = Tuple{Vector{Int},elem_type(base_ring(R))}[]
     for g in G
@@ -14,7 +14,6 @@ function Initials(R::Singular.PolyRing, G::Vector{spoly{n_Q}}, w::Vector{Int64})
             tmpw = dot(w, e)
             if maxw == tmpw
                 push!(indexw, (e, c))
-                #rethink this. gens are preordered
             elseif maxw < tmpw
                 empty!(indexw)
                 push!(indexw, (e, c))
@@ -43,7 +42,7 @@ end
 
 #Return the difference of the exponents of the leading terms (Lm) and the
 #exponent vectors of the tail of all polynomials of the ideal.
-function LmMinusV(
+function difference_lead_tail(
     I::Singular.sideal,
     Lm::Vector{spoly{L}},
 ) where {L<:Nemo.RingElem}
@@ -61,7 +60,7 @@ end
 
 #Return the difference of the exponents of the leading terms (Lm) and the
 #exponent vectors of the tail of all polynomials of the ideal.
-function LmMinusV(I::Singular.sideal)
+function difference_lead_tail(I::Singular.sideal)
     v = Vector{Int}[]
     for g in gens(I)
         ltu = Singular.leading_exponent_vector(g)
@@ -125,7 +124,7 @@ end
 
 function ordering_as_matrix(w::Vector{Int64}, ord::Symbol)
     if length(w) > 2
-        if ord == :lex || ord == Symbol("Singular(lp)")
+        if ord == :lex
             return [
                 w'
                 ident_matrix(length(w))[1:length(w)-1, :]
@@ -145,14 +144,14 @@ function ordering_as_matrix(w::Vector{Int64}, ord::Symbol)
                 anti_diagonal_matrix(length(w))[1:length(w)-2, :]
             ]
         end
-        if ord == :revlex || a.ord == Symbol("Singular(dp)")
+        if ord == :revlex
             return [
                 w'
                 anti_diagonal_matrix(length(w))[1:length(w)-1, :]
             ]
         end
     else
-        error("not implemented yet")
+        error("not implemented")
     end
 end
 
@@ -172,7 +171,6 @@ end
 
 function ordering_as_matrix(ord::Symbol, nvars::Int64)
     if ord == :lex
-        #return [w'; ident_matrix(length(w))[1:length(w)-1,:]]
         return ident_matrix(nvars)
     end
     if ord == :deglex
@@ -187,15 +185,17 @@ function ordering_as_matrix(ord::Symbol, nvars::Int64)
             anti_diagonal_matrix(nvars)[1:nvars-1, :]
         ]
     end
-    if ord == :revlex || a.ord == Symbol("Singular(dp)")
+    if ord == :revlex
         return [
             w'
             anti_diagonal_matrix(length(w))[1:length(w)-1, :]
         ]
+    else
+        error("not implemented")
     end
 end
 
-function PertubedVector(
+function pertubed_vector(
     G::Singular.sideal,
     Mo::MonomialOrder{Matrix{Int64}},
     t::Vector{Int64},
@@ -222,24 +222,22 @@ function PertubedVector(
     for i = 2:p
         msum += m[i]
     end
-    maxtdeg = 0
+    maxdeg = 0
     for g in gens(G)
-        td = tdeg(g, n)
-        if (td > maxtdeg)
-            maxtdeg = td
+        td = deg(g, n)
+        if (td > maxdeg)
+            maxdeg = td
         end
     end
-    e = maxtdeg * msum + 1
+    e = maxdeg * msum + 1
     w = M[1, :] * e^(p - 1)
     for i = 2:p
         w += e^(p - i) * M[i, :]
     end
-    println(w)
-
     return w
 end
 
-function PertubedVector(G::Singular.sideal, M::Matrix{Int64}, p::Integer)
+function pertubed_vector(G::Singular.sideal, M::Matrix{Int64}, p::Integer)
     m = []
     n = size(M)[1]
     for i = 1:p
@@ -256,22 +254,22 @@ function PertubedVector(G::Singular.sideal, M::Matrix{Int64}, p::Integer)
     for i = 2:p
         msum += m[i]
     end
-    maxtdeg = 0
+    maxdeg = 0
     for g in gens(G)
-        td = tdeg(g, n)
-        if (td > maxtdeg)
-            maxtdeg = td
+        td = deg(g, n)
+        if (td > maxdeg)
+            maxdeg = td
         end
     end
-    e = maxtdeg * msum + 1
+    e = maxdeg * msum + 1
     w = M[1, :] * e^(p - 1)
     for i = 2:p
         w += e^(p - i) * M[i, :]
     end
-    println(w)
     return w
 end
-function PertubedVector(
+
+function pertubed_vector(
     G::Singular.sideal,
     T::MonomialOrder{Matrix{Int64},Vector{Int64}},
     p::Integer,
@@ -297,67 +295,22 @@ function PertubedVector(
     for i = 2:p
         msum += m[i]
     end
-    maxtdeg = 0
+    maxdeg = 0
     for g in gens(G)
-        td = tdeg(g, n)
-        if (td > maxtdeg)
-            maxtdeg = td
+        td = deg(g, n)
+        if (td > maxdeg)
+            maxdeg = td
         end
     end
-    e = maxtdeg * msum + 1
+    e = maxdeg * msum + 1
     w = M[1, :] * e^(p - 1)
     for i = 2:p
         w += e^(p - i) * M[i, :]
     end
-    println(w)
-
-    return w
-end
-function PertubedVector(
-    G::Singular.sideal,
-    T::MonomialOrder{Matrix{Int64},Vector{Int64}},
-    mult::Int64,
-    p::Integer,
-)
-    m = []
-    if T.t == T.m[1, :]
-        M = T.m
-    else
-        M = insert_weight_vector(T.t, T.m)
-    end
-    n = size(M)[1]
-    for i = 1:p
-        max = M[i, 1]
-        for j = 2:n
-            temp = abs(M[i, j])
-            if temp > max
-                max = temp
-            end
-        end
-        push!(m, max)
-    end
-    msum = 0
-    for i = 2:p
-        msum += m[i]
-    end
-    maxtdeg = 0
-    for g in gens(G)
-        td = tdeg(g, n)
-        if (td > maxtdeg)
-            maxtdeg = td
-        end
-    end
-    #TODO: rethink * mult
-    e = maxtdeg * msum + 1
-    w = M[1, :] * e^(p - 1)
-    for i = 2:p
-        w += e^(p - i) * M[i, :]
-    end
-    println(w)
     return w
 end
 
-function tdeg(p::Singular.spoly, n::Int64)
+function deg(p::Singular.spoly, n::Int64)
     max = 0
     for mon in Singular.monomials(p)
         ev = Singular.exponent_vectors(mon)
@@ -374,10 +327,10 @@ function tdeg(p::Singular.spoly, n::Int64)
     return max
 end
 
-function InCone(G::Singular.sideal, T::Matrix{Int64}, t::Vector{Int64})
+function inCone(G::Singular.sideal, T::Matrix{Int64}, t::Vector{Int64})
     R, V = change_order(G.base_ring, T)
     I = Singular.Ideal(R, [change_ring(x, R) for x in gens(G)])
-    cvzip = zip(Singular.gens(I), Initials(R, Singular.gens(I), t))
+    cvzip = zip(Singular.gens(I), initials(R, Singular.gens(I), t))
     for (g, ing) in cvzip
         if !isequal(Singular.leading_term(g), Singular.leading_term(ing))
             return false
@@ -386,22 +339,21 @@ function InCone(G::Singular.sideal, T::Matrix{Int64}, t::Vector{Int64})
     return true
 end
 
-function Lift(
+function lift(
     G::Singular.sideal,
-    InG::Singular.sideal,
+    Gw::Singular.sideal,
     R::Singular.PolyRing,
     S::Singular.PolyRing,
 )
     G.isGB = true
     rest = [
         gen - change_ring(Singular.reduce(change_ring(gen, R), G), S) for
-        gen in gens(InG)
+        gen in gens(Gw)
     ]
-    Gnew = Singular.Ideal(S, [S(x) for x in rest])
-    Gnew.isGB = true
-    return Gnew
+    G = Singular.Ideal(S, [S(x) for x in rest])
+    G.isGB = true
+    return G
 end
-
 
 #############################################
 # unspecific help functions

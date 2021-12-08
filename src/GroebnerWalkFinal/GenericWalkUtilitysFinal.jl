@@ -4,28 +4,29 @@ include("GroebnerWalkUtilitysFinal.jl")
 #Utilitys for generic_walk
 ###############################################################
 
-#Return the facet_initials of polynomials w.r.t. a weight vector.
-function FacetInitials(
+#Return the facet_facet_facet_initials of polynomials w.r.t. a weight vector.
+function facet_initials(
     R::Singular.PolyRing,
     G::Singular.sideal,
     v::Vector{Int64},
     lm::Vector{spoly{L}},
 ) where {L<:Nemo.RingElem}
-    inits = []
+    initials = []
     count = 1
     for g in Singular.gens(G)
         inw = Singular.MPolyBuildCtx(R)
         el = first(Singular.exponent_vectors(lm[count]))
-        for (e, c) in zip(Singular.exponent_vectors(g), Singular.coefficients(g))
+        for (e, c) in
+            zip(Singular.exponent_vectors(g), Singular.coefficients(g))
             if el == e || isParallel(el - e, v)
                 Singular.push_term!(inw, c, e)
             end
         end
         h = finish(inw)
-        push!(inits, h)
+        push!(initials, h)
         count += 1
     end
-    return inits
+    return initials
 end
 
 #
@@ -57,7 +58,7 @@ function isParallel(u::Vector{Int64}, v::Vector{Int64})
 end
 
 #lifting step of the generic_walk
-function LiftGeneric(
+function lift_generic(
     G::Singular.sideal,
     Lm::Vector{Singular.spoly{L}},
     H::Singular.sideal,
@@ -111,14 +112,14 @@ function filter_lf(
 end
 
 #return the next facet_normal.
-function NextGamma(
+function next_gamma(
     G::Singular.sideal,
     Lm::Vector{spoly{L}},
     w::Vector{Int64},
     S::Matrix{Int64},
     T::Matrix{Int64},
 ) where {L<:Nemo.RingElem}
-    V = filter_btz(S, LmMinusV(G, Lm))
+    V = filter_btz(S, difference_lead_tail(G, Lm))
     V = filter_ltz(T, V)
     if (w != [0])
         V = filter_lf(w, S, T, V)
@@ -136,13 +137,13 @@ function NextGamma(
 end
 
 #return the next facet_normal.
-function NextGamma(
+function next_gamma(
     G::Singular.sideal,
     w::Vector{Int64},
     S::Matrix{Int64},
     T::Matrix{Int64},
 )
-    V = filter_btz(S, LmMinusV(G))
+    V = filter_btz(S, difference_lead_tail(G))
     V = filter_ltz(T, V)
     if (w != [0])
         V = filter_lf(w, S, T, V)
@@ -202,11 +203,7 @@ function less_facet(
 end
 
 #returns divrem()
-function divrem(
-    p::Singular.spoly,
-    lm::Singular.spoly,
-    S::Singular.PolyRing,
-)
+function divrem(p::Singular.spoly, lm::Singular.spoly, S::Singular.PolyRing)
     div = false
     newpoly = Singular.MPolyBuildCtx(S)
     for term in Singular.terms(p)

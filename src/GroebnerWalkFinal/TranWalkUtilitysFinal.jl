@@ -1,7 +1,7 @@
 include("GroebnerWalkUtilitysFinal.jl")
 
 
-function RepresentationVector(G::Singular.sideal, T::Matrix{Int64})
+function representation_vector(G::Singular.sideal, T::Matrix{Int64})
     n = size(T)[1]
     M = 0
     for i = 1:n
@@ -12,11 +12,10 @@ function RepresentationVector(G::Singular.sideal, T::Matrix{Int64})
             end
         end
     end
-
     d0 = 0
     for g in Singular.gens(G)
         #        println(g, " in tedeg", tdeg(g))
-        temp = tdeg(g, n)
+        temp = deg(g, n)
         if d0 < temp
             d0 = temp
         end
@@ -29,16 +28,16 @@ function RepresentationVector(G::Singular.sideal, T::Matrix{Int64})
     return w
 end
 
-function InSeveralCones(Gw::Vector{spoly{L}}) where {L<:Nemo.RingElem}
+function inSeveralCones(Gw::Vector{spoly{L}}) where {L<:Nemo.RingElem}
     counter = 0
     for g in Gw
         if size(collect(Singular.coefficients(g)))[1] > 2
             return true
         end
         if size(collect(Singular.coefficients(g)))[1] == 2
-            counter = counter +1
+            counter = counter + 1
         end
-end
+    end
     if counter > 1
         return true
     end

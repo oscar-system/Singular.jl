@@ -1,23 +1,34 @@
 include("GroebnerWalkUtilitysFinal.jl")
-
-#Solves problems with weight vectors of floats.
-function convertBoundingVector(wtemp::Vector{T}) where {T<:Number}
+#=
+@doc Markdown.doc"""
+   convert_bounding_vector(wtemp::Vector{T}) where {T<:Number}
+Given a Vector{Number} $v$ this function computes a Vector{Int64} w with w = v*gcd(v).
+"""=#
+function convert_bounding_vector(v::Vector{T}) where {T<:Number}
     w = Vector{Int64}()
-    for i = 1:length(wtemp)
-        push!(w, float(divexact(wtemp[i], gcd(wtemp))))
+    for i = 1:length(v)
+        push!(w, float(divexact(v[i], gcd(v))))
     end
     return w
 end
 
-#Checks if a weight vector t is in the cone of the ordering T w.r.t. an ideal.
-function InCone(
+#=
+@doc Markdown.doc"""
+function inCone(
+    G::Singular.sideal,
+    T::MonomialOrder{Matrix{Int64},Vector{Int64}},
+    t::Vector{Int64},
+)
+Returns 'true' if the leading tems of $G$ w.r.t the monomial ordering $T$ are the same as the leading terms of $G$ w.r.t the weighted monomial ordering with weight vector $t$ and the monomial ordering $T$. 
+"""=#
+function inCone(
     G::Singular.sideal,
     T::MonomialOrder{Matrix{Int64},Vector{Int64}},
     t::Vector{Int64},
 )
     R, V = change_order(G.base_ring, T.t, T.m)
     I = Singular.Ideal(R, [change_ring(x, R) for x in Singular.gens(G)])
-    cvzip = zip(Singular.gens(I), Initials(R, Singular.gens(I), t))
+    cvzip = zip(Singular.gens(I), initials(R, Singular.gens(I), t))
     for (g, ing) in cvzip
         if !isequal(Singular.leading_term(g), Singular.leading_term(ing))
             return false
@@ -39,7 +50,7 @@ function change_order(
     )
 end
 
-function LiftFractalWalk(
+function lift_fractal_walk(
     G::Singular.sideal,
     Gw::Singular.sideal,
     R::Singular.PolyRing,
@@ -57,7 +68,7 @@ function LiftFractalWalk(
 end
 
 #returns ´true´ if all polynomials of the array are monomials.
-function IsMonomial(Gw::Vector{spoly{L}}) where {L<:Nemo.RingElem}
+function isMonomial(Gw::Vector{spoly{L}}) where {L<:Nemo.RingElem}
     for g in Gw
         if size(collect(Singular.coefficients(g)))[1] > 1
             return false
@@ -67,7 +78,7 @@ function IsMonomial(Gw::Vector{spoly{L}}) where {L<:Nemo.RingElem}
 end
 
 #returns ´true´ if all polynomials of the array are binomial or less.
-function IsBinomial(Gw::Vector{spoly{L}}) where {L<:Nemo.RingElem}
+function isbinomial(Gw::Vector{spoly{L}}) where {L<:Nemo.RingElem}
     for g in Gw
         if size(collect(Singular.coefficients(g)))[1] > 2
             return false
@@ -75,39 +86,23 @@ function IsBinomial(Gw::Vector{spoly{L}}) where {L<:Nemo.RingElem}
     end
     return true
 end
-#=
-function diff_vectors_lt(I::Singular.sideal)
-    zip = []
-    v = []
-    for g in gens(I)
-        ltu = Singular.leading_exponent_vector(g)
-        for e in Singular.exponent_vectors(tail(g))
-            push!(v, (ltu .- e))
-        end
-        push!(zip, (unique(v), ltu))
-        v = []
-    end
-    return zip
-end
-=#
 
 #Computes next weight vector. Version used in Amrhein Gloor.
-function NextWeight(
+function next_weight(
     G::Singular.sideal,
     w::Array{T,1},
-    tau::Array{K,1},
+    tw::Array{K,1},
 ) where {T<:Number,K<:Number}
-    if (w == tau)
+    if (w == t)
         return [0]
     end
-
     tmin = 2
     t = 0
     for g in gens(G)
         a = Singular.leading_exponent_vector(g)
         d = Singular.exponent_vectors(tail(g))
         for v in d
-            frac = (dot(w, a) - dot(w, v) + dot(tau, v) - dot(tau, a))
+            frac = (dot(w, a) - dot(w, v) + dot(tw, v) - dot(tw, a))
             if frac != 0
                 t = (dot(w, a) - dot(w, v)) // frac
             end
@@ -116,20 +111,20 @@ function NextWeight(
             end
         end
     end
-
     if tmin <= 1
-        w = w + tmin * (tau - w)
+        w = w + tmin * (t - w)
     else
         return [0]
     end
-    return convertBoundingVector(w)
+    return convert_bounding_vector(w)
 end
-function NextT(
+
+function nextT(
     G::Singular.sideal,
     w::Array{T,1},
-    tau::Array{K,1},
+    tw::Array{K,1},
 ) where {T<:Number,K<:Number}
-    if (w == tau)
+    if (w == tw)
         return [0]
     end
     tmin = 2
@@ -138,7 +133,7 @@ function NextT(
         a = Singular.leading_exponent_vector(g)
         d = Singular.exponent_vectors(tail(g))
         for v in d
-            frac = (dot(w, a) - dot(w, v) + dot(tau, v) - dot(tau, a))
+            frac = (dot(w, a) - dot(w, v) + dot(tw, v) - dot(tw, a))
             if frac != 0
                 t = (dot(w, a) - dot(w, v)) // frac
             end
@@ -147,7 +142,6 @@ function NextT(
             end
         end
     end
-
     if tmin <= 1
         return tmin
     else
