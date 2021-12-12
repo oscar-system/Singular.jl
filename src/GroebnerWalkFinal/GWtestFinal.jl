@@ -306,8 +306,9 @@ function test(case::Int)
             I,
             ordering_as_matrix(:degrevlex, 4),
             ordering_as_matrix(:lex, 4),
-            :fractal,
+            :fractal_lex,
         )
+        
         @time JJ = groebnerwalk(
             I,
             ordering_as_matrix(:degrevlex, 4),
@@ -326,7 +327,7 @@ function test(case::Int)
             I,
             ordering_as_matrix(:degrevlex, 4),
             ordering_as_matrix(:lex, 4),
-            :fractal_lex,
+            :fractal,
         )
         @time M = groebnerwalk(
             I,
@@ -334,6 +335,7 @@ function test(case::Int)
             ordering_as_matrix(:lex, 4),
             :generic,
         )
+
 
 
         S, V = Singular.PolynomialRing(

@@ -21,16 +21,16 @@ function test(case::Int)
             I,
             ordering_as_matrix(:degrevlex, 2),
             ordering_as_matrix(:lex, 2),
-            :standard,
+            :tran,
         )
+
+
         @time T0 = Singular.std(
             Singular.Ideal(S, [change_ring(x, S) for x in gens(I)]),
             complete_reduction = true,
         )
-
         T6 = Singular.Ideal(S, [change_ring(x, S) for x in gens(H)])
         println("test tran: ", equalitytest(T0, T6))
-
 
         if !(equalitytest(T6, T0))
             test_successfull = false
@@ -48,6 +48,8 @@ function test(case::Int)
             ),
         )
 
+
+
         f1 = x^2 - y
         f2 = y^2 - x * z - y * z
         I = Singular.Ideal(R, [f1, f2])
@@ -57,7 +59,8 @@ function test(case::Int)
             I,
             ordering_as_matrix([5, 4, 1], :deglex),
             ordering_as_matrix([6, 1, 3], :lex),
-            :tran,
+            :fractal,
+            3,
         )
 
         S, V = Singular.PolynomialRing(
@@ -65,7 +68,6 @@ function test(case::Int)
             ["x", "y", "z"],
             ordering = Singular.ordering_M(ordering_as_matrix([6, 1, 3], :lex)),
         )
-
 
         T0 = Singular.std(
             Singular.Ideal(S, [change_ring(x, S) for x in gens(I)]),
@@ -75,8 +77,6 @@ function test(case::Int)
         T6 = Singular.Ideal(S, [change_ring(x, S) for x in gens(H)])
 
         println("test tran: ", equalitytest(T0, T6))
-
-
 
         if !(equalitytest(T0, T6))
             test_successfull = false
@@ -102,8 +102,9 @@ function test(case::Int)
             I,
             ordering_as_matrix(:degrevlex, 6),
             ordering_as_matrix(:lex, 6),
-            :standard,
+            :fractal,
         )
+
 
         S, V = Singular.PolynomialRing(
             Singular.QQ,
@@ -117,9 +118,7 @@ function test(case::Int)
 
         T6 = Singular.Ideal(S, [change_ring(x, S) for x in gens(H)])
 
-        println("test tran: ", equalitytest(T0, T6))
-
-
+        println("test tran: ", Singular.equal(T0, T6))
         if !(Singular.equal(T0, T6))
             test_successfull = false
         end
@@ -131,8 +130,6 @@ function test(case::Int)
             ["q", "c", "p", "d"],
             ordering = Singular.ordering_M(ordering_as_matrix(:degrevlex, 4)),
         )
-
-
         f1 =
             2 * c * d * p * q - 4 * c * d + 2 * p * q + 4 * p * q * c -
             4 * d^2 * q - 2 * d^2 * p * q + p^2 * d^2 - 2 * c^2 * q +
@@ -164,7 +161,8 @@ function test(case::Int)
             I,
             ordering_as_matrix(:degrevlex, 4),
             ordering_as_matrix(:lex, 4),
-            :tran,
+            :fractal,
+            3
         )
 
 
@@ -182,13 +180,10 @@ function test(case::Int)
 
         println("test tran: ", equalitytest(T0, T6))
 
-
-
         if !(equalitytest(T6, T0))
             test_successfull = false
         end
     end
-
     if case == 5 || case == 99
         R, (x, y, z) = Singular.PolynomialRing(
             Singular.QQ,
@@ -214,11 +209,11 @@ function test(case::Int)
             I,
             ordering_as_matrix(:degrevlex, 3),
             ordering_as_matrix(:lex, 3),
-            :standard,
+            :fractal,
+            2,
         )
 
         T1 = Singular.Ideal(S, [change_ring(x, S) for x in gens(H)])
-
 
         @time T0 = Singular.std(
             Singular.Ideal(S, [change_ring(x, S) for x in gens(I)]),
@@ -227,8 +222,6 @@ function test(case::Int)
         T6 = Singular.Ideal(S, [change_ring(x, S) for x in gens(H)])
 
         println("test tran: ", equalitytest(T0, T6))
-
-
 
         if !(Singular.equal(T0, T6))
             test_successfull = false
@@ -248,8 +241,8 @@ function test(case::Int)
         )
 
         f1 = 2 * x^2 + 2 * y^2 + 2 * z^2 + 2 * t^2 + 2 * u^2 + v^2 - v
-        f2 = x * y + y * z + 2 * z * t + 2 * t * u + 2 * u * v - u
-        f3 = 2 * x * z + 2 * y * t + 2 * z * u + u^2 + 2 * t * v - t
+        f2 = 2*x * y +2* y * z + 2 * z * t + 2 * t * u + 2 * u * v - u
+        f3 = 2 * x * z + 2 * y * t + 2 * z * u +2* u^2 + 2 * t * v - t
         f4 = 2 * x * t + 2 * y * u + 2 * t * u + 2 * z * v - z
         f5 = t^2 + 2 * x * v + 2 * y * v + 2 * z * v - y
         f6 = 2 * x + 2 * y + 2 * z + 2 * t + 2 * u + v - 1
@@ -264,27 +257,118 @@ function test(case::Int)
             :pertubed,
             5,
         )
-
         @time J = groebnerwalk(
             I,
             ordering_as_matrix([1, 1, 1, 1, 1, 1], :lex),
             ordering_as_matrix(:lex, 6),
-            :fractal_look_ahead,
+            :fractal,
+            5,
         )
+
         S, V = Singular.PolynomialRing(
             Singular.QQ,
             ["v", "u", "t", "z", "y", "x"],
             ordering = Singular.ordering_M(ordering_as_matrix(:lex, 6)),
         )
-
         T0 = Singular.Ideal(S, [change_ring(x, S) for x in gens(J)])
         T6 = Singular.Ideal(S, [change_ring(x, S) for x in gens(H)])
 
         println("test standard: ", equalitytest(T0, T6))
-
         if !(isequal(T6, T0))
             test_successfull = false
         end
     end
-    println("All tests were: ", test_successfull)
+
+
+if case == 7 || case == 99
+    R, (v, u, t, z, y) = Singular.PolynomialRing(
+        Singular.QQ,
+        ["v", "u", "t", "z", "y"],
+        ordering = Singular.ordering_M(
+            ordering_as_matrix([1, 1, 1, 1, 1], :lex),
+        ),
+    )
+
+    f1 = 2 * y^2 + 2 * z^2 + 2 * t^2 + 2 * u^2 + v^2 - v
+    f2 =  2*z*y + 2 * z * t + 2 * t * u + 2 * u * v - u
+    f3 =  2 * y * t + 2 * z * u + 2*u^2 + 2 * t * v - t
+    f4 =  2 * y * u + 2 * t * u + 2 * z * v - z
+    f5 =  2 * y + 2 * z + 2 * t + 2 * u + v - 1
+
+    I = Singular.Ideal(R, [f1, f2, f3, f4, f5])
+    I = Singular.std(I, complete_reduction = true)
+
+    @time H = groebnerwalk(
+        I,
+        ordering_as_matrix([1, 1, 1, 1, 1], :lex),
+        ordering_as_matrix(:lex, 5),
+        :pertubed,
+        5,
+    )
+    @time J = groebnerwalk(
+        I,
+        ordering_as_matrix([1, 1, 1, 1, 1], :lex),
+        ordering_as_matrix(:lex, 5),
+        :fractal_lex,
+        5,
+    )
+
+    S, V = Singular.PolynomialRing(
+        Singular.QQ,
+        ["v", "u", "t", "z", "y"],
+        ordering = Singular.ordering_M(ordering_as_matrix(:lex, 5)),
+    )
+    T0 = Singular.Ideal(S, [change_ring(x, S) for x in gens(J)])
+    T6 = Singular.Ideal(S, [change_ring(x, S) for x in gens(H)])
+
+    println("test standard: ", equalitytest(T0, T6))
+    if !(isequal(T6, T0))
+        test_successfull = false
+    end
+end
+
+if case == 8 || case == 99
+
+    #cyclic 9
+    R, (z0,z1,z2, z3, z4, z5, z6, z7, z8) = Singular.PolynomialRing(
+        Singular.QQ,
+        ["z0", "z1", "z2", "z3", "z4", "z5", "z6", "z7", "z8"],
+        ordering = Singular.ordering_M(
+            ordering_as_matrix([1, 1, 1, 1, 1,1,1,1,1], :lex),
+        ),
+    )
+
+    I = Singular.Ideal(R, [f1, f2, f3, f4, f5,f6,f7,f8,f9])
+    I = Singular.std(I, complete_reduction = true)
+
+    @time H = groebnerwalk(
+        I,
+        ordering_as_matrix([1, 1, 1, 1, 1,1,1,1,1], :lex),
+        ordering_as_matrix(:lex, 9),
+        :pertubed,
+        5,
+    )
+    @time J = groebnerwalk(
+        I,
+        ordering_as_matrix([1, 1, 1, 1, 1,1,1,1], :lex),
+        ordering_as_matrix(:lex, 9),
+        :fractal_lex,
+        5,
+    )
+
+    S, V = Singular.PolynomialRing(
+        Singular.QQ,
+        ["z0", "z1", "z2", "z3", "z4", "z5", "z6", "z7", "z8"],
+        ordering = Singular.ordering_M(ordering_as_matrix(:lex, 9)),
+    )
+    T0 = Singular.Ideal(S, [change_ring(x, S) for x in gens(J)])
+    T6 = Singular.Ideal(S, [change_ring(x, S) for x in gens(H)])
+
+    println("test standard: ", equalitytest(T0, T6))
+    if !(isequal(T6, T0))
+        test_successfull = false
+    end
+end
+
+println("All tests were: ", test_successfull)
 end

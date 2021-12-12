@@ -14,7 +14,6 @@ function representation_vector(G::Singular.sideal, T::Matrix{Int64})
     end
     d0 = 0
     for g in Singular.gens(G)
-        #        println(g, " in tedeg", tdeg(g))
         temp = deg(g, n)
         if d0 < temp
             d0 = temp

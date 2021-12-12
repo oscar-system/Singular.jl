@@ -6,15 +6,15 @@ include("GroebnerWalkUtilitysFinal.jl")
 
 #Return the facet_facet_facet_initials of polynomials w.r.t. a weight vector.
 function facet_initials(
-    R::Singular.PolyRing,
     G::Singular.sideal,
-    v::Vector{Int64},
     lm::Vector{spoly{L}},
+    v::Vector{Int64},
 ) where {L<:Nemo.RingElem}
-    initials = []
+    Rn = base_ring(G)
+    initials = Array{Singular.elem_type(Rn),1}(undef, 0)
     count = 1
     for g in Singular.gens(G)
-        inw = Singular.MPolyBuildCtx(R)
+        inw = Singular.MPolyBuildCtx(Rn)
         el = first(Singular.exponent_vectors(lm[count]))
         for (e, c) in
             zip(Singular.exponent_vectors(g), Singular.coefficients(g))
@@ -27,6 +27,24 @@ function facet_initials(
         count += 1
     end
     return initials
+end
+
+#Return the difference of the exponents of the leading terms (Lm) and the
+#exponent vectors of the tail of all polynomials of the ideal.
+function difference_lead_tail(
+    I::Singular.sideal,
+    Lm::Vector{spoly{L}},
+) where {L<:Nemo.RingElem}
+    v = Vector{Int}[]
+    for i = 1:ngens(I)
+        ltu = Singular.leading_exponent_vector(Lm[i])
+        for e in Singular.exponent_vectors(gens(I)[i])
+            if ltu != e
+                push!(v, ltu .- e)
+            end
+        end
+    end
+    return unique!(v)
 end
 
 #
@@ -63,18 +81,18 @@ function lift_generic(
     Lm::Vector{Singular.spoly{L}},
     H::Singular.sideal,
 ) where {L<:Nemo.RingElem}
-    S = base_ring(G)
-    Newlm = Array{Singular.elem_type(S),1}(undef, 0)
-    liftPolys = Array{Singular.elem_type(S),1}(undef, 0)
+    Rn = base_ring(G)
+    Newlm = Array{Singular.elem_type(Rn),1}(undef, 0)
+    liftPolys = Array{Singular.elem_type(Rn),1}(undef, 0)
     for g in Singular.gens(H)
-        r, b = reduce_recursive(g, gens(G), Lm, S)
+        r, b = modulo(g, gens(G), Lm)
         diff = g - r
         if diff != 0
             push!(Newlm, Singular.leading_term(g))
             push!(liftPolys, diff)
         end
     end
-    return liftPolys, Newlm, S
+    return liftPolys, Newlm
 end
 
 function filter_btz(S::Matrix{Int64}, V::Vector{Vector{Int64}})
@@ -203,7 +221,7 @@ function less_facet(
 end
 
 #returns divrem()
-function divrem(p::Singular.spoly, lm::Singular.spoly, S::Singular.PolyRing)
+function divremGW(p::Singular.spoly, lm::Singular.spoly, S::Singular.PolyRing)
     div = false
     newpoly = Singular.MPolyBuildCtx(S)
     for term in Singular.terms(p)
@@ -220,17 +238,17 @@ function divrem(p::Singular.spoly, lm::Singular.spoly, S::Singular.PolyRing)
     return (finish(newpoly), div)
 end
 
-function reduce_recursive(
+function modulo(
     p::Singular.spoly,
     G::Vector{spoly{L}},
     Lm::Vector{spoly{L}},
-    R::Singular.PolyRing,
     c::Bool = false,
 ) where {L<:Nemo.RingElem}
     I = 0
+    R = parent(p)
     Q = zero(R)
     for i = 1:length(G)
-        (q, b) = divrem(p, Lm[i], R)
+        (q, b) = divremGW(p, Lm[i], R)
         if b
             I = i
             Q = q
@@ -238,7 +256,7 @@ function reduce_recursive(
         end
     end
     if I != 0
-        r, b = reduce_recursive(p - (Q * G[I]), G, Lm, R)
+        r, b = modulo(p - (Q * G[I]), G, Lm)
         return r, true
     else
         return p, false
@@ -246,30 +264,29 @@ function reduce_recursive(
 end
 
 function interreduce(
-    G::Singular.sideal,
+    G::Vector{spoly{L}},
     Lm::Vector{spoly{L}},
 ) where {L<:Nemo.RingElem}
-    R = Singular.base_ring(G)
-    gens = collect(Singular.gens(G))
+    Rn = parent(first(G))
     changed = true
     while changed
         changed = false
-        for i = 1:Singular.ngens(G)
-            gensrest = Array{Singular.elem_type(R),1}(undef, 0)
-            Lmrest = Array{Singular.elem_type(R),1}(undef, 0)
-            for j = 1:Singular.ngens(G)
+        for i = 1:Singular.length(G)
+            gensrest = Array{Singular.elem_type(Rn),1}(undef, 0)
+            Lmrest = Array{Singular.elem_type(Rn),1}(undef, 0)
+            for j = 1:length(G)
                 if i != j
-                    push!(gensrest, gens[j])
+                    push!(gensrest, G[j])
                     push!(Lmrest, Lm[j])
                 end
             end
-            r, b = reduce_recursive(gens[i], gensrest, Lmrest, R)
+            r, b = modulo(G[i], gensrest, Lmrest)
             if b
                 changed = true
-                gens[i] = r
+                G[i] = r
                 break
             end
         end
     end
-    return Singular.Ideal(R, [R(p) for p in gens])
+    return G
 end
