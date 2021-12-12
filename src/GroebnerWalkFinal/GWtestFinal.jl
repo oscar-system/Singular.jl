@@ -19,38 +19,38 @@ function test(case::Int)
 
         S, V = Singular.PolynomialRing(Singular.QQ, ["x", "y"], ordering = :lex)
 
-        @time H = groebnerwalk(
+        @time T = groebnerwalk(
             I,
             ordering_as_matrix(:degrevlex, 2),
             ordering_as_matrix(:lex, 2),
             :tran,
         )
-        @time J = groebnerwalk(
+        @time F = groebnerwalk(
             I,
             ordering_as_matrix(:degrevlex, 2),
             ordering_as_matrix(:lex, 2),
             :fractal,
         )
-        @time JJ = groebnerwalk(
+        @time FA = groebnerwalk(
             I,
             ordering_as_matrix(:degrevlex, 2),
             ordering_as_matrix(:lex, 2),
             :fractal_look_ahead,
         )
-        @time L = groebnerwalk(
+        @time St = groebnerwalk(
             I,
             ordering_as_matrix(:degrevlex, 2),
             ordering_as_matrix(:lex, 2),
             :standard,
         )
-        @time K = groebnerwalk(
+        @time Pe = groebnerwalk(
             I,
             ordering_as_matrix(:degrevlex, 2),
             ordering_as_matrix(:lex, 2),
             :pertubed,
             2,
         )
-        @time M = groebnerwalk(
+        @time Ge = groebnerwalk(
             I,
             ordering_as_matrix(:degrevlex, 2),
             ordering_as_matrix(:lex, 2),
@@ -60,19 +60,19 @@ function test(case::Int)
             Singular.Ideal(S, [change_ring(x, S) for x in gens(I)]),
             complete_reduction = true,
         )
-        T1 = Singular.Ideal(S, [change_ring(x, S) for x in gens(J)])
-        T2 = Singular.Ideal(S, [change_ring(x, S) for x in gens(K)])
-        T3 = Singular.Ideal(S, [change_ring(x, S) for x in gens(L)])
-        T4 = Singular.Ideal(S, [change_ring(x, S) for x in gens(M)])
-        T5 = Singular.Ideal(S, [change_ring(x, S) for x in gens(JJ)])
-        T6 = Singular.Ideal(S, [change_ring(x, S) for x in gens(H)])
+        T1 = Singular.Ideal(S, [change_ring(x, S) for x in gens(T)])
+        T2 = Singular.Ideal(S, [change_ring(x, S) for x in gens(F)])
+        T3 = Singular.Ideal(S, [change_ring(x, S) for x in gens(FA)])
+        T4 = Singular.Ideal(S, [change_ring(x, S) for x in gens(St)])
+        T5 = Singular.Ideal(S, [change_ring(x, S) for x in gens(Pe)])
+        T6 = Singular.Ideal(S, [change_ring(x, S) for x in gens(Ge)])
 
-        println("test tran: ", equalitytest(T0, T6))
-        println("test fractal: ", equalitytest(T0, T5))
-        println("test fractal: ", equalitytest(T0, T1))
-        println("test pertubed: ", equalitytest(T2, T0))
-        println("test standard: ", equalitytest(T3, T0))
-        println("test generic: ", equalitytest(T4, T0))
+        println("test tran: ", equalitytest(T0, T1))
+        println("test fractal: ", equalitytest(T0, T2))
+        println("test fractal: ", equalitytest(T0, T3))
+        println("test pertubed: ", equalitytest(T5, T0))
+        println("test standard: ", equalitytest(T4, T0))
+        println("test generic: ", equalitytest(T6, T0))
 
         if !(
             equalitytest(T2, T1) &&
@@ -97,38 +97,38 @@ function test(case::Int)
         I = Singular.Ideal(R, [f1, f2])
 
         I = Singular.std(I, complete_reduction = true)
-        @time H = groebnerwalk(
+        @time T = groebnerwalk(
             I,
             ordering_as_matrix([5, 4, 1], :deglex),
             ordering_as_matrix([6, 1, 3], :lex),
             :tran,
         )
-        @time J = groebnerwalk(
+        @time F = groebnerwalk(
             I,
             ordering_as_matrix([5, 4, 1], :deglex),
             ordering_as_matrix([6, 1, 3], :lex),
             :fractal,
         )
-        @time JJ = groebnerwalk(
+        @time FA = groebnerwalk(
             I,
             ordering_as_matrix([5, 4, 1], :deglex),
             ordering_as_matrix([6, 1, 3], :lex),
             :fractal_look_ahead,
         )
-        @time K = groebnerwalk(
+        @time Pe = groebnerwalk(
             I,
             ordering_as_matrix([5, 4, 1], :deglex),
             ordering_as_matrix([6, 1, 3], :lex),
             :pertubed,
             3,
         )
-        @time L = groebnerwalk(
+        @time St = groebnerwalk(
             I,
             ordering_as_matrix([5, 4, 1], :deglex),
             ordering_as_matrix([6, 1, 3], :lex),
             :standard,
         )
-        @time M = groebnerwalk(
+        @time Ge = groebnerwalk(
             I,
             ordering_as_matrix([5, 4, 1], :deglex),
             ordering_as_matrix([6, 1, 3], :lex),
@@ -145,20 +145,19 @@ function test(case::Int)
             Singular.Ideal(S, [change_ring(x, S) for x in gens(I)]),
             complete_reduction = true,
         )
-        T1 = Singular.Ideal(S, [change_ring(x, S) for x in gens(J)])
-        T2 = Singular.Ideal(S, [change_ring(x, S) for x in gens(K)])
-        T3 = Singular.Ideal(S, [change_ring(x, S) for x in gens(L)])
-        T4 = Singular.Ideal(S, [change_ring(x, S) for x in gens(M)])
-        T5 = Singular.Ideal(S, [change_ring(x, S) for x in gens(JJ)])
-        T6 = Singular.Ideal(S, [change_ring(x, S) for x in gens(H)])
+        T1 = Singular.Ideal(S, [change_ring(x, S) for x in gens(T)])
+        T2 = Singular.Ideal(S, [change_ring(x, S) for x in gens(F)])
+        T3 = Singular.Ideal(S, [change_ring(x, S) for x in gens(FA)])
+        T4 = Singular.Ideal(S, [change_ring(x, S) for x in gens(St)])
+        T5 = Singular.Ideal(S, [change_ring(x, S) for x in gens(Pe)])
+        T6 = Singular.Ideal(S, [change_ring(x, S) for x in gens(Ge)])
 
-        println("test tran: ", equalitytest(T0, T6))
-        println("test fractal2: ", equalitytest(T0, T5))
-        println("test fractal: ", equalitytest(T0, T1))
-        println("test pertubed: ", equalitytest(T2, T0))
-        println("test standard: ", equalitytest(T3, T0))
-        println("test generic: ", equalitytest(T4, T0))
-
+        println("test tran: ", equalitytest(T0, T1))
+        println("test fractal: ", equalitytest(T0, T2))
+        println("test fractal: ", equalitytest(T0, T3))
+        println("test pertubed: ", equalitytest(T5, T0))
+        println("test standard: ", equalitytest(T4, T0))
+        println("test generic: ", equalitytest(T6, T0))
         if !(
             equalitytest(T2, T1) &&
             equalitytest(T3, T4) &&
@@ -296,40 +295,40 @@ function test(case::Int)
         I = Singular.Ideal(R, [f1, f2, f3, f4])
         I = Singular.std(I, complete_reduction = true)
 
-        @time H = groebnerwalk(
+        @time T = groebnerwalk(
             I,
             ordering_as_matrix(:degrevlex, 4),
             ordering_as_matrix(:lex, 4),
             :tran,
         )
-        @time J = groebnerwalk(
+        @time F = groebnerwalk(
             I,
             ordering_as_matrix(:degrevlex, 4),
             ordering_as_matrix(:lex, 4),
             :fractal_lex,
         )
-        
-        @time JJ = groebnerwalk(
+
+        @time Fa = groebnerwalk(
             I,
             ordering_as_matrix(:degrevlex, 4),
             ordering_as_matrix(:lex, 4),
             :fractal_look_ahead,
         )
 
-        @time K = groebnerwalk(
+        @time Pe = groebnerwalk(
             I,
             ordering_as_matrix(:degrevlex, 4),
             ordering_as_matrix(:lex, 4),
             :pertubed,
             4,
         )
-        @time L = groebnerwalk(
+        @time St = groebnerwalk(
             I,
             ordering_as_matrix(:degrevlex, 4),
             ordering_as_matrix(:lex, 4),
-            :fractal,
+            :standard,
         )
-        @time M = groebnerwalk(
+        @time Ge = groebnerwalk(
             I,
             ordering_as_matrix(:degrevlex, 4),
             ordering_as_matrix(:lex, 4),
@@ -347,20 +346,19 @@ function test(case::Int)
             Singular.Ideal(S, [change_ring(x, S) for x in gens(I)]),
             complete_reduction = true,
         )
-        T1 = Singular.Ideal(S, [change_ring(x, S) for x in gens(J)])
-        T2 = Singular.Ideal(S, [change_ring(x, S) for x in gens(K)])
-        T3 = Singular.Ideal(S, [change_ring(x, S) for x in gens(L)])
-        T4 = Singular.Ideal(S, [change_ring(x, S) for x in gens(M)])
-        T5 = Singular.Ideal(S, [change_ring(x, S) for x in gens(JJ)])
-        T6 = Singular.Ideal(S, [change_ring(x, S) for x in gens(H)])
+        T1 = Singular.Ideal(S, [change_ring(x, S) for x in gens(T)])
+        T2 = Singular.Ideal(S, [change_ring(x, S) for x in gens(F)])
+        T3 = Singular.Ideal(S, [change_ring(x, S) for x in gens(Fa)])
+        T4 = Singular.Ideal(S, [change_ring(x, S) for x in gens(St)])
+        T5 = Singular.Ideal(S, [change_ring(x, S) for x in gens(Pe)])
+        T6 = Singular.Ideal(S, [change_ring(x, S) for x in gens(Ge)])
 
-        println("test tran: ", equalitytest(T0, T6))
-        println("test fractal: ", equalitytest(T0, T1))
-        println("test fractal2: ", equalitytest(T0, T5))
-        println("test pertubed: ", equalitytest(T2, T0))
-        println("test standard: ", equalitytest(T3, T0))
-        println("test generic: ", Singular.equal(T4, T0))
-
+        println("test tran: ", equalitytest(T0, T1))
+        println("test fractal: ", equalitytest(T0, T2))
+        println("test fractal: ", equalitytest(T0, T3))
+        println("test pertubed: ", equalitytest(T5, T0))
+        println("test standard: ", equalitytest(T4, T0))
+        println("test generic: ", equalitytest(T6, T0))
 
         if !(
             equalitytest(T2, T1) &&
@@ -391,63 +389,63 @@ function test(case::Int)
             ordering = :lex,
         )
 
-        @time H = groebnerwalk(
+        @time T = groebnerwalk(
             I,
             ordering_as_matrix(:degrevlex, 3),
             ordering_as_matrix(:lex, 3),
             :tran,
         )
-        @time J = groebnerwalk(
+        @time F = groebnerwalk(
             I,
             ordering_as_matrix(:degrevlex, 3),
             ordering_as_matrix(:lex, 3),
             :fractal,
         )
-        @time JJ = groebnerwalk(
+        @time FA = groebnerwalk(
             I,
             ordering_as_matrix(:degrevlex, 3),
             ordering_as_matrix(:lex, 3),
             :fractal_look_ahead,
         )
 
-        @time L = groebnerwalk(
+        @time St = groebnerwalk(
             I,
             ordering_as_matrix(:degrevlex, 3),
             ordering_as_matrix(:lex, 3),
-            :fractal_lex,
+            :standard,
         )
-        @time K = groebnerwalk(
+        @time Pe = groebnerwalk(
             I,
             ordering_as_matrix(:degrevlex, 3),
             ordering_as_matrix(:lex, 3),
             :pertubed,
             3,
         )
-        @time M = groebnerwalk(
+        @time Ge = groebnerwalk(
             I,
             ordering_as_matrix(:degrevlex, 3),
             ordering_as_matrix(:lex, 3),
             :generic,
         )
-        T1 = Singular.Ideal(S, [change_ring(x, S) for x in gens(J)])
-        T2 = Singular.Ideal(S, [change_ring(x, S) for x in gens(K)])
-        T3 = Singular.Ideal(S, [change_ring(x, S) for x in gens(L)])
-        T4 = Singular.Ideal(S, [change_ring(x, S) for x in gens(M)])
-        T5 = Singular.Ideal(S, [change_ring(x, S) for x in gens(JJ)])
 
         @time T0 = Singular.std(
             Singular.Ideal(S, [change_ring(x, S) for x in gens(I)]),
             complete_reduction = true,
         )
-        T6 = Singular.Ideal(S, [change_ring(x, S) for x in gens(H)])
 
-        println("test tran: ", equalitytest(T0, T6))
-        println("test fractal2: ", equalitytest(T0, T5))
-        println("test fractal: ", equalitytest(T0, T1))
-        println("test pertubed: ", equalitytest(T2, T0))
-        println("test standard: ", equalitytest(T3, T0))
-        println("test generic: ", Singular.equal(T4, T0))
+        T1 = Singular.Ideal(S, [change_ring(x, S) for x in gens(T)])
+        T2 = Singular.Ideal(S, [change_ring(x, S) for x in gens(F)])
+        T3 = Singular.Ideal(S, [change_ring(x, S) for x in gens(FA)])
+        T4 = Singular.Ideal(S, [change_ring(x, S) for x in gens(St)])
+        T5 = Singular.Ideal(S, [change_ring(x, S) for x in gens(Pe)])
+        T6 = Singular.Ideal(S, [change_ring(x, S) for x in gens(Ge)])
 
+        println("test tran: ", equalitytest(T0, T1))
+        println("test fractal: ", equalitytest(T0, T2))
+        println("test fractal: ", equalitytest(T0, T3))
+        println("test pertubed: ", equalitytest(T5, T0))
+        println("test standard: ", equalitytest(T4, T0))
+        println("test generic: ", equalitytest(T6, T0))
         if !(
             equalitytest(T2, T1) &&
             equalitytest(T3, T6) &&
