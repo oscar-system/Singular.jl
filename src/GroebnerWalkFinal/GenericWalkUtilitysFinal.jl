@@ -268,9 +268,6 @@ function interreduce(
     Lm::Vector{spoly{L}},
 ) where {L<:Nemo.RingElem}
     Rn = parent(first(G))
-    changed = true
-    while changed
-        changed = false
         for i = 1:Singular.length(G)
             gensrest = Array{Singular.elem_type(Rn),1}(undef, 0)
             Lmrest = Array{Singular.elem_type(Rn),1}(undef, 0)
@@ -282,11 +279,8 @@ function interreduce(
             end
             r, b = modulo(G[i], gensrest, Lmrest)
             if b
-                changed = true
                 G[i] = r
-                break
             end
-        end
     end
     return G
 end

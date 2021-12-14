@@ -261,7 +261,7 @@ function test(case::Int)
             I,
             ordering_as_matrix([1, 1, 1, 1, 1, 1], :lex),
             ordering_as_matrix(:lex, 6),
-            :fractal,
+            :generic,
             5,
         )
 
@@ -303,13 +303,13 @@ if case == 7 || case == 99
         ordering_as_matrix([1, 1, 1, 1, 1], :lex),
         ordering_as_matrix(:lex, 5),
         :pertubed,
-        5,
+        4,
     )
     @time J = groebnerwalk(
         I,
         ordering_as_matrix([1, 1, 1, 1, 1], :lex),
         ordering_as_matrix(:lex, 5),
-        :fractal_lex,
+        :tran,
         5,
     )
 
