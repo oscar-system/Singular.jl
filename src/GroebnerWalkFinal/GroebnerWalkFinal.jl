@@ -205,7 +205,7 @@ function pertubed_walk(
     T::Matrix{Int64},
     p::Int64,
 )
-    #cweight = pert_Vectors(G, S, p)
+    #cweight = pertubed_vector(G, S, p)
     cweight = S[1, :]
     terminate = false
     println("pertubed_walk results")
@@ -569,6 +569,10 @@ function tran_walk(G::Singular.sideal, S::Matrix{Int64}, T::Matrix{Int64})
     terminate = false
     while !terminate
         w = next_weight(G, cweight, tweight)
+        if tryparse(string(w), Int32) == nothing
+            println("w bigger than int32")
+            return G
+        end
         Rn= change_order(R, w, T)
         if w == tweight
             if inCone(G, T, cweight)
