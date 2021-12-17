@@ -83,9 +83,9 @@ function groebnerwalk(
             )
     elseif grwalktype == :tran
         walk = (x, y, z) -> tran_walk(x, y, z)
-    elseif grwalktype == :alternative
+    elseif grwalktype == :fractal_combined
         walk =
-            (x, y, z) -> alternative_algorithm_top(
+            (x, y, z) -> fractal_combined(
                 x,
                 MonomialOrder(S, S[1, :], [0]),
                 MonomialOrder(T, T[1, :], T[1, :]),
@@ -552,6 +552,96 @@ function fractal_walk_look_ahead_recursiv(
     return G
 end
 
+
+
+
+function fractal_walk_combined(
+    G::Singular.sideal,
+    S::MonomialOrder{Matrix{Int64},Vector{Int64}},
+    T::MonomialOrder{Matrix{Int64},Vector{Int64}},
+)
+    global PertVecs =
+        [pertubed_vector(G, T, i) for i = 1:nvars(Singular.base_ring(G))]
+    println("fractal_walk_withStartorder results")
+    println("Crossed Cones in: ")
+    Gb = fractal_walk_combined(G, S, T, PertVecs, 1)
+    println("Cones crossed: ", deleteCounterFr())
+    return Gb
+end
+
+function fractal_walk_combined(
+    G::Singular.sideal,
+    S::MonomialOrder{Matrix{Int64},Vector{Int64}},
+    T::MonomialOrder{Matrix{Int64},Vector{Int64}},
+    PertVecs::Vector{Vector{Int64}},
+    p::Int64,
+)
+    R = Singular.base_ring(G)
+    terminate = false
+    G.isGB = true
+    if (p == 1)
+        if !isMonomial(initials(R, Singular.gens(G), S.w))
+            global cwPert = [pertubed_vector(G, S, S.w, i) for i = 1:nvars(R)]
+            global firstStepMode = true
+        end
+    end
+    if firstStepMode
+        w = cwPert[p]
+    else
+        w = S.w
+    end
+    while !terminate
+        t = nextT(G, w, PertVecs[p])
+        if t == [0]
+            if inCone(G, T, PertVecs[p])
+                println(PertVecs[p], " in depth", p)
+                return G
+            else
+                global PertVecs = [pertubed_vector(G, T, i) for i = 1:nvars(R)]
+                continue
+            end
+        end
+        if t == 1 && p==1
+            return fractal_walk_combined(
+                G,
+                S,
+                T,
+                PertVecs,
+                p + 1,
+            )
+        else
+        w = w + t * (PertVecs[p] - w)
+        w = convert_bounding_vector(w)
+        T.w = w
+        b = w
+        Rn = change_order(R, T)
+        Gw = initials(R, gens(G), w)
+        if (p == Singular.nvars(R) || isbinomial(Gw))
+            H = Singular.std(
+                Singular.Ideal(Rn, [change_ring(x, Rn) for x in Gw]),
+                complete_reduction = true,
+            )
+            println(w, " in depth", p)
+            raiseCounterFr()
+        else
+            println("up in: ", p, " with: ", w)
+            H = fractal_walk_combined(
+                Singular.Ideal(R, [x for x in Gw]),
+                S,
+                T,
+                PertVecs,
+                p + 1,
+            )
+            global firstStepMode = false
+        end
+    end
+        H = liftGW2(G, R, Gw, H, Rn)
+        #H = lift(G, R, H, Rn)
+        G = Singular.std(H, complete_reduction = true)
+        R = Rn
+    end
+    return G
+end
 ###############################################################
 #Tran-version of the groebner walk by Tran (2002)
 ###############################################################
