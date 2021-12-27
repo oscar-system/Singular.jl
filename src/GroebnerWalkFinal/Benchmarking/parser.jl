@@ -4,7 +4,7 @@ using CSV
 using DataFrames
 
 function parseideal()
-    csv_reader = CSV.File("Beispiele4Variablen.txt")
+    csv_reader = CSV.File("Beispiele3Variablen.txt")
     for row in csv_reader
         poly = collect(split("$(row.generator)", ""))
         result = ""
@@ -42,7 +42,7 @@ function parseideal()
             end
         end
         df = DataFrame(generator = result)
-        savea(df, "cBeispiele4Variablen.txt")
+        savea(df, "cBeispiele3Variablen.txt")
         cd("/Users/JordiWelp/Results/1ideals")
 
     end

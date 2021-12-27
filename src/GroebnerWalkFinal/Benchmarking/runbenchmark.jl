@@ -1,3 +1,249 @@
+using BenchmarkTools
+
+function prepare()
+df = DataFrame(
+    weights = ["weights"],
+    weight = ["weight"],
+    nGens = ["nGens"],
+    initials = ["initials"],
+    stdh = ["stdh"],
+    liftGW2 = ["liftGW2"],
+    lift2 = ["lift2"],
+    interred = ["interred"],
+    example = ["example"],
+)
+savew(df, "standardWalk.txt")
+df = DataFrame(
+    weights = ["weights"],
+    weight = ["weight"],
+    nGens = ["nGens"],
+    initials = ["initials"],
+    stdh = ["stdh"],
+    liftGW2 = ["liftGW2"],
+    lift2 = ["lift2"],
+    interred = ["interred"],
+    pert = ["pert"],
+    inCone = ["inCone"],
+    laststd = ["laststd"],
+    degree = ["degree"],
+    example = ["example"],
+)
+savew(df, "pertubedWalk2.txt")
+df = DataFrame(
+    weights = ["weights"],
+    weight = ["weight"],
+    nGens = ["nGens"],
+    initials = ["initials"],
+    stdh = ["stdh"],
+    liftGW2 = ["liftGW2"],
+    lift2 = ["lift2"],
+    interred = ["interred"],
+    pert = ["pert"],
+    inCone = ["inCone"],
+    laststd = ["laststd"],
+    degree = ["degree"],
+    example = ["example"],
+)
+savew(df, "pertubedWalk3.txt")
+df = DataFrame(
+    weights = ["weights"],
+    weight = ["weight"],
+    nGens = ["nGens"],
+    initials = ["initials"],
+    stdh = ["stdh"],
+    liftGW2 = ["liftGW2"],
+    lift2 = ["lift2"],
+    interred = ["interred"],
+    pert = ["pert"],
+    inCone = ["inCone"],
+    laststd = ["laststd"],
+    degree = ["degree"],
+    example = ["example"],
+)
+savew(df, "pertubedWalk4.txt")
+df = DataFrame(
+    weights = ["weights"],
+    weight = ["weight"],
+    nGens = ["nGens"],
+    initials = ["initials"],
+    stdh = ["stdh"],
+    liftGW2 = ["liftGW2"],
+    lift2 = ["lift2"],
+    interred = ["interred"],
+    pert = ["pert"],
+    inCone = ["inCone"],
+    laststd = ["laststd"],
+    degree = ["degree"],
+    example = ["example"],
+)
+savew(df, "pertubedWalk5.txt")
+df = DataFrame(
+    weights = ["weights"],
+    weight = ["weight"],
+    nGens = ["nGens"],
+    initials = ["initials"],
+    stdh = ["stdh"],
+    liftGW2 = ["liftGW2"],
+    lift2 = ["lift2"],
+    interred = ["interred"],
+    pert = ["pert"],
+    inCone = ["inCone"],
+    laststd = ["laststd"],
+    degree = ["degree"],
+    example = ["example"],
+)
+savew(df, "pertubedWalk6.txt")
+df = DataFrame(
+    weights = ["weights"],
+    weight = ["weight"],
+    nGens = ["nGens"],
+    initials = ["initials"],
+    stdh = ["stdh"],
+    liftGW2 = ["liftGW2"],
+    lift2 = ["lift2"],
+    interred = ["interred"],
+    pert = ["pert"],
+    inCone = ["inCone"],
+    laststd = ["laststd"],
+    degree = ["degree"],
+    example = ["example"],
+)
+savew(df, "pertubedWalk7.txt")
+df = DataFrame(
+    weights = ["weights"],
+    weight = ["weight"],
+    nGens = ["nGens"],
+    initials = ["initials"],
+    stdh = ["stdh"],
+    liftGW2 = ["liftGW2"],
+    lift2 = ["lift2"],
+    interred = ["interred"],
+    pert = ["pert"],
+    inCone = ["inCone"],
+    laststd = ["laststd"],
+    degree = ["degree"],
+    example = ["example"],
+)
+savew(df, "pertubedWalk8.txt")
+df = DataFrame(
+    weights = ["weights"],
+    weight = ["weight"],
+    nGens = ["nGens"],
+    initials = ["initials"],
+    stdh = ["stdh"],
+    liftGW2 = ["liftGW2"],
+    lift2 = ["lift2"],
+    interred = ["interred"],
+    pert = ["pert"],
+    inCone = ["inCone"],
+    laststd = ["laststd"],
+    degree = ["degree"],
+    example = ["example"],
+)
+savew(df, "pertubedWalk9.txt")
+df = DataFrame(
+    weights = ["weights"],
+    weight = ["weight"],
+    nGens = ["nGens"],
+    initials = ["initials"],
+    stdh = ["stdh"],
+    liftGW2 = ["liftGW2"],
+    lift2 = ["lift2"],
+    interred = ["interred"],
+    pert = ["pert"],
+    inCone = ["inCone"],
+    laststd = ["laststd"],
+    degree = ["degree"],
+    example = ["example"],
+)
+savew(df, "pertubedWalk10.txt")
+df = DataFrame(
+    weights = ["weights"],
+    facetnormal = ["-"],
+    initials = ["initials"],
+    stdh = ["stdh"],
+    liftgeneric = ["liftgeneric"],
+    interred = ["interred"],
+    example = ["example"],
+)
+savew(df, "genericWalk.txt")
+
+df = DataFrame(
+    weights = ["weights"],
+    weight = ["weight"],
+    nGens = ["nGens"],
+    initials = ["initials"],
+    stdh = ["stdh"],
+    lift2 = ["lift2"],
+    lift = ["lift"],
+    interred = ["interred"],
+    inCone = ["inCone"],
+    pertvec = ["pertvec"],
+    depth = ["depth"],
+    example = ["example"],
+)
+savew(df, "fractalWalk.txt")
+df = DataFrame(
+    weights = ["weights"],
+    weight = ["weight"],
+    nGens = ["nGens"],
+    initials = ["initials"],
+    stdh = ["stdh"],
+    lift2 = ["lift2"],
+    lift = ["lift"],
+    interred = ["interred"],
+    inCone = ["inCone"],
+    pertvec = ["pertvec"],
+    depth = ["depth"],
+    example = ["example"],
+)
+savew(df, "fractalWalklex.txt")
+df = DataFrame(
+    weights = ["weights"],
+    weight = ["weight"],
+    nGens = ["nGens"],
+    initials = ["initials"],
+    stdh = ["stdh"],
+    lift2 = ["lift2"],
+    lift = ["lift"],
+    interred = ["interred"],
+    inCone = ["inCone"],
+    pertvec = ["pertvec"],
+    depth = ["depth"],
+    example = ["example"],
+)
+savew(df, "fractalWalklookahead.txt")
+df = DataFrame(
+    weights = ["weights"],
+    weight = ["weight"],
+    nGens = ["nGens"],
+    initials = ["initials"],
+    stdh = ["stdh"],
+    lift2 = ["lift2"],
+    lift = ["lift"],
+    interred = ["interred"],
+    inCone = ["inCone"],
+    pertvec = ["pertvec"],
+    depth = ["depth"],
+    example = ["example"],
+)
+savew(df, "fractalWalkcombined.txt")
+df = DataFrame(
+    weights = "weights",
+    weight = "weight",
+    nGens = ["nGens"],
+    initials = ["initials"],
+    stdh = ["stdh"],
+    liftGW2 = ["liftGW2"],
+    lift2 = ["lift2"],
+    interred = ["interred"],
+    rep = ["rep"],
+    inCone = ["inCone"],
+    inseveral = ["inseveral"],
+    example = ["example"],
+)
+savew(df, "tranWalk.txt")
+end
 function runb(
     v::String,
     ideal::Singular.sideal,
@@ -236,6 +482,7 @@ function runb(
     df = DataFrame(
         weights = "-",
         weight = "-",
+        nGens = ["-"],
         initials = ["-"],
         stdh = ["-"],
         liftGW2 = ["-"],
@@ -249,8 +496,8 @@ function runb(
     savea(df, "tranWalk.txt")
 
 
-
-    @time I = Singular.std(ideal, complete_reduction = true)
+    stime =@belapsed Singular.std($ideal, complete_reduction = true) evals = 1 samples = 1
+    I = Singular.std(ideal, complete_reduction = true)
     ideals = []
     for i = 2:nvars(S)
         push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :pertubed, i))
@@ -265,12 +512,19 @@ function runb(
     push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :tran))
 
     println("Computing GB")
+    ttime = @belapsed Singular.std(
+        Singular.Ideal($S, [change_ring(x, $S) for x in Singular.gens($ideal)]),
+        complete_reduction = true,
+    ) evals=1 samples =1
+
+    df = DataFrame(startTime = [stime], targetTime =[ttime], example=[v])
+    savea(df, "SingularComputationTimings")
     s = Singular.std(
         Singular.Ideal(S, [change_ring(x, S) for x in Singular.gens(ideal)]),
         complete_reduction = true,
     )
 
-    df = DataFrame(test1 = ["-"], test2 = ["-"], example = [v])
+    df = DataFrame(test1 = ["-"], test2 = ["-"], example = ["-"])
     savea(df, "correct.txt")
 
     println("Benchmark ideals")
@@ -280,7 +534,7 @@ function runb(
             s,
         )
         b = equalitytest(s, id)
-        df = DataFrame(a = [a], b = [b])
+        df = DataFrame(a = [a], b = [b],c=[v])
         savea(df, "correct.txt")
     end
 end
