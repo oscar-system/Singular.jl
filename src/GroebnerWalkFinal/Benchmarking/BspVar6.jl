@@ -2,6 +2,7 @@ include("/Users/JordiWelp/github/Singular.jl/src/GroebnerWalkFinal/Benchmarking/
 include("readWriteHelper.jl")
 include("parser.jl")
 include("runbenchmark.jl")
+include("/Users/JordiWelp/github/Singular.jl/src/GroebnerWalkFinal/Benchmarking/BenchmarkingAlg/runbenchmark2.jl")
 
 
 using DataFrames
@@ -9,7 +10,8 @@ using CSV
 
 function var6()
   cd("/Users/JordiWelp/Results")
-
+  prepare()
+  prepare2()
   dim = 6
   ve = [1, 1, 1, 1, 1, 1]
   StartOrd = ordering_as_matrix(ve, :lex)
@@ -471,6 +473,8 @@ function var6()
 
   for i in ideals
     runb("sparseid(3,0,5,100-(1*10),90)", i, S)
+    runb2("sparseid(3,0,5,100-(1*10),90)", i, S)
+
   end
   ideals = []
   push!(
@@ -1339,6 +1343,7 @@ function var6()
   )
   for i in ideals
     runb("sparseid(3,0,5,100-(2*10),90)", i, S)
+    runb2("sparseid(3,0,5,100-(2*10),90)", i, S)
   end
   ideals = []
   push!(
@@ -2621,6 +2626,7 @@ function var6()
   )
   for i in ideals
     runb("sparseid(3,0,5,100-(3*10),90)", i, S)
+    runb2("sparseid(3,0,5,100-(3*10),90)", i, S)
   end
   ideals = []
   push!(
@@ -4326,6 +4332,7 @@ function var6()
   )
   for i in ideals
     runb("sparseid(3,0,5,100-(4*10),90)", i, S)
+    runb2("sparseid(3,0,5,100-(4*10),90)", i, S)
   end
   ideals = []
 

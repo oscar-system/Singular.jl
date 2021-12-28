@@ -2,6 +2,7 @@ include("/Users/JordiWelp/github/Singular.jl/src/GroebnerWalkFinal/Benchmarking/
 include("readWriteHelper.jl")
 include("parser.jl")
 include("runbenchmark.jl")
+include("/Users/JordiWelp/github/Singular.jl/src/GroebnerWalkFinal/Benchmarking/BenchmarkingAlg/runbenchmark2.jl")
 
 
 using DataFrames
@@ -9,7 +10,8 @@ using CSV
 
 function benchmarkVar5()
     cd("/Users/JordiWelp/Results")
-
+    prepare()
+    prepare()
     dim = 5
     ve = [1, 1, 1, 1, 1]
     StartOrd = ordering_as_matrix(ve, :lex)
@@ -284,6 +286,7 @@ function benchmarkVar5()
     )
     for i in ideals
         runb("sparseid(3,0,5,100-(1*10),90)", i, S, StartOrd, TarOrd)
+        runb2("sparseid(3,0,5,100-(1*10),90)", i, S, StartOrd, TarOrd)
     end
     push!(
         ideals,
@@ -767,6 +770,7 @@ function benchmarkVar5()
     )
     for i in ideals
         runb("sparseid(3,0,5,100-(2*10),90)", i, S, StartOrd, TarOrd)
+        runb2("sparseid(3,0,5,100-(2*10),90)", i, S, StartOrd, TarOrd)
     end
     push!(
         ideals,
@@ -1481,6 +1485,7 @@ function benchmarkVar5()
     )
     for i in ideals
         runb("sparseid(3,0,5,100-(3*10),90)", i, S, StartOrd, TarOrd)
+        runb2("sparseid(3,0,5,100-(3*10),90)", i, S, StartOrd, TarOrd)
     end
     push!(
         ideals,
@@ -2420,6 +2425,7 @@ function benchmarkVar5()
     )
     for i in ideals
         runb("sparseid(3,0,5,100-(4*10),90)", i, S, StartOrd, TarOrd)
+        runb2("sparseid(3,0,5,100-(4*10),90)", i, S, StartOrd, TarOrd)
     end
     push!(
         ideals,
@@ -3587,6 +3593,7 @@ function benchmarkVar5()
     )
     for i in ideals
         runb("sparseid(3,0,5,100-(5*10),90)", i, S, StartOrd, TarOrd)
+        runb2("sparseid(3,0,5,100-(5*10),90)", i, S, StartOrd, TarOrd)
     end
     push!(
         ideals,
@@ -4976,6 +4983,7 @@ function benchmarkVar5()
     )
     for i in ideals
         runb("sparseid(3,0,5,100-(6*10),90)", i, S, StartOrd, TarOrd)
+        runb2("sparseid(3,0,5,100-(6*10),90)", i, S, StartOrd, TarOrd)
     end
     push!(
         ideals,
@@ -6593,6 +6601,7 @@ function benchmarkVar5()
     )
     for i in ideals
         runb("sparseid(3,0,5,100-(7*10),90)", i, S, StartOrd, TarOrd)
+        runb2("sparseid(3,0,5,100-(7*10),90)", i, S, StartOrd, TarOrd)
     end
     s = Singular.std(
         Singular.Ideal(S, [change_ring(x, S) for x in Singular.gens(I)]),
