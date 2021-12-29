@@ -1,0 +1,372 @@
+function runAll(
+    v::String,
+    ideal::Singular.sideal,
+    S::Singular.PolyRing,
+    StartOrd::Matrix{Int64},
+    TarOrd::Matrix{Int64},
+)
+runb(v,ideal,S,StartOrd,TarOrd)
+runb2(v,ideal,S,StartOrd,TarOrd)
+runb3(v,ideal,S,StartOrd,TarOrd)
+end
+
+function prepareAlloc()
+df = DataFrame(
+    weights = ["weights"],
+    weight = ["weight"],
+    nGens = ["nGens"],
+    initials = ["initials"],
+    stdh = ["stdh"],
+    liftGW2 = ["liftGW2"],
+    lift2 = ["lift2"],
+    interred = ["interred"],
+    example = ["example"],
+)
+savew(df, "allocsStandardWalk")
+df = DataFrame(
+    weights = ["weights"],
+    weight = ["weight"],
+    nGens = ["nGens"],
+    initials = ["initials"],
+    stdh = ["stdh"],
+    liftGW2 = ["liftGW2"],
+    lift2 = ["lift2"],
+    interred = ["interred"],
+    pert = ["pert"],
+    inCone = ["inCone"],
+    laststd = ["laststd"],
+    degree = ["degree"],
+    example = ["example"],
+)
+for i in 2:10
+savew(df, "allocsPertubedWalk",i)
+end
+
+df = DataFrame(
+    weights = ["weights"],
+    facetnormal = ["-"],
+    initials = ["initials"],
+    stdh = ["stdh"],
+    liftgeneric = ["liftgeneric"],
+    interred = ["interred"],
+    example = ["example"],
+)
+savew(df, "allocsGenericWalk")
+
+df = DataFrame(
+    weights = ["weights"],
+    weight = ["weight"],
+    nGens = ["nGens"],
+    initials = ["initials"],
+    stdh = ["stdh"],
+    lift2 = ["lift2"],
+    lift = ["lift"],
+    interred = ["interred"],
+    inCone = ["inCone"],
+    pertvec = ["pertvec"],
+    depth = ["depth"],
+    example = ["example"],
+)
+savew(df, "allocsFractalWalk")
+df = DataFrame(
+    weights = ["weights"],
+    weight = ["weight"],
+    nGens = ["nGens"],
+    initials = ["initials"],
+    stdh = ["stdh"],
+    lift2 = ["lift2"],
+    lift = ["lift"],
+    interred = ["interred"],
+    inCone = ["inCone"],
+    pertvec = ["pertvec"],
+    depth = ["depth"],
+    example = ["example"],
+)
+savew(df, "allocsFractalWalklex")
+df = DataFrame(
+    weights = ["weights"],
+    weight = ["weight"],
+    nGens = ["nGens"],
+    initials = ["initials"],
+    stdh = ["stdh"],
+    lift2 = ["lift2"],
+    lift = ["lift"],
+    interred = ["interred"],
+    inCone = ["inCone"],
+    pertvec = ["pertvec"],
+    depth = ["depth"],
+    example = ["example"],
+)
+savew(df, "allocsFractalWalklookahead")
+
+df = DataFrame(
+    weights = ["weights"],
+    weight = ["weight"],
+    nGens = ["nGens"],
+    initials = ["initials"],
+    stdh = ["stdh"],
+    lift2 = ["lift2"],
+    lift = ["lift"],
+    interred = ["interred"],
+    inCone = ["inCone"],
+    pertvec = ["pertvec"],
+    depth = ["depth"],
+    example = ["example"],
+)
+savew(df, "allocsFractalWalkcombined")
+df = DataFrame(
+    weights = "weights",
+    weight = "weight",
+    nGens = ["nGens"],
+    initials = ["initials"],
+    stdh = ["stdh"],
+    liftGW2 = ["liftGW2"],
+    lift2 = ["lift2"],
+    interred = ["interred"],
+    rep = ["rep"],
+    inCone = ["inCone"],
+    inseveral = ["inseveral"],
+    example = ["example"],
+)
+savew(df, "allocsTranWalk")
+end
+
+function prepareExampleAlloc(v::String)
+df = DataFrame(
+    weights = ["-"],
+    weight = ["-"],
+    nGens = ["-"],
+    initials = ["-"],
+    stdh = ["-"],
+    liftGW2 = ["-"],
+    lift2 = ["-"],
+    interred = ["-"],
+    example = [v],
+)
+savea(df, "allocsStandardWalk")
+df = DataFrame(
+    weights = ["-"],
+    weight = ["-"],
+    nGens = ["-"],
+    initials = ["-"],
+    stdh = ["-"],
+    liftGW2 = ["-"],
+    lift2 = ["-"],
+    interred = ["-"],
+    pert = ["-"],
+    inCone = ["-"],
+    laststd = ["-"],
+    degree = ["-"],
+    example = [v],
+)
+for i in 2:10
+savea(df, "allocsPertubedWalk",i)
+end
+
+df = DataFrame(
+    weights = ["-"],
+    facetnormal = ["-"],
+    initials = ["-"],
+    stdh = ["-"],
+    liftgeneric = ["-"],
+    interred = ["-"],
+    example = [v],
+)
+savea(df, "allocsGenericWalk")
+
+df = DataFrame(
+    weights = ["-"],
+    weight = ["-"],
+    nGens = ["-"],
+    initials = ["-"],
+    stdh = ["-"],
+    lift2 = ["-"],
+    lift = ["-"],
+    interred = ["-"],
+    inCone = ["-"],
+    pertvec = ["-"],
+    depth = ["-"],
+    example = [v],
+)
+savea(df, "allocsFractalWalk")
+df = DataFrame(
+    weights = ["-"],
+    weight = ["-"],
+    nGens = ["-"],
+    initials = ["-"],
+    stdh = ["-"],
+    lift2 = ["-"],
+    lift = ["-"],
+    interred = ["-"],
+    inCone = ["-"],
+    pertvec = ["-"],
+    depth = ["-"],
+    example = [v],
+)
+savea(df, "allocsFractalWalklex")
+df = DataFrame(
+    weights = ["-"],
+    weight = ["-"],
+    nGens = ["-"],
+    initials = ["-"],
+    stdh = ["-"],
+    lift2 = ["-"],
+    lift = ["-"],
+    interred = ["-"],
+    inCone = ["-"],
+    pertvec = ["-"],
+    depth = ["-"],
+    example = [v],
+)
+savea(df, "allocsFractalWalklookahead")
+df = DataFrame(
+    weights = ["-"],
+    weight = ["-"],
+    nGens = ["-"],
+    initials = ["-"],
+    stdh = ["-"],
+    lift2 = ["-"],
+    lift = ["-"],
+    interred = ["-"],
+    inCone = ["-"],
+    pertvec = ["-"],
+    depth = ["-"],
+    example = [v],
+)
+savea(df, "allocsFractalWalkcombined")
+df = DataFrame(
+    weights = "-",
+    weight = "-",
+    nGens = ["-"],
+    initials = ["-"],
+    stdh = ["-"],
+    liftGW2 = ["-"],
+    lift2 = ["-"],
+    interred = ["-"],
+    rep = ["-"],
+    inCone = ["-"],
+    inseveral = ["-"],
+    example = [v],
+)
+savea(df, "allocsTranWalk")
+end
+
+function prepareExampleElapsed(v::String)
+ df = DataFrame(
+     NextWeight = ["-"],
+     weight = ["-"],
+     nGens = ["-"],
+     initials = ["-"],
+     stdh = ["-"],
+     liftGW2 = ["-"],
+     lift = ["-"],
+     interred = ["-"],
+     example = [v],
+ )
+ savea(df, "standardWalk")
+ df = DataFrame(
+     NextWeight = ["-"],
+     weight = ["-"],
+     nGens = ["-"],
+     initials = ["-"],
+     stdh = ["-"],
+     liftGW2 = ["-"],
+     lift = ["-"],
+     interred = ["-"],
+     pert = ["-"],
+     inCone = ["-"],
+     laststd = ["-"],
+     degree = ["-"],
+     example = [v],
+ )
+ for i in 2:10
+ savew(df, "pertubedWalk",i)
+ end
+
+ df = DataFrame(
+     NextWeight = ["-"],
+     facetnormal = ["-"],
+     initials = ["-"],
+     stdh = ["-"],
+     liftgeneric = ["-"],
+     interred = ["-"],
+     example = [v],
+ )
+ savea(df, "genericWalk")
+
+ df = DataFrame(
+     NextWeight = ["-"],
+     weight = ["-"],
+     nGens = ["-"],
+     initials = ["-"],
+     stdh = ["-"],
+     liftGW2 = ["liftGW2"],
+     lift = ["-"],
+     interred = ["-"],
+     inCone = ["-"],
+     pertvec = ["-"],
+     depth = ["-"],
+     example = [v],
+ )
+ savea(df, "fractalWalk")
+ df = DataFrame(
+     NextWeight = ["-"],
+     weight = ["-"],
+     nGens = ["-"],
+     initials = ["-"],
+     stdh = ["-"],
+     liftGW2 = ["liftGW2"],
+     lift = ["-"],
+     interred = ["-"],
+     inCone = ["-"],
+     pertvec = ["-"],
+     depth = ["-"],
+     example = [v],
+ )
+ savea(df, "fractalWalklex")
+ df = DataFrame(
+     NextWeight = ["-"],
+     weight = ["-"],
+     nGens = ["-"],
+     initials = ["-"],
+     stdh = ["-"],
+     liftGW2 = ["liftGW2"],
+     lift = ["-"],
+     interred = ["-"],
+     inCone = ["-"],
+     pertvec = ["-"],
+     depth = ["-"],
+     example = [v],
+ )
+ savea(df, "fractalWalklookahead")
+ df = DataFrame(
+     NextWeight = ["-"],
+     weight = ["-"],
+     nGens = ["-"],
+     initials = ["-"],
+     stdh = ["-"],
+     liftGW2 = ["liftGW2"],
+     lift = ["-"],
+     interred = ["-"],
+     inCone = ["-"],
+     pertvec = ["-"],
+     depth = ["-"],
+     example = [v],
+ )
+ savea(df, "fractalWalkcombined")
+ df = DataFrame(
+     NextWeight = "-",
+     weight = "-",
+     nGens = ["-"],
+     initials = ["-"],
+     stdh = ["-"],
+     liftGW2 = ["-"],
+     lift = ["-"],
+     interred = ["-"],
+     rep = ["-"],
+     inCone = ["-"],
+     inseveral = ["-"],
+     example = [v],
+ )
+ savea(df, "tranWalk")
+end

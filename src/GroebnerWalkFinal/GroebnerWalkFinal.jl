@@ -266,7 +266,7 @@ function fractal_walk(
 )
     global PertVecs = [pertubed_vector(G, T, i) for i = 1:nvars(base_ring(G))]
     println(PertVecs)
-    println("FacrtalWalk_standard results")
+    println("FractalWalk_standard results")
     println("Crossed Cones in: ")
     Gb = fractal_recursiv(G, S,T, PertVecs, 1)
     println("Cones crossed: ", deleteCounterFr())

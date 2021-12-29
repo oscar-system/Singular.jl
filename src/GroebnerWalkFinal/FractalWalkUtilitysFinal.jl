@@ -176,9 +176,9 @@ function pertubed_vector(
         end
     end
     e = maxdeg * msum + 1
-    w = M[1, :] * e^(p - 1)
+    w = view(M,1, :) * e^(p - 1)
     for i = 2:p
-        w += e^(p - i) * M[i, :]
+        w += e^(p - i) * view(M,i, :)
     end
     return w
 end
@@ -217,9 +217,9 @@ function pertubed_vector(
         end
     end
     e = maxdeg * msum + 1
-    w = M[1, :] * e^(p - 1)
+    w = view(M, 1, :) * e^(p - 1)
     for i = 2:p
-        w += e^(p - i) * M[i, :]
+        w += e^(p - i) * view(M, i, :)
     end
     return w
 end

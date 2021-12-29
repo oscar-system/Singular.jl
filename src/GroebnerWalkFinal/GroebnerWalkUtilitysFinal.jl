@@ -137,12 +137,12 @@ function liftGW2(
     s = length(inG)
     for i = 1:length(gH)
         q = divalg(change_ring(gH[i], R), [change_ring(x, R) for x in inG], R)
-        gH[i] = R(0)
+        gH[i] = Rn(0)
         for j = 1:s
-            gH[i] = change_ring(gH[i], R) + q[j] * gG[j]
+            gH[i] = change_ring(gH[i], Rn) + change_ring(q[j],Rn) * change_ring(gG[j],Rn)
         end
     end
-    G = Singular.Ideal(Rn, [change_ring(x, Rn) for x in gH])
+    G = Singular.Ideal(Rn, [x for x in gH])
     G.isGB = true
     return G
 end
