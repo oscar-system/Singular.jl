@@ -47,7 +47,7 @@ function groebnerwalk2(
     p::Int64 = 0,
 )
     if grwalktype == :standard
-        walk = (x, y, z) -> standard_walk2(x, y, z)
+        walk = (x, y, z) -> standard_walkAlloc(x, y, z)
     elseif grwalktype == :generic
         walk = (x, y, z) -> generic_walk2(x, y, z)
     elseif grwalktype == :pertubed
@@ -82,7 +82,7 @@ function groebnerwalk2(
             )
     elseif grwalktype == :tran
         walk = (x, y, z) -> tran_walk2(x, y, z)
-    elseif grwalktype == :fractal_combined2
+    elseif grwalktype == :fractal_combined
         walk =
             (x, y, z) -> fractal_combined2(
                 x,
@@ -103,13 +103,13 @@ function groebnerwalk2(
 end
 
 
-function standard_walk22(G::Singular.sideal, S::Matrix{Int64}, T::Matrix{Int64})
-    #println("standard_walk22 results")
+function standard_walkAlloc(G::Singular.sideal, S::Matrix{Int64}, T::Matrix{Int64})
+    #println("standard_walkAlloc results")
     #println("Crossed Cones in: ")
-    standard_walk22(G, S, T, S[1, :], T[1, :])
+    standard_walkAlloc(G, S, T, S[1, :], T[1, :])
 end
 
-function standard_walk22(
+function standard_walkAlloc(
     G::Singular.sideal,
     S::Matrix{Int64},
     T::Matrix{Int64},
@@ -120,7 +120,7 @@ function standard_walk22(
     Rn = change_order(R, cweight, T)
     terminate = false
     while !terminate
-        G = standard_step(G, R, cweight, Rn)
+        G = standard_stepAlloc(G, R, cweight, Rn)
         #println(cweight)
         #global counter = getCounter() + 1
         if cweight == tweight
@@ -134,7 +134,7 @@ function standard_walk22(
     return G
 end
 
-function standard_step(
+function standard_stepAlloc(
     G::Singular.sideal,
     R::Singular.PolyRing,
     cw::Vector{Int64},
@@ -166,13 +166,13 @@ function generic_walk2(G::Singular.sideal, S::Matrix{Int64}, T::Matrix{Int64})
     while !isempty(v)
         #global counter = getCounter() + 1
         #println(v)
-        G, Lm = generic_step(G, Lm, v, T,R)
+        G, Lm = generic_stepAlloc(G, Lm, v, T,R)
         v = next_gamma(G, Lm, v, S, T)
     end
     return Singular.interreduce(G)
 end
 
-function generic_step(
+function generic_stepAlloc(
     G::Singular.sideal,
     Lm::Vector{Singular.spoly{L}},
     v::Vector{Int64},
@@ -212,7 +212,7 @@ function pertubed_walk2(
 
     while !terminate
         tweight = pertubed_vector(G, T, p)
-        G = standard_walk22(G, S, T, cweight, tweight)
+        G = standard_walkAlloc(G, S, T, cweight, tweight)
         if inCone(G, T, tweight)
             terminate = true
         else
@@ -554,7 +554,7 @@ end
 
 
 
-function fractal_walk2_combined(
+function fractal_combined2(
     G::Singular.sideal,
     S::MonomialOrder{Matrix{Int64},Vector{Int64}},
     T::MonomialOrder{Matrix{Int64},Vector{Int64}},
@@ -658,7 +658,7 @@ function tran_walk2(G::Singular.sideal, S::Matrix{Int64}, T::Matrix{Int64})
     terminate = false
     while !terminate
         w = next_weight(G, cweight, tweight)
-        if tryparse(string(w), Int32) == nothing
+        if tryparse(Int32,string(w)) == nothing
             #println("w bigger than int32")
             return G
         end
@@ -673,7 +673,7 @@ function tran_walk2(G::Singular.sideal, S::Matrix{Int64}, T::Matrix{Int64})
                 end
             end
         end
-        G = standard_step(G, R, w, Rn)
+        G = standard_stepAlloc(G, R, w, Rn)
         #global counter = getCounter() + 1
         #println(w)
         R = Rn

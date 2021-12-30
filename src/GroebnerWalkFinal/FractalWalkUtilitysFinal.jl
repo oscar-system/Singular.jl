@@ -61,15 +61,15 @@ Performs a lifting step in the Groebner Walk. See Fukuda et. al.
 """=#
 function lift_fractal_walk(
     G::Singular.sideal,
-    Gw::Singular.sideal,
     R::Singular.PolyRing,
+    H::Singular.sideal,
     Rn::Singular.PolyRing,
 )
     G.isGB = true
     rest = [
         change_ring(gen, Rn) -
         change_ring(Singular.reduce(change_ring(gen, R), G), Rn) for
-        gen in Singular.gens(Gw)
+        gen in Singular.gens(H)
     ]
     G = Singular.Ideal(Rn, [Rn(x) for x in rest])
     G.isGB = true

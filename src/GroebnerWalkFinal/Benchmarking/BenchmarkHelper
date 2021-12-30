@@ -7,7 +7,6 @@ function runAll(
 )
 runb(v,ideal,S,StartOrd,TarOrd)
 runb2(v,ideal,S,StartOrd,TarOrd)
-runb3(v,ideal,S,StartOrd,TarOrd)
 end
 
 function prepareAlloc()

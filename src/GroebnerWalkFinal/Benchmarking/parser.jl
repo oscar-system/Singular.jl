@@ -3,17 +3,19 @@ include("readWriteHelper.jl")
 using CSV
 using DataFrames
 
-function parseideal()
-    csv_reader = CSV.File("Beispiele3Variablen.txt")
+function parseideal(k::String)
+    csv_reader = CSV.File("Beispiele"*"$k"*"Variablen.txt")
     for row in csv_reader
         poly = collect(split("$(row.generator)", ""))
         result = ""
         println("from", poly)
         d = length(poly)
+
         for i = 1:d
             a = poly[i]
             if i == d
                 result = result * a
+                result = result* ","
                 println("to", result)
                 break
             end
@@ -41,8 +43,8 @@ function parseideal()
                 end
             end
         end
-        df = DataFrame(generator = result)
-        savea(df, "cBeispiele3Variablen.txt")
+        df = DataFrame(generator = Symbol(result))
+        savea(df, "cBeispiele"*"$k"*"Variablen")
         cd("/Users/JordiWelp/Results/1ideals")
 
     end

@@ -130,7 +130,6 @@ function runb(
     prepareExampleElapsed(v)
 
     println("Computing deglex-Basis")
-    stime =@belapsed Singular.std($ideal, complete_reduction = true) evals = 1 samples = 1
     I = Singular.std(ideal, complete_reduction = true)
 
     println("Benchmarking GroebnerWalk")
@@ -147,14 +146,7 @@ function runb(
     push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :fractal_combined))
     push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :tran))
 
-    println("Computing lex-Basis")
-    ttime = @belapsed Singular.std(
-        Singular.Ideal($S, [change_ring(x, $S) for x in Singular.gens($ideal)]),
-        complete_reduction = true,
-    ) evals=1 samples =1
 
-    df = DataFrame(startTime = [stime], targetTime =[ttime], example=[v])
-    savea(df, "SingularComputationTimings")
     s = Singular.std(
         Singular.Ideal(S, [change_ring(x, S) for x in Singular.gens(ideal)]),
         complete_reduction = true,

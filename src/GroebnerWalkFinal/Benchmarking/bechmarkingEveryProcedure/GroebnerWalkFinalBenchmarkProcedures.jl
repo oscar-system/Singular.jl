@@ -658,7 +658,7 @@ function fractal_walk(
 )
     global PertVecs = [pertubed_vector(G, T, i) for i = 1:nvars(base_ring(G))]
     println(PertVecs)
-    println("FacrtalWalk_standard results")
+    println("FractalWalk_standard results")
     println("Crossed Cones in: ")
     Gb = fractal_recursiv(G, S, T, PertVecs, 1)
     println("Cones crossed: ", deleteCounterFr())
@@ -695,10 +695,10 @@ function fractal_recursiv(
                 return G
             else
                 i2 =
-                    @ballocated [pertubed_vector($G, $T, $i) for i = 1:nvars(R)] evals = 1 samples = 1
+                    @ballocated [pertubed_vector($G, $T, i) for i = 1:nvars($R)] evals = 1 samples = 1
 
                 i =
-                    @belapsed [pertubed_vector($G, $T, $i) for i = 1:nvars(R)] evals = 1 samples = 1
+                    @belapsed [pertubed_vector($G, $T, i) for i = 1:nvars($R)] evals = 1 samples = 1
                 global PertVecs = [pertubed_vector(G, T, i) for i = 1:nvars(R)]
                 continue
             end
@@ -861,10 +861,10 @@ function fractal_walk_recursiv_startorder(
                 return G
             else
                 i2 =
-                    @ballocated [pertubed_vector($G, $T, i) for i = 1:nvars(R)] evals = 1 samples = 1
+                    @ballocated [pertubed_vector($G, $T, i) for i = 1:nvars($R)] evals = 1 samples = 1
 
                 i =
-                    @belapsed [pertubed_vector($G, $T, i) for i = 1:nvars(R)] evals = 1 samples = 1
+                    @belapsed [pertubed_vector($G, $T, i) for i = 1:nvars($R)] evals = 1 samples = 1
                 global PertVecs = [pertubed_vector(G, T, i) for i = 1:nvars(R)]
                 continue
             end
@@ -1012,9 +1012,9 @@ function fractal_walk_recursive_lex(
                 return G
             else
                 i =
-                    @belapsed [pertubed_vector($G, $T, i) for i = 1:nvars(R)] evals = 1 samples = 1
+                    @belapsed [pertubed_vector($G, $T, i) for i = 1:nvars($R)] evals = 1 samples = 1
                 i2 =
-                    @ballocated [pertubed_vector($G, $T, i) for i = 1:nvars(R)] evals = 1 samples = 1
+                    @ballocated [pertubed_vector($G, $T, i) for i = 1:nvars($R)] evals = 1 samples = 1
                 global PertVecs =
                     [pertubed_vector(G, T, i) for i = 1:Singular.nvars(R)]
                 println(PertVecs)
@@ -1170,9 +1170,9 @@ function fractal_walk_look_ahead_recursiv(
                 return G
             else
                 i =
-                    @belapsed [pertubed_vector($G, $T, i) for i = 1:nvars(R)] evals = 1 samples = 1
+                    @belapsed [pertubed_vector($G, $T, i) for i = 1:nvars($R)] evals = 1 samples = 1
                 i2 =
-                    @ballocated [pertubed_vector($G, $T, i) for i = 1:nvars(R)] evals = 1 samples = 1
+                    @ballocated [pertubed_vector($G, $T, i) for i = 1:nvars($R)] evals = 1 samples = 1
 
                 global PertVecs = [pertubed_vector(G, T, i) for i = 1:nvars(R)]
                 continue
@@ -1239,7 +1239,7 @@ function fractal_walk_look_ahead_recursiv(
         j2 = p
 
         G = Singular.std(H, complete_reduction = true)
-        df = DataFrame(
+        df2 = DataFrame(
             a2 = [a2],
             b2 = [b2],
             z2 = [z2],
@@ -1253,9 +1253,22 @@ function fractal_walk_look_ahead_recursiv(
             j2 = [j2],
             k2 = [k2],
         )
+        df = DataFrame(
+            a = [a],
+            b = [b],
+            z = [z],
+            c = [c],
+            d = [d],
+            e = [e],
+            f = [f],
+            g = [g],
+            h = [h],
+            i = [i],
+            j = [j],
+            k = [k],
+        )
         savea(df, "fractalWalklookahead")
         savea(df2, "allocsFractalWalklookahead")
-        cleardf2()
         cleardf()
 
         R = Rn
@@ -1320,10 +1333,10 @@ function fractal_walk_combined(
                 return G
             else
                 i2 =
-                    @ballocated [pertubed_vector($G, $T, i) for i = 1:nvars(R)] evals = 1 samples = 1
+                    @ballocated [pertubed_vector($G, $T, i) for i = 1:nvars($R)] evals = 1 samples = 1
 
                 i =
-                    @belapsed [pertubed_vector($G, $T, i) for i = 1:nvars(R)] evals = 1 samples = 1
+                    @belapsed [pertubed_vector($G, $T, i) for i = 1:nvars($R)] evals = 1 samples = 1
                 global PertVecs = [pertubed_vector(G, T, i) for i = 1:nvars(R)]
                 continue
             end

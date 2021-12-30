@@ -33,9 +33,8 @@ function runAllSingleExample()
     f4 = 2 * y * u + 2 * t * u + 2 * z * v - z
     f5 = 2 * y + 2 * z + 2 * t + 2 * u + v - 1
     I = Singular.Ideal(R, [f1, f2, f3, f4, f5])
-    runb("Katsura5", I, S, StartOrd, TarOrd)
-    runb2("Katsura5", I, S, StartOrd, TarOrd)
-    runb3("Katsura5", I, S, StartOrd, TarOrd)
+    runAll("Katsura5", I, S, StartOrd, TarOrd)
+
 
     #Katsura6
 

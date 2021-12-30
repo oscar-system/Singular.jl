@@ -659,7 +659,7 @@ function tran_walk(G::Singular.sideal, S::Matrix{Int64}, T::Matrix{Int64})
     terminate = false
     while !terminate
         w = next_weight(G, cweight, tweight)
-        if tryparse(string(w), Int32) == nothing
+        if tryparse(Int32,string(w)) == nothing
             println("w bigger than int32")
             return G
         end

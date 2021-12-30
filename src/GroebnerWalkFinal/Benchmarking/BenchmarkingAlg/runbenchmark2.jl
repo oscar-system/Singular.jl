@@ -35,30 +35,20 @@ function runb2(
     println("starting Benchmark2")
 
 
-    example=[]
-    standard=[]
-    pertubed2=[]
-    pertubed3=[]
-    pertubed4=[]
-    pertubed5=[]
-    pertubed6=[]
-    pertubed7=[]
-    pertubed8=[]
-    pertubed9=[]
-    pertubed10=[]
-    fractal=[]
-    fractallex=[]
-    fractallookahead[]
-    fractalcombined=[]
-    generic=[]
-    tran=[]
-
     println("Computing deglex-Basis")
-    @belapsed stime = Singular.std($ideal, complete_reduction = true) evals = 1 samples = 1
+    stime = @belapsed Singular.std($ideal, complete_reduction = true) evals = 1 samples = 1
     I = Singular.std(ideal, complete_reduction = true)
     ideals = []
     println("Benchmarking groebnerwalk2")
-
+    pertubed2= "-"
+    pertubed3= "-"
+    pertubed4= "-"
+    pertubed5= "-"
+    pertubed6= "-"
+    pertubed7= "-"
+    pertubed8= "-"
+    pertubed9= "-"
+    pertubed10= "-"
     for i = 2:nvars(S)
         if i ==2
         pertubed2 = @belapsed groebnerwalk2($I, $StartOrd, $TarOrd, $:pertubed, $i) evals =1 samples =1
@@ -79,24 +69,20 @@ function runb2(
     elseif i==10
         pertubed10 = @belapsed groebnerwalk2($I, $StartOrd, $TarOrd, $:pertubed, $i) evals =1 samples =1
     end
-        gb = groebnerwalk2(I, StartOrd, TarOrd, :pertubed, i)
-        push!(ideals, gb)
     end
-    standard = @belapsed groebnerwalk2($I, $StartOrd, $TarOrd, $:standard, $i) evals =1 samples =1
-    push!(ideals, groebnerwalk2(I, StartOrd, TarOrd, :standard))
-    generic = @belapsed groebnerwalk2($I, $StartOrd, $TarOrd, $:generic, $i) evals =1 samples =1
-    push!(ideals, groebnerwalk2(I, StartOrd, TarOrd, :generic))
-    fractal = @belapsed groebnerwalk2($I, $StartOrd, $TarOrd, $:fractal, $i) evals =1 samples =1
-    push!(ideals, groebnerwalk2(I, StartOrd, TarOrd, :fractal))
-    fractallex = @belapsed groebnerwalk2($I, $StartOrd, $TarOrd, $:fractallex, $i) evals =1 samples =1
-    push!(ideals, groebnerwalk2(I, StartOrd, TarOrd, :fractal_look_ahead))
-    fractallookahead = @belapsed groebnerwalk2($I, $StartOrd, $TarOrd, $:fractallookahead, $i) evals =1 samples =1
-    push!(ideals, groebnerwalk2(I, StartOrd, TarOrd, :fractal_lex))
-    fractalcombined = @belapsed groebnerwalk2($I, $StartOrd, $TarOrd, $:fractalcombined, $i) evals =1 samples =1
-    push!(ideals, groebnerwalk2(I, StartOrd, TarOrd, :fractal_combined))
-    tran = @belapsed groebnerwalk2($I, $StartOrd, $TarOrd, $:tran, $i) evals =1 samples =1
-    push!(ideals, groebnerwalk2(I, StartOrd, TarOrd, :tran))
+    standard = @belapsed groebnerwalk2($I, $StartOrd, $TarOrd, $:standard) evals =1 samples =1
+    generic = @belapsed groebnerwalk2($I, $StartOrd, $TarOrd, $:generic) evals =1 samples =1
+    fractal = @belapsed groebnerwalk2($I, $StartOrd, $TarOrd, $:fractal) evals =1 samples =1
+    fractallex = @belapsed groebnerwalk2($I, $StartOrd, $TarOrd, $:fractal_lex) evals =1 samples =1
+    fractallookahead = @belapsed groebnerwalk2($I, $StartOrd, $TarOrd, $:fractal_look_ahead) evals =1 samples =1
+    fractalcombined = @belapsed groebnerwalk2($I, $StartOrd, $TarOrd, $:fractal_combined) evals =1 samples =1
+    tran = @belapsed groebnerwalk2($I, $StartOrd, $TarOrd, $:tran) evals =1 samples =1
 
+    println("Computing lex-Basis")
+    ttime = @belapsed Singular.std(
+        Singular.Ideal($S, [change_ring(x, $S) for x in Singular.gens($ideal)]),
+        complete_reduction = true,
+    ) evals=1 samples =1
 
     df = DataFrame(
     example=[v],
@@ -112,7 +98,7 @@ function runb2(
     pertubed10=[pertubed10],
     fractal=[fractal],
     fractallex=[fractallex],
-    fractallookahead[fractallookahead],
+    fractallookahead=[fractallookahead],
     fractalcombined=[fractalcombined],
     generic=[generic],
     tran=[tran],
