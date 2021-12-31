@@ -279,7 +279,7 @@ function prepareExampleElapsed(v::String)
      example = [v],
  )
  for i in 2:10
- savew(df, "pertubedWalk",i)
+ savea(df, "pertubedWalk",i)
  end
 
  df = DataFrame(
@@ -299,7 +299,7 @@ function prepareExampleElapsed(v::String)
      nGens = ["-"],
      initials = ["-"],
      stdh = ["-"],
-     liftGW2 = ["liftGW2"],
+     liftGW2 = ["-"],
      lift = ["-"],
      interred = ["-"],
      inCone = ["-"],
@@ -314,7 +314,7 @@ function prepareExampleElapsed(v::String)
      nGens = ["-"],
      initials = ["-"],
      stdh = ["-"],
-     liftGW2 = ["liftGW2"],
+     liftGW2 = ["-"],
      lift = ["-"],
      interred = ["-"],
      inCone = ["-"],
@@ -329,7 +329,7 @@ function prepareExampleElapsed(v::String)
      nGens = ["-"],
      initials = ["-"],
      stdh = ["-"],
-     liftGW2 = ["liftGW2"],
+     liftGW2 = ["-"],
      lift = ["-"],
      interred = ["-"],
      inCone = ["-"],
@@ -344,7 +344,7 @@ function prepareExampleElapsed(v::String)
      nGens = ["-"],
      initials = ["-"],
      stdh = ["-"],
-     liftGW2 = ["liftGW2"],
+     liftGW2 = ["-"],
      lift = ["-"],
      interred = ["-"],
      inCone = ["-"],

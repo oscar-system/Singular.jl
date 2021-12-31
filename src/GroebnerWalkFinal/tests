@@ -1,0 +1,140 @@
+include("/Users/JordiWelp/github/Singular.jl/src/GroebnerWalkFinal/GroebnerWalkFinal.jl")
+include("/Users/JordiWelp/github/Singular.jl/src/GroebnerWalkFinal/Examples.jl")
+
+@testset "Groebnerwalks" begin
+    @testset "Testing Groebnerwalks" begin
+        let id = cyclic5()
+            dim = nvars(base_ring(id))
+            ve=ones(Int64,dim)
+            StartOrd = ordering_as_matrix(ve, :lex)
+            TarOrd = ordering_as_matrix(:lex, dim)
+            S = change_order(R, TarOrd)
+            I = Singular.std(ideal, complete_reduction = true)
+
+            ideals = []
+            for i = 2:nvars(S)
+                push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :pertubed, i))
+            end
+            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :standard))
+            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :generic))
+            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :fractal))
+            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :fractal_look_ahead))
+            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :fractal_lex))
+            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :fractal_combined))
+            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :tran))
+
+            s = Singular.std(
+                Singular.Ideal(S, [change_ring(x, S) for x in Singular.gens(ideal)]),
+                complete_reduction = true,
+            )
+
+            for id in ideals
+                @test Singular.equal(
+                    Singular.Ideal(S, [change_ring(x, S) for x in Singular.gens(id)]),
+                    s,
+                )
+            end
+        end
+
+        let id = katsura5()
+            dim = nvars(base_ring(id))
+            ve=ones(Int64,dim)
+            StartOrd = ordering_as_matrix(ve, :lex)
+            TarOrd = ordering_as_matrix(:lex, dim)
+            S = change_order(R, TarOrd)
+
+            I = Singular.std(ideal, complete_reduction = true)
+
+            ideals = []
+            for i = 2:nvars(S)
+                push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :pertubed, i))
+            end
+            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :standard))
+            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :generic))
+            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :fractal))
+            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :fractal_look_ahead))
+            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :fractal_lex))
+            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :fractal_combined))
+            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :tran))
+
+            s = Singular.std(
+                Singular.Ideal(S, [change_ring(x, S) for x in Singular.gens(ideal)]),
+                complete_reduction = true,
+            )
+
+            for id in ideals
+                @test Singular.equal(
+                    Singular.Ideal(S, [change_ring(x, S) for x in Singular.gens(id)]),
+                    s,
+                )
+            end
+        end
+
+        let id = cohn4()
+            dim = nvars(base_ring(id))
+            ve=ones(Int64,dim)
+            StartOrd = ordering_as_matrix(ve, :lex)
+            TarOrd = ordering_as_matrix(:lex, dim)
+            S = change_order(R, TarOrd)
+
+            I = Singular.std(ideal, complete_reduction = true)
+
+            ideals = []
+            for i = 2:nvars(S)
+                push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :pertubed, i))
+            end
+            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :standard))
+            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :generic))
+            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :fractal))
+            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :fractal_look_ahead))
+            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :fractal_lex))
+            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :fractal_combined))
+            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :tran))
+
+            s = Singular.std(
+                Singular.Ideal(S, [change_ring(x, S) for x in Singular.gens(ideal)]),
+                complete_reduction = true,
+            )
+
+            for id in ideals
+                @test Singular.equal(
+                    Singular.Ideal(S, [change_ring(x, S) for x in Singular.gens(id)]),
+                    s,
+                )
+            end
+        end
+
+        let id = noon5()
+            dim = nvars(base_ring(id))
+            ve=ones(Int64,dim)
+            StartOrd = ordering_as_matrix(ve, :lex)
+            TarOrd = ordering_as_matrix(:lex, dim)
+            S = change_order(R, TarOrd)
+
+            I = Singular.std(ideal, complete_reduction = true)
+
+            ideals = []
+            for i = 2:nvars(S)
+                push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :pertubed, i))
+            end
+            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :standard))
+            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :generic))
+            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :fractal))
+            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :fractal_look_ahead))
+            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :fractal_lex))
+            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :fractal_combined))
+            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :tran))
+
+            s = Singular.std(
+                Singular.Ideal(S, [change_ring(x, S) for x in Singular.gens(ideal)]),
+                complete_reduction = true,
+            )
+
+            for id in ideals
+                @test Singular.equal(
+                    Singular.Ideal(S, [change_ring(x, S) for x in Singular.gens(id)]),
+                    s,
+                )
+            end
+        end
+    end

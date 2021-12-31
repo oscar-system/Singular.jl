@@ -700,6 +700,7 @@ function fractal_recursiv(
                 i =
                     @belapsed [pertubed_vector($G, $T, i) for i = 1:nvars($R)] evals = 1 samples = 1
                 global PertVecs = [pertubed_vector(G, T, i) for i = 1:nvars(R)]
+                println(PertVecs)
                 continue
             end
         end
@@ -857,7 +858,6 @@ function fractal_walk_recursiv_startorder(
                     @ballocated inCone($G, $T, PertVecs[$p]) evals = 1 samples =
                         1
 
-                println(PertVecs[p], " in depth", p)
                 return G
             else
                 i2 =
@@ -866,6 +866,8 @@ function fractal_walk_recursiv_startorder(
                 i =
                     @belapsed [pertubed_vector($G, $T, i) for i = 1:nvars($R)] evals = 1 samples = 1
                 global PertVecs = [pertubed_vector(G, T, i) for i = 1:nvars(R)]
+                println(PertVecs)
+
                 continue
             end
         end
@@ -1022,6 +1024,7 @@ function fractal_walk_recursive_lex(
             end
         end
         if t == 1 && p == 1
+            println("up in: ", p, " with: ", w)
             return fractal_walk_recursive_lex(G, S, T, PertVecs, p + 1)
         else
             w = w + t * (PertVecs[p] - w)
@@ -1286,7 +1289,7 @@ function fractal_walk_combined(
 )
     global PertVecs =
         [pertubed_vector(G, T, i) for i = 1:nvars(Singular.base_ring(G))]
-    println("fractal_walk_withStartorder results")
+    println("fractal_walk_combined results")
     println("Crossed Cones in: ")
     Gb = fractal_walk_combined(G, S, T, PertVecs, 1)
     println("Cones crossed: ", deleteCounterFr())

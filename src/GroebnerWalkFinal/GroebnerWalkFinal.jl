@@ -372,7 +372,6 @@ function fractal_walk_recursiv_startorder(
         t = nextT(G, w, PertVecs[p])
         if t == [0]
             if inCone(G, T, PertVecs[p])
-                println(PertVecs[p], " in depth", p)
                 return G
             else
                 global PertVecs = [pertubed_vector(G, T, i) for i = 1:nvars(R)]
@@ -562,7 +561,7 @@ function fractal_walk_combined(
 )
     global PertVecs =
         [pertubed_vector(G, T, i) for i = 1:nvars(Singular.base_ring(G))]
-    println("fractal_walk_withStartorder results")
+    println("fractal_walk_combined results")
     println("Crossed Cones in: ")
     Gb = fractal_walk_combined(G, S, T, PertVecs, 1)
     println("Cones crossed: ", deleteCounterFr())
