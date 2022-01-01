@@ -2,26 +2,26 @@ using BenchmarkTools
 
 function prepare()
 df = DataFrame(
-    NextWeight = ["NextWeight"],
-    weight = ["weight"],
+    nextW = ["nextW"],
+    currrentWeight = ["currrentWeight"],
     nGens = ["nGens"],
     initials = ["initials"],
     stdH = ["stdH"],
-    liftGW2 = ["liftGW2"],
+    liftAlternative = ["liftAlternative"],
     lift = ["lift"],
-    interred = ["interred"],
+    interreduce = ["interreduce"],
     example = ["example"],
 )
 savew(df, "standardWalk")
 df = DataFrame(
-    NextWeight = ["NextWeight"],
-    weight = ["weight"],
+    nextW = ["nextW"],
+    currrentWeight = ["currrentWeight"],
     nGens = ["nGens"],
     initials = ["initials"],
-    stdh = ["stdh"],
-    liftGW2 = ["liftGW2"],
+    stdH = ["stdH"],
+    liftAlternative = ["liftAlternative"],
     lift = ["lift"],
-    interred = ["interred"],
+    interreduce = ["interreduce"],
     pert = ["pert"],
     inCone = ["inCone"],
     laststd = ["laststd"],
@@ -32,25 +32,25 @@ for i in 2:10
 savew(df, "pertubedWalk",i)
 end
 df = DataFrame(
-    NextWeight = ["NextWeight"],
+    nextW = ["nextW"],
     facetnormal = ["-"],
     initials = ["initials"],
-    stdh = ["stdh"],
+    stdH = ["stdH"],
     liftgeneric = ["liftgeneric"],
-    interred = ["interred"],
+    interreduce = ["interreduce"],
     example = ["example"],
 )
 savew(df, "genericWalk")
 
 df = DataFrame(
-    NextWeight = ["NextWeight"],
-    weight = ["weight"],
+    nextW = ["nextW"],
+    currrentWeight = ["currrentWeight"],
     nGens = ["nGens"],
     initials = ["initials"],
-    stdh = ["stdh"],
-    liftGW2 = ["liftGW2"],
+    stdH = ["stdH"],
+    liftAlternative = ["liftAlternative"],
     lift = ["lift"],
-    interred = ["interred"],
+    interreduce = ["interreduce"],
     inCone = ["inCone"],
     pertvec = ["pertvec"],
     depth = ["depth"],
@@ -58,14 +58,14 @@ df = DataFrame(
 )
 savew(df, "fractalWalk")
 df = DataFrame(
-    NextWeight = ["NextWeight"],
-    weight = ["weight"],
+    nextW = ["nextW"],
+    currrentWeight = ["currrentWeight"],
     nGens = ["nGens"],
     initials = ["initials"],
-    stdh = ["stdh"],
-    liftGW2 = ["liftGW2"],
+    stdH = ["stdH"],
+    liftAlternative = ["liftAlternative"],
     lift = ["lift"],
-    interred = ["interred"],
+    interreduce = ["interreduce"],
     inCone = ["inCone"],
     pertvec = ["pertvec"],
     depth = ["depth"],
@@ -73,14 +73,14 @@ df = DataFrame(
 )
 savew(df, "fractalWalklex")
 df = DataFrame(
-    NextWeight = ["NextWeight"],
-    weight = ["weight"],
+    nextW = ["nextW"],
+    currrentWeight = ["currrentWeight"],
     nGens = ["nGens"],
     initials = ["initials"],
-    stdh = ["stdh"],
-    liftGW2 = ["liftGW2"],
+    stdH = ["stdH"],
+    liftAlternative = ["liftAlternative"],
     lift = ["lift"],
-    interred = ["interred"],
+    interreduce = ["interreduce"],
     inCone = ["inCone"],
     pertvec = ["pertvec"],
     depth = ["depth"],
@@ -88,14 +88,14 @@ df = DataFrame(
 )
 savew(df, "fractalWalklookahead")
 df = DataFrame(
-    NextWeight = ["NextWeight"],
-    weight = ["weight"],
+    nextW = ["nextW"],
+    currrentWeight = ["currrentWeight"],
     nGens = ["nGens"],
     initials = ["initials"],
-    stdh = ["stdh"],
-    liftGW2 = ["liftGW2"],
+    stdH = ["stdH"],
+    liftAlternative = ["liftAlternative"],
     lift = ["lift"],
-    interred = ["interred"],
+    interreduce = ["interreduce"],
     inCone = ["inCone"],
     pertvec = ["pertvec"],
     depth = ["depth"],
@@ -103,14 +103,14 @@ df = DataFrame(
 )
 savew(df, "fractalWalkcombined")
 df = DataFrame(
-    NextWeight = "NextWeight",
-    weight = "weight",
+    nextW = "nextW",
+    currrentWeight = "currrentWeight",
     nGens = ["nGens"],
     initials = ["initials"],
-    stdh = ["stdh"],
-    liftGW2 = ["liftGW2"],
+    stdH = ["stdH"],
+    liftAlternative = ["liftAlternative"],
     lift = ["lift"],
-    interred = ["interred"],
+    interreduce = ["interreduce"],
     rep = ["rep"],
     inCone = ["inCone"],
     inseveral = ["inseveral"],
@@ -157,11 +157,11 @@ function runb(
 
     println("Benchmarking ideals")
     for id in ideals
-        a = isequal(
+        a = Singular.isequal(
             Singular.Ideal(S, [change_ring(x, S) for x in Singular.gens(id)]),
             s,
         )
-        b = equalitytest(s, id)
+        b = "-"
         df = DataFrame(a = [a], b = [b],c=[v])
         savea(df, "correct")
     end

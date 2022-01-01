@@ -36,7 +36,7 @@ function runb2(
 
 
     println("Computing deglex-Basis")
-    stime = @belapsed Singular.std($ideal, complete_reduction = true) evals = 1 samples = 1
+    stime = @belapsed Singular.std($ideal, complete_reduction = true) evals = 5 samples = 1
     I = Singular.std(ideal, complete_reduction = true)
     ideals = []
     println("Benchmarking groebnerwalk2")
@@ -82,7 +82,7 @@ function runb2(
     ttime = @belapsed Singular.std(
         Singular.Ideal($S, [change_ring(x, $S) for x in Singular.gens($ideal)]),
         complete_reduction = true,
-    ) evals=1 samples =1
+    ) evals=5 samples =1
 
     df = DataFrame(
     example=[v],

@@ -15,7 +15,7 @@ include(
 )
 using BenchmarkTools
 BenchmarkTools.DEFAULT_PARAMETERS.samples = 1
-BenchmarkTools.DEFAULT_PARAMETERS.evals = 1
+BenchmarkTools.DEFAULT_PARAMETERS.evals= 5
 a = "-"
 b = "-"
 z = "-"
@@ -200,11 +200,11 @@ function standard_walk(
             terminate = true
         else
             global a =
-                @belapsed next_weight($G, $cweight, $tweight) evals = 1 samples =
-                    1
+                @belapsed next_weight($G, $cweight, $tweight) evals= 5 samples =
+                    2
             global a2 =
-                @ballocated next_weight($G, $cweight, $tweight) evals = 1 samples =
-                    1
+                @ballocated next_weight($G, $cweight, $tweight) evals= 5 samples =
+                    2
 
             cweight = next_weight(G, cweight, tweight)
             R = Rn
@@ -224,37 +224,37 @@ function standard_step(
     global z2 = length(Singular.gens(G))
 
 
-    global c = @belapsed initials($Rn, gens($G), $cw) evals = 1 samples = 1
-    global c2 = @ballocated initials($Rn, gens($G), $cw) evals = 1 samples = 1
+    global c = @belapsed initials($Rn, gens($G), $cw) evals= 5 samples = 2
+    global c2 = @ballocated initials($Rn, gens($G), $cw) evals= 5 samples = 2
 
     Gw = initials(Rn, gens(G), cw)
     global d = @belapsed Singular.std(
         Singular.Ideal($Rn, $Gw),
         complete_reduction = true,
-    ) evals = 1 samples = 1
+    ) evals= 5 samples = 2
 
     global d2 = @ballocated Singular.std(
         Singular.Ideal($Rn, $Gw),
         complete_reduction = true,
-    ) evals = 1 samples = 1
+    ) evals= 5 samples = 2
 
     H = Singular.std(Singular.Ideal(Rn, Gw), complete_reduction = true)
 
 
-    global e = @belapsed liftGW2($G, $R, $Gw, $H, $Rn) evals = 1 samples = 1
-    global e2 = @ballocated liftGW2($G, $R, $Gw, $H, $Rn) evals = 1 samples = 1
+    global e = @belapsed liftGW2($G, $R, $Gw, $H, $Rn) evals= 5 samples = 2
+    global e2 = @ballocated liftGW2($G, $R, $Gw, $H, $Rn) evals= 5 samples = 2
 
-    global f = @belapsed lift($G, $R, $H, $Rn) evals = 1 samples = 1
-    global f2 = @ballocated lift($G, $R, $H, $Rn) evals = 1 samples = 1
+    global f = @belapsed lift($G, $R, $H, $Rn) evals= 5 samples = 2
+    global f2 = @ballocated lift($G, $R, $H, $Rn) evals= 5 samples = 2
 
     #H = liftGW2(G, R, Gw, H, Rn)
     H = lift(G, R, H, Rn)
     global g =
-        @belapsed Singular.std($H, complete_reduction = true) evals = 1 samples =
-            1
+        @belapsed Singular.std($H, complete_reduction = true) evals= 5 samples =
+            2
     global g2 =
-        @ballocated Singular.std($H, complete_reduction = true) evals = 1 samples =
-            1
+        @ballocated Singular.std($H, complete_reduction = true) evals= 5 samples =
+            2
 
     df = DataFrame(
         a = [a],
@@ -349,11 +349,11 @@ function standard_walk2(
             terminate = true
         else
             global a2 =
-                @ballocated next_weight($G, $cweight, $tweight) evals = 1 samples =
-                    1
+                @ballocated next_weight($G, $cweight, $tweight) evals= 5 samples =
+                    2
             global a =
-                @belapsed next_weight($G, $cweight, $tweight) evals = 1 samples =
-                    1
+                @belapsed next_weight($G, $cweight, $tweight) evals= 5 samples =
+                    2
             cweight = next_weight(G, cweight, tweight)
             R = Rn
             Rn = change_order(Rn, cweight, T)
@@ -372,37 +372,37 @@ function standard_step2(
     global z2 = length(Singular.gens(G))
 
 
-    global c = @belapsed initials($Rn, gens($G), $cw) evals = 1 samples = 1
-    global c2 = @ballocated initials($Rn, gens($G), $cw) evals = 1 samples = 1
+    global c = @belapsed initials($Rn, gens($G), $cw) evals= 5 samples = 2
+    global c2 = @ballocated initials($Rn, gens($G), $cw) evals= 5 samples = 2
 
     Gw = initials(Rn, gens(G), cw)
 
     global d = @belapsed Singular.std(
         Singular.Ideal($Rn, $Gw),
         complete_reduction = true,
-    ) evals = 1 samples = 1
+    ) evals= 5 samples = 2
 
     global d2 = @ballocated Singular.std(
         Singular.Ideal($Rn, $Gw),
         complete_reduction = true,
-    ) evals = 1 samples = 1
+    ) evals= 5 samples = 2
 
     H = Singular.std(Singular.Ideal(Rn, Gw), complete_reduction = true)
 
-    global e2 = @ballocated liftGW2($G, $R, $Gw, $H, $Rn) evals = 1 samples = 1
+    global e2 = @ballocated liftGW2($G, $R, $Gw, $H, $Rn) evals= 5 samples = 2
 
-    global e = @belapsed liftGW2($G, $R, $Gw, $H, $Rn) evals = 1 samples = 1
+    global e = @belapsed liftGW2($G, $R, $Gw, $H, $Rn) evals= 5 samples = 2
 
-    global f2 = @ballocated lift($G, $R, $H, $Rn) evals = 1 samples = 1
-    global f = @belapsed lift($G, $R, $H, $Rn) evals = 1 samples = 1
+    global f2 = @ballocated lift($G, $R, $H, $Rn) evals= 5 samples = 2
+    global f = @belapsed lift($G, $R, $H, $Rn) evals= 5 samples = 2
     #H = liftGW2(G, R, Gw, H, Rn)
     H = lift(G, R, H, Rn)
     global g =
-        @belapsed Singular.std($H, complete_reduction = true) evals = 1 samples =
-            1
+        @belapsed Singular.std($H, complete_reduction = true) evals= 5 samples =
+            2
     global g2 =
-        @ballocated Singular.std($H, complete_reduction = true) evals = 1 samples =
-            1
+        @ballocated Singular.std($H, complete_reduction = true) evals= 5 samples =
+            2
 
     return Singular.std(H, complete_reduction = true)
 end
@@ -413,8 +413,8 @@ end
 function generic_walk(G::Singular.sideal, S::Matrix{Int64}, T::Matrix{Int64})
     R = base_ring(G)
     Rn = change_order(G.base_ring, T)
-    global a = @belapsed next_gamma($G, $[0], $S, $T) evals = 1 samples = 1
-    global a2 = @ballocated next_gamma($G, $[0], $S, $T) evals = 1 samples = 1
+    global a = @belapsed next_gamma($G, $[0], $S, $T) evals= 5 samples = 2
+    global a2 = @ballocated next_gamma($G, $[0], $S, $T) evals= 5 samples = 2
 
     v = next_gamma(G, [0], S, T)
     Lm = [change_ring(Singular.leading_term(g), Rn) for g in gens(G)]
@@ -453,10 +453,10 @@ function generic_walk(G::Singular.sideal, S::Matrix{Int64}, T::Matrix{Int64})
         savea(df, "genericWalk")
         cleardf()
         global a2 =
-            @ballocated next_gamma($G, $Lm, $v, $S, $T) evals = 1 samples = 1
+            @ballocated next_gamma($G, $Lm, $v, $S, $T) evals= 5 samples = 2
 
         global a =
-            @belapsed next_gamma($G, $Lm, $v, $S, $T) evals = 1 samples = 1
+            @belapsed next_gamma($G, $Lm, $v, $S, $T) evals= 5 samples = 2
         v = next_gamma(G, Lm, v, S, T)
     end
     return Singular.interreduce(G)
@@ -473,29 +473,29 @@ function generic_step(
 
 
     Rn = Singular.base_ring(G)
-    global c = @belapsed facet_initials($G, $Lm, $v) evals = 1 samples = 1
-    global c2 = @ballocated facet_initials($G, $Lm, $v) evals = 1 samples = 1
+    global c = @belapsed facet_initials($G, $Lm, $v) evals= 5 samples = 2
+    global c2 = @ballocated facet_initials($G, $Lm, $v) evals= 5 samples = 2
 
     facet_Generators = facet_initials(G, Lm, v)
     global d = @belapsed Singular.std(
         Singular.Ideal($Rn, $facet_Generators),
         complete_reduction = true,
-    ) evals = 1 samples = 1
+    ) evals= 5 samples = 2
 
     global d2 = @ballocated Singular.std(
         Singular.Ideal($Rn, $facet_Generators),
         complete_reduction = true,
-    ) evals = 1 samples = 1
+    ) evals= 5 samples = 2
     H = Singular.std(
         Singular.Ideal(Rn, facet_Generators),
         complete_reduction = true,
     )
-    global e2 = @ballocated lift_generic($G, $Lm, $H) evals = 1 samples = 1
+    global e2 = @ballocated lift_generic($G, $Lm, $H) evals= 5 samples = 2
 
-    global e = @belapsed lift_generic($G, $Lm, $H) evals = 1 samples = 1
+    global e = @belapsed lift_generic($G, $Lm, $H) evals= 5 samples = 2
     H, Lm = lift_generic(G, Lm, H)
-    global f = @belapsed interreduce($H, $Lm) evals = 1 samples = 1
-    global f2 = @ballocated interreduce($H, $Lm) evals = 1 samples = 1
+    global f = @belapsed interreduce($H, $Lm) evals= 5 samples = 2
+    global f2 = @ballocated interreduce($H, $Lm) evals= 5 samples = 2
 
     G = interreduce(H, Lm)
     G = Singular.Ideal(Rn, G)
@@ -554,17 +554,17 @@ function pertubed_walk(
     println("Crossed Cones in: ")
 
     while !terminate
-        global h = @belapsed pertubed_vector($G, $T, $p) evals = 1 samples = 1
+        global h = @belapsed pertubed_vector($G, $T, $p) evals= 5 samples = 2
         global h2 =
-            @ballocated pertubed_vector($G, $T, $p) evals = 1 samples = 1
+            @ballocated pertubed_vector($G, $T, $p) evals= 5 samples = 2
 
         tweight = pertubed_vector(G, T, p)
         G = standard_walk2(G, S, T, cweight, tweight, k)
 
         if inCone(G, T, tweight)
-            global i = @belapsed inCone($G, $T, $tweight) evals = 1 samples = 1
+            global i = @belapsed inCone($G, $T, $tweight) evals= 5 samples = 2
             global i2 =
-                @ballocated inCone($G, $T, $tweight) evals = 1 samples = 1
+                @ballocated inCone($G, $T, $tweight) evals= 5 samples = 2
 
             terminate = true
         else
@@ -573,10 +573,10 @@ function pertubed_walk(
                 G = Singular.Ideal(R, [change_ring(x, R) for x in gens(G)])
                 global j =
                     @belapsed Singular.std($G, complete_reduction = true) evals =
-                        1 samples = 1
+                        2 samples = 1
                 global j2 =
                     @ballocated Singular.std($G, complete_reduction = true) evals =
-                        1 samples = 1
+                        2 samples = 1
 
                 G = Singular.std(G, complete_reduction = true)
                 terminate = true
@@ -681,24 +681,24 @@ function fractal_recursiv(
     h2 = "-"
     i2 = "-"
     while !terminate
-        a = @belapsed nextT($G, $w, PertVecs[$p]) evals = 1 samples = 1
-        a2 = @ballocated nextT($G, $w, PertVecs[$p]) evals = 1 samples = 1
+        a = @belapsed nextT($G, $w, PertVecs[$p]) evals= 5 samples = 2
+        a2 = @ballocated nextT($G, $w, PertVecs[$p]) evals= 5 samples = 2
 
         t = nextT(G, w, PertVecs[p])
         if (t == [0])
             if inCone(G, T, PertVecs[p])
-                h = @belapsed inCone($G, $T, PertVecs[$p]) evals = 1 samples = 1
+                h = @belapsed inCone($G, $T, PertVecs[$p]) evals= 5 samples = 2
                 h2 =
-                    @ballocated inCone($G, $T, PertVecs[$p]) evals = 1 samples =
-                        1
+                    @ballocated inCone($G, $T, PertVecs[$p]) evals= 5 samples =
+                        2
 
                 return G
             else
                 i2 =
-                    @ballocated [pertubed_vector($G, $T, i) for i = 1:nvars($R)] evals = 1 samples = 1
+                    @ballocated [pertubed_vector($G, $T, i) for i = 1:nvars($R)] evals= 5 samples = 2
 
                 i =
-                    @belapsed [pertubed_vector($G, $T, i) for i = 1:nvars($R)] evals = 1 samples = 1
+                    @belapsed [pertubed_vector($G, $T, i) for i = 1:nvars($R)] evals= 5 samples = 2
                 global PertVecs = [pertubed_vector(G, T, i) for i = 1:nvars(R)]
                 println(PertVecs)
                 continue
@@ -713,20 +713,20 @@ function fractal_recursiv(
          z = length(Singular.gens(G))
          z2 = length(Singular.gens(G))
 
-        c2 = @ballocated initials($R, Singular.gens($G), $w) evals = 1 samples =
-            1
+        c2 = @ballocated initials($R, Singular.gens($G), $w) evals= 5 samples =
+            2
 
-        c = @belapsed initials($R, Singular.gens($G), $w) evals = 1 samples = 1
+        c = @belapsed initials($R, Singular.gens($G), $w) evals= 5 samples = 2
         Gw = initials(R, Singular.gens(G), w)
         if p == nvars(R)
             d = @belapsed Singular.std(
                 Singular.Ideal($Rn, [change_ring(x, $Rn) for x in $Gw]),
                 complete_reduction = true,
-            ) evals = 1 samples = 1
+            ) evals= 5 samples = 2
             d2 = @ballocated Singular.std(
                 Singular.Ideal($Rn, [change_ring(x, $Rn) for x in $Gw]),
                 complete_reduction = true,
-            ) evals = 1 samples = 1
+            ) evals= 5 samples = 2
             H = Singular.std(
                 Singular.Ideal(Rn, [change_ring(x, Rn) for x in Gw]),
                 complete_reduction = true,
@@ -746,20 +746,20 @@ function fractal_recursiv(
                 p + 1,
             )
         end
-        e2 = @ballocated liftGW2($G, $R, $Gw, $H, $Rn) evals = 1 samples = 1
-        e = @belapsed liftGW2($G, $R, $Gw, $H, $Rn) evals = 1 samples = 1
-        f = @belapsed lift_fractal_walk($G, $R, $H, $Rn) evals = 1 samples = 1
-        f2 = @ballocated lift_fractal_walk($G, $R, $H, $Rn) evals = 1 samples = 1
+        e2 = @ballocated liftGW2($G, $R, $Gw, $H, $Rn) evals= 5 samples = 2
+        e = @belapsed liftGW2($G, $R, $Gw, $H, $Rn) evals= 5 samples = 2
+        f = @belapsed lift_fractal_walk($G, $R, $H, $Rn) evals= 5 samples = 2
+        f2 = @ballocated lift_fractal_walk($G, $R, $H, $Rn) evals= 5 samples = 2
 
         #H = liftGW2(G, R, Gw, H, Rn)
         H = lift_fractal_walk(G, R, H, Rn)
         g2 =
-            @ballocated Singular.std($H, complete_reduction = true) evals = 1 samples =
-                1
+            @ballocated Singular.std($H, complete_reduction = true) evals= 5 samples =
+                2
 
         g =
-            @belapsed Singular.std($H, complete_reduction = true) evals = 1 samples =
-                1
+            @belapsed Singular.std($H, complete_reduction = true) evals= 5 samples =
+                2
         G = Singular.std(H, complete_reduction = true)
         R = Rn
         j = p
@@ -847,24 +847,24 @@ function fractal_walk_recursiv_startorder(
     h2 = "-"
     i2 = "-"
     while !terminate
-        a = @belapsed nextT($G, $w, PertVecs[$p]) evals = 1 samples = 1
-        a2 = @ballocated nextT($G, $w, PertVecs[$p]) evals = 1 samples = 1
+        a = @belapsed nextT($G, $w, PertVecs[$p]) evals= 5 samples = 2
+        a2 = @ballocated nextT($G, $w, PertVecs[$p]) evals= 5 samples = 2
 
         t = nextT(G, w, PertVecs[p])
         if t == [0]
             if inCone(G, T, PertVecs[p])
-                h = @belapsed inCone($G, $T, PertVecs[$p]) evals = 1 samples = 1
+                h = @belapsed inCone($G, $T, PertVecs[$p]) evals= 5 samples = 2
                 h2 =
-                    @ballocated inCone($G, $T, PertVecs[$p]) evals = 1 samples =
-                        1
+                    @ballocated inCone($G, $T, PertVecs[$p]) evals= 5 samples =
+                        2
 
                 return G
             else
                 i2 =
-                    @ballocated [pertubed_vector($G, $T, i) for i = 1:nvars($R)] evals = 1 samples = 1
+                    @ballocated [pertubed_vector($G, $T, i) for i = 1:nvars($R)] evals= 5 samples = 2
 
                 i =
-                    @belapsed [pertubed_vector($G, $T, i) for i = 1:nvars($R)] evals = 1 samples = 1
+                    @belapsed [pertubed_vector($G, $T, i) for i = 1:nvars($R)] evals= 5 samples = 2
                 global PertVecs = [pertubed_vector(G, T, i) for i = 1:nvars(R)]
                 println(PertVecs)
 
@@ -881,20 +881,20 @@ function fractal_walk_recursiv_startorder(
          z = length(Singular.gens(G))
          z2 = length(Singular.gens(G))
 
-        c2 = @ballocated initials($R, Singular.gens($G), $w) evals = 1 samples =
-            1
+        c2 = @ballocated initials($R, Singular.gens($G), $w) evals= 5 samples =
+            2
 
-        c = @belapsed initials($R, Singular.gens($G), $w) evals = 1 samples = 1
+        c = @belapsed initials($R, Singular.gens($G), $w) evals= 5 samples = 2
         Gw = initials(R, gens(G), w)
         if p == Singular.nvars(R)
             d = @belapsed Singular.std(
                 Singular.Ideal($Rn, [change_ring(x, $Rn) for x in $Gw]),
                 complete_reduction = true,
-            ) evals = 1 samples = 1
+            ) evals= 5 samples = 2
             d2 = @ballocated Singular.std(
                 Singular.Ideal($Rn, [change_ring(x, $Rn) for x in $Gw]),
                 complete_reduction = true,
-            ) evals = 1 samples = 1
+            ) evals= 5 samples = 2
             H = Singular.std(
                 Singular.Ideal(Rn, [change_ring(x, Rn) for x in Gw]),
                 complete_reduction = true,
@@ -916,21 +916,21 @@ function fractal_walk_recursiv_startorder(
             )
             global firstStepMode = false
         end
-        e2 = @ballocated liftGW2($G, $R, $Gw, $H, $Rn) evals = 1 samples = 1
+        e2 = @ballocated liftGW2($G, $R, $Gw, $H, $Rn) evals= 5 samples = 2
 
-        e = @belapsed liftGW2($G, $R, $Gw, $H, $Rn) evals = 1 samples = 1
-        f = @belapsed lift_fractal_walk($G, $R, $H, $Rn) evals = 1 samples = 1
-        f2 = @ballocated lift_fractal_walk($G, $R, $H, $Rn) evals = 1 samples = 1
+        e = @belapsed liftGW2($G, $R, $Gw, $H, $Rn) evals= 5 samples = 2
+        f = @belapsed lift_fractal_walk($G, $R, $H, $Rn) evals= 5 samples = 2
+        f2 = @ballocated lift_fractal_walk($G, $R, $H, $Rn) evals= 5 samples = 2
 
         H = liftGW2(G, R, Gw, H, Rn)
         #H = lift_fractal_walk(G, R, H, Rn)
         g2 =
-            @ballocated Singular.std($H, complete_reduction = true) evals = 1 samples =
-                1
+            @ballocated Singular.std($H, complete_reduction = true) evals= 5 samples =
+                2
 
         g =
-            @belapsed Singular.std($H, complete_reduction = true) evals = 1 samples =
-                1
+            @belapsed Singular.std($H, complete_reduction = true) evals= 5 samples =
+                2
         j = p
         j2 = p
 
@@ -1000,23 +1000,23 @@ function fractal_walk_recursive_lex(
     h2 = "-"
     i2 = "-"
     while !terminate
-        a = @belapsed nextT($G, $w, PertVecs[$p]) evals = 1 samples = 1
-        a2 = @ballocated nextT($G, $w, PertVecs[$p]) evals = 1 samples = 1
+        a = @belapsed nextT($G, $w, PertVecs[$p]) evals= 5 samples = 2
+        a2 = @ballocated nextT($G, $w, PertVecs[$p]) evals= 5 samples = 2
 
         t = nextT(G, w, PertVecs[p])
         if t == [0]
             if inCone(G, T, PertVecs[p])
-                h = @belapsed inCone($G, $T, PertVecs[$p]) evals = 1 samples = 1
+                h = @belapsed inCone($G, $T, PertVecs[$p]) evals= 5 samples = 2
                 h2 =
-                    @ballocated inCone($G, $T, PertVecs[$p]) evals = 1 samples =
-                        1
+                    @ballocated inCone($G, $T, PertVecs[$p]) evals= 5 samples =
+                        2
 
                 return G
             else
                 i =
-                    @belapsed [pertubed_vector($G, $T, i) for i = 1:nvars($R)] evals = 1 samples = 1
+                    @belapsed [pertubed_vector($G, $T, i) for i = 1:nvars($R)] evals= 5 samples = 2
                 i2 =
-                    @ballocated [pertubed_vector($G, $T, i) for i = 1:nvars($R)] evals = 1 samples = 1
+                    @ballocated [pertubed_vector($G, $T, i) for i = 1:nvars($R)] evals= 5 samples = 2
                 global PertVecs =
                     [pertubed_vector(G, T, i) for i = 1:Singular.nvars(R)]
                 println(PertVecs)
@@ -1038,22 +1038,22 @@ function fractal_walk_recursive_lex(
             z2 = length(Singular.gens(G))
 
             c2 =
-                @ballocated initials($R, Singular.gens($G), $w) evals = 1 samples =
-                    1
+                @ballocated initials($R, Singular.gens($G), $w) evals= 5 samples =
+                    2
 
             c =
-                @belapsed initials($R, Singular.gens($G), $w) evals = 1 samples =
-                    1
+                @belapsed initials($R, Singular.gens($G), $w) evals= 5 samples =
+                    2
             Gw = initials(R, Singular.gens(G), w)
             if p == Singular.nvars(R)
                 d = @belapsed Singular.std(
                     Singular.Ideal($Rn, [change_ring(x, $Rn) for x in $Gw]),
                     complete_reduction = true,
-                ) evals = 1 samples = 1
+                ) evals= 5 samples = 2
                 d2 = @ballocated Singular.std(
                     Singular.Ideal($Rn, [change_ring(x, $Rn) for x in $Gw]),
                     complete_reduction = true,
-                ) evals = 1 samples = 1
+                ) evals= 5 samples = 2
 
                 H = Singular.std(
                     Singular.Ideal(Rn, [change_ring(x, Rn) for x in Gw]),
@@ -1077,19 +1077,19 @@ function fractal_walk_recursive_lex(
                 global firstStepMode = false
             end
         end
-        e2 = @ballocated liftGW2($G, $R, $Gw, $H, $Rn) evals = 1 samples = 1
-        e = @belapsed liftGW2($G, $R, $Gw, $H, $Rn) evals = 1 samples = 1
-        f = @belapsed lift_fractal_walk($G, $R, $H, $Rn) evals = 1 samples = 1
-        f2 = @ballocated lift_fractal_walk($G, $R, $H, $Rn) evals = 1 samples = 1
+        e2 = @ballocated liftGW2($G, $R, $Gw, $H, $Rn) evals= 5 samples = 2
+        e = @belapsed liftGW2($G, $R, $Gw, $H, $Rn) evals= 5 samples = 2
+        f = @belapsed lift_fractal_walk($G, $R, $H, $Rn) evals= 5 samples = 2
+        f2 = @ballocated lift_fractal_walk($G, $R, $H, $Rn) evals= 5 samples = 2
 
         H = liftGW2(G, R, Gw, H, Rn)
         #H = lift_fractal_walk(G, R, H, Rn)
         g =
-            @belapsed Singular.std($H, complete_reduction = true) evals = 1 samples =
-                1
+            @belapsed Singular.std($H, complete_reduction = true) evals= 5 samples =
+                2
         g2 =
-            @ballocated Singular.std($H, complete_reduction = true) evals = 1 samples =
-                1
+            @ballocated Singular.std($H, complete_reduction = true) evals= 5 samples =
+                2
 
         j = p
         j2 = p
@@ -1159,23 +1159,23 @@ function fractal_walk_look_ahead_recursiv(
     h2 = "-"
     i2 = "-"
     while !terminate
-        a = @belapsed nextT($G, $w, PertVecs[$p]) evals = 1 samples = 1
-        a2 = @ballocated nextT($G, $w, PertVecs[$p]) evals = 1 samples = 1
+        a = @belapsed nextT($G, $w, PertVecs[$p]) evals= 5 samples = 2
+        a2 = @ballocated nextT($G, $w, PertVecs[$p]) evals= 5 samples = 2
 
         t = nextT(G, w, PertVecs[p])
         if t == [0]
             if inCone(G, T, PertVecs[p])
-                h = @belapsed inCone($G, $T, PertVecs[$p]) evals = 1 samples = 1
+                h = @belapsed inCone($G, $T, PertVecs[$p]) evals= 5 samples = 2
                 h2 =
-                    @ballocated inCone($G, $T, PertVecs[$p]) evals = 1 samples =
-                        1
+                    @ballocated inCone($G, $T, PertVecs[$p]) evals= 5 samples =
+                        2
 
                 return G
             else
                 i =
-                    @belapsed [pertubed_vector($G, $T, i) for i = 1:nvars($R)] evals = 1 samples = 1
+                    @belapsed [pertubed_vector($G, $T, i) for i = 1:nvars($R)] evals= 5 samples = 2
                 i2 =
-                    @ballocated [pertubed_vector($G, $T, i) for i = 1:nvars($R)] evals = 1 samples = 1
+                    @ballocated [pertubed_vector($G, $T, i) for i = 1:nvars($R)] evals= 5 samples = 2
 
                 global PertVecs = [pertubed_vector(G, T, i) for i = 1:nvars(R)]
                 continue
@@ -1190,20 +1190,20 @@ function fractal_walk_look_ahead_recursiv(
         Rn = change_order(R, T)
         z = length(Singular.gens(G))
         z2 = length(Singular.gens(G))
-        c2 = @ballocated initials($R, Singular.gens($G), $w) evals = 1 samples =
-            1
+        c2 = @ballocated initials($R, Singular.gens($G), $w) evals= 5 samples =
+            2
 
-        c = @belapsed initials($R, Singular.gens($G), $w) evals = 1 samples = 1
+        c = @belapsed initials($R, Singular.gens($G), $w) evals= 5 samples = 2
         Gw = initials(R, Singular.gens(G), w)
         if (p == Singular.nvars(R) || isbinomial(Gw))
             d = @belapsed Singular.std(
                 Singular.Ideal($Rn, [change_ring(x, $Rn) for x in $Gw]),
                 complete_reduction = true,
-            ) evals = 1 samples = 1
+            ) evals= 5 samples = 2
             d2 = @ballocated Singular.std(
                 Singular.Ideal($Rn, [change_ring(x, $Rn) for x in $Gw]),
                 complete_reduction = true,
-            ) evals = 1 samples = 1
+            ) evals= 5 samples = 2
             H = Singular.std(
                 Singular.Ideal(Rn, [change_ring(x, Rn) for x in Gw]),
                 complete_reduction = true,
@@ -1223,20 +1223,20 @@ function fractal_walk_look_ahead_recursiv(
                 p + 1,
             )
         end
-        e2 = @ballocated liftGW2($G, $R, $Gw, $H, $Rn) evals = 1 samples = 1
+        e2 = @ballocated liftGW2($G, $R, $Gw, $H, $Rn) evals= 5 samples = 2
 
-        e = @belapsed liftGW2($G, $R, $Gw, $H, $Rn) evals = 1 samples = 1
-        f = @belapsed lift_fractal_walk($G, $R, $H, $Rn) evals = 1 samples = 1
-        f2 = @ballocated lift_fractal_walk($G, $R, $H, $Rn) evals = 1 samples = 1
+        e = @belapsed liftGW2($G, $R, $Gw, $H, $Rn) evals= 5 samples = 2
+        f = @belapsed lift_fractal_walk($G, $R, $H, $Rn) evals= 5 samples = 2
+        f2 = @ballocated lift_fractal_walk($G, $R, $H, $Rn) evals= 5 samples = 2
 
         H = liftGW2(G, R, Gw, H, Rn)
         #H = lift_fractal_walk(G, R H, Rn)
         g =
-            @belapsed Singular.std($H, complete_reduction = true) evals = 1 samples =
-                1
+            @belapsed Singular.std($H, complete_reduction = true) evals= 5 samples =
+                2
         g2 =
-            @ballocated Singular.std($H, complete_reduction = true) evals = 1 samples =
-                1
+            @ballocated Singular.std($H, complete_reduction = true) evals= 5 samples =
+                2
 
         j = p
         j2 = p
@@ -1322,24 +1322,24 @@ function fractal_walk_combined(
     h2 = "-"
     i2 = "-"
     while !terminate
-        a = @belapsed nextT($G, $w, PertVecs[$p]) evals = 1 samples = 1
-        a2 = @ballocated nextT($G, $w, PertVecs[$p]) evals = 1 samples = 1
+        a = @belapsed nextT($G, $w, PertVecs[$p]) evals= 5 samples = 2
+        a2 = @ballocated nextT($G, $w, PertVecs[$p]) evals= 5 samples = 2
 
         t = nextT(G, w, PertVecs[p])
         if t == [0]
             if inCone(G, T, PertVecs[p])
-                h = @belapsed inCone($G, $T, PertVecs[$p]) evals = 1 samples = 1
+                h = @belapsed inCone($G, $T, PertVecs[$p]) evals= 5 samples = 2
                 h2 =
-                    @ballocated inCone($G, $T, PertVecs[$p]) evals = 1 samples =
-                        1
+                    @ballocated inCone($G, $T, PertVecs[$p]) evals= 5 samples =
+                        2
                 println(PertVecs[p], " in depth", p)
                 return G
             else
                 i2 =
-                    @ballocated [pertubed_vector($G, $T, i) for i = 1:nvars($R)] evals = 1 samples = 1
+                    @ballocated [pertubed_vector($G, $T, i) for i = 1:nvars($R)] evals= 5 samples = 2
 
                 i =
-                    @belapsed [pertubed_vector($G, $T, i) for i = 1:nvars($R)] evals = 1 samples = 1
+                    @belapsed [pertubed_vector($G, $T, i) for i = 1:nvars($R)] evals= 5 samples = 2
                 global PertVecs = [pertubed_vector(G, T, i) for i = 1:nvars(R)]
                 continue
             end
@@ -1358,22 +1358,22 @@ function fractal_walk_combined(
              z2 = length(Singular.gens(G))
 
             c2 =
-                @ballocated initials($R, Singular.gens($G), $w) evals = 1 samples =
-                    1
+                @ballocated initials($R, Singular.gens($G), $w) evals= 5 samples =
+                    2
 
             c =
-                @belapsed initials($R, Singular.gens($G), $w) evals = 1 samples =
-                    1
+                @belapsed initials($R, Singular.gens($G), $w) evals= 5 samples =
+                    2
             Gw = initials(R, gens(G), w)
             if (p == Singular.nvars(R) || isbinomial(Gw))
                 d = @belapsed Singular.std(
                     Singular.Ideal($Rn, [change_ring(x, $Rn) for x in $Gw]),
                     complete_reduction = true,
-                ) evals = 1 samples = 1
+                ) evals= 5 samples = 2
                 d2 = @ballocated Singular.std(
                     Singular.Ideal($Rn, [change_ring(x, $Rn) for x in $Gw]),
                     complete_reduction = true,
-                ) evals = 1 samples = 1
+                ) evals= 5 samples = 2
                 H = Singular.std(
                     Singular.Ideal(Rn, [change_ring(x, Rn) for x in Gw]),
                     complete_reduction = true,
@@ -1396,18 +1396,18 @@ function fractal_walk_combined(
                 global firstStepMode = false
             end
         end
-        e = @belapsed liftGW2($G, $R, $Gw, $H, $Rn) evals = 1 samples = 1
-        e2 = @ballocated liftGW2($G, $R, $Gw, $H, $Rn) evals = 1 samples = 1
-        f2 = @ballocated lift_fractal_walk($G, $R, $H, $Rn) evals = 1 samples = 1
-        f = @belapsed lift_fractal_walk($G, $R, $H, $Rn) evals = 1 samples = 1
+        e = @belapsed liftGW2($G, $R, $Gw, $H, $Rn) evals= 5 samples = 2
+        e2 = @ballocated liftGW2($G, $R, $Gw, $H, $Rn) evals= 5 samples = 2
+        f2 = @ballocated lift_fractal_walk($G, $R, $H, $Rn) evals= 5 samples = 2
+        f = @belapsed lift_fractal_walk($G, $R, $H, $Rn) evals= 5 samples = 2
         H = liftGW2(G, R, Gw, H, Rn)
         #H = lift_fractal_walk(G, R, H, Rn)
         g2 =
-            @ballocated Singular.std($H, complete_reduction = true) evals = 1 samples =
-                1
+            @ballocated Singular.std($H, complete_reduction = true) evals= 5 samples =
+                2
         g =
-            @belapsed Singular.std($H, complete_reduction = true) evals = 1 samples =
-                1
+            @belapsed Singular.std($H, complete_reduction = true) evals= 5 samples =
+                2
         j = p
         j2 = p
 
@@ -1466,12 +1466,13 @@ function tran_walk(G::Singular.sideal, S::Matrix{Int64}, T::Matrix{Int64})
     terminate = false
     while !terminate
         global a2 =
-            @ballocated next_weight($G, $cweight, $tweight) evals = 1 samples =
-                1
+            @ballocated next_weight($G, $cweight, $tweight) evals= 5 samples =
+                2
 
         global a =
-            @belapsed next_weight($G, $cweight, $tweight) evals = 1 samples = 1
+            @belapsed next_weight($G, $cweight, $tweight) evals= 5 samples = 2
         w = next_weight(G, cweight, tweight)
+        println(w)
         if tryparse(Int32, string(w)) == nothing
             println("w bigger than int32")
             return G
@@ -1480,25 +1481,25 @@ function tran_walk(G::Singular.sideal, S::Matrix{Int64}, T::Matrix{Int64})
         if w == tweight
             if inCone(G, T, cweight)
                 global i2 =
-                    @ballocated inCone($G, $T, $cweight) evals = 1 samples = 1
+                    @ballocated inCone($G, $T, $cweight) evals= 5 samples = 2
 
                 global i =
-                    @belapsed inCone($G, $T, $cweight) evals = 1 samples = 1
+                    @belapsed inCone($G, $T, $cweight) evals= 5 samples = 2
                 return G
             else
                 if inSeveralCones(initials(base_ring(G), gens(G), w))
                     global j = @belapsed inSeveralCones(
                         initials(base_ring($G), gens($G), $w),
-                    ) evals = 1 samples = 1
+                    ) evals= 5 samples = 2
                     global j2 = @ballocated inSeveralCones(
                         initials(base_ring($G), gens($G), $w),
-                    ) evals = 1 samples = 1
+                    ) evals= 5 samples = 2
                     global h2 =
-                        @ballocated representation_vector($G, $T) evals = 1 samples =
-                            1
+                        @ballocated representation_vector($G, $T) evals= 5 samples =
+                            2
                     global h =
-                        @belapsed representation_vector($G, $T) evals = 1 samples =
-                            1
+                        @belapsed representation_vector($G, $T) evals= 5 samples =
+                            2
                     tweight = representation_vector(G, T)
                     continue
                 end

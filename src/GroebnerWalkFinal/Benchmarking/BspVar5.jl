@@ -1,9 +1,10 @@
-include("/Users/JordiWelp/github/Singular.jl/src/GroebnerWalkFinal/Benchmarking/bechmarkingEveryProcedure/GroebnerWalkFinalBenchmarkProcedures.jl")
-include("/Users/JordiWelp/github/Singular.jl/src/GroebnerWalkFinal/Benchmarking/bechmarkingEveryProcedure/runbenchmark.jl")
-include("/Users/JordiWelp/github/Singular.jl/src/GroebnerWalkFinal/Benchmarking/BenchmarkingAlg/GroebnerWalkFinalBenchmark.jl")
-include("/Users/JordiWelp/github/Singular.jl/src/GroebnerWalkFinal/Benchmarking/BenchmarkingAlg/runbenchmark2.jl")
-include("/Users/JordiWelp/github/Singular.jl/src/GroebnerWalkFinal/Benchmarking/BenchmarkHelper")
+include("GroebnerWalkFinalBenchmarkProcedures.jl")
+include("runbenchmark.jl")
+include("GroebnerWalkFinalBenchmark.jl")
+include("runbenchmark2.jl")
+include("BenchmarkHelper")
 include("readWriteHelper.jl")
+include("Examples")
 
 using DataFrames
 using CSV

@@ -1,9 +1,10 @@
-include("/Users/JordiWelp/github/Singular.jl/src/GroebnerWalkFinal/Benchmarking/bechmarkingEveryProcedure/GroebnerWalkFinalBenchmarkProcedures.jl")
-include("/Users/JordiWelp/github/Singular.jl/src/GroebnerWalkFinal/Benchmarking/bechmarkingEveryProcedure/runbenchmark.jl")
-include("/Users/JordiWelp/github/Singular.jl/src/GroebnerWalkFinal/Benchmarking/BenchmarkingAlg/GroebnerWalkFinalBenchmark.jl")
-include("/Users/JordiWelp/github/Singular.jl/src/GroebnerWalkFinal/Benchmarking/BenchmarkingAlg/runbenchmark2.jl")
-include("/Users/JordiWelp/github/Singular.jl/src/GroebnerWalkFinal/Benchmarking/BenchmarkHelper")
+include("GroebnerWalkFinalBenchmarkProcedures.jl")
+include("runbenchmark.jl")
+include("GroebnerWalkFinalBenchmark.jl")
+include("runbenchmark2.jl")
+include("BenchmarkHelper")
 include("readWriteHelper.jl")
+include("/Users/JordiWelp/github/Singular.jl/src/GroebnerWalkFinal/Examples")
 using DataFrames
 using CSV
 
@@ -24,7 +25,7 @@ function benchmarkVar3()
     S = change_order(R, TarOrd)
     ideals = []
 
-    push!(
+    #=push!(
     ideals,
     Singular.Ideal(
         R,[48*b+23*a*c+47*a^5+69*a*b^4,
@@ -45,7 +46,7 @@ push!(
 for i in ideals
     runAll("sparseid(3,0,5,100-(1*2),90)", i, S, StartOrd, TarOrd)
 end
-ideals =[]
+ideals =[]=#
 push!(
     ideals,
     Singular.Ideal(

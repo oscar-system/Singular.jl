@@ -1,8 +1,8 @@
-include("/Users/JordiWelp/github/Singular.jl/src/GroebnerWalkFinal/Benchmarking/bechmarkingEveryProcedure/GroebnerWalkFinalBenchmarkProcedures.jl")
-include("/Users/JordiWelp/github/Singular.jl/src/GroebnerWalkFinal/Benchmarking/bechmarkingEveryProcedure/runbenchmark.jl")
-include("/Users/JordiWelp/github/Singular.jl/src/GroebnerWalkFinal/Benchmarking/BenchmarkingAlg/GroebnerWalkFinalBenchmark.jl")
-include("/Users/JordiWelp/github/Singular.jl/src/GroebnerWalkFinal/Benchmarking/BenchmarkingAlg/runbenchmark2.jl")
-include("/Users/JordiWelp/github/Singular.jl/src/GroebnerWalkFinal/Benchmarking/BenchmarkHelper")
+include("GroebnerWalkFinalBenchmarkProcedures.jl")
+include("runbenchmark.jl")
+include("GroebnerWalkFinalBenchmark.jl")
+include("runbenchmark2.jl")
+include("BenchmarkHelper")
 include("readWriteHelper.jl")
 include("/Users/JordiWelp/github/Singular.jl/src/GroebnerWalkFinal/Examples")
 
@@ -17,158 +17,173 @@ function runAllSingleExample()
     prepareAlloc()
 
     id = katsura5()
-    dim = nvars(base_ring(id))
+    R= base_ring(id)
+    dim = nvars(R)
     ve=ones(Int64,dim)
     StartOrd = ordering_as_matrix(ve, :lex)
     TarOrd = ordering_as_matrix(:lex, dim)
     S = change_order(R, TarOrd)
-    runAll("Katsura5", I, S, StartOrd, TarOrd)
+    runAll("Katsura5", id, S, StartOrd, TarOrd)
 
 
-    #Katsura6
 
     id = katsura6()
-    dim = nvars(base_ring(id))
+R= base_ring(id)
+dim = nvars(R)
     ve=ones(Int64,dim)
     StartOrd = ordering_as_matrix(ve, :lex)
     TarOrd = ordering_as_matrix(:lex, dim)
     S = change_order(R, TarOrd)
-    runAll("Katsura6", I, S, StartOrd, TarOrd)
+    runAll("Katsura6", id, S, StartOrd, TarOrd)
 
 
 
     example = "Cyclic7"
     id = cyclic7()
-    dim = nvars(base_ring(id))
+R= base_ring(id)
+dim = nvars(R)
     ve=ones(Int64,dim)
     StartOrd = ordering_as_matrix(ve, :lex)
     TarOrd = ordering_as_matrix(:lex, dim)
     S = change_order(R, TarOrd)
-    runAll(example, I, S, StartOrd, TarOrd)
+    runAll(example, id, S, StartOrd, TarOrd)
 
 
 
 
     example = "Cyclic6"
     id = cyclic6()
-    dim = nvars(base_ring(id))
+R= base_ring(id)
+dim = nvars(R)
     ve=ones(Int64,dim)
     StartOrd = ordering_as_matrix(ve, :lex)
     TarOrd = ordering_as_matrix(:lex, dim)
     S = change_order(R, TarOrd)
-    runAll(example, I, S, StartOrd, TarOrd)
+    runAll(example, id, S, StartOrd, TarOrd)
 
 
     example = "Cyclic5"
     id = cyclic5()
-    dim = nvars(base_ring(id))
+R= base_ring(id)
+dim = nvars(R)
     ve=ones(Int64,dim)
     StartOrd = ordering_as_matrix(ve, :lex)
     TarOrd = ordering_as_matrix(:lex, dim)
     S = change_order(R, TarOrd)
-    runAll(example, I, S, StartOrd, TarOrd)
+    runAll(example, id, S, StartOrd, TarOrd)
 
 
     example = "eco6"
     id = eco6()
-    dim = nvars(base_ring(id))
+R= base_ring(id)
+dim = nvars(R)
     ve=ones(Int64,dim)
     StartOrd = ordering_as_matrix(ve, :lex)
     TarOrd = ordering_as_matrix(:lex, dim)
     S = change_order(R, TarOrd)
-    runAll(example, I, S, StartOrd, TarOrd)
+    runAll(example, id, S, StartOrd, TarOrd)
 
     example = "eco7"
     id = eco7()
-    dim = nvars(base_ring(id))
+R= base_ring(id)
+dim = nvars(R)
     ve=ones(Int64,dim)
     StartOrd = ordering_as_matrix(ve, :lex)
     TarOrd = ordering_as_matrix(:lex, dim)
     S = change_order(R, TarOrd)
-    runAll(example, I, S, StartOrd, TarOrd)
+    runAll(example, id, S, StartOrd, TarOrd)
 
     example = "noon5"
     id = noon5()
-    dim = nvars(base_ring(id))
+R= base_ring(id)
+dim = nvars(R)
     ve=ones(Int64,dim)
     StartOrd = ordering_as_matrix(ve, :lex)
     TarOrd = ordering_as_matrix(:lex, dim)
     S = change_order(R, TarOrd)
-    runAll(example, I, S, StartOrd, TarOrd)
+    runAll(example, id, S, StartOrd, TarOrd)
 
 
 
     example = "noon6"
     id = noon6()
-    dim = nvars(base_ring(id))
+R= base_ring(id)
+dim = nvars(R)
     ve=ones(Int64,dim)
     StartOrd = ordering_as_matrix(ve, :lex)
     TarOrd = ordering_as_matrix(:lex, dim)
     S = change_order(R, TarOrd)
-    runAll(example, I, S, StartOrd, TarOrd)
+    runAll(example, id, S, StartOrd, TarOrd)
 
     example = "noon7"
     id = noon7()
-    dim = nvars(base_ring(id))
+R= base_ring(id)
+dim = nvars(R)
     ve=ones(Int64,dim)
     StartOrd = ordering_as_matrix(ve, :lex)
     TarOrd = ordering_as_matrix(:lex, dim)
     S = change_order(R, TarOrd)
-    runAll(example, I, S, StartOrd, TarOrd)
+    runAll(example, id, S, StartOrd, TarOrd)
 
     example = "noon8"
     id = noon8()
-    dim = nvars(base_ring(id))
+R= base_ring(id)
+dim = nvars(R)
     ve=ones(Int64,dim)
     StartOrd = ordering_as_matrix(ve, :lex)
     TarOrd = ordering_as_matrix(:lex, dim)
     S = change_order(R, TarOrd)
-    runAll(example, I, S, StartOrd, TarOrd)
+    runAll(example, id, S, StartOrd, TarOrd)
 
     example = "redeco7"
     id = redeco7()
-    dim = nvars(base_ring(id))
+R= base_ring(id)
+dim = nvars(R)
     ve=ones(Int64,dim)
     StartOrd = ordering_as_matrix(ve, :lex)
     TarOrd = ordering_as_matrix(:lex, dim)
     S = change_order(R, TarOrd)
-    runAll(example, I, S, StartOrd, TarOrd)
+    runAll(example, id, S, StartOrd, TarOrd)
 
     example = "redeco8"
     id = redeco8()
-    dim = nvars(base_ring(id))
+R= base_ring(id)
+dim = nvars(R)
     ve=ones(Int64,dim)
     StartOrd = ordering_as_matrix(ve, :lex)
     TarOrd = ordering_as_matrix(:lex, dim)
     S = change_order(R, TarOrd)
-    runAll(example, I, S, StartOrd, TarOrd)
+    runAll(example, id, S, StartOrd, TarOrd)
 
     example = "wang91"
     id = wang91()
-    dim = nvars(base_ring(id))
+R= base_ring(id)
+dim = nvars(R)
     ve=ones(Int64,dim)
     StartOrd = ordering_as_matrix(ve, :lex)
     TarOrd = ordering_as_matrix(:lex, dim)
     S = change_order(R, TarOrd)
-    runAll(example, I, S, StartOrd, TarOrd)
+    runAll(example, id, S, StartOrd, TarOrd)
 
     example = "cohn4"
     id = cohn4()
-    dim = nvars(base_ring(id))
+R= base_ring(id)
+dim = nvars(R)
     ve=ones(Int64,dim)
     StartOrd = ordering_as_matrix(ve, :lex)
     TarOrd = ordering_as_matrix(:lex, dim)
     S = change_order(R, TarOrd)
-    runAll(example, I, S, StartOrd, TarOrd)
+    runAll(example, id, S, StartOrd, TarOrd)
 
     example = "of"
     id = oberfr()
-    dim = nvars(base_ring(id))
+R= base_ring(id)
+dim = nvars(R)
     ve=ones(Int64,dim)
     StartOrd = ordering_as_matrix(ve, :lex)
     TarOrd = ordering_as_matrix(:lex, dim)
     S = change_order(R, TarOrd)
-    runAll(example, I, S, StartOrd, TarOrd)
+    runAll(example, id, S, StartOrd, TarOrd)
 
 
 end
@@ -195,7 +210,7 @@ S = change_order(R, TarOrd)
   f7 =x1*x2+x2*x3+x3*x4+x4*x5+x5*x6+x1-u7
 
 I = Singular.Ideal(R, [f1, f2,f3,f4,f5,f6,f7])
-runb(example, I, S, StartOrd, TarOrd)
+runb(example, id, S, StartOrd, TarOrd)
 
 s = Singular.std(
     Singular.Ideal(S, [change_ring(x, S) for x in Singular.gens(I)]),
