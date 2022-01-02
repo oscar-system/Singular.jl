@@ -1,122 +1,123 @@
 using BenchmarkTools
 
 function prepare()
-df = DataFrame(
-    nextW = ["nextW"],
-    currrentWeight = ["currrentWeight"],
-    nGens = ["nGens"],
-    initials = ["initials"],
-    stdH = ["stdH"],
-    liftAlternative = ["liftAlternative"],
-    lift = ["lift"],
-    interreduce = ["interreduce"],
-    example = ["example"],
-)
-savew(df, "standardWalk")
-df = DataFrame(
-    nextW = ["nextW"],
-    currrentWeight = ["currrentWeight"],
-    nGens = ["nGens"],
-    initials = ["initials"],
-    stdH = ["stdH"],
-    liftAlternative = ["liftAlternative"],
-    lift = ["lift"],
-    interreduce = ["interreduce"],
-    pert = ["pert"],
-    inCone = ["inCone"],
-    laststd = ["laststd"],
-    degree = ["degree"],
-    example = ["example"],
-)
-for i in 2:10
-savew(df, "pertubedWalk",i)
-end
-df = DataFrame(
-    nextW = ["nextW"],
-    facetnormal = ["-"],
-    initials = ["initials"],
-    stdH = ["stdH"],
-    liftgeneric = ["liftgeneric"],
-    interreduce = ["interreduce"],
-    example = ["example"],
-)
-savew(df, "genericWalk")
+    df = DataFrame(
+        nextW = ["-"],
+        currrentWeight = ["-"],
+        nGens = ["-"],
+        initials = ["-"],
+        stdH = ["-"],
+        liftAlternative = ["-"],
+        lift = ["-"],
+        interreduce = ["-"],
+        example = ["-"],
+    )
+    savew(df, "standardWalk")
+    df = DataFrame(
+        nextW = ["-"],
+        currrentWeight = ["-"],
+        nGens = ["-"],
+        initials = ["-"],
+        stdH = ["-"],
+        liftAlternative = ["-"],
+        lift = ["-"],
+        interreduce = ["-"],
+        pert = ["-"],
+        inCone = ["-"],
+        laststd = ["-"],
+        degree = ["-"],
+        example = ["-"],
+    )
+    for i = 2:10
+        savew(df, "pertubedWalk", i)
+    end
+    df = DataFrame(
+        nextW = ["-"],
+        facetnormal = ["-"],
+        nGens = ["-"],
+        initials = ["-"],
+        stdH = ["-"],
+        liftgeneric = ["-"],
+        interreduce = ["-"],
+        example = ["-"],
+    )
+    savew(df, "genericWalk")
 
-df = DataFrame(
-    nextW = ["nextW"],
-    currrentWeight = ["currrentWeight"],
-    nGens = ["nGens"],
-    initials = ["initials"],
-    stdH = ["stdH"],
-    liftAlternative = ["liftAlternative"],
-    lift = ["lift"],
-    interreduce = ["interreduce"],
-    inCone = ["inCone"],
-    pertvec = ["pertvec"],
-    depth = ["depth"],
-    example = ["example"],
-)
-savew(df, "fractalWalk")
-df = DataFrame(
-    nextW = ["nextW"],
-    currrentWeight = ["currrentWeight"],
-    nGens = ["nGens"],
-    initials = ["initials"],
-    stdH = ["stdH"],
-    liftAlternative = ["liftAlternative"],
-    lift = ["lift"],
-    interreduce = ["interreduce"],
-    inCone = ["inCone"],
-    pertvec = ["pertvec"],
-    depth = ["depth"],
-    example = ["example"],
-)
-savew(df, "fractalWalklex")
-df = DataFrame(
-    nextW = ["nextW"],
-    currrentWeight = ["currrentWeight"],
-    nGens = ["nGens"],
-    initials = ["initials"],
-    stdH = ["stdH"],
-    liftAlternative = ["liftAlternative"],
-    lift = ["lift"],
-    interreduce = ["interreduce"],
-    inCone = ["inCone"],
-    pertvec = ["pertvec"],
-    depth = ["depth"],
-    example = ["example"],
-)
-savew(df, "fractalWalklookahead")
-df = DataFrame(
-    nextW = ["nextW"],
-    currrentWeight = ["currrentWeight"],
-    nGens = ["nGens"],
-    initials = ["initials"],
-    stdH = ["stdH"],
-    liftAlternative = ["liftAlternative"],
-    lift = ["lift"],
-    interreduce = ["interreduce"],
-    inCone = ["inCone"],
-    pertvec = ["pertvec"],
-    depth = ["depth"],
-    example = ["example"],
-)
-savew(df, "fractalWalkcombined")
-df = DataFrame(
-    nextW = "nextW",
-    currrentWeight = "currrentWeight",
-    nGens = ["nGens"],
-    initials = ["initials"],
-    stdH = ["stdH"],
-    liftAlternative = ["liftAlternative"],
-    lift = ["lift"],
-    interreduce = ["interreduce"],
-    rep = ["rep"],
-    inCone = ["inCone"],
-    inseveral = ["inseveral"],
-    example = ["example"],
-)
-savew(df, "tranWalk")
+    df = DataFrame(
+        nextW = ["-"],
+        currrentWeight = ["-"],
+        nGens = ["-"],
+        initials = ["-"],
+        stdH = ["-"],
+        liftAlternative = ["-"],
+        lift = ["-"],
+        interreduce = ["-"],
+        inCone = ["-"],
+        pertvec = ["-"],
+        depth = ["-"],
+        example = ["-"],
+    )
+    savew(df, "fractalWalk")
+    df = DataFrame(
+        nextW = ["-"],
+        currrentWeight = ["-"],
+        nGens = ["-"],
+        initials = ["-"],
+        stdH = ["-"],
+        liftAlternative = ["-"],
+        lift = ["-"],
+        interreduce = ["-"],
+        inCone = ["-"],
+        pertvec = ["-"],
+        depth = ["-"],
+        example = ["-"],
+    )
+    savew(df, "fractalWalklex")
+    df = DataFrame(
+        nextW = ["-"],
+        currrentWeight = ["-"],
+        nGens = ["-"],
+        initials = ["-"],
+        stdH = ["-"],
+        liftAlternative = ["-"],
+        lift = ["-"],
+        interreduce = ["-"],
+        inCone = ["-"],
+        pertvec = ["-"],
+        depth = ["-"],
+        example = ["-"],
+    )
+    savew(df, "fractalWalklookahead")
+    df = DataFrame(
+        nextW = ["-"],
+        currrentWeight = ["-"],
+        nGens = ["-"],
+        initials = ["-"],
+        stdH = ["-"],
+        liftAlternative = ["-"],
+        lift = ["-"],
+        interreduce = ["-"],
+        inCone = ["-"],
+        pertvec = ["-"],
+        depth = ["-"],
+        example = ["-"],
+    )
+    savew(df, "fractalWalkcombined")
+    df = DataFrame(
+        nextW = ["-"],
+        currrentWeight = ["-"],
+        nGens = ["-"],
+        initials = ["-"],
+        stdH = ["-"],
+        liftAlternative = ["-"],
+        lift = ["-"],
+        interreduce = ["-"],
+        rep = ["-"],
+        inCone = ["-"],
+        inseveral = ["-"],
+        example = ["-"],
+    )
+    savew(df, "tranWalk")
 end
 function runb(
     v::String,
@@ -162,7 +163,7 @@ function runb(
             s,
         )
         b = "-"
-        df = DataFrame(a = [a], b = [b],c=[v])
+        df = DataFrame(a = [a], b = [b], c = [v])
         savea(df, "correct")
     end
 end

@@ -4,7 +4,7 @@ using CSV
 using DataFrames
 
 function parseideal(k::String)
-    csv_reader = CSV.File("Beispiele"*"$k"*"Variablen.txt")
+    csv_reader = CSV.File("Beispiele" * "$k" * "Variablen.txt")
     for row in csv_reader
         poly = collect(split("$(row.generator)", ""))
         result = ""
@@ -15,7 +15,7 @@ function parseideal(k::String)
             a = poly[i]
             if i == d
                 result = result * a
-                result = result* ","
+                result = result * ","
                 println("to", result)
                 break
             end
@@ -44,7 +44,7 @@ function parseideal(k::String)
             end
         end
         df = DataFrame(generator = Symbol(result))
-        savea(df, "cBeispiele"*"$k"*"Variablen")
+        savea(df, "cBeispiele" * "$k" * "Variablen")
         cd("/Users/JordiWelp/Results/1ideals")
 
     end
