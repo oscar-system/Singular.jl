@@ -287,7 +287,10 @@ end
 #
 ###############################################################################
 
-# mutable
+# Singular needs addresses for both elements and parents.
+# Both of these wrappers are to provide singular with addresses for both
+# element objects and parent objects in case that the julia object does not
+# support pointer_from_objref.
 mutable struct RingWrapper{S, T} <: Nemo.Ring
    data::S
 end
@@ -314,6 +317,20 @@ function promote_rule(::Type{n_FieldElem{FieldElemWrapper{S, T}}}, ::Type{T}) wh
    return n_FieldElem{FieldElemWrapper{S, T}}
 end
 
+# julia says the above are ambiguous on these cases
+function promote_rule(::Type{Singular.n_RingElem{Singular.RingElemWrapper{S, Nemo.fmpz}}}, ::Type{Nemo.fmpz}) where S
+   return Singular.n_RingElem{Singular.RingElemWrapper{S, Nemo.fmpz}}
+end
+
+function promote_rule(::Type{Singular.n_FieldElem{Singular.FieldElemWrapper{S, Nemo.fmpq}}}, ::Type{Nemo.fmpz}) where S
+   return Singular.n_FieldElem{Singular.FieldElemWrapper{S, Nemo.fmpq}}
+end
+
+function promote_rule(::Type{Singular.n_FieldElem{Singular.FieldElemWrapper{S, Nemo.fmpq}}}, ::Type{Nemo.fmpq}) where S
+   return Singular.n_FieldElem{Singular.FieldElemWrapper{S, Nemo.fmpq}}
+end
+
+
 function expressify(a::Union{RingWrapper, FieldWrapper}; context = nothing)
    return expressify(a.data, context = context)
 end
@@ -333,8 +350,12 @@ end
 elem_type(::Type{RingWrapper{S, T}}) where {S, T} = RingElemWrapper{S, T}
 elem_type(::Type{FieldWrapper{S, T}}) where {S, T} = FieldElemWrapper{S, T}
 
+parent_type(a::Type{RingElemWrapper{S, T}}) where {S, T} = RingWrapper{S, T}
+parent_type(a::Type{FieldElemWrapper{S, T}}) where {S, T} = FieldWrapper{S, T}
+
 parent(a::RingElemWrapper{S, T}) where {S, T} = a.parent
 parent(a::FieldElemWrapper{S, T}) where {S, T} = a.parent
+
 
 function (R::RingWrapper{S, T})() where {S, T}
    return RingElemWrapper{S, T}(R.data(), R)
@@ -416,7 +437,7 @@ for op in (:iszero, :isone)
 end
 
 # one input, one wrapped output
-for op in (:-, :zero, :one, :inv)
+for op in (:-, :zero, :one, :inv, :canonical_unit)
    @eval begin
       function ($op)(a::($rew){S, T}) where {S, T}
          return ($rew){S, T}(($op)(a.data), a.parent)
@@ -486,29 +507,32 @@ end
 
 end # for (rw, rew) in
 
+CoefficientRingID = Dict{Nemo.Ring, Any}()
 
-function CoefficientRing(R::Nemo.Ring)
-   T = elem_type(R)
-
-   if VERSION >= v"1.8"
-      ok = ismutabletype(T)
-   else
-      ok = ismutable(R())
-   end
-
-   if R isa Nemo.Field
-      if ok
-         return N_Field{T}(R)
+# FIXME: We need caching here? And the caching mechanism is not type stable?
+function CoefficientRing(R::Nemo.Ring, cached::Bool = true)
+   return AbstractAlgebra.get_cached!(CoefficientRingID, R, cached) do
+      T = elem_type(R)
+      # see comments for RingWrapper and FieldWrapper types
+      if VERSION >= v"1.8"
+         ok = ismutable(R) && ismutabletype(T)
       else
-         RR = FieldWrapper{typeof(R), elem_type(R)}(R)
-         return N_Field{elem_type(RR)}(RR)
+         ok = ismutable(R) && ismutable(R())
       end
-   else
-      if ok
-         return N_Ring{T}(R)
+      if R isa Nemo.Field
+         if ok
+            return N_Field{T}(R)
+         else
+            RR = FieldWrapper{typeof(R), elem_type(R)}(R)
+            return N_Field{elem_type(RR)}(RR)
+         end
       else
-         RR = RingWrapper{typeof(R), elem_type(R)}(R)
-         return N_Ring{elem_type(RR)}(RR)
+         if ok
+            return N_Ring{T}(R)
+         else
+            RR = RingWrapper{typeof(R), elem_type(R)}(R)
+            return N_Ring{elem_type(RR)}(RR)
+         end
       end
    end
 end

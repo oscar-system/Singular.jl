@@ -1203,6 +1203,33 @@ function (R::AbstractAlgebra.Generic.MPolyRing{T})(p::Singular.spoly{Singular.n_
    return finish(B)
 end
 
+
+function (R::AbstractAlgebra.Generic.MPolyRing{T})(
+   p::Singular.spoly{Singular.n_RingElem{Singular.RingElemWrapper{S, T}}}
+) where {S, T <: Nemo.RingElem}
+
+   B = MPolyBuildCtx(R)
+   cvzip = zip(coefficients(p), exponent_vectors(p))
+   for (c, v) in cvzip
+      cc = GC.@preserve c libSingular.julia(libSingular.cast_number_to_void(c.ptr))
+      push_term!(B, cc.data, v)
+   end
+   return finish(B)
+end
+
+function (R::AbstractAlgebra.Generic.MPolyRing{T})(
+   p::Singular.spoly{Singular.n_FieldElem{Singular.FieldElemWrapper{S, T}}}
+) where {S, T <: Nemo.FieldElem}
+
+   B = MPolyBuildCtx(R)
+   cvzip = zip(coefficients(p), exponent_vectors(p))
+   for (c, v) in cvzip
+      cc = GC.@preserve c libSingular.julia(libSingular.cast_number_to_void(c.ptr))
+      push_term!(B, cc.data, v)
+   end
+   return finish(B)
+end
+
 ###############################################################################
 #
 #   Differential functions
