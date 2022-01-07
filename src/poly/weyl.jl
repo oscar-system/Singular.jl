@@ -45,17 +45,17 @@ end
 function WeylAlgebra(R::Nemo.Ring, s::Vector{String};
                      ordering = :degrevlex, ordering2::Symbol = :comp1min,
                      cached::Bool = true, degree_bound::Int = 0)
-   R = CoefficientRing(R)
+   RR = CoefficientRing(R)
    s = vcat(s, ["d"*sym for sym in s])
-   return _WeylAlgebra(R, s, ordering, ordering2, cached, degree_bound)
+   return _WeylAlgebra(RR, s, ordering, ordering2, cached, degree_bound)
 end
 
 function WeylAlgebra(R::Nemo.Ring, s2::Matrix{String};
                      ordering = :degrevlex, ordering2::Symbol = :comp1min,
                      cached::Bool = true, degree_bound::Int = 0)
-   R = CoefficientRing(R)
+   RR = CoefficientRing(R)
    s = vcat(view(s, 1, :), view(s, 2, :))
-   return _WeylAlgebra(R, s, ordering, ordering2, cached, degree_bound)
+   return _WeylAlgebra(RR, s, ordering, ordering2, cached, degree_bound)
 end
 
 macro WeylAlgebra(R, s, n, o)

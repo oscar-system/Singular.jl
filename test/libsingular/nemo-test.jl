@@ -320,7 +320,7 @@ end
 
    U = Nemo.GF(Nemo.fmpz(11))
 
-   R, (x, y, dx, dy) = WeylAlgebra(U, ["x", "y"]) # @inferred broken
+   R, (x, y, dx, dy) = @inferred WeylAlgebra(U, ["x", "y"])
 
    wrappedUtype = Singular.n_FieldElem{Singular.FieldElemWrapper{Nemo.GaloisFmpzField, Nemo.gfp_fmpz_elem}}
 
@@ -437,7 +437,7 @@ end
 @testset "Nemo.NemoField.FreeAlgebra" begin
    U = Nemo.Generic.FractionField(Nemo.ZZ)
 
-   R, (x, y) = FreeAlgebra(U, ["x", "y"], 13) # @inferred broken
+   R, (x, y) = @inferred FreeAlgebra(U, ["x", "y"], 13)
 
    f1 = 3x*y + x^2 + 2y
    f2 = y^2 + 1

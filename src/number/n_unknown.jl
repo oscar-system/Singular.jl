@@ -509,30 +509,67 @@ end # for (rw, rew) in
 
 CoefficientRingID = Dict{Nemo.Ring, Any}()
 
-# FIXME: We need caching here? And the caching mechanism is not type stable?
-function CoefficientRing(R::Nemo.Ring, cached::Bool = true)
+if VERSION >= v"1.7"
+  _can_i_haz_mutable(::Type{T}) where {T} = ismutabletype(T) && ismutabletype(elem_type(T))
+else
+  _can_i_haz_mutable(::Type{T}) where {T} = T.mutable && elem_type(T).mutable
+end
+
+# insert a dummy type to force some things to happen at compile time
+struct _Dummy{T}
+end
+
+_Dummy{T}(x::T) where {T} = x
+
+@generated function _can_i_haz_type(::Type{T}) where {T <: Nemo.Field}
+  if _can_i_haz_mutable(T)
+    return :(_Dummy{T})
+  else
+    S = FieldWrapper{T, elem_type(T)}
+    return :($S)
+  end
+end
+
+@generated function _can_i_haz_type(::Type{T}) where T
+  if _can_i_haz_mutable(T)
+    return :(_Dummy{T})
+  else
+    S = RingWrapper{T, elem_type(T)}
+    return :($S)
+  end
+end
+
+function _can_i_haz_ring_or_field(::Type{<:Nemo.Field}, newring)
+  return N_Field{elem_type(newring)}(newring)
+end
+
+function _can_i_haz_ring_or_field(::Type{<:Nemo.Ring}, newring)
+  return N_Ring{elem_type(newring)}(newring)
+end
+
+function _can_i_haz_ring_or_field_type(::Type{<: Nemo.Field}, ::Type{S}) where {S}
+  return N_Field{elem_type(S)}
+end
+
+function _can_i_haz_ring_or_field_type(::Type{<: Nemo.Field}, ::Type{_Dummy{S}}) where {S}
+  return N_Field{elem_type(S)}
+end
+
+function _can_i_haz_ring_or_field_type(::Type{<: Nemo.Ring}, ::Type{S}) where {S}
+  return N_Ring{elem_type(S)}
+end
+
+function _can_i_haz_ring_or_field_type(::Type{<: Nemo.Ring}, ::Type{_Dummy{S}}) where {S}
+  return N_Ring{elem_type(S)}
+end
+
+function CoefficientRing(R::U, cached::Bool = true) where {U <: Nemo.Ring}
+   T = elem_type(U)
+   wrappedtype = _can_i_haz_type(U)
    return AbstractAlgebra.get_cached!(CoefficientRingID, R, cached) do
-      T = elem_type(R)
       # see comments for RingWrapper and FieldWrapper types
-      if VERSION >= v"1.8"
-         ok = ismutable(R) && ismutabletype(T)
-      else
-         ok = ismutable(R) && ismutable(R())
-      end
-      if R isa Nemo.Field
-         if ok
-            return N_Field{T}(R)
-         else
-            RR = FieldWrapper{typeof(R), elem_type(R)}(R)
-            return N_Field{elem_type(RR)}(RR)
-         end
-      else
-         if ok
-            return N_Ring{T}(R)
-         else
-            RR = RingWrapper{typeof(R), elem_type(R)}(R)
-            return N_Ring{elem_type(RR)}(RR)
-         end
-      end
-   end
+      newring = _can_i_haz_type(U)(R)
+      RR = _can_i_haz_ring_or_field(U, newring)
+      return RR
+    end::_can_i_haz_ring_or_field_type(U, wrappedtype)
 end
