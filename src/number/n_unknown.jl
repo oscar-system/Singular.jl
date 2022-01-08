@@ -524,7 +524,7 @@ CoefficientRingID = Dict{Nemo.Ring, Any}()
 
 if VERSION < v"1.7"
   # This function was added in >= 1.7
-  ismutabletype(::Type{T}) = T.mutable
+  ismutabletype(::Type{T}) where {T} = T.mutable
 end
 
 # - If R::T is mutable, the wrapper type should be T itself (no need for a
