@@ -507,69 +507,89 @@ end
 
 end # for (rw, rew) in
 
+################################################################################
+#
+#  Coefficient ring wrapper
+#
+################################################################################
+
 CoefficientRingID = Dict{Nemo.Ring, Any}()
 
-if VERSION >= v"1.7"
-  _can_i_haz_mutable(::Type{T}) where {T} = ismutabletype(T) && ismutabletype(elem_type(T))
-else
-  _can_i_haz_mutable(::Type{T}) where {T} = T.mutable && elem_type(T).mutable
+# We wrap everything into an N_Field or N_Ring.
+# But if the ring or the element type is mutable, we have to wrap them first
+# into something mutable (RingWrapper and FieldWrapper)
+#
+# To keep it type stable, we use a @generated function to treat being mutable
+# as a property available at compile time.
+
+if VERSION < v"1.7"
+  # This function was added in >= 1.7
+  ismutabletype(::Type{T}) = T.mutable
 end
 
-# insert a dummy type to force some things to happen at compile time
-struct _Dummy{T}
+# - If R::T is mutable, the wrapper type should be T itself (no need for a
+#   wrapper)
+# - If R::T is immutable, the wrapper type is say Ring[Field]Wrapper
+#
+# Let S be the wrapper type. The wrapped object will be constructed
+# as S(R). This will work in the second case (because we have such
+# constructors), but not in the first case. There is in general no
+# (::Type{T})(R::T) = R constructor.
+# So we introduce a dummy type which just does
+# (::Type{_DummyWrapper{T}})(R::T) = R
+
+struct _DummyWrapper{T}
 end
 
-_Dummy{T}(x::T) where {T} = x
+_DummyWrapper{T}(x::T) where {T} = x
 
-@generated function _can_i_haz_type(::Type{T}) where {T <: Nemo.Field}
-  if _can_i_haz_mutable(T)
-    return :(_Dummy{T})
-  else
-    S = FieldWrapper{T, elem_type(T)}
+@generated function mutable_field_or_ring_type_wrapper(::Type{T}) where {T <: Nemo.Ring}
+  if ismutabletype(T) && ismutabletype(Base.invokelatest(elem_type, T))
+    return :(_DummyWrapper{T})
+  else 
+    if T <: Nemo.Field
+      S = FieldWrapper{T, elem_type(T)}
+    else
+      S = RingWrapper{T, elem_type(T)}
+    end
     return :($S)
   end
 end
 
-@generated function _can_i_haz_type(::Type{T}) where T
-  if _can_i_haz_mutable(T)
-    return :(_Dummy{T})
-  else
-    S = RingWrapper{T, elem_type(T)}
-    return :($S)
-  end
+# The second wrapper
+function _second_wrapper(R::Nemo.Ring)
+  return N_Ring{elem_type(R)}(R)
 end
 
-function _can_i_haz_ring_or_field(::Type{<:Nemo.Field}, newring)
-  return N_Field{elem_type(newring)}(newring)
+function _second_wrapper(R::Nemo.Field)
+  return N_Field{elem_type(R)}(R)
 end
 
-function _can_i_haz_ring_or_field(::Type{<:Nemo.Ring}, newring)
-  return N_Ring{elem_type(newring)}(newring)
-end
-
-function _can_i_haz_ring_or_field_type(::Type{<: Nemo.Field}, ::Type{S}) where {S}
+# The second wrapper type (we need this to determine the type of the result)
+# To no do the @generated again, we just reuse the _DummyWrapper again.
+function _second_wrapper_type(::Type{S}) where {S <: Nemo.Field}
   return N_Field{elem_type(S)}
 end
 
-function _can_i_haz_ring_or_field_type(::Type{<: Nemo.Field}, ::Type{_Dummy{S}}) where {S}
+function _second_wrapper_type(::Type{_DummyWrapper{S}}) where {S <: Nemo.Field}
   return N_Field{elem_type(S)}
 end
 
-function _can_i_haz_ring_or_field_type(::Type{<: Nemo.Ring}, ::Type{S}) where {S}
+function _second_wrapper_type(::Type{S}) where {S <: Nemo.Ring}
   return N_Ring{elem_type(S)}
 end
 
-function _can_i_haz_ring_or_field_type(::Type{<: Nemo.Ring}, ::Type{_Dummy{S}}) where {S}
+function _second_wrapper_type(::Type{_DummyWrapper{S}}) where {S <: Nemo.Ring}
   return N_Ring{elem_type(S)}
 end
 
 function CoefficientRing(R::U, cached::Bool = true) where {U <: Nemo.Ring}
-   T = elem_type(U)
-   wrappedtype = _can_i_haz_type(U)
+   wrappedtype = mutable_field_or_ring_type_wrapper(U)
    return AbstractAlgebra.get_cached!(CoefficientRingID, R, cached) do
       # see comments for RingWrapper and FieldWrapper types
-      newring = _can_i_haz_type(U)(R)
-      RR = _can_i_haz_ring_or_field(U, newring)
+      newring = wrappedtype(R) # this is either R or Ring[Field]Wrapper(R)
+      # Now comes the second layer of wrapping
+      RR = _second_wrapper(newring)
       return RR
-    end::_can_i_haz_ring_or_field_type(U, wrappedtype)
+    end::_second_wrapper_type(wrappedtype)
 end
