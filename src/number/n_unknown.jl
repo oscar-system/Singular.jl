@@ -543,14 +543,14 @@ end
 
 _DummyWrapper{T}(x::T) where {T} = x
 
-@generated function mutable_field_or_ring_type_wrapper(::Type{T}) where {T <: Nemo.Ring}
-  if ismutabletype(T) && ismutabletype(Base.invokelatest(elem_type, T))
+@generated function mutable_field_or_ring_type_wrapper(::Type{T}, ::Type{U}) where {T <: Nemo.Ring, U}
+  if ismutabletype(T) && ismutabletype(U)
     return :(_DummyWrapper{T})
   else 
     if T <: Nemo.Field
-      S = FieldWrapper{T, elem_type(T)}
+      S = FieldWrapper{T, U}
     else
-      S = RingWrapper{T, elem_type(T)}
+      S = RingWrapper{T, U}
     end
     return :($S)
   end
@@ -584,7 +584,7 @@ function _second_wrapper_type(::Type{_DummyWrapper{S}}) where {S <: Nemo.Ring}
 end
 
 function CoefficientRing(R::U, cached::Bool = true) where {U <: Nemo.Ring}
-   wrappedtype = mutable_field_or_ring_type_wrapper(U)
+   wrappedtype = mutable_field_or_ring_type_wrapper(U, elem_type(U))
    return AbstractAlgebra.get_cached!(CoefficientRingID, R, cached) do
       # see comments for RingWrapper and FieldWrapper types
       newring = wrappedtype(R) # this is either R or Ring[Field]Wrapper(R)
