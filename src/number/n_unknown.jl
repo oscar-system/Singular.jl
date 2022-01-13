@@ -287,7 +287,10 @@ end
 #
 ###############################################################################
 
-# mutable
+# Singular needs addresses for both elements and parents.
+# Both of these wrappers are to provide singular with addresses for both
+# element objects and parent objects in case that the julia object does not
+# support pointer_from_objref.
 mutable struct RingWrapper{S, T} <: Nemo.Ring
    data::S
 end
@@ -314,6 +317,20 @@ function promote_rule(::Type{n_FieldElem{FieldElemWrapper{S, T}}}, ::Type{T}) wh
    return n_FieldElem{FieldElemWrapper{S, T}}
 end
 
+# julia says the above are ambiguous on these cases
+function promote_rule(::Type{Singular.n_RingElem{Singular.RingElemWrapper{S, Nemo.fmpz}}}, ::Type{Nemo.fmpz}) where S
+   return Singular.n_RingElem{Singular.RingElemWrapper{S, Nemo.fmpz}}
+end
+
+function promote_rule(::Type{Singular.n_FieldElem{Singular.FieldElemWrapper{S, Nemo.fmpq}}}, ::Type{Nemo.fmpz}) where S
+   return Singular.n_FieldElem{Singular.FieldElemWrapper{S, Nemo.fmpq}}
+end
+
+function promote_rule(::Type{Singular.n_FieldElem{Singular.FieldElemWrapper{S, Nemo.fmpq}}}, ::Type{Nemo.fmpq}) where S
+   return Singular.n_FieldElem{Singular.FieldElemWrapper{S, Nemo.fmpq}}
+end
+
+
 function expressify(a::Union{RingWrapper, FieldWrapper}; context = nothing)
    return expressify(a.data, context = context)
 end
@@ -333,8 +350,12 @@ end
 elem_type(::Type{RingWrapper{S, T}}) where {S, T} = RingElemWrapper{S, T}
 elem_type(::Type{FieldWrapper{S, T}}) where {S, T} = FieldElemWrapper{S, T}
 
+parent_type(a::Type{RingElemWrapper{S, T}}) where {S, T} = RingWrapper{S, T}
+parent_type(a::Type{FieldElemWrapper{S, T}}) where {S, T} = FieldWrapper{S, T}
+
 parent(a::RingElemWrapper{S, T}) where {S, T} = a.parent
 parent(a::FieldElemWrapper{S, T}) where {S, T} = a.parent
+
 
 function (R::RingWrapper{S, T})() where {S, T}
    return RingElemWrapper{S, T}(R.data(), R)
@@ -416,7 +437,7 @@ for op in (:iszero, :isone)
 end
 
 # one input, one wrapped output
-for op in (:-, :zero, :one, :inv)
+for op in (:-, :zero, :one, :inv, :canonical_unit)
    @eval begin
       function ($op)(a::($rew){S, T}) where {S, T}
          return ($rew){S, T}(($op)(a.data), a.parent)
@@ -486,29 +507,50 @@ end
 
 end # for (rw, rew) in
 
+################################################################################
+#
+#  Coefficient ring wrapper
+#
+################################################################################
 
-function CoefficientRing(R::Nemo.Ring)
-   T = elem_type(R)
+CoefficientRingID = Dict{Nemo.Ring, Any}()
 
-   if VERSION >= v"1.8"
-      ok = ismutabletype(T)
-   else
-      ok = ismutable(R())
-   end
+# We wrap everything into an N_Field or N_Ring.
+# But if the ring or the element type is mutable, we have to wrap them first
+# into something mutable (RingWrapper and FieldWrapper)
+#
+# To keep it type stable, we use a @generated function to treat being mutable
+# as a property available at compile time.
 
-   if R isa Nemo.Field
-      if ok
-         return N_Field{T}(R)
-      else
-         RR = FieldWrapper{typeof(R), elem_type(R)}(R)
-         return N_Field{elem_type(RR)}(RR)
-      end
-   else
-      if ok
-         return N_Ring{T}(R)
-      else
-         RR = RingWrapper{typeof(R), elem_type(R)}(R)
-         return N_Ring{elem_type(RR)}(RR)
-      end
-   end
+if VERSION < v"1.7"
+  # This function was added in >= 1.7
+  ismutabletype(::Type{T}) where {T} = T.mutable
+end
+
+@generated function mutable_field_or_ring_type_wrapper(::Type{T}, ::Type{U}) where {T <: Nemo.Ring, U}
+  if ismutabletype(T) && ismutabletype(U)
+    S = T
+  elseif T <: Nemo.Field
+    S = FieldWrapper{T, U}
+  else
+    S = RingWrapper{T, U}
+  end
+  return :($S)
+end
+
+function CoefficientRing(R::T, cached::Bool = true) where {T <: Nemo.Ring}
+  U = elem_type(T)
+  wrappertype = mutable_field_or_ring_type_wrapper(T, U)
+  wrapperelemtype = elem_type(wrappertype)
+  rettype = T <: Nemo.Field ? N_Field{wrapperelemtype} : N_Ring{wrapperelemtype}
+  return AbstractAlgebra.get_cached!(CoefficientRingID, R, cached) do
+    if ismutabletype(T) && ismutabletype(U)
+      newring = R
+    elseif T <: Nemo.Field
+      newring = FieldWrapper{T, U}(R)
+    else
+      newring = RingWrapper{T, U}(R)
+    end
+    return rettype(newring)
+  end::rettype
 end
