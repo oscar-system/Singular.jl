@@ -204,3 +204,17 @@ end
     @test_throws Exception Singular.lookup_library_symbol("Finvar", "meiyou")
     @test_throws Exception Singular.lookup_library_symbol("blah", "bluh")
 end
+
+@testset "caller.noncommutative" begin
+    F, (q1, q2) = FunctionField(QQ, ["q1", "q2"])
+    R, (x, y, z) = PolynomialRing(F, ["x", "y", "z"])
+    S, (x, y, z) = GAlgebra(R, Singular.Matrix(R, [0 q2 q1; 0 0 1; 0 0 0]),
+                               Singular.Matrix(R, [0 x z; 0 0 0; 0 0 0]))
+    @test Singular.LibNctools.ndcond(S) isa sideal
+
+    AA, (x, y, z, t) = PolynomialRing(QQ, ["x", "y", "z", "t"])
+    D = zero_matrix(AA, 4, 4)
+    D[1,2] = -z; D[1,3] = 2*x; D[2,3] = -2*y
+    A, (x, y, z, t) = GAlgebra(AA, Singular.Matrix(AA, [0 1 1 1; 0 0 1 1; 0 0 0 1; 0 0 0 1]), D)
+    @test Singular.LibCentral.center(A, 3) isa sideal
+end

@@ -258,7 +258,7 @@ function prepare_argument(x::String)
     return Any[mapping_types_reversed[:STRING_CMD], libSingular.copy_string_to_void(x)], nothing
 end
 
-function prepare_argument(x::PolyRing)
+function prepare_argument(x::PolyRingUnion)
     GC.@preserve x new_ptr = libSingular.get_ring_ref(x.ptr)
     return Any[mapping_types_reversed[:RING_CMD], new_ptr], x
 end
@@ -298,7 +298,7 @@ function prepare_argument(x::Union{
 end
 
 
-function prepare_argument(x::Vector{Any}, R::PolyRing)
+function prepare_argument(x::Vector{Any}, R::PolyRingUnion)
     args = Vector{Any}()
     types = Vector{Int}()
     for i in x
