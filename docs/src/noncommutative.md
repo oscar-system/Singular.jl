@@ -52,24 +52,34 @@ $D$ over $R$. If the variables of $R$ are $x_1,\dots,x_n$, then the noncommutati
 algebra is constructed with relations $x_j x_i = c_{i,j} x_i x_j + d_{i,j}$ for
 $1 \le i < j \le n$. The $c_{i,j}$ must be nonzero constant polynomials and the
 relations $x_i x_j > \mathrm{lm}(d_{i,j})$ must hold in the monomial ordering
-of the ring $R$. The entries of the matrices $C$ and $D$ on or
-below the main diagonal are ignored.
+of the ring $R$.
+
+The entries of the matrices $C$ and $D$ on or below the main diagonal are
+ignored. A non-matrix argument `a` for either `C` or `D` is turned into a
+matrix with with all relevent entries set to `a`.
 
 !!! note
     The conditions that assure that multiplication is associative in the
-    resulting algebra are currently *not* checked.
+    resulting algebra are currently *not* checked. The example below
+    illustrates how this condition can be checked.
 
 **Examples**
 
 ```julia
 julia> R, (x, y) = PolynomialRing(QQ, ["x", "y"]);
 
-julia> G, (x, y) = GAlgebra(R, Singular.Matrix(R, [0 2; 0 0]),
-                               Singular.Matrix(R, [0 x; 0 0]))
+julia> G, (x, y) = GAlgebra(R, 2, Singular.Matrix(R, [0 x; 0 0]))
 (Singular G-Algebra (QQ),(x,y),(dp(2),C), spluralg{n_Q}[x, y])
 
 julia> y*x
 2*x*y + x
+```
+
+Associativity can be checked via the following library proceedure.
+
+```
+julia> iszero(Singular.LibNctools.ndcond(G))
+true
 ```
 
 The construction of a GR-algebra proceeds by taking the quotient of a G-algebra

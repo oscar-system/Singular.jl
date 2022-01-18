@@ -114,9 +114,22 @@ end
 #
 ###############################################################################
 
-function GAlgebra(R::PolyRing{T}, C::smatrix{spoly{T}}, D::smatrix{spoly{T}};
-                  cached::Bool = true) where T <: Nemo.RingElem
-   parent_obj = PluralRing{T}(R, C, D, R.S)
+function _to_matrix(R::PolyRing, a::smatrix)
+   R == base_ring(a) || error("matrix has the wrong base ring")
+   return a
+end
+
+function _to_matrix(R::PolyRing, a)
+   n = nvars(R)
+   m = zero_matrix(R, n, n)
+   for i in 1:n, j in i+1:n
+      m[i,j] = R(a)
+   end
+   return m
+end
+
+function GAlgebra(R::PolyRing{T}, C, D; cached::Bool = true) where T <: Nemo.RingElem
+   parent_obj = PluralRing{T}(R, _to_matrix(R, C), _to_matrix(R, D), R.S)
    return (parent_obj, gens(parent_obj))
 end
 

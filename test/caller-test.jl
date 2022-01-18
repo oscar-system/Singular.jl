@@ -215,6 +215,6 @@ end
     AA, (x, y, z, t) = PolynomialRing(QQ, ["x", "y", "z", "t"])
     D = zero_matrix(AA, 4, 4)
     D[1,2] = -z; D[1,3] = 2*x; D[2,3] = -2*y
-    A, (x, y, z, t) = GAlgebra(AA, Singular.Matrix(AA, [0 1 1 1; 0 0 1 1; 0 0 0 1; 0 0 0 1]), D)
+    A, (x, y, z, t) = GAlgebra(AA, 1, D)
     @test Singular.LibCentral.center(A, 3) isa sideal
 end
