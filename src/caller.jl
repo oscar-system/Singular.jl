@@ -348,8 +348,6 @@ function prepare_argument(x::Any)
         rng = parent(x)
         new_ptr = libSingular.n_Copy(ptr, rng.ptr)
         return Any[mapping_types_reversed[:NUMBER_CMD], new_ptr.cpp_object], nothing
-    elseif x.ptr isa libSingular.map_ptr
-        return Any[mapping_types_reversed[:MAP_CMD], x.ptr.cpp_object], nothing
     end
     error("unrecognized argument $x")
 end
