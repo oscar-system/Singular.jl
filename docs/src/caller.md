@@ -2,7 +2,7 @@
 CurrentModule = Singular
 ```
 
-# Library Proceedures
+# Library Procedures
 
 Singular.jl provides limited access to the functionality of the Singular
 interpreter and its associated standard library procedures. The following
@@ -16,7 +16,7 @@ features of the Singular language are not supported:
    Singular language and Singular.jl because the Singular language tracks the
    preimage ring by name only and the rings in Singular.jl do not have names.
 
- - Very few library proceedures work with [Nemo rings and fields](@ref)
+ - Very few library procedures work with [Nemo rings and fields](@ref).
 
 ## Calling a Library Procedure
 
@@ -25,16 +25,16 @@ corresponding function in `Singular.jl` is called `Singular.LibGeneral.sort`.
 The full list of libraries included can be viewed by typing `Singular.Lib` at
 the REPL and double pressing the tab key.
 
-One issue that comes up in calling library proceedures is the implicit argument
+One issue that comes up in calling library procedures is the implicit argument
 `basering` that all procedures receive in the Singular language. `Singular.jl`
 tries to infer the base ring from the arguments provided to the function. When
 this fails or is simply not possible, the user can always provide a base ring
 by passing it in as the first argument to the `Singular.jl` function. Note that
-if the first argument to the `Singular.jl` version of a library procedure, then
-this is automatically assumed to be the base ring. Hence, if a procedure in the
-Singular language takes a ring as a first argument, you will have to pass that
-ring in as the second argument after specifying the base ring in the first
-argument.
+if the first argument to the `Singular.jl` version of a library procedure is a
+polynomial or non-commutative ring, then this is automatically assumed to be the
+base ring. Hence, if a procedure in the Singular language takes a ring as a
+first argument, you will have to pass that ring as the second argument after
+specifying the base ring in the first argument.
 
 **Examples**
 
