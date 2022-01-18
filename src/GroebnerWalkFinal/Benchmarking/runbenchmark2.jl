@@ -1,29 +1,5 @@
 using BenchmarkTools
-function prepare2()
 
-    df = DataFrame(
-        example = ["-"],
-        standard = ["-"],
-        pertubed2 = ["-"],
-        pertubed3 = ["-"],
-        pertubed4 = ["-"],
-        pertubed5 = ["-"],
-        pertubed6 = ["-"],
-        pertubed7 = ["-"],
-        pertubed8 = ["-"],
-        pertubed9 = ["-"],
-        pertubed10 = ["-"],
-        fractal = ["-"],
-        fractallex = ["-"],
-        fractallookahead = ["-"],
-        fractalcombined = ["-"],
-        generic = ["-"],
-        tran = ["-"],
-        stime = ["-"],
-        ttime = ["-"],
-    )
-    savew(df, "CompareAlg")
-end
 
 function runb2(
     v::String,

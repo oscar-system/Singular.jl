@@ -141,6 +141,9 @@ function standard_walkAlloc(
             terminate = true
         else
             cweight = next_weight(G, cweight, tweight)
+            if !checkInt32(cweight)
+                return G
+            end
             R = Rn
             Rn = change_order(Rn, cweight, T)
         end
@@ -215,8 +218,8 @@ function pertubed_walk2(
     T::Matrix{Int64},
     p::Int64,
 )
-    #cweight = pertubed_vector(G, S, p)
-    cweight = S[1, :]
+    cweight = pertubed_vector(G, S, p)
+    #cweight = S[1, :]
     terminate = false
     #println("pertubed_walk2 results")
     #println("Crossed Cones in: ")
@@ -307,6 +310,9 @@ function fractal_recursiv2(
         end
         w = w + t * (PertVecs[p] - w)
         w = convert_bounding_vector(w)
+        if !checkInt32(w)
+            return G
+        end
         T.w = w
         Rn = change_order(R, T)
         Gw = initials(R, Singular.gens(G), w)
@@ -391,6 +397,9 @@ function fractal_walk2_recursiv_startorder2(
         end
         w = w + t * (PertVecs[p] - w)
         w = convert_bounding_vector(w)
+        if !checkInt32(cweight)
+            return G
+        end
         T.w = w
         Rn = change_order(R, T)
         Gw = initials(R, gens(G), w)
@@ -413,8 +422,8 @@ function fractal_walk2_recursiv_startorder2(
             )
             global firstStepMode = false
         end
-        H = liftGW2(G, R, Gw, H, Rn)
-        #H = lift(G, R, H, Rn)
+        #H = liftGW2(G, R, Gw, H, Rn)
+        H = lift(G, R, H, Rn)
         G = Singular.std(H, complete_reduction = true)
         R = Rn
     end
@@ -461,6 +470,9 @@ function fractal_walk2_recursive_lex2(
         else
             w = w + t * (PertVecs[p] - w)
             w = convert_bounding_vector(w)
+            if !checkInt32(w)
+                return G
+            end
             T.w = w
             Rn = change_order(R, T)
             Gw = initials(R, Singular.gens(G), w)
@@ -527,6 +539,9 @@ function fractal_walk2_look_ahead_recursiv2(
         end
         w = w + t * (PertVecs[p] - w)
         w = convert_bounding_vector(w)
+        if !checkInt32(w)
+            return G
+        end
         T.w = w
         Rn = change_order(R, T)
         Gw = initials(R, Singular.gens(G), w)
@@ -548,8 +563,8 @@ function fractal_walk2_look_ahead_recursiv2(
             )
         end
 
-        H = liftGW2(G, R, Gw, H, Rn)
-        #H = lift(G, R H, Rn)
+        #H = liftGW2(G, R, Gw, H, Rn)
+        H = lift_fractal_walk(G, R, H, Rn)
         G = Singular.std(H, complete_reduction = true)
         R = Rn
     end
@@ -610,6 +625,9 @@ function fractal_walk2_combined(
         else
             w = w + t * (PertVecs[p] - w)
             w = convert_bounding_vector(w)
+            if !checkInt32(w)
+                return G
+            end
             T.w = w
             b = w
             Rn = change_order(R, T)
@@ -657,11 +675,8 @@ function tran_walk2(G::Singular.sideal, S::Matrix{Int64}, T::Matrix{Int64})
     terminate = false
     while !terminate
         w = next_weight(G, cweight, tweight)
-        for i = 1:length(w)
-            if tryparse(Int32, string(w[i])) == nothing
-                println("w bigger than int32")
-                return G
-            end
+        if !checkInt32(w)
+            return G
         end
         Rn = change_order(R, w, T)
         if w == tweight

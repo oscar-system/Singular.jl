@@ -39,13 +39,27 @@ Fractal Walk (:fractal) computes the Walk like it´s presented in Amrhein & Gloo
 Fractal Walk (:fractal_start_order) computes the Walk like it´s presented in Amrhein & Gloor (1998). Pertubes oth, the start und the target vector.
 Fractal Walk (:fractal_lex) computes the Walk like it´s presented in Amrhein & Gloor (1998) in the special case that $T$ represents the lex ordering. Pertubes only the target vector.
 Fractal Walk (:factal_look_ahead) computes the Walk like it´spresented in Amrhein & Gloor (1998). This Version uses the buchberger algorithm under certain circumstances before reaching the maximal pertubation depth.
+
+#Arguments
+*`I::Singular.sideal`: Gröbnerbasis to compute the Gröbnerbasis w.r.t. the traget-ordering.
+*`S::Matrix{Int64}`: The ordering w.r.t. the Gröbnerbasis I. Note that S has to be a nxn-matrix with rank(S)=n.
+*`T::Matrix{Int64}`: The ordering we want to compute a Gröbnerbasis for. Note that T has to be a nxn-matrix with rank(T)=n.
+*`grwalktype::Symbol`: Strategy of the Gröbnerwalk to be used. There are the strategies:
+    - `standard`: Standard Walk (default),
+    - `pertubed`: Pertubed Walk,
+    - `tran`: Tran´s Walk,
+    - `generic`: Generic Walk,
+    - `fractal`: Standard-Version of the Fractal Walk,
+    - `fractalcombined`: Combined Fractal Walk with handling of start-ordering and look-ahead computation for lexicographic target-ordering,
+    - `fractal_look_ahead`:Fractal Walk with look-ahead computation.
+*`p::Int64`: Pertubationdegree (p,p) for the pertubed Walk. Default is 2.
 """=#
 function groebnerwalk(
     G::Singular.sideal,
     S::Matrix{Int64},
     T::Matrix{Int64},
     grwalktype::Symbol = :standard,
-    p::Int64 = 0,
+    p::Int64 = 2,
 )
     if grwalktype == :standard
         walk = (x, y, z) -> standard_walk(x, y, z)
@@ -128,6 +142,9 @@ function standard_walk(
             terminate = true
         else
             cweight = next_weight(G, cweight, tweight)
+            if !checkInt32(cweight)
+                return G
+            end
             R = Rn
             Rn = change_order(Rn, cweight, T)
         end
@@ -295,6 +312,9 @@ function fractal_recursiv(
         w = w + t * (PertVecs[p] - w)
         w = convert_bounding_vector(w)
         T.w = w
+        if !checkInt32(w)
+            return G
+        end
         Rn = change_order(R, T)
         Gw = initials(R, Singular.gens(G), w)
         if p == nvars(R)
@@ -377,6 +397,9 @@ function fractal_walk_recursiv_startorder(
         end
         w = w + t * (PertVecs[p] - w)
         w = convert_bounding_vector(w)
+        if !checkInt32(w)
+            return G
+        end
         T.w = w
         Rn = change_order(R, T)
         Gw = initials(R, gens(G), w)
@@ -447,6 +470,9 @@ function fractal_walk_recursive_lex(
         else
             w = w + t * (PertVecs[p] - w)
             w = convert_bounding_vector(w)
+            if !checkInt32(w)
+                return G
+            end
             T.w = w
             Rn = change_order(R, T)
             Gw = initials(R, Singular.gens(G), w)
@@ -513,6 +539,9 @@ function fractal_walk_look_ahead_recursiv(
         end
         w = w + t * (PertVecs[p] - w)
         w = convert_bounding_vector(w)
+        if !checkInt32(w)
+            return G
+        end
         T.w = w
         Rn = change_order(R, T)
         Gw = initials(R, Singular.gens(G), w)
@@ -596,6 +625,9 @@ function fractal_walk_combined(
         else
             w = w + t * (PertVecs[p] - w)
             w = convert_bounding_vector(w)
+            if !checkInt32(w)
+                return G
+            end
             T.w = w
             b = w
             Rn = change_order(R, T)
@@ -643,6 +675,9 @@ function tran_walk(G::Singular.sideal, S::Matrix{Int64}, T::Matrix{Int64})
     terminate = false
     while !terminate
         w = next_weight(G, cweight, tweight)
+        if !checkInt32(w)
+            return G
+        end
         for i = 1:length(w)
             if tryparse(Int32, string(w[i])) == nothing
                 println("w bigger than int32")

@@ -191,11 +191,15 @@ function standard_walk(
     Rn = change_order(R, cweight, T)
     terminate = false
     while !terminate
-        global counter = getCounter() + 1
         println(cweight)
         global b = cweight
         global b2 = cweight
+        Gtemp = G
         G = standard_step(G, R, cweight, Rn)
+        if !isequal(Singular.Ideal(Rn, [change_ring(x, Rn) for x in gens(Gtemp)]), G)
+                global counter = getCounter() + 1
+                println(true)
+            end
         if cweight == tweight
             terminate = true
         else
@@ -207,10 +211,27 @@ function standard_walk(
                     2
 
             cweight = next_weight(G, cweight, tweight)
+            if !checkInt32(cweight)
+                return G
+            end
             R = Rn
             Rn = change_order(Rn, cweight, T)
         end
     end
+    global z = Singular.ngens(G)
+    df = DataFrame(
+        a = [a],
+        b = [b],
+        z = [z],
+        c = [c],
+        d = [d],
+        e = [e],
+        f = [f],
+        g = [g],
+        h = ["-"],
+        counter = [getCounter()],
+    )
+    savea(df, "standardWalk")
     return G
 end
 
@@ -265,7 +286,8 @@ function standard_step(
         e = [e],
         f = [f],
         g = [g],
-        h = [counter],
+        h = ["-"],
+        counter = ["-"]
     )
     df2 = DataFrame(
         a2 = [a2],
@@ -276,7 +298,8 @@ function standard_step(
         e2 = [e2],
         f2 = [f2],
         g2 = [g2],
-        h2 = [counter],
+        h2 = ["-"],
+        counter = ["-"]
     )
 
     savea(df, "standardWalk")
@@ -305,12 +328,17 @@ function standard_walk2(
     Rn = change_order(R, cweight, T)
     terminate = false
     while !terminate
-        global counter = getCounter() + 1
         println(cweight)
         global b = cweight
         global b2 = cweight
 
+        Gtemp = G
         G = standard_step2(G, R, cweight, Rn)
+
+        if !isequal(Singular.Ideal(Rn, [change_ring(x, Rn) for x in gens(Gtemp)]), G)
+                global counter = getCounter() + 1
+                println(true)
+            end
         df = DataFrame(
             a = [a],
             b = [b],
@@ -325,6 +353,8 @@ function standard_walk2(
             j = [j],
             k = [k],
             l = [l],
+            counter = ["-"]
+
         )
         df2 = DataFrame(
             a2 = [a2],
@@ -340,6 +370,8 @@ function standard_walk2(
             j2 = [j2],
             k2 = [k2],
             l2 = [l2],
+            counter = ["-"]
+
         )
         cleardf()
         savea(df, "pertubedWalk", k)
@@ -355,6 +387,9 @@ function standard_walk2(
                 @belapsed next_weight($G, $cweight, $tweight) evals = 5 samples =
                     2
             cweight = next_weight(G, cweight, tweight)
+            if !checkInt32(cweight)
+                return G
+            end
             R = Rn
             Rn = change_order(Rn, cweight, T)
         end
@@ -440,6 +475,8 @@ function generic_walk(G::Singular.sideal, S::Matrix{Int64}, T::Matrix{Int64})
             e = [e],
             f = [f],
             g = [g],
+            counter = ["-"]
+
         )
         df2 = DataFrame(
             a2 = [a2],
@@ -450,6 +487,8 @@ function generic_walk(G::Singular.sideal, S::Matrix{Int64}, T::Matrix{Int64})
             e2 = [e2],
             f2 = [f2],
             g2 = [g2],
+            counter = ["-"]
+
         )
         savea(df2, "allocsGenericWalk")
         savea(df, "genericWalk")
@@ -461,6 +500,19 @@ function generic_walk(G::Singular.sideal, S::Matrix{Int64}, T::Matrix{Int64})
             @belapsed next_gamma($G, $Lm, $v, $S, $T) evals = 5 samples = 2
         v = next_gamma(G, Lm, v, S, T)
     end
+    global z = Singular.ngens(G)
+    df = DataFrame(
+        a = [a],
+        b = [b],
+        z = [z],
+        c = [c],
+        d = [d],
+        e = [e],
+        f = [f],
+        g = [g],
+        counter = [getCounter()],
+    )
+    savea(df, "genericWalk")
     return Singular.interreduce(G)
 end
 
@@ -530,6 +582,8 @@ function pertubed_walk(
         j = ["-"],
         k = [(p, p)],
         l = ["-"],
+        counter = ["-"]
+
     )
     df2 = DataFrame(
         a2 = ["-"],
@@ -545,11 +599,13 @@ function pertubed_walk(
         j2 = ["-"],
         k2 = [(p, p)],
         l2 = ["-"],
+        counter = ["-"]
+
     )
     savea(df2, "allocsPertubedWalk", k)
     savea(df, "pertubedWalk", k)
-    #cweight = pertubed_vector(G, S, p)
-    cweight = S[1, :]
+    cweight = pertubed_vector(G, S, p)
+    #cweight = S[1, :]
     terminate = false
     println("pertubed_walk results")
     println("Crossed Cones in: ")
@@ -599,6 +655,8 @@ function pertubed_walk(
             j = [j],
             k = [k],
             l = [l],
+            counter = ["-"]
+
         )
         df2 = DataFrame(
             a2 = [a2],
@@ -614,12 +672,33 @@ function pertubed_walk(
             j2 = [j2],
             k2 = [k2],
             l2 = [l2],
+            counter = ["-"]
+
         )
         savea(df, "pertubedWalk", k)
         savea(df2, "allocsPertubedWalk", k)
         cleardf()
 
     end
+    global z = Singular.ngens(G)
+    df = DataFrame(
+        a = [a],
+        b = [b],
+        z = [z],
+        c = [c],
+        d = [d],
+        e = [e],
+        f = [f],
+        g = [g],
+        h = [h],
+        i = [i],
+        j = [j],
+        k = [k],
+        l = [l],
+        counter = [getCounter()],
+    )
+    savea(df, "pertubedWalk", k)
+
     return G
 end
 
@@ -662,6 +741,23 @@ function fractal_walk(
     println("FractalWalk_standard results")
     println("Crossed Cones in: ")
     Gb = fractal_recursiv(G, S, T, PertVecs, 1)
+    z = length(Singular.gens(Gb))
+    df = DataFrame(
+        a = [a],
+        b = [b],
+        z = [z],
+        c = [c],
+        d = [d],
+        e = [e],
+        f = [f],
+        g = [g],
+        h = [h],
+        i = [i],
+        j = [j],
+        k = [k],
+        counter = [deleteCounterFr()],
+    )
+    savea(df, "fractalWalk")
     println("Cones crossed: ", deleteCounterFr())
     return Gb
 end
@@ -707,6 +803,9 @@ function fractal_recursiv(
         end
         w = w + t * (PertVecs[p] - w)
         w = convert_bounding_vector(w)
+        if !checkInt32(w)
+            return G
+        end
         b = w
         b2 = w
         T.w = w
@@ -779,6 +878,8 @@ function fractal_recursiv(
             i2 = [i2],
             j2 = [j2],
             k2 = [k2],
+            counter = ["-"]
+
         )
 
         df = DataFrame(
@@ -794,6 +895,8 @@ function fractal_recursiv(
             i = [i],
             j = [j],
             k = [k],
+            counter = ["-"]
+
         )
         savea(df, "fractalWalk")
         savea(df2, "allocsFractalWalk")
@@ -819,6 +922,23 @@ function fractal_walk_start_order(
     println("fractal_walk_withStartorder results")
     println("Crossed Cones in: ")
     Gb = fractal_walk_recursiv_startorder(G, S, T, PertVecs, 1)
+    z = length(Singular.gens(Gb))
+    df = DataFrame(
+        a = [a],
+        b = [b],
+        z = [z],
+        c = [c],
+        d = [d],
+        e = [e],
+        f = [f],
+        g = [g],
+        h = [h],
+        i = [i],
+        j = [j],
+        k = [k],
+        counter = [deleteCounterFr()],
+    )
+    savea(df, "fractalWalk")
     println("Cones crossed: ", deleteCounterFr())
     return Gb
 end
@@ -875,6 +995,9 @@ function fractal_walk_recursiv_startorder(
         end
         w = w + t * (PertVecs[p] - w)
         w = convert_bounding_vector(w)
+        if !checkInt32(w)
+            return G
+        end
         T.w = w
         b = w
         b2 = w
@@ -951,6 +1074,8 @@ function fractal_walk_recursiv_startorder(
             i = [i],
             j = [j],
             k = [k],
+            counter = ["-"]
+
         )
         df2 = DataFrame(
             a2 = [a2],
@@ -965,6 +1090,8 @@ function fractal_walk_recursiv_startorder(
             i2 = [i2],
             j2 = [j2],
             k2 = [k2],
+            counter = ["-"]
+
         )
         savea(df2, "allocsFractalWalkstartorder")
         savea(df, "fractalWalkstartorder")
@@ -983,6 +1110,23 @@ function fractal_walk_lex(
     println("fractal_walk_lex results")
     println("Crossed Cones in: ")
     Gb = fractal_walk_recursive_lex(G, S, T, PertVecs, 1)
+    z = length(Singular.gens(Gb))
+    df = DataFrame(
+        a = [a],
+        b = [b],
+        z = [z],
+        c = [c],
+        d = [d],
+        e = [e],
+        f = [f],
+        g = [g],
+        h = [h],
+        i = [i],
+        j = [j],
+        k = [k],
+        counter = [deleteCounterFr()],
+    )
+    savea(df, "fractalWalklex")
     println("Cones crossed: ", deleteCounterFr())
     return Gb
 end
@@ -1032,6 +1176,9 @@ function fractal_walk_recursive_lex(
         else
             w = w + t * (PertVecs[p] - w)
             w = convert_bounding_vector(w)
+            if !checkInt32(w)
+                return G
+            end
             T.w = w
             b = w
             b2 = w
@@ -1112,6 +1259,8 @@ function fractal_walk_recursive_lex(
             i2 = [i2],
             j2 = [j2],
             k2 = [k2],
+            counter = ["-"]
+
         )
         df = DataFrame(
             a = [a],
@@ -1126,6 +1275,8 @@ function fractal_walk_recursive_lex(
             i = [i],
             j = [j],
             k = [k],
+            counter = ["-"]
+
         )
         savea(df, "fractalWalklex")
         savea(df2, "allocsFractalWalklex")
@@ -1143,6 +1294,23 @@ function fractal_walk_look_ahead(
     println("Crossed Cones in: ")
     global PertVecs = [pertubed_vector(G, T, i) for i = 1:nvars(base_ring(G))]
     Gb = fractal_walk_look_ahead_recursiv(G, S, T, PertVecs, 1)
+    z = length(Singular.gens(Gb))
+    df = DataFrame(
+        a = [a],
+        b = [b],
+        z = [z],
+        c = [c],
+        d = [d],
+        e = [e],
+        f = [f],
+        g = [g],
+        h = [h],
+        i = [i],
+        j = [j],
+        k = [k],
+        counter = [deleteCounterFr()],
+    )
+    savea(df, "fractalWalklookahead")
     println("Cones crossed: ", deleteCounterFr())
     return Gb
 end
@@ -1187,6 +1355,9 @@ function fractal_walk_look_ahead_recursiv(
         end
         w = w + t * (PertVecs[p] - w)
         w = convert_bounding_vector(w)
+        if !checkInt32(w)
+            return G
+        end
         T.w = w
         b = w
         b2 = w
@@ -1234,8 +1405,8 @@ function fractal_walk_look_ahead_recursiv(
         f2 =
             @ballocated lift_fractal_walk($G, $R, $H, $Rn) evals = 5 samples = 2
 
-        H = liftGW2(G, R, Gw, H, Rn)
-        #H = lift_fractal_walk(G, R H, Rn)
+        #H = liftGW2(G, R, Gw, H, Rn)
+        H = lift_fractal_walk(G, R, H, Rn)
         g =
             @belapsed Singular.std($H, complete_reduction = true) evals = 5 samples =
                 2
@@ -1260,6 +1431,8 @@ function fractal_walk_look_ahead_recursiv(
             i2 = [i2],
             j2 = [j2],
             k2 = [k2],
+            counter = ["-"]
+
         )
         df = DataFrame(
             a = [a],
@@ -1274,6 +1447,8 @@ function fractal_walk_look_ahead_recursiv(
             i = [i],
             j = [j],
             k = [k],
+            counter = ["-"]
+
         )
         savea(df, "fractalWalklookahead")
         savea(df2, "allocsFractalWalklookahead")
@@ -1297,6 +1472,23 @@ function fractal_walk_combined(
     println("fractal_walk_combined results")
     println("Crossed Cones in: ")
     Gb = fractal_walk_combined(G, S, T, PertVecs, 1)
+    z = length(Singular.gens(Gb))
+    df = DataFrame(
+        a = [a],
+        b = [b],
+        z = [z],
+        c = [c],
+        d = [d],
+        e = [e],
+        f = [f],
+        g = [g],
+        h = [h],
+        i = [i],
+        j = [j],
+        k = [k],
+        counter = [deleteCounterFr()],
+    )
+    savea(df, "fractalWalkcombined")
     println("Cones crossed: ", deleteCounterFr())
     return Gb
 end
@@ -1354,6 +1546,9 @@ function fractal_walk_combined(
         else
             w = w + t * (PertVecs[p] - w)
             w = convert_bounding_vector(w)
+            if !checkInt32(w)
+                return G
+            end
             T.w = w
             b = w
             b2 = w
@@ -1431,6 +1626,8 @@ function fractal_walk_combined(
             i = [i],
             j = [j],
             k = [k],
+            counter = ["-"]
+
         )
         df2 = DataFrame(
             a2 = [a2],
@@ -1445,6 +1642,8 @@ function fractal_walk_combined(
             i2 = [i2],
             j2 = [j2],
             k2 = [k2],
+            counter = ["-"]
+
         )
         savea(df, "fractalWalkcombined")
         savea(df2, "allocsFractalWalkcombined")
@@ -1478,11 +1677,8 @@ function tran_walk(G::Singular.sideal, S::Matrix{Int64}, T::Matrix{Int64})
         global a =
             @belapsed next_weight($G, $cweight, $tweight) evals = 5 samples = 2
         w = next_weight(G, cweight, tweight)
-        for i = 1:length(w)
-            if tryparse(Int32, string(w[i])) == nothing
-                println("w bigger than int32")
-                return G
-            end
+        if !checkInt32(w)
+            return G
         end
         Rn = change_order(R, w, T)
         if w == tweight
@@ -1492,6 +1688,24 @@ function tran_walk(G::Singular.sideal, S::Matrix{Int64}, T::Matrix{Int64})
 
                 global i =
                     @belapsed inCone($G, $T, $cweight) evals = 5 samples = 2
+                global z = Singular.nGens(G)
+                df = DataFrame(
+                    a = [a],
+                    b = [b],
+                    z = [z],
+                    c = [c],
+                    d = [d],
+                    e = [e],
+                    f = [f],
+                    g = [g],
+                    h = [h],
+                    i = [i],
+                    j = [j],
+                    k = [k],
+                    counter = [getCounter()],
+                )
+                savea(df, "tranWalk")
+
                 return G
             else
                 if inSeveralCones(initials(base_ring(G), gens(G), w))
@@ -1533,6 +1747,8 @@ function tran_walk(G::Singular.sideal, S::Matrix{Int64}, T::Matrix{Int64})
             i = [i],
             j = [j],
             k = [k],
+            counter = ["-"]
+
         )
         df2 = DataFrame(
             a2 = [a2],
@@ -1547,6 +1763,8 @@ function tran_walk(G::Singular.sideal, S::Matrix{Int64}, T::Matrix{Int64})
             i2 = [i2],
             j2 = [j2],
             k2 = [k2],
+            counter = ["-"]
+
         )
         savea(df, "tranWalk")
         savea(df2, "allocsTranWalk")

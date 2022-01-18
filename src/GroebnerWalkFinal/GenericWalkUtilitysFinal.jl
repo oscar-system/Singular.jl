@@ -4,7 +4,15 @@ include("GroebnerWalkUtilitysFinal.jl")
 #Utilitys for generic_walk
 ###############################################################
 
-#Return the facet_facet_facet_initials of polynomials w.r.t. a weight vector.
+#=
+@doc Markdown.doc"""
+function facet_initials(
+    G::Singular.sideal,
+    lm::Vector{spoly{L}},
+    v::Vector{Int64},
+) where {L<:Nemo.RingElem}
+Returns the facet initials of the polynomials w.r.t. the vector v.
+"""=#
 function facet_initials(
     G::Singular.sideal,
     lm::Vector{spoly{L}},
@@ -29,8 +37,14 @@ function facet_initials(
     return initials
 end
 
-#Return the difference of the exponents of the leading terms (Lm) and the
-#exponent vectors of the tail of all polynomials of the ideal.
+#=
+@doc Markdown.doc"""
+function difference_lead_tail(
+    I::Singular.sideal,
+    Lm::Vector{spoly{L}},
+) where {L<:Nemo.RingElem}
+Returns the differences of the exponent vectors of the leading terms and the polynomials of the generators of I.
+"""=#
 function difference_lead_tail(
     I::Singular.sideal,
     Lm::Vector{spoly{L}},
@@ -47,7 +61,11 @@ function difference_lead_tail(
     return unique!(v)
 end
 
-#
+#=
+@doc Markdown.doc"""
+function isParallel(u::Vector{Int64}, v::Vector{Int64})
+Returns true if the vector u is parallel to the vector v.
+"""=#
 function isParallel(u::Vector{Int64}, v::Vector{Int64})
     count = 1
     x = 0
@@ -75,7 +93,15 @@ function isParallel(u::Vector{Int64}, v::Vector{Int64})
     return true
 end
 
-#lifting step of the generic_walk
+#=
+@doc Markdown.doc"""
+function lift_generic(
+    G::Singular.sideal,
+    Lm::Vector{Singular.spoly{L}},
+    H::Singular.sideal,
+) where {L<:Nemo.RingElem}
+Performs a lifting step in the Groebner Walk proposed by Fukuda et. al.
+"""=#
 function lift_generic(
     G::Singular.sideal,
     Lm::Vector{Singular.spoly{L}},
@@ -129,7 +155,6 @@ function filter_lf(
     return btz
 end
 
-#return the next facet_normal.
 function next_gamma(
     G::Singular.sideal,
     Lm::Vector{spoly{L}},
@@ -154,7 +179,6 @@ function next_gamma(
     return minV
 end
 
-#return the next facet_normal.
 function next_gamma(
     G::Singular.sideal,
     w::Vector{Int64},
@@ -220,8 +244,12 @@ function less_facet(
     return false
 end
 
-#returns divrem()
-function divremGW(p::Singular.spoly, lm::Singular.spoly, S::Singular.PolyRing)
+#=
+@doc Markdown.doc"""
+function dividesGW(p::Singular.spoly, lm::Singular.spoly, S::Singular.PolyRing)
+Returns the multiple m for all terms q in p with lm * m = q.
+"""=#
+function dividesGW(p::Singular.spoly, lm::Singular.spoly, S::Singular.PolyRing)
     div = false
     newpoly = Singular.MPolyBuildCtx(S)
     for term in Singular.terms(p)
@@ -238,6 +266,16 @@ function divremGW(p::Singular.spoly, lm::Singular.spoly, S::Singular.PolyRing)
     return (finish(newpoly), div)
 end
 
+#=
+@doc Markdown.doc"""
+function modulo(
+    p::Singular.spoly,
+    G::Vector{spoly{L}},
+    Lm::Vector{spoly{L}},
+    c::Bool = false,
+) where {L<:Nemo.RingElem}
+Returns p modulo G w.r.t. the leading terms Lm and true if a division occured.
+"""=#
 function modulo(
     p::Singular.spoly,
     G::Vector{spoly{L}},
@@ -248,7 +286,7 @@ function modulo(
     R = parent(p)
     Q = zero(R)
     for i = 1:length(G)
-        (q, b) = divremGW(p, Lm[i], R)
+        (q, b) = dividesGW(p, Lm[i], R)
         if b
             I = i
             Q = q
@@ -263,6 +301,14 @@ function modulo(
     end
 end
 
+#=
+@doc Markdown.doc"""
+function interreduce(
+    G::Vector{spoly{L}},
+    Lm::Vector{spoly{L}},
+) where {L<:Nemo.RingElem}
+G represents a Gröbnerbasis. This function interreduces G w.r.t. the leading terms Lm with tail-reduction.
+"""=#
 function interreduce(
     G::Vector{spoly{L}},
     Lm::Vector{spoly{L}},

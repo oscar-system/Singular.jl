@@ -57,7 +57,7 @@ function lift_fractal_walk(
     R::Singular.PolyRing,
     S::Singular.PolyRing,
 )
-Performs a lifting step in the Groebner Walk. See Fukuda et. al.
+Performs a lifting step in the Groebner Walk proposed by Amrhein et. al.
 """=#
 function lift_fractal_walk(
     G::Singular.sideal,
@@ -76,7 +76,13 @@ function lift_fractal_walk(
     return G
 end
 
-#returns ´true´ if all polynomials of the array are monomials.
+#=
+@doc Markdown.doc"""
+function isMonomial(
+Gw::Vector{spoly{L}},
+) where {L<:Nemo.RingElem}
+Returns ´true´ if all polynomials of the given array are monomials.
+"""=#
 function isMonomial(Gw::Vector{spoly{L}}) where {L<:Nemo.RingElem}
     for g in Gw
         if size(collect(Singular.coefficients(g)))[1] > 1
@@ -86,7 +92,13 @@ function isMonomial(Gw::Vector{spoly{L}}) where {L<:Nemo.RingElem}
     return true
 end
 
-#returns ´true´ if all polynomials of the array are binomial or less.
+#=
+@doc Markdown.doc"""
+function isbinomial(
+Gw::Vector{spoly{L}},
+)
+Returns ´true´ if all polynomials of the given array are binomials or less.
+"""=#
 function isbinomial(Gw::Vector{spoly{L}}) where {L<:Nemo.RingElem}
     for g in Gw
         if size(collect(Singular.coefficients(g)))[1] > 2
@@ -97,6 +109,15 @@ function isbinomial(Gw::Vector{spoly{L}}) where {L<:Nemo.RingElem}
 end
 
 
+#=
+@doc Markdown.doc"""
+function nextT(
+    G::Singular.sideal,
+    w::Array{T,1},
+    tw::Array{K,1},
+) where {T<:Number,K<:Number}
+Returns the next t to compute the next weight vector w(t) = w + t * (tw - w).
+"""=#
 function nextT(
     G::Singular.sideal,
     w::Array{T,1},
@@ -127,6 +148,14 @@ function nextT(
     end
 end
 
+#=
+@doc Markdown.doc"""
+function change_order(
+    R::Singular.PolyRing,
+    T::MonomialOrder{Matrix{Int64},Vector{Int64}},
+) where {L<:Number,K<:Number}
+Returns a new PolynomialRing w.r.t. the monomial ordering T.
+"""=#
 function change_order(
     R::Singular.PolyRing,
     T::MonomialOrder{Matrix{Int64},Vector{Int64}},
@@ -141,6 +170,16 @@ function change_order(
     return S
 end
 
+#=
+@doc Markdown.doc"""
+function pertubed_vector(
+G::Singular.sideal,
+Mo::MonomialOrder{Matrix{Int64}},
+t::Vector{Int64},
+p::Integer,
+)
+Computes a p-pertubed weight vector of the current weight vector t by using the monomial ordering Mo.
+"""=#
 function pertubed_vector(
     G::Singular.sideal,
     Mo::MonomialOrder{Matrix{Int64}},
@@ -183,6 +222,16 @@ function pertubed_vector(
     return w
 end
 
+#=
+@doc Markdown.doc"""
+function pertubed_vector(
+G::Singular.sideal,
+Mo::MonomialOrder{Matrix{Int64}},
+t::Vector{Int64},
+p::Integer,
+)
+Computes a p-pertubed weight vector of the current weight vector given by the first row of the matrix corresponding the the monomial ordering T.
+"""=#
 function pertubed_vector(
     G::Singular.sideal,
     T::MonomialOrder{Matrix{Int64},Vector{Int64}},

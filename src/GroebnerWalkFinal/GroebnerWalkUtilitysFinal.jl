@@ -23,6 +23,16 @@ function next_weight(
     return convert_bounding_vector(w)
 end
 
+function checkInt32(w::Vector{Int64})
+for i = 1:length(w)
+    if tryparse(Int32, string(w[i])) == nothing
+        println("w bigger than int32")
+        return false
+    end
+end
+return true
+end
+
 #Return the initials of polynomials w.r.t. a weight vector.
 function initials(R::Singular.PolyRing, G::Vector{spoly{n_Q}}, w::Vector{Int64})
     inits = spoly{elem_type(base_ring(R))}[]
