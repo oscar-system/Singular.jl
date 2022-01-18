@@ -26,7 +26,8 @@ makedocs(
             ],
             "alghom.md",
             "resolution.md",
-            "matrix.md"
+            "matrix.md",
+            "caller.md"
          ]
 )
 

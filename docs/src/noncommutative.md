@@ -75,7 +75,7 @@ julia> y*x
 2*x*y + x
 ```
 
-Associativity can be checked via the following library proceedure.
+Associativity can be checked via [Library Proceedures](@ref).
 
 ```
 julia> iszero(Singular.LibNctools.ndcond(G))

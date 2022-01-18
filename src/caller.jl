@@ -263,7 +263,7 @@ function prepare_argument(x::PolyRingUnion)
     return Any[mapping_types_reversed[:RING_CMD], new_ptr], x
 end
 
-function prepare_argument(x::spoly)
+function prepare_argument(x::SPolyUnion)
     R = parent(x)
     GC.@preserve x R return (Any[mapping_types_reversed[:POLY_CMD],
                                  libSingular.copy_polyptr_to_void(x.ptr, R.ptr)],
@@ -339,6 +339,13 @@ end
 function prepare_argument(x::BigInt)
     y = libSingular.number_ptr(x, libSingular.get_coeffs_BIGINT())
     return Any[mapping_types_reversed[:BIGINT_CMD], y.cpp_object], nothing
+end
+
+# errors
+function prepare_argument(x::Vector)
+   error("`intvec` may be passed in as Vector{Int}. All other vectors (`list` "*
+          "in Singular) must be passed in as Vector{Any} along with an "*
+          "explicit base ring in the first argument")
 end
 
 function prepare_argument(x::Any)
