@@ -168,6 +168,7 @@ end
    @test order(x^2 + 2x + 1) == 0
 
    @test leading_exponent_vector(x^3 + 2x + 1) == [3]
+   @test_throws ErrorException leading_exponent_vector(zero(R))
 
    @test deepcopy(x + 2) == x + 2
 

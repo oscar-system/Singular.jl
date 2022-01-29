@@ -251,6 +251,7 @@ leading term.
 function leading_exponent_vector(p::Union{spoly, spluralg})
    R = parent(p)
    n = nvars(R)
+   iszero(p) && error("Zero polynomial does not have a leading exponent vector")
    A = Array{Int}(undef, n)
    GC.@preserve p R libSingular.p_GetExpVL(p.ptr, A, R.ptr)
    return A
