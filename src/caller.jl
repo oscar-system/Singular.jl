@@ -258,12 +258,12 @@ function prepare_argument(x::String)
     return Any[mapping_types_reversed[:STRING_CMD], libSingular.copy_string_to_void(x)], nothing
 end
 
-function prepare_argument(x::PolyRing)
+function prepare_argument(x::PolyRingUnion)
     GC.@preserve x new_ptr = libSingular.get_ring_ref(x.ptr)
     return Any[mapping_types_reversed[:RING_CMD], new_ptr], x
 end
 
-function prepare_argument(x::spoly)
+function prepare_argument(x::SPolyUnion)
     R = parent(x)
     GC.@preserve x R return (Any[mapping_types_reversed[:POLY_CMD],
                                  libSingular.copy_polyptr_to_void(x.ptr, R.ptr)],
@@ -298,7 +298,7 @@ function prepare_argument(x::Union{
 end
 
 
-function prepare_argument(x::Vector{Any}, R::PolyRing)
+function prepare_argument(x::Vector{Any}, R::PolyRingUnion)
     args = Vector{Any}()
     types = Vector{Int}()
     for i in x
@@ -341,6 +341,13 @@ function prepare_argument(x::BigInt)
     return Any[mapping_types_reversed[:BIGINT_CMD], y.cpp_object], nothing
 end
 
+# errors
+function prepare_argument(x::Vector)
+   error("`intvec` may be passed in as Vector{Int}. All other vectors (`list` "*
+          "in Singular) must be passed in as Vector{Any} along with an "*
+          "explicit base ring in the first argument")
+end
+
 function prepare_argument(x::Any)
     :ptr in fieldnames(typeof(x)) || error("unrecognized argument $x")
     if x.ptr isa libSingular.number_ptr
@@ -348,8 +355,6 @@ function prepare_argument(x::Any)
         rng = parent(x)
         new_ptr = libSingular.n_Copy(ptr, rng.ptr)
         return Any[mapping_types_reversed[:NUMBER_CMD], new_ptr.cpp_object], nothing
-    elseif x.ptr isa libSingular.map_ptr
-        return Any[mapping_types_reversed[:MAP_CMD], x.ptr.cpp_object], nothing
     end
     error("unrecognized argument $x")
 end

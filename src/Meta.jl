@@ -46,11 +46,11 @@ for (name, funcs) in libraryfunctiondictionary
             input_manipulator = get(get(input_manipulator_funcs, name, Dict()), symb, identity)
             output_manipulator = get(get(output_manipulator_funcs, name, Dict()), symb, identity)
             push!(func_calls, :($symb(args...) = $(output_manipulator)(low_level_caller($(name_string), $func_name, $(input_manipulator)(args)...)) ))
-            push!(func_calls, :($symb(ring::PolyRing, args...) = $(output_manipulator)(low_level_caller_rng($(name_string), $func_name, ring, $(input_manipulator)(args)...)) ))
+            push!(func_calls, :($symb(ring::PolyRingUnion, args...) = $(output_manipulator)(low_level_caller_rng($(name_string), $func_name, ring, $(input_manipulator)(args)...)) ))
         end
     end
     eval(:(baremodule $name_caps
-        import ..Singular: PolyRing, low_level_caller, low_level_caller_rng
+        import ..Singular: PolyRingUnion, low_level_caller, low_level_caller_rng
         import Base: *
         $(func_calls...)
     end))
