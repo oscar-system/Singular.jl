@@ -7,6 +7,20 @@
 """
 module Singular
 
+#
+# More helpful error message for users on Windows.
+windows_error() = error("""
+
+    This package unfortunately does not run natively under Windows.
+    Please install Julia using Windows subsystem for Linux and try again.
+    See also https://oscar.computeralgebra.de/install/.
+    """)
+
+if Sys.iswindows()
+  windows_error()
+end
+
+
 import AbstractAlgebra
 using Markdown
 using Nemo
@@ -74,18 +88,6 @@ const libflint = Nemo.libflint
 const libantic = Nemo.libantic
 
 mapping_types_reversed = nothing
-#
-# More helpful error message for users on Windows.
-windows_error() = error("""
-
-    This package unfortunately does not run natively under Windows.
-    Please install Julia using Windows subsystem for Linux and try again.
-    See also https://oscar.computeralgebra.de/install/.
-    """)
-
-if Sys.iswindows()
-  windows_error()
-end
 
 function __init__()
    if Sys.iswindows()
@@ -185,7 +187,7 @@ const VERSION_NUMBER = pkgversion(@__MODULE__)
 #
 #   Load Singular Rings/Fields/etc
 #     There is a slight circular dependency: in order to create a G-Algebra
-#     you need a PolyRing R and matrices over R, and in order to create a 
+#     you need a PolyRing R and matrices over R, and in order to create a
 #     quotient ring you need the polynomial ring and an ideal.
 #     The matrix code requires some module code, which requires some ideal
 #     code, which requies some poly code. Therefore, we include all of the
