@@ -56,7 +56,7 @@ of the ring $R$.
 
 The entries of the matrices $C$ and $D$ on or below the main diagonal are
 ignored. A non-matrix argument `a` for either `C` or `D` is turned into a
-matrix with with all relevent entries set to `a`.
+matrix with all relevent entries set to `a`.
 
 !!! note
     The conditions that assure that multiplication is associative in the
