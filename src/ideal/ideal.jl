@@ -598,6 +598,14 @@ function reduce(p::S, G::sideal{S}) where S <: SPolyUnion
    return R(ptr)
 end
 
+function reduce(a::T, b::T) where T <: SPolyUnion
+   R = parent(b)
+   parent(a) == R || error("Incompatible parents")
+   G = sideal{T}(R, b)
+   ptr = GC.@preserve a G R libSingular.p_Reduce(a.ptr, G.ptr, R.ptr)
+   return R(ptr)
+end
+
 ###############################################################################
 #
 #   Eliminate

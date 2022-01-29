@@ -357,9 +357,8 @@ end
 
       q, r = divrem(a, b)
       @test a == b*q + r
-
-      q2 = div(a, b)
-      @test q2 == q
+      @test q == div(a, b)
+      @test r == reduce(a, b)
    end
 end
 
@@ -372,9 +371,11 @@ end
 
       flag, q = divides(a*b, b)
       @test flag && q == a
+      @test iszero(reduce(a*b, b))
 
       flag, q = divides(a, y)
       @test !flag
+      @test !iszero(reduce(a, y))
 
       val, q = remove(a*b^3, b)
       @test val == 3 && q == a
