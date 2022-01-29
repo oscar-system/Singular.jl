@@ -535,6 +535,9 @@ end
 
    #Check highcorner
    @test f == y^4
+
+   R, (x, y, z) = PolynomialRing(Fp(32003), ["x", "y", "z"])
+   @test ngens(kbase(std(Ideal(R, x^2, y^3, x*y*z)), 2)) == 5
 end
 
 @testset "sideal.independent_set" begin
