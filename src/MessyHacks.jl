@@ -44,6 +44,31 @@ function with_multBound(f, mu::Integer)
    return g
 end
 
+for (name, str) in [(:with_fastHC, "OPT_FASTHC")
+                    (:with_infRedTail, "OPT_INFREDTAIL")
+                    (:with_lazy, "OPT_OLDSTD")
+                    (:with_length, "V_LENGTH")
+                    (:with_notBuckets, "OPT_NOT_BUCKETS")
+                    (:with_prot, "OPT_PROT")
+                    (:with_qringNF, "V_QRING")
+                    (:with_redTail, "OPT_REDTAIL")
+                    (:with_redThrough, "OPT_REDTHROUGH")]
+   @eval begin
+      function ($name)(f, flag::Bool)
+         old_flag = libSingular.set_option($str, flag)
+         local g = nothing
+         try
+            g = f()
+         finally
+            libSingular.set_option($str, old_flag)
+         end
+         return g
+      end
+
+      export $name
+   end
+end
+
 #=
    messy hack #1:
 

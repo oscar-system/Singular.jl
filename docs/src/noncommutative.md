@@ -75,7 +75,7 @@ julia> y*x
 2*x*y + x
 ```
 
-Associativity can be checked via [Library Proceedures](@ref).
+Associativity can be checked via [Interpreter Functionality](@ref).
 
 ```
 julia> iszero(Singular.LibNctools.ndcond(G))
