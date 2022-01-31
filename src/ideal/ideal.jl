@@ -864,6 +864,24 @@ function kbase(I::sideal{S}) where {T <: Nemo.FieldElem,
 end
 
 @doc Markdown.doc"""
+    kbase(I::sideal{S}, n::Int) where {T <: Nemo.FieldElem, S <: Union{spoly{T}, spluralg{T}}}
+
+Return the degree `n` part of a vector space basis of the quotient
+`base_ring(I)/I` where `base_ring(I)` must be a polynomial ring over a field,
+and $I$ must be a Groebner basis.
+The array of vector space basis elements is returned as a Singular ideal.
+"""
+function kbase(I::sideal{S}, n::Int) where {T <: Nemo.FieldElem,
+                                    S <: Union{spoly{T}, spluralg{T}}}
+   n >= 0 || throw(ArgumentError("Degree $n should be nonnegative"))
+   I.isGB || error("Not a Groebner basis")
+   R = base_ring(I)
+   ptr = GC.@preserve I R libSingular.id_kbase(I.ptr, n, R.ptr)
+   return sideal{S}(R, ptr)
+end
+
+
+@doc Markdown.doc"""
     highcorner(I::sideal{S}) where {T <: Nemo.FieldElem, S <: Union{spoly{T}, spluralg{T}}}
 
 Given a zero-dimensional ideal $I$ this function computes its highest corner,
