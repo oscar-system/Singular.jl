@@ -365,6 +365,15 @@ void singular_define_ideals(jlcxx::Module & Singular)
         return res;
     });
 
+    Singular.method("id_kbase", [](ideal I, int n, ring r) {
+        ideal res;
+        const ring origin = currRing;
+        rChangeCurrRing(r);
+        res = scKBase(n, I, r->qideal);
+        rChangeCurrRing(origin);
+        return res;
+    });
+
     Singular.method("id_highcorner", [](ideal I, ring r) {
         poly h;
         const ring origin = currRing;
