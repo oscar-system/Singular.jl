@@ -105,6 +105,17 @@ function __init__()
    # silence printlevel-based printing
    libSingular.set_printlevel(-100)
 
+   # At this point we have Kstd1_mu = 2^31-1 and OPT_MULTBOUND unset, which is
+   # a slightly inconsistent state. The singular intepreter variable "multBound"
+   # simply reads Kstd1_mu and assigning to "multBound" assigns to Kstd1_mu
+   # and sets OPT_MULTBOUND if it is nonzero, and unsets OPT_MULTBOUND if it is
+   # zero. Since we want to be able to easily restore the multBound to a
+   # consistent state, we set Kstd1_mu to zero here, which also leaves
+   # OPT_MULTBOUND unset.
+   Singular.libSingular.set_multBound(0)
+   # ditto
+   Singular.libSingular.set_degBound(0)
+
    # set up Singular parents (we cannot do this before Singular is initialised)
 
    global ZZ = Integers()

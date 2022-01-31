@@ -2,7 +2,7 @@
 CurrentModule = Singular
 ```
 
-# Library Procedures
+# Interpreter Functionality
 
 Singular.jl provides limited access to the functionality of the Singular
 interpreter and its associated standard library procedures. The following
@@ -70,3 +70,74 @@ julia> Singular.LibCentral.center(A, 3)   # base ring cannot be infered from the
 Singular ideal over Singular G-Algebra (QQ),(x,y,z,t),(dp(4),C) with generators (t, 4*x*y + z^2 - 2*z)
 ```
 
+## Global variables
+
+The global variables `degBound` and `multBound` can be used in a local fashion.
+As with any global variable, their usage should be accompanied with caution.
+
+```@docs
+with_degBound(f, degb::Integer)
+```
+
+```@docs
+with_multBound(f, degb::Integer)
+```
+
+The following [options](https://www.singular.uni-kl.de/Manual/4-3-0/sing_318.htm#SEC358)
+are available. The usage of, say, the option `infRefTail`
+would be as `with_infRefTail(f, flag::Bool)` where the same do-block syntax
+can be used as with the degree bounds.
+
+```
+fastHC, infRedTail, lazy, length, notBuckets, prot, qringNF, redTail, redThrough
+```
+
+**Examples**
+
+```julia
+julia> r, (x,y,z) = PolynomialRing(QQ, ["x", "y", "z"], ordering=ordering_ds());
+
+julia> i = Ideal(r, [x^7+y^7+z^6,x^6+y^8+z^7,x^7+y^5+z^8,x^2*y^3+y^2*z^3+x^3*z^2,x^3*y^2+y^3*z^2+x^2*z^3]);
+
+julia> degree(std(i))   # default behaviour of no multiplicity bound
+(0, 86)
+
+julia> with_multBound(100) do
+           # run with a multiplicity bound of 100
+           return degree(std(i))
+       end
+(0, 98)
+
+julia> degree(std(i))   # back to default behaviour
+(0, 86)
+
+julia> gens(std(i))
+11-element Vector{spoly{n_Q}}:
+ x^3*y^2 + y^3*z^2 + x^2*z^3
+ x^2*y^3 + x^3*z^2 + y^2*z^3
+ y^5 + x^7 + z^8
+ x^6 + z^7 + y^8
+ x^4*z^2 - y^4*z^2 - x^2*y*z^3 + x*y^2*z^3
+ z^6 + x^7 + y^7
+ y^4*z^3 - y^3*z^4 - x^2*z^5 - x^9
+ x^3*y*z^4 - x^2*y^2*z^4 + x*y^3*z^4 - y^4*z^4 + x^3*z^5 - x^2*y*z^5
+ x^3*z^5
+ x^2*y*z^5 + y^3*z^5 + x^2*z^6
+ x*y^3*z^5
+
+julia> gens(with_degBound(5) do; return std(i); end)
+5-element Vector{spoly{n_Q}}:
+ x^3*y^2 + y^3*z^2 + x^2*z^3
+ x^2*y^3 + x^3*z^2 + y^2*z^3
+ y^5 + x^7 + z^8
+ x^6 + z^7 + y^8
+ z^6 + x^7 + y^7
+
+julia> R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+(Singular Polynomial Ring (QQ),(x,y),(dp(2),C), spoly{n_Q}[x, y])
+
+julia> with_prot(true) do; return std(Ideal(R, x^5 - y*x + 1, y^6*x + x^2 + y^3)); end
+[65535:2]5s7s11s1214-s15
+product criterion:1 chain criterion:1
+Singular ideal over Singular Polynomial Ring (QQ),(x,y),(dp(2),C) with generators (x^5 - x*y + 1, x*y^6 + y^3 + x^2, x^4*y^3 - y^6 - y^4 - x, y^9 + y^7 + x^3*y^3 + x*y^3 + x*y - 1)
+```

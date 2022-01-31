@@ -1,4 +1,75 @@
 #=
+   messy hack #0: (not really that messy)
+
+   provide wrappers for working with Singular's global variables
+=#
+
+export with_degBound, with_multBound
+
+@doc Markdown.doc"""
+    with_degBound(f, degb::Integer)
+
+Evaluate and return `f()` with the Singular global setting `degBound = degb`. The
+value of `degBound` is automatically restored upon return; the effect is only a
+local one on `f()`. The value `degBound = 0` corresponds to no degree bound in
+Singular and this is the starting value.
+"""
+function with_degBound(f, degb::Integer)
+   old_degb = libSingular.set_degBound(Cint(degb))
+   local g = nothing
+   try
+      g = f()
+   finally
+      libSingular.set_degBound(old_degb)
+   end
+   return g
+end
+
+@doc Markdown.doc"""
+    with_multBound(f, mu::Integer)
+
+Evaluate and return `f()` with the Singular global setting `multBound = mu`. The
+value of `multBound` is automatically restored upon return; the effect is only a
+local one on `f()`. The value `multBound = 0` corresponds to no multiplicity
+bound in Singular and this is the starting value.
+"""
+function with_multBound(f, mu::Integer)
+   old_mu = libSingular.set_multBound(Cint(mu))
+   local g = nothing
+   try
+      g = f()
+   finally
+      libSingular.set_multBound(old_mu)
+   end
+   return g
+end
+
+for (name, str) in [(:with_fastHC, "OPT_FASTHC")
+                    (:with_infRedTail, "OPT_INFREDTAIL")
+                    (:with_lazy, "OPT_OLDSTD")
+                    (:with_length, "V_LENGTH")
+                    (:with_notBuckets, "OPT_NOT_BUCKETS")
+                    (:with_prot, "OPT_PROT")
+                    (:with_qringNF, "V_QRING")
+                    (:with_redTail, "OPT_REDTAIL")
+                    (:with_redThrough, "OPT_REDTHROUGH")]
+   @eval begin
+      function ($name)(f, flag::Bool)
+         old_flag = libSingular.set_option($str, flag)
+         local g = nothing
+         try
+            g = f()
+         finally
+            libSingular.set_option($str, old_flag)
+         end
+         return g
+      end
+
+      export $name
+   end
+end
+
+#=
    messy hack #1:
 
    Getting the nemo ring element out of the darn n_unknown struct:
