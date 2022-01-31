@@ -311,16 +311,15 @@ function leading_monomial(p::SPolyUnion)
    GC.@preserve p R begin
       P = p.ptr
       if P.cpp_object == C_NULL
-         return zero(R)
-      else
-         B = base_ring(R)
-         t = one(B)
-         GC.@preserve B t begin
-            mptr = libSingular.p_Head(P, R.ptr)
-            n = libSingular.n_Copy(t.ptr, B.ptr)
-            libSingular.p_SetCoeff0(mptr, n, R.ptr)
-            return R(mptr)
-         end
+         error("Zero polynomial does not have a leading exponent vector")
+      end
+      B = base_ring(R)
+      t = one(B)
+      GC.@preserve B t begin
+         mptr = libSingular.p_Head(P, R.ptr)
+         n = libSingular.n_Copy(t.ptr, B.ptr)
+         libSingular.p_SetCoeff0(mptr, n, R.ptr)
+         return R(mptr)
       end
    end
 end
