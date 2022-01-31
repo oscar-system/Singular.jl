@@ -5,8 +5,9 @@
    G, (z, u, v, w) = @inferred GAlgebra(R, Singular.Matrix(R, [0 -1 -1 -1; 0 0 -1 -1; 0 0 0 -1; 0 0 0 0]),
                                            Singular.Matrix(R, [0 0 0 0; 0 0 0 0; 0 0 0 0; 0 0 0 0]))
 
-   # error thrown if ideal is not a Gröbner basis (and not two sided)
-   I = Ideal(G, [u])
+   # error thrown if ideal is not a Groebner basis (and not two sided)
+   # note principal ideals are now auto recognized as isGB=true
+   I = Ideal(G, [u^2-v^3*w, z^2*v-u^2])
    @test_throws ErrorException QuotientRing(G, I)
 
    # error thrown if ideal is GB but not two sided
@@ -14,7 +15,7 @@
    @test_throws ErrorException QuotientRing(G, I)
 
    # error thrown if ideal is two sided but not a GB
-   I = Ideal(G, [u], twosided = true)
+   I = Ideal(G, [u^2-v^3*w, z^2*v-u^2], twosided = true)
    @test_throws ErrorException QuotientRing(G, I)
 
    # all good if two sided and GB
