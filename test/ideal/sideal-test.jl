@@ -347,6 +347,11 @@ end
    a = @inferred satstd(I, J)
    b = @inferred std(S)
    @test equal(a, b)
+
+   r, (x, y) = PolynomialRing(ZZ, ["x", "y"], ordering = ordering_dp())
+   I = Ideal(r, x^5 + x^4, y^2 + y)
+   @test equal(satstd(I), Ideal(r, x + 1, y + 1))
+
 end
 
 @testset "sideal.slimgb" begin
