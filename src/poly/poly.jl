@@ -241,16 +241,12 @@ function order(p::spoly)
    end
 end
 
-@doc Markdown.doc"""
-    leading_exponent_vector(p::spoly)
-
-Return the exponent vector of the leading term of the given polynomial. The return
-value is a Julia 1-dimensional array giving the exponent for each variable of the
-leading term.
-"""
 function leading_exponent_vector(p::Union{spoly, spluralg})
    R = parent(p)
    n = nvars(R)
+   if iszero(p)
+      throw(ArgumentError("Zero polynomial does not have a leading exponent vector"))
+   end
    A = Array{Int}(undef, n)
    GC.@preserve p R libSingular.p_GetExpVL(p.ptr, A, R.ptr)
    return A
@@ -301,7 +297,10 @@ function leading_term(p::SPolyUnion)
    R = parent(p)
    GC.@preserve p R begin
       P = p.ptr
-      return P.cpp_object == C_NULL ? zero(R) : R(libSingular.p_Head(P, R.ptr))
+      if P.cpp_object == C_NULL
+         throw(ArgumentError("Zero polynomial does not have a leading term"))
+      end
+      return  R(libSingular.p_Head(P, R.ptr))
    end
 end
 
@@ -310,16 +309,15 @@ function leading_monomial(p::SPolyUnion)
    GC.@preserve p R begin
       P = p.ptr
       if P.cpp_object == C_NULL
-         return zero(R)
-      else
-         B = base_ring(R)
-         t = one(B)
-         GC.@preserve B t begin
-            mptr = libSingular.p_Head(P, R.ptr)
-            n = libSingular.n_Copy(t.ptr, B.ptr)
-            libSingular.p_SetCoeff0(mptr, n, R.ptr)
-            return R(mptr)
-         end
+         throw(ArgumentError("Zero polynomial does not have a leading exponent vector"))
+      end
+      B = base_ring(R)
+      t = one(B)
+      GC.@preserve B t begin
+         mptr = libSingular.p_Head(P, R.ptr)
+         n = libSingular.n_Copy(t.ptr, B.ptr)
+         libSingular.p_SetCoeff0(mptr, n, R.ptr)
+         return R(mptr)
       end
    end
 end
