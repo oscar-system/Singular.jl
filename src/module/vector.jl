@@ -160,6 +160,23 @@ end
 
 ###############################################################################
 #
+#   Leading terms
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    lead(a::svector{T}) where T <: Nemo.RingElem
+
+Return the initial terms of $a$.
+"""
+function lead(a::svector{T}) where T <: Nemo.RingElem
+   R = base_ring(a)
+   ptr = GC.@preserve a R libSingular.p_Head(a.ptr, R.ptr)
+   return svector{T}(R, a.rank, ptr)
+end
+
+###############################################################################
+#
 #   Parent object call overload
 #
 ###############################################################################
