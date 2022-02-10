@@ -1,65 +1,73 @@
 include("GroebnerWalkFinal.jl")
-
+include("Examples")
 function test(case::Int)
 
     test_successfull = true
 
     if case == 1 || case == 99
-        R, (x, y) = Singular.PolynomialRing(
-            Singular.QQ,
-            ["x", "y"],
-            ordering = Singular.ordering_M(ordering_as_matrix(:degrevlex, 2)),
+        id = oberfr()
+
+        R = base_ring(id)
+        dim = nvars(R)
+        ve = ones(Int, dim)
+        StartOrd = ordering_as_matrix(:degrevlex, dim)
+        TarOrd = ordering_as_matrix(:lex, dim)
+        R2 = change_order(R, StartOrd)
+        S = change_order(R, TarOrd)
+        I = Singular.std(
+            Singular.Ideal(R2, [change_ring(x, R2) for x in gens(id)]),
+            complete_reduction = true,
         )
-
-        f1 = x^2 - y^3
-        f2 = x^3 - y^2 - x
-        I = Singular.Ideal(R, [f1, f2])
-
-        I = Singular.std(I, complete_reduction = true)
-
-        S, V = Singular.PolynomialRing(Singular.QQ, ["x", "y"], ordering = :lex)
-
+        #I = Singular.std(id, complete_reduction = true)
         @time T = groebnerwalk(
             I,
-            ordering_as_matrix(:degrevlex, 2),
-            ordering_as_matrix(:lex, 2),
-            :tran,
+            ordering_as_matrix(:degrevlex, dim),
+            ordering_as_matrix(:lex, dim),
+            :pertubed,
+            2,
         )
+
+
         @time F = groebnerwalk(
             I,
-            ordering_as_matrix(:degrevlex, 2),
-            ordering_as_matrix(:lex, 2),
+            ordering_as_matrix(:degrevlex, dim),
+            ordering_as_matrix(:lex, dim),
             :fractal,
         )
         @time FA = groebnerwalk(
             I,
-            ordering_as_matrix(:degrevlex, 2),
-            ordering_as_matrix(:lex, 2),
-            :fractal_look_ahead,
+            ordering_as_matrix(:degrevlex, dim),
+            ordering_as_matrix(:lex, dim),
+            :fractal_combined,
         )
         @time St = groebnerwalk(
             I,
-            ordering_as_matrix(:degrevlex, 2),
-            ordering_as_matrix(:lex, 2),
-            :standard,
+            ordering_as_matrix(:degrevlex, dim),
+            ordering_as_matrix(:lex, dim),
+            :pertubed,
+            3,
         )
         @time Pe = groebnerwalk(
             I,
-            ordering_as_matrix(:degrevlex, 2),
-            ordering_as_matrix(:lex, 2),
+            ordering_as_matrix(:degrevlex, dim),
+            ordering_as_matrix(:lex, dim),
             :pertubed,
-            2,
+            3,
         )
         @time Ge = groebnerwalk(
             I,
-            ordering_as_matrix(:degrevlex, 2),
-            ordering_as_matrix(:lex, 2),
+            ordering_as_matrix(:degrevlex, dim),
+            ordering_as_matrix(:lex, dim),
             :generic,
         )
-        @time T0 = Singular.std(
-            Singular.Ideal(S, [change_ring(x, S) for x in gens(I)]),
-            complete_reduction = true,
-        )
+
+
+
+        #@time T0 = Singular.std(
+        #    Singular.Ideal(S, [change_ring(x, S) for x in gens(I)]),
+        #    complete_reduction = true,
+        #)
+
         T1 = Singular.Ideal(S, [change_ring(x, S) for x in gens(T)])
         T2 = Singular.Ideal(S, [change_ring(x, S) for x in gens(F)])
         T3 = Singular.Ideal(S, [change_ring(x, S) for x in gens(FA)])
@@ -67,13 +75,15 @@ function test(case::Int)
         T5 = Singular.Ideal(S, [change_ring(x, S) for x in gens(Pe)])
         T6 = Singular.Ideal(S, [change_ring(x, S) for x in gens(Ge)])
 
-        println("test tran: ", equalitytest(T0, T1))
-        println("test fractal: ", equalitytest(T0, T2))
-        println("test fractal: ", equalitytest(T0, T3))
-        println("test pertubed: ", equalitytest(T5, T0))
-        println("test standard: ", equalitytest(T4, T0))
-        println("test generic: ", equalitytest(T6, T0))
 
+
+
+        println("test tran: ", equalitytest(T6, T1))
+        println("test fractal: ", equalitytest(T6, T2))
+        println("test fractal: ", equalitytest(T6, T3))
+        println("test pertubed: ", equalitytest(T5, T6))
+        println("test standard: ", equalitytest(T4, T6))
+        println("test generic: ", equalitytest(T6, T6))
         if !(
             equalitytest(T2, T1) &&
             equalitytest(T3, T4) &&
@@ -87,77 +97,88 @@ function test(case::Int)
         R, (x, y, z) = Singular.PolynomialRing(
             Singular.QQ,
             ["x", "y", "z"],
-            ordering = Singular.ordering_M(
-                ordering_as_matrix([5, 4, 1], :deglex),
-            ),
+            ordering = Singular.ordering_M(ordering_as_matrix(:degrevlex, 3)),
         )
 
-        f1 = x^2 - y
-        f2 = y^2 - x * z - y * z
+        f1 = 16 + 3 * x^2 + 16 * x^2 * z + 14 * x^2 * y^3
+        f2 = 6 + y^3 * z + 17 * x^2 * z^2 + 7 * x * y^2 * z^2 + 13 * x^3 * z^2
         I = Singular.Ideal(R, [f1, f2])
+
 
         I = Singular.std(I, complete_reduction = true)
         @time T = groebnerwalk(
             I,
-            ordering_as_matrix([5, 4, 1], :deglex),
-            ordering_as_matrix([6, 1, 3], :lex),
+            ordering_as_matrix(:degrevlex, 3),
+            ordering_as_matrix(:lex, 3),
             :tran,
         )
         @time F = groebnerwalk(
             I,
-            ordering_as_matrix([5, 4, 1], :deglex),
-            ordering_as_matrix([6, 1, 3], :lex),
+            ordering_as_matrix(:degrevlex, 3),
+            ordering_as_matrix(:lex, 3),
             :fractal,
         )
+
+
         @time FA = groebnerwalk(
             I,
-            ordering_as_matrix([5, 4, 1], :deglex),
-            ordering_as_matrix([6, 1, 3], :lex),
+            ordering_as_matrix(:degrevlex, 3),
+            ordering_as_matrix(:lex, 3),
             :fractal_look_ahead,
         )
         @time Pe = groebnerwalk(
             I,
-            ordering_as_matrix([5, 4, 1], :deglex),
-            ordering_as_matrix([6, 1, 3], :lex),
+            ordering_as_matrix(:degrevlex, 3),
+            ordering_as_matrix(:lex, 3),
             :pertubed,
-            3,
+            2,
         )
         @time St = groebnerwalk(
             I,
-            ordering_as_matrix([5, 4, 1], :deglex),
-            ordering_as_matrix([6, 1, 3], :lex),
+            ordering_as_matrix(:degrevlex, 3),
+            ordering_as_matrix(:lex, 3),
             :standard,
         )
         @time Ge = groebnerwalk(
             I,
-            ordering_as_matrix([5, 4, 1], :deglex),
-            ordering_as_matrix([6, 1, 3], :lex),
+            ordering_as_matrix(:degrevlex, 3),
+            ordering_as_matrix(:lex, 3),
             :generic,
         )
+
 
         S, V = Singular.PolynomialRing(
             Singular.QQ,
             ["x", "y", "z"],
-            ordering = Singular.ordering_M(ordering_as_matrix([6, 1, 3], :lex)),
+            ordering = Singular.ordering_M(ordering_as_matrix(:lex, 3)),
         )
 
         T0 = Singular.std(
             Singular.Ideal(S, [change_ring(x, S) for x in gens(I)]),
             complete_reduction = true,
         )
+
         T1 = Singular.Ideal(S, [change_ring(x, S) for x in gens(T)])
         T2 = Singular.Ideal(S, [change_ring(x, S) for x in gens(F)])
         T3 = Singular.Ideal(S, [change_ring(x, S) for x in gens(FA)])
         T4 = Singular.Ideal(S, [change_ring(x, S) for x in gens(St)])
         T5 = Singular.Ideal(S, [change_ring(x, S) for x in gens(Pe)])
         T6 = Singular.Ideal(S, [change_ring(x, S) for x in gens(Ge)])
-
+        for gens in gens(T0)
+            println(leading_term(gens))
+        end
+        for gens in gens(T5)
+            println(leading_term(gens))
+        end
         println("test tran: ", equalitytest(T0, T1))
         println("test fractal: ", equalitytest(T0, T2))
         println("test fractal: ", equalitytest(T0, T3))
         println("test pertubed: ", equalitytest(T5, T0))
         println("test standard: ", equalitytest(T4, T0))
         println("test generic: ", equalitytest(T6, T0))
+
+
+
         if !(
             equalitytest(T2, T1) &&
             equalitytest(T3, T4) &&
@@ -184,7 +205,8 @@ function test(case::Int)
             I,
             ordering_as_matrix(:degrevlex, 6),
             ordering_as_matrix(:lex, 6),
-            :standard,
+            :pertubed,
+            4,
         )
         #=    @time J = fractal_walk(
                 I,
@@ -255,7 +277,7 @@ function test(case::Int)
             equalitytest(T2, T0) &&
             equalitytest(T3, T6) &&
             equalitytest(T0, T5) &&
-            Singular.equal(T0, T4)
+            equalitytest(T0, T4)
         )
             test_successfull = false
         end
@@ -266,7 +288,6 @@ function test(case::Int)
             ["q", "c", "p", "d"],
             ordering = Singular.ordering_M(ordering_as_matrix(:degrevlex, 4)),
         )
-
 
         f1 =
             2 * c * d * p * q - 4 * c * d + 2 * p * q + 4 * p * q * c -
@@ -364,10 +385,11 @@ function test(case::Int)
             equalitytest(T2, T1) &&
             equalitytest(T3, T6) &&
             equalitytest(T0, T5) &&
-            Singular.equal(T0, T4)
+            equalitytest(T0, T4)
         )
             test_successfull = false
         end
+
     end
     if case == 5 || case == 99
         R, (x, y, z) = Singular.PolynomialRing(
@@ -450,7 +472,7 @@ function test(case::Int)
             equalitytest(T2, T1) &&
             equalitytest(T3, T6) &&
             equalitytest(T0, T5) &&
-            Singular.equal(T0, T4)
+            equalitytest(T0, T4)
         )
             test_successfull = false
         end
@@ -482,19 +504,22 @@ function test(case::Int)
             ordering_as_matrix(:lex, 6),
             :standard,
         )
-        #=    @time J = fractal_walk(
-                I,
-                MonomialOrder(
-                    ordering_as_matrix(:degrevlex, 6),
-                    [1, 1, 1, 1, 1, 1],
-                    [0],
-                ),
-                MonomialOrder(
-                    ordering_as_matrix(:lex, 6),
-                    [1, 0, 0, 0, 0, 0],
-                    [1, 0, 0, 0, 0, 0],
-                ),
-            ) =#
+        @time J = fractal_walk(
+            I,
+            MonomialOrder(
+                ordering_as_matrix(:degrevlex, 6),
+                [1, 1, 1, 1, 1, 1],
+                [0],
+            ),
+            MonomialOrder(
+                ordering_as_matrix(:lex, 6),
+                [1, 0, 0, 0, 0, 0],
+                [1, 0, 0, 0, 0, 0],
+            ),
+        )
+
+
+
         @time JJ = groebnerwalk(
             I,
             ordering_as_matrix(:degrevlex, 6),
@@ -507,7 +532,7 @@ function test(case::Int)
             ordering_as_matrix(:degrevlex, 6),
             ordering_as_matrix(:lex, 6),
             :pertubed,
-            6,
+            4,
         )
         @time L = groebnerwalk(
             I,
@@ -526,6 +551,7 @@ function test(case::Int)
             ["x", "y", "z", "u", "v", "w"],
             ordering = Singular.ordering_M(ordering_as_matrix(:lex, 6)),
         )
+
         @time T0 = Singular.std(
             Singular.Ideal(S, [change_ring(x, S) for x in gens(I)]),
             complete_reduction = true,
@@ -548,7 +574,7 @@ function test(case::Int)
             equalitytest(T2, T0) &&
             equalitytest(T3, T6) &&
             equalitytest(T0, T5) &&
-            Singular.equal(T0, T4)
+            equalitytest(T0, T4)
         )
             test_successfull = false
         end

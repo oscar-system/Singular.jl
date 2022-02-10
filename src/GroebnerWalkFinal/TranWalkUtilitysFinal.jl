@@ -1,7 +1,7 @@
 include("GroebnerWalkUtilitysFinal.jl")
 
 
-function representation_vector(G::Singular.sideal, T::Matrix{Int64})
+function representation_vector(G::Singular.sideal, T::Matrix{Int})
     n = size(T)[1]
     M = 0
     for i = 1:n
@@ -24,6 +24,7 @@ function representation_vector(G::Singular.sideal, T::Matrix{Int64})
     for i = 2:n
         w = w + d^(n - i) * T[i, :]
     end
+    println(w)
     return w
 end
 

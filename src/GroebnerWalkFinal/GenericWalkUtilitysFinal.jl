@@ -9,14 +9,14 @@ include("GroebnerWalkUtilitysFinal.jl")
 function facet_initials(
     G::Singular.sideal,
     lm::Vector{spoly{L}},
-    v::Vector{Int64},
+    v::Vector{Int},
 ) where {L<:Nemo.RingElem}
 Returns the facet initials of the polynomials w.r.t. the vector v.
 """=#
 function facet_initials(
     G::Singular.sideal,
     lm::Vector{spoly{L}},
-    v::Vector{Int64},
+    v::Vector{Int},
 ) where {L<:Nemo.RingElem}
     Rn = base_ring(G)
     initials = Array{Singular.elem_type(Rn),1}(undef, 0)
@@ -63,10 +63,10 @@ end
 
 #=
 @doc Markdown.doc"""
-function isParallel(u::Vector{Int64}, v::Vector{Int64})
+function isParallel(u::Vector{Int}, v::Vector{Int})
 Returns true if the vector u is parallel to the vector v.
 """=#
-function isParallel(u::Vector{Int64}, v::Vector{Int64})
+function isParallel(u::Vector{Int}, v::Vector{Int})
     count = 1
     x = 0
     for i = 1:length(u)
@@ -121,8 +121,8 @@ function lift_generic(
     return liftPolys, Newlm
 end
 
-function filter_btz(S::Matrix{Int64}, V::Vector{Vector{Int64}})
-    btz = Set{Vector{Int64}}()
+function filter_btz(S::Matrix{Int}, V::Vector{Vector{Int}})
+    btz = Set{Vector{Int}}()
     for v in V
         if bigger_than_zero(S, v)
             push!(btz, v)
@@ -131,8 +131,8 @@ function filter_btz(S::Matrix{Int64}, V::Vector{Vector{Int64}})
     return btz
 end
 
-function filter_ltz(S::Matrix{Int64}, V::Set{Vector{Int64}})
-    btz = Set{Vector{Int64}}()
+function filter_ltz(S::Matrix{Int}, V::Set{Vector{Int}})
+    btz = Set{Vector{Int}}()
     for v in V
         if less_than_zero(S, v)
             push!(btz, v)
@@ -141,12 +141,12 @@ function filter_ltz(S::Matrix{Int64}, V::Set{Vector{Int64}})
     return btz
 end
 function filter_lf(
-    w::Vector{Int64},
-    S::Matrix{Int64},
-    T::Matrix{Int64},
-    V::Set{Vector{Int64}},
+    w::Vector{Int},
+    S::Matrix{Int},
+    T::Matrix{Int},
+    V::Set{Vector{Int}},
 )
-    btz = Set{Vector{Int64}}()
+    btz = Set{Vector{Int}}()
     for v in V
         if less_facet(w, v, S, T)
             push!(btz, v)
@@ -158,9 +158,9 @@ end
 function next_gamma(
     G::Singular.sideal,
     Lm::Vector{spoly{L}},
-    w::Vector{Int64},
-    S::Matrix{Int64},
-    T::Matrix{Int64},
+    w::Vector{Int},
+    S::Matrix{Int},
+    T::Matrix{Int},
 ) where {L<:Nemo.RingElem}
     V = filter_btz(S, difference_lead_tail(G, Lm))
     V = filter_ltz(T, V)
@@ -181,9 +181,9 @@ end
 
 function next_gamma(
     G::Singular.sideal,
-    w::Vector{Int64},
-    S::Matrix{Int64},
-    T::Matrix{Int64},
+    w::Vector{Int},
+    S::Matrix{Int},
+    T::Matrix{Int},
 )
     V = filter_btz(S, difference_lead_tail(G))
     V = filter_ltz(T, V)
@@ -202,7 +202,7 @@ function next_gamma(
     return minV
 end
 
-function bigger_than_zero(M::Matrix{Int64}, v::Vector{Int64})
+function bigger_than_zero(M::Matrix{Int}, v::Vector{Int})
     for i = 1:size(M)[1]
         d = dot(M[i, :], v)
         if d != 0
@@ -212,7 +212,7 @@ function bigger_than_zero(M::Matrix{Int64}, v::Vector{Int64})
     return false
 end
 
-function less_than_zero(M::Matrix{Int64}, v::Vector{Int64})
+function less_than_zero(M::Matrix{Int}, v::Vector{Int})
     nrows, ncols = size(M)
     for i = 1:nrows
         d = 0
@@ -227,10 +227,10 @@ function less_than_zero(M::Matrix{Int64}, v::Vector{Int64})
 end
 
 function less_facet(
-    u::Vector{Int64},
-    v::Vector{Int64},
-    S::Matrix{Int64},
-    T::Matrix{Int64},
+    u::Vector{Int},
+    v::Vector{Int},
+    S::Matrix{Int},
+    T::Matrix{Int},
 )
     for i = 1:size(T)[1]
         for j = 1:size(S)[1]
@@ -314,19 +314,19 @@ function interreduce(
     Lm::Vector{spoly{L}},
 ) where {L<:Nemo.RingElem}
     Rn = parent(first(G))
-        for i = 1:Singular.length(G)
-            gensrest = Array{Singular.elem_type(Rn),1}(undef, 0)
-            Lmrest = Array{Singular.elem_type(Rn),1}(undef, 0)
-            for j = 1:length(G)
-                if i != j
-                    push!(gensrest, G[j])
-                    push!(Lmrest, Lm[j])
-                end
+    for i = 1:Singular.length(G)
+        gensrest = Array{Singular.elem_type(Rn),1}(undef, 0)
+        Lmrest = Array{Singular.elem_type(Rn),1}(undef, 0)
+        for j = 1:length(G)
+            if i != j
+                push!(gensrest, G[j])
+                push!(Lmrest, Lm[j])
             end
-            r, b = modulo(G[i], gensrest, Lmrest)
-            if b
-                G[i] = r
-            end
+        end
+        r, b = modulo(G[i], gensrest, Lmrest)
+        if b
+            G[i] = r
+        end
     end
     return G
 end

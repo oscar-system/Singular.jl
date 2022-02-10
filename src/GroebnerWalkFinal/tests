@@ -1,30 +1,32 @@
-include("/Users/JordiWelp/github/Singular.jl/src/GroebnerWalkFinal/GroebnerWalkFinal.jl")
-include("/Users/JordiWelp/github/Singular.jl/src/GroebnerWalkFinal/Examples.jl")
+include("GroebnerWalkFinal.jl")
+include("Examples")
+using Test
 
 @testset "Groebnerwalks" begin
     @testset "Testing Groebnerwalks" begin
         let id = cyclic5()
-            dim = nvars(base_ring(id))
+            R = base_ring(id)
+            dim = nvars(R)
             ve=ones(Int64,dim)
-            StartOrd = ordering_as_matrix(ve, :lex)
+            StartOrd = ordering_as_matrix(:degrevlex, dim)
             TarOrd = ordering_as_matrix(:lex, dim)
             S = change_order(R, TarOrd)
-            I = Singular.std(ideal, complete_reduction = true)
+            I = Singular.std(id, complete_reduction = true)
 
             ideals = []
             for i = 2:nvars(S)
-                push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :pertubed, i))
+                push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :pertubed, i))
             end
-            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :standard))
-            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :generic))
-            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :fractal))
-            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :fractal_look_ahead))
-            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :fractal_lex))
-            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :fractal_combined))
-            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :tran))
+            push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :standard))
+            push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :generic))
+            push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :fractal))
+            push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :fractal_look_ahead))
+            push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :fractal_lex))
+            push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :fractal_combined))
+            push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :tran))
 
             s = Singular.std(
-                Singular.Ideal(S, [change_ring(x, S) for x in Singular.gens(ideal)]),
+                Singular.Ideal(S, [change_ring(x, S) for x in Singular.gens(id)]),
                 complete_reduction = true,
             )
 
@@ -37,28 +39,29 @@ include("/Users/JordiWelp/github/Singular.jl/src/GroebnerWalkFinal/Examples.jl")
         end
 
         let id = katsura5()
-            dim = nvars(base_ring(id))
+            R = base_ring(id)
+            dim = nvars(R)
             ve=ones(Int64,dim)
-            StartOrd = ordering_as_matrix(ve, :lex)
+            StartOrd = ordering_as_matrix(:degrevlex, dim)
             TarOrd = ordering_as_matrix(:lex, dim)
             S = change_order(R, TarOrd)
 
-            I = Singular.std(ideal, complete_reduction = true)
+            I = Singular.std(id, complete_reduction = true)
 
             ideals = []
-            for i = 2:nvars(S)
-                push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :pertubed, i))
+            for i = 1:nvars(S)-1
+                push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :pertubed, i))
             end
-            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :standard))
-            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :generic))
-            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :fractal))
-            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :fractal_look_ahead))
-            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :fractal_lex))
-            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :fractal_combined))
-            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :tran))
+            push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :standard))
+            push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :generic))
+            push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :fractal))
+            push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :fractal_look_ahead))
+            push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :fractal_lex))
+            push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :fractal_combined))
+            push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :tran))
 
             s = Singular.std(
-                Singular.Ideal(S, [change_ring(x, S) for x in Singular.gens(ideal)]),
+                Singular.Ideal(S, [change_ring(x, S) for x in Singular.gens(id)]),
                 complete_reduction = true,
             )
 
@@ -71,30 +74,32 @@ include("/Users/JordiWelp/github/Singular.jl/src/GroebnerWalkFinal/Examples.jl")
         end
 
         let id = cohn4()
-            dim = nvars(base_ring(id))
+            R = base_ring(id)
+            dim = nvars(R)
             ve=ones(Int64,dim)
-            StartOrd = ordering_as_matrix(ve, :lex)
+            StartOrd = ordering_as_matrix(:degrevlex, dim)
             TarOrd = ordering_as_matrix(:lex, dim)
             S = change_order(R, TarOrd)
 
-            I = Singular.std(ideal, complete_reduction = true)
+            I = Singular.std(id, complete_reduction = true)
 
             ideals = []
             for i = 2:nvars(S)
-                push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :pertubed, i))
+                push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :pertubed, i))
             end
-            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :standard))
-            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :generic))
-            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :fractal))
-            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :fractal_look_ahead))
-            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :fractal_lex))
-            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :fractal_combined))
-            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :tran))
+            push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :standard))
+            push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :generic))
+            push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :fractal))
+            push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :fractal_look_ahead))
+            push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :fractal_lex))
+            push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :fractal_combined))
+            push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :tran))
 
             s = Singular.std(
-                Singular.Ideal(S, [change_ring(x, S) for x in Singular.gens(ideal)]),
+                Singular.Ideal(S, [change_ring(x, S) for x in Singular.gens(id)]),
                 complete_reduction = true,
             )
+
 
             for id in ideals
                 @test Singular.equal(
@@ -104,29 +109,30 @@ include("/Users/JordiWelp/github/Singular.jl/src/GroebnerWalkFinal/Examples.jl")
             end
         end
 
-        let id = noon5()
-            dim = nvars(base_ring(id))
+        let id = ex1()
+            R = base_ring(id)
+            dim = nvars(R)
             ve=ones(Int64,dim)
-            StartOrd = ordering_as_matrix(ve, :lex)
+            StartOrd = ordering_as_matrix(:degrevlex)
             TarOrd = ordering_as_matrix(:lex, dim)
             S = change_order(R, TarOrd)
 
-            I = Singular.std(ideal, complete_reduction = true)
+            I = Singular.std(id, complete_reduction = true)
 
             ideals = []
             for i = 2:nvars(S)
-                push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :pertubed, i))
+                push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex), ordering_as_matrix(:lex, dim), :pertubed, i))
             end
-            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :standard))
-            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :generic))
-            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :fractal))
-            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :fractal_look_ahead))
-            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :fractal_lex))
-            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :fractal_combined))
-            push!(ideals, groebnerwalk(I, StartOrd, TarOrd, :tran))
+            push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex), ordering_as_matrix(:lex, dim), :standard))
+            push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex), ordering_as_matrix(:lex, dim), :generic))
+            push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex), ordering_as_matrix(:lex, dim), :fractal))
+            push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex), ordering_as_matrix(:lex, dim), :fractal_look_ahead))
+            push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex), ordering_as_matrix(:lex, dim), :fractal_lex))
+            push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex), ordering_as_matrix(:lex, dim), :fractal_combined))
+            push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex), Taordering_as_matrix(:lex, dim)rOrd, :tran))
 
             s = Singular.std(
-                Singular.Ideal(S, [change_ring(x, S) for x in Singular.gens(ideal)]),
+                Singular.Ideal(S, [change_ring(x, S) for x in Singular.gens(id)]),
                 complete_reduction = true,
             )
 
@@ -138,3 +144,4 @@ include("/Users/JordiWelp/github/Singular.jl/src/GroebnerWalkFinal/Examples.jl")
             end
         end
     end
+end

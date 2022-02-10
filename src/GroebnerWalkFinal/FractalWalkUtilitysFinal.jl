@@ -2,11 +2,7 @@ include("GroebnerWalkUtilitysFinal.jl")
 
 #Structure which is used to define a MonomialOrdering a(v)*a(tv)*ordering_M(T)
 #Maybe not needed
-mutable struct MonomialOrder{
-    T<:Matrix{Int64},
-    v<:Vector{Int64},
-    tv<:Vector{Int64},
-}
+mutable struct MonomialOrder{T<:Matrix{Int},v<:Vector{Int},tv<:Vector{Int}}
     m::T
     w::v
     t::tv
@@ -14,10 +10,10 @@ end
 #=
 @doc Markdown.doc"""
    convert_bounding_vector(wtemp::Vector{T}) where {T<:Number}
-Given a Vector{Number} $v$ this function computes a Vector{Int64} w with w = v*gcd(v).
+Given a Vector{Number} $v$ this function computes a Vector{Int} w with w = v*gcd(v).
 """=#
 function convert_bounding_vector(v::Vector{T}) where {T<:Number}
-    w = Vector{Int64}()
+    w = Vector{Int}()
     for i = 1:length(v)
         push!(w, float(divexact(v[i], gcd(v))))
     end
@@ -28,15 +24,15 @@ end
 @doc Markdown.doc"""
 function inCone(
     G::Singular.sideal,
-    T::MonomialOrder{Matrix{Int64},Vector{Int64}},
-    t::Vector{Int64},
+    T::MonomialOrder{Matrix{Int},Vector{Int}},
+    t::Vector{Int},
 )
 Returns 'true' if the leading tems of $G$ w.r.t the monomial ordering $T$ are the same as the leading terms of $G$ w.r.t the weighted monomial ordering with weight vector $t$ and the monomial ordering $T$.
 """=#
 function inCone(
     G::Singular.sideal,
-    T::MonomialOrder{Matrix{Int64},Vector{Int64}},
-    t::Vector{Int64},
+    T::MonomialOrder{Matrix{Int},Vector{Int}},
+    t::Vector{Int},
 )
     R = change_order(G.base_ring, T.t, T.m)
     I = Singular.Ideal(R, [change_ring(x, R) for x in Singular.gens(G)])
@@ -152,13 +148,13 @@ end
 @doc Markdown.doc"""
 function change_order(
     R::Singular.PolyRing,
-    T::MonomialOrder{Matrix{Int64},Vector{Int64}},
+    T::MonomialOrder{Matrix{Int},Vector{Int}},
 ) where {L<:Number,K<:Number}
 Returns a new PolynomialRing w.r.t. the monomial ordering T.
 """=#
 function change_order(
     R::Singular.PolyRing,
-    T::MonomialOrder{Matrix{Int64},Vector{Int64}},
+    T::MonomialOrder{Matrix{Int},Vector{Int}},
 ) where {L<:Number,K<:Number}
     G = Singular.gens(R)
     Gstrich = string.(G)
@@ -174,16 +170,16 @@ end
 @doc Markdown.doc"""
 function pertubed_vector(
 G::Singular.sideal,
-Mo::MonomialOrder{Matrix{Int64}},
-t::Vector{Int64},
+Mo::MonomialOrder{Matrix{Int}},
+t::Vector{Int},
 p::Integer,
 )
 Computes a p-pertubed weight vector of the current weight vector t by using the monomial ordering Mo.
 """=#
 function pertubed_vector(
     G::Singular.sideal,
-    Mo::MonomialOrder{Matrix{Int64}},
-    t::Vector{Int64},
+    Mo::MonomialOrder{Matrix{Int}},
+    t::Vector{Int},
     p::Integer,
 )
     if t == Mo.m[1, :]
@@ -215,9 +211,9 @@ function pertubed_vector(
         end
     end
     e = maxdeg * msum + 1
-    w = view(M,1, :) * e^(p - 1)
+    w = view(M, 1, :) * e^(p - 1)
     for i = 2:p
-        w += e^(p - i) * view(M,i, :)
+        w += e^(p - i) * view(M, i, :)
     end
     return w
 end
@@ -226,15 +222,15 @@ end
 @doc Markdown.doc"""
 function pertubed_vector(
 G::Singular.sideal,
-Mo::MonomialOrder{Matrix{Int64}},
-t::Vector{Int64},
+Mo::MonomialOrder{Matrix{Int}},
+t::Vector{Int},
 p::Integer,
 )
 Computes a p-pertubed weight vector of the current weight vector given by the first row of the matrix corresponding the the monomial ordering T.
 """=#
 function pertubed_vector(
     G::Singular.sideal,
-    T::MonomialOrder{Matrix{Int64},Vector{Int64}},
+    T::MonomialOrder{Matrix{Int},Vector{Int}},
     p::Integer,
 )
     m = []
@@ -271,4 +267,26 @@ function pertubed_vector(
         w += e^(p - i) * view(M, i, :)
     end
     return w
+end
+
+function next_weightfr(
+    G::Singular.sideal,
+    cweight::Array{T,1},
+    tweight::Array{K,1},
+) where {T<:Number,K<:Number}
+    if (cweight == tweight)
+        return [0]
+    end
+    tmin = 1
+    for v in difference_lead_tail(G)
+        cw = dot(cweight, v)
+        tw = dot(tweight, v)
+        if tw < 0
+            t = cw // (cw - tw)
+            if t < tmin
+                tmin = t
+            end
+        end
+    end
+    return tmin
 end

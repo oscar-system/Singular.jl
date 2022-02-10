@@ -6,35 +6,55 @@
 #This Version is used by the standard_walk, pertubed_walk and tran_walk.
 function next_weight(
     G::Singular.sideal,
-    cweight::Array{T,1},
-    tweight::Array{K,1},
-) where {T<:Number,K<:Number}
-    tv = []
+    cweight::Vector{Int},
+    tweight::Vector{Int},
+) where {K<:Number}
+    tmin = 1
     for v in difference_lead_tail(G)
         cw = dot(cweight, v)
         tw = dot(tweight, v)
+
         if tw < 0
-            push!(tv, cw // (cw - tw))
+            t = cw // (cw - tw)
+            if t < tmin
+                tmin = t
+            end
         end
     end
-    push!(tv, 1)
-    t = minimum(tv)
-    w = (1 - t) * cweight + t * tweight
-    return convert_bounding_vector(w)
+    w = convert_bounding_vector((1 - tmin) * cweight + tmin * tweight)
+    #=    if !checkInt32(w)
+            println(w)
+            for i in 1:length(cweight)
+                cweight[i] = round(cweight[i] * 0.10)
+                if cweight[i]== 0
+                    cweight = 1
+                end
+            end
+                if !inCone(G, T, cweight)
+                    println("not", cweight)
+                    return w
+            end
+            w= next_weight(G,T,cweight,tweight)
+        end=#
+    return w
 end
 
-function checkInt32(w::Vector{Int64})
-for i = 1:length(w)
-    if tryparse(Int32, string(w[i])) == nothing
-        println("w bigger than int32")
-        return false
+function checkInt32(w::Vector{Int})
+    for i = 1:length(w)
+        if tryparse(Int32, string(w[i])) == nothing
+            println("w bigger than int32")
+            return false
+        end
     end
-end
-return true
+    return true
 end
 
 #Return the initials of polynomials w.r.t. a weight vector.
-function initials(R::Singular.PolyRing, G::Vector{spoly{n_Q}}, w::Vector{Int64})
+function initials(
+    R::Singular.PolyRing,
+    G::Vector{L},
+    w::Vector{Int},
+) where {L<:Nemo.RingElem}
     inits = spoly{elem_type(base_ring(R))}[]
     indexw = Tuple{Vector{Int},elem_type(base_ring(R))}[]
     for g in G
@@ -74,7 +94,7 @@ function difference_lead_tail(I::Singular.sideal)
     return unique!(v)
 end
 
-function pertubed_vector(G::Singular.sideal, M::Matrix{Int64}, p::Integer)
+function pertubed_vector(G::Singular.sideal, M::Matrix{Int}, p::Integer)
     m = []
     n = size(M)[1]
     for i = 1:p
@@ -103,10 +123,49 @@ function pertubed_vector(G::Singular.sideal, M::Matrix{Int64}, p::Integer)
     for i = 2:p
         w += e^(p - i) * M[i, :]
     end
-    return w
+    #if !checkInt32(w)
+    #    w = pertubed_vector(G, M, p, e - 1)
+    #end
+
+    return convert_bounding_vector(w)
 end
 
-function inCone(G::Singular.sideal, T::Matrix{Int64}, t::Vector{Int64})
+#=function pertubed_vector(G::Singular.sideal, M::Matrix{Int}, p::Integer, e::Int)
+    m = []
+    n = size(M)[1]
+    for i = 1:p
+        max = M[i, 1]
+        for j = 2:n
+            temp = abs(M[i, j])
+            if temp > max
+                max = temp
+            end
+        end
+        push!(m, max)
+    end
+    msum = 0
+    for i = 2:p
+        msum += m[i]
+    end
+    maxdeg = 0
+    for g in gens(G)
+        td = deg(g, n)
+        if (td > maxdeg)
+            maxdeg = td
+        end
+    end
+    #e = maxdeg * msum + 1
+    w = M[1, :] * e^(p - 1)
+    for i = 2:p
+        w += e^(p - i) * M[i, :]
+    end
+    if !checkInt32(w)
+        w = pertubed_vector(G, M, p, e - 1)
+    end
+    return w
+end=#
+
+function inCone(G::Singular.sideal, T::Matrix{Int}, t::Vector{Int})
     R = change_order(G.base_ring, T)
     I = Singular.Ideal(R, [change_ring(x, R) for x in gens(G)])
     cvzip = zip(Singular.gens(I), initials(R, Singular.gens(I), t))
@@ -122,7 +181,7 @@ function lift(
     G::Singular.sideal,
     R::Singular.PolyRing,
     H::Singular.sideal,
-    Rn::Singular.PolyRing
+    Rn::Singular.PolyRing,
 )
     G.isGB = true
     rest = [
@@ -139,7 +198,7 @@ function liftGW2(
     R::Singular.PolyRing,
     inG::Vector{spoly{L}},
     H::Singular.sideal,
-    Rn::Singular.PolyRing
+    Rn::Singular.PolyRing,
 ) where {L<:Nemo.RingElem}
 
     gH = collect(gens(H))
@@ -149,7 +208,9 @@ function liftGW2(
         q = divalg(change_ring(gH[i], R), [change_ring(x, R) for x in inG], R)
         gH[i] = Rn(0)
         for j = 1:s
-            gH[i] = change_ring(gH[i], Rn) + change_ring(q[j],Rn) * change_ring(gG[j],Rn)
+            gH[i] =
+                change_ring(gH[i], Rn) +
+                change_ring(q[j], Rn) * change_ring(gG[j], Rn)
         end
     end
     G = Singular.Ideal(Rn, [x for x in gH])
@@ -180,8 +241,8 @@ function divalg(
                 i = i + 1
             end
         end
-            if div == false
-                p = p - leading_term(p)
+        if div == false
+            p = p - leading_term(p)
         end
     end
     return q
@@ -189,34 +250,49 @@ end
 
 #Solves problems with weight vectors of floats.
 function convert_bounding_vector(wtemp::Vector{T}) where {T<:Number}
-    w = Vector{Int64}()
+    w = Vector{Int}()
+    g = gcd(wtemp)
     for i = 1:length(wtemp)
-        push!(w, float(divexact(wtemp[i], gcd(wtemp))))
+        push!(w, float(divexact(wtemp[i], g)))
     end
     return w
 end
+
 
 #return a copy of the PolynomialRing I, equipped with the ordering a(cweight)*ordering_M(T)
 function change_order(
     R::Singular.PolyRing,
     cweight::Array{L,1},
-    T::Matrix{Int64},
+    T::Matrix{Int},
 ) where {L<:Number,K<:Number}
     G = Singular.gens(R)
     Gstrich = string.(G)
-    S, H = Singular.PolynomialRing(
-        R.base_ring,
-        Gstrich,
-        ordering = Singular.ordering_a(cweight) * Singular.ordering_M(T),
-        cached = false,
-    )
+    s = size(T)
+    if s[1] == s[2]
+        S, H = Singular.PolynomialRing(
+            R.base_ring,
+            Gstrich,
+            ordering = Singular.ordering_a(cweight) * Singular.ordering_M(T),
+            cached = false,
+        )
+    else
+        S, H = Singular.PolynomialRing(
+            R.base_ring,
+            Gstrich,
+            ordering = Singular.ordering_a(cweight) *
+                       Singular.ordering_a(T[1, :]) *
+                       Singular.ordering_M(T[2:end, :]),
+            cached = false,
+        )
+    end
     return S
+
 end
 
 #return a copy of the PolynomialRing I, equipped with the ordering ordering_M(T)
 function change_order(
     R::Singular.PolyRing,
-    M::Matrix{Int64},
+    M::Matrix{Int},
 ) where {T<:Number,K<:Number}
     G = Singular.gens(R)
     Gstrich = string.(G)
@@ -252,16 +328,16 @@ end
 # unspecific help functions
 #############################################
 
-function ident_matrix(n::Int64)
-    M = zeros(Int64, n, n)
+function ident_matrix(n::Int)
+    M = zeros(Int, n, n)
     for i = 1:n
         M[i, i] = 1
     end
     return M
 end
 
-function anti_diagonal_matrix(n::Int64)
-    M = zeros(Int64, n, n)
+function anti_diagonal_matrix(n::Int)
+    M = zeros(Int, n, n)
     for i = 1:n
         M[i, n+1-i] = -1
     end
@@ -285,7 +361,7 @@ function equalitytest(G::Singular.sideal, K::Singular.sideal)
     return false
 end
 
-function dot(v::Vector{Int64}, w::Vector{Int64})
+function dot(v::Vector{Int}, w::Vector{Int})
     n = length(v)
     sum = 0
     for i = 1:n
@@ -294,7 +370,7 @@ function dot(v::Vector{Int64}, w::Vector{Int64})
     return sum
 end
 
-function ordering_as_matrix(w::Vector{Int64}, ord::Symbol)
+function ordering_as_matrix(w::Vector{Int}, ord::Symbol)
     if length(w) > 2
         if ord == :lex
             return [
@@ -305,14 +381,14 @@ function ordering_as_matrix(w::Vector{Int64}, ord::Symbol)
         if ord == :deglex
             return [
                 w'
-                ones(Int64, length(w))'
+                ones(Int, length(w))'
                 ident_matrix(length(w))[1:length(w)-2, :]
             ]
         end
         if ord == :degrevlex
             return [
                 w'
-                ones(Int64, length(w))'
+                ones(Int, length(w))'
                 anti_diagonal_matrix(length(w))[1:length(w)-2, :]
             ]
         end
@@ -327,33 +403,38 @@ function ordering_as_matrix(w::Vector{Int64}, ord::Symbol)
     end
 end
 
-function change_weight_vector(w::Vector{Int64}, M::Matrix{Int64})
+function change_weight_vector(w::Vector{Int}, M::Matrix{Int})
     return [
         w'
         M[2:length(w), :]
     ]
 end
-function insert_weight_vector(w::Vector{Int64}, M::Matrix{Int64})
+function insert_weight_vector(w::Vector{Int}, M::Matrix{Int})
     return [
         w'
         M[1:length(w)-1, :]
     ]
 end
+function add_weight_vector(w::Vector{Int}, M::Matrix{Int})
+    return [
+        w'
+        M
+    ]
+end
 
-
-function ordering_as_matrix(ord::Symbol, nvars::Int64)
+function ordering_as_matrix(ord::Symbol, nvars::Int)
     if ord == :lex
         return ident_matrix(nvars)
     end
     if ord == :deglex
         return [
-            ones(Int64, nvars)'
+            ones(Int, nvars)'
             ident_matrix(nvars)[1:nvars-1, :]
         ]
     end
     if ord == :degrevlex
         return [
-            ones(Int64, nvars)'
+            ones(Int, nvars)'
             anti_diagonal_matrix(nvars)[1:nvars-1, :]
         ]
     end
@@ -368,7 +449,7 @@ function ordering_as_matrix(ord::Symbol, nvars::Int64)
 end
 
 
-function deg(p::Singular.spoly, n::Int64)
+function deg(p::Singular.spoly, n::Int)
     max = 0
     for mon in Singular.monomials(p)
         ev = Singular.exponent_vectors(mon)
@@ -377,9 +458,9 @@ function deg(p::Singular.spoly, n::Int64)
             for i = 1:n
                 sum += e[i]
             end
-        end
-        if (max < sum)
-            max = sum
+            if (max < sum)
+                max = sum
+            end
         end
     end
     return max
