@@ -162,7 +162,9 @@ function change_order(
     S, H = Singular.PolynomialRing(
         R.base_ring,
         Gstrich,
-        ordering = Singular.ordering_a(T.w) * Singular.ordering_a(T.t) * Singular.ordering_M(T.m),
+        ordering = Singular.ordering_a(T.w) *
+                   Singular.ordering_a(T.t) *
+                   Singular.ordering_M(T.m),
     )
     return S
 end
