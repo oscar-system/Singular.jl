@@ -157,6 +157,7 @@ function inCone(G::Singular.sideal, T::Matrix{Int}, t::Vector{Int})
     end
     return true
 end
+
 #Fukuda et al
 function lift(
     G::Singular.sideal,

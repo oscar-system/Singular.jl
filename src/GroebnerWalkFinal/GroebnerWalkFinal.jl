@@ -117,7 +117,6 @@ function groebnerwalk(
     return Singular.Ideal(S, [change_ring(gen, S) for gen in gens(Gb)])
 end
 
-
 function standard_walk(G::Singular.sideal, S::Matrix{Int}, T::Matrix{Int})
     println("standard_walk results")
     println("Crossed Cones in: ")
