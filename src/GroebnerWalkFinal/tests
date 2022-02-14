@@ -19,11 +19,11 @@ using Test
             end
             push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :standard))
             push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :generic))
-            push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :fractal))
+            #push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :fractal))
             push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :fractal_look_ahead))
-            push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :fractal_lex))
+            #push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :fractal_lex))
             push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :fractal_combined))
-            push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :tran))
+            push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :generic))
 
             s = Singular.std(
                 Singular.Ideal(S, [change_ring(x, S) for x in Singular.gens(id)]),
@@ -31,7 +31,7 @@ using Test
             )
 
             for id in ideals
-                @test Singular.equal(
+                @test equalitytest(
                     Singular.Ideal(S, [change_ring(x, S) for x in Singular.gens(id)]),
                     s,
                 )
@@ -58,7 +58,7 @@ using Test
             push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :fractal_look_ahead))
             push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :fractal_lex))
             push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :fractal_combined))
-            push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :tran))
+            push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :generic))
 
             s = Singular.std(
                 Singular.Ideal(S, [change_ring(x, S) for x in Singular.gens(id)]),
@@ -66,7 +66,7 @@ using Test
             )
 
             for id in ideals
-                @test Singular.equal(
+                @test equalitytest(
                     Singular.Ideal(S, [change_ring(x, S) for x in Singular.gens(id)]),
                     s,
                 )
@@ -93,7 +93,7 @@ using Test
             push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :fractal_look_ahead))
             push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :fractal_lex))
             push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :fractal_combined))
-            push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :tran))
+            push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :generic))
 
             s = Singular.std(
                 Singular.Ideal(S, [change_ring(x, S) for x in Singular.gens(id)]),
@@ -102,7 +102,7 @@ using Test
 
 
             for id in ideals
-                @test Singular.equal(
+                @test equalitytest(
                     Singular.Ideal(S, [change_ring(x, S) for x in Singular.gens(id)]),
                     s,
                 )
@@ -129,7 +129,7 @@ using Test
             push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex), ordering_as_matrix(:lex, dim), :fractal_look_ahead))
             push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex), ordering_as_matrix(:lex, dim), :fractal_lex))
             push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex), ordering_as_matrix(:lex, dim), :fractal_combined))
-            push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex), Taordering_as_matrix(:lex, dim)rOrd, :tran))
+            push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex), ordering_as_matrix(:lex, dim), :generic))
 
             s = Singular.std(
                 Singular.Ideal(S, [change_ring(x, S) for x in Singular.gens(id)]),
@@ -137,7 +137,7 @@ using Test
             )
 
             for id in ideals
-                @test Singular.equal(
+                @test equalitytest(
                     Singular.Ideal(S, [change_ring(x, S) for x in Singular.gens(id)]),
                     s,
                 )

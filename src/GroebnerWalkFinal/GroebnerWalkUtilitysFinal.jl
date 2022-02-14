@@ -9,10 +9,11 @@ function next_weight(
     cweight::Vector{Int},
     tweight::Vector{Int},
 ) where {K<:Number}
-    tmin = 1
+
+    tmin = BigInt(1)
     for v in difference_lead_tail(G)
-        cw = dot(cweight, v)
-        tw = dot(tweight, v)
+        cw = BigInt(dot(cweight, v))
+        tw = BigInt(dot(tweight, v))
 
         if tw < 0
             t = cw // (cw - tw)
@@ -21,7 +22,8 @@ function next_weight(
             end
         end
     end
-    w = convert_bounding_vector((1 - tmin) * cweight + tmin * tweight)
+
+    w = convert_bounding_vector(cweight + tmin * (tweight- cweight))
     #=    if !checkInt32(w)
             println(w)
             for i in 1:length(cweight)
@@ -42,7 +44,7 @@ end
 function checkInt32(w::Vector{Int})
     for i = 1:length(w)
         if tryparse(Int32, string(w[i])) == nothing
-            println("w bigger than int32")
+            println("int32")
             return false
         end
     end
@@ -94,6 +96,15 @@ function difference_lead_tail(I::Singular.sideal)
     return unique!(v)
 end
 
+#=
+@doc Markdown.doc"""
+function pertubed_vector(
+G::Singular.sideal,
+M::Matrix{Int},
+p::Integer
+)
+Computes a p-pertubed weight vector of M.
+"""=#
 function pertubed_vector(G::Singular.sideal, M::Matrix{Int}, p::Integer)
     m = []
     n = size(M)[1]
@@ -123,48 +134,18 @@ function pertubed_vector(G::Singular.sideal, M::Matrix{Int}, p::Integer)
     for i = 2:p
         w += e^(p - i) * M[i, :]
     end
-    #if !checkInt32(w)
-    #    w = pertubed_vector(G, M, p, e - 1)
-    #end
-
     return convert_bounding_vector(w)
 end
 
-#=function pertubed_vector(G::Singular.sideal, M::Matrix{Int}, p::Integer, e::Int)
-    m = []
-    n = size(M)[1]
-    for i = 1:p
-        max = M[i, 1]
-        for j = 2:n
-            temp = abs(M[i, j])
-            if temp > max
-                max = temp
-            end
-        end
-        push!(m, max)
-    end
-    msum = 0
-    for i = 2:p
-        msum += m[i]
-    end
-    maxdeg = 0
-    for g in gens(G)
-        td = deg(g, n)
-        if (td > maxdeg)
-            maxdeg = td
-        end
-    end
-    #e = maxdeg * msum + 1
-    w = M[1, :] * e^(p - 1)
-    for i = 2:p
-        w += e^(p - i) * M[i, :]
-    end
-    if !checkInt32(w)
-        w = pertubed_vector(G, M, p, e - 1)
-    end
-    return w
-end=#
-
+#=
+@doc Markdown.doc"""
+function inCone(
+    G::Singular.sideal,
+    T::Matrix{Int},
+    t::Vector{Int},
+)
+Returns 'true' if the leading tems of $G$ w.r.t the matrixordering $T$ are the same as the leading terms of $G$ w.r.t the weighted monomial ordering with weight vector $t$ and the Matrixordering $T$.
+"""=#
 function inCone(G::Singular.sideal, T::Matrix{Int}, t::Vector{Int})
     R = change_order(G.base_ring, T)
     I = Singular.Ideal(R, [change_ring(x, R) for x in gens(G)])
@@ -192,7 +173,18 @@ function lift(
     G.isGB = true
     return G
 end
-#Amrhein  & Gloor
+
+#=
+@doc Markdown.doc"""
+function lift_fractal_walk(
+G::Singular.sideal,
+R::Singular.PolyRing,
+inG::Vector{spoly{L}},
+H::Singular.sideal,
+Rn::Singular.PolyRing,
+)
+Performs a lifting step in the Groebner Walk proposed by Amrhein et. al. and Cox Little Oshea
+"""=#
 function liftGW2(
     G::Singular.sideal,
     R::Singular.PolyRing,
@@ -204,8 +196,9 @@ function liftGW2(
     gH = collect(gens(H))
     gG = collect(gens(G))
     s = length(inG)
+    inGR = [change_ring(x, R) for x in inG]
     for i = 1:length(gH)
-        q = divalg(change_ring(gH[i], R), [change_ring(x, R) for x in inG], R)
+        q = divalg(change_ring(gH[i], R), inGR, R)
         gH[i] = Rn(0)
         for j = 1:s
             gH[i] =
@@ -248,8 +241,23 @@ function divalg(
     return q
 end
 
-#Solves problems with weight vectors of floats.
-function convert_bounding_vector(wtemp::Vector{T}) where {T<:Number}
+#=
+@doc Markdown.doc"""
+   convert_bounding_vector(wtemp::Vector{T}) where {T<:Number}
+Given a Vector{Number} $v$ this function computes a Vector{Int} w with w = v:gcd(v).
+"""=#function convert_bounding_vector(wtemp::Vector{T}) where {T<:Rational{BigInt}}
+    w = Vector{Int}()
+    g = gcd(wtemp)
+    for i = 1:length(wtemp)
+        push!(w, float(divexact(wtemp[i], g)))
+    end
+    return w
+end
+#=
+@doc Markdown.doc"""
+   convert_bounding_vector(wtemp::Vector{T}) where {T<:Number}
+Given a Vector{Number} $v$ this function computes a Vector{Int} w with w = v:gcd(v).
+"""=#function convert_bounding_vector(wtemp::Vector{T}) where {T<:Number}
     w = Vector{Int}()
     g = gcd(wtemp)
     for i = 1:length(wtemp)
@@ -346,12 +354,16 @@ end
 
 # Singular.isequal depends on order of generators
 function equalitytest(G::Singular.sideal, K::Singular.sideal)
+    if Singular.ngens(G) != Singular.ngens(K)
+        return false
+    end
     generators = Singular.gens(G)
     count = 0
     for gen in generators
         for r in Singular.gens(K)
-            if gen - r == 0
+            if gen*leading_coefficient(r) - r*leading_coefficient(gen) == 0
                 count += 1
+                break
             end
         end
     end

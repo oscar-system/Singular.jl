@@ -8,9 +8,10 @@ mutable struct MonomialOrder{T<:Matrix{Int},v<:Vector{Int},tv<:Vector{Int}}
     t::tv
 end
 #=
+#=
 @doc Markdown.doc"""
    convert_bounding_vector(wtemp::Vector{T}) where {T<:Number}
-Given a Vector{Number} $v$ this function computes a Vector{Int} w with w = v*gcd(v).
+Given a Vector{Number} $v$ this function computes a Vector{Int} w with w = v:gcd(v).
 """=#
 function convert_bounding_vector(v::Vector{T}) where {T<:Number}
     w = Vector{Int}()
@@ -18,7 +19,7 @@ function convert_bounding_vector(v::Vector{T}) where {T<:Number}
         push!(w, float(divexact(v[i], gcd(v))))
     end
     return w
-end
+end=#
 
 #=
 @doc Markdown.doc"""
@@ -34,7 +35,7 @@ function inCone(
     T::MonomialOrder{Matrix{Int},Vector{Int}},
     t::Vector{Int},
 )
-    R = change_order(G.base_ring, T.t, T.m)
+    R = change_order(G.base_ring, T.m)
     I = Singular.Ideal(R, [change_ring(x, R) for x in Singular.gens(G)])
     cvzip = zip(Singular.gens(I), initials(R, Singular.gens(I), t))
     for (g, ing) in cvzip
@@ -53,7 +54,7 @@ function lift_fractal_walk(
     R::Singular.PolyRing,
     S::Singular.PolyRing,
 )
-Performs a lifting step in the Groebner Walk proposed by Amrhein et. al.
+Performs a lifting step in the Groebner Walk proposed by Amrhein et. al. and Cox Little Oshea
 """=#
 function lift_fractal_walk(
     G::Singular.sideal,
@@ -161,112 +162,9 @@ function change_order(
     S, H = Singular.PolynomialRing(
         R.base_ring,
         Gstrich,
-        ordering = Singular.ordering_a(T.w) * Singular.ordering_M(T.m),
+        ordering = Singular.ordering_a(T.w) * Singular.ordering_a(T.t) * Singular.ordering_M(T.m),
     )
     return S
-end
-
-#=
-@doc Markdown.doc"""
-function pertubed_vector(
-G::Singular.sideal,
-Mo::MonomialOrder{Matrix{Int}},
-t::Vector{Int},
-p::Integer,
-)
-Computes a p-pertubed weight vector of the current weight vector t by using the monomial ordering Mo.
-"""=#
-function pertubed_vector(
-    G::Singular.sideal,
-    Mo::MonomialOrder{Matrix{Int}},
-    t::Vector{Int},
-    p::Integer,
-)
-    if t == Mo.m[1, :]
-        M = Mo.m
-    else
-        M = insert_weight_vector(t, Mo.m)
-    end
-    m = []
-    n = size(M)[1]
-    for i = 1:p
-        max = M[i, 1]
-        for j = 2:n
-            temp = abs(M[i, j])
-            if temp > max
-                max = temp
-            end
-        end
-        push!(m, max)
-    end
-    msum = 0
-    for i = 2:p
-        msum += m[i]
-    end
-    maxdeg = 0
-    for g in gens(G)
-        td = deg(g, n)
-        if (td > maxdeg)
-            maxdeg = td
-        end
-    end
-    e = maxdeg * msum + 1
-    w = view(M, 1, :) * e^(p - 1)
-    for i = 2:p
-        w += e^(p - i) * view(M, i, :)
-    end
-    return w
-end
-
-#=
-@doc Markdown.doc"""
-function pertubed_vector(
-G::Singular.sideal,
-Mo::MonomialOrder{Matrix{Int}},
-t::Vector{Int},
-p::Integer,
-)
-Computes a p-pertubed weight vector of the current weight vector given by the first row of the matrix corresponding the the monomial ordering T.
-"""=#
-function pertubed_vector(
-    G::Singular.sideal,
-    T::MonomialOrder{Matrix{Int},Vector{Int}},
-    p::Integer,
-)
-    m = []
-    if T.t == T.m[1, :]
-        M = T.m
-    else
-        M = insert_weight_vector(T.t, T.m)
-    end
-    n = size(M)[1]
-    for i = 1:p
-        max = M[i, 1]
-        for j = 2:n
-            temp = abs(M[i, j])
-            if temp > max
-                max = temp
-            end
-        end
-        push!(m, max)
-    end
-    msum = 0
-    for i = 2:p
-        msum += m[i]
-    end
-    maxdeg = 0
-    for g in gens(G)
-        td = deg(g, n)
-        if (td > maxdeg)
-            maxdeg = td
-        end
-    end
-    e = maxdeg * msum + 1
-    w = view(M, 1, :) * e^(p - 1)
-    for i = 2:p
-        w += e^(p - i) * view(M, i, :)
-    end
-    return w
 end
 
 function next_weightfr(

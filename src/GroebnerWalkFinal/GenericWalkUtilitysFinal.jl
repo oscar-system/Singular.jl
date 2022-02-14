@@ -276,6 +276,7 @@ function modulo(
 ) where {L<:Nemo.RingElem}
 Returns p modulo G w.r.t. the leading terms Lm and true if a division occured.
 """=#
+
 function modulo(
     p::Singular.spoly,
     G::Vector{spoly{L}},
@@ -300,7 +301,33 @@ function modulo(
         return p, false
     end
 end
-
+#=
+function modulo(
+    p::Singular.spoly,
+    G::Vector{spoly{L}},
+    Lm::Vector{spoly{L}},
+    c::Bool = false,
+) where {L<:Nemo.RingElem}
+    I = 0
+    R = parent(p)
+    Q = zero(R)
+    result = p
+    b = true
+    r = false
+    while b
+        b = false
+        for i = 1:length(G)
+            (q, b) = dividesGW(result, Lm[i], R)
+            if b
+                result = result - (q * G[i])
+                b = true
+                r = true
+                break
+            end
+        end
+    end
+    return result, r
+end=#
 #=
 @doc Markdown.doc"""
 function interreduce(
