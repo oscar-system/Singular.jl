@@ -102,6 +102,7 @@ auto id_StdHilb_helper(ideal a, ring b, jlcxx::ArrayRef<int> h, bool complete_re
     }
     else
         id = idInit(0, a->rank);
+    delete hilb;
     return id;
 }
 
@@ -450,7 +451,7 @@ void singular_define_ideals(jlcxx::Module & Singular)
             wi[i] = w[i];
         SPrintStart();
         scDegree(I, module_w, R->qideal);
-        // cleanup module_w ???
+        delete module_w;
         char *s = SPrintEnd();
         s[strlen(s)-1]='\0';
         std::string res(s);
