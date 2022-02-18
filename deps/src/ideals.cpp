@@ -498,4 +498,23 @@ void singular_define_ideals(jlcxx::Module & Singular)
         }
         rChangeCurrRing(origin);
     });
+    Singular.method("scHilbWeighted", [](ideal I, ring r, jlcxx::ArrayRef<int> weights, jlcxx::ArrayRef<int> a) {
+        int sz = weights.size();
+        intvec * w = new intvec(sz);
+        int * hi = w->ivGetVec();
+        for (int i=0; i< sz; i++) {
+          hi[i] = weights[i];
+        }
+        const ring origin = currRing;
+        rChangeCurrRing(r);
+        intvec *v=hFirstSeries(I,NULL,r->qideal,w);
+        delete w;
+        int * content = v->ivGetVec();
+        for(int j = 0; j < v->length(); j++)
+        {
+          a.push_back(content[j]);
+        }
+        delete v;
+        rChangeCurrRing(origin);
+    });
 }
