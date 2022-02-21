@@ -82,7 +82,7 @@ Returns ´true´ if all polynomials of the given array are monomials.
 """=#
 function isMonomial(Gw::Vector{spoly{L}}) where {L<:Nemo.RingElem}
     for g in Gw
-        if size(collect(Singular.coefficients(g)))[1] > 1
+        if length(Singular.coefficients(g)) > 1
             return false
         end
     end
@@ -98,7 +98,7 @@ Returns ´true´ if all polynomials of the given array are binomials or less.
 """=#
 function isbinomial(Gw::Vector{spoly{L}}) where {L<:Nemo.RingElem}
     for g in Gw
-        if size(collect(Singular.coefficients(g)))[1] > 2
+        if length(Singular.coefficients(g)) > 2
             return false
         end
     end

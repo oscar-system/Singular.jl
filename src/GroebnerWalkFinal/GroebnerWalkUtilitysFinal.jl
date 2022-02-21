@@ -9,12 +9,10 @@ function next_weight(
     cweight::Vector{Int},
     tweight::Vector{Int},
 ) where {K<:Number}
-
     tmin = BigInt(1)
     for v in difference_lead_tail(G)
         cw = BigInt(dot(cweight, v))
         tw = BigInt(dot(tweight, v))
-
         if tw < 0
             t = cw // (cw - tw)
             if t < tmin
@@ -22,7 +20,6 @@ function next_weight(
             end
         end
     end
-
     w = convert_bounding_vector(cweight + tmin * (tweight- cweight))
     #=    if !checkInt32(w)
             println(w)
@@ -106,11 +103,11 @@ p::Integer
 Computes a p-pertubed weight vector of M.
 """=#
 function pertubed_vector(G::Singular.sideal, M::Matrix{Int}, p::Integer)
-    m = []
-    n = size(M)[1]
+    m = Int[]
+    n = size(M,1)
     for i = 1:p
         max = M[i, 1]
-        for j = 2:n
+        for j = 1:n
             temp = abs(M[i, j])
             if temp > max
                 max = temp
@@ -157,7 +154,6 @@ function inCone(G::Singular.sideal, T::Matrix{Int}, t::Vector{Int})
     end
     return true
 end
-
 #Fukuda et al
 function lift(
     G::Singular.sideal,
@@ -196,12 +192,11 @@ function liftGW2(
 
     gH = collect(gens(H))
     gG = collect(gens(G))
-    s = length(inG)
-    inGR = [change_ring(x, R) for x in inG]
+    inG = [change_ring(x, R) for x in inG]
     for i = 1:length(gH)
-        q = divalg(change_ring(gH[i], R), inGR, R)
+        q = divalg(change_ring(gH[i], R), inG, R)
         gH[i] = Rn(0)
-        for j = 1:s
+        for j = 1:length(inG)
             gH[i] =
                 change_ring(gH[i], Rn) +
                 change_ring(q[j], Rn) * change_ring(gG[j], Rn)
@@ -217,15 +212,14 @@ function divalg(
     f::Vector{spoly{L}},
     R::Singular.PolyRing,
 ) where {L<:Nemo.RingElem}
-    s = length(f)
-    q = Array{Singular.elem_type(R),1}(undef, s)
-    for i = 1:s
+    q = Array{Singular.elem_type(R),1}(undef, length(f))
+    for i = 1:length(f)
         q[i] = R(0)
     end
     while !isequal(p, R(0))
         i = 1
         div = false
-        while (div == false && i <= s)
+        while (div == false && i <= length(f))
             b, m = divides(leading_term(p), leading_term(f[i]))
             if b
                 q[i] = q[i] + m
@@ -246,7 +240,8 @@ end
 @doc Markdown.doc"""
    convert_bounding_vector(wtemp::Vector{T}) where {T<:Number}
 Given a Vector{Number} $v$ this function computes a Vector{Int} w with w = v:gcd(v).
-"""=#function convert_bounding_vector(wtemp::Vector{T}) where {T<:Rational{BigInt}}
+"""=#
+function convert_bounding_vector(wtemp::Vector{T}) where {T<:Rational{BigInt}}
     w = Vector{Int}()
     g = gcd(wtemp)
     for i = 1:length(wtemp)
@@ -258,7 +253,8 @@ end
 @doc Markdown.doc"""
    convert_bounding_vector(wtemp::Vector{T}) where {T<:Number}
 Given a Vector{Number} $v$ this function computes a Vector{Int} w with w = v:gcd(v).
-"""=#function convert_bounding_vector(wtemp::Vector{T}) where {T<:Number}
+"""=#
+function convert_bounding_vector(wtemp::Vector{T}) where {T<:Number}
     w = Vector{Int}()
     g = gcd(wtemp)
     for i = 1:length(wtemp)
@@ -295,7 +291,27 @@ function change_order(
         )
     end
     return S
+end
 
+#return a copy of the PolynomialRing I, equipped with the ordering a(cweight)*ordering_M(T)
+function change_order(
+    R::Singular.PolyRing,
+    w::Vector{Int},
+    t::Vector{Int},
+    T::Matrix{Int},
+) where {}
+    G = Singular.gens(R)
+    Gstrich = string.(G)
+    s = size(T)
+        S, H = Singular.PolynomialRing(
+            R.base_ring,
+            Gstrich,
+            ordering = Singular.ordering_a(w) *
+                       Singular.ordering_a(t) *
+                       Singular.ordering_M(T),
+            cached = false,
+        )
+    return S
 end
 
 #return a copy of the PolynomialRing I, equipped with the ordering ordering_M(T)
@@ -375,10 +391,9 @@ function equalitytest(G::Singular.sideal, K::Singular.sideal)
 end
 
 function dot(v::Vector{Int}, w::Vector{Int})
-    n = length(v)
     sum = 0
-    for i = 1:n
-        sum += v[i] * w[i]
+    for i = 1:length(v)
+        @inbounds sum += v[i] * w[i]
     end
     return sum
 end

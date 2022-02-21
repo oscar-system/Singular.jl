@@ -14,7 +14,7 @@ using Test
             I = Singular.std(id, complete_reduction = true)
 
             ideals = []
-            for i = 2:nvars(S)
+            for i = 2:nvars(S)-1
                 push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :pertubed, i))
             end
             push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :standard))
@@ -73,7 +73,7 @@ using Test
             end
         end
 
-        let id = katsura5()
+        let id = cyclic4()
             R = base_ring(id)
             dim = nvars(R)
             ve=ones(Int64,dim)
@@ -84,7 +84,7 @@ using Test
             I = Singular.std(id, complete_reduction = true)
 
             ideals = []
-            for i = 2:nvars(S)
+            for i = 2:nvars(S)-1
                 push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :pertubed, i))
             end
             push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :standard))
@@ -113,7 +113,7 @@ using Test
             R = base_ring(id)
             dim = nvars(R)
             ve=ones(Int64,dim)
-            StartOrd = ordering_as_matrix(:degrevlex)
+            StartOrd = ordering_as_matrix(:degrevlex,dim)
             TarOrd = ordering_as_matrix(:lex, dim)
             S = change_order(R, TarOrd)
 
@@ -121,7 +121,7 @@ using Test
 
             ideals = []
             for i = 2:nvars(S)
-                push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex), ordering_as_matrix(:lex, dim), :pertubed, i))
+                push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :pertubed, i))
             end
             push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex), ordering_as_matrix(:lex, dim), :standard))
             push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex), ordering_as_matrix(:lex, dim), :generic))

@@ -85,11 +85,17 @@ include("Examples")
         f1 = 3 * x^2
         f2 = y^3 * z
         J = Singular.Ideal(R, [f1, f2])
+        f1 = x^3*y^2 + z^2 +y^2
+        f2 = y^3
+        K = Singular.Ideal(R, [f1, f2])
+
 
         @test isMonomial(gens(I)) == false
         @test isMonomial(gens(J)) == true
         @test isbinomial(gens(I)) == true
         @test isbinomial(gens(J)) == true
+        @test isbinomial(gens(K)) == false
+        @test isMonomial(gens(K)) == false
 
     end
 
@@ -175,7 +181,7 @@ include("Examples")
             b^2 * a^2 * c^4 +
             d^3 +
             e^3 +
-            b^8 * d^10 * e^18,
+            b^12 * d^10 * e^18,
         )
         f2 = R(a^3 * b^3)
         f3 = R(a^2 * b^4 + c^2 + a^3 * 4 + a * e^3)
@@ -188,13 +194,13 @@ include("Examples")
         println(t.time)
 
 
-        @test (reduce(f1, I), true) ==
+        @test (reduce(f1, I)) ==
               modulo(f1, gens(I), [Singular.leading_term(g) for g in gens(I)])
-        @test (reduce(f2, I), true) ==
+        @test (reduce(f2, I)) ==
               modulo(f2, gens(I), [Singular.leading_term(g) for g in gens(I)])
-        @test (reduce(f3, I), true) ==
+        @test (reduce(f3, I)) ==
               modulo(f3, gens(I), [Singular.leading_term(g) for g in gens(I)])
-        @test (reduce(f4, I), false) ==
+        @test (reduce(f4, I)) ==
               modulo(f4, gens(I), [Singular.leading_term(g) for g in gens(I)])
         J = Singular.std(J)
         @test equalitytest(

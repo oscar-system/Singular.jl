@@ -68,42 +68,17 @@ function groebnerwalk(
     elseif grwalktype == :pertubed
         walk = (x, y, z) -> pertubed_walk(x, y, z, p)
     elseif grwalktype == :fractal
-        walk =
-            (x, y, z) -> fractal_walk(
-                x,
-                MonomialOrder(S, S[1, :], [0]),
-                MonomialOrder(T, T[1, :], T[1, :]),
-            )
+        walk = (x, y, z) -> fractal_walk(x, y, z)
     elseif grwalktype == :fractal_start_order
-        walk =
-            (x, y, z) -> fractal_walk_start_order(
-                x,
-                MonomialOrder(S, S[1, :], [0]),
-                MonomialOrder(T, T[1, :], T[1, :]),
-            )
+        walk = (x, y, z) -> fractal_walk_start_order(x, y, z)
     elseif grwalktype == :fractal_lex
-        walk =
-            (x, y, z) -> fractal_walk_lex(
-                x,
-                MonomialOrder(S, S[1, :], [0]),
-                MonomialOrder(T, T[1, :], T[1, :]),
-            )
+        walk = (x, y, z) -> fractal_walk_lex(x, y, z)
     elseif grwalktype == :fractal_look_ahead
-        walk =
-            (x, y, z) -> fractal_walk_look_ahead(
-                x,
-                MonomialOrder(S, S[1, :], [0]),
-                MonomialOrder(T, T[1, :], T[1, :]),
-            )
+        walk = (x, y, z) -> fractal_walk_look_ahead(x, y, z)
     elseif grwalktype == :tran
         walk = (x, y, z) -> tran_walk(x, y, z)
     elseif grwalktype == :fractal_combined
-        walk =
-            (x, y, z) -> fractal_walk_combined(
-                x,
-                MonomialOrder(S, S[1, :], [0]),
-                MonomialOrder(T, T[1, :], T[1, :]),
-            )
+        walk = (x, y, z) -> fractal_walk_combined(x, y, z)
     end
 
     ######TODO:Check the parameter#####
@@ -159,8 +134,8 @@ function standard_step(
 )
     Gw = initials(Rn, gens(G), cw)
     H = Singular.std(Singular.Ideal(Rn, Gw), complete_reduction = true)
-    H = liftGW2(G, R, Gw, H, Rn)
-    #H = lift(G, R, H, Rn)
+    #H = liftGW2(G, R, Gw, H, Rn)
+    H = lift(G, R, H, Rn)
     return Singular.std(H, complete_reduction = true)
 end
 
@@ -267,42 +242,42 @@ end
 PertVecs = []
 sigma = []
 
-function fractal_walk(
-    G::Singular.sideal,
-    S::MonomialOrder{Matrix{Int},Vector{Int}},
-    T::MonomialOrder{Matrix{Int},Vector{Int}},
-)
-    global PertVecs = [pertubed_vector(G, T.m, i) for i = 1:nvars(base_ring(G))]
+function fractal_walk(G::Singular.sideal, S::Matrix{Int}, T::Matrix{Int})
+    global PertVecs = [pertubed_vector(G, T, i) for i = 1:nvars(base_ring(G))]
     println(PertVecs)
     println("FractalWalk_standard results")
     println("Crossed Cones in: ")
-    Gb = fractal_recursiv(G, S, T, PertVecs, 1)
+    Gb = fractal_recursiv(G, S, T, S[1, :], PertVecs, 1)
     println("Cones crossed: ", deleteCounterFr())
     return Gb
 end
 
 function fractal_recursiv(
     G::Singular.sideal,
-    S::MonomialOrder{Matrix{Int},Vector{Int}},
-    T::MonomialOrder{Matrix{Int},Vector{Int}},
+    S::Matrix{Int},
+    T::Matrix{Int},
+    cw::Vector{Int},
     PertVecs::Vector{Vector{Int}},
     p::Int,
 )
     R = base_ring(G)
     terminate = false
     G.isGB = true
-    w = S.w
-
+    w = cw
 
     while !terminate
         t = next_weightfr(G, w, PertVecs[p])
-        if (t == [0])
+        if t == 1
+            if inCone(G, T, cw)
+                return G
+            end
+        end
+        if t == [0]
             if inCone(G, T, PertVecs[p])
                 println(PertVecs[p], " in Cone", p)
                 return G
             else
-                global PertVecs = [pertubed_vector(G, T.m, i) for i = 1:nvars(R)]
-                T.t = PertVecs[p]
+                global PertVecs = [pertubed_vector(G, T, i) for i = 1:nvars(R)]
                 println("not in Cone ", PertVecs)
                 continue
             end
@@ -310,8 +285,7 @@ function fractal_recursiv(
         w = w + t * (PertVecs[p] - w)
         w = convert_bounding_vector(w)
         checkInt32(w)
-        T.w = w
-        Rn = change_order(R, T)
+        Rn = change_order(R, w, PertVecs[p], T)
         Gw = initials(R, Singular.gens(G), w)
         if p == nvars(R)
             H = Singular.std(
@@ -324,18 +298,18 @@ function fractal_recursiv(
             println("up in: ", p, " with: ", w)
             H = fractal_recursiv(
                 Singular.Ideal(R, [x for x in Gw]),
-                MonomialOrder(S.m, S.w, PertVecs[p]),
-                MonomialOrder(T.m, T.w, PertVecs[p + 1]),
+                S,
+                T,
+                deepcopy(cw),
                 PertVecs,
                 p + 1,
             )
         end
-        H = liftGW2(G, R, Gw, H, Rn)
-        #H = lift(G, R, H, Rn)
+        #H = liftGW2(G, R, Gw, H, Rn)
+        H = lift_fractal_walk(G, R, H, Rn)
         G = Singular.std(H, complete_reduction = true)
         R = Rn
-        S.w = T.w
-
+        cw = w
     end
     return G
 end
@@ -348,23 +322,24 @@ end
 
 function fractal_walk_start_order(
     G::Singular.sideal,
-    S::MonomialOrder{Matrix{Int},Vector{Int}},
-    T::MonomialOrder{Matrix{Int},Vector{Int}},
+    S::Matrix{Int},
+    T::Matrix{Int},
 )
     global PertVecs =
         [pertubed_vector(G, T, i) for i = 1:nvars(Singular.base_ring(G))]
-    global sigma = S.w
+    global sigma = S[1, :]
     println("fractal_walk_withStartorder results")
     println("Crossed Cones in: ")
-    Gb = fractal_walk_recursiv_startorder(G, S, T, PertVecs, 1)
+    Gb = fractal_walk_recursiv_startorder(G, S, T, S[1, :], PertVecs, 1)
     println("Cones crossed: ", deleteCounterFr())
     return Gb
 end
 
 function fractal_walk_recursiv_startorder(
     G::Singular.sideal,
-    S::MonomialOrder{Matrix{Int},Vector{Int}},
-    T::MonomialOrder{Matrix{Int},Vector{Int}},
+    S::Matrix{Int},
+    T::Matrix{Int},
+    cw::Vector{Int},
     PertVecs::Vector{Vector{Int}},
     p::Int,
 )
@@ -372,26 +347,30 @@ function fractal_walk_recursiv_startorder(
     terminate = false
     G.isGB = true
     if (p == 1)
-        if !isMonomial(initials(R, Singular.gens(G), S.w))
-            global cwPert = [pertubed_vector(G, S.m, i) for i = 1:nvars(R)]
+        if !isMonomial(initials(R, Singular.gens(G), cw))
+            global cwPert = [pertubed_vector(G, S, i) for i = 1:nvars(R)]
             global firstStepMode = true
         end
     end
     if firstStepMode
         w = cwPert[p]
     else
-        w = S.w
+        w = cw
     end
 
     while !terminate
         t = next_weightfr(G, w, PertVecs[p])
+        if t == 1
+            if inCone(G, T, w)
+                return G
+            end
+        end
         if t == [0]
             if inCone(G, T, PertVecs[p])
                 println(PertVecs[p], " in Cone", p)
                 return G
             else
-                global PertVecs = [pertubed_vector(G, T.m, i) for i = 1:nvars(R)]
-                T.t = PertVecs[p]
+                global PertVecs = [pertubed_vector(G, T, i) for i = 1:nvars(R)]
                 println("not in Cone ", PertVecs)
                 continue
             end
@@ -399,8 +378,7 @@ function fractal_walk_recursiv_startorder(
         w = w + t * (PertVecs[p] - w)
         w = convert_bounding_vector(w)
         checkInt32(w)
-        T.w = w
-        Rn = change_order(R, T)
+        Rn = change_order(R, w, PertVecs[p], T)
         Gw = initials(R, gens(G), w)
         if p == Singular.nvars(R)
             H = Singular.std(
@@ -411,49 +389,45 @@ function fractal_walk_recursiv_startorder(
             raiseCounterFr()
         else
             println("up in: ", p, " with: ", w)
-
             H = fractal_walk_recursiv_startorder(
                 Singular.Ideal(R, [x for x in Gw]),
-                MonomialOrder(S.m, S.w, PertVecs[p]),
-                MonomialOrder(T.m, T.w, PertVecs[p + 1]),
+                S,
+                T,
+                deepcopy(cw),
                 PertVecs,
                 p + 1,
             )
             global firstStepMode = false
         end
-        H = liftGW2(G, R, Gw, H, Rn)
-        #H = lift(G, R, H, Rn)
+        #H = liftGW2(G, R, Gw, H, Rn)
+        H = lift_fractal_walk(G, R, H, Rn)
         G = Singular.std(H, complete_reduction = true)
         R = Rn
-        S.w = T.w
-
+        cw = w
     end
     return G
 end
-function fractal_walk_lex(
-    G::Singular.sideal,
-    S::MonomialOrder{Matrix{Int},Vector{Int}},
-    T::MonomialOrder{Matrix{Int},Vector{Int}},
-)
-    global PertVecs = [pertubed_vector(G, T.m, i) for i = 1:nvars(base_ring(G))]
+function fractal_walk_lex(G::Singular.sideal, S::Matrix{Int}, T::Matrix{Int})
+    global PertVecs = [pertubed_vector(G, T, i) for i = 1:nvars(base_ring(G))]
     println("fractal_walk_lex results")
     println("Crossed Cones in: ")
-    Gb = fractal_walk_recursive_lex(G, S, T, PertVecs, 1)
+    Gb = fractal_walk_recursive_lex(G, S, T, S[1, :], PertVecs, 1)
     println("Cones crossed: ", deleteCounterFr())
     return Gb
 end
 
 function fractal_walk_recursive_lex(
     G::Singular.sideal,
-    S::MonomialOrder{Matrix{Int},Vector{Int}},
-    T::MonomialOrder{Matrix{Int},Vector{Int}},
+    S::Matrix{Int},
+    T::Matrix{Int},
+    cw::Vector{Int},
     PertVecs::Vector{Vector{Int}},
     p::Int,
 )
     R = Singular.base_ring(G)
     terminate = false
     G.isGB = true
-    w = S.w
+    w = cw
     while !terminate
         t = next_weightfr(G, w, PertVecs[p])
         if t == [0]
@@ -461,21 +435,18 @@ function fractal_walk_recursive_lex(
                 println(PertVecs[p], " in Cone", p)
                 return G
             else
-                global PertVecs =
-                global PertVecs = [pertubed_vector(G, T.m, i) for i = 1:nvars(R)]
-                T.t = PertVecs[p]
+                global PertVecs = [pertubed_vector(G, T, i) for i = 1:nvars(R)]
                 println("not in Cone ", PertVecs)
                 continue
             end
         end
         if t == 1 && p == 1
-            return fractal_walk_recursive_lex(G, S, MonomialOrder(T.m, T.w, PertVecs[p + 1]), PertVecs, p + 1)
+            return fractal_walk_recursive_lex(G, S, T, w, PertVecs, p + 1)
         else
             w = w + t * (PertVecs[p] - w)
             w = convert_bounding_vector(w)
             checkInt32(w)
-            T.w = w
-            Rn = change_order(R, T)
+            Rn = change_order(R, w, PertVecs[p], T)
             Gw = initials(R, Singular.gens(G), w)
             if p == Singular.nvars(R)
                 H = Singular.std(
@@ -488,57 +459,57 @@ function fractal_walk_recursive_lex(
                 println("up in: ", p, " with: ", w)
                 H = fractal_walk_recursive_lex(
                     Singular.Ideal(R, [x for x in Gw]),
-                    MonomialOrder(S.m, S.w, PertVecs[p]),
-                    MonomialOrder(T.m, T.w, PertVecs[p + 1]),
+                    S,
+                    T,
+                    deepcopy(cw),
                     PertVecs,
                     p + 1,
                 )
                 global firstStepMode = false
             end
         end
-        H = liftGW2(G, R, Gw, H, Rn)
-        #H = lift(G, R, H, Rn)
+        #H = liftGW2(G, R, Gw, H, Rn)
+        H = lift_fractal_walk(G, R, H, Rn)
         G = Singular.std(H, complete_reduction = true)
         R = Rn
-        S.w = T.w
-
+        cw = w
     end
     return G
 end
 function fractal_walk_look_ahead(
     G::Singular.sideal,
-    S::MonomialOrder{Matrix{Int},Vector{Int}},
-    T::MonomialOrder{Matrix{Int},Vector{Int}},
+    S::Matrix{Int},
+    T::Matrix{Int},
 )
     println("fractal_walk_look_ahead results")
     println("Crossed Cones in: ")
-    global PertVecs = [pertubed_vector(G, T.m, i) for i = 1:nvars(base_ring(G))]
-    Gb = fractal_walk_look_ahead_recursiv(G, S, T, PertVecs, 1)
+    global PertVecs = [pertubed_vector(G, T, i) for i = 1:nvars(base_ring(G))]
+    Gb = fractal_walk_look_ahead_recursiv(G, S, T, S[1, :], PertVecs, 1)
     println("Cones crossed: ", deleteCounterFr())
     return Gb
 end
 
 function fractal_walk_look_ahead_recursiv(
     G::Singular.sideal,
-    S::MonomialOrder{Matrix{Int},Vector{Int}},
-    T::MonomialOrder{Matrix{Int},Vector{Int}},
+    S::Matrix{Int},
+    T::Matrix{Int},
+    cw::Vector{Int},
     PertVecs::Vector{Vector{Int}},
     p::Int,
 )
     R = Singular.base_ring(G)
     terminate = false
     G.isGB = true
-    w = S.w
+    w = cw
 
     while !terminate
         t = next_weightfr(G, w, PertVecs[p])
         if t == [0]
-            if inCone(G, T.m, PertVecs[p])
-                println(PertVecs[p], " in Cone ",p)
+            if inCone(G, T, PertVecs[p])
+                println(PertVecs[p], " in Cone ", p)
                 return G
             else
-                global PertVecs = [pertubed_vector(G, T.m, i) for i = 1:nvars(R)]
-                T.t = PertVecs[p]
+                global PertVecs = [pertubed_vector(G, T, i) for i = 1:nvars(R)]
                 println(PertVecs[p], " not in Cone")
                 continue
             end
@@ -546,8 +517,7 @@ function fractal_walk_look_ahead_recursiv(
         w = w + t * (PertVecs[p] - w)
         w = convert_bounding_vector(w)
         checkInt32(w)
-        T.w = w
-        Rn = change_order(R, T)
+        Rn = change_order(R, w, PertVecs[p], T)
         Gw = initials(R, Singular.gens(G), w)
         if (p == Singular.nvars(R) || isbinomial(Gw))
             H = Singular.std(
@@ -560,53 +530,52 @@ function fractal_walk_look_ahead_recursiv(
             println("up in: ", p, " with: ", w)
             H = fractal_walk_look_ahead_recursiv(
                 Singular.Ideal(R, Gw),
-                MonomialOrder(S.m, S.w, PertVecs[p]),
-                MonomialOrder(T.m, T.w, PertVecs[p + 1]),
+                S,
+                T,
+                deepcopy(cw),
                 PertVecs,
                 p + 1,
             )
         end
-
-        H = liftGW2(G, R, Gw, H, Rn)
-        #H = lift(G, R H, Rn)
+        #H = liftGW2(G, R, Gw, H, Rn)
+        H = lift_fractal_walk(G, R, H, Rn)
         G = Singular.std(H, complete_reduction = true)
         R = Rn
-        S.w = T.w
+        cw = w
     end
     return G
 end
 
 
-
-
 function fractal_walk_combined(
     G::Singular.sideal,
-    S::MonomialOrder{Matrix{Int},Vector{Int}},
-    T::MonomialOrder{Matrix{Int},Vector{Int}},
+    S::Matrix{Int},
+    T::Matrix{Int},
 )
     global PertVecs =
-        [pertubed_vector(G, T.m, i) for i = 1:nvars(Singular.base_ring(G))]
-println(PertVecs)
+        [pertubed_vector(G, T, i) for i = 1:nvars(Singular.base_ring(G))]
+    println(PertVecs)
     println("fractal_walk_combined results")
     println("Crossed Cones in: ")
-    Gb = fractal_walk_combined(G, S, T, PertVecs, 1)
+    Gb = fractal_walk_combined(G, S, T, S[1, :], PertVecs, 1)
     println("Cones crossed: ", deleteCounterFr())
     return Gb
 end
 
 function fractal_walk_combined(
     G::Singular.sideal,
-    S::MonomialOrder{Matrix{Int},Vector{Int}},
-    T::MonomialOrder{Matrix{Int},Vector{Int}},
+    S::Matrix{Int},
+    T::Matrix{Int},
+    cw::Vector{Int},
     PertVecs::Vector{Vector{Int}},
     p::Int,
 )
-R = Singular.base_ring(G)
+    R = Singular.base_ring(G)
     terminate = false
     G.isGB = true
     if (p == 1)
-        if !isMonomial(initials(R, Singular.gens(G), S.w))
-            global cwPert = [pertubed_vector(G, S.m, i) for i = 1:nvars(R)]
+        if !isMonomial(initials(R, Singular.gens(G), cw))
+            global cwPert = [pertubed_vector(G, S, i) for i = 1:nvars(R)]
             println(cwPert)
             global firstStepMode = true
         end
@@ -614,31 +583,34 @@ R = Singular.base_ring(G)
     if firstStepMode
         w = cwPert[p]
     else
-        w = S.w
+        w = cw
     end
 
     while !terminate
         t = next_weightfr(G, w, PertVecs[p])
+        if t == 1
+            if inCone(G, T, cw)
+                return G
+            end
+        end
         if t == [0]
-            if inCone(G, T.m, PertVecs[p])
+            if inCone(G, T, PertVecs[p])
                 println(PertVecs[p], " in Cone", p)
                 return G
             else
-                global PertVecs = [pertubed_vector(G, T.m, i) for i = 1:nvars(R)]
-                T.t = PertVecs[p]
+                global PertVecs = [pertubed_vector(G, T, i) for i = 1:nvars(R)]
                 println("not in Cone ", PertVecs)
                 continue
             end
-    end
+        end
         if t == 1 && p == 1
             println("up in: ", p, " with: t = 1")
-            return fractal_walk_combined(G, S, MonomialOrder(T.m, T.w, PertVecs[p + 1]), PertVecs, p + 1)
+            return fractal_walk_combined(G, S, T, w, PertVecs, p + 1)
         else
             w = w + t * (PertVecs[p] - w)
             w = convert_bounding_vector(w)
             checkInt32(w)
-            T.w = w
-            Rn = change_order(R, T)
+            Rn = change_order(R, w, PertVecs[p], T)
             Gw = initials(R, gens(G), w)
             if (p == Singular.nvars(R) || isbinomial(Gw))
                 H = Singular.std(
@@ -648,22 +620,23 @@ R = Singular.base_ring(G)
                 println(w, " in depth", p)
                 raiseCounterFr()
             else
-                println("from $(S.w) to $(T.w)","up in: ", p, " with: ", w)
+                println("from $(cw) to $(w)", "up in: ", p, " with: ", w)
                 H = fractal_walk_combined(
                     Singular.Ideal(R, [x for x in Gw]),
-                    MonomialOrder(S.m, S.w, PertVecs[p]),
-                    MonomialOrder(T.m, T.w, PertVecs[p + 1]),
+                    S,
+                    T,
+                    deepcopy(cw),
                     PertVecs,
                     p + 1,
                 )
                 global firstStepMode = false
             end
         end
-        H = liftGW2(G, R, Gw, H, Rn)
-        #H = lift(G, R, H, Rn)
+        #H = liftGW2(G, R, Gw, H, Rn)
+        H = lift_fractal_walk(G, R, H, Rn)
         G = Singular.std(H, complete_reduction = true)
         R = Rn
-        S.w = T.w
+        cw = w
     end
     return G
 end
