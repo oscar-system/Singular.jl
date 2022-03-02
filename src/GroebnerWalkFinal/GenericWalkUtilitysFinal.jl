@@ -111,8 +111,8 @@ function lift_generic(
     Newlm = Array{Singular.elem_type(Rn),1}(undef, 0)
     liftPolys = Array{Singular.elem_type(Rn),1}(undef, 0)
     for g in Singular.gens(H)
-            push!(Newlm, Singular.leading_term(g))
-            push!(liftPolys, g - modulo(g, G, Lm))
+        push!(Newlm, Singular.leading_term(g))
+        push!(liftPolys, g - modulo(g, G, Lm))
     end
     return liftPolys, Newlm
 end
@@ -232,7 +232,7 @@ function less_facet(
     S::Matrix{Int},
     T::Matrix{Int},
 )
-    for i = 1:size(T,1)
+    for i = 1:size(T, 1)
         for j = 1:size(S, 1)
             @inbounds Tuv = dot(T[i, :], u) * dot(S[j, :], v)
             @inbounds Tvu = dot(T[i, :], v) * dot(S[j, :], u)
@@ -285,7 +285,7 @@ function modulo(
     for i = 1:length(G)
         (q, b) = dividesGW(p, Lm[i], parent(p))
         if b
-            return modulo(p-(q* G[i]), G, Lm)
+            return modulo(p - (q * G[i]), G, Lm)
         end
     end
     return p
@@ -361,22 +361,22 @@ function submult(
     multc = Array{RingElem,1}(undef, 0)
     multe = Array{Vector{Int},1}(undef, 0)
 
-    for m in 1:length(cq)
-         for n in 1:length(cc)
-             skip = false
-             so = eq[m] + ec[n]
-             for i in 1:length(multe)
-                 if multe[i] == so
-                     multc[i] = multc[i] + (cq[m]*cc[n])
-                     skip = true
-                 end
-             end
-             if !skip
-             push!(multe, so)
-             push!(multc,cq[m] * cc[n])
-         end
-     end
- end
+    for m = 1:length(cq)
+        for n = 1:length(cc)
+            skip = false
+            so = eq[m] + ec[n]
+            for i = 1:length(multe)
+                if multe[i] == so
+                    multc[i] = multc[i] + (cq[m] * cc[n])
+                    skip = true
+                end
+            end
+            if !skip
+                push!(multe, so)
+                push!(multc, cq[m] * cc[n])
+            end
+        end
+    end
     for j = 1:length(ep)
         fin = true
         for k = 1:length(multe)

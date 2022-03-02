@@ -63,9 +63,14 @@ function lift_fractal_walk(
     Rn::Singular.PolyRing,
 )
     G.isGB = true
-    G = Singular.Ideal(Rn, [change_ring(gen, Rn) -
-    change_ring(Singular.reduce(change_ring(gen, R), G), Rn) for
-    gen in Singular.gens(H)])
+    G = Singular.Ideal(
+        Rn,
+        [
+            change_ring(gen, Rn) -
+            change_ring(Singular.reduce(change_ring(gen, R), G), Rn) for
+            gen in Singular.gens(H)
+        ],
+    )
     G.isGB = true
     return G
 end
@@ -152,7 +157,7 @@ Returns a new PolynomialRing w.r.t. the monomial ordering T.
 """=#
 function change_order(
     R::Singular.PolyRing,
-    T::MonomialOrder{Matrix{Int},Vector{Int}},
+    T::Matrix{Int},
 ) where {L<:Number,K<:Number}
     G = Singular.gens(R)
     Gstrich = string.(G)
@@ -197,12 +202,22 @@ function inCone(
 )
 Returns 'true' if the leading tems of $G$ w.r.t the matrixordering $T$ are the same as the leading terms of $G$ w.r.t the weighted monomial ordering with weight vector $t$ and the Matrixordering $T$.
 """=#
-function inCone(G::Singular.sideal, T::Matrix{Int}, pvecs::Vector{Vector{Int}}, p::Int)
+function inCone(
+    G::Singular.sideal,
+    T::Matrix{Int},
+    pvecs::Vector{Vector{Int}},
+    p::Int,
+)
     R = change_order(G.base_ring, T)
     I = Singular.Ideal(R, [change_ring(x, R) for x in gens(G)])
-    cvzip = zip(Singular.gens(I), initials(R, Singular.gens(I), pvecs[p-1]), initials(R, Singular.gens(I), pvecs[p]))
+    cvzip = zip(
+        Singular.gens(I),
+        initials(R, Singular.gens(I), pvecs[p-1]),
+        initials(R, Singular.gens(I), pvecs[p]),
+    )
     for (g, in, in2) in cvzip
-        if !isequal(Singular.leading_term(g), Singular.leading_term(in)) || !isequal(Singular.leading_term(g), Singular.leading_term(in2))
+        if !isequal(Singular.leading_term(g), Singular.leading_term(in)) ||
+           !isequal(Singular.leading_term(g), Singular.leading_term(in2))
             return false
         end
     end

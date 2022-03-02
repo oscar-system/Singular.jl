@@ -1,8 +1,6 @@
 include("GroebnerWalkUtilitysFinal.jl")
 include("FractalWalkUtilitysFinal.jl")
 include("GenericWalkUtilitysFinal.jl")
-#include("GenericWalkUtilitysFinalPert.jl")
-
 include("StandardWalkUtilitysFinal.jl")
 include("TranWalkUtilitysFinal.jl")
 
@@ -170,7 +168,7 @@ function generic_walk(G::Singular.sideal, S::Matrix{Int}, T::Matrix{Int})
         v = next_gamma(G, Lm, v, S, T)
     end
     G = Singular.Ideal(Rn, G)
-    G.isGB= true
+    G.isGB = true
     return Singular.interreduce(G)
 end
 
@@ -276,7 +274,7 @@ function fractal_recursiv(
     while !terminate
         t = next_weightfr(G, w, PertVecs[p])
         if t == [0]
-            if inCone(G, T, PertVecs,p)
+            if inCone(G, T, PertVecs, p)
                 println(PertVecs[p], " in Cone", p)
                 return G
             else
@@ -593,7 +591,7 @@ function fractal_walk_combined(
     while !terminate
         t = next_weightfr(G, w, PertVecs[p])
         if t == [0]
-            if inCone(G, T, PertVecs,p)
+            if inCone(G, T, PertVecs, p)
                 println(PertVecs[p], " in Cone", p)
                 return G
             else
@@ -661,11 +659,11 @@ function tran_walk(G::Singular.sideal, S::Matrix{Int}, T::Matrix{Int})
         w = next_weight(G, cweight, tweight)
         println(w)
         while !checkInt32(w)
-        #    w, b = truncw(G, w)
-        #    if !b
-        #        return G
-        #    end
-        #end
+            #    w, b = truncw(G, w)
+            #    if !b
+            return G
+            #    end
+        end
         Rn = change_order(R, w, T)
         if w == tweight
             if inCone(G, T, cweight)
@@ -680,4 +678,5 @@ function tran_walk(G::Singular.sideal, S::Matrix{Int}, T::Matrix{Int})
         R = Rn
         cweight = w
     end
+    return G
 end

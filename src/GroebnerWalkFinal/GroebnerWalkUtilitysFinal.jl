@@ -20,7 +20,7 @@ function next_weight(
             end
         end
     end
-    w = convert_bounding_vector(cweight + tmin * (tweight- cweight))
+    w = convert_bounding_vector(cweight + tmin * (tweight - cweight))
     #=cw = cweight
        if !checkInt32(w)
             println(w)
@@ -49,18 +49,18 @@ function checkInt32(w::Vector{Int})
     return true
 end
 function truncw(G::Singular.sideal, w::Vector{Int})
-wtemp = Vector{Int}(undef, length(w))
-R = base_ring(G)
-for i = 1:length(w)
-    wtemp[i] = round(w[i] * 0.10)
-end
-if initials(R, gens(G), w) != initials(R, gens(G), wtemp)
-    println(wtemp)
-    println(initials(R, gens(G), w) ," and ", initials(R, gens(G), wtemp))
-    return w, false
-else
-    return wtemp, true
-end
+    wtemp = Vector{Int}(undef, length(w))
+    R = base_ring(G)
+    for i = 1:length(w)
+        wtemp[i] = round(w[i] * 0.10)
+    end
+    if initials(R, gens(G), w) != initials(R, gens(G), wtemp)
+        println(wtemp)
+        println(initials(R, gens(G), w), " and ", initials(R, gens(G), wtemp))
+        return w, false
+    else
+        return wtemp, true
+    end
 end
 #Return the initials of polynomials w.r.t. a weight vector.
 function initials(
@@ -118,7 +118,7 @@ Computes a p-pertubed weight vector of M.
 """=#
 function pertubed_vector(G::Singular.sideal, M::Matrix{Int}, p::Integer)
     m = Int[]
-    n = size(M,1)
+    n = size(M, 1)
     for i = 1:p
         max = M[i, 1]
         for j = 1:n
@@ -179,7 +179,10 @@ function isGb(
 function isGb(G::Singular.sideal, T::Matrix{Int})
     R = change_order(G.base_ring, T)
     for g in Singular.gens(G)
-        if !isequal(Singular.leading_term(g), change_ring(Singular.leading_term(change_ring(g, R)), G.base_ring))
+        if !isequal(
+            Singular.leading_term(g),
+            change_ring(Singular.leading_term(change_ring(g, R)), G.base_ring),
+        )
             return false
         end
     end
@@ -193,8 +196,13 @@ function lift(
     Rn::Singular.PolyRing,
 )
     G.isGB = true
-    G = Singular.Ideal(Rn, [gen - change_ring(Singular.reduce(change_ring(gen, R), G), Rn) for
-    gen in gens(H)])
+    G = Singular.Ideal(
+        Rn,
+        [
+            gen - change_ring(Singular.reduce(change_ring(gen, R), G), Rn)
+            for gen in gens(H)
+        ],
+    )
     G.isGB = true
     return G
 end
@@ -331,14 +339,14 @@ function change_order(
     G = Singular.gens(R)
     Gstrich = string.(G)
     s = size(T)
-        S, H = Singular.PolynomialRing(
-            R.base_ring,
-            Gstrich,
-            ordering = Singular.ordering_a(w) *
-                       Singular.ordering_a(t) *
-                       Singular.ordering_M(T),
-            cached = false,
-        )
+    S, H = Singular.PolynomialRing(
+        R.base_ring,
+        Gstrich,
+        ordering = Singular.ordering_a(w) *
+                   Singular.ordering_a(t) *
+                   Singular.ordering_M(T),
+        cached = false,
+    )
     return S
 end
 
@@ -385,15 +393,13 @@ function interreduce(
 ) where {L<:Nemo.RingElem}
 G represents a Gröbnerbasis. This function interreduces G w.r.t. the leading terms Lm with tail-reduction.
 """=#
-function interreduceGW(
-    G::Singular.sideal,
-) where {L<:Nemo.RingElem}
+function interreduceGW(G::Singular.sideal) where {L<:Nemo.RingElem}
     Rn = base_ring(G)
-        Generator = collect(gens(G))
-        I = 0
-        for i in 1:ngens(G)
-            I = Singular.Ideal(Rn,Generator[1:end .!= i])
-            I.isGB = true
+    Generator = collect(gens(G))
+    I = 0
+    for i = 1:ngens(G)
+        I = Singular.Ideal(Rn, Generator[1:end.!=i])
+        I.isGB = true
         Generator[i] = reduce(Generator[i], I)
     end
     G = Singular.Ideal(Rn, Generator)
@@ -428,7 +434,7 @@ function equalitytest(G::Singular.sideal, K::Singular.sideal)
     count = 0
     for gen in generators
         for r in Singular.gens(K)
-            if gen*leading_coefficient(r) - r*leading_coefficient(gen) == 0
+            if gen * leading_coefficient(r) - r * leading_coefficient(gen) == 0
                 count += 1
                 break
             end
