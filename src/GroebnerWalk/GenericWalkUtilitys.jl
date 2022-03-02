@@ -174,30 +174,7 @@ function next_gamma(
     end
     return minV
 end
-#=
-function next_gamma(
-    G::Singular.sideal,
-    w::Vector{Int},
-    S::Matrix{Int},
-    T::Matrix{Int},
-)
-    V = filter_btz(S, difference_lead_tail(G))
-    V = filter_ltz(T, V)
-    if (w != [0])
-        V = filter_lf(w, S, T, V)
-    end
-    if isempty(V)
-        return V
-    end
-    minV = first(V)
-    for v in V
-        if less_facet(v, minV, S, T)
-            minV = v
-        end
-    end
-    return minV
-end
-=#
+
 function bigger_than_zero(M::Matrix{Int}, v::Vector{Int})
     nrows, ncols = size(M)
     for i = 1:nrows

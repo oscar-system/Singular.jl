@@ -375,14 +375,6 @@ function change_ring(p::Singular.spoly, R::Singular.PolyRing)
     end
     return finish(M)
 end
-function change_ring(p::Singular.spoly, R::Singular.PolyRing)
-    cvzip = zip(Singular.coefficients(p), Singular.exponent_vectors(p))
-    M = MPolyBuildCtx(R)
-    for (c, v) in cvzip
-        Singular.push_term!(M, c, v)
-    end
-    return finish(M)
-end
 
 
 #=

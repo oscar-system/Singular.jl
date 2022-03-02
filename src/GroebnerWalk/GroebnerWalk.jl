@@ -1,7 +1,6 @@
 include("GroebnerWalkUtilitys.jl")
 include("FractalWalkUtilitys.jl")
 include("GenericWalkUtilitys.jl")
-include("StandardWalkUtilitys.jl")
 include("TranWalkUtilitys.jl")
 
 export groebnerwalk
@@ -54,6 +53,11 @@ Fractal Walk (:factal_look_ahead) computes the Walk like it´spresented in Amrhe
     - `fractal_look_ahead`:Fractal Walk with look-ahead computation.
 *`p::Int`: Pertubationdegree (p,p) for the pertubed Walk. Default is 2.
 """=#
+function groebnerWalk(G::Singular.sideal, StartOrder::Symbol = :degrevlex, TargetOrder::Symbol = :lex, WalkType::Symbol = :standard)
+    Rn = change_order(base_ring(G), ordering_as_matrix(StartOrder, nvars(base_ring(G))))
+    Gb = std(change_ring(x, Rn) for x in gens(G), complete_reduction= true)
+end
+
 function groebnerwalk(
     G::Singular.sideal,
     S::Matrix{Int},
@@ -309,7 +313,7 @@ function fractal_recursiv(
         else
             println("up in: ", p, " with: ", w)
             H = fractal_recursiv(
-                Singular.Ideal(R, [x for x in Gw]),
+                Singular.Ideal(R, Gw),
                 S,
                 T,
                 deepcopy(cw),
@@ -409,7 +413,7 @@ function fractal_walk_recursiv_startorder(
         else
             println("up in: ", p, " with: ", w)
             H = fractal_walk_recursiv_startorder(
-                Singular.Ideal(R, [x for x in Gw]),
+                Singular.Ideal(R, Gw),
                 S,
                 T,
                 deepcopy(cw),
@@ -480,7 +484,6 @@ function fractal_walk_recursive_lex(
             Rn = change_order(R, w, T)
 
             if p == Singular.nvars(R)
-                Rn = change_order(R, w, PertVecs[p], T)
                 H = Singular.std(
                     Singular.Ideal(Rn, [change_ring(x, Rn) for x in Gw]),
                     complete_reduction = true,
@@ -490,7 +493,7 @@ function fractal_walk_recursive_lex(
             else
                 println("up in: ", p, " with: ", w)
                 H = fractal_walk_recursive_lex(
-                    Singular.Ideal(R, [x for x in Gw]),
+                    Singular.Ideal(R, Gw),
                     S,
                     T,
                     deepcopy(cw),
@@ -673,7 +676,7 @@ function fractal_walk_combined(
             else
                 println("from $(cw) to $(w)", "up in: ", p, " with: ", w)
                 H = fractal_walk_combined(
-                    Singular.Ideal(R, [x for x in Gw]),
+                    Singular.Ideal(R, Gw),
                     S,
                     T,
                     deepcopy(cw),
