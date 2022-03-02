@@ -21,7 +21,8 @@ function next_weight(
         end
     end
     w = convert_bounding_vector(cweight + tmin * (tweight- cweight))
-    #=    if !checkInt32(w)
+    #=cw = cweight
+       if !checkInt32(w)
             println(w)
             for i in 1:length(cweight)
                 cweight[i] = round(cweight[i] * 0.10)
@@ -29,11 +30,11 @@ function next_weight(
                     cweight = 1
                 end
             end
-                if !inCone(G, T, cweight)
+                if !inCone(G, add_weight_vector(cw, T), cweight)
                     println("not", cweight)
                     return w
             end
-            w= next_weight(G,T,cweight,tweight)
+            w= next_weight(G,cweight,tweight,T)
         end=#
     return w
 end
@@ -47,7 +48,20 @@ function checkInt32(w::Vector{Int})
     end
     return true
 end
-
+function truncw(G::Singular.sideal, w::Vector{Int})
+wtemp = Vector{Int}(undef, length(w))
+R = base_ring(G)
+for i = 1:length(w)
+    wtemp[i] = round(w[i] * 0.10)
+end
+if initials(R, gens(G), w) != initials(R, gens(G), wtemp)
+    println(wtemp)
+    println(initials(R, gens(G), w) ," and ", initials(R, gens(G), wtemp))
+    return w, false
+else
+    return wtemp, true
+end
+end
 #Return the initials of polynomials w.r.t. a weight vector.
 function initials(
     R::Singular.PolyRing,
@@ -154,6 +168,23 @@ function inCone(G::Singular.sideal, T::Matrix{Int}, t::Vector{Int})
     end
     return true
 end
+
+#=
+@doc Markdown.doc"""
+function isGb(
+    G::Singular.sideal,
+    T::Matrix{Int},
+)
+"""=#
+function isGb(G::Singular.sideal, T::Matrix{Int})
+    R = change_order(G.base_ring, T)
+    for g in Singular.gens(G)
+        if !isequal(Singular.leading_term(g), change_ring(Singular.leading_term(change_ring(g, R)), G.base_ring))
+            return false
+        end
+    end
+    return true
+end
 #Fukuda et al
 function lift(
     G::Singular.sideal,
@@ -162,11 +193,8 @@ function lift(
     Rn::Singular.PolyRing,
 )
     G.isGB = true
-    rest = [
-        gen - change_ring(Singular.reduce(change_ring(gen, R), G), Rn) for
-        gen in gens(H)
-    ]
-    G = Singular.Ideal(Rn, [Rn(x) for x in rest])
+    G = Singular.Ideal(Rn, [gen - change_ring(Singular.reduce(change_ring(gen, R), G), Rn) for
+    gen in gens(H)])
     G.isGB = true
     return G
 end
@@ -349,6 +377,28 @@ function change_ring(p::Singular.spoly, R::Singular.PolyRing)
 end
 
 
+#=
+@doc Markdown.doc"""
+function interreduce(
+    G::Vector{spoly{L}},
+    Lm::Vector{spoly{L}},
+) where {L<:Nemo.RingElem}
+G represents a Gröbnerbasis. This function interreduces G w.r.t. the leading terms Lm with tail-reduction.
+"""=#
+function interreduceGW(
+    G::Singular.sideal,
+) where {L<:Nemo.RingElem}
+    Rn = base_ring(G)
+        Generator = collect(gens(G))
+        I = 0
+        for i in 1:ngens(G)
+            I = Singular.Ideal(Rn,Generator[1:end .!= i])
+            I.isGB = true
+        Generator[i] = reduce(Generator[i], I)
+    end
+    G = Singular.Ideal(Rn, Generator)
+    return G
+end
 #############################################
 # unspecific help functions
 #############################################

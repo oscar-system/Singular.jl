@@ -14,14 +14,14 @@ function facet_initials(
 Returns the facet initials of the polynomials w.r.t. the vector v.
 """=#
 function facet_initials(
-    G::Singular.sideal,
+    G::Vector{Singular.spoly{L}},
     lm::Vector{spoly{L}},
     v::Vector{Int},
 ) where {L<:Nemo.RingElem}
-    Rn = base_ring(G)
+    Rn = parent(first(G))
     initials = Array{Singular.elem_type(Rn),1}(undef, 0)
     count = 1
-    for g in Singular.gens(G)
+    for g in G
         inw = Singular.MPolyBuildCtx(Rn)
         el = first(Singular.exponent_vectors(lm[count]))
         for (e, c) in
@@ -46,13 +46,13 @@ function difference_lead_tail(
 Returns the differences of the exponent vectors of the leading terms and the polynomials of the generators of I.
 """=#
 function difference_lead_tail(
-    I::Singular.sideal,
+    G::Vector{spoly{L}},
     Lm::Vector{spoly{L}},
 ) where {L<:Nemo.RingElem}
     v = Vector{Int}[]
-    for i = 1:ngens(I)
+    for i = 1:length(G)
         ltu = Singular.leading_exponent_vector(Lm[i])
-        for e in Singular.exponent_vectors(gens(I)[i])
+        for e in Singular.exponent_vectors(G[i])
             if ltu != e
                 push!(v, ltu .- e)
             end
@@ -103,20 +103,16 @@ function lift_generic(
 Performs a lifting step in the Groebner Walk proposed by Fukuda et. al.
 """=#
 function lift_generic(
-    G::Singular.sideal,
+    G::Vector{spoly{L}},
     Lm::Vector{Singular.spoly{L}},
     H::Singular.sideal,
 ) where {L<:Nemo.RingElem}
-    Rn = base_ring(G)
+    Rn = parent(first(G))
     Newlm = Array{Singular.elem_type(Rn),1}(undef, 0)
     liftPolys = Array{Singular.elem_type(Rn),1}(undef, 0)
     for g in Singular.gens(H)
-        r = modulo(g, gens(G), Lm)
-        diff = g - r
-        if diff != 0
             push!(Newlm, Singular.leading_term(g))
-            push!(liftPolys, diff)
-        end
+            push!(liftPolys, g - modulo(g, G, Lm))
     end
     return liftPolys, Newlm
 end
@@ -156,7 +152,7 @@ function filter_lf(
 end
 
 function next_gamma(
-    G::Singular.sideal,
+    G::Vector{spoly{L}},
     Lm::Vector{spoly{L}},
     w::Vector{Int},
     S::Matrix{Int},
@@ -178,7 +174,7 @@ function next_gamma(
     end
     return minV
 end
-
+#=
 function next_gamma(
     G::Singular.sideal,
     w::Vector{Int},
@@ -201,7 +197,7 @@ function next_gamma(
     end
     return minV
 end
-
+=#
 function bigger_than_zero(M::Matrix{Int}, v::Vector{Int})
     nrows, ncols = size(M)
     for i = 1:nrows
@@ -348,6 +344,7 @@ function interreduce(
     end
     return G
 end
+
 function submult(
     p::Singular.spoly{L},
     q::Singular.spoly{L},

@@ -3,7 +3,7 @@ function katsura5()
     ve = [1, 1, 1, 1, 1]
     StartOrd = ordering_as_matrix(:degrevlex, dim)
     R, (v, u, t, z, y) = Singular.PolynomialRing(
-        Singular.QQ,
+         Singular.N_ZpField(32003),
         ["v", "u", "t", "z", "y"],
         ordering = Singular.ordering_M(StartOrd),
     )
