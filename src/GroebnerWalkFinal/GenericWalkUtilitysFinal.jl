@@ -14,14 +14,14 @@ function facet_initials(
 Returns the facet initials of the polynomials w.r.t. the vector v.
 """=#
 function facet_initials(
-    G::Singular.sideal,
+    G::Vector{Singular.spoly{L}},
     lm::Vector{spoly{L}},
     v::Vector{Int},
 ) where {L<:Nemo.RingElem}
-    Rn = base_ring(G)
+    Rn = parent(first(G))
     initials = Array{Singular.elem_type(Rn),1}(undef, 0)
     count = 1
-    for g in Singular.gens(G)
+    for g in G
         inw = Singular.MPolyBuildCtx(Rn)
         el = first(Singular.exponent_vectors(lm[count]))
         for (e, c) in
@@ -46,13 +46,13 @@ function difference_lead_tail(
 Returns the differences of the exponent vectors of the leading terms and the polynomials of the generators of I.
 """=#
 function difference_lead_tail(
-    I::Singular.sideal,
+    G::Vector{spoly{L}},
     Lm::Vector{spoly{L}},
 ) where {L<:Nemo.RingElem}
     v = Vector{Int}[]
-    for i = 1:ngens(I)
+    for i = 1:length(G)
         ltu = Singular.leading_exponent_vector(Lm[i])
-        for e in Singular.exponent_vectors(gens(I)[i])
+        for e in Singular.exponent_vectors(G[i])
             if ltu != e
                 push!(v, ltu .- e)
             end
@@ -86,7 +86,7 @@ function isParallel(u::Vector{Int}, v::Vector{Int})
         return true
     end
     for i = count:length(v)
-        if v[i] != x * u[i]
+        @inbounds if v[i] != x * u[i]
             return false
         end
     end
@@ -103,20 +103,16 @@ function lift_generic(
 Performs a lifting step in the Groebner Walk proposed by Fukuda et. al.
 """=#
 function lift_generic(
-    G::Singular.sideal,
+    G::Vector{spoly{L}},
     Lm::Vector{Singular.spoly{L}},
     H::Singular.sideal,
 ) where {L<:Nemo.RingElem}
-    Rn = base_ring(G)
+    Rn = parent(first(G))
     Newlm = Array{Singular.elem_type(Rn),1}(undef, 0)
     liftPolys = Array{Singular.elem_type(Rn),1}(undef, 0)
     for g in Singular.gens(H)
-        r, b = modulo(g, gens(G), Lm)
-        diff = g - r
-        if diff != 0
-            push!(Newlm, Singular.leading_term(g))
-            push!(liftPolys, diff)
-        end
+        push!(Newlm, Singular.leading_term(g))
+        push!(liftPolys, g - modulo(g, G, Lm))
     end
     return liftPolys, Newlm
 end
@@ -156,7 +152,7 @@ function filter_lf(
 end
 
 function next_gamma(
-    G::Singular.sideal,
+    G::Vector{spoly{L}},
     Lm::Vector{spoly{L}},
     w::Vector{Int},
     S::Matrix{Int},
@@ -178,7 +174,7 @@ function next_gamma(
     end
     return minV
 end
-
+#=
 function next_gamma(
     G::Singular.sideal,
     w::Vector{Int},
@@ -201,10 +197,14 @@ function next_gamma(
     end
     return minV
 end
-
+=#
 function bigger_than_zero(M::Matrix{Int}, v::Vector{Int})
-    for i = 1:size(M)[1]
-        d = dot(M[i, :], v)
+    nrows, ncols = size(M)
+    for i = 1:nrows
+        d = 0
+        for j = 1:ncols
+            @inbounds d += M[i, j] * v[j]
+        end
         if d != 0
             return d > 0
         end
@@ -232,10 +232,10 @@ function less_facet(
     S::Matrix{Int},
     T::Matrix{Int},
 )
-    for i = 1:size(T)[1]
-        for j = 1:size(S)[1]
-            Tuv = dot(T[i, :], u) * dot(S[j, :], v)
-            Tvu = dot(T[i, :], v) * dot(S[j, :], u)
+    for i = 1:size(T, 1)
+        for j = 1:size(S, 1)
+            @inbounds Tuv = dot(T[i, :], u) * dot(S[j, :], v)
+            @inbounds Tvu = dot(T[i, :], v) * dot(S[j, :], u)
             if Tuv != Tvu
                 return Tuv < Tvu
             end
@@ -263,7 +263,7 @@ function dividesGW(p::Singular.spoly, lm::Singular.spoly, S::Singular.PolyRing)
             div = true
         end
     end
-    return (finish(newpoly), div)
+    return finish(newpoly), div
 end
 
 #=
@@ -281,25 +281,14 @@ function modulo(
     p::Singular.spoly,
     G::Vector{spoly{L}},
     Lm::Vector{spoly{L}},
-    c::Bool = false,
 ) where {L<:Nemo.RingElem}
-    I = 0
-    R = parent(p)
-    Q = zero(R)
     for i = 1:length(G)
-        (q, b) = dividesGW(p, Lm[i], R)
+        (q, b) = dividesGW(p, Lm[i], parent(p))
         if b
-            I = i
-            Q = q
-            break
+            return modulo(p - (q * G[i]), G, Lm)
         end
     end
-    if I != 0
-        r, b = modulo(p - (Q * G[I]), G, Lm)
-        return r, true
-    else
-        return p, false
-    end
+    return p
 end
 #=
 function modulo(
@@ -351,10 +340,77 @@ function interreduce(
                 push!(Lmrest, Lm[j])
             end
         end
-        r, b = modulo(G[i], gensrest, Lmrest)
-        if b
-            G[i] = r
-        end
+        G[i] = modulo(G[i], gensrest, Lmrest)
     end
     return G
+end
+
+function submult(
+    p::Singular.spoly{L},
+    q::Singular.spoly{L},
+    c::Singular.spoly{L},
+    dim::Int64,
+) where {L<:Nemo.RingElem}
+    sol = MPolyBuildCtx(parent(p))
+    ep = collect(Singular.exponent_vectors(p))
+    eq = collect(Singular.exponent_vectors(q))
+    cp = collect(Singular.coefficients(p))
+    cq = collect(Singular.coefficients(q))
+    ec = collect(Singular.exponent_vectors(c))
+    cc = collect(Singular.coefficients(c))
+    multc = Array{RingElem,1}(undef, 0)
+    multe = Array{Vector{Int},1}(undef, 0)
+
+    for m = 1:length(cq)
+        for n = 1:length(cc)
+            skip = false
+            so = eq[m] + ec[n]
+            for i = 1:length(multe)
+                if multe[i] == so
+                    multc[i] = multc[i] + (cq[m] * cc[n])
+                    skip = true
+                end
+            end
+            if !skip
+                push!(multe, so)
+                push!(multc, cq[m] * cc[n])
+            end
+        end
+    end
+    for j = 1:length(ep)
+        fin = true
+        for k = 1:length(multe)
+            equals = true
+            if ep[j] != multe[k]
+                equals = false
+            end
+            if equals
+                diff = cp[j] - multc[k]
+                if diff != 0
+                    Singular.push_term!(sol, diff, ep[j])
+                    diff = nothing
+                end
+                fin = false
+                multe[k][1] = -1 #delete Vector if equal
+                break
+            end
+        end
+        if fin
+            Singular.push_term!(sol, cp[j], ep[j])
+        end
+    end
+    for i = 1:length(multe)
+        if multe[i][1] != -1
+            Singular.push_term!(sol, -multc[i], multe[i])
+        end
+    end
+    ep = nothing
+    eq = nothing
+    cp = nothing
+    cq = nothing
+    ec = nothing
+    cc = nothing
+    multc = nothing
+    multe = nothing
+    return Singular.finish(sol)
 end

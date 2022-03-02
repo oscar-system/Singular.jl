@@ -3,10 +3,8 @@ include("Examples")
 function test(case::Int)
 
     test_successfull = true
-
     if case == 1 || case == 99
         id = katsura5()
-
         R = base_ring(id)
         dim = nvars(R)
         ve = ones(Int, dim)
@@ -21,46 +19,59 @@ function test(case::Int)
 
 
 
+
         #I = Singular.std(id, complete_reduction = true)
         @time T = groebnerwalk(
-            I,
+            deepcopy(I),
             ordering_as_matrix(:degrevlex, dim),
             ordering_as_matrix(:lex, dim),
-            :pertubed,
-            4,
+            :fractal,
+            1,
         )
+
+
+
         @time F = groebnerwalk(
             I,
             ordering_as_matrix(:degrevlex, dim),
             ordering_as_matrix(:lex, dim),
-            :fractal,
+            :fractal_look_ahead,
+            2
         )
+
         @time FA = groebnerwalk(
             I,
             ordering_as_matrix(:degrevlex, dim),
             ordering_as_matrix(:lex, dim),
-            :fractal_look_ahead,
+            :fractal_combined,
         )
+
+
+
+
+
         @time St = groebnerwalk(
             I,
             ordering_as_matrix(:degrevlex, dim),
             ordering_as_matrix(:lex, dim),
-            :pertubed,
+            :fractal_start_order,
             3,
         )
+
 
         @time Pe = groebnerwalk(
             I,
             ordering_as_matrix(:degrevlex, dim),
             ordering_as_matrix(:lex, dim),
             :pertubed,
-            3,
+            4,
         )
         @time Ge = groebnerwalk(
             I,
             ordering_as_matrix(:degrevlex, dim),
             ordering_as_matrix(:lex, dim),
             :generic,
+            4
         )
 
 
@@ -119,7 +130,7 @@ function test(case::Int)
             I,
             ordering_as_matrix(:degrevlex, 3),
             ordering_as_matrix(:lex, 3),
-            :fractal,
+            :fractal_start_order
         )
 
 
@@ -127,7 +138,7 @@ function test(case::Int)
             I,
             ordering_as_matrix(:degrevlex, 3),
             ordering_as_matrix(:lex, 3),
-            :fractal_look_ahead,
+            :fractal_combined,
         )
         @time Pe = groebnerwalk(
             I,
@@ -205,6 +216,7 @@ function test(case::Int)
             :pertubed,
             4,
         )
+
         #=    @time J = fractal_walk(
                 I,
                 MonomialOrder(
@@ -224,7 +236,7 @@ function test(case::Int)
             I,
             ordering_as_matrix(:degrevlex, 6),
             ordering_as_matrix(:lex, 6),
-            :fractal_look_ahead,
+            :fractal_combined,
         )
         @time K = groebnerwalk(
             I,
@@ -325,14 +337,14 @@ function test(case::Int)
             I,
             ordering_as_matrix(:degrevlex, 4),
             ordering_as_matrix(:lex, 4),
-            :fractal,
+            :fractal
         )
 
         @time Fa = groebnerwalk(
             I,
             ordering_as_matrix(:degrevlex, 4),
             ordering_as_matrix(:lex, 4),
-            :fractal_look_ahead,
+            :fractal_combined,
         )
 
         @time Pe = groebnerwalk(
@@ -420,7 +432,7 @@ function test(case::Int)
             I,
             ordering_as_matrix(:degrevlex, 3),
             ordering_as_matrix(:lex, 3),
-            :fractal,
+            :fractal_combined
         )
         @time FA = groebnerwalk(
             I,
@@ -503,7 +515,7 @@ function test(case::Int)
             ordering_as_matrix(:lex, 6),
             :standard,
         )
-        @time J = fractal_walk_combined(
+#=        @time J = fractal_walk_combined(
             I,
             MonomialOrder(
                 ordering_as_matrix(:degrevlex, 6),
@@ -515,7 +527,7 @@ function test(case::Int)
                 [1, 0, 0, 0, 0, 0],
                 [1, 0, 0, 0, 0, 0],
             ),
-        )
+        )=#
 
 
 
@@ -620,8 +632,9 @@ function test(case::Int)
             I,
             ordering_as_matrix(:degrevlex, dim),
             ordering_as_matrix(:lex, dim),
-            :fractal,
+            :fractal_start_order
         )
+
         @time FA = groebnerwalk(
             I,
             ordering_as_matrix(:degrevlex, dim),

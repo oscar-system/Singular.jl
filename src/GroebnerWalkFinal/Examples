@@ -3,7 +3,7 @@ function katsura5()
     ve = [1, 1, 1, 1, 1]
     StartOrd = ordering_as_matrix(:degrevlex, dim)
     R, (v, u, t, z, y) = Singular.PolynomialRing(
-        Singular.QQ,
+         Singular.N_ZpField(32003),
         ["v", "u", "t", "z", "y"],
         ordering = Singular.ordering_M(StartOrd),
     )
@@ -151,6 +151,23 @@ function cyclic5()
     return Singular.Ideal(R, [f1, f2, f3, f4, f5])
 end
 
+function cyclic4()
+    dim = 4
+    ve = [1, 1, 1, 1]
+    example = "Cyclic4"
+    StartOrd = ordering_as_matrix(:degrevlex, dim)
+    R, (v, w, x, y, z) = Singular.PolynomialRing(
+        Singular.QQ,
+        ["v", "w", "x", "y", "z"],
+        ordering = Singular.ordering_M(StartOrd),
+    )
+
+    f1 = w+x+y+z
+    f2 = w*x+x*y+w*z+y*z
+    f3 = w*x*y+w*x*z+w*y*z+x*y*z
+    f4 = w*x*y*z-1
+    return Singular.Ideal(R, [f1, f2, f3, f4])
+end
 function eco6()
     dim = 6
     ve = [1, 1, 1, 1, 1, 1]
