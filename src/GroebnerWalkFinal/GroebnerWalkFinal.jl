@@ -590,15 +590,19 @@ function fractal_walk_combined(
 
     while !terminate
         t = next_weightfr(G, w, PertVecs[p])
-        if t == [0]
-            if inCone(G, T, PertVecs, p)
+        if t == 1 && p != 1
+            if inCone(G, T, cw)
+                println(cw, " in Cone", p)
+                return G
+            end
+        elseif t == [0]
+            if inCone(G, T, cw)
                 println(PertVecs[p], " in Cone", p)
                 return G
-            else
-                global PertVecs = [pertubed_vector(G, T, i) for i = 1:nvars(R)]
-                println("not in Cone ", PertVecs)
-                continue
             end
+            global PertVecs = [pertubed_vector(G, T, i) for i = 1:nvars(R)]
+            println("not in Cone ", PertVecs)
+            continue
         end
         if t == 1 && p == 1
             println("up in: ", p, " with: t = 1")
@@ -608,9 +612,9 @@ function fractal_walk_combined(
             w = convert_bounding_vector(w)
             checkInt32(w)
             Gw = initials(R, gens(G), w)
+            Rn = change_order(R, w, T)
 
             if (p == Singular.nvars(R) || isbinomial(Gw))
-                Rn = change_order(R, w, PertVecs[p], T)
                 H = Singular.std(
                     Singular.Ideal(Rn, [change_ring(x, Rn) for x in Gw]),
                     complete_reduction = true,
@@ -630,11 +634,10 @@ function fractal_walk_combined(
                 global firstStepMode = false
             end
         end
-        Rn = change_order(R, w, PertVecs[p], T)
+
         #H = liftGW2(G, R, Gw, H, Rn)
-        @time H = lift_fractal_walk(G, R, H, Rn)
+        H = lift_fractal_walk(G, R, H, Rn)
         G = interreduceGW(H)
-        G = G.value
         R = Rn
         cw = w
     end
