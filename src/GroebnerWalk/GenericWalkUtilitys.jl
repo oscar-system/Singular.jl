@@ -1,4 +1,4 @@
-include("GroebnerWalkUtilitysFinal.jl")
+include("GroebnerWalkUtilitys.jl")
 
 ###############################################################
 #Utilitys for generic_walk

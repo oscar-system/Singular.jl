@@ -1,8 +1,8 @@
-include("GroebnerWalkUtilitysFinal.jl")
-include("FractalWalkUtilitysFinal.jl")
-include("GenericWalkUtilitysFinal.jl")
-include("StandardWalkUtilitysFinal.jl")
-include("TranWalkUtilitysFinal.jl")
+include("GroebnerWalkUtilitys.jl")
+include("FractalWalkUtilitys.jl")
+include("GenericWalkUtilitys.jl")
+include("StandardWalkUtilitys.jl")
+include("TranWalkUtilitys.jl")
 
 export groebnerwalk
 
@@ -273,22 +273,33 @@ function fractal_recursiv(
 
     while !terminate
         t = next_weightfr(G, w, PertVecs[p])
-        if t == [0]
-            if inCone(G, T, PertVecs, p)
+        if t == 1 && p != 1
+                if !inCone(G, T, PertVecs, p)
+                    global PertVecs =
+                        [pertubed_vector(G, T, i) for i = 1:nvars(R)]
+                    println("not in Cone ", PertVecs)
+                    continue
+                end
+                if inCone(G, T, cw)
+                    println(cw, " in Cone", p)
+                return G
+            end
+        elseif t == [0]
+            if p == 1 || inCone(G, T, PertVecs, p)
                 println(PertVecs[p], " in Cone", p)
                 return G
-            else
-                global PertVecs = [pertubed_vector(G, T, i) for i = 1:nvars(R)]
+            end
+            global PertVecs =
+                    [pertubed_vector(G, T, i) for i = 1:nvars(R)]
                 println("not in Cone ", PertVecs)
                 continue
-            end
         end
         w = w + t * (PertVecs[p] - w)
         w = convert_bounding_vector(w)
         checkInt32(w)
         Gw = initials(R, Singular.gens(G), w)
+        Rn = change_order(R, w, T)
         if p == nvars(R)
-            Rn = change_order(R, w, PertVecs[p], T)
             H = Singular.std(
                 Singular.Ideal(Rn, [change_ring(x, Rn) for x in Gw]),
                 complete_reduction = true,
@@ -306,8 +317,6 @@ function fractal_recursiv(
                 p + 1,
             )
         end
-        Rn = change_order(R, w, PertVecs[p], T)
-
         #H = liftGW2(G, R, Gw, H, Rn)
         H = lift_fractal_walk(G, R, H, Rn)
         G = interreduceGW(H)
@@ -362,23 +371,35 @@ function fractal_walk_recursiv_startorder(
     end
 
     while !terminate
-        t = next_weightfr(G, w, PertVecs, p)
-        if t == [0]
-            if inCone(G, T, PertVecs[p])
+        t = next_weightfr(G, w, PertVecs[p])
+        if t == 1 && p != 1
+                if !inCone(G, T, PertVecs, p)
+                    global PertVecs =
+                        [pertubed_vector(G, T, i) for i = 1:nvars(R)]
+                    println("not in Cone ", PertVecs)
+                    continue
+                end
+                if inCone(G, T, cw)
+                    println(cw, " in Cone", p)
+                return G
+            end
+        elseif t == [0]
+            if p == 1 ||inCone(G, T, PertVecs, p)
                 println(PertVecs[p], " in Cone", p)
                 return G
-            else
-                global PertVecs = [pertubed_vector(G, T, i) for i = 1:nvars(R)]
+            end
+            global PertVecs =
+                    [pertubed_vector(G, T, i) for i = 1:nvars(R)]
                 println("not in Cone ", PertVecs)
                 continue
-            end
         end
         w = w + t * (PertVecs[p] - w)
         w = convert_bounding_vector(w)
         checkInt32(w)
         Gw = initials(R, gens(G), w)
+        Rn = change_order(R, w, T)
+
         if p == Singular.nvars(R)
-            Rn = change_order(R, w, PertVecs[p], T)
             H = Singular.std(
                 Singular.Ideal(Rn, [change_ring(x, Rn) for x in Gw]),
                 complete_reduction = true,
@@ -397,8 +418,6 @@ function fractal_walk_recursiv_startorder(
             )
             global firstStepMode = false
         end
-        Rn = change_order(R, w, PertVecs[p], T)
-
         #H = liftGW2(G, R, Gw, H, Rn)
         H = lift_fractal_walk(G, R, H, Rn)
         G = interreduceGW(H)
@@ -430,15 +449,26 @@ function fractal_walk_recursive_lex(
     w = cw
     while !terminate
         t = next_weightfr(G, w, PertVecs[p])
-        if t == [0]
-            if inCone(G, T, PertVecs, p)
+        if t == 1 && p != 1
+                if !inCone(G, T, PertVecs, p)
+                    global PertVecs =
+                        [pertubed_vector(G, T, i) for i = 1:nvars(R)]
+                    println("not in Cone ", PertVecs)
+                    continue
+                end
+                if inCone(G, T, cw)
+                    println(cw, " in Cone", p)
+                return G
+            end
+        elseif t == [0]
+            if p == 1 || inCone(G, T, PertVecs, p)
                 println(PertVecs[p], " in Cone", p)
                 return G
-            else
-                global PertVecs = [pertubed_vector(G, T, i) for i = 1:nvars(R)]
+            end
+            global PertVecs =
+                    [pertubed_vector(G, T, i) for i = 1:nvars(R)]
                 println("not in Cone ", PertVecs)
                 continue
-            end
         end
         if t == 1 && p == 1
             return fractal_walk_recursive_lex(G, S, T, w, PertVecs, p + 1)
@@ -447,6 +477,8 @@ function fractal_walk_recursive_lex(
             w = convert_bounding_vector(w)
             checkInt32(w)
             Gw = initials(R, Singular.gens(G), w)
+            Rn = change_order(R, w, T)
+
             if p == Singular.nvars(R)
                 Rn = change_order(R, w, PertVecs[p], T)
                 H = Singular.std(
@@ -468,7 +500,6 @@ function fractal_walk_recursive_lex(
                 global firstStepMode = false
             end
         end
-        Rn = change_order(R, w, PertVecs[p], T)
         #H = liftGW2(G, R, Gw, H, Rn)
         H = lift_fractal_walk(G, R, H, Rn)
         G = interreduceGW(H)
@@ -505,22 +536,34 @@ function fractal_walk_look_ahead_recursiv(
 
     while !terminate
         t = next_weightfr(G, w, PertVecs[p])
-        if t == [0]
-            if inCone(G, T, PertVecs, p)
-                println(PertVecs[p], " in Cone ", p)
+        if t == 1 && p != 1
+                if !inCone(G, T, PertVecs, p)
+                    global PertVecs =
+                        [pertubed_vector(G, T, i) for i = 1:nvars(R)]
+                    println("not in Cone ", PertVecs)
+                    continue
+                end
+                if inCone(G, T, cw)
+                    println(cw, " in Cone", p)
                 return G
-            else
-                global PertVecs = [pertubed_vector(G, T, i) for i = 1:nvars(R)]
-                println(PertVecs[p], " not in Cone")
-                continue
             end
+        elseif t == [0]
+            if p == 1 || inCone(G, T, PertVecs, p)
+                println(PertVecs[p], " in Cone", p)
+                return G
+            end
+            global PertVecs =
+                    [pertubed_vector(G, T, i) for i = 1:nvars(R)]
+                println("not in Cone ", PertVecs)
+                continue
         end
         w = w + t * (PertVecs[p] - w)
         w = convert_bounding_vector(w)
         checkInt32(w)
         Gw = initials(R, Singular.gens(G), w)
+        Rn = change_order(R, w, T)
+
         if (p == Singular.nvars(R) || isbinomial(Gw))
-            Rn = change_order(R, w, PertVecs[p], T)
             H = Singular.std(
                 Singular.Ideal(Rn, [change_ring(x, Rn) for x in Gw]),
                 complete_reduction = true,
@@ -538,7 +581,6 @@ function fractal_walk_look_ahead_recursiv(
                 p + 1,
             )
         end
-        Rn = change_order(R, w, PertVecs[p], T)
         #H = liftGW2(G, R, Gw, H, Rn)
         H = lift_fractal_walk(G, R, H, Rn)
         G = interreduceGW(H)
@@ -591,18 +633,25 @@ function fractal_walk_combined(
     while !terminate
         t = next_weightfr(G, w, PertVecs[p])
         if t == 1 && p != 1
-            if inCone(G, T, cw)
-                println(cw, " in Cone", p)
+                if !inCone(G, T, PertVecs, p)
+                    global PertVecs =
+                        [pertubed_vector(G, T, i) for i = 1:nvars(R)]
+                    println("not in Cone ", PertVecs)
+                    continue
+                end
+                if inCone(G, T, cw)
+                    println(cw, " in Cone", p)
                 return G
             end
         elseif t == [0]
-            if inCone(G, T, cw)
+            if inCone(G, T, PertVecs, p)
                 println(PertVecs[p], " in Cone", p)
                 return G
             end
-            global PertVecs = [pertubed_vector(G, T, i) for i = 1:nvars(R)]
-            println("not in Cone ", PertVecs)
-            continue
+            global PertVecs =
+                    [pertubed_vector(G, T, i) for i = 1:nvars(R)]
+                println("not in Cone ", PertVecs)
+                continue
         end
         if t == 1 && p == 1
             println("up in: ", p, " with: t = 1")
@@ -682,4 +731,49 @@ function tran_walk(G::Singular.sideal, S::Matrix{Int}, T::Matrix{Int})
         cweight = w
     end
     return G
+end
+
+function pgeneric_walk(
+    G::Singular.sideal,
+    S::Matrix{Int},
+    T::Matrix{Int},
+    p::Int,
+)
+    R = base_ring(G)
+    Rn = change_order(G.base_ring, T)
+    v = next_gamma(G, [0], S, T, p)
+    Lm = [change_ring(Singular.leading_term(g), Rn) for g in gens(G)]
+    G = Singular.Ideal(Rn, [change_ring(x, Rn) for x in gens(G)])
+
+    println("generic_walk results")
+    println("Crossed Cones with facetNormal: ")
+    while !isempty(v)
+        global counter = getCounter() + 1
+        println(v)
+        G, Lm = generic_step(G, Lm, v, T, R)
+        v = next_gamma(G, Lm, v, S, T, p)
+    end
+    return Singular.interreduce(G)
+end
+
+function generic_step(
+    G::Singular.sideal,
+    Lm::Vector{Singular.spoly{L}},
+    v::Vector{Int},
+    T::Matrix{Int},
+    R::Singular.PolyRing,
+) where {L<:Nemo.RingElem}
+
+    Rn = Singular.base_ring(G)
+
+    facet_Generators = facet_initials(G, Lm, v)
+    H = Singular.std(
+        Singular.Ideal(Rn, facet_Generators),
+        complete_reduction = true,
+    )
+    H, Lm = lift_generic(G, Lm, H)
+    G = interreduce(H, Lm)
+    G = Singular.Ideal(Rn, G)
+    G.isGB = true
+    return G, Lm
 end
