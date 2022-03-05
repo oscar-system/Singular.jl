@@ -1,10 +1,11 @@
 include("GroebnerWalk.jl")
-include("Examples")
+include("Examples.jl")
 function test(case::Int)
+
 
     test_successfull = true
     if case == 1 || case == 99
-        id = katsura5()
+        id = redeco7()
         R = base_ring(id)
         dim = nvars(R)
         ve = ones(Int, dim)
@@ -21,18 +22,17 @@ function test(case::Int)
             deepcopy(I),
             ordering_as_matrix(:degrevlex, dim),
             ordering_as_matrix(:lex, dim),
-            :generic,
+            :fractal_combined,
             2,
         )
+
         @time F = groebnerwalk(
             I,
             ordering_as_matrix(:degrevlex, dim),
             ordering_as_matrix(:lex, dim),
-            :fractal,
+            :fractal_combined,
             2,
         )
-
-
 
         @time FA = groebnerwalk(
             I,
@@ -41,14 +41,15 @@ function test(case::Int)
             :fractal_combined,
         )
 
+
+
         @time St = groebnerwalk(
             I,
             ordering_as_matrix(:degrevlex, dim),
             ordering_as_matrix(:lex, dim),
-            :pertubed,
+            :standard,
             3,
         )
-
         @time Pe = groebnerwalk(
             I,
             ordering_as_matrix(:degrevlex, dim),
@@ -76,9 +77,6 @@ function test(case::Int)
         T5 = Singular.Ideal(S, [change_ring(x, S) for x in gens(Pe)])
         T6 = Singular.Ideal(S, [change_ring(x, S) for x in gens(Ge)])
 
-
-
-
         println("test tran: ", equalitytest(T6, T1))
         println("test fractal: ", equalitytest(T6, T2))
         println("test fractal: ", equalitytest(T6, T3))
@@ -105,8 +103,6 @@ function test(case::Int)
         f1 = 16 + 3 * x^2 + 16 * x^2 * z + 14 * x^2 * y^3
         f2 = 6 + y^3 * z + 17 * x^2 * z^2 + 7 * x * y^2 * z^2 + 13 * x^3 * z^2
         J = Singular.Ideal(R, [f1, f2])
-
-
 
         I = Singular.std(J, complete_reduction = true)
         @time T = groebnerwalk(
@@ -151,12 +147,12 @@ function test(case::Int)
             :generic,
         )
 
-
         S, V = Singular.PolynomialRing(
             Singular.QQ,
             ["x", "y", "z"],
             ordering = Singular.ordering_M(ordering_as_matrix(:lex, 3)),
         )
+
 
         T0 = Singular.std(
             Singular.Ideal(S, [change_ring(x, S) for x in gens(I)]),
@@ -221,7 +217,6 @@ function test(case::Int)
                     [1, 0, 0, 0, 0, 0],
                 ),
             ) =#
-
 
         @time JJ = groebnerwalk(
             I,
