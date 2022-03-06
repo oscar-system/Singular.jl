@@ -1,6 +1,6 @@
 using Test
-include("GroebnerWalkFinal.jl")
-include("Examples")
+include("GroebnerWalk.jl")
+include("Examples.jl")
 
 @testset "UnitTests" begin
     @testset "Testing GroebnerwalkUtilitys" begin
@@ -35,7 +35,7 @@ include("Examples")
         q[3] = R(0)
         q[4] = R(1)
         q[5] = R(0)
-        @test divalg(g, F, R) == q
+        @test division_algorithm(g, F, R) == q
 
         J = Singular.Ideal(R, [f2, f1])
         f1 = 4 * x^2 + 16 * x^2 * z + 14 * x^2 * y^3
@@ -85,17 +85,17 @@ include("Examples")
         f1 = 3 * x^2
         f2 = y^3 * z
         J = Singular.Ideal(R, [f1, f2])
-        f1 = x^3*y^2 + z^2 +y^2
+        f1 = x^3 * y^2 + z^2 + y^2
         f2 = y^3
         K = Singular.Ideal(R, [f1, f2])
 
 
-        @test isMonomial(gens(I)) == false
-        @test isMonomial(gens(J)) == true
+        @test ismonomial(gens(I)) == false
+        @test ismonomial(gens(J)) == true
         @test isbinomial(gens(I)) == true
         @test isbinomial(gens(J)) == true
         @test isbinomial(gens(K)) == false
-        @test isMonomial(gens(K)) == false
+        @test ismonomial(gens(K)) == false
 
     end
 
@@ -113,7 +113,8 @@ include("Examples")
         G = Singular.std(I, complete_reduction = true)
 
         @test next_gamma(
-            G,
+            gens(G),
+            [Singular.leading_term(g) for g in gens(G)],
             [0],
             ordering_as_matrix(:degrevlex, 2),
             ordering_as_matrix(:lex, 2),
@@ -126,20 +127,20 @@ include("Examples")
         )
         g = [Rn(y^3 - x^2), Rn(x^3)]
         @test facet_initials(
-            Singular.Ideal(Rn, [change_ring(x, Rn) for x in gens(G)]),
+            [change_ring(x, Rn) for x in gens(G)],
             [change_ring(Singular.leading_term(g), Rn) for g in gens(G)],
             [-2, 3],
         ) == g
 
         @test difference_lead_tail(
-            G,
+            gens(G),
             [Singular.leading_term(g) for g in gens(G)],
         ) == [[-2, 3], [3, -2], [2, 0]]
 
-        @test isParallel([1, 2], [1, 4]) == false
-        @test isParallel([1, 2], [2, 4]) == true
-        @test isParallel([-1, 0], [-2, 1]) == false
-        @test isParallel([-1, 0], [2, 0]) == true
+        @test isparallel([1, 2], [1, 4]) == false
+        @test isparallel([1, 2], [2, 4]) == true
+        @test isparallel([-1, 0], [-2, 1]) == false
+        @test isparallel([-1, 0], [2, 0]) == true
 
         @test less_facet(
             [-2, 3],
@@ -188,15 +189,14 @@ include("Examples")
         f4 = R(0)
 
 
-        @time modulo(f1, gens(I), [Singular.leading_term(g) for g in gens(I)])
         @test (reduce(f3, I)) ==
-              modulo(f3, gens(I), [Singular.leading_term(g) for g in gens(I)])
+              reduce_walk(f3, gens(I), [Singular.leading_term(g) for g in gens(I)])
         @test (reduce(f1, I)) ==
-              modulo(f1, gens(I), [Singular.leading_term(g) for g in gens(I)])
+              reduce_walk(f1, gens(I), [Singular.leading_term(g) for g in gens(I)])
         @test (reduce(f2, I)) ==
-              modulo(f2, gens(I), [Singular.leading_term(g) for g in gens(I)])
+              reduce_walk(f2, gens(I), [Singular.leading_term(g) for g in gens(I)])
         @test (reduce(f4, I)) ==
-              modulo(f4, gens(I), [Singular.leading_term(g) for g in gens(I)])
+              reduce_walk(f4, gens(I), [Singular.leading_term(g) for g in gens(I)])
         J = Singular.std(J)
         @test equalitytest(
             Singular.std(J, complete_reduction = true),

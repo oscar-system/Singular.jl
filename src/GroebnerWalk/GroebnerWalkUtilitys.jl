@@ -6,37 +6,21 @@
 #This Version is used by the standard_walk, pertubed_walk and tran_walk.
 function next_weight(
     G::Singular.sideal,
-    cweight::Vector{Int},
-    tweight::Vector{Int},
+    cw::Vector{Int},
+    tw::Vector{Int},
 ) where {K<:Number}
     tmin = BigInt(1)
     for v in difference_lead_tail(G)
-        cw = BigInt(dot(cweight, v))
-        tw = BigInt(dot(tweight, v))
-        if tw < 0
-            t = cw // (cw - tw)
+        cdotw = BigInt(dot(cw, v))
+        tdotw = BigInt(dot(tw, v))
+        if tdotw < 0
+            t = cdotw // (cdotw - tdotw)
             if t < tmin
                 tmin = t
             end
         end
     end
-    w = convert_bounding_vector(cweight + tmin * (tweight - cweight))
-    #=cw = cweight
-       if !checkInt32(w)
-            println(w)
-            for i in 1:length(cweight)
-                cweight[i] = round(cweight[i] * 0.10)
-                if cweight[i]== 0
-                    cweight = 1
-                end
-            end
-                if !inCone(G, add_weight_vector(cw, T), cweight)
-                    println("not", cweight)
-                    return w
-            end
-            w= next_weight(G,cweight,tweight,T)
-        end=#
-    return w
+    return convert_bounding_vector(cw + tmin * (tw - cw))
 end
 
 function checkInt32(w::Vector{Int})
@@ -48,19 +32,25 @@ function checkInt32(w::Vector{Int})
     end
     return true
 end
-function truncw(G::Singular.sideal, w::Vector{Int})
-    wtemp = Vector{Int}(undef, length(w))
-    R = base_ring(G)
-    for i = 1:length(w)
-        wtemp[i] = round(w[i] * 0.10)
+function truncw(
+    G::Singular.sideal,
+    w::Vector{Int},
+    inw::Vector{L},
+) where {L<:Nemo.RingElem}
+    while !checkInt32(w)
+        println("$w > Int32")
+        R = base_ring(G)
+        for i = 1:length(w)
+            w[i] = round(w[i] * 0.10)
+        end
+        w = convert_bounding_vector(w)
+        if inw != initials(R, gens(G), w)
+            println("Initials are different - return not rounded weight")
+            return w, false
+        end
     end
-    if initials(R, gens(G), w) != initials(R, gens(G), wtemp)
-        println(wtemp)
-        println(initials(R, gens(G), w), " and ", initials(R, gens(G), wtemp))
-        return w, false
-    else
-        return wtemp, true
-    end
+    println("Converted to Vector $w of the same face.")
+    return w, true
 end
 #Return the initials of polynomials w.r.t. a weight vector.
 function initials(
@@ -230,7 +220,7 @@ function liftGW2(
     gG = collect(gens(G))
     inG = [change_ring(x, R) for x in inG]
     for i = 1:length(gH)
-        q = divalg(change_ring(gH[i], R), inG, R)
+        q = division_algorithm(change_ring(gH[i], R), inG, R)
         gH[i] = Rn(0)
         for j = 1:length(inG)
             gH[i] =
@@ -243,7 +233,7 @@ function liftGW2(
     return G
 end
 
-function divalg(
+function division_algorithm(
     p::spoly{L},
     f::Vector{spoly{L}},
     R::Singular.PolyRing,
@@ -300,10 +290,10 @@ function convert_bounding_vector(wtemp::Vector{T}) where {T<:Number}
 end
 
 
-#return a copy of the PolynomialRing I, equipped with the ordering a(cweight)*ordering_M(T)
+#return a copy of the PolynomialRing I, equipped with the ordering a(cw)*ordering_M(T)
 function change_order(
     R::Singular.PolyRing,
-    cweight::Array{L,1},
+    cw::Array{L,1},
     T::Matrix{Int},
 ) where {L<:Number,K<:Number}
     G = Singular.gens(R)
@@ -313,23 +303,33 @@ function change_order(
         S, H = Singular.PolynomialRing(
             R.base_ring,
             Gstrich,
-            ordering = Singular.ordering_a(cweight) * Singular.ordering_M(T),
+            ordering = Singular.ordering_a(cw) * Singular.ordering_M(T),
+            cached = false,
+        )
+    elseif s[1] - s[2] == 1
+        S, H = Singular.PolynomialRing(
+            R.base_ring,
+            Gstrich,
+            ordering = Singular.ordering_a(cw) *
+                       Singular.ordering_a(T[1, :]) *
+                       Singular.ordering_M(T[2:end, :]),
             cached = false,
         )
     else
         S, H = Singular.PolynomialRing(
             R.base_ring,
             Gstrich,
-            ordering = Singular.ordering_a(cweight) *
+            ordering = Singular.ordering_a(cw) *
                        Singular.ordering_a(T[1, :]) *
-                       Singular.ordering_M(T[2:end, :]),
+                       Singular.ordering_a(T[2, :]) *
+                       Singular.ordering_M(T[3:end, :]),
             cached = false,
         )
     end
     return S
 end
 
-#return a copy of the PolynomialRing I, equipped with the ordering a(cweight)*ordering_M(T)
+#return a copy of the PolynomialRing I, equipped with the ordering a(cw)*ordering_M(T)
 function change_order(
     R::Singular.PolyRing,
     w::Vector{Int},
@@ -363,18 +363,9 @@ function change_order(
         ordering = Singular.ordering_M(M),
         cached = false,
     )
-    #@error("Not implemented yet")
     return S
 end
 
-function change_ring(p::Singular.spoly, R::Singular.PolyRing)
-    cvzip = zip(Singular.coefficients(p), Singular.exponent_vectors(p))
-    M = MPolyBuildCtx(R)
-    for (c, v) in cvzip
-        Singular.push_term!(M, c, v)
-    end
-    return finish(M)
-end
 function change_ring(p::Singular.spoly, R::Singular.PolyRing)
     cvzip = zip(Singular.coefficients(p), Singular.exponent_vectors(p))
     M = MPolyBuildCtx(R)
@@ -393,7 +384,7 @@ function interreduce(
 ) where {L<:Nemo.RingElem}
 G represents a Gröbnerbasis. This function interreduces G w.r.t. the leading terms Lm with tail-reduction.
 """=#
-function interreduceGW(G::Singular.sideal) where {L<:Nemo.RingElem}
+function interreduce_walk(G::Singular.sideal) where {L<:Nemo.RingElem}
     Rn = base_ring(G)
     Generator = collect(gens(G))
     I = 0
@@ -404,148 +395,4 @@ function interreduceGW(G::Singular.sideal) where {L<:Nemo.RingElem}
     end
     G = Singular.Ideal(Rn, Generator)
     return G
-end
-#############################################
-# unspecific help functions
-#############################################
-
-function ident_matrix(n::Int)
-    M = zeros(Int, n, n)
-    for i = 1:n
-        M[i, i] = 1
-    end
-    return M
-end
-
-function anti_diagonal_matrix(n::Int)
-    M = zeros(Int, n, n)
-    for i = 1:n
-        M[i, n+1-i] = -1
-    end
-    return M
-end
-
-# Singular.isequal depends on order of generators
-function equalitytest(G::Singular.sideal, K::Singular.sideal)
-    if Singular.ngens(G) != Singular.ngens(K)
-        return false
-    end
-    generators = Singular.gens(G)
-    count = 0
-    for gen in generators
-        for r in Singular.gens(K)
-            if gen * leading_coefficient(r) - r * leading_coefficient(gen) == 0
-                count += 1
-                break
-            end
-        end
-    end
-    if count == Singular.ngens(G)
-        return true
-    end
-    return false
-end
-
-function dot(v::Vector{Int}, w::Vector{Int})
-    sum = 0
-    for i = 1:length(v)
-        @inbounds sum += v[i] * w[i]
-    end
-    return sum
-end
-
-function ordering_as_matrix(w::Vector{Int}, ord::Symbol)
-    if length(w) > 2
-        if ord == :lex
-            return [
-                w'
-                ident_matrix(length(w))[1:length(w)-1, :]
-            ]
-        end
-        if ord == :deglex
-            return [
-                w'
-                ones(Int, length(w))'
-                ident_matrix(length(w))[1:length(w)-2, :]
-            ]
-        end
-        if ord == :degrevlex
-            return [
-                w'
-                ones(Int, length(w))'
-                anti_diagonal_matrix(length(w))[1:length(w)-2, :]
-            ]
-        end
-        if ord == :revlex
-            return [
-                w'
-                anti_diagonal_matrix(length(w))[1:length(w)-1, :]
-            ]
-        end
-    else
-        error("not implemented")
-    end
-end
-
-function change_weight_vector(w::Vector{Int}, M::Matrix{Int})
-    return [
-        w'
-        M[2:length(w), :]
-    ]
-end
-function insert_weight_vector(w::Vector{Int}, M::Matrix{Int})
-    return [
-        w'
-        M[1:length(w)-1, :]
-    ]
-end
-function add_weight_vector(w::Vector{Int}, M::Matrix{Int})
-    return [
-        w'
-        M
-    ]
-end
-
-function ordering_as_matrix(ord::Symbol, nvars::Int)
-    if ord == :lex
-        return ident_matrix(nvars)
-    end
-    if ord == :deglex
-        return [
-            ones(Int, nvars)'
-            ident_matrix(nvars)[1:nvars-1, :]
-        ]
-    end
-    if ord == :degrevlex
-        return [
-            ones(Int, nvars)'
-            anti_diagonal_matrix(nvars)[1:nvars-1, :]
-        ]
-    end
-    if ord == :revlex
-        return [
-            w'
-            anti_diagonal_matrix(length(w))[1:length(w)-1, :]
-        ]
-    else
-        error("not implemented")
-    end
-end
-
-
-function deg(p::Singular.spoly, n::Int)
-    max = 0
-    for mon in Singular.monomials(p)
-        ev = Singular.exponent_vectors(mon)
-        sum = 0
-        for e in ev
-            for i = 1:n
-                sum += e[i]
-            end
-            if (max < sum)
-                max = sum
-            end
-        end
-    end
-    return max
 end

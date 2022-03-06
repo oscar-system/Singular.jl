@@ -1,67 +1,20 @@
-include("GroebnerWalkUtilitysFinal.jl")
-
-#Structure which is used to define a MonomialOrdering a(v)*a(tv)*ordering_M(T)
-#Maybe not needed
-mutable struct MonomialOrder{T<:Matrix{Int},v<:Vector{Int},tv<:Vector{Int}}
-    m::T
-    w::v
-    t::tv
-end
-#=
-#=
-@doc Markdown.doc"""
-   convert_bounding_vector(wtemp::Vector{T}) where {T<:Number}
-Given a Vector{Number} $v$ this function computes a Vector{Int} w with w = v:gcd(v).
-"""=#
-function convert_bounding_vector(v::Vector{T}) where {T<:Number}
-    w = Vector{Int}()
-    for i = 1:length(v)
-        push!(w, float(divexact(v[i], gcd(v))))
-    end
-    return w
-end=#
-
-#=
-@doc Markdown.doc"""
-function inCone(
-    G::Singular.sideal,
-    T::MonomialOrder{Matrix{Int},Vector{Int}},
-    t::Vector{Int},
-)
-Returns 'true' if the leading tems of $G$ w.r.t the monomial ordering $T$ are the same as the leading terms of $G$ w.r.t the weighted monomial ordering with weight vector $t$ and the monomial ordering $T$.
-"""=#
-function inCone(
-    G::Singular.sideal,
-    T::MonomialOrder{Matrix{Int},Vector{Int}},
-    t::Vector{Int},
-)
-    R = change_order(G.base_ring, T.m)
-    I = Singular.Ideal(R, [change_ring(x, R) for x in Singular.gens(G)])
-    cvzip = zip(Singular.gens(I), initials(R, Singular.gens(I), t))
-    for (g, ing) in cvzip
-        if !isequal(Singular.leading_term(g), Singular.leading_term(ing))
-            return false
-        end
-    end
-    return true
-end
+include("GroebnerWalkUtilitys.jl")
 
 #=
 @doc Markdown.doc"""
 function lift_fractal_walk(
-    G::Singular.sideal,
-    Gw::Singular.sideal,
-    R::Singular.PolyRing,
-    S::Singular.PolyRing,
+G::Singular.sideal,
+H::Singular.sideal,
+Rn::Singular.PolyRing,
 )
-Performs a lifting step in the Groebner Walk proposed by Amrhein et. al. and Cox Little Oshea
+Performs a lifting step in the Fractal Walk.
 """=#
 function lift_fractal_walk(
     G::Singular.sideal,
-    R::Singular.PolyRing,
     H::Singular.sideal,
     Rn::Singular.PolyRing,
 )
+    R = base_ring(G)
     G.isGB = true
     G = Singular.Ideal(
         Rn,
@@ -77,12 +30,12 @@ end
 
 #=
 @doc Markdown.doc"""
-function isMonomial(
+function ismonomial(
 Gw::Vector{spoly{L}},
 ) where {L<:Nemo.RingElem}
 Returns ´true´ if all polynomials of the given array are monomials.
 """=#
-function isMonomial(Gw::Vector{spoly{L}}) where {L<:Nemo.RingElem}
+function ismonomial(Gw::Vector{spoly{L}}) where {L<:Nemo.RingElem}
     for g in Gw
         if length(Singular.coefficients(g)) > 1
             return false
@@ -115,7 +68,7 @@ function nextT(
     w::Array{T,1},
     tw::Array{K,1},
 ) where {T<:Number,K<:Number}
-Returns the next t to compute the next weight vector w(t) = w + t * (tw - w).
+Returns the next t to compute the next weight vector $w(t) = w + t * (tw - w)$ like it´s done in Amrhein & Gloor (1998)
 """=#
 function nextT(
     G::Singular.sideal,
@@ -149,28 +102,13 @@ end
 
 #=
 @doc Markdown.doc"""
-function change_order(
-    R::Singular.PolyRing,
-    T::MonomialOrder{Matrix{Int},Vector{Int}},
-) where {L<:Number,K<:Number}
-Returns a new PolynomialRing w.r.t. the monomial ordering T.
+function next_weightfr(
+    G::Singular.sideal,
+    cweight::Array{T,1},
+    tweight::Array{K,1},
+) where {T<:Number,K<:Number}
+Returns the next t to compute the next weight vector $w(t) = w + t * (tw - w)$ like it´s done in Fukuda et al. (2005).
 """=#
-function change_order(
-    R::Singular.PolyRing,
-    T::Matrix{Int},
-) where {L<:Number,K<:Number}
-    G = Singular.gens(R)
-    Gstrich = string.(G)
-    S, H = Singular.PolynomialRing(
-        R.base_ring,
-        Gstrich,
-        ordering = Singular.ordering_a(T.w) *
-                   Singular.ordering_a(T.t) *
-                   Singular.ordering_M(T.m),
-    )
-    return S
-end
-
 function next_weightfr(
     G::Singular.sideal,
     cweight::Array{T,1},
@@ -179,10 +117,10 @@ function next_weightfr(
     if (cweight == tweight)
         return [0]
     end
-    tmin = 1
+    tmin = BigInt(1)
     for v in difference_lead_tail(G)
-        cw = dot(cweight, v)
-        tw = dot(tweight, v)
+        cw = BigInt(dot(cweight, v))
+        tw = BigInt(dot(tweight, v))
         if tw < 0
             t = cw // (cw - tw)
             if t < tmin
@@ -198,9 +136,10 @@ end
 function inCone(
     G::Singular.sideal,
     T::Matrix{Int},
-    t::Vector{Int},
+    pvecs::Vector{Vector{Int}},
+    p::Int,
 )
-Returns 'true' if the leading tems of $G$ w.r.t the matrixordering $T$ are the same as the leading terms of $G$ w.r.t the weighted monomial ordering with weight vector $t$ and the Matrixordering $T$.
+Returns 'true' if the leading tems of $G$ w.r.t the matrixordering $T$ are the same as the leading terms of $G$ w.r.t the weighted monomial ordering with weight vector of pvecs[p] (pvecs[p-1]) and the Matrixordering $T$.
 """=#
 function inCone(
     G::Singular.sideal,

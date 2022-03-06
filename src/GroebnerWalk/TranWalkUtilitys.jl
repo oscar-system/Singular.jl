@@ -1,4 +1,4 @@
-include("GroebnerWalkUtilitysFinal.jl")
+include("GroebnerWalkUtilitys.jl")
 
 
 function representation_vector(G::Singular.sideal, T::Matrix{Int})
