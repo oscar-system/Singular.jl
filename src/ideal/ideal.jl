@@ -2,7 +2,8 @@ export sideal, IdealSet, syz, lead, normalize!, isconstant, iszerodim, fglm,
        fres, dimension, highcorner, jet, kbase, minimal_generating_set,
        independent_sets, maximal_independent_set, ngens, sres, intersection,
        quotient, reduce, eliminate, kernel, equal, contains, isvar_generated,
-       saturation, satstd, slimgb, std, vdim, interreduce, degree, mult
+       saturation, satstd, slimgb, std, vdim, interreduce, degree, mult,
+       hilbert_series
 
 ###############################################################################
 #
@@ -979,5 +980,28 @@ function maximal_independent_set(I::sideal{spoly{T}}; all::Bool = false) where T
       end
       return P
    end
+end
+
+###############################################################################
+#
+#   Hilbert series
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    hilbert_series(I::sideal{spoly{T}}) where T <: Nemo.FieldElem
+
+Return the coefficient vector of $Q(t)$ where `Q(t)/(1-t)^nvars(base_ring(I))`
+is the Hilbert-Poincare series of $I$ for weights $(1, \dots, 1)$.
+The coefficient vector is returned as a `Vector{Int32}`, and the last element
+is not actually part of the coefficients of Q(t).
+The function is undefined if the coefficients of Q(t) do not fit `Int32`.
+"""
+function hilbert_series(I::sideal{spoly{T}}) where T <: Nemo.FieldElem
+   z = Vector{Int32}()
+   I.isGB || error("Not a Groebner basis")
+   R = base_ring(I)
+   GC.@preserve libSingular.scHilb(I.ptr, R.ptr, z)
+   return z
 end
 
