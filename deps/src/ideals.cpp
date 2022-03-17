@@ -102,6 +102,7 @@ auto id_StdHilb_helper(ideal a, ring b, jlcxx::ArrayRef<int> h, bool complete_re
     }
     else
         id = idInit(0, a->rank);
+    delete hilb;
     return id;
 }
 
@@ -450,7 +451,7 @@ void singular_define_ideals(jlcxx::Module & Singular)
             wi[i] = w[i];
         SPrintStart();
         scDegree(I, module_w, R->qideal);
-        // cleanup module_w ???
+        delete module_w;
         char *s = SPrintEnd();
         s[strlen(s)-1]='\0';
         std::string res(s);
@@ -496,6 +497,25 @@ void singular_define_ideals(jlcxx::Module & Singular)
         {
           a.push_back(content[j]);
         }
+        rChangeCurrRing(origin);
+    });
+    Singular.method("scHilbWeighted", [](ideal I, ring r, jlcxx::ArrayRef<int> weights, jlcxx::ArrayRef<int> a) {
+        int sz = weights.size();
+        intvec * w = new intvec(sz);
+        int * hi = w->ivGetVec();
+        for (int i=0; i< sz; i++) {
+          hi[i] = weights[i];
+        }
+        const ring origin = currRing;
+        rChangeCurrRing(r);
+        intvec *v=hFirstSeries(I,NULL,r->qideal,w);
+        delete w;
+        int * content = v->ivGetVec();
+        for(int j = 0; j < v->length(); j++)
+        {
+          a.push_back(content[j]);
+        }
+        delete v;
         rChangeCurrRing(origin);
     });
 }
