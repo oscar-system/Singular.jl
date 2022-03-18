@@ -998,10 +998,26 @@ is not actually part of the coefficients of Q(t).
 The function is undefined if the coefficients of Q(t) do not fit `Int32`.
 """
 function hilbert_series(I::sideal{spoly{T}}) where T <: Nemo.FieldElem
-   z = Vector{Int32}()
    I.isGB || error("Not a Groebner basis")
    R = base_ring(I)
-   GC.@preserve libSingular.scHilb(I.ptr, R.ptr, z)
+   z = Vector{Int32}()
+   GC.@preserve I R libSingular.scHilb(I.ptr, R.ptr, z)
+   return z
+end
+
+@doc Markdown.doc"""
+    hilbert_series(I::sideal{spoly{T}}, w::Vector{<:Integer}) where T <: Nemo.FieldElem
+
+Return the coefficient vector of $Q(t)$ where `Q(t)/(1-t)^nvars(base_ring(I))`
+is the Hilbert-Poincare series of $I$ for weights $w$.
+"""
+function hilbert_series(I::sideal{spoly{T}}, w::Vector{<:Integer}) where T <: Nemo.FieldElem
+   I.isGB || error("Not a Groebner basis")
+   R = base_ring(I)
+   length(w) == nvars(R) || error("wrong number of weights")
+   w = convert(Vector{Int32}, w)
+   z = Vector{Int32}()
+   GC.@preserve I R libSingular.scHilbWeighted(I.ptr, R.ptr, w, z)
    return z
 end
 
