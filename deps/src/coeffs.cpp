@@ -425,7 +425,6 @@ void singular_define_coeffs(jlcxx::Module & Singular)
     Singular.method("omFree_internal", [](void * m) { omFree(m); });
 
     /* Setting a Ptr{number} to a number */
-
     Singular.method("setindex_internal", [](void * x, snumber * y) {
         *reinterpret_cast<snumber **>(x) = y;
     });
