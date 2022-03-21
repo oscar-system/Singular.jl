@@ -117,18 +117,18 @@ function next_weightfr(
     if (cweight == tweight)
         return [0]
     end
-    tmin = BigInt(1)
+    tmin = 1
     for v in difference_lead_tail(G)
-        cw = BigInt(dot(cweight, v))
-        tw = BigInt(dot(tweight, v))
+        tw = dot(tweight, v)
         if tw < 0
+            cw = dot(cweight, v)
             t = cw // (cw - tw)
             if t < tmin
                 tmin = t
             end
         end
     end
-    return tmin
+    return BigInt(numerator(tmin))//BigInt(denominator(tmin))
 end
 
 #=
@@ -148,15 +148,14 @@ function inCone(
     p::Int,
 )
     R = change_order(G.base_ring, T)
-    I = Singular.Ideal(R, [change_ring(x, R) for x in gens(G)])
     cvzip = zip(
-        Singular.gens(I),
-        initials(R, Singular.gens(I), pvecs[p-1]),
-        initials(R, Singular.gens(I), pvecs[p]),
+        Singular.gens(G),
+        initials(R, Singular.gens(G), pvecs[p-1]),
+        initials(R, Singular.gens(G), pvecs[p]),
     )
     for (g, in, in2) in cvzip
-        if !isequal(Singular.leading_term(g), Singular.leading_term(in)) ||
-           !isequal(Singular.leading_term(g), Singular.leading_term(in2))
+        if !isequal(Singular.leading_exponent_vector(change_ring(g, R)), Singular.leading_exponent_vector(in)) ||
+           !isequal(Singular.leading_exponent_vector(change_ring(g, R)), Singular.leading_exponent_vector(in2))
             return false
         end
     end

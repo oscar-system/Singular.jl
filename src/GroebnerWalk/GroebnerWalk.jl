@@ -155,7 +155,6 @@ function groebnerwalk(
     I = Singular.Ideal(R, [R(x) for x in gens(G)])
 
     Gb = walk(I, S, T)
-    println("Cones crossed: ", getCounter())
 
     S = change_order(R, T)
     return Singular.Ideal(S, [change_ring(gen, S) for gen in gens(Gb)])
@@ -169,7 +168,9 @@ end
 function standard_walk(G::Singular.sideal, S::Matrix{Int}, T::Matrix{Int})
     println("standard_walk results")
     println("Crossed Cones in: ")
-    standard_walk(G, S, T, S[1, :], T[1, :])
+    Gb = standard_walk(G, S, T, S[1, :], T[1, :])
+    println("Cones crossed: ", getCounter())
+    return Gb
 end
 
 function standard_walk(
@@ -195,13 +196,15 @@ end
 
 function standard_step(G::Singular.sideal, w::Vector{Int}, T::Matrix{Int})
     R = base_ring(G)
+    Rn = 0
+    Gw = 0
 
     #check if no entry of w is bigger than In32. If it´s bigger multiply it by 0.1 and round.
     if !checkInt32(w)
         Gw = initials(R, gens(G), w)
         w, b = truncw(G, w, Gw)
         if !b
-            throw(Exception)
+            throw(error("Some entrys of the intermediate weight-vector $w are bigger than int32"))
         end
         Rn = change_order(R, w, T)
         Gw = [change_ring(x, Rn) for x in Gw]
@@ -209,7 +212,6 @@ function standard_step(G::Singular.sideal, w::Vector{Int}, T::Matrix{Int})
         Rn = change_order(R, w, T)
         Gw = initials(Rn, gens(G), w)
     end
-
     H = Singular.std(Singular.Ideal(Rn, Gw), complete_reduction = true)
     #H = liftGW2(G, R, Gw, H, Rn)
     H = lift(G, R, H, Rn)
@@ -237,6 +239,7 @@ function generic_walk(G::Singular.sideal, S::Matrix{Int}, T::Matrix{Int})
     end
     G = Singular.Ideal(Rn, G)
     G.isGB = true
+    println("Cones crossed: ", getCounter())
     return Singular.interreduce(G)
 end
 
@@ -275,7 +278,7 @@ function pertubed_walk(
         tarweight = pertubed_vector(G, T, p)
         Tn = add_weight_vector(tarweight, T)
         G = standard_walk(G, S, Tn, currweight, tarweight)
-        if inCone(G, T, tarweight)
+        if same_cone(G, T)
             terminate = true
         else
             p = p - 1
@@ -283,6 +286,8 @@ function pertubed_walk(
             S = Tn
         end
     end
+    println("Cones crossed: ", getCounter())
+
     return G
 end
 
@@ -344,18 +349,17 @@ function fractal_recursiv(
 
         # Handling the final step in the current depth.
         if t == 1 && p != 1
-            if !inCone(G, T, pTargetWeights, p)
-                global pTargetWeights =
-                    [pertubed_vector(G, T, i) for i = 1:nvars(R)]
-                println("not in Cone ", pTargetWeights)
-                continue
-            end
-            if inCone(G, T, currweight)
+            if same_cone(G, T)
                 println(currweight, " in Cone", p)
+                if !inCone(G, T,pTargetWeights, p)
+                    global pTargetWeights =
+                        [pertubed_vector(G, T, i) for i = 1:nvars(R)]
+                    println("not in Cone ", pTargetWeights)
+                end
                 return G
             end
         elseif t == [0]
-            if p == 1 || inCone(G, T, pTargetWeights, p)
+            if p == 1 || inCone(G, T,pTargetWeights, p)
                 println(pTargetWeights[p], " in Cone", p)
                 return G
             end
@@ -372,7 +376,7 @@ function fractal_recursiv(
         if !checkInt32(w)
             w, b = truncw(G, w, Gw)
             if !b
-                throw(Exception)
+                return G
             end
         end
 
@@ -453,18 +457,17 @@ function fractal_walk_recursiv_startorder(
 
         # Handling the final step in the current depth.
         if t == 1 && p != 1
-            if !inCone(G, T, pTargetWeights, p)
-                global pTargetWeights =
-                    [pertubed_vector(G, T, i) for i = 1:nvars(R)]
-                println("not in Cone ", pTargetWeights)
-                continue
-            end
-            if inCone(G, T, currweight)
+            if same_cone(G, T)
                 println(currweight, " in Cone", p)
+                if !inCone(G, T,pTargetWeights, p)
+                    global pTargetWeights =
+                        [pertubed_vector(G, T, i) for i = 1:nvars(R)]
+                    println("not in Cone ", pTargetWeights)
+                end
                 return G
             end
         elseif t == [0]
-            if p == 1 || inCone(G, T, pTargetWeights, p)
+            if p == 1 || inCone(G, T,pTargetWeights, p)
                 println(pTargetWeights[p], " in Cone", p)
                 return G
             end
@@ -541,18 +544,17 @@ function fractal_walk_recursive_lex(
 
         # Handling the final step in the current depth.
         if t == 1 && p != 1
-            if !inCone(G, T, pTargetWeights, p)
-                global pTargetWeights =
-                    [pertubed_vector(G, T, i) for i = 1:nvars(R)]
-                println("not in Cone ", pTargetWeights)
-                continue
-            end
-            if inCone(G, T, currweight)
+            if same_cone(G, T)
                 println(currweight, " in Cone", p)
+                if !inCone(G, T,pTargetWeights, p)
+                    global pTargetWeights =
+                        [pertubed_vector(G, T, i) for i = 1:nvars(R)]
+                    println("not in Cone ", pTargetWeights)
+                end
                 return G
             end
         elseif t == [0]
-            if p == 1 || inCone(G, T, pTargetWeights, p)
+            if p == 1 || inCone(G, T,pTargetWeights, p)
                 println(pTargetWeights[p], " in Cone", p)
                 return G
             end
@@ -639,18 +641,17 @@ function fractal_walk_look_ahead_recursiv(
 
         # Handling the final step in the current depth.
         if t == 1 && p != 1
-            if !inCone(G, T, pTargetWeights, p)
-                global pTargetWeights =
-                    [pertubed_vector(G, T, i) for i = 1:nvars(R)]
-                println("not in Cone ", pTargetWeights)
-                continue
-            end
-            if inCone(G, T, currweight)
+            if same_cone(G, T)
                 println(currweight, " in Cone", p)
+                if !inCone(G, T,pTargetWeights, p)
+                    global pTargetWeights =
+                        [pertubed_vector(G, T, i) for i = 1:nvars(R)]
+                    println("not in Cone ", pTargetWeights)
+                end
                 return G
             end
         elseif t == [0]
-            if p == 1 || inCone(G, T, pTargetWeights, p)
+            if p == 1 || inCone(G, T,pTargetWeights, p)
                 println(pTargetWeights[p], " in Cone", p)
                 return G
             end
@@ -699,7 +700,7 @@ function fractal_walk_look_ahead_recursiv(
     end
     return G
 end
-
+global time = 0
 
 function fractal_walk_combined(
     G::Singular.sideal,
@@ -712,6 +713,7 @@ function fractal_walk_combined(
     println("Crossed Cones in: ")
     Gb = fractal_walk_combined(G, S, T, S[1, :], pTargetWeights, 1)
     println("Cones crossed: ", deleteCounterFr())
+    println(time)
     return Gb
 end
 
@@ -742,13 +744,13 @@ function fractal_walk_combined(
     end
 
     while !terminate
-        t = next_weightfr(G, w, pTargetWeights[p])
+         t =  next_weightfr(G, w, pTargetWeights[p])
 
         # Handling the final step in the current depth.
         if t == 1 && p != 1
-            if inCone(G, T, currweight)
+            if same_cone(G, T)
                 println(currweight, " in Cone", p)
-                if !inCone(G, T, pTargetWeights, p)
+                if !inCone(G, T,pTargetWeights, p)
                     global pTargetWeights =
                         [pertubed_vector(G, T, i) for i = 1:nvars(R)]
                     println("not in Cone ", pTargetWeights)
@@ -756,7 +758,7 @@ function fractal_walk_combined(
                 return G
             end
         elseif t == [0]
-            if inCone(G, T, pTargetWeights, p)
+            if inCone(G, T,pTargetWeights, p)
                 println(pTargetWeights[p], " in Cone", p)
                 return G
             end
@@ -786,7 +788,7 @@ function fractal_walk_combined(
                         ),
                         complete_reduction = true,
                     )
-                    if !inCone(G, T, pTargetWeights, p)
+                    if !inCone(G, T,pTargetWeights, p)
                         global pTargetWeights =
                             [pertubed_vector(G, T, i) for i = 1:nvars(R)]
                         println("not in Cone ", pTargetWeights)
@@ -808,7 +810,7 @@ function fractal_walk_combined(
                 raiseCounterFr()
             else
                 println(
-                    "from $(currweight) to $(w)",
+                    "from $(currweight) to $(pTargetWeights[p])",
                     "up in: ",
                     p,
                     " with: ",
@@ -860,7 +862,7 @@ function tran_walk(G::Singular.sideal, S::Matrix{Int}, T::Matrix{Int})
         end
         Rn = change_order(R, w, T)
         if w == tarweight
-            if inCone(G, T, currweight)
+            if same_cone(G, T)
                 #this checks if in_{<_{cw}}(g)= in_<(in_cw(g)) = in_<<(g) f.a. g in G
                 return G
             elseif inSeveralCones(initials(base_ring(G), gens(G), tarweight))
@@ -873,6 +875,7 @@ function tran_walk(G::Singular.sideal, S::Matrix{Int}, T::Matrix{Int})
         R = Rn
         currweight = w
     end
+    println("Cones crossed: ", getCounter())
     return G
 end
 
