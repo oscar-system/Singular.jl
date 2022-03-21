@@ -9,24 +9,24 @@ function next_weight(
     cw::Vector{Int},
     tw::Vector{Int},
 ) where {K<:Number}
-    tmin = BigInt(1)
+    tmin = 1
     for v in difference_lead_tail(G)
-        cdotw = BigInt(dot(cw, v))
-        tdotw = BigInt(dot(tw, v))
+        tdotw = dot(tw, v)
         if tdotw < 0
+            cdotw = dot(cw, v)
             t = cdotw // (cdotw - tdotw)
             if t < tmin
                 tmin = t
             end
         end
     end
-    return convert_bounding_vector(cw + tmin * (tw - cw))
+    return convert_bounding_vector(cw + BigInt(numerator(tmin))//BigInt(denominator(tmin)) * (tw - cw))
 end
 
 function checkInt32(w::Vector{Int})
     for i = 1:length(w)
         if tryparse(Int32, string(w[i])) == nothing
-            println("int32")
+            #println("int32")
             return false
         end
     end
@@ -152,7 +152,45 @@ function inCone(G::Singular.sideal, T::Matrix{Int}, t::Vector{Int})
     I = Singular.Ideal(R, [change_ring(x, R) for x in gens(G)])
     cvzip = zip(Singular.gens(I), initials(R, Singular.gens(I), t))
     for (g, ing) in cvzip
-        if !isequal(Singular.leading_term(g), Singular.leading_term(ing))
+        if !isequal(Singular.leading_exponent_vector(g), Singular.leading_exponent_vector(ing))
+            return false
+        end
+    end
+    return true
+end
+
+#=
+@doc Markdown.doc"""
+function inCone(
+    G::Singular.sideal,
+    T::Matrix{Int},
+    t::Vector{Int},
+)
+Returns 'true' if the leading tems of $G$ w.r.t the matrixordering $T$ are the same as the leading terms of $G$ w.r.t the weighted monomial ordering with weight vector $t$ and the Matrixordering $T$.
+"""=#
+function inCone(G::Singular.sideal, t::Vector{Int})
+    cvzip = zip(Singular.gens(G), initials(base_ring(G), Singular.gens(G), t))
+    for (g, ing) in cvzip
+        if !isequal(Singular.leading_exponent_vector(g), Singular.leading_exponent_vector(ing))
+            return false
+        end
+    end
+    return true
+end
+
+#=
+@doc Markdown.doc"""
+function inCone(
+    G::Singular.sideal,
+    T::Matrix{Int},
+    t::Vector{Int},
+)
+Returns 'true' if the leading tems of $G$ w.r.t the matrixordering $T$ are the same as the leading terms of $G$ with the current ordering.
+"""=#
+function same_cone(G::Singular.sideal, T::Matrix{Int})
+    R = change_order(G.base_ring, T)
+    for g in gens(G)
+        if !isequal(Singular.leading_exponent_vector(change_ring(g,R)), Singular.leading_exponent_vector(g))
             return false
         end
     end
