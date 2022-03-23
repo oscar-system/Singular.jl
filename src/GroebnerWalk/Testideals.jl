@@ -145,36 +145,6 @@ using Test
         end
 
 
-        id = noon8()
-        R = base_ring(id)
-        dim = nvars(R)
-        ve = ones(Int, dim)
-        StartOrd = ordering_as_matrix(:degrevlex, dim)
-        TarOrd = ordering_as_matrix(:lex, dim)
-        R2 = change_order(R, StartOrd)
-        S = change_order(R, TarOrd)
-        I = Singular.std(id, complete_reduction = true)
-
-        ideals = []
-        for i = 2:nvars(S)-3
-            push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :pertubed, i))
-        end
-        push!(ideals, groebnerwalk(I, :degrevlex, :lex, :standard))
-        push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :fractal_combined))
-        push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :generic))
-
-        s = Singular.std(
-            Singular.Ideal(S, [change_ring(x, S) for x in Singular.gens(id)]),
-            complete_reduction = true,
-        )
-
-        for id in ideals
-            @test equalitytest(
-                Singular.Ideal(S, [change_ring(x, S) for x in Singular.gens(id)]),
-                s,
-            )
-        end
-
         id = redeco7()
         R = base_ring(id)
         dim = nvars(R)

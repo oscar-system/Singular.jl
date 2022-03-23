@@ -1,9 +1,8 @@
 ###############################################################
-#Utilitys for Groebnerwalks
+# Several Procedures for the Groebner Walk
 ###############################################################
 
-#Computes next weight vector. Version used in Cox O´shea and Fukuda et al.
-#This Version is used by the standard_walk, pertubed_walk and tran_walk.
+# Returns the next intermediate weight vector.
 function next_weight(
     G::Singular.sideal,
     cw::Vector{Int},
@@ -23,36 +22,28 @@ function next_weight(
     return convert_bounding_vector(cw + BigInt(numerator(tmin))//BigInt(denominator(tmin)) * (tw - cw))
 end
 
-function checkInt32(w::Vector{Int})
-    for i = 1:length(w)
-        if tryparse(Int32, string(w[i])) == nothing
-            #println("int32")
-            return false
-        end
-    end
-    return true
-end
+# multiplys every entry of the given weight with 0.1 as long as it stays on the halfspace.
 function truncw(
     G::Singular.sideal,
     w::Vector{Int},
     inw::Vector{L},
 ) where {L<:Nemo.RingElem}
     while !checkInt32(w)
-        println("$w > Int32")
         R = base_ring(G)
         for i = 1:length(w)
             w[i] = round(w[i] * 0.10)
         end
         w = convert_bounding_vector(w)
         if inw != initials(R, gens(G), w)
-            println("Initials are different - return not rounded weight")
+            #Initials are different - return not rounded weight
             return w, false
         end
     end
-    println("Converted to Vector $w of the same face.")
+    # Converted to Vector w of the same face
     return w, true
 end
-#Return the initials of polynomials w.r.t. a weight vector.
+
+#Returns the initialform of G w.r.t. the given weight vector.
 function initials(
     R::Singular.PolyRing,
     G::Vector{L},
@@ -84,8 +75,6 @@ function initials(
     return inits
 end
 
-#Return the difference of the exponents of the leading terms (Lm) and the
-#exponent vectors of the tail of all polynomials of the ideal.
 function difference_lead_tail(I::Singular.sideal)
     v = Vector{Int}[]
     for g in gens(I)
@@ -97,15 +86,7 @@ function difference_lead_tail(I::Singular.sideal)
     return unique!(v)
 end
 
-#=
-@doc Markdown.doc"""
-function pertubed_vector(
-G::Singular.sideal,
-M::Matrix{Int},
-p::Integer
-)
-Computes a p-pertubed weight vector of M.
-"""=#
+# Computes a p-pertubed vector from M
 function pertubed_vector(G::Singular.sideal, M::Matrix{Int}, p::Integer)
     m = Int[]
     n = size(M, 1)
@@ -138,15 +119,7 @@ function pertubed_vector(G::Singular.sideal, M::Matrix{Int}, p::Integer)
     return convert_bounding_vector(w)
 end
 
-#=
-@doc Markdown.doc"""
-function inCone(
-    G::Singular.sideal,
-    T::Matrix{Int},
-    t::Vector{Int},
-)
-Returns 'true' if the leading tems of $G$ w.r.t the matrixordering $T$ are the same as the leading terms of $G$ w.r.t the weighted monomial ordering with weight vector $t$ and the Matrixordering $T$.
-"""=#
+#Returns 'true' if the leading terms of G w.r.t the matrixorder T are the same as the leading terms of G w.r.t the weighted monomial order with weight vector t and matrix T.
 function inCone(G::Singular.sideal, T::Matrix{Int}, t::Vector{Int})
     R = change_order(G.base_ring, T)
     I = Singular.Ideal(R, [change_ring(x, R) for x in gens(G)])
@@ -159,15 +132,7 @@ function inCone(G::Singular.sideal, T::Matrix{Int}, t::Vector{Int})
     return true
 end
 
-#=
-@doc Markdown.doc"""
-function inCone(
-    G::Singular.sideal,
-    T::Matrix{Int},
-    t::Vector{Int},
-)
-Returns 'true' if the leading tems of $G$ w.r.t the matrixordering $T$ are the same as the leading terms of $G$ w.r.t the weighted monomial ordering with weight vector $t$ and the Matrixordering $T$.
-"""=#
+#Returns 'true' if the leading tems of G w.r.t the matrixordering T are the same as the leading terms of G w.r.t the weighted monomial order with weight vector t and the matrix order T.
 function inCone(G::Singular.sideal, t::Vector{Int})
     cvzip = zip(Singular.gens(G), initials(base_ring(G), Singular.gens(G), t))
     for (g, ing) in cvzip
@@ -178,15 +143,7 @@ function inCone(G::Singular.sideal, t::Vector{Int})
     return true
 end
 
-#=
-@doc Markdown.doc"""
-function inCone(
-    G::Singular.sideal,
-    T::Matrix{Int},
-    t::Vector{Int},
-)
-Returns 'true' if the leading tems of $G$ w.r.t the matrixordering $T$ are the same as the leading terms of $G$ with the current ordering.
-"""=#
+# Returns 'true' if the leading tems of G w.r.t the matrixordering T are the same as the leading terms of G with the current ordering.
 function same_cone(G::Singular.sideal, T::Matrix{Int})
     R = change_order(G.base_ring, T)
     for g in gens(G)
@@ -197,26 +154,7 @@ function same_cone(G::Singular.sideal, T::Matrix{Int})
     return true
 end
 
-#=
-@doc Markdown.doc"""
-function isGb(
-    G::Singular.sideal,
-    T::Matrix{Int},
-)
-"""=#
-function isGb(G::Singular.sideal, T::Matrix{Int})
-    R = change_order(G.base_ring, T)
-    for g in Singular.gens(G)
-        if !isequal(
-            Singular.leading_term(g),
-            change_ring(Singular.leading_term(change_ring(g, R)), G.base_ring),
-        )
-            return false
-        end
-    end
-    return true
-end
-#Fukuda et al
+# Lifting step by Fukuda et al. (2005).
 function lift(
     G::Singular.sideal,
     R::Singular.PolyRing,
@@ -235,17 +173,7 @@ function lift(
     return G
 end
 
-#=
-@doc Markdown.doc"""
-function lift_fractal_walk(
-G::Singular.sideal,
-R::Singular.PolyRing,
-inG::Vector{spoly{L}},
-H::Singular.sideal,
-Rn::Singular.PolyRing,
-)
-Performs a lifting step in the Groebner Walk proposed by Amrhein et. al. and Cox Little Oshea
-"""=#
+# lifting step in the Groebner Walk by Collart et al. (1997).
 function liftGW2(
     G::Singular.sideal,
     R::Singular.PolyRing,
@@ -271,6 +199,7 @@ function liftGW2(
     return G
 end
 
+# divisionalgorithm that returns q with q_1*f_1 + ... + q_s *f_s=p.
 function division_algorithm(
     p::spoly{L},
     f::Vector{spoly{L}},
@@ -300,11 +229,7 @@ function division_algorithm(
     return q
 end
 
-#=
-@doc Markdown.doc"""
-   convert_bounding_vector(wtemp::Vector{T}) where {T<:Number}
-Given a Vector{Number} $v$ this function computes a Vector{Int} w with w = v:gcd(v).
-"""=#
+# converts a vector wtemp by dividing the entries with gcd(wtemp).
 function convert_bounding_vector(wtemp::Vector{T}) where {T<:Rational{BigInt}}
     w = Vector{Int}()
     g = gcd(wtemp)
@@ -313,11 +238,8 @@ function convert_bounding_vector(wtemp::Vector{T}) where {T<:Rational{BigInt}}
     end
     return w
 end
-#=
-@doc Markdown.doc"""
-   convert_bounding_vector(wtemp::Vector{T}) where {T<:Number}
-Given a Vector{Number} $v$ this function computes a Vector{Int} w with w = v:gcd(v).
-"""=#
+
+# converts a vector wtemp by dividing the entries with gcd(wtemp).
 function convert_bounding_vector(wtemp::Vector{T}) where {T<:Number}
     w = Vector{Int}()
     g = gcd(wtemp)
@@ -327,8 +249,7 @@ function convert_bounding_vector(wtemp::Vector{T}) where {T<:Number}
     return w
 end
 
-
-#return a copy of the PolynomialRing I, equipped with the ordering a(cw)*ordering_M(T)
+# returns a copy of the PolynomialRing I, equipped with the ordering a(cw)*ordering_M(T)
 function change_order(
     R::Singular.PolyRing,
     cw::Array{L,1},
@@ -367,7 +288,7 @@ function change_order(
     return S
 end
 
-#return a copy of the PolynomialRing I, equipped with the ordering a(cw)*ordering_M(T)
+# returns a copy of the PolynomialRing I, equipped with the ordering a(w)*a(t)*ordering_M(T)
 function change_order(
     R::Singular.PolyRing,
     w::Vector{Int},
@@ -388,7 +309,7 @@ function change_order(
     return S
 end
 
-#return a copy of the PolynomialRing I, equipped with the ordering ordering_M(T)
+#returns a copy of the PolynomialRing I, equipped with the ordering ordering_M(T)
 function change_order(
     R::Singular.PolyRing,
     M::Matrix{Int},
@@ -404,6 +325,7 @@ function change_order(
     return S
 end
 
+# recreates the polynomials p equipped with ring R.
 function change_ring(p::Singular.spoly, R::Singular.PolyRing)
     cvzip = zip(Singular.coefficients(p), Singular.exponent_vectors(p))
     M = MPolyBuildCtx(R)
@@ -413,15 +335,7 @@ function change_ring(p::Singular.spoly, R::Singular.PolyRing)
     return finish(M)
 end
 
-
-#=
-@doc Markdown.doc"""
-function interreduce(
-    G::Vector{spoly{L}},
-    Lm::Vector{spoly{L}},
-) where {L<:Nemo.RingElem}
-G represents a Gröbnerbasis. This function interreduces G w.r.t. the leading terms Lm with tail-reduction.
-"""=#
+# interreduces the Groebner basis G.
 function interreduce_walk(G::Singular.sideal) where {L<:Nemo.RingElem}
     Rn = base_ring(G)
     Generator = collect(gens(G))

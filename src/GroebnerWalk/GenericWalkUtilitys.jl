@@ -1,18 +1,11 @@
 include("GroebnerWalkUtilitys.jl")
 
-###############################################################
-#Utilitys for generic_walk
-###############################################################
+#################################################################
+# Procedures of the generic walk.
+# The generic walk is proposed by Fukuda, Lauritzen & Thomas (2005).
+#################################################################
 
-#=
-@doc Markdown.doc"""
-function facet_initials(
-    G::Singular.sideal,
-    lm::Vector{spoly{L}},
-    v::Vector{Int},
-) where {L<:Nemo.RingElem}
-Returns the initials of the polynomials w.r.t. the vector v.
-"""=#
+# returns the initials of the polynomials w.r.t. the vector v.
 function facet_initials(
     G::Vector{Singular.spoly{L}},
     lm::Vector{spoly{L}},
@@ -37,14 +30,7 @@ function facet_initials(
     return initials
 end
 
-#=
-@doc Markdown.doc"""
-function difference_lead_tail(
-G::Vector{spoly{L}},
-Lm::Vector{spoly{L}},
-) where {L<:Nemo.RingElem}
-Returns the differences of the exponent vectors of the leading terms and the polynomials of the generators of $I$.
-"""=#
+# returns the differences of the exponent vectors of the leading terms and the polynomials of the generators of I.
 function difference_lead_tail(
     G::Vector{spoly{L}},
     Lm::Vector{spoly{L}},
@@ -61,11 +47,7 @@ function difference_lead_tail(
     return unique!(v)
 end
 
-#=
-@doc Markdown.doc"""
-function isparallel(u::Vector{Int}, v::Vector{Int})
-Returns true if the vector $u$ is parallel to the vector $v$.
-"""=#
+# returns true if the vector u is parallel to the vector v.
 function isparallel(u::Vector{Int}, v::Vector{Int})
     count = 1
     x = 0
@@ -93,15 +75,7 @@ function isparallel(u::Vector{Int}, v::Vector{Int})
     return true
 end
 
-#=
-@doc Markdown.doc"""
-function lift_generic(
-G::Vector{spoly{L}},
-    Lm::Vector{Singular.spoly{L}},
-    H::Singular.sideal,
-) where {L<:Nemo.RingElem}
-Performs a lifting step in the Groebner Walk proposed by Fukuda et al. (2005).
-"""=#
+# performs a lifting step in the Groebner Walk proposed by Fukuda et al. (2005).
 function lift_generic(
     G::Vector{spoly{L}},
     Lm::Vector{Singular.spoly{L}},
@@ -117,6 +91,7 @@ function lift_generic(
     return liftPolys, Newlm
 end
 
+# returns all v\in V if v>0 w.r.t. the ordering represented by S.
 function filter_btz(S::Matrix{Int}, V::Vector{Vector{Int}})
     btz = Set{Vector{Int}}()
     for v in V
@@ -127,6 +102,7 @@ function filter_btz(S::Matrix{Int}, V::Vector{Vector{Int}})
     return btz
 end
 
+# returns all v \in V if v<0 w.r.t. the ordering represented by S.
 function filter_ltz(S::Matrix{Int}, V::Set{Vector{Int}})
     btz = Set{Vector{Int}}()
     for v in V
@@ -136,6 +112,8 @@ function filter_ltz(S::Matrix{Int}, V::Set{Vector{Int}})
     end
     return btz
 end
+
+# returns all v \in V if w<v w.r.t. the facet-preorder.
 function filter_lf(
     w::Vector{Int},
     S::Matrix{Int},
@@ -151,17 +129,7 @@ function filter_lf(
     return btz
 end
 
-#=
-@doc Markdown.doc"""
-function next_gamma(
-    G::Vector{spoly{L}},
-    Lm::Vector{spoly{L}},
-    w::Vector{Int},
-    S::Matrix{Int},
-    T::Matrix{Int},
-) where {L<:Nemo.RingElem}
-Computes the next vector in the generic walk.
-"""=#
+# computes the next vector in the generic walk.
 function next_gamma(
     G::Vector{spoly{L}},
     Lm::Vector{spoly{L}},
@@ -186,6 +154,7 @@ function next_gamma(
     return minV
 end
 
+# tests if v>0 w.r.t. the ordering M.
 function bigger_than_zero(M::Matrix{Int}, v::Vector{Int})
     nrows, ncols = size(M)
     for i = 1:nrows
@@ -200,6 +169,7 @@ function bigger_than_zero(M::Matrix{Int}, v::Vector{Int})
     return false
 end
 
+# tests if v<0 w.r.t. the ordering M.
 function less_than_zero(M::Matrix{Int}, v::Vector{Int})
     nrows, ncols = size(M)
     for i = 1:nrows
@@ -214,6 +184,7 @@ function less_than_zero(M::Matrix{Int}, v::Vector{Int})
     return false
 end
 
+# tests if u<v w.r.t. the facet-preorder represented by the matrices S and T.
 function less_facet(
     u::Vector{Int},
     v::Vector{Int},
@@ -232,12 +203,12 @@ function less_facet(
     return false
 end
 
-#=
-@doc Markdown.doc"""
-function divides_walk(p::Singular.spoly, lm::Singular.spoly, S::Singular.PolyRing)
-Returns the multiple $m$ for all terms $q$ in $p$ with $lm * m = q$.
-"""=#
-function divides_walk(p::Singular.spoly, lm::Singular.spoly, S::Singular.PolyRing)
+# returns the multiple m for all terms q in p with lm * m = q.
+function divides_walk(
+    p::Singular.spoly,
+    lm::Singular.spoly,
+    S::Singular.PolyRing,
+)
     div = false
     newpoly = Singular.MPolyBuildCtx(S)
     for term in Singular.terms(p)
@@ -254,17 +225,7 @@ function divides_walk(p::Singular.spoly, lm::Singular.spoly, S::Singular.PolyRin
     return finish(newpoly), div
 end
 
-#=
-@doc Markdown.doc"""
-function reduce_walk(
-    p::Singular.spoly,
-    G::Vector{spoly{L}},
-    Lm::Vector{spoly{L}},
-    c::Bool = false,
-) where {L<:Nemo.RingElem}
-Returns $p$ reduced by $G$ w.r.t. the leading terms Lm and true if a division occured.
-"""=#
-
+# returns p reduced by the Groebner basis G w.r.t. the leading terms Lm.
 function reduce_walk(
     p::Singular.spoly,
     G::Vector{spoly{L}},
@@ -280,14 +241,7 @@ function reduce_walk(
     return p
 end
 
-#=
-@doc Markdown.doc"""
-function interreduce(
-    G::Vector{spoly{L}},
-    Lm::Vector{spoly{L}},
-) where {L<:Nemo.RingElem}
-$G$ represents a Gröbnerbasis. This function interreduces $G$ w.r.t. the leading terms $Lm$ with tail-reduction.
-"""=#
+# this function interreduces the Groebner basis G w.r.t. the leading terms Lm with tail-reduction.
 function interreduce(
     G::Vector{spoly{L}},
     Lm::Vector{spoly{L}},

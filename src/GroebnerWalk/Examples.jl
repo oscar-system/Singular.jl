@@ -2,17 +2,17 @@ function katsura5()
     dim = 5
     ve = [1, 1, 1, 1, 1]
     StartOrd = ordering_as_matrix(:degrevlex, dim)
-    R, (v, u, t, z, y) = Singular.PolynomialRing(
+    R, (x0, x1, x2, x3, x4) = Singular.PolynomialRing(
         Singular.N_ZpField(32003),
-        ["v", "u", "t", "z", "y"],
+        ["x0", "x1", "x2", "x3", "x4"],
         ordering = Singular.ordering_M(StartOrd),
     )
 
-    f1 = 2 * y^2 + 2 * z^2 + 2 * t^2 + 2 * u^2 + v^2 - v
-    f2 = 2 * z * y + 2 * z * t + 2 * t * u + 2 * u * v - u
-    f3 = 2 * y * t + 2 * z * u + 2 * u^2 + 2 * t * v - t
-    f4 = 2 * y * u + 2 * t * u + 2 * z * v - z
-    f5 = 2 * y + 2 * z + 2 * t + 2 * u + v - 1
+    f1 = 2 * x4^2 + 2 * x3^2 + 2 * x2^2 + 2 * x1^2 + x0^2 - x0
+    f2 = 2 * x3 * x4 + 2 * x3 * x2 + 2 * x2 * x1 + 2 * x1 * x0 - x1
+    f3 = 2 * x4 * x2 + 2 * x3 * x1 + 2 * x1^2 + 2 * x2 * x0 - x2
+    f4 = 2 * x4 * x1 + 2 * x2 * x1 + 2 * x3 * x0 - x3
+    f5 = 2 * x4 + 2 * x3 + 2 * x2 + 2 * x1 + x0 - 1
     return Singular.Ideal(R, [f1, f2, f3, f4, f5])
 end
 
@@ -22,20 +22,87 @@ function katsura6()
     dim = 6
     ve = [1, 1, 1, 1, 1, 1]
     StartOrd = ordering_as_matrix(:degrevlex, dim)
-    R, (v, u, t, z, y, x) = Singular.PolynomialRing(
+    R, (x0, x1, x2, x3, x4, x5) = Singular.PolynomialRing(
         Singular.N_ZpField(32003),
-        ["v", "u", "t", "z", "y", "x"],
+        ["x0", "x1", "x2", "x3", "x4", "x5"],
         ordering = Singular.ordering_M(StartOrd),
     )
-    f1 = 2 * x^2 + 2 * y^2 + 2 * z^2 + 2 * t^2 + 2 * u^2 + v^2 - v
-    f2 = 2 * x * y + 2 * y * z + 2 * z * t + 2 * t * u + 2 * u * v - u
-    f3 = 2 * x * z + 2 * y * t + 2 * z * u + 2 * u^2 + 2 * t * v - t
-    f4 = 2 * x * t + 2 * y * u + 2 * t * u + 2 * z * v - z
-    f5 = t^2 + 2 * x * v + 2 * y * v + 2 * z * v - y
-    f6 = 2 * x + 2 * y + 2 * z + 2 * t + 2 * u + v - 1
+    f1 = 2 * x5^2 + 2 * x4^2 + 2 * x3^2 + 2 * x2^2 + 2 * x1^2 + x0^2 - x0
+    f2 = 2 * x5 * x4 + 2 * x4 * x3 + 2 * x3 * x2 + 2 * x2 * x1 + 2 * x1 * x0 - x1
+    f3 = 2 * x5 * x3 + 2 * x4 * x2 + 2 * x3 * x1 + 2 * x1^2 + 2 * x2 * x0 - x2
+    f4 = 2 * x5 * x2 + 2 * x4 * x1 + 2 * x2 * x1 + 2 * x3 * x0 - x3
+    f5 = x2^2 + 2 * x5 * x0 + 2 * x4 * x0 + 2 * x3 * x0 - x4
+    f6 = 2 * x5 + 2 * x4 + 2 * x3 + 2 * x2 + 2 * x1 + x0 - 1
 
     return Singular.Ideal(R, [f1, f2, f3, f4, f5, f6])
 end
+
+
+function katsura7()
+    dim = 7
+    ve = [1, 1, 1, 1, 1, 1,1]
+    StartOrd = ordering_as_matrix(:degrevlex, dim)
+    R, (x0,x1,x2,x3,x4,x5,x6) = Singular.PolynomialRing(
+        Singular.N_ZpField(32003),
+        ["x0","x1","x2","x3","x4","x5","x6"],
+        ordering = Singular.ordering_M(StartOrd),
+    )
+    f1 = x0+2*x1+2*x2+2*x3+2*x4+2*x5+2*x6-1
+    f2 = 2*x2*x3+2*x1*x4+2*x0*x5+2*x1*x6-x5
+    f3 = x2^2+2*x1*x3+2*x0*x4+2*x1*x5+2*x2*x6-x4
+    f4 = 2*x1*x2+2*x0*x3+2*x1*x4+2*x2*x5+2*x3*x6-x3
+    f5 = x1^2+2*x0*x2+2*x1*x3+2*x2*x4+2*x3*x5+2*x4*x6-x2
+    f6 = 2*x0*x1+2*x1*x2+2*x2*x3+2*x3*x4+2*x4*x5+2*x5*x6-x1
+    f7 = x0^2+2*x1^2+2*x2^2+2*x3^2+2*x4^2+2*x5^2+2*x6^2-x0
+
+    return Singular.Ideal(R, [f1, f2, f3, f4, f5, f6, f7])
+end
+
+
+
+function katsura8()
+    dim = 8
+    ve = [1, 1, 1, 1, 1, 1, 1,1]
+    StartOrd = ordering_as_matrix(:degrevlex, dim)
+    R, (u0, u1, u2, u3, u4, u5, u6, u7) = Singular.PolynomialRing(
+        Singular.N_ZpField(32003),
+        ["u0","u1","u2","u3", "u4","u5","u6", "u7"],
+        ordering = Singular.ordering_M(StartOrd),
+    )
+f1=    u0+2*u1+2*u2+2*u3+2*u4+2*u5+2*u6+2*u7-1
+f2=    u3^2+2*u2*u4+2*u1*u5+2*u0*u6+2*u1*u7-u6
+f3=    2*u2*u3+2*u1*u4+2*u0*u5+2*u1*u6+2*u2*u7-u5
+f4=    u2^2+2*u1*u3+2*u0*u4+2*u1*u5+2*u2*u6+2*u3*u7-u4
+f5=    2*u1*u2+2*u0*u3+2*u1*u4+2*u2*u5+2*u3*u6+2*u4*u7-u3
+f6=    u1^2+2*u0*u2+2*u1*u3+2*u2*u4+2*u3*u5+2*u4*u6+2*u5*u7-u2
+f7=    2*u0*u1+2*u1*u2+2*u2*u3+2*u3*u4+2*u4*u5+2*u5*u6+2*u6*u7-u1
+f8=    u0^2+2*u1^2+2*u2^2+2*u3^2+2*u4^2+2*u5^2+2*u6^2+2*u7^2-u0
+
+    return Singular.Ideal(R, [f1, f2, f3, f4, f5, f6, f7, f8])
+end
+
+function katsura9()
+    dim = 9
+    ve = [1, 1, 1, 1, 1, 1,1,1,1]
+    StartOrd = ordering_as_matrix(:degrevlex, dim)
+    R, (u0,u1,u2,u3,u4,u5,u6,u7,u8) = Singular.PolynomialRing(
+        Singular.N_ZpField(32003),
+        ["u0","u1","u2","u3","u4","u5","u6","u7","u8"],
+        ordering = Singular.ordering_M(StartOrd),
+    )
+    f1 = u0+2*u1+2*u2+2*u3+2*u4+2*u5+2*u6+2*u7+2*u8-1
+    f2 = 2*u3*u4+2*u2*u5+2*u1*u6+2*u0*u7+2*u1*u8-u7
+    f3 = u3^2+2*u2*u4+2*u1*u5+2*u0*u6+2*u1*u7+2*u2*u8-u6
+    f4 = 2*u2*u3+2*u1*u4+2*u0*u5+2*u1*u6+2*u2*u7+2*u3*u8-u5
+    f5 = u2^2+2*u1*u3+2*u0*u4+2*u1*u5+2*u2*u6+2*u3*u7+2*u4*u8-u4
+    f6 = 2*u1*u2+2*u0*u3+2*u1*u4+2*u2*u5+2*u3*u6+2*u4*u7+2*u5*u8-u3
+    f7 = u1^2+2*u0*u2+2*u1*u3+2*u2*u4+2*u3*u5+2*u4*u6+2*u5*u7+2*u6*u8-u2
+    f8 = 2*u0*u1+2*u1*u2+2*u2*u3+2*u3*u4+2*u4*u5+2*u5*u6+2*u6*u7+2*u7*u8-u1
+    f9 = u0^2+2*u1^2+2*u2^2+2*u3^2+2*u4^2+2*u5^2+2*u6^2+2*u7^2+2*u8^2-u0
+
+    return Singular.Ideal(R, [f1, f2, f3, f4, f5, f6, f7, f8, f9])
+end
+
 
 function cyclic7()
     dim = 7
@@ -43,7 +110,7 @@ function cyclic7()
     example = "Cyclic7"
     StartOrd = ordering_as_matrix(:degrevlex, dim)
     R, (x1, x2, x3, x4, x5, x6, x7) = Singular.PolynomialRing(
-        Singular.QQ,
+        Singular.N_ZpField(32003),
         ["x1", "x2", "x3", "x4", "x5", "x6", "x7"],
         ordering = Singular.ordering_M(StartOrd),
     )
@@ -93,7 +160,7 @@ function cyclic6()
     example = "Cyclic6"
     StartOrd = ordering_as_matrix(:degrevlex, dim)
     R, (x1, x2, x3, x4, x5, x6) = Singular.PolynomialRing(
-        Singular.QQ,
+        Singular.N_ZpField(32003),
         ["x1", "x2", "x3", "x4", "x5", "x6"],
         ordering = Singular.ordering_M(StartOrd),
     )
@@ -157,7 +224,7 @@ function cyclic4()
     example = "Cyclic4"
     StartOrd = ordering_as_matrix(:degrevlex, dim)
     R, (w, x, y, z) = Singular.PolynomialRing(
-        Singular.QQ,
+        Singular.N_ZpField(32003),
         ["w", "x", "y", "z"],
         ordering = Singular.ordering_M(StartOrd),
     )
@@ -168,13 +235,37 @@ function cyclic4()
     f4 = w * x * y * z - 1
     return Singular.Ideal(R, [f1, f2, f3, f4])
 end
+
+function cyclic8()
+    dim = 8
+    ve = [1, 1, 1, 1, 1 ,1 ,1 ,1]
+    example = "Cyclic8"
+    StartOrd = ordering_as_matrix(:degrevlex, dim)
+    R, (x1,x2,x3,x4,x5,x6,x7,x8) = Singular.PolynomialRing(
+        Singular.N_ZpField(32003),
+        ["x1","x2", "x3","x4","x5","x6","x7","x8"],
+        ordering = Singular.ordering_M(StartOrd),
+    )
+
+    f1 = x1+x2+x3+x4+x5+x6+x7+x8
+    f2 = x1*x2+x2*x3+x3*x4+x4*x5+x5*x6+x6*x7+x1*x8+x7*x8
+    f3 = x1*x2*x3+x2*x3*x4+x3*x4*x5+x4*x5*x6+x5*x6*x7+x1*x2*x8+x1*x7*x8+x6*x7*x8
+    f4 = x1*x2*x3*x4+x2*x3*x4*x5+x3*x4*x5*x6+x4*x5*x6*x7+x1*x2*x3*x8+x1*x2*x7*x8+x1*x6*x7*x8+x5*x6*x7*x8
+    f5 = x1*x2*x3*x4*x5+x2*x3*x4*x5*x6+x3*x4*x5*x6*x7+x1*x2*x3*x4*x8+x1*x2*x3*x7*x8+x1*x2*x6*x7*x8+x1*x5*x6*x7*x8+x4*x5*x6*x7*x8
+    f6 = x1*x2*x3*x4*x5*x6+x2*x3*x4*x5*x6*x7+x1*x2*x3*x4*x5*x8+x1*x2*x3*x4*x7*x8+x1*x2*x3*x6*x7*x8+x1*x2*x5*x6*x7*x8+x1*x4*x5*x6*x7*x8+x3*x4*x5*x6*x7*x8
+    f7 = x1*x2*x3*x4*x5*x6*x7+x1*x2*x3*x4*x5*x6*x8+x1*x2*x3*x4*x5*x7*x8+x1*x2*x3*x4*x6*x7*x8+x1*x2*x3*x5*x6*x7*x8+x1*x2*x4*x5*x6*x7*x8+x1*x3*x4*x5*x6*x7*x8+x2*x3*x4*x5*x6*x7*x8
+    f8 = x1*x2*x3*x4*x5*x6*x7*x8-1
+    return Singular.Ideal(R, [f1, f2, f3, f4, f5, f6, f7, f8])
+end
+
+
 function eco6()
     dim = 6
     ve = [1, 1, 1, 1, 1, 1]
     example = "eco6"
     StartOrd = ordering_as_matrix(:degrevlex, dim)
     R, (x1, x2, x3, x4, x5, x6) = Singular.PolynomialRing(
-        Singular.QQ,
+        Singular.N_ZpField(32003),
         ["x1", "x2", "x3", "x4", "x5", "x6"],
         ordering = Singular.ordering_M(StartOrd),
     )
@@ -196,7 +287,7 @@ function eco7()
     example = "eco7"
     StartOrd = ordering_as_matrix(:degrevlex, dim)
     R, (x1, x2, x3, x4, x5, x6) = Singular.PolynomialRing(
-        Singular.QQ,
+        Singular.N_ZpField(32003),
         ["x1", "x2", "x3", "x4", "x5", "x6"],
         ordering = Singular.ordering_M(StartOrd),
     )
@@ -225,7 +316,7 @@ function noon5()
     example = "noon5"
     StartOrd = ordering_as_matrix(:degrevlex, dim)
     R, (x1, x2, x3, x4, x5) = Singular.PolynomialRing(
-        Singular.QQ,
+        Singular.N_ZpField(32003),
         ["x1", "x2", "x3", "x4", "x5"],
         ordering = Singular.ordering_M(StartOrd),
     )
@@ -255,7 +346,7 @@ function noon6()
     example = "noon6"
     StartOrd = ordering_as_matrix(:degrevlex, dim)
     R, (x1, x2, x3, x4, x5, x6) = Singular.PolynomialRing(
-        Singular.QQ,
+        Singular.N_ZpField(32003),
         ["x1", "x2", "x3", "x4", "x5", "x6"],
         ordering = Singular.ordering_M(StartOrd),
     )
@@ -306,7 +397,7 @@ function noon7()
     example = "noon7"
     StartOrd = ordering_as_matrix(:degrevlex, dim)
     R, (x1, x2, x3, x4, x5, x6, x7) = Singular.PolynomialRing(
-        Singular.QQ,
+        Singular.N_ZpField(32003),
         ["x1", "x2", "x3", "x4", "x5", "x6", "x7"],
         ordering = Singular.ordering_M(StartOrd),
     )
@@ -471,7 +562,7 @@ function redeco8()
     example = "redeco8"
     StartOrd = ordering_as_matrix(:degrevlex, dim)
     R, (x1, x2, x3, x4, u8, x5, x6, x7) = Singular.PolynomialRing(
-        Singular.QQ,
+        Singular.N_ZpField(32003),
         ["x1", "x2", "x3", "x4", "u8", "x5", "x6", "x7"],
         ordering = Singular.ordering_M(StartOrd),
     )
@@ -494,7 +585,7 @@ function wang91()
     example = "Wang-91"
     StartOrd = ordering_as_matrix(:degrevlex, dim)
     R, (x3, x2, x1, x0, b, a) = Singular.PolynomialRing(
-        Singular.QQ,
+        Singular.N_ZpField(32003),
         ["x3", "x2", "x1", "x0", "b", "a"],
         ordering = Singular.ordering_M(StartOrd),
     )
@@ -513,7 +604,7 @@ function cohn4()
     example = "cohn4"
     StartOrd = ordering_as_matrix(:degrevlex, dim)
     R, (x, y, z, t) = Singular.PolynomialRing(
-        Singular.QQ,
+        Singular.N_ZpField(32003),
         ["x", "y", "z", "t"],
         ordering = Singular.ordering_M(StartOrd),
     )
@@ -568,7 +659,7 @@ function oberfr()
     example = "Oberfranz"
     StartOrd = ordering_as_matrix(:degrevlex, dim)
     R, (x1, x2, x3) = Singular.PolynomialRing(
-        Singular.QQ,
+        Singular.N_ZpField(32003),
         ["x1", "x2", "x3"],
         ordering = Singular.ordering_M(StartOrd),
     )
@@ -584,7 +675,7 @@ function trinks1()
     example = "trinks1"
     StartOrd = ordering_as_matrix(:degrevlex, dim)
     R, (x, y, z, t, u, v) = Singular.PolynomialRing(
-        Singular.QQ,
+        Singular.N_ZpField(32003),
         ["x", "y", "z", "t", "u", "v"],
         ordering = Singular.ordering_M(StartOrd),
     )
@@ -664,4 +755,37 @@ function ex2()
             4 * d,
         ],
     )
+end
+
+function v3g7d50()
+
+    dim = 3
+    ve = [1, 1, 1]
+    StartOrd = ordering_as_matrix(:degrevlex, dim)
+    TarOrd = ordering_as_matrix(:lex, dim)
+    R, (a, b, c) = Singular.PolynomialRing(
+        Singular.N_ZpField(32003),
+        ["a", "b", "c"],
+        ordering = Singular.ordering_M(StartOrd),
+    )
+
+    S = change_order(R, TarOrd)
+    return Singular.Ideal(R,[5*a^7+4*a^5*b^2+2*a^3*b^4+5*a^2*b^5+4*b^7+5*a^3*b^3*c+3*a^2*b^4*c+4*a^5*c^2+5*a^2*b^3*c^2+5*a^4*c^3+a^3*b*c^3+2*a^2*b^2*c^3+3*a*b^3*c^3+4*a^2*c^5+5*a*b*c^5+b^2*c^5+a^6+3*a^4*b^2+4*a*b^5+3*a^5*c+3*a*b^4*c+5*a^3*b*c^2+2*a^3*c^3+5*a^2*b*c^3+2*a^2*c^4+2*b^2*c^4+a*c^5+2*b*c^5+2*c^6+3*a^3*b^2+a*b^4+5*a*b^3*c+4*a^2*b*c^2+a*b^2*c^2+a^2*c^3+5*a*c^4+4*c^5+2*a^3*b+2*b^4+4*a*b^2*c+3*a*b*c^2+5*b*c^3+2*a*b^2+5*b^2*c+5*a*c^2+5*c^3+3*a^2+a*c+b*c+2*c^2+a+2*c,4*a^6*b+4*a^5*b^2+3*a^4*b^3+4*a^3*b^4+5*a*b^6+4*a^6*c+4*a^4*b^2*c+5*a^4*b*c^2+a^3*b^2*c^2+4*a^2*b^3*c^2+a^4*c^3+5*a^3*b*c^3+4*b^4*c^3+3*a^2*b*c^4+a*b^2*c^4+3*b^3*c^4+4*a^2*c^5+5*a*b*c^5+3*a*c^6+c^7+3*a^5*b+2*a^3*b^3+5*a^2*b^4+3*b^6+a^5*c+5*a^4*b*c+4*a^2*b^3*c+5*b^5*c+a^4*c^2+4*a^3*b*c^2+4*a^2*b^2*c^2+4*a^3*c^3+4*a^2*b*c^3+4*b^3*c^3+3*a^2*c^4+a^5+5*a^2*b^3+4*a*b^4+5*b^5+5*a^4*c+5*a^2*b^2*c+4*b^4*c+4*a^3*c^2+3*a^2*b*c^2+5*b^3*c^2+3*a^2*c^3+4*b^2*c^3+3*c^5+5*a^4+2*a^3*b+b^4+2*a^3*c+3*a^2*b*c+4*a*b^2*c+2*b^3*c+4*a^2*c^2+3*b^2*c^2+2*c^4+3*a^3+3*b^3+a*b*c+2*b^2*c+2*a*c^2+c^3+2*b^2+4*a*c+5*a+5])
+end
+
+function v4g3()
+
+    dim = 4
+    ve = [1, 1, 1, 1]
+    StartOrd = ordering_as_matrix(:degrevlex, dim)
+    TarOrd = ordering_as_matrix(:lex, dim)
+    R, (a, b, c, d) = Singular.PolynomialRing(
+        Singular.N_ZpField(32003),
+        ["a", "b", "c", "d"],
+        ordering = Singular.ordering_M(StartOrd),
+    )
+
+    S = change_order(R, TarOrd)
+    return Singular.Ideal(R,[3*a^3+3*a^2*b+5*a*b^2+2*b^3+a^2*c+2*b^2*c+3*a*c^2+3*a^2*d+5*b^2*d+3*a*c*d+a*d^2+b*d^2+3*c*d^2+5*d^3+4*b^2+3*a*c+5*b*c+3*c^2+4*a*d+2*b*d+c*d+d^2+4*a+4*b+c,3*a^2*b+5*a*b^2+2*a^2*c+5*a*b*c+4*b^2*c+4*a*c^2+5*c^3+5*a^2*d+a*b*d+4*b^2*d+2*a*c*d+3*b*c*d+4*c^2*d+5*b*d^2+4*a*b+3*b^2+2*a*c+5*c^2+5*a*d+2*d^2+4*a+5*c
+])
 end
