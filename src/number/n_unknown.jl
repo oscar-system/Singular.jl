@@ -515,9 +515,9 @@ end # for (rw, rew) in
 
 CoefficientRingID = Dict{Nemo.Ring, Any}()
 
-# We wrap everything into an N_Field or N_Ring.
-# But if the ring or the element type is mutable, we have to wrap them first
-# into something mutable (RingWrapper and FieldWrapper)
+# We wrap everything into an N_Field or N_Ring. If either the ring type or the
+# element type is immutable, we have to wrap both into something mutable, i.e
+# RingWrapper/FieldWrapper and RingElemWrapper/FieldElemWrapper.
 #
 # To keep it type stable, we use a @generated function to treat being mutable
 # as a property available at compile time.

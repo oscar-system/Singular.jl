@@ -590,3 +590,15 @@ end
    # causing a dimension mismatch
 end
 
+@testset "sideal.hilbert_series" begin
+   R, (x, y, z) = PolynomialRing(Fp(32003), ["x", "y", "z"])
+   p = hilbert_series(std(Ideal(R, x^2, y^2, z^2)))
+   pop!(p)
+   @test p == [1,0,-3,0,3,0,-1]
+
+   R, (x, y, z) = PolynomialRing(Fp(32003), ["x", "y", "z"])
+   p = hilbert_series(std(Ideal(R, x, y, z)), [1, 2, 3])
+   pop!(p)
+   @test p == [1,-1,-1,0,1,1,-1]
+end
+
