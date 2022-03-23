@@ -1,6 +1,6 @@
 include("GroebnerWalkUtilitys.jl")
 
-
+# computes the representation of the matrixorder defined by T.
 function representation_vector(G::Singular.sideal, T::Matrix{Int})
     n = size(T)[1]
     M = 0
@@ -24,10 +24,10 @@ function representation_vector(G::Singular.sideal, T::Matrix{Int})
     for i = 2:n
         w = w + d^(n - i) * T[i, :]
     end
-    println(w)
     return w
 end
 
+# checks if Gw is an initialform of an ideal corresponding to a face of the Groebner fan with dimension less than n-1.
 function inSeveralCones(Gw::Vector{spoly{L}}) where {L<:Nemo.RingElem}
     counter = 0
     for g in Gw

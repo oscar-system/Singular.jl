@@ -11,7 +11,6 @@ include("Examples.jl")
             ordering = Singular.ordering_M(ordering_as_matrix(:degrevlex, 3)),
         )
 
-
         f1 = 3 * x^2 + 16 * x^2 * z + 14 * x^2 * y^3
         f2 = y^3 * z + 17 * x^2 * z^2 + 7 * x^2 * y^2 * z^2 + 13 * x^3 * z^2
         I = Singular.Ideal(R, [f1, f2])
@@ -46,7 +45,6 @@ include("Examples.jl")
 
         @test deg(f1, 3) == 5
 
-
         id = trinks1()
         R = base_ring(id)
         dim = nvars(R)
@@ -64,9 +62,8 @@ include("Examples.jl")
         @test pertubed_vector(I, TarOrd, 3) == [49, 7, 1, 0, 0, 0]
         @test pertubed_vector(I, TarOrd, 4) == [1000, 100, 10, 1, 0, 0]
 
-        @test inCone(I, StartOrd, [1000, 1000, 1000, 999, 990, 900]) == true
-        @test inCone(I, StartOrd, [100, 1000, 1000, 999, 990, 900]) == false
-
+        @test inCone(I, [1000, 1000, 1000, 999, 990, 900]) == true
+        @test inCone(I, [100, 1000, 1000, 999, 990, 900]) == false
 
         @test dot([1, 2, 3, 4], [2, 2, 2, 2]) == 20
 
@@ -89,14 +86,12 @@ include("Examples.jl")
         f2 = y^3
         K = Singular.Ideal(R, [f1, f2])
 
-
         @test ismonomial(gens(I)) == false
         @test ismonomial(gens(J)) == true
         @test isbinomial(gens(I)) == true
         @test isbinomial(gens(J)) == true
         @test isbinomial(gens(K)) == false
         @test ismonomial(gens(K)) == false
-
     end
 
     @testset "Testing GenericWalkUtilitys" begin
@@ -105,7 +100,6 @@ include("Examples.jl")
             ["x", "y"],
             ordering = Singular.ordering_M(ordering_as_matrix(:degrevlex, 2)),
         )
-
 
         f1 = x^2 - y^3
         f2 = x^3 - y^2 - x
@@ -188,7 +182,6 @@ include("Examples.jl")
         f3 = R(a^2 * b^4 + c^2 + a^3 * 4 + a * e^3)
         f4 = R(0)
 
-
         @test (reduce(f3, I)) ==
               reduce_walk(f3, gens(I), [Singular.leading_term(g) for g in gens(I)])
         @test (reduce(f1, I)) ==
@@ -198,6 +191,7 @@ include("Examples.jl")
         @test (reduce(f4, I)) ==
               reduce_walk(f4, gens(I), [Singular.leading_term(g) for g in gens(I)])
         J = Singular.std(J)
+        
         @test equalitytest(
             Singular.std(J, complete_reduction = true),
             Singular.Ideal(

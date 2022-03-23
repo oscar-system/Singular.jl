@@ -86,12 +86,14 @@ function change_weight_vector(w::Vector{Int}, M::Matrix{Int})
         M[2:length(w), :]
     ]
 end
+
 function insert_weight_vector(w::Vector{Int}, M::Matrix{Int})
     return [
         w'
         M[1:length(w)-1, :]
     ]
 end
+
 function add_weight_vector(w::Vector{Int}, M::Matrix{Int})
     return [
         w'
@@ -125,7 +127,6 @@ function ordering_as_matrix(ord::Symbol, nvars::Int)
     end
 end
 
-
 function deg(p::Singular.spoly, n::Int)
     max = 0
     for mon in Singular.monomials(p)
@@ -152,4 +153,13 @@ function check_ordering_M(S::Matrix{Int}, T::Matrix{Int}, G::Singular.sideal)
         rank(T) == nvars(base_ring(G)) &&
         rank(S) == nvars(base_ring(G))
     )
+end
+
+function checkInt32(w::Vector{Int})
+    for i = 1:length(w)
+        if tryparse(Int32, string(w[i])) == nothing
+            return false
+        end
+    end
+    return true
 end

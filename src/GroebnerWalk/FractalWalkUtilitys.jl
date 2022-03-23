@@ -1,14 +1,11 @@
 include("GroebnerWalkUtilitys.jl")
 
-#=
-@doc Markdown.doc"""
-function lift_fractal_walk(
-G::Singular.sideal,
-H::Singular.sideal,
-Rn::Singular.PolyRing,
-)
-Performs a lifting step in the Fractal Walk.
-"""=#
+#################################################################
+# Procedures of the fractal walk.
+# The fractal walk is proposed by Amrhein & Gloor (1998)
+#################################################################
+
+#Performs a lifting step in the Fractal Walk.
 function lift_fractal_walk(
     G::Singular.sideal,
     H::Singular.sideal,
@@ -28,13 +25,7 @@ function lift_fractal_walk(
     return G
 end
 
-#=
-@doc Markdown.doc"""
-function ismonomial(
-Gw::Vector{spoly{L}},
-) where {L<:Nemo.RingElem}
-Returns ´true´ if all polynomials of the given array are monomials.
-"""=#
+# returns ´true´ if all polynomials of the given array are monomials.
 function ismonomial(Gw::Vector{spoly{L}}) where {L<:Nemo.RingElem}
     for g in Gw
         if length(Singular.coefficients(g)) > 1
@@ -44,13 +35,7 @@ function ismonomial(Gw::Vector{spoly{L}}) where {L<:Nemo.RingElem}
     return true
 end
 
-#=
-@doc Markdown.doc"""
-function isbinomial(
-Gw::Vector{spoly{L}},
-)
-Returns ´true´ if all polynomials of the given array are binomials or less.
-"""=#
+# returns ´true´ if all polynomials of the given array are binomials or less.
 function isbinomial(Gw::Vector{spoly{L}}) where {L<:Nemo.RingElem}
     for g in Gw
         if length(Singular.coefficients(g)) > 2
@@ -60,16 +45,7 @@ function isbinomial(Gw::Vector{spoly{L}}) where {L<:Nemo.RingElem}
     return true
 end
 
-
-#=
-@doc Markdown.doc"""
-function nextT(
-    G::Singular.sideal,
-    w::Array{T,1},
-    tw::Array{K,1},
-) where {T<:Number,K<:Number}
-Returns the next t to compute the next weight vector $w(t) = w + t * (tw - w)$ like it´s done in Amrhein & Gloor (1998)
-"""=#
+# returns the next t to compute the next weight vector w(t) = w + t * (tw - w) like it´s done in Amrhein & Gloor (1998). This Method is NOT tested sufficiently.
 function nextT(
     G::Singular.sideal,
     w::Array{T,1},
@@ -100,15 +76,7 @@ function nextT(
     end
 end
 
-#=
-@doc Markdown.doc"""
-function next_weightfr(
-    G::Singular.sideal,
-    cweight::Array{T,1},
-    tweight::Array{K,1},
-) where {T<:Number,K<:Number}
-Returns the next t to compute the next weight vector $w(t) = w + t * (tw - w)$ like it´s done in Fukuda et al. (2005).
-"""=#
+# returns the next t to compute the next weight vector w(t) = w + t * (tw - w) like it´s done in Cox, Little & O'Sheao (2005).
 function next_weightfr(
     G::Singular.sideal,
     cweight::Array{T,1},
@@ -128,25 +96,21 @@ function next_weightfr(
             end
         end
     end
-    return BigInt(numerator(tmin))//BigInt(denominator(tmin))
+
+    # BigInt is needed to prevent overflows in the conversion of the weight vectors.
+    return BigInt(numerator(tmin)) // BigInt(denominator(tmin))
 end
 
-#=
-@doc Markdown.doc"""
+# returns 'true' if the leading tems of G w.r.t the matrixordering T are the same as the leading terms of G w.r.t the weighted monomial ordering with weight vector of pvecs[p] (pvecs[p-1]) and the Matrixordering T.
 function inCone(
     G::Singular.sideal,
     T::Matrix{Int},
     pvecs::Vector{Vector{Int}},
     p::Int,
 )
-Returns 'true' if the leading tems of $G$ w.r.t the matrixordering $T$ are the same as the leading terms of $G$ w.r.t the weighted monomial ordering with weight vector of pvecs[p] (pvecs[p-1]) and the Matrixordering $T$.
-"""=#
-function inCone(
-    G::Singular.sideal,
-    T::Matrix{Int},
-    pvecs::Vector{Vector{Int}},
-    p::Int,
-)
+    if p == 1
+        return true
+    end
     R = change_order(G.base_ring, T)
     cvzip = zip(
         Singular.gens(G),
@@ -154,8 +118,14 @@ function inCone(
         initials(R, Singular.gens(G), pvecs[p]),
     )
     for (g, in, in2) in cvzip
-        if !isequal(Singular.leading_exponent_vector(change_ring(g, R)), Singular.leading_exponent_vector(in)) ||
-           !isequal(Singular.leading_exponent_vector(change_ring(g, R)), Singular.leading_exponent_vector(in2))
+        if !isequal(
+            Singular.leading_exponent_vector(change_ring(g, R)),
+            Singular.leading_exponent_vector(in),
+        ) ||
+           !isequal(
+            Singular.leading_exponent_vector(change_ring(g, R)),
+            Singular.leading_exponent_vector(in2),
+        )
             return false
         end
     end
