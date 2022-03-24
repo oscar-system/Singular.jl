@@ -13,14 +13,14 @@ export groebnerwalk
 ###############################################################
 
 #=
-Compute a reduced Groebner basis w.r.t. to a monomial ordering by converting it using the Groebner Walk.
+Compute a reduced Groebner basis w.r.t. to a monomial order by converting it using the Groebner Walk.
 The Groebner Walk is proposed by Collart, Kalkbrener & Mall (1997).
 One can choose a strategy of:
 Standard Walk (:standard) computes the Walk like it´s presented in Cox, Little & O´Shea (2005).
-Generic Walk (:generic) computes the Walk like it´s presented in Fukuda, Lauritzen Thomas (2005).
+Generic Walk (:generic) computes the Walk like it´s presented in Fukuda, Jensen, Lauritzen & Thomas (2005).
 Pertubed Walk (:pertubed, with p = degree of the pertubation) computes the Walk like it´s presented in Amrhein, Gloor & Küchlin (1997).
 Tran´s Walk (:tran) computes the Walk like it´s presented in Tran (2000).
-Fractal Walk (:fractalcombined) computes the Walk like it´s presented in Amrhein & Gloor (1998) with multiple extensions. The target order has to be lex. This version uses the Buchberger Algorithm to skip weightvectors with entries bigger than Int32.
+Fractal Walk (:fractalcombined) computes the Walk like it´s presented in Amrhein & Gloor (1998) with multiple extensions. The target order has to be lex. This version uses the Buchberger Algorithm to skip weight vectors with entries bigger than Int32.
 Fractal Walk (:fractal) computes the Walk like it´s presented in Amrhein & Gloor (1998). Pertubes only the target vector.
 
 #Arguments
@@ -50,7 +50,7 @@ function groebnerwalk(
 )
     R = change_order(
         base_ring(G),
-        ordering_as_matrix(startOrder, nvars(base_ring(G))),
+        order_as_matrix(startOrder, nvars(base_ring(G))),
     )
     Gb = std(
         Singular.Ideal(R, [change_ring(x, R) for x in gens(G)]),
@@ -59,8 +59,8 @@ function groebnerwalk(
 
     return groebnerwalk(
         Gb,
-        ordering_as_matrix(startOrder, nvars(R)),
-        ordering_as_matrix(targetOrder, nvars(R)),
+        order_as_matrix(startOrder, nvars(R)),
+        order_as_matrix(targetOrder, nvars(R)),
         walktype,
         pertubationDegree,
         infoLevel,
@@ -68,20 +68,20 @@ function groebnerwalk(
 end
 
 #=
-Computes a reduced Groebner basis w.r.t. the monomial order T by converting the reduced Groebner basis G w.r.t. the monomial ordering S using the Groebner Walk.
+Computes a reduced Groebner basis w.r.t. the monomial order T by converting the reduced Groebner basis G w.r.t. the monomial order S using the Groebner Walk.
 One can choose a strategy of:
 Standard Walk (:standard) computes the Walk like it´s presented in Cox et al. (2005).
-Generic Walk (:generic) computes the Walk like it´s presented in Fukuda et al. (2006).
+Generic Walk (:generic) computes the Walk like it´s presented in Fukuda et al. (2005).
 Pertubed Walk (:pertubed, with p = degree of the pertubation) computes the Walk like it´s presented in Amrhein et al. (1997).
 Tran´s Walk (:tran) computes the Walk like it´s presented in Tran (2000).
 Fractal Walk (:fractal) computes the Walk like it´s presented in Amrhein & Gloor (1998). Pertubes only the target vector.
 Fractal Walk (:fractalcombined) computes the Walk like it´s presented in Amrhein & Gloor (1998) with multiple extensions. The target order has to be lex. This version uses the Buchberger Algorithm to skip weightvectors with entries bigger than Int32.
 
 #Arguments
-*`G::Singular.sideal`: Gröbnerbasis to convert to the Gröbnerbasis w.r.t. the traget-ordering.
-*`S::Matrix{Int}`: The start ordering w.r.t. the Gröbnerbasis I. Note that S has to be a nxn-matrix with rank(S)=n.
-*`T::Matrix{Int}`: The target ordering we want to compute a Gröbnerbasis for. Note that T has to be a nxn-matrix with rank(T)=n.
-*`grwalktype::Symbol=:standard`: Strategy of the Gröbnerwalk to be used. There are the strategies:
+*`G::Singular.sideal`: Groebner basis to convert to the Groebner basis w.r.t. the traget-order.
+*`S::Matrix{Int}`: The start order w.r.t. the Groebner basis I. Note that S has to be a nxn-matrix with rank(S)=n.
+*`T::Matrix{Int}`: The target order we want to compute a Groebner basis for. Note that T has to be a nxn-matrix with rank(T)=n.
+*`grwalktype::Symbol=:standard`: Strategy of the Groebner Walk to be used. There are the strategies:
     - `standard`: Standard Walk (default),
     - `pertubed`: Pertubed Walk,
     - `tran`: Tran´s Walk,
@@ -122,7 +122,7 @@ function groebnerwalk(
         walk = (x) -> fractal_walk_combined(x, S, T, infoLevel)
     end
 
-    !check_ordering_M(S, T, G) && throw(
+    !check_order_M(S, T, G) && throw(
         error(
             "The matrices representing the monomial order have to be nxn-matrices with full rank.",
         ),
@@ -258,6 +258,7 @@ function generic_walk(
     if infoLevel >= 1
         println("Cones crossed: ", counter)
     end
+    # to generate the same coefficients as Singular.std does. This version of the generic walk computes LC(g)=1 for all g \in G.
     return Singular.interreduce(G)
 end
 
@@ -342,7 +343,7 @@ firstStepMode = false
 ###############################################################
 # Combined version of the extensions of the Fractal Walk.
 # This version
-# - checks if the starting weight vector represents the ordering and pertubes it if necessary.
+# - checks if the starting weight vector represents the order and pertubes it if necessary.
 # - analyses the Groebner basis Gw of the initialforms and uses the Buchberger-algorithm if the generators of Gw are binomial or less.
 # - skips a step in top level in the last step.
 # - checks if an entry of an intermediate weight vector is bigger than int32. In case of that the Buchberger-Algorithm is used to compute the Groebner basis of the ideal of the initialforms.
@@ -412,7 +413,7 @@ function fractal_walk_combined(
                     global pTargetWeights =
                         [pertubed_vector(G, T, i) for i = 1:nvars(R)]
                     if infoLevel >= 1
-                        println("depth $p: not in cone ", TargetWeights[p], ".")
+                        println("depth $p: not in cone ",pTargetWeights[p], ".")
                     end
                 end
                 return G
@@ -427,7 +428,7 @@ function fractal_walk_combined(
             global pTargetWeights =
                 [pertubed_vector(G, T, i) for i = 1:nvars(R)]
             if infoLevel >= 1
-                println("depth $p: not in cone ", TargetWeights[p], ".")
+                println("depth $p: not in cone ",pTargetWeights[p], ".")
             end
             continue
         end
@@ -470,7 +471,7 @@ function fractal_walk_combined(
                         if infoLevel >= 1
                             println(
                                 "depth $p: not in cone ",
-                                TargetWeights[p],
+                               pTargetWeights[p],
                                 ".",
                             )
                         end
@@ -572,7 +573,7 @@ function fractal_recursiv(
                     global pTargetWeights =
                         [pertubed_vector(G, T, i) for i = 1:nvars(R)]
                     if infoLevel >= 1
-                        println("depth $p: not in cone ", TargetWeights[p], ".")
+                        println("depth $p: not in cone ",pTargetWeights[p], ".")
                     end
                 end
                 return G
@@ -580,14 +581,14 @@ function fractal_recursiv(
         elseif t == [0] # The Groebner basis w.r.t. the target weight and T is already computed.
             if inCone(G, T, pTargetWeights, p)
                 if infoLevel >= 1
-                    println("depth $p: in cone ", TargetWeights[p], ".")
+                    println("depth $p: in cone ",pTargetWeights[p], ".")
                 end
                 return G
             end
             global pTargetWeights =
                 [pertubed_vector(G, T, i) for i = 1:nvars(R)]
             if infoLevel >= 1
-                println("depth $p: not in cone ", TargetWeights[p], ".")
+                println("depth $p: not in cone ",pTargetWeights[p], ".")
             end
             continue
         end
@@ -610,7 +611,7 @@ function fractal_recursiv(
                     global pTargetWeights =
                         [pertubed_vector(G, T, i) for i = 1:nvars(R)]
                     if infoLevel >= 1
-                        println("depth $p: not in cone ", TargetWeights[p], ".")
+                        println("depth $p: not in cone ",pTargetWeights[p], ".")
                     end
                 end
                 return G
@@ -727,7 +728,7 @@ function fractal_walk_recursiv_startorder(
                     global pTargetWeights =
                         [pertubed_vector(G, T, i) for i = 1:nvars(R)]
                     if infoLevel >= 1
-                        println("depth $p: not in cone ", TargetWeights[p], ".")
+                        println("depth $p: not in cone ",pTargetWeights[p], ".")
                     end
                 end
                 return G
@@ -735,14 +736,14 @@ function fractal_walk_recursiv_startorder(
         elseif t == [0] # The Groebner basis w.r.t. the target weight and T is already computed.
             if inCone(G, T, pTargetWeights, p)
                 if infoLevel >= 1
-                    println("depth $p: in cone ", TargetWeights[p], ".")
+                    println("depth $p: in cone ",pTargetWeights[p], ".")
                 end
                 return G
             end
             global pTargetWeights =
                 [pertubed_vector(G, T, i) for i = 1:nvars(R)]
             if infoLevel >= 1
-                println("depth $p: not in cone ", TargetWeights[p], ".")
+                println("depth $p: not in cone ",pTargetWeights[p], ".")
             end
             continue
         end
@@ -765,7 +766,7 @@ function fractal_walk_recursiv_startorder(
                     global pTargetWeights =
                         [pertubed_vector(G, T, i) for i = 1:nvars(R)]
                     if infoLevel >= 1
-                        println("depth $p: not in cone ", TargetWeights[p], ".")
+                        println("depth $p: not in cone ",pTargetWeights[p], ".")
                     end
                 end
                 return G
@@ -872,7 +873,7 @@ function fractal_walk_recursive_lex(
                     global pTargetWeights =
                         [pertubed_vector(G, T, i) for i = 1:nvars(R)]
                     if infoLevel >= 1
-                        println("depth $p: not in cone ", TargetWeights[p], ".")
+                        println("depth $p: not in cone ",pTargetWeights[p], ".")
                     end
                 end
                 return G
@@ -880,14 +881,14 @@ function fractal_walk_recursive_lex(
         elseif t == [0] # The Groebner basis w.r.t. the target weight and T is already computed.
             if inCone(G, T, pTargetWeights, p)
                 if infoLevel >= 1
-                    println("depth $p: in cone ", TargetWeights[p], ".")
+                    println("depth $p: in cone ",pTargetWeights[p], ".")
                 end
                 return G
             end
             global pTargetWeights =
                 [pertubed_vector(G, T, i) for i = 1:nvars(R)]
             if infoLevel >= 1
-                println("depth $p: not in cone ", TargetWeights[p], ".")
+                println("depth $p: not in cone ",pTargetWeights[p], ".")
             end
             continue
         end
@@ -927,7 +928,7 @@ function fractal_walk_recursive_lex(
                         if infoLevel >= 1
                             println(
                                 "depth $p: not in cone ",
-                                TargetWeights[p],
+                               pTargetWeights[p],
                                 ".",
                             )
                         end
@@ -1036,7 +1037,7 @@ function fractal_walk_look_ahead_recursiv(
                     global pTargetWeights =
                         [pertubed_vector(G, T, i) for i = 1:nvars(R)]
                     if infoLevel >= 1
-                        println("depth $p: not in cone ", TargetWeights[p], ".")
+                        println("depth $p: not in cone ",pTargetWeights[p], ".")
                     end
                 end
                 return G
@@ -1044,14 +1045,14 @@ function fractal_walk_look_ahead_recursiv(
         elseif t == [0] # The Groebner basis w.r.t. the target weight and T is already computed.
             if inCone(G, T, pTargetWeights, p)
                 if infoLevel >= 1
-                    println("depth $p: in cone ", TargetWeights[p], ".")
+                    println("depth $p: in cone ",pTargetWeights[p], ".")
                 end
                 return G
             end
             global pTargetWeights =
                 [pertubed_vector(G, T, i) for i = 1:nvars(R)]
             if infoLevel >= 1
-                println("depth $p: not in cone ", TargetWeights[p], ".")
+                println("depth $p: not in cone ",pTargetWeights[p], ".")
             end
             continue
         end
@@ -1074,7 +1075,7 @@ function fractal_walk_look_ahead_recursiv(
                     global pTargetWeights =
                         [pertubed_vector(G, T, i) for i = 1:nvars(R)]
                     if infoLevel >= 1
-                        println("depth $p: not in cone ", TargetWeights[p], ".")
+                        println("depth $p: not in cone ",pTargetWeights[p], ".")
                     end
                 end
                 return G

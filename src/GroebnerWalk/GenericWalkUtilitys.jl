@@ -91,22 +91,11 @@ function lift_generic(
     return liftPolys, Newlm
 end
 
-# returns all v\in V if v>0 w.r.t. the ordering represented by S.
-function filter_btz(S::Matrix{Int}, V::Vector{Vector{Int}})
+# returns all v \in V if v<0 w.r.t. the ordering represented by T and v>0 w.r.t the ordering represented by S.
+function filter_by_ordering(S::Matrix{Int},T::Matrix{Int}, V::Vector{Vector{Int}})
     btz = Set{Vector{Int}}()
     for v in V
-        if bigger_than_zero(S, v)
-            push!(btz, v)
-        end
-    end
-    return btz
-end
-
-# returns all v \in V if v<0 w.r.t. the ordering represented by S.
-function filter_ltz(S::Matrix{Int}, V::Set{Vector{Int}})
-    btz = Set{Vector{Int}}()
-    for v in V
-        if less_than_zero(S, v)
+        if less_than_zero(T, v) && bigger_than_zero(S, v)
             push!(btz, v)
         end
     end
@@ -137,8 +126,7 @@ function next_gamma(
     S::Matrix{Int},
     T::Matrix{Int},
 ) where {L<:Nemo.RingElem}
-    V = filter_btz(S, difference_lead_tail(G, Lm))
-    V = filter_ltz(T, V)
+    V = filter_by_ordering(S, T, difference_lead_tail(G, Lm))
     if (w != [0])
         V = filter_lf(w, S, T, V)
     end

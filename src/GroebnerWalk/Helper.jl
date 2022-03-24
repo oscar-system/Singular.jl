@@ -47,7 +47,7 @@ function dot(v::Vector{Int}, w::Vector{Int})
     return sum
 end
 
-function ordering_as_matrix(w::Vector{Int}, ord::Symbol)
+function order_as_matrix(w::Vector{Int}, ord::Symbol)
     if length(w) > 2
         if ord == :lex
             return [
@@ -101,7 +101,7 @@ function add_weight_vector(w::Vector{Int}, M::Matrix{Int})
     ]
 end
 
-function ordering_as_matrix(ord::Symbol, nvars::Int)
+function order_as_matrix(ord::Symbol, nvars::Int)
     if ord == :lex
         return ident_matrix(nvars)
     end
@@ -144,7 +144,7 @@ function deg(p::Singular.spoly, n::Int)
     return max
 end
 
-function check_ordering_M(S::Matrix{Int}, T::Matrix{Int}, G::Singular.sideal)
+function check_order_M(S::Matrix{Int}, T::Matrix{Int}, G::Singular.sideal)
     (nrows, ncols) = size(T)
     return (
         (nrows, ncols) == size(S) &&
