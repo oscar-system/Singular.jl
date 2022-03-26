@@ -2,10 +2,10 @@ include("GroebnerWalkUtilitys.jl")
 
 #################################################################
 # Procedures of the fractal walk.
-# The fractal walk is proposed by Amrhein & Gloor (1998)
+# The fractal walk is proposed by Amrhein & Gloor (1998).
 #################################################################
 
-#Performs a lifting step in the Fractal Walk.
+# lifts the Groebner basis G to the Groebner basis w.r.t. in the Fractal Walk like it´s done in Fukuda et. al (2005).
 function lift_fractal_walk(
     G::Singular.sideal,
     H::Singular.sideal,
@@ -101,7 +101,7 @@ function next_weightfr(
     return BigInt(numerator(tmin)) // BigInt(denominator(tmin))
 end
 
-# returns 'true' if the leading tems of G w.r.t the matrixordering T are the same as the leading terms of G w.r.t the weighted monomial ordering with weight vector of pvecs[p] (pvecs[p-1]) and the Matrixordering T.
+# returns 'true' if the leading terms of G w.r.t the matrixordering T are the same as the leading terms of G w.r.t the weighted monomial ordering with weight vector of pvecs[p] (pvecs[p-1]) and the matrixordering T.
 function inCone(
     G::Singular.sideal,
     T::Matrix{Int},

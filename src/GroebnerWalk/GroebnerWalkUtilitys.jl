@@ -2,7 +2,7 @@
 # Several Procedures for the Groebner Walk
 ###############################################################
 
-# Returns the next intermediate weight vector.
+# returns the next intermediate weight vector.
 function next_weight(
     G::Singular.sideal,
     cw::Vector{Int},
@@ -22,7 +22,7 @@ function next_weight(
     return convert_bounding_vector(cw + BigInt(numerator(tmin))//BigInt(denominator(tmin)) * (tw - cw))
 end
 
-# multiplys every entry of the given weight with 0.1 as long as it stays on the halfspace.
+# multiplys every entry of the given weight w with 0.1 as long as it stays on the same halfspace as w.
 function truncw(
     G::Singular.sideal,
     w::Vector{Int},
@@ -35,15 +35,15 @@ function truncw(
         end
         w = convert_bounding_vector(w)
         if inw != initials(R, gens(G), w)
-            #Initials are different - return not rounded weight
+            # initials are different - return unrounded weight
             return w, false
         end
     end
-    # Converted to Vector w of the same face
+    # converted to Vector w of the same face
     return w, true
 end
 
-#Returns the initialform of G w.r.t. the given weight vector.
+# returns the initialform of G w.r.t. the given weight vector.
 function initials(
     R::Singular.PolyRing,
     G::Vector{L},
@@ -86,7 +86,7 @@ function difference_lead_tail(I::Singular.sideal)
     return unique!(v)
 end
 
-# Computes a p-pertubed vector from M
+# computes a p-pertubed vector from the matrix M.
 function pertubed_vector(G::Singular.sideal, M::Matrix{Int}, p::Integer)
     m = Int[]
     n = size(M, 1)
@@ -119,7 +119,7 @@ function pertubed_vector(G::Singular.sideal, M::Matrix{Int}, p::Integer)
     return convert_bounding_vector(w)
 end
 
-#Returns 'true' if the leading terms of G w.r.t the matrixorder T are the same as the leading terms of G w.r.t the weighted monomial order with weight vector t and matrix T.
+# returns 'true' if the leading terms of G w.r.t the matrixorder T are the same as the leading terms of G w.r.t the weighted monomial order with weight vector t and matrix T.
 function inCone(G::Singular.sideal, T::Matrix{Int}, t::Vector{Int})
     R = change_order(G.base_ring, T)
     I = Singular.Ideal(R, [change_ring(x, R) for x in gens(G)])
@@ -132,7 +132,7 @@ function inCone(G::Singular.sideal, T::Matrix{Int}, t::Vector{Int})
     return true
 end
 
-#Returns 'true' if the leading tems of G w.r.t the matrixordering T are the same as the leading terms of G w.r.t the weighted monomial order with weight vector t and the matrix order T.
+# returns 'true' if the leading terms of G w.r.t the matrixordering T are the same as the leading terms of G w.r.t the weighted monomial order with weight vector t and the matrix order T.
 function inCone(G::Singular.sideal, t::Vector{Int})
     cvzip = zip(Singular.gens(G), initials(base_ring(G), Singular.gens(G), t))
     for (g, ing) in cvzip
@@ -143,7 +143,7 @@ function inCone(G::Singular.sideal, t::Vector{Int})
     return true
 end
 
-# Returns 'true' if the leading tems of G w.r.t the matrixordering T are the same as the leading terms of G with the current ordering.
+# returns 'true' if the leading terms of G w.r.t the matrixordering T are the same as the leading terms of G with the current ordering.
 function same_cone(G::Singular.sideal, T::Matrix{Int})
     R = change_order(G.base_ring, T)
     for g in gens(G)
@@ -154,7 +154,7 @@ function same_cone(G::Singular.sideal, T::Matrix{Int})
     return true
 end
 
-# Lifting step by Fukuda et al. (2005).
+# lifts the Groebner basis G to the Groebner basis w.r.t. the Ring Rn like it´s presented in Fukuda et al. (2005).
 function lift(
     G::Singular.sideal,
     R::Singular.PolyRing,
@@ -173,7 +173,7 @@ function lift(
     return G
 end
 
-# lifting step in the Groebner Walk by Collart et al. (1997).
+# lifts the Groebner basis G to the Groebner basis w.r.t. the Ring Rn like it´s done in Collart et al. (1997).
 function liftGW2(
     G::Singular.sideal,
     R::Singular.PolyRing,
@@ -249,7 +249,7 @@ function convert_bounding_vector(wtemp::Vector{T}) where {T<:Number}
     return w
 end
 
-# returns a copy of the PolynomialRing I, equipped with the ordering a(cw)*ordering_M(T)
+# returns a copy of the PolynomialRing I, equipped with the ordering a(cw)*ordering_M(T).
 function change_order(
     R::Singular.PolyRing,
     cw::Array{L,1},
@@ -288,7 +288,7 @@ function change_order(
     return S
 end
 
-# returns a copy of the PolynomialRing I, equipped with the ordering a(w)*a(t)*ordering_M(T)
+# returns a copy of the PolynomialRing I, equipped with the ordering a(w)*a(t)*ordering_M(T).
 function change_order(
     R::Singular.PolyRing,
     w::Vector{Int},
@@ -309,7 +309,7 @@ function change_order(
     return S
 end
 
-#returns a copy of the PolynomialRing I, equipped with the ordering ordering_M(T)
+# returns a copy of the PolynomialRing I, equipped with the ordering ordering_M(T).
 function change_order(
     R::Singular.PolyRing,
     M::Matrix{Int},

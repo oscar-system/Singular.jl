@@ -144,7 +144,7 @@ function deg(p::Singular.spoly, n::Int)
     return max
 end
 
-function check_ordering_M(S::Matrix{Int}, T::Matrix{Int}, G::Singular.sideal)
+function check_order_M(S::Matrix{Int}, T::Matrix{Int}, G::Singular.sideal)
     (nrows, ncols) = size(T)
     return (
         (nrows, ncols) == size(S) &&
