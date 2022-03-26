@@ -20,6 +20,7 @@ using Test
             push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :standard))
             #push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :tran))
             push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :fractal))
+            push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :fractal_start_order))
             push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :fractal_look_ahead))
             push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :fractal_lex))
             push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :fractal_combined))
@@ -55,6 +56,7 @@ using Test
             push!(ideals, groebnerwalk(I, ordering_as_matrix([1,3,1,3,1],:lex), ordering_as_matrix([1,0,0,0,2],:lex), :standard))
             #push!(ideals, groebnerwalk(I, ordering_as_matrix([1,3,1,3,1],:lex), ordering_as_matrix([1,0,0,0,2],:lex), :tran))
             push!(ideals, groebnerwalk(I, ordering_as_matrix([1,3,1,3,1],:lex), ordering_as_matrix([1,0,0,0,2],:lex), :fractal))
+            push!(ideals, groebnerwalk(I, ordering_as_matrix([1,3,1,3,1],:lex), ordering_as_matrix([1,0,0,0,2],:lex), :fractal_start_order))
             push!(ideals, groebnerwalk(I, ordering_as_matrix([1,3,1,3,1],:lex), ordering_as_matrix([1,0,0,0,2],:lex), :fractal_look_ahead))
             push!(ideals, groebnerwalk(I, ordering_as_matrix([1,3,1,3,1],:lex), ordering_as_matrix([1,0,0,0,2],:lex), :fractal_lex))
             push!(ideals, groebnerwalk(I, ordering_as_matrix([1,3,1,3,1],:lex), ordering_as_matrix([1,0,0,0,2],:lex), :fractal_combined))
@@ -90,6 +92,7 @@ using Test
             push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :standard))
             push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :tran))
             push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :fractal))
+            push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :fractal_start_order))
             push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :fractal_look_ahead))
             push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :fractal_lex))
             push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :fractal_combined))
@@ -127,9 +130,10 @@ using Test
             #push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :tran))
             push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :fractal))
             push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :fractal_look_ahead))
+            push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :fractal_start_order))
             push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :fractal_lex))
             push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :fractal_combined))
-            push!(ideals, groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :generic))
+            push!(ideals, groebnerwalk(I, :degrevlex, :lex, :generic))
 
             s = Singular.std(
                 Singular.Ideal(S, [change_ring(x, S) for x in Singular.gens(id)]),

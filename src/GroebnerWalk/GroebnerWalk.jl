@@ -20,7 +20,7 @@ Standard Walk (:standard) computes the Walk like it´s presented in Cox, Little 
 Generic Walk (:generic) computes the Walk like it´s presented in Fukuda, Jensen, Lauritzen & Thomas (2005).
 Pertubed Walk (:pertubed, with p = degree of the pertubation) computes the Walk like it´s presented in Amrhein, Gloor & Küchlin (1997).
 Tran´s Walk (:tran) computes the Walk like it´s presented in Tran (2000).
-Fractal Walk (:fractalcombined) computes the Walk like it´s presented in Amrhein & Gloor (1998) with multiple extensions. The target order has to be lex. This version uses the Buchberger Algorithm to skip weight vectors with entries bigger than Int32.
+Fractal Walk (:fractalcombined) computes the Walk like it´s presented in Amrhein & Gloor (1998) with multiple extensions. The target monomial order has to be lex. This version uses the Buchberger Algorithm to skip weight vectors with entries bigger than Int32.
 Fractal Walk (:fractal) computes the Walk like it´s presented in Amrhein & Gloor (1998). Pertubes only the target vector.
 
 #Arguments
@@ -33,7 +33,7 @@ Fractal Walk (:fractal) computes the Walk like it´s presented in Amrhein & Gloo
     - `tran`: Tran´s Walk,
     - `generic`: Generic Walk,
     - `fractal`: standard-version of the Fractal Walk,
-    - `fractalcombined`: combined Fractal Walk. Target order needs to be lex,
+    - `fractalcombined`: combined Fractal Walk. Target monomial order needs to be lex,
 *`pertubationDegree::Int=2`: pertubationdegree for the Pertubed Walk.
 *'infoLevel::Int=0':
     -'0': no printout,
@@ -50,7 +50,7 @@ function groebnerwalk(
 )
     R = change_order(
         base_ring(G),
-        order_as_matrix(startOrder, nvars(base_ring(G))),
+        ordering_as_matrix(startOrder, nvars(base_ring(G))),
     )
     Gb = std(
         Singular.Ideal(R, [change_ring(x, R) for x in gens(G)]),
@@ -59,8 +59,8 @@ function groebnerwalk(
 
     return groebnerwalk(
         Gb,
-        order_as_matrix(startOrder, nvars(R)),
-        order_as_matrix(targetOrder, nvars(R)),
+        ordering_as_matrix(startOrder, nvars(R)),
+        ordering_as_matrix(targetOrder, nvars(R)),
         walktype,
         pertubationDegree,
         infoLevel,
@@ -75,19 +75,19 @@ Generic Walk (:generic) computes the Walk like it´s presented in Fukuda et al. 
 Pertubed Walk (:pertubed, with p = degree of the pertubation) computes the Walk like it´s presented in Amrhein et al. (1997).
 Tran´s Walk (:tran) computes the Walk like it´s presented in Tran (2000).
 Fractal Walk (:fractal) computes the Walk like it´s presented in Amrhein & Gloor (1998). Pertubes only the target vector.
-Fractal Walk (:fractalcombined) computes the Walk like it´s presented in Amrhein & Gloor (1998) with multiple extensions. The target order has to be lex. This version uses the Buchberger Algorithm to skip weightvectors with entries bigger than Int32.
+Fractal Walk (:fractalcombined) computes the Walk like it´s presented in Amrhein & Gloor (1998) with multiple extensions. The target monomial order has to be lex. This version uses the Buchberger Algorithm to skip weightvectors with entries bigger than Int32.
 
 #Arguments
-*`G::Singular.sideal`: Groebner basis to convert to the Groebner basis w.r.t. the traget-order.
-*`S::Matrix{Int}`: The start order w.r.t. the Groebner basis I. Note that S has to be a nxn-matrix with rank(S)=n.
-*`T::Matrix{Int}`: The target order we want to compute a Groebner basis for. Note that T has to be a nxn-matrix with rank(T)=n.
+*`G::Singular.sideal`: Groebner basis to convert to the Groebner basis w.r.t. the target-order.
+*`S::Matrix{Int}`: The start monomial order w.r.t. the Groebner basis I. Note that S has to be a nxn-matrix with rank(S)=n.
+*`T::Matrix{Int}`: The target monomial order we want to compute a Groebner basis for. Note that T has to be a nxn-matrix with rank(T)=n.
 *`grwalktype::Symbol=:standard`: Strategy of the Groebner Walk to be used. There are the strategies:
     - `standard`: Standard Walk (default),
     - `pertubed`: Pertubed Walk,
     - `tran`: Tran´s Walk,
     - `generic`: Generic Walk,
     - `fractal`: standard-version of the Fractal Walk,
-    - `fractalcombined`: combined Fractal Walk. Target order needs to be lex,
+    - `fractalcombined`: combined Fractal Walk. The target monomial order needs to be lex,
 *`p::Int=2`: Pertubationdegree for the pertubed Walk.
 *'infoLevel::Int=0':
     -'0': no printout,
@@ -130,11 +130,32 @@ function groebnerwalk(
 
     R = base_ring(G)
     Gb = walk(Singular.Ideal(R, [R(x) for x in gens(G)]))
+
+    if infoLevel >= 1
+        println("Cones crossed: ", delete_counter())
+    end
+
     S = change_order(R, T)
     return Singular.Ideal(S, [change_ring(gen, S) for gen in gens(Gb)])
 end
 
-
+###########################################
+# Counter for the steps in the Fractal Walk.
+###########################################
+counter = 0
+function delete_counter()
+    global counter
+    temp = counter
+    counter = 0
+    return temp
+end
+function getcounter()
+    global counter
+    return counter
+end
+function raise_counter()
+    global counter = getcounter() + 1
+end
 ###############################################################
 # Implementation of the standard walk.
 ###############################################################
@@ -151,6 +172,7 @@ function standard_walk(
     end
 
     Gb = standard_walk(G, S, T, S[1, :], T[1, :], infoLevel)
+
     return Gb
 end
 
@@ -162,9 +184,7 @@ function standard_walk(
     tarweight::Vector{Int},
     infoLevel::Int,
 )
-    counter = 0
-    terminate = false
-    while !terminate
+    while true
         G = standard_step(G, currweight, T)
         if infoLevel >= 1
             println(currweight)
@@ -172,18 +192,13 @@ function standard_walk(
                 println(G)
             end
         end
-        counter += 1
+        raise_counter()
         if currweight == tarweight
-            terminate = true
+            return G
         else
             currweight = next_weight(G, currweight, tarweight)
         end
     end
-
-    if infoLevel >= 1
-        println("Cones crossed: ", counter)
-    end
-    return G
 end
 
 ###############################################################
@@ -229,7 +244,6 @@ function generic_walk(
     T::Matrix{Int},
     infoLevel::Int,
 )
-    counter = 0
     R = base_ring(G)
     Rn = change_order(G.base_ring, T)
     Lm = [change_ring(Singular.leading_term(g), Rn) for g in gens(G)]
@@ -241,8 +255,8 @@ function generic_walk(
         println("Crossed Cones with: ")
     end
     while !isempty(v)
-        counter += 1
         G, Lm = generic_step(G, Lm, v, Rn)
+        raise_counter()
 
         if infoLevel >= 1
             println(v)
@@ -255,9 +269,7 @@ function generic_walk(
     end
     G = Singular.Ideal(Rn, G)
     G.isGB = true
-    if infoLevel >= 1
-        println("Cones crossed: ", counter)
-    end
+
     # to generate the same coefficients as Singular.std does. This version of the generic walk computes LC(g)=1 for all g \in G.
     return Singular.interreduce(G)
 end
@@ -295,44 +307,25 @@ function pertubed_walk(
     end
 
     currweight = pertubed_vector(G, S, p)
-    terminate = false
 
-    while !terminate
+    while true
         tarweight = pertubed_vector(G, T, p)
         Tn = add_weight_vector(tarweight, T)
         G = standard_walk(G, S, Tn, currweight, tarweight, infoLevel)
         if same_cone(G, T)
-            terminate = true
+            return G
         else
             p = p - 1
             currweight = tarweight
             S = Tn
         end
     end
-    return G
 end
 
 ###############################################################
 # The Fractal Walk
 ###############################################################
 
-###########################################
-# Counter for the steps in the Fractal Walk.
-###########################################
-counterFr = 0
-function deleteCounterFr()
-    global counterFr
-    temp = counterFr
-    counterFr = 0
-    return temp
-end
-function getCounterFr()
-    global counterFr
-    return counterFr
-end
-function raiseCounterFr()
-    global counterFr = getCounterFr() + 1
-end
 ##########################################
 # global weightvectors
 ##########################################
@@ -343,7 +336,7 @@ firstStepMode = false
 ###############################################################
 # Combined version of the extensions of the Fractal Walk.
 # This version
-# - checks if the starting weight vector represents the order and pertubes it if necessary.
+# - checks if the starting weight vector represents the monomial order and pertubes it if necessary.
 # - analyses the Groebner basis Gw of the initialforms and uses the Buchberger-algorithm if the generators of Gw are binomial or less.
 # - skips a step in top level in the last step.
 # - checks if an entry of an intermediate weight vector is bigger than int32. In case of that the Buchberger-Algorithm is used to compute the Groebner basis of the ideal of the initialforms.
@@ -361,12 +354,7 @@ function fractal_walk_combined(
 
     global pTargetWeights =
         [pertubed_vector(G, T, i) for i = 1:nvars(Singular.base_ring(G))]
-    Gb = fractal_walk_combined(G, S, T, S[1, :], pTargetWeights, 1, infoLevel)
-
-    if infoLevel >= 1
-        println("Cones crossed: ", deleteCounterFr())
-    end
-    return Gb
+    return fractal_walk_combined(G, S, T, S[1, :], pTargetWeights, 1, infoLevel)
 end
 
 function fractal_walk_combined(
@@ -379,7 +367,6 @@ function fractal_walk_combined(
     infoLevel::Int,
 )
     R = Singular.base_ring(G)
-    terminate = false
     G.isGB = true
 
     # Handling the weight of the start order.
@@ -396,7 +383,7 @@ function fractal_walk_combined(
     end
 
     # main loop
-    while !terminate
+    while true
         t = next_weightfr(G, w, pTargetWeights[p])
 
         # Handling the final step in the current depth.
@@ -433,7 +420,7 @@ function fractal_walk_combined(
             continue
         end
 
-        # skip a step for target order lex.
+        # skip a step for target monomial order lex.
         if t == 1 && p == 1
             if infoLevel >= 1
                 println("depth $p: recursive call in ", pTargetWeights[p])
@@ -490,7 +477,7 @@ function fractal_walk_combined(
                 if infoLevel >= 1
                     println("depth $p: conversion in ", w, ".")
                 end
-                raiseCounterFr()
+                raise_counter()
             else
                 if infoLevel >= 1
                     println("depth $p: recursive call in $w.")
@@ -513,7 +500,6 @@ function fractal_walk_combined(
         R = Rn
         currweight = w
     end
-    return G
 end
 
 ###############################################################
@@ -534,12 +520,7 @@ function fractal_walk(
 
     global pTargetWeights =
         [pertubed_vector(G, T, i) for i = 1:nvars(base_ring(G))]
-    Gb = fractal_recursiv(G, S, T, S[1, :], pTargetWeights, 1, infoLevel)
-
-    if infoLevel >= 1
-        println("Cones crossed: ", deleteCounterFr())
-    end
-    return Gb
+    return fractal_recursiv(G, S, T, S[1, :], pTargetWeights, 1, infoLevel)
 end
 
 function fractal_recursiv(
@@ -552,11 +533,10 @@ function fractal_recursiv(
     infoLevel::Int,
 )
     R = base_ring(G)
-    terminate = false
     G.isGB = true
     w = currweight
 
-    while !terminate
+    while true
         t = next_weightfr(G, w, pTargetWeights[p])
 
         # Handling the final step in the current depth.
@@ -628,7 +608,7 @@ function fractal_recursiv(
             if infoLevel >= 1
                 println("depth $p: conversion in ", w, ".")
             end
-            raiseCounterFr()
+            raise_counter()
         else
             if infoLevel >= 1
                 println("depth $p: recursive call in $w.")
@@ -649,7 +629,6 @@ function fractal_recursiv(
         R = Rn
         currweight = w
     end
-    return G
 end
 
 ###############################################################
@@ -669,7 +648,7 @@ function fractal_walk_start_order(
 
     global pTargetWeights =
         [pertubed_vector(G, T, i) for i = 1:nvars(Singular.base_ring(G))]
-    Gb = fractal_walk_recursiv_startorder(
+    return fractal_walk_recursiv_startorder(
         G,
         S,
         T,
@@ -678,11 +657,6 @@ function fractal_walk_start_order(
         1,
         infoLevel,
     )
-
-    if infoLevel >= 1
-        println("Cones crossed: ", deleteCounterFr())
-    end
-    return Gb
 end
 
 function fractal_walk_recursiv_startorder(
@@ -695,7 +669,6 @@ function fractal_walk_recursiv_startorder(
     infoLevel::Int,
 )
     R = Singular.base_ring(G)
-    terminate = false
     G.isGB = true
 
     # Handling the starting weight.
@@ -711,7 +684,7 @@ function fractal_walk_recursiv_startorder(
         w = currweight
     end
 
-    while !terminate
+    while true
         t = next_weightfr(G, w, pTargetWeights[p])
 
         # Handling the final step in the current depth.
@@ -783,7 +756,7 @@ function fractal_walk_recursiv_startorder(
             if infoLevel >= 1
                 println("depth $p: conversion in ", w, ".")
             end
-            raiseCounterFr()
+            raise_counter()
         else
             if infoLevel >= 1
                 println("depth $p: recursive call in $w.")
@@ -805,7 +778,6 @@ function fractal_walk_recursiv_startorder(
         R = Rn
         currweight = w
     end
-    return G
 end
 
 ###############################################################
@@ -825,7 +797,7 @@ function fractal_walk_lex(
 
     global pTargetWeights =
         [pertubed_vector(G, T, i) for i = 1:nvars(base_ring(G))]
-    Gb = fractal_walk_recursive_lex(
+    return fractal_walk_recursive_lex(
         G,
         S,
         T,
@@ -834,11 +806,6 @@ function fractal_walk_lex(
         1,
         infoLevel,
     )
-
-    if infoLevel >= 1
-        println("Cones crossed: ", deleteCounterFr())
-    end
-    return Gb
 end
 
 function fractal_walk_recursive_lex(
@@ -851,14 +818,12 @@ function fractal_walk_recursive_lex(
     infoLevel::Int,
 )
     R = Singular.base_ring(G)
-    terminate = false
     G.isGB = true
     w = currweight
 
-    while !terminate
+    while true
         t = next_weightfr(G, w, pTargetWeights[p])
 
-        # Handling the final step in the current depth.
         # Handling the final step in the current depth.
         # Next_weightfr may return 0 if the target vector does not lie in the cone of T while G already defines the Groebner basis w.r.t. T.
         # -> Checking if G is already a Groebner basis w.r.t. T solves this problem and reduces computational effort since next_weightfr returns 1 in the last step on every local path.        if t == 1 && p != 1
@@ -938,7 +903,7 @@ function fractal_walk_recursive_lex(
             end
             Rn = change_order(R, w, T)
 
-            # Converting the Groebnerbasis
+            # Converting the Groebner basis
             if p == Singular.nvars(R)
                 H = Singular.std(
                     Singular.Ideal(Rn, [change_ring(x, Rn) for x in Gw]),
@@ -947,7 +912,7 @@ function fractal_walk_recursive_lex(
                 if infoLevel >= 1
                     println("depth $p: conversion in ", w, ".")
                 end
-                raiseCounterFr()
+                raise_counter()
             else
                 if infoLevel >= 1
                     println("depth $p: recursive call in $w.")
@@ -970,7 +935,6 @@ function fractal_walk_recursive_lex(
         R = Rn
         currweight = w
     end
-    return G
 end
 
 ###############################################################
@@ -990,7 +954,7 @@ function fractal_walk_look_ahead(
 
     global pTargetWeights =
         [pertubed_vector(G, T, i) for i = 1:nvars(base_ring(G))]
-    Gb = fractal_walk_look_ahead_recursiv(
+    return fractal_walk_look_ahead_recursiv(
         G,
         S,
         T,
@@ -999,10 +963,6 @@ function fractal_walk_look_ahead(
         1,
         infoLevel,
     )
-
-    if infoLevel >= 1
-        println("Cones crossed: ", deleteCounterFr())
-    end
     return Gb
 end
 
@@ -1016,11 +976,10 @@ function fractal_walk_look_ahead_recursiv(
     infoLevel,
 )
     R = Singular.base_ring(G)
-    terminate = false
     G.isGB = true
     w = currweight
 
-    while !terminate
+    while true
         t = next_weightfr(G, w, pTargetWeights[p])
 
         # Handling the final step in the current depth.
@@ -1092,7 +1051,7 @@ function fractal_walk_look_ahead_recursiv(
             if infoLevel >= 1
                 println("depth $p: conversion in ", w, ".")
             end
-            raiseCounterFr()
+            raise_counter()
         else
             if infoLevel >= 1
                 println("depth $p: recursive call in $w.")
@@ -1113,9 +1072,7 @@ function fractal_walk_look_ahead_recursiv(
         R = Rn
         currweight = w
     end
-    return G
 end
-global time = 0
 
 ###############################################################
 # Tran´s version of the Groebner Walk.
@@ -1133,7 +1090,6 @@ function tran_walk(
         println("Crossed Cones in: ")
     end
 
-    counter = 0
     currweight = S[1, :]
     tarweight = T[1, :]
     R = base_ring(G)
@@ -1141,8 +1097,7 @@ function tran_walk(
         currweight = pertubed_vector(G, S, nvars(R))
     end
 
-    terminate = false
-    while !terminate
+    while true
         w = next_weight(G, currweight, tarweight)
 
         # return the Groebner basis if an entry of w is bigger than int32.
@@ -1155,6 +1110,9 @@ function tran_walk(
         Rn = change_order(R, w, T)
         if w == tarweight
             if same_cone(G, T)
+                if infoLevel >= 1
+                    println("Cones crossed: ", counter)
+                end
                 return G
             elseif inSeveralCones(initials(base_ring(G), gens(G), tarweight))
                 tarweight = representation_vector(G, T)
@@ -1168,14 +1126,10 @@ function tran_walk(
                 println(G)
             end
         end
-        counter += 1
         R = Rn
         currweight = w
+        raise_counter()
     end
-    if infoLevel >= 1
-        println("Cones crossed: ", counter)
-    end
-    return G
 end
 
 ###############################################################
@@ -1196,8 +1150,9 @@ function standard_step_without_int32_check(
     return interreduce_walk(H)
 end
 
+#=
 ###############################################################
-# Generic Walk with a choosable pertubationdegree. This version is not tested yet.
+# Generic Walk with choosable dergree of pertubation. This version is not tested yet.
 ###############################################################
 
 function pgeneric_walk(
@@ -1244,3 +1199,4 @@ function generic_step(
     G.isGB = true
     return G, Lm
 end
+=#

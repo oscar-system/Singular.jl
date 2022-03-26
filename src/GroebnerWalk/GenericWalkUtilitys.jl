@@ -75,7 +75,7 @@ function isparallel(u::Vector{Int}, v::Vector{Int})
     return true
 end
 
-# performs a lifting step in the Groebner Walk proposed by Fukuda et al. (2005).
+# performs the lifting in the generic Walk like it´s proposed by Fukuda et al. (2005).
 function lift_generic(
     G::Vector{spoly{L}},
     Lm::Vector{Singular.spoly{L}},
