@@ -1008,9 +1008,9 @@ end
 @doc Markdown.doc"""
     hilbert_series(I::sideal{spoly{T}}, w::Vector{<:Integer}) where T <: Nemo.FieldElem
 
-Return the coefficient vector of $Q(t)$ where `Q(t)/(1-t)^nvars(base_ring(I))`
-is the Hilbert-Poincare series of $I$ for weights $\{w_i\}$, where each weight
-is positive $w_i > 0$.
+Return the coefficient vector of $Q(t)$ where $\frac{Q(t)}{\prod_i (1-t^{w_i})}$
+is the Hilbert-Poincare series of $I$ for weights $\{w_i\}$. Each weight must be
+positive $w_i > 0$.
 """
 function hilbert_series(I::sideal{spoly{T}}, w::Vector{<:Integer}) where T <: Nemo.FieldElem
    I.isGB || error("Not a Groebner basis")
