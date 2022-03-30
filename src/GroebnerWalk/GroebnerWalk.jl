@@ -33,7 +33,7 @@ Fractal Walk (:fractal) computes the Walk like it´s presented in Amrhein & Gloo
     - `tran`: Tran´s Walk,
     - `generic`: Generic Walk,
     - `fractal`: standard-version of the Fractal Walk,
-    - `fractalcombined`: combined Fractal Walk. Target monomial order needs to be lex,
+    - `fractalcombined`: combined Version of the Fractal Walk. Target monomial order needs to be lex,
 *`pertubationDegree::Int=2`: pertubationdegree for the Pertubed Walk.
 *'infoLevel::Int=0':
     -'0': no printout,
@@ -79,16 +79,16 @@ Fractal Walk (:fractalcombined) computes the Walk like it´s presented in Amrhei
 
 #Arguments
 *`G::Singular.sideal`: Groebner basis to convert to the Groebner basis w.r.t. the target-order.
-*`S::Matrix{Int}`: The start monomial order w.r.t. the Groebner basis I. Note that S has to be a nxn-matrix with rank(S)=n.
-*`T::Matrix{Int}`: The target monomial order we want to compute a Groebner basis for. Note that T has to be a nxn-matrix with rank(T)=n.
+*`S::Matrix{Int}`: The start monomial order w.r.t. the Groebner basis I. Note that S has to be a nxn-matrix with rank(S)=n and its first row needs to have positive entries.
+*`T::Matrix{Int}`: The target monomial order we want to compute a Groebner basis for. Note that T has to be a nxn-matrix with rank(T)=n and its first row needs to have positive entries.
 *`grwalktype::Symbol=:standard`: Strategy of the Groebner Walk to be used. There are the strategies:
     - `standard`: Standard Walk (default),
     - `pertubed`: Pertubed Walk,
     - `tran`: Tran´s Walk,
     - `generic`: Generic Walk,
     - `fractal`: standard-version of the Fractal Walk,
-    - `fractalcombined`: combined Fractal Walk. The target monomial order needs to be lex,
-*`p::Int=2`: Pertubationdegree for the pertubed Walk.
+    - `fractalcombined`: combined version of the Fractal Walk. The target monomial order needs to be lex,
+*`p::Int=2`: pertubationdegree for the pertubed Walk.
 *'infoLevel::Int=0':
     -'0': no printout,
     -'1': intermediate weight vectors,
