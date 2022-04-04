@@ -33,7 +33,7 @@ Fractal Walk (:fractal) computes the Walk like it´s presented in Amrhein & Gloo
     - `tran`: Tran´s Walk,
     - `generic`: Generic Walk,
     - `fractal`: standard-version of the Fractal Walk,
-    - `fractalcombined`: combined Fractal Walk. Target monomial order needs to be lex,
+    - `fractalcombined`: combined Version of the Fractal Walk. Target monomial order needs to be lex,
 *`pertubationDegree::Int=2`: pertubationdegree for the Pertubed Walk.
 *'infoLevel::Int=0':
     -'0': no printout,
@@ -79,16 +79,16 @@ Fractal Walk (:fractalcombined) computes the Walk like it´s presented in Amrhei
 
 #Arguments
 *`G::Singular.sideal`: Groebner basis to convert to the Groebner basis w.r.t. the target-order.
-*`S::Matrix{Int}`: The start monomial order w.r.t. the Groebner basis I. Note that S has to be a nxn-matrix with rank(S)=n.
-*`T::Matrix{Int}`: The target monomial order we want to compute a Groebner basis for. Note that T has to be a nxn-matrix with rank(T)=n.
+*`S::Matrix{Int}`: The start monomial order w.r.t. the Groebner basis I. Note that S has to be a nxn-matrix with rank(S)=n and its first row needs to have positive entries.
+*`T::Matrix{Int}`: The target monomial order we want to compute a Groebner basis for. Note that T has to be a nxn-matrix with rank(T)=n and its first row needs to have positive entries.
 *`grwalktype::Symbol=:standard`: Strategy of the Groebner Walk to be used. There are the strategies:
     - `standard`: Standard Walk (default),
     - `pertubed`: Pertubed Walk,
     - `tran`: Tran´s Walk,
     - `generic`: Generic Walk,
     - `fractal`: standard-version of the Fractal Walk,
-    - `fractalcombined`: combined Fractal Walk. The target monomial order needs to be lex,
-*`p::Int=2`: Pertubationdegree for the pertubed Walk.
+    - `fractalcombined`: combined version of the Fractal Walk. The target monomial order needs to be lex,
+*`p::Int=2`: pertubationdegree for the pertubed Walk.
 *'infoLevel::Int=0':
     -'0': no printout,
     -'1': intermediate weight vectors,
@@ -1149,54 +1149,3 @@ function standard_step_without_int32_check(
     H = lift(G, R, H, Rn)
     return interreduce_walk(H)
 end
-
-#=
-###############################################################
-# Generic Walk with choosable dergree of pertubation. This version is not tested yet.
-###############################################################
-
-function pgeneric_walk(
-    G::Singular.sideal,
-    S::Matrix{Int},
-    T::Matrix{Int},
-    p::Int,
-    infoLevel::Int,
-)
-    R = base_ring(G)
-    Rn = change_order(G.base_ring, T)
-    v = next_gamma(G, [0], S, T, p)
-    Lm = [change_ring(Singular.leading_term(g), Rn) for g in gens(G)]
-    G = Singular.Ideal(Rn, [change_ring(x, Rn) for x in gens(G)])
-
-    println("generic_walk results")
-    println("Crossed Cones with facetNormal: ")
-    while !isempty(v)
-        global counter = getCounter() + 1
-        println(v)
-        G, Lm = generic_step(G, Lm, v, T, R)
-        v = next_gamma(G, Lm, v, S, T, p)
-    end
-    return Singular.interreduce(G)
-end
-
-function generic_step(
-    G::Singular.sideal,
-    Lm::Vector{Singular.spoly{L}},
-    v::Vector{Int},
-    T::Matrix{Int},
-    R::Singular.PolyRing,
-) where {L<:Nemo.RingElem}
-
-    Rn = Singular.base_ring(G)
-    facet_Generators = facet_initials(G, Lm, v)
-    H = Singular.std(
-        Singular.Ideal(Rn, facet_Generators),
-        complete_reduction = true,
-    )
-    H, Lm = lift_generic(G, Lm, H)
-    G = interreduce(H, Lm)
-    G = Singular.Ideal(Rn, G)
-    G.isGB = true
-    return G, Lm
-end
-=#
