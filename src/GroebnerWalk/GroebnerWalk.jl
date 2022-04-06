@@ -5,8 +5,6 @@ include("GenericWalkUtilitys.jl")
 include("TranWalkUtilitys.jl")
 
 
-export groebnerwalk
-
 ###############################################################
 # Implementation of different variants of the Groebner Walk.
 # The Groebner Walk is proposed by Collart, Kalkbrener & Mall (1997).
@@ -24,7 +22,7 @@ Fractal Walk (:fractalcombined) computes the Walk like it´s presented in Amrhei
 Fractal Walk (:fractal) computes the Walk like it´s presented in Amrhein & Gloor (1998). Pertubes only the target vector.
 
 #Arguments
-*`I::Singular.sideal`: ideal one wants to compute a Groebner basis for.
+*`G::Singular.sideal`: ideal one wants to compute a Groebner basis for.
 *`startOrder::Symbol=:degrevlex`: monomial order to begin the conversion.
 *`targetOrder::Symbol=:lex`: monomial order one wants to compute a Groebner basis for.
 *`walktype::Symbol=standard`: strategy of the Groebner Walk. One can choose a strategy of:
@@ -79,8 +77,8 @@ Fractal Walk (:fractalcombined) computes the Walk like it´s presented in Amrhei
 
 #Arguments
 *`G::Singular.sideal`: Groebner basis to convert to the Groebner basis w.r.t. the target-order.
-*`S::Matrix{Int}`: The start monomial order w.r.t. the Groebner basis I. Note that S has to be a nxn-matrix with rank(S)=n and its first row needs to have positive entries.
-*`T::Matrix{Int}`: The target monomial order we want to compute a Groebner basis for. Note that T has to be a nxn-matrix with rank(T)=n and its first row needs to have positive entries.
+*`S::Matrix{Int}`: The start monomial order w.r.t. the Groebner basis G. Note that S has to be a nxn-matrix with rank(S)=n and its first row needs to have positive entries.
+*`T::Matrix{Int}`: The target monomial order one wants to compute a Groebner basis for. Note that T has to be a nxn-matrix with rank(T)=n and its first row needs to have positive entries.
 *`grwalktype::Symbol=:standard`: Strategy of the Groebner Walk to be used. There are the strategies:
     - `standard`: Standard Walk (default),
     - `pertubed`: Pertubed Walk,
