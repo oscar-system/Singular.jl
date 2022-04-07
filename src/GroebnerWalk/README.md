@@ -2,7 +2,7 @@
 
 ### Usage
 
-The following function calls perform different versions of the Gröbner Walk by computing the Gröbner basis w.r.t. the monomial order ```julia :degrevlex``` and converting it to the Groebner basis w.r.t. the monomial order ```julia :lex ```.
+The following function calls perform different versions of the Gröbner Walk by computing the Gröbner basis w.r.t. the monomial order ```:degrevlex``` and converting it to the Groebner basis w.r.t. the monomial order ```:lex```.
 
 ```julia
 using Singular
@@ -17,7 +17,7 @@ groebnerwalk(id, :degrevlex, :lex ,:fractal_combined)
 groebnerwalk(id, :degrevlex, :lex ,:generic)
 ```
 
-The following function call performs the standard version of the Gröbner Walk by converting the given Groebner basis w.r.t. the monomial order ```julia :degrevlex ``` to the Groebner basis w.r.t. the monomial order ```julia :lex ```.
+The following function call performs the standard version of the Gröbner Walk by converting the given Groebner basis w.r.t. the monomial order ``` :degrevlex``` to the Groebner basis w.r.t. the monomial order ```:lex```.
 
 ```julia
 using Singular
