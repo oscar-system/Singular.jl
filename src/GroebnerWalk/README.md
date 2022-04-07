@@ -11,7 +11,6 @@ include("Examples.jl")
 include("GroebnerWalk.jl")
 
 id = katsura4()
-
 groebnerwalk(id, :degrevlex, :lex ,:standard)
 groebnerwalk(id, :degrevlex, :lex ,:pertubed, 2)
 groebnerwalk(id, :degrevlex, :lex ,:fractal_combined)
@@ -28,14 +27,12 @@ include("GroebnerWalk.jl")
 
 id = katsura4()
 R = base_ring(id)
-dim = nvars(R)
 I = Singular.std(id, complete_reduction = true)
 
-groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :standard)
+groebnerwalk(I, ordering_as_matrix(:degrevlex, nvars(R)), ordering_as_matrix(:lex, nvars(R)), :standard)
 
 ```
 
 ### Tests
 
 The tests can be started with **runtests**.
-
