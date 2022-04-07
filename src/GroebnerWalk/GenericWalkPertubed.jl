@@ -1,6 +1,6 @@
 
 ###############################################################
-# Not tested Version of the Generic Walk with different degree
+# Not tested version of the Generic Walk with different degree
 # of pertubation. This implementation is not verified.
 ###############################################################
 

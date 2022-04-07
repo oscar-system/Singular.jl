@@ -1,5 +1,3 @@
-include("GroebnerWalkUtilitys.jl")
-
 #################################################################
 # Procedures of the fractal walk.
 # The fractal walk is proposed by Amrhein & Gloor (1998).
