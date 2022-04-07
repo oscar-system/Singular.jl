@@ -1,5 +1,3 @@
-include("GroebnerWalkUtilitys.jl")
-
 #################################################################
 # Procedures of the generic walk.
 # The generic walk is proposed by Fukuda, Lauritzen & Thomas (2005).
