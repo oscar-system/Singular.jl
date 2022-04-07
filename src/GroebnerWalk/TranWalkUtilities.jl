@@ -1,5 +1,3 @@
-include("GroebnerWalkUtilitys.jl")
-
 # computes the representation of the matrixorder defined by T.
 function representation_vector(G::Singular.sideal, T::Matrix{Int})
     n = size(T)[1]
