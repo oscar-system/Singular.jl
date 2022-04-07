@@ -4,11 +4,9 @@ using Test
 
 @testset "Groebnerwalks" begin
     @testset "Testing Groebnerwalks" begin
-        let id = katsura6()
+        let id = katsura5()
             R = base_ring(id)
             dim = nvars(R)
-            ve=ones(Int64,dim)
-            StartOrd = ordering_as_matrix(:degrevlex, dim)
             TarOrd = ordering_as_matrix(:lex, dim)
             S = change_order(R, TarOrd)
             I = Singular.std(id, complete_reduction = true)
@@ -39,10 +37,9 @@ using Test
             end
         end
 
-        let id = katsura5()
+        let id = katsura4()
             R = base_ring(id)
             dim = nvars(R)
-            ve=ones(Int64,dim)
             StartOrd = ordering_as_matrix([1,3,1,3,1],:lex)
             TarOrd = ordering_as_matrix([1,0,0,0,2],:lex)
             S = change_order(R, TarOrd)
@@ -78,8 +75,6 @@ using Test
         let id = cyclic4()
             R = base_ring(id)
             dim = nvars(R)
-            ve=ones(Int64,dim)
-            StartOrd = ordering_as_matrix(:degrevlex, dim)
             TarOrd = ordering_as_matrix(:lex, dim)
             S = change_order(R, TarOrd)
 
@@ -115,11 +110,8 @@ using Test
         let id = ex2()
             R = base_ring(id)
             dim = nvars(R)
-            ve=ones(Int64,dim)
-            StartOrd = ordering_as_matrix(:degrevlex,dim)
             TarOrd = ordering_as_matrix(:lex, dim)
             S = change_order(R, TarOrd)
-
             I = Singular.std(id, complete_reduction = true)
 
             ideals = []
@@ -152,10 +144,7 @@ using Test
         id = redeco7()
         R = base_ring(id)
         dim = nvars(R)
-        ve = ones(Int, dim)
-        StartOrd = ordering_as_matrix(:degrevlex, dim)
         TarOrd = ordering_as_matrix(:lex, dim)
-        R2 = change_order(R, StartOrd)
         S = change_order(R, TarOrd)
         I = Singular.std(id, complete_reduction = true)
 
