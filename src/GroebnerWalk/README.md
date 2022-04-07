@@ -36,3 +36,7 @@ groebnerwalk(I, ordering_as_matrix(:degrevlex, nvars(R)), ordering_as_matrix(:le
 ### Tests
 
 The tests can be started with **runtests**.
+
+### Tracing the Walk
+
+For different infoLevels for the conversions-steps we advise to the documentation in **GroebnerWalk.jl*
