@@ -35,7 +35,7 @@ groebnerwalk(I, ordering_as_matrix(:degrevlex, nvars(R)), ordering_as_matrix(:le
 
 ### Tests
 
-The tests can be started with **runtests**.
+The tests can be started with **runtests.jl**.
 
 ### Tracing the Walk
 
