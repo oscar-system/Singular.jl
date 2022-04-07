@@ -11,6 +11,7 @@ include("Examples.jl")
 include("GroebnerWalk.jl")
 
 id = katsura4()
+
 groebnerwalk(id, :degrevlex, :lex ,:standard)
 groebnerwalk(id, :degrevlex, :lex ,:pertubed, 2)
 groebnerwalk(id, :degrevlex, :lex ,:fractal_combined)
