@@ -33,3 +33,7 @@ I = Singular.std(id, complete_reduction = true)
 groebnerwalk(I, ordering_as_matrix(:degrevlex, dim), ordering_as_matrix(:lex, dim), :standard)
 
 ```
+
+### Tests
+
+The tests can be started with **runtests**
