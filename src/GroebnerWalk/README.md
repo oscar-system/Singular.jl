@@ -39,4 +39,4 @@ The tests can be started with **runtests**.
 
 ### Tracing the Walk
 
-For different infoLevels for the conversions-steps we advise to the documentation in **GroebnerWalk.jl*
+For informations about the conversions-steps use the parameter ```infoLevel```. 
