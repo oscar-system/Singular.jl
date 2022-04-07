@@ -1,4 +1,4 @@
-function katsura5()
+function katsura4()
     dim = 5
     ve = [1, 1, 1, 1, 1]
     StartOrd = ordering_as_matrix(:degrevlex, dim)
@@ -18,7 +18,7 @@ end
 
 
 #Katsura6
-function katsura6()
+function katsura5()
     dim = 6
     ve = [1, 1, 1, 1, 1, 1]
     StartOrd = ordering_as_matrix(:degrevlex, dim)
@@ -38,7 +38,7 @@ function katsura6()
 end
 
 
-function katsura7()
+function katsura6()
     dim = 7
     ve = [1, 1, 1, 1, 1, 1,1]
     StartOrd = ordering_as_matrix(:degrevlex, dim)
@@ -60,7 +60,7 @@ end
 
 
 
-function katsura8()
+function katsura7()
     dim = 8
     ve = [1, 1, 1, 1, 1, 1, 1,1]
     StartOrd = ordering_as_matrix(:degrevlex, dim)
@@ -81,7 +81,7 @@ f8=    u0^2+2*u1^2+2*u2^2+2*u3^2+2*u4^2+2*u5^2+2*u6^2+2*u7^2-u0
     return Singular.Ideal(R, [f1, f2, f3, f4, f5, f6, f7, f8])
 end
 
-function katsura9()
+function katsura8()
     dim = 9
     ve = [1, 1, 1, 1, 1, 1,1,1,1]
     StartOrd = ordering_as_matrix(:degrevlex, dim)

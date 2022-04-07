@@ -1,8 +1,8 @@
 include("Helper.jl")
-include("GroebnerWalkUtilitys.jl")
-include("FractalWalkUtilitys.jl")
-include("GenericWalkUtilitys.jl")
-include("TranWalkUtilitys.jl")
+include("GroebnerWalkUtilities.jl")
+include("FractalWalkUtilities.jl")
+include("GenericWalkUtilities.jl")
+include("TranWalkUtilities.jl")
 
 
 ###############################################################
@@ -76,10 +76,10 @@ Fractal Walk (:fractal) computes the Walk like it´s presented in Amrhein & Gloo
 Fractal Walk (:fractalcombined) computes the Walk like it´s presented in Amrhein & Gloor (1998) with multiple extensions. The target monomial order has to be lex. This version uses the Buchberger Algorithm to skip weightvectors with entries bigger than Int32.
 
 #Arguments
-*`G::Singular.sideal`: Groebner basis to convert to the Groebner basis w.r.t. the target order T. G needs to be a Groebner basis w.r.t. the start order S.
-*`S::Matrix{Int}`: start monomial order w.r.t. the Groebner basis G. Note that S has to be a nxn-matrix with rank(S)=n and its first row needs to have positive entries.
-*`T::Matrix{Int}`: target monomial order one wants to compute a Groebner basis for. Note that T has to be a nxn-matrix with rank(T)=n and its first row needs to have positive entries.
-*`grwalktype::Symbol=:standard`: Strategy of the Groebner Walk to be used. There are the strategies:
+*`G::Singular.sideal`: ideal one wants to compute a Groebner basis for.
+*`startOrder::Symbol=:degrevlex`: monomial order to begin the conversion.
+*`targetOrder::Symbol=:lex`: monomial order one wants to compute a Groebner basis for.
+*`walktype::Symbol=standard`: strategy of the Groebner Walk. One can choose a strategy of:
     - `standard`: Standard Walk (default),
     - `pertubed`: Pertubed Walk,
     - `tran`: Tran´s Walk,
