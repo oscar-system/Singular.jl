@@ -1,4 +1,3 @@
-
 ###############################################################
 # Not tested version of the Generic Walk with different degree
 # of pertubation. This implementation is not verified.

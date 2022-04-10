@@ -267,9 +267,7 @@ function generic_walk(
     end
     G = Singular.Ideal(Rn, G)
     G.isGB = true
-
-    # to generate the same coefficients as Singular.std does. This version of the generic walk computes LC(g)=1 for all g \in G.
-    return Singular.interreduce(G)
+    return G
 end
 
 function generic_step(
