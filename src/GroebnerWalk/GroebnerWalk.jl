@@ -120,6 +120,7 @@ function groebnerwalk(
         walk = (x) -> fractal_walk_combined(x, S, T, infoLevel)
     end
 
+    delete_counter()
     !check_order_M(S, T, G) && throw(
         error(
             "The matrices representing the monomial order have to be nxn-matrices with full rank.",
