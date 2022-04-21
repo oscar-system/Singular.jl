@@ -56,7 +56,7 @@ end
 
    @test iszero(I0)
 
-   @test iszerodim(I1)
+   @test iszerodim(std(I1))
    @test dimension(std(I0)) == 2
    @test dimension(std(I1)) == 0
 
