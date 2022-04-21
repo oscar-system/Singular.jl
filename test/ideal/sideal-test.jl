@@ -88,6 +88,9 @@ end
    f = (x^3+y^5)^2+x^2*y^7
    @test mult(std(@inferred jacobian_ideal(f))) == 46
    @test mult(std(Ideal(R, f))) == 6
+   
+   R, (x, y) = PolynomialRing(QQ, ["x", "y"]; ordering= :lex)
+   @test_throws ErrorException iszerodim(Ideal(R, x+y,x^2))
 end
 
 @testset "sideal.spluralg.manipulation" begin
