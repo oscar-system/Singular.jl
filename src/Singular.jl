@@ -165,10 +165,10 @@ function __init__()
    mapping_types_reversed = Dict( i[2] => i[1] for i in libSingular.get_type_mapper() )
    casting_functions = create_casting_functions()
 
-   # Respect the -q flag
-   isquiet = Bool(Base.JLOptions().quiet)
+   # Respect the -q and --banner flag
+   allowbanner = Base.JLOptions().banner != 0
 
-   show_banner = !isquiet && isinteractive() &&
+   show_banner = allowbanner && isinteractive() &&
                 !any(x->x.name in ["Oscar"], keys(Base.package_locks)) &&
                 get(ENV, "SINGULAR_PRINT_BANNER", "true") != "false"
 
