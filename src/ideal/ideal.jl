@@ -3,7 +3,7 @@ export sideal, IdealSet, syz, lead, normalize!, is_constant, is_zerodim, fglm,
        independent_sets, maximal_independent_set, ngens, sres, intersection,
        quotient, reduce, eliminate, kernel, equal, contains, is_var_generated,
        saturation, satstd, slimgb, std, vdim, interreduce, degree, mult,
-       hilbert_series
+       hilbert_series, is_homogeneous
 
 ###############################################################################
 #
@@ -154,6 +154,12 @@ function is_var_generated(I::sideal)
       end
    end
    return true
+end
+
+function is_homogeneous(I::sideal)
+   R = base_ring(I)
+   res = GC.@preserve I R libSingular.id_HomModule(Vector{Cint}(), I.ptr, R.ptr)
+   return Bool(res)
 end
 
 @doc Markdown.doc"""

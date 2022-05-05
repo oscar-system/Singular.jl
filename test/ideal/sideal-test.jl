@@ -88,6 +88,12 @@ end
    f = (x^3+y^5)^2+x^2*y^7
    @test mult(std(@inferred jacobian_ideal(f))) == 46
    @test mult(std(Ideal(R, f))) == 6
+
+   R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"])
+   I = Ideal(R, x^2+y^3+z^4, x^5+y^4+z^3)
+   @test !is_homogeneous(I)
+   I = Ideal(R, x^2+y^2+z^2, x^3+y^3+z^3)
+   @test is_homogeneous(I)
 end
 
 @testset "sideal.spluralg.manipulation" begin
