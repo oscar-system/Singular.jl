@@ -401,6 +401,8 @@ void singular_define_rings(jlcxx::Module & Singular)
     Singular.method("p_SortAdd", p_SortAdd);
     Singular.method("p_Setm", p_Setm);
     Singular.method("p_Neg", p_Neg);
+    Singular.method("p_WTotaldegree", p_WTotaldegree);
+    Singular.method("p_Homogen", p_Homogen);
     Singular.method("pGetCoeff", [](spolyrec * p) { return pGetCoeff(p); });
     Singular.method("pSetCoeff", [](poly p, long c, ring r) {
         number n = n_Init(c, r->cf);
