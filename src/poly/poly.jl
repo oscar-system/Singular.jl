@@ -4,7 +4,7 @@ export spoly, PolyRing, change_base_ring, coeff, coefficients,
        derivative, div, divides, evaluate, exponent,
        exponent_vectors, exponent_words, factor, factor_squarefree, finish, gen,
        has_global_ordering, has_mixed_ordering, has_local_ordering,
-       inflate, isgen, ismonomial, isordering_symbolic, isterm,
+       inflate, is_gen, is_monomial, isordering_symbolic, is_term,
        jacobian_ideal, jacobian_matrix, jet,
        leading_coefficient, leading_exponent_vector, leading_term,
        leading_monomial, lead_exponent,
@@ -147,7 +147,7 @@ function isone(p::SPolyUnion)
    GC.@preserve R p return Bool(libSingular.p_IsOne(p.ptr, R.ptr))
 end
 
-function isgen(p::Union{spoly, spluralg})
+function is_gen(p::Union{spoly, spluralg})
    R = parent(p)
    GC.@preserve R p begin
       if p.ptr.cpp_object == C_NULL || libSingular.pNext(p.ptr).cpp_object != C_NULL ||
@@ -170,7 +170,7 @@ function isgen(p::Union{spoly, spluralg})
    end
 end
 
-function isconstant(p::SPolyUnion)
+function is_constant(p::SPolyUnion)
    R = parent(p)
    GC.@preserve R p begin
       if p.ptr.cpp_object == C_NULL
@@ -188,14 +188,14 @@ function isconstant(p::SPolyUnion)
    end
 end
 
-function isterm(p::SPolyUnion)
+function is_term(p::SPolyUnion)
    GC.@preserve p begin
       return p.ptr.cpp_object != C_NULL &&
              libSingular.pNext(p.ptr).cpp_object == C_NULL
    end
 end
 
-function isunit(p::SPolyUnion)
+function is_unit(p::SPolyUnion)
    GC.@preserve p begin
       return p.ptr.cpp_object != C_NULL &&
              libSingular.pNext(p.ptr).cpp_object == C_NULL &&
@@ -1262,7 +1262,7 @@ Return the derivative of $x$ with respect to the variable $v$.
 """
 function derivative(x::spoly{T}, v::spoly{T}) where T <: Nemo.RingElem
    R = parent(x)
-   R == parent(v) && isgen(v) || error("Second argument is not a variable")
+   R == parent(v) && is_gen(v) || error("Second argument is not a variable")
    return derivative(x, var_index(v))
 end
 

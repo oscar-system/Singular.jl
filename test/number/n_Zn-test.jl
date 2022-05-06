@@ -38,8 +38,8 @@ end
 
    @test isone(one(R))
    @test iszero(zero(R))
-   @test isunit(R(1)) && isunit(R(5))
-   @test !isunit(R(0))  && !isunit(R(2))
+   @test is_unit(R(1)) && is_unit(R(5))
+   @test !is_unit(R(0))  && !is_unit(R(2))
 
    @test characteristic(R) == 6
 

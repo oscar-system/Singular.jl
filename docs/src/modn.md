@@ -57,7 +57,7 @@ Coerce a Singular or Flint integer value into the ring.
 R = ResidueRing(ZZ, 26)
 a = R(5)
 
-isunit(a)
+is_unit(a)
 c = characteristic(R)
 ```
 

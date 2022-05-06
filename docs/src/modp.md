@@ -64,7 +64,7 @@ Coerce a Singular or Flint integer value into the field.
 R = Fp(23)
 a = R(5)
 
-isunit(a)
+is_unit(a)
 c = characteristic(R)
 ```
 

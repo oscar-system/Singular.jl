@@ -67,7 +67,7 @@ function iszero(n::n_algExt)
    GC.@preserve n c return libSingular.n_IsZero(n.ptr, c.ptr)
 end
 
-isunit(n::n_algExt) = !iszero(n)
+is_unit(n::n_algExt) = !iszero(n)
 
 function modulus(a::N_AlgExtField)
    return a.minpoly

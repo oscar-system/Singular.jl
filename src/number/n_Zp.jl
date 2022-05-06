@@ -51,7 +51,7 @@ function iszero(n::n_Zp)
    GC.@preserve n return libSingular.n_IsZero(n.ptr, c.ptr)
 end
 
-isunit(n::n_Zp) = !iszero(n)
+is_unit(n::n_Zp) = !iszero(n)
 
 ###############################################################################
 #

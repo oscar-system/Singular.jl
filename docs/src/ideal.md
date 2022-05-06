@@ -98,7 +98,7 @@ dimension(I::sideal{spoly{T}}) where T <: Nemo.RingElem
 ```
 
 ```@docs
-isconstant(::sideal)
+is_constant(::sideal)
 ```
 
 ```@docs
@@ -123,7 +123,7 @@ I = Ideal(R, x^2 + 1, x*y)
 n = ngens(I)
 p = I[1]
 I[1] = 2x + y^2
-isconstant(I) == false
+is_constant(I) == false
 isvar_generated(I) == false
 iszerodim(I) == false
 

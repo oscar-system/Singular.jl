@@ -63,7 +63,7 @@ numerator(::n_Z)
 ```
 a = ZZ(-12)
 
-isunit(a)
+is_unit(a)
 n = numerator(a)
 d = denominator(a)
 c = abs(a)

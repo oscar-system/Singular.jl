@@ -17,8 +17,8 @@ end
 @testset "n_Z.manipulation" begin
    @test isone(one(ZZ))
    @test iszero(zero(ZZ))
-   @test isunit(ZZ(1)) && isunit(ZZ(-1))
-   @test !isunit(ZZ(2)) && !isunit(ZZ(0))
+   @test is_unit(ZZ(1)) && is_unit(ZZ(-1))
+   @test !is_unit(ZZ(2)) && !is_unit(ZZ(0))
 
    @test characteristic(ZZ) == 0
 

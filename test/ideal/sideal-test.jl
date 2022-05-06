@@ -60,7 +60,7 @@ end
    @test dimension(std(I0)) == 2
    @test dimension(std(I1)) == 0
 
-   @test isconstant(Ideal(R, R(1), R(2)))
+   @test is_constant(Ideal(R, R(1), R(2)))
 
    @test isvar_generated(Ideal(R, x))
    @test isvar_generated(Ideal(R, y))
@@ -115,7 +115,7 @@ end
 
    @test iszero(I0)
 
-   @test isconstant(Ideal(R, R(1), R(2)))
+   @test is_constant(Ideal(R, R(1), R(2)))
 
    @test isvar_generated(Ideal(R, x))
    @test isvar_generated(Ideal(R, y))
@@ -148,7 +148,7 @@ end
 
    @test iszero(I0)
 
-   @test isconstant(Ideal(R, R(1), R(2)))
+   @test is_constant(Ideal(R, R(1), R(2)))
 
    @test isvar_generated(Ideal(R, x))
    @test isvar_generated(Ideal(R, y))

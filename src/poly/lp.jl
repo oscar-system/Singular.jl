@@ -70,7 +70,7 @@ function degree_bound(R::LPRing)
    return R.deg_bound
 end
 
-function isgen(p::slpalg)
+function is_gen(p::slpalg)
    R = parent(p)
    GC.@preserve R p begin
       if p.ptr.cpp_object == C_NULL || libSingular.pNext(p.ptr).cpp_object != C_NULL ||

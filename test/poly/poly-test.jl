@@ -57,13 +57,13 @@
 
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
-   @test isgen(x)
-   @test isgen(y)
-   @test !isgen(R(1))
-   @test !isgen(R(0))
-   @test !isgen(2x)
-   @test !isgen(x + y)
-   @test !isgen(x^2)
+   @test is_gen(x)
+   @test is_gen(y)
+   @test !is_gen(R(1))
+   @test !is_gen(R(0))
+   @test !is_gen(2x)
+   @test !is_gen(x + y)
+   @test !is_gen(x^2)
 
    @test has_global_ordering(R)
    @test !has_local_ordering(R)
@@ -154,15 +154,15 @@ end
 
    @test isone(one(R))
    @test iszero(zero(R))
-   @test isunit(R(1)) && isunit(R(-1))
-   @test !isunit(R(2)) && !isunit(R(0)) && !isunit(x)
-   @test isgen(x)
-   @test !isgen(R(1)) && !isgen(x + 1)
-   @test isconstant(R(0)) && isconstant(R(1))
-   @test !isconstant(x) && !isconstant(x + 1)
-   @test ismonomial(x) && ismonomial(R(1))
-   @test !ismonomial(2x) && !ismonomial(x + 1)
-   @test isterm(2x) && !isterm(x + 1)
+   @test is_unit(R(1)) && is_unit(R(-1))
+   @test !is_unit(R(2)) && !is_unit(R(0)) && !is_unit(x)
+   @test is_gen(x)
+   @test !is_gen(R(1)) && !is_gen(x + 1)
+   @test is_constant(R(0)) && is_constant(R(1))
+   @test !is_constant(x) && !is_constant(x + 1)
+   @test is_monomial(x) && is_monomial(R(1))
+   @test !is_monomial(2x) && !is_monomial(x + 1)
+   @test is_term(2x) && !is_term(x + 1)
    @test length(x^2 + 2x + 1) == 3
    @test total_degree(x^2 + 2x + 1) == 2
    @test order(x^2 + 2x + 1) == 0

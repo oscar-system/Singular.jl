@@ -45,8 +45,8 @@ end
 
    @test isone(one(K))
    @test iszero(zero(K))
-   @test isunit(K(1)) && isunit(K(2))
-   @test !isunit(K(0))
+   @test is_unit(K(1)) && is_unit(K(2))
+   @test !is_unit(K(0))
 
    @test characteristic(K) == 7
    @test modulus(K) == a^2 + 1
