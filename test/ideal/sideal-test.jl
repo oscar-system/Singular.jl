@@ -56,17 +56,17 @@ end
 
    @test iszero(I0)
 
-   @test iszerodim(I1)
+   @test is_zerodim(I1)
    @test dimension(std(I0)) == 2
    @test dimension(std(I1)) == 0
 
-   @test isconstant(Ideal(R, R(1), R(2)))
+   @test is_constant(Ideal(R, R(1), R(2)))
 
-   @test isvar_generated(Ideal(R, x))
-   @test isvar_generated(Ideal(R, y))
-   @test isvar_generated(Ideal(R, x, y))
-   @test !isvar_generated(Ideal(R, R(1)))
-   @test !isvar_generated(Ideal(R, x + y))
+   @test is_var_generated(Ideal(R, x))
+   @test is_var_generated(Ideal(R, y))
+   @test is_var_generated(Ideal(R, x, y))
+   @test !is_var_generated(Ideal(R, R(1)))
+   @test !is_var_generated(Ideal(R, x + y))
 
    R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
    @test -1 == dimension(std(Ideal(R, R(-1))))
@@ -115,13 +115,13 @@ end
 
    @test iszero(I0)
 
-   @test isconstant(Ideal(R, R(1), R(2)))
+   @test is_constant(Ideal(R, R(1), R(2)))
 
-   @test isvar_generated(Ideal(R, x))
-   @test isvar_generated(Ideal(R, y))
-   @test isvar_generated(Ideal(R, x, y))
-   @test !isvar_generated(Ideal(R, R(1)))
-   @test !isvar_generated(Ideal(R, x + y))
+   @test is_var_generated(Ideal(R, x))
+   @test is_var_generated(Ideal(R, y))
+   @test is_var_generated(Ideal(R, x, y))
+   @test !is_var_generated(Ideal(R, R(1)))
+   @test !is_var_generated(Ideal(R, x + y))
 
 end
 
@@ -148,13 +148,13 @@ end
 
    @test iszero(I0)
 
-   @test isconstant(Ideal(R, R(1), R(2)))
+   @test is_constant(Ideal(R, R(1), R(2)))
 
-   @test isvar_generated(Ideal(R, x))
-   @test isvar_generated(Ideal(R, y))
-   @test isvar_generated(Ideal(R, x, y))
-   @test !isvar_generated(Ideal(R, R(1)))
-   @test !isvar_generated(Ideal(R, x + y))
+   @test is_var_generated(Ideal(R, x))
+   @test is_var_generated(Ideal(R, y))
+   @test is_var_generated(Ideal(R, x, y))
+   @test !is_var_generated(Ideal(R, R(1)))
+   @test !is_var_generated(Ideal(R, x + y))
 
 end
 

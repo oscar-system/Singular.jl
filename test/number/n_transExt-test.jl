@@ -58,8 +58,8 @@ end
 
    @test isone(one(F))
    @test iszero(zero(F))
-   @test isunit(F(1)) && isunit(F(2))
-   @test !isunit(F(0))
+   @test is_unit(F(1)) && is_unit(F(2))
+   @test !is_unit(F(0))
 
    @test characteristic(F) == 5
    @test transcendence_degree(F) == 3

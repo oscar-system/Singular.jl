@@ -287,7 +287,7 @@ function ordering_weights(a::sordering)
    return a.data[1].weights
 end
 
-isordering_symbolic(a::sordering) = isordering_symbolic_with_symbol(a)[1]
+is_ordering_symbolic(a::sordering) = is_ordering_symbolic_with_symbol(a)[1]
 
 @doc Markdown.doc"""
     ordering_as_symbol(a::sordering)
@@ -295,9 +295,9 @@ isordering_symbolic(a::sordering) = isordering_symbolic_with_symbol(a)[1]
 If the ordering `a` is a pure block, return a symbol representing its type.
 The symbol `:unknown` is returned if `a` is not a pure block.
 """
-ordering_as_symbol(a::sordering) = isordering_symbolic_with_symbol(a)[2]
+ordering_as_symbol(a::sordering) = is_ordering_symbolic_with_symbol(a)[2]
 
-function isordering_symbolic_with_symbol(a::sordering)
+function is_ordering_symbolic_with_symbol(a::sordering)
    _ispure_block(a) || return (false, :unknown)
    o = a.data[1].order
    if o == ringorder_lp

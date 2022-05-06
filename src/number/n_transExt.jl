@@ -110,7 +110,7 @@ function iszero(n::n_transExt)
    GC.@preserve n c return libSingular.n_IsZero(n.ptr, c.ptr)
 end
 
-isunit(n::n_transExt) = !iszero(n)
+is_unit(n::n_transExt) = !iszero(n)
 
 function _tExt_to_poly(R::N_FField, cached)
    n = transcendence_degree(R)
@@ -257,7 +257,7 @@ end
 
 function divexact(x::n_transExt, y::n_transExt; check::Bool=true)
    # low priority FIXME Singular still crashes upon division by zero here
-   isunit(y) || error("division by zero")
+   is_unit(y) || error("division by zero")
    c = parent(x)
    p = GC.@preserve x y c libSingular.n_Div(x.ptr, y.ptr, c.ptr)
    z = c(p)

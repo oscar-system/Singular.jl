@@ -1,12 +1,12 @@
-export isquotient_ring, QuotientRing
+export is_quotient_ring, QuotientRing
 
 @doc Markdown.doc"""
-    isquotient_ring(R::PolyRing)
+    is_quotient_ring(R::PolyRing)
 
 Return `true` if the given ring is the quotient of a polynomial ring with
 a non - zero ideal.
 """
-function isquotient_ring(R::PolyRingUnion)
+function is_quotient_ring(R::PolyRingUnion)
    GC.@preserve R return Bool(Singular.libSingular.rIsQuotientRing(R.ptr))
 end
 

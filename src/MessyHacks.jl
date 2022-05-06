@@ -156,7 +156,7 @@ function all_singular_symbols(R::PolyRingUnion)
    return vcat(all_singular_symbols(base_ring(R)), singular_symbols(R))
 end
 
-function isbad_name(x::String)
+function is_bad_name(x::String)
    if !occursin(r"\A[@a-zA-Z\']([@a-zA-Z\']*[0-9]*_*)*\Z", x)
       return true
    end
@@ -168,11 +168,11 @@ end
 # bad singular interpreter names and does not conflict with prev.
 # gensym generates truly awful names, so cannot use that
 function rename_symbol(prev::Base.Set{String}, x::String, def::String)
-   if isbad_name(x)
+   if is_bad_name(x)
       x = replace(replace(replace(x, "[" => "_"), "]" => ""), "," => "_")
-      if isbad_name(x)
+      if is_bad_name(x)
          x = replace(replace(replace(x, "(" => "_"), ")" => ""), "-" => "m")
-         if isbad_name(x)
+         if is_bad_name(x)
             x = def
          end
       end

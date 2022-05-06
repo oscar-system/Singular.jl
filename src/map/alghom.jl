@@ -106,8 +106,8 @@ function preimage(f::Map(SAlgHom), I::sideal)
    end
 
    # The following catches an error returned by Singular in iparith.cc
-   if (isquotient_ring(f.domain) && !has_global_ordering(f.domain)) ||
-          (isquotient_ring(f.codomain) && !has_global_ordering(f.codomain))
+   if (is_quotient_ring(f.domain) && !has_global_ordering(f.domain)) ||
+          (is_quotient_ring(f.codomain) && !has_global_ordering(f.codomain))
       error("Algorithm not implemented for local quotient rings.")
    end
 
