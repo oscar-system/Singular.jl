@@ -266,4 +266,6 @@ include("Map.jl")
 
 include("MessyHacks.jl")
 
+include("Aliases.jl")
+
 end # module

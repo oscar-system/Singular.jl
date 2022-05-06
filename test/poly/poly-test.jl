@@ -207,7 +207,7 @@ end
    end
    @test gen(R, 1) == x
 
-   @test isordering_symbolic(R)
+   @test is_ordering_symbolic(R)
    @test ordering_as_symbol(R) == :degrevlex
    @test degree(x^2*y^3 + 1, 1) == 2
    @test degree(x^2*y^3 + 1, y) == 3

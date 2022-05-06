@@ -4,7 +4,7 @@ export spoly, PolyRing, change_base_ring, coeff, coefficients,
        derivative, div, divides, evaluate, exponent,
        exponent_vectors, exponent_words, factor, factor_squarefree, finish, gen,
        has_global_ordering, has_mixed_ordering, has_local_ordering,
-       inflate, is_gen, is_monomial, isordering_symbolic, is_term,
+       inflate, is_gen, is_monomial, is_ordering_symbolic, is_term,
        jacobian_ideal, jacobian_matrix, jet,
        leading_coefficient, leading_exponent_vector, leading_term,
        leading_monomial, lead_exponent,
@@ -105,11 +105,11 @@ function ordering(R::PolyRingUnion)
 end
 
 @doc Markdown.doc"""
-    isordering_symbolic(R::PolyRing)
+    is_ordering_symbolic(R::PolyRing)
 
 Return `true` if the ordering of `R` can be represented as a symbol.
 """
-isordering_symbolic(R::PolyRing) = isordering_symbolic(R.ord)
+is_ordering_symbolic(R::PolyRing) = is_ordering_symbolic(R.ord)
 
 @doc Markdown.doc"""
     ordering_as_symbol(R::PolyRing)

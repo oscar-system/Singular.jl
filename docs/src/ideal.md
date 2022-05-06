@@ -90,7 +90,7 @@ iszero(::sideal)
 ```
 
 ```@docs
-iszerodim(::sideal)
+is_zerodim(::sideal)
 ```
 
 ```@docs
@@ -102,7 +102,7 @@ is_constant(::sideal)
 ```
 
 ```@docs
-isvar_generated(::sideal)
+is_var_generated(::sideal)
 ```
 
 ```@docs
@@ -124,8 +124,8 @@ n = ngens(I)
 p = I[1]
 I[1] = 2x + y^2
 is_constant(I) == false
-isvar_generated(I) == false
-iszerodim(I) == false
+is_var_generated(I) == false
+is_zerodim(I) == false
 
 S, (u, v) = PolynomialRing(QQ, ["u", "v"])
 J = Ideal(S, u^2 + 1, u*v)
