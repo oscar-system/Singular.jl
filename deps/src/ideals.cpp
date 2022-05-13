@@ -518,4 +518,16 @@ void singular_define_ideals(jlcxx::Module & Singular)
         delete v;
         rChangeCurrRing(origin);
     });
+    Singular.method("id_Homogen", id_Homogen);
+    Singular.method("id_HomModule", [](jlcxx::ArrayRef<int> weights, ideal I, ring r) {
+        intvec* w = NULL;
+        bool res = id_HomModule(I, r->qideal, &w, r);
+        if (w != NULL)
+        {
+            for (int i = 0; i < w->length(); i++)
+                weights.push_back((*w)[i]);
+            delete w;
+        }
+        return res;
+    });
 }
