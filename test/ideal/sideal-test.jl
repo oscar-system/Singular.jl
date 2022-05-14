@@ -90,6 +90,24 @@ end
    @test mult(std(Ideal(R, f))) == 6
 end
 
+@testset "sideal.spoly.homogeneous" begin
+   R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"])
+   I = Ideal(R, x^2+y^3+z^4, x^5+y^4+z^3)
+   @test !is_homogeneous(I)
+   @test is_homogeneous(homogenize(I, z))
+   I = Ideal(R, x^2+y^2+z^2, x^3+y^3+z^3)
+   @test is_homogeneous(I)
+   @test is_homogeneous(homogenize(I, z))
+
+   R, (x, y, z, w) = PolynomialRing(QQ, ["x", "y", "z", "w"], ordering = ordering_wp([6,4,3,1]))
+   I = Ideal(R, x^2+y^3+z^4, x^1+z^2)
+   @test is_homogeneous(I)
+   @test is_homogeneous(homogenize(I, w))
+   I = Ideal(R, x^2+y^2+z^2, x^3+y^3+z^3)
+   @test !is_homogeneous(I)
+   @test is_homogeneous(homogenize(I, w))
+end
+
 @testset "sideal.spluralg.manipulation" begin
 
    r, (x, y) = PolynomialRing(QQ, ["x", "y"], ordering = :degrevlex)

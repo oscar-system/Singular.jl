@@ -352,6 +352,12 @@ p = primpart(f)
 c = content(f)
 ```
 
+### Homogeneous polynomials
+
+```@docs
+homogenize(p::spoly{T}, v::spoly{T}) where T <: Nemo.RingElem
+```
+
 ### Multivariate Factorisation
 
 For the Singular base fields `QQ` and `Fp` a function to compute a

@@ -3,7 +3,7 @@ export sideal, IdealSet, syz, lead, normalize!, is_constant, is_zerodim, fglm,
        independent_sets, maximal_independent_set, ngens, sres, intersection,
        quotient, reduce, eliminate, kernel, equal, contains, is_var_generated,
        saturation, satstd, slimgb, std, vdim, interreduce, degree, mult,
-       hilbert_series
+       hilbert_series, is_homogeneous
 
 ###############################################################################
 #
@@ -155,6 +155,39 @@ function is_var_generated(I::sideal)
    end
    return true
 end
+
+@doc Markdown.doc"""
+    is_homogeneous(I::sideal)
+
+Return `true` if each stored generator of `I` is homogeneous, otherwise `false`.
+If `base_ring(I)` has a weighted monomial ordering, the test is conducted
+with respect to the corresponding weights. 
+"""
+function is_homogeneous(I::sideal)
+   R = base_ring(I)
+   res = GC.@preserve I R libSingular.id_HomModule(Vector{Cint}(), I.ptr, R.ptr)
+   return Bool(res)
+end
+
+@doc Markdown.doc"""
+    homogenize(I::sideal{S}, v::S) where S <: spoly
+
+Multiply each monomial in the generators of `I` by a suitable power of the
+variable `v` and return the corresponding homogenous ideal.
+The variable `v` must have weight `1`.
+"""
+function homogenize(I::sideal{S}, v::S) where S <: spoly
+   R = base_ring(I)
+   R == parent(v) || error("incompatible parents")
+   i = var_index(v)
+   GC.@preserve I v R begin
+      isone(libSingular.p_WTotaldegree(v.ptr, R.ptr)) ||
+               error("variable must have weight 1")
+      ptr = libSingular.id_Homogen(I.ptr, i, R.ptr)
+      return sideal{S}(R, ptr)
+    end
+end
+
 
 @doc Markdown.doc"""
     normalize!(I::sideal)

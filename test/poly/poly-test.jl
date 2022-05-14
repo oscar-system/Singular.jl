@@ -526,6 +526,18 @@ end
    @test jf == x^3
 end
 
+@testset "poly.homogeneous" begin
+   R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"])
+   @test divides(homogenize(x + y^2, z), x*z + y^2)[1]
+
+   R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"], ordering = ordering_wp([2,3,1]))
+   @test divides(homogenize(x + y^2, z), x*z^4 + y^2)[1]
+   @test is_homogeneous(Ideal(R, [homogenize(x + y^2, z)]))
+
+   R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"], ordering = ordering_wp([1,2,3]))
+   @test_throws ErrorException homogenize(x + y^2, z)
+end
+
 @testset "poly.test_spoly_factor" begin
    # everything works for QQ, Fp, and extensions of these by a minpoly
    # factor_squarefree strangely does not work for ZZ
