@@ -229,6 +229,16 @@ I = Ideal(R, x^2 + 1, x*y)
 V = lead(I)
 ```
 
+### Homogeneous ideals
+
+```@docs
+is_homogeneous(I::sideal)
+```
+
+```@docs
+homogenize(I::sideal{S}, v::S) where S <: spoly
+```
+
 ### Saturation
 
 ```@docs

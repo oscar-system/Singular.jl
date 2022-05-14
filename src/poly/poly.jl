@@ -4,6 +4,7 @@ export spoly, PolyRing, change_base_ring, coeff, coefficients,
        derivative, div, divides, evaluate, exponent,
        exponent_vectors, exponent_words, factor, factor_squarefree, finish, gen,
        has_global_ordering, has_mixed_ordering, has_local_ordering,
+       homogenize,
        inflate, is_gen, is_monomial, is_ordering_symbolic, is_term,
        jacobian_ideal, jacobian_matrix, jet,
        leading_coefficient, leading_exponent_vector, leading_term,
@@ -147,27 +148,39 @@ function isone(p::SPolyUnion)
    GC.@preserve R p return Bool(libSingular.p_IsOne(p.ptr, R.ptr))
 end
 
-function is_gen(p::Union{spoly, spluralg})
+# return 0 for non-generators, otherwise the index of the variable
+function _var_index(p::Union{spoly, spluralg})
    R = parent(p)
    GC.@preserve R p begin
       if p.ptr.cpp_object == C_NULL || libSingular.pNext(p.ptr).cpp_object != C_NULL ||
         !Bool(libSingular.n_IsOne(libSingular.pGetCoeff(p.ptr), base_ring(p).ptr))
-         return false
+         return 0
       end
-       n = 0
+      idx = 0
       for i = 1:nvars(R)
          d = libSingular.p_GetExp(p.ptr, Cint(i), R.ptr)
          if d > 1
-            return false
+            return 0
          elseif d == 1
-            if n == 1
-               return false
+            if idx > 0
+               return 0
             end
-            n = 1
+            idx = i
          end
       end
-      return n == 1
+      return idx
    end
+end
+
+function is_gen(p::Union{spoly, spluralg})
+   i = _var_index(p)
+   return i > 0
+end
+
+function var_index(p::Union{spoly, spluralg})
+   i = _var_index(p)
+   i > 0 || error("$p is not a variable")
+   return i
 end
 
 function is_constant(p::SPolyUnion)
@@ -1130,6 +1143,25 @@ function permute_variables(p::SPolyUnion, perm::Vector{Int64}, new_ring::PolyRin
                                      new_ring.ptr, map_ptr, Ptr{Int32}(C_NULL))
        poly = new_ring(poly_ptr)
        return poly
+   end
+end
+
+@doc Markdown.doc"""
+    homogenize(p::spoly{T}, v::spoly{T}) where T <: Nemo.RingElem
+
+Multiply each monomial in p by a suitable power of the
+variable `v` and return the corresponding homogenous polynomial.
+The variable `v` must have weight `1`.
+"""
+function homogenize(p::spoly{T}, v::spoly{T}) where T <: Nemo.RingElem
+   R = parent(p)
+   check_parent(p, v)
+   i = var_index(v)
+   GC.@preserve p v R begin
+      isone(libSingular.p_WTotaldegree(v.ptr, R.ptr)) ||
+               error("variable must have weight 1")
+      z = R(libSingular.p_Homogen(p.ptr, i, R.ptr))
+      return z
    end
 end
 

@@ -170,6 +170,26 @@ function is_homogeneous(I::sideal)
 end
 
 @doc Markdown.doc"""
+    homogenize(I::sideal{S}, v::S) where S <: spoly
+
+Multiply each monomial in the generators of `I` by a suitable power of the
+variable `v` and return the corresponding homogenous ideal.
+The variable `v` must have weight `1`.
+"""
+function homogenize(I::sideal{S}, v::S) where S <: spoly
+   R = base_ring(I)
+   R == parent(v) || error("incompatible parents")
+   i = var_index(v)
+   GC.@preserve I v R begin
+      isone(libSingular.p_WTotaldegree(v.ptr, R.ptr)) ||
+               error("variable must have weight 1")
+      ptr = libSingular.id_Homogen(I.ptr, i, R.ptr)
+      return sideal{S}(R, ptr)
+    end
+end
+
+
+@doc Markdown.doc"""
     normalize!(I::sideal)
 
 Normalize the polynomial generators of the ideal $I$ in-place. This means to reduce
