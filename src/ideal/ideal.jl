@@ -156,6 +156,13 @@ function is_var_generated(I::sideal)
    return true
 end
 
+@doc Markdown.doc"""
+    is_homogeneous(I::sideal)
+
+Return `true` if each stored generator of `I` is homogeneous, otherwise `false`.
+If `base_ring(I)` has a weighted monomial ordering, the test is conducted
+with respect to the corresponding weights. 
+"""
 function is_homogeneous(I::sideal)
    R = base_ring(I)
    res = GC.@preserve I R libSingular.id_HomModule(Vector{Cint}(), I.ptr, R.ptr)
