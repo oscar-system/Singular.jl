@@ -59,7 +59,7 @@ R,w = FiniteField(7, 2, "w")
 w^48 == 1
 a = R(5)
 
-isunit(a)
+is_unit(a)
 c = characteristic(R)
 d = degree(R)
 ```

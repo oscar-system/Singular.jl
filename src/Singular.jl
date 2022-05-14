@@ -55,9 +55,9 @@ import Nemo: add!, addeq!, base_ring, canonical_unit,
              deflate, deflation, degree, degrees, derivative, divexact,
              divides, domain, elem_type, evaluate, exponent_vectors,
              factor_squarefree,
-             finish, gcdinv, gen, gens, intersect, isconstant,
-             isgen, ismonomial, inflate, isnegative, isone,
-             isterm, isunit, iszero, lift, leading_coefficient,
+             finish, gcdinv, gen, gens, intersect, is_constant,
+             is_gen, is_monomial, inflate, is_negative, isone,
+             is_term, is_unit, iszero, lift, leading_coefficient,
              leading_term, leading_monomial, monomials,
              MPolyBuildCtx, mul!, nvars, ordering, parent_type,
              parent, primpart, promote_rule, push_term!,
@@ -165,10 +165,10 @@ function __init__()
    mapping_types_reversed = Dict( i[2] => i[1] for i in libSingular.get_type_mapper() )
    casting_functions = create_casting_functions()
 
-   # Respect the -q flag
-   isquiet = Bool(Base.JLOptions().quiet)
+   # Respect the -q and --banner flag
+   allowbanner = Base.JLOptions().banner != 0
 
-   show_banner = !isquiet && isinteractive() &&
+   show_banner = allowbanner && isinteractive() &&
                 !any(x->x.name in ["Oscar"], keys(Base.package_locks)) &&
                 get(ENV, "SINGULAR_PRINT_BANNER", "true") != "false"
 
@@ -265,5 +265,7 @@ include("Meta.jl")
 include("Map.jl")
 
 include("MessyHacks.jl")
+
+include("Aliases.jl")
 
 end # module

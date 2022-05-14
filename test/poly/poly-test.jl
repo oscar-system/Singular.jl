@@ -57,13 +57,13 @@
 
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
-   @test isgen(x)
-   @test isgen(y)
-   @test !isgen(R(1))
-   @test !isgen(R(0))
-   @test !isgen(2x)
-   @test !isgen(x + y)
-   @test !isgen(x^2)
+   @test is_gen(x)
+   @test is_gen(y)
+   @test !is_gen(R(1))
+   @test !is_gen(R(0))
+   @test !is_gen(2x)
+   @test !is_gen(x + y)
+   @test !is_gen(x^2)
 
    @test has_global_ordering(R)
    @test !has_local_ordering(R)
@@ -154,15 +154,15 @@ end
 
    @test isone(one(R))
    @test iszero(zero(R))
-   @test isunit(R(1)) && isunit(R(-1))
-   @test !isunit(R(2)) && !isunit(R(0)) && !isunit(x)
-   @test isgen(x)
-   @test !isgen(R(1)) && !isgen(x + 1)
-   @test isconstant(R(0)) && isconstant(R(1))
-   @test !isconstant(x) && !isconstant(x + 1)
-   @test ismonomial(x) && ismonomial(R(1))
-   @test !ismonomial(2x) && !ismonomial(x + 1)
-   @test isterm(2x) && !isterm(x + 1)
+   @test is_unit(R(1)) && is_unit(R(-1))
+   @test !is_unit(R(2)) && !is_unit(R(0)) && !is_unit(x)
+   @test is_gen(x)
+   @test !is_gen(R(1)) && !is_gen(x + 1)
+   @test is_constant(R(0)) && is_constant(R(1))
+   @test !is_constant(x) && !is_constant(x + 1)
+   @test is_monomial(x) && is_monomial(R(1))
+   @test !is_monomial(2x) && !is_monomial(x + 1)
+   @test is_term(2x) && !is_term(x + 1)
    @test length(x^2 + 2x + 1) == 3
    @test total_degree(x^2 + 2x + 1) == 2
    @test order(x^2 + 2x + 1) == 0
@@ -207,7 +207,7 @@ end
    end
    @test gen(R, 1) == x
 
-   @test isordering_symbolic(R)
+   @test is_ordering_symbolic(R)
    @test ordering_as_symbol(R) == :degrevlex
    @test degree(x^2*y^3 + 1, 1) == 2
    @test degree(x^2*y^3 + 1, y) == 3
@@ -524,6 +524,18 @@ end
 
    #Check jet
    @test jf == x^3
+end
+
+@testset "poly.homogeneous" begin
+   R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"])
+   @test divides(homogenize(x + y^2, z), x*z + y^2)[1]
+
+   R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"], ordering = ordering_wp([2,3,1]))
+   @test divides(homogenize(x + y^2, z), x*z^4 + y^2)[1]
+   @test is_homogeneous(Ideal(R, [homogenize(x + y^2, z)]))
+
+   R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"], ordering = ordering_wp([1,2,3]))
+   @test_throws ErrorException homogenize(x + y^2, z)
 end
 
 @testset "poly.test_spoly_factor" begin

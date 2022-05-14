@@ -1,4 +1,4 @@
-export n_Q, Rationals, reconstruct, isone, iszero, isunit, divexact,
+export n_Q, Rationals, reconstruct, isone, iszero, is_unit, divexact,
        canonical_unit
 
 ###############################################################################
@@ -52,7 +52,7 @@ function iszero(n::n_Q)
    GC.@preserve n c return libSingular.n_IsZero(n.ptr, c.ptr)
 end
 
-isunit(n::n_Q) = !iszero(n)
+is_unit(n::n_Q) = !iszero(n)
 
 @doc Markdown.doc"""
     numerator(x::n_Q)

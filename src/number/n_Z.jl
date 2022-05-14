@@ -47,7 +47,7 @@ function iszero(n::n_Z)
    GC.@preserve n c return libSingular.n_IsZero(n.ptr, c.ptr)
 end
 
-isunit(n::n_Z) = n == 1 || n == -1
+is_unit(n::n_Z) = n == 1 || n == -1
 
 @doc Markdown.doc"""
     numerator(n::n_Z)
@@ -86,7 +86,7 @@ end
 #
 ###############################################################################
 
-canonical_unit(x::n_Z) = isnegative(x) ? -one(parent(x)) : one(parent(x))
+canonical_unit(x::n_Z) = is_negative(x) ? -one(parent(x)) : one(parent(x))
 
 ###############################################################################
 #
@@ -109,7 +109,7 @@ function show(io::IO, n::n_Z)
    print(io, libSingular.StringEndS())
 end
 
-isnegative(x::n_Z) = !libSingular.n_GreaterZero(x.ptr, parent(x).ptr) &&
+is_negative(x::n_Z) = !libSingular.n_GreaterZero(x.ptr, parent(x).ptr) &&
                       !iszero(x)
 
 ###############################################################################

@@ -38,13 +38,13 @@
    @test isa(g, spluralg)
 
 
-   @test isgen(x)
-   @test isgen(y)
-   @test !isgen(R(1))
-   @test !isgen(R(0))
-   @test !isgen(2x)
-   @test !isgen(x + y)
-   @test !isgen(x^2)
+   @test is_gen(x)
+   @test is_gen(y)
+   @test !is_gen(R(1))
+   @test !is_gen(R(0))
+   @test !is_gen(2x)
+   @test !is_gen(x + y)
+   @test !is_gen(x^2)
 
    @test has_global_ordering(R)
    @test !has_local_ordering(R)
@@ -77,16 +77,16 @@ end
 
    @test isone(one(R))
    @test iszero(zero(R))
-   @test isunit(R(1))
-   @test isunit(R(-1))
-   @test isunit(R(2))
-   @test !isunit(R(0))
-   @test !isunit(x)
-   @test isgen(x)
-   @test !isgen(R(1))
-   @test !isgen(x + 1)
-   @test isterm(2x)
-   @test !isterm(x + 1)
+   @test is_unit(R(1))
+   @test is_unit(R(-1))
+   @test is_unit(R(2))
+   @test !is_unit(R(0))
+   @test !is_unit(x)
+   @test is_gen(x)
+   @test !is_gen(R(1))
+   @test !is_gen(x + 1)
+   @test is_term(2x)
+   @test !is_term(x + 1)
    @test length(x^2 + 2x + 1) == 3
 
    @test deepcopy(x + 2) == x + 2

@@ -55,18 +55,17 @@ end
    @test I2[2] == x^2 + 1
 
    @test iszero(I0)
-
-   @test iszerodim(std(I1))
+   @test is_zerodim(std(I1))
    @test dimension(std(I0)) == 2
    @test dimension(std(I1)) == 0
 
-   @test isconstant(Ideal(R, R(1), R(2)))
+   @test is_constant(Ideal(R, R(1), R(2)))
 
-   @test isvar_generated(Ideal(R, x))
-   @test isvar_generated(Ideal(R, y))
-   @test isvar_generated(Ideal(R, x, y))
-   @test !isvar_generated(Ideal(R, R(1)))
-   @test !isvar_generated(Ideal(R, x + y))
+   @test is_var_generated(Ideal(R, x))
+   @test is_var_generated(Ideal(R, y))
+   @test is_var_generated(Ideal(R, x, y))
+   @test !is_var_generated(Ideal(R, R(1)))
+   @test !is_var_generated(Ideal(R, x + y))
 
    R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
    @test -1 == dimension(std(Ideal(R, R(-1))))
@@ -91,6 +90,24 @@ end
    
    R, (x, y) = PolynomialRing(QQ, ["x", "y"]; ordering= :lex)
    @test_throws ErrorException iszerodim(Ideal(R, x+y,x^2))
+end
+
+@testset "sideal.spoly.homogeneous" begin
+   R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"])
+   I = Ideal(R, x^2+y^3+z^4, x^5+y^4+z^3)
+   @test !is_homogeneous(I)
+   @test is_homogeneous(homogenize(I, z))
+   I = Ideal(R, x^2+y^2+z^2, x^3+y^3+z^3)
+   @test is_homogeneous(I)
+   @test is_homogeneous(homogenize(I, z))
+
+   R, (x, y, z, w) = PolynomialRing(QQ, ["x", "y", "z", "w"], ordering = ordering_wp([6,4,3,1]))
+   I = Ideal(R, x^2+y^3+z^4, x^1+z^2)
+   @test is_homogeneous(I)
+   @test is_homogeneous(homogenize(I, w))
+   I = Ideal(R, x^2+y^2+z^2, x^3+y^3+z^3)
+   @test !is_homogeneous(I)
+   @test is_homogeneous(homogenize(I, w))
 end
 
 @testset "sideal.spluralg.manipulation" begin
@@ -118,13 +135,13 @@ end
 
    @test iszero(I0)
 
-   @test isconstant(Ideal(R, R(1), R(2)))
+   @test is_constant(Ideal(R, R(1), R(2)))
 
-   @test isvar_generated(Ideal(R, x))
-   @test isvar_generated(Ideal(R, y))
-   @test isvar_generated(Ideal(R, x, y))
-   @test !isvar_generated(Ideal(R, R(1)))
-   @test !isvar_generated(Ideal(R, x + y))
+   @test is_var_generated(Ideal(R, x))
+   @test is_var_generated(Ideal(R, y))
+   @test is_var_generated(Ideal(R, x, y))
+   @test !is_var_generated(Ideal(R, R(1)))
+   @test !is_var_generated(Ideal(R, x + y))
 
 end
 
@@ -151,13 +168,13 @@ end
 
    @test iszero(I0)
 
-   @test isconstant(Ideal(R, R(1), R(2)))
+   @test is_constant(Ideal(R, R(1), R(2)))
 
-   @test isvar_generated(Ideal(R, x))
-   @test isvar_generated(Ideal(R, y))
-   @test isvar_generated(Ideal(R, x, y))
-   @test !isvar_generated(Ideal(R, R(1)))
-   @test !isvar_generated(Ideal(R, x + y))
+   @test is_var_generated(Ideal(R, x))
+   @test is_var_generated(Ideal(R, y))
+   @test is_var_generated(Ideal(R, x, y))
+   @test !is_var_generated(Ideal(R, R(1)))
+   @test !is_var_generated(Ideal(R, x + y))
 
 end
 

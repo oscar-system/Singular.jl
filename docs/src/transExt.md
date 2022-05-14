@@ -94,7 +94,7 @@ F1, (a, b, c) = FunctionField(QQ, ["a", "b", "c"])
 x = F1(5)*a
 y = a^2 *b+a*b+b^2
 
-isunit(x)
+is_unit(x)
 char = characteristic(F1)
 d = transcendence_degree(F1)
 

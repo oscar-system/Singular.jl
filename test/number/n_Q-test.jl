@@ -40,8 +40,8 @@ end
 @testset "n_Q.manipulation" begin
    @test isone(one(QQ))
    @test iszero(zero(QQ))
-   @test isunit(QQ(1)) && isunit(QQ(2))
-   @test !isunit(QQ(0))
+   @test is_unit(QQ(1)) && is_unit(QQ(2))
+   @test !is_unit(QQ(0))
 
    @test characteristic(QQ) == 0
 

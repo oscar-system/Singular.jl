@@ -90,7 +90,7 @@ iszero(::sideal)
 ```
 
 ```@docs
-iszerodim(::sideal)
+is_zerodim(::sideal)
 ```
 
 ```@docs
@@ -98,11 +98,11 @@ dimension(I::sideal{spoly{T}}) where T <: Nemo.RingElem
 ```
 
 ```@docs
-isconstant(::sideal)
+is_constant(::sideal)
 ```
 
 ```@docs
-isvar_generated(::sideal)
+is_var_generated(::sideal)
 ```
 
 ```@docs
@@ -123,9 +123,9 @@ I = Ideal(R, x^2 + 1, x*y)
 n = ngens(I)
 p = I[1]
 I[1] = 2x + y^2
-isconstant(I) == false
-isvar_generated(I) == false
-iszerodim(I) == false
+is_constant(I) == false
+is_var_generated(I) == false
+is_zerodim(I) == false
 
 S, (u, v) = PolynomialRing(QQ, ["u", "v"])
 J = Ideal(S, u^2 + 1, u*v)
@@ -227,6 +227,16 @@ R, (x , y) = PolynomialRing(QQ, ["x", "y"])
 I = Ideal(R, x^2 + 1, x*y)
 
 V = lead(I)
+```
+
+### Homogeneous ideals
+
+```@docs
+is_homogeneous(I::sideal)
+```
+
+```@docs
+homogenize(I::sideal{S}, v::S) where S <: spoly
 ```
 
 ### Saturation

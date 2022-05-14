@@ -59,7 +59,7 @@ function iszero(n::n_Zn)
    GC.@preserve n c return libSingular.n_IsZero(n.ptr, c.ptr)
 end
 
-isunit(n::n_Zn) = gcd(n, parent(n)(characteristic(parent(n)))) == 1
+is_unit(n::n_Zn) = gcd(n, parent(n)(characteristic(parent(n)))) == 1
 
 ###############################################################################
 #

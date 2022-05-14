@@ -294,7 +294,7 @@ function eliminate(M::smodule, polys::spoly...)
    R = base_ring(M)
    p = one(R)
    for i = 1:length(polys)
-      !isgen(polys[i]) && error("Not a variable")
+      !is_gen(polys[i]) && error("Not a variable")
       parent(polys[i]) != R && error("Incompatible base rings")
       p *= polys[i]
    end
