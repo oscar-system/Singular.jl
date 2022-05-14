@@ -25,7 +25,7 @@ Nemo = "0.31.0"
 RandomExtensions = "0.4.2"
 Singular_jll = "~403.1.200"
 julia = "1.6"
-libsingular_julia_jll = "~0.23.0"
+libsingular_julia_jll = "~0.24.0"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
