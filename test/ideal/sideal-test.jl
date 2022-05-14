@@ -55,8 +55,7 @@ end
    @test I2[2] == x^2 + 1
 
    @test iszero(I0)
-
-   @test is_zerodim(I1)
+   @test is_zerodim(std(I1))
    @test dimension(std(I0)) == 2
    @test dimension(std(I1)) == 0
 
@@ -88,6 +87,9 @@ end
    f = (x^3+y^5)^2+x^2*y^7
    @test mult(std(@inferred jacobian_ideal(f))) == 46
    @test mult(std(Ideal(R, f))) == 6
+   
+   R, (x, y) = PolynomialRing(QQ, ["x", "y"]; ordering= :lex)
+   @test_throws ErrorException iszerodim(Ideal(R, x+y,x^2))
 end
 
 @testset "sideal.spoly.homogeneous" begin
