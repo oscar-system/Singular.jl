@@ -765,7 +765,7 @@ function fres(id::Union{sideal{spoly{T}}, smodule{spoly{T}}}, max_length::Int, m
       error("wrong optional argument for fres")
    end
    r, minimal = GC.@preserve id R libSingular.id_fres(id.ptr, Cint(max_length + 1), method, R.ptr)
-   return sresolution{spoly{T}}(R, r, Bool(minimal))
+   return sresolution{spoly{T}}(R, r, Bool(minimal), true)
 end
 
 @doc Markdown.doc"""
@@ -784,7 +784,7 @@ function sres(I::sideal{spoly{T}}, max_length::Int) where T <: Nemo.FieldElem
         # TODO: consider qrings
    end
    r, minimal = GC.@preserve I R libSingular.id_sres(I.ptr, Cint(max_length + 1), R.ptr)
-   return sresolution{spoly{T}}(R, r, Bool(minimal))
+   return sresolution{spoly{T}}(R, r, Bool(minimal), true)
 end
 
 ###############################################################################
