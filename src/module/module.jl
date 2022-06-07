@@ -311,9 +311,9 @@ end
 @doc Markdown.doc"""
     lift(M::smodule, SM::smodule)
 
-represents the generators of SM in terms of the generators of M.
+Represents the generators of SM in terms of the generators of M.
 Returns result, rest
-(Matrix(SM)-Matrix(rest) = Matrix(M)*Matrix(result))
+    Matrix(SM) - Matrix(rest) = Matrix(M)*Matrix(result)
 If SM is in M, rest is the null module
 otherwise: rest = SM
 """
@@ -327,9 +327,9 @@ end
 @doc Markdown.doc"""
     lift(M::smodule, SM::smodule, goodShape::Bool, isSB::Bool, divide::Bool)
 
-represents the generators of SM in terms of the generators of M.
-Returns result, rest
-(Matrix(SM)*U-Matrix(rest) = Matrix(M)*Matrix(result))
+Represents the generators of SM in terms of the generators of M.
+Returns (result, rest) with
+    Matrix(SM)*U - Matrix(rest) = Matrix(M)*Matrix(result)
 If SM is in M, rest is the null module
 otherwise: rest = SM (if not divide)
 or: rest=normalform(SM,std(M))
