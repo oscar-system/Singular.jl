@@ -309,13 +309,17 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    lift(M::smodule, SM::smodule)
+    lift(M::smodule{T}, SM::smodule{T}) where T
 
-Represents the generators of SM in terms of the generators of M.
-Returns result, rest
-    Matrix(SM) - Matrix(rest) = Matrix(M)*Matrix(result)
-If SM is in M, rest is the null module
-otherwise: rest = SM
+Represents the generators of `SM` in terms of the generators of `M`.
+If `SM` is in `M`, `rest` is the null module, otherwise `rest = reduce(SM, std(M))`.
+Returns `(result, rest)` with
+for global orderings:
+    `Matrix(SM) - Matrix(rest) = Matrix(M)*Matrix(result)`
+for non-global orderings:
+    `Matrix(SM)*U - Matrix(rest) = Matrix(M)*Matrix(result)`
+where `U` is some diagonal matrix of units. To compute this `U`,
+see `lift(M::smodule, SM::smodule, goodShape::Bool, isSB::Bool, divide::Bool)`.
 """
 function lift(M::smodule{T}, SM::smodule{T}) where T
    R = base_ring(M)
@@ -325,19 +329,20 @@ function lift(M::smodule{T}, SM::smodule{T}) where T
 end
 
 @doc Markdown.doc"""
-    lift(M::smodule, SM::smodule, goodShape::Bool, isSB::Bool, divide::Bool)
+    lift(M::smodule{T}, SM::smodule{T}, goodShape::Bool, isSB::Bool, divide::Bool) where T
 
-Represents the generators of SM in terms of the generators of M.
-Returns (result, rest) with
-    Matrix(SM)*U - Matrix(rest) = Matrix(M)*Matrix(result)
-If SM is in M, rest is the null module
-otherwise: rest = SM (if not divide)
-or: rest=normalform(SM,std(M))
-U is a diagonal matrix of units, differs from unity matrix only for local ring orderings
+Represents the generators of `SM` in terms of the generators of `M`.
+Returns `(result, rest, U)` with
+    `Matrix(SM)*U - Matrix(rest) = Matrix(M)*Matrix(result)`
+If `SM` is in `M`, then `rest` is the null module. Otherwise, `rest = SM` if
+`!divide`, and `rest = normalform(SM, std(M))` if `divide`.
+`U` is a diagonal matrix of units, differing from the identity matrix only for
+local ring orderings.
 
-goodShape: maximal non-zero index in generators of SM <= that of M
-isSB: generators of M form a Groebner basis
-divide: allow SM not to be a submodule of M
+There are three boolean options.
+`goodShape`: maximal non-zero index in generators of `SM` <= that of `M`.
+`isSB`: generators of `M` form a Groebner basis.
+`divide`: allow `SM` not to be a submodule of `M`.
 """
 function lift(M::smodule{T}, SM::smodule{T},
                             goodShape::Bool, isSB::Bool, divide::Bool) where T
