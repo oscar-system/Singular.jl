@@ -38,7 +38,7 @@ end
 
    @test length(F) == 3
 
-   @test isa(F[1], smodule)
+   @test isa(F[1], sideal)
    @test isa(F[2], smodule)
    @test isa(F[3], smodule)
 

@@ -215,6 +215,7 @@ end
    # the length is 3, as numbering starts at index 0 with R^6
 
    @test length(F) == 3
+   @test F[1] isa smodule
 
    M1 = Singular.Matrix(F[1])
    M2 = Singular.Matrix(F[2])

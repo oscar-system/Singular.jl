@@ -466,6 +466,10 @@ end
    @test (@inferred length(F1)) == 2
    @test (@inferred length(F2)) == 2
 
+   # check index 1 is an ideal
+   @test F1[1] isa sideal
+   @test F2[1] isa sideal
+
    M1 = @inferred Singular.Matrix(F1[1])
    N1 = @inferred Singular.Matrix(F1[2])
 

@@ -33,7 +33,11 @@ function getindex(r::sresolution, i::Int)
       if ptr.cpp_object != C_NULL
          ptr = libSingular.id_Copy(ptr, R.ptr)
       end
-      return Module(R, ptr)
+      if i == 1 && r.index_1_is_an_ideal
+         return Ideal(R, ptr)
+      else
+         return Module(R, ptr)
+      end
    end
 end
 
