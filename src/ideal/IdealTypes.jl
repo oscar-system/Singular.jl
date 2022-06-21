@@ -67,7 +67,8 @@ function sideal{S}(R::PolyRingUnion, ids::Vector{<:SPolyUnion}, isTwoSided::Bool
       p = libSingular.p_Copy(ids[i].ptr, R.ptr)
       libSingular.setindex_internal(id, p, Cint(i - 1))
    end
-   return sideal{S}(R, id, n < 2, isTwoSided)   # n < 2 => isGB
+   # n < 2 && !is_quotient_ring => isGB
+   return sideal{S}(R, id, (n < 2) && !is_quotient_ring(R), isTwoSided)
 end
 
 function sideal{T}(R::PolyRingUnion, ids::SPolyUnion...) where T
@@ -77,6 +78,7 @@ function sideal{T}(R::PolyRingUnion, ids::SPolyUnion...) where T
       p = libSingular.p_Copy(ids[i].ptr, R.ptr)
       libSingular.setindex_internal(id, p, Cint(i - 1))
    end
-   return sideal{T}(R, id, n < 2, is_default_twosided_ideal(R))  # n < 2 => isGB
+   # n < 2 && !is_quotient_ring => isGB
+   return sideal{T}(R, id, (n < 2) && !is_quotient_ring(R), is_default_twosided_ideal(R))
 end
 
