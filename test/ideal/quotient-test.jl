@@ -1,3 +1,14 @@
+@testset "quotient.PolynomialRing" begin
+   R, (x, y, z) = @inferred PolynomialRing(QQ, ["x", "y", "z"])
+   Q, (x, y, z) = @inferred QuotientRing(R, Ideal(R, x^2 - y*z))
+
+   @test is_quotient_ring(Q)
+
+   I = Ideal(Q, x)
+   @test !I.isGB
+   @test iszero(reduce(Ideal(Q, x, y*z), std(I)))
+end
+
 @testset "quotient.GAlgebra" begin
 
    R, _ = @inferred PolynomialRing(QQ, ["z", "u", "v", "w"])
