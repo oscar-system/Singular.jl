@@ -6,6 +6,7 @@
 
    I = Ideal(Q, x)
    @test !I.isGB
+   @test iszero(reduce(Ideal(Q, x, y*z), I))
 end
 
 @testset "quotient.GAlgebra" begin
