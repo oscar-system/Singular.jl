@@ -606,7 +606,7 @@ end
     reduce(I::sideal{S}, G::sideal{S}) where S <: SPolyUnion
 
 Return an ideal whose generators are the generators of $I$ reduced by the
-ideal $G$. The ideal $G$ is required to be a Groebner basis. The returned
+ideal $G$. The ideal $G$ need not be a Groebner basis. The returned
 ideal will have the same number of generators as $I$, even if they are zero.
 For PLURAL rings (S <: spluralg, GAlgebra, WeylAlgebra), the reduction is only a
 left reduction, and hence cannot be used to test containment in a two-sided ideal.
@@ -616,7 +616,6 @@ only two-sided ideals can be constructed here.
 function reduce(I::sideal{S}, G::sideal{S}) where S <: SPolyUnion
    check_parent(I, G)
    R = base_ring(I)
-   G.isGB || error("Not a Groebner basis")
    ptr = GC.@preserve I G R libSingular.p_Reduce(I.ptr, G.ptr, R.ptr)
    return sideal{S}(R, ptr, false, I.isTwoSided)
 end
@@ -625,7 +624,7 @@ end
     reduce(p::S, G::sideal{S}) where S <: SPolyUnion
 
 Return the polynomial which is $p$ reduced by the polynomials generating $G$.
-It is assumed that $G$ is a Groebner basis.
+The ideal $G$ need not be a Groebner basis.
 For PLURAL rings (S <: spluralg, GAlgebra, WeylAlgebra), the reduction is only a
 left reduction, and hence cannot be used to test membership in a two-sided ideal.
 For LETTERPLACE rings (S <: slpalg, FreeAlgebra), the reduction is the full
@@ -634,7 +633,6 @@ two-sided reduction as only two-sided ideals can be constructed here.
 function reduce(p::S, G::sideal{S}) where S <: SPolyUnion
    R = parent(p)
    R == base_ring(G) || error("Incompatible base rings")
-   G.isGB || error("Not a Groebner basis")
    ptr = GC.@preserve p G R libSingular.p_Reduce(p.ptr, G.ptr, R.ptr)
    return R(ptr)
 end
