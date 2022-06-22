@@ -708,6 +708,60 @@ end
 
 ###############################################################################
 #
+#   Lift
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    lift(M::sideal{T}, SM::sideal{T}) where T
+
+Represents the generators of `SM` in terms of the generators of `M`.
+If `SM` is in `M`, `rest` is the null module, otherwise `rest = reduce(SM, std(M))`.
+Returns `(result, rest)` with
+for global orderings:
+    `Matrix(SM) - Matrix(rest) = Matrix(M)*Matrix(result)`
+for non-global orderings:
+    `Matrix(SM)*U - Matrix(rest) = Matrix(M)*Matrix(result)`
+where `U` is some diagonal matrix of units. To compute this `U`,
+see `lift(M::sideal, SM::sideal, goodShape::Bool, isSB::Bool, divide::Bool)`.
+"""
+function lift(M::Singular.sideal{T}, SM::Singular.sideal{T}) where T
+   R = base_ring(M)
+   R == base_ring(SM) || error("base rings must match")
+   ptr, rest_ptr = GC.@preserve M SM R Singular.libSingular.id_Lift(M.ptr, SM.ptr, R.ptr)
+   return Singular.Module(R, ptr), Singular.Module(R,rest_ptr)
+end
+
+@doc Markdown.doc"""
+    lift(M::sideal{T}, SM::sideal{T}, goodShape::Bool, isSB::Bool, divide::Bool) where T
+
+Represents the generators of `SM` in terms of the generators of `M`.
+Returns `(result, rest, U)` with
+    `Matrix(SM)*U - Matrix(rest) = Matrix(M)*Matrix(result)`
+If `SM` is in `M`, then `rest` is the null module. Otherwise, `rest = SM` if
+`!divide`, and `rest = normalform(SM, std(M))` if `divide`.
+`U` is a diagonal matrix of units, differing from the identity matrix only for
+local ring orderings.
+
+There are three boolean options.
+`goodShape`: maximal non-zero index in generators of `SM` <= that of `M`, which
+should be come from a rank check `rank(SM)==rank(M)`.
+`isSB`: generators of `M` form a Groebner basis
+`divide`: allow `SM` not to be a submodule of `M`, which is useful for division
+with remainder.
+"""
+function lift(M::Singular.sideal{T}, SM::Singular.sideal{T},
+                            goodShape::Bool, isSB::Bool, divide::Bool) where T
+   R = base_ring(M)
+   R == base_ring(SM) || error("base rings must match")
+   res, rest, U = GC.@preserve M SM R Singular.libSingular.id_Lift(M.ptr, SM.ptr,
+                                                goodShape, isSB, divide, R.ptr)
+   return (Singular.smodule{T}(R, res), Singular.smodule{T}(R, rest), Singular.smatrix{T}(R, U))
+end
+
+
+###############################################################################
+#
 #   LiftStd
 #
 ###############################################################################
