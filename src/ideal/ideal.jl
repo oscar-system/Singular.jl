@@ -739,7 +739,8 @@ If `SM` is in `M`, then `rest` is the null module. Otherwise, `rest = SM` if
 local ring orderings.
 
 There are three boolean options.
-`goodShape`: maximal non-zero index in generators of `SM` <= that of `M`
+`goodShape`: maximal non-zero index in generators of `SM` <= that of `M`, which
+should be come from a rank check `rank(SM)==rank(M)`.
 `isSB`: generators of `M` form a Groebner basis
 `divide`: allow `SM` not to be a submodule of `M`, which is useful for division
 with remainder.
