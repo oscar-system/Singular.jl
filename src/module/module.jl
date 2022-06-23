@@ -167,13 +167,12 @@ end
 @doc Markdown.doc"""
    reduce(M::smodule, G::smodule)
 Return a submodule whose generators are the generators of $M$ reduced by the
-submodule $G$. The submodule $G$ is required to be given by a Groebner basis. The returned
+submodule $G$. The submodule $G$ need not be a Groebner basis. The returned
 submodule will have the same number of generators as $M$, even if they are zero.
 """
 function reduce(M::smodule, G::smodule)
    check_parent(M, G)
    R = base_ring(M)
-   !G.isGB && error("Not a Groebner basis")
    ptr = GC.@preserve M G R libSingular.p_Reduce(M.ptr, G.ptr, R.ptr)
    return Module(R, ptr)
 end
