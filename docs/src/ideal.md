@@ -90,7 +90,7 @@ iszero(::sideal)
 ```
 
 ```@docs
-is_zerodim(::sideal)
+is_zerodim(I::sideal)
 ```
 
 ```@docs

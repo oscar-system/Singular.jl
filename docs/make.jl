@@ -20,6 +20,7 @@ makedocs(
             "polynomial.md",
             "noncommutative.md",
             "ideal.md",
+            "qring.md",
             "Modules" => [
                   "module.md",
                   "vector.md"

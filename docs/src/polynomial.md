@@ -254,10 +254,6 @@ degree_bound(R::PolyRing)
 ```
 
 ```@docs
-leading_exponent_vector(p::spoly)
-```
-
-```@docs
 total_degree(p::spoly)
 ```
 
