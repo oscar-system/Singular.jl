@@ -3,6 +3,7 @@
    Q, (x, y, z) = @inferred QuotientRing(R, Ideal(R, x^2 - y*z))
 
    @test is_quotient_ring(Q)
+   @test isequal(quotient_ideal(Q), Ideal(R, x^2 - y*z))
 
    I = Ideal(Q, x)
    @test !I.isGB

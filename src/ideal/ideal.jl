@@ -82,7 +82,6 @@ end
 Return `true` if the given ideal is zero dimensional, i.e. the Krull dimension of
 $R/I$ is zero, where $R$ is the polynomial ring over which $I$ is an ideal..
 """
-
 function is_zerodim(I::sideal)
    I.isGB || error("Not a Groebner basis")
    R = base_ring(I)
