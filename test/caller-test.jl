@@ -171,12 +171,17 @@ end
     L = Singular.LibHess.RiemannRochHess(r, f, Any[D, E], "free")
 
     @test length(L[1]) == 5
-    @test length(findall(P->P== 5*x^2*y^3-5*x*y^4-5*x^2*y^2+10*x*y^3-2*y^4-5*x*y^2+4*y^3-2*y^2, L[1])) == 1
-    @test length(findall(P->P== 2*x^3*y^2+x^2*y^3-3*x*y^4-2*x^3*y-x^2*y^2+6*x*y^3-3*x*y^2, L[1])) == 1
-    @test length(findall(P->P== 5*x^3*y^2-5*x*y^4-4*x^3*y+10*x*y^3-5*x*y^2, L[1])) == 1
-    @test length(findall(P->P== 5*x^4*y-5*x*y^4-x^3*y+10*x*y^3-5*x*y^2, L[1])) == 1
-    @test length(findall(P->P== x^5+2*x^4*y-3*x*y^4+6*x*y^3-3*x*y^2, L[1])) == 1
     @test L[2] == x^5
+    # The real test here is that the QQ-span of L[1] == the Q-span of the five
+    # polys below. The weaker ideal equality test is sufficient and is less
+    # cumbersome to type.
+    @test equal(Ideal(r, L[1]), Ideal(r,
+            3*x^5 + x^3*y^2 - 4*x^2*y^3 - x^3*y + 4*x^2*y^2 + 3*y^4 - 6*y^3 + 3*y^2,
+            5*x^3*y^2 - 5*x^2*y^3 - 2*x^3*y + 5*x^2*y^2,
+            5*x^4*y - 5*x^3*y^2 + 3*x^3*y,
+            5*x^5 - 5*x^4*y + 3*x^3*y,
+            x^5 + 2*x^4*y - 3*x*y^4 + 6*x*y^3 - 3*x*y^2
+          ))
 
     R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"])
     F = y^2*(y-z)-x^3
