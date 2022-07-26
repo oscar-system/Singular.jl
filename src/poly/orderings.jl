@@ -213,6 +213,12 @@ function ordering_M(m::Matrix{Int}; check::Bool=true)
    return sordering([sorder_block(ringorder_M, nr, vec(transpose(m)))])
 end
 
+function ordering_M(m::fmpz_mat; check::Bool=true)
+   !check || !iszero(Nemo.det(m)) || throw(ArgumentError("weight matrix must nonsingular"))
+   return ordering_M(Int.(m); check=false)
+end
+
+# TODO: remove this for some breaking release
 function ordering_M(m::fmpz_mat, check::Bool=true)
    !check || !iszero(Nemo.det(m)) || throw(ArgumentError("weight matrix must nonsingular"))
    return ordering_M(Int.(m), check=false)
