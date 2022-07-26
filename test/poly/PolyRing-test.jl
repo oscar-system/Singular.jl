@@ -84,8 +84,8 @@ end
    @test_throws ArgumentError ordering_M([1 2; 3 6])
    @test_throws ArgumentError ordering_M([1 2 3; 3 6 7])
 
-   R, (x1, x2, x3, x4) = PolynomialRing(QQ, "x".*string.(1:4), ordering =
-                                          ordering_M([1 2; 3 5])*ordering_dp())
+   t = ordering_M([1 2; 3 5]; check = false)*ordering_dp()
+   R, (x1, x2, x3, x4) = PolynomialRing(QQ, "x".*string.(1:4), ordering = t)
    test_ordering(ordering(R), [:matrix, :degrevlex, :comp1min],
                               [2, 2, 0],
                               [Int[1, 2, 3, 5], Int[], Int[]])
@@ -93,7 +93,7 @@ end
       x1*x2^2, x1^2*x2*x3, x1^2*x2*x4, x2^2, x1*x2, x2, x1, x3, x4, one(R)])
 
    t = [1 0 1 0; 0 1 0 -1; 1 0 0 1; 0 1 1 0]
-   t = ordering_M(Singular.Nemo.matrix(Singular.Nemo.ZZ, t))
+   t = ordering_M(Singular.Nemo.matrix(Singular.Nemo.ZZ, t); check = true)
    R, (x1, x2, x3, x4) = PolynomialRing(QQ, "x".*string.(1:4), ordering = t)
    test_ordering(ordering(R), [:matrix, :comp1min],
                               [4, 0],
