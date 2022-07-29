@@ -484,17 +484,19 @@ the quotient ideal $(I:J^\infty)$ and the number of iterations.
 """
 function saturation(I::sideal{T}, J::sideal{T}) where T <: Nemo.RingElem
    check_parent(I, J)
-   R = base_ring(I)
-   !has_global_ordering(R) && error("Must be over a ring with global ordering")
-   Q = quotient(I, J)
-   # we already have contains(Q, I) automatically
-   k = 0
-   while !contains(I, Q)
-      I = Q
-      Q = quotient(I, J)
-      k = k + 1
+   has_global_ordering(base_ring(I)) || error("Must be over a ring with global ordering")
+   if !I.isGB
+      I = std(I)
    end
-   return I, k
+   k = 0
+   done = false
+   while !done
+      Q = quotient(I, J)
+      done = contains(I, Q)
+      I = std(Q)
+      k += 1
+   end
+   return I, k - 1
 end
 
 ###############################################################################
