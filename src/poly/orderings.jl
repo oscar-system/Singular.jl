@@ -218,12 +218,6 @@ function ordering_M(m::fmpz_mat; check::Bool=true)
    return ordering_M(Int.(m); check=false)
 end
 
-# TODO: remove this for some breaking release
-function ordering_M(m::fmpz_mat, check::Bool=true)
-   !check || !iszero(Nemo.det(m)) || throw(ArgumentError("weight matrix must nonsingular"))
-   return ordering_M(Int.(m), check=false)
-end
-
 # C, c, and S can take a dummy int in singular, but they do nothing with it?
 
 @doc Markdown.doc"""
