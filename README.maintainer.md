@@ -39,6 +39,11 @@ Singular kernel itself.
 After the new version of `Singular.jl` is picked up by the registry, it may be used
 in further downstream packages.
 
+Note: if you would like test simultaneous changes to both `libsingular_julia` and
+`Singular.jl`, create pull requests against both with the same branch name.
+The CI should show some "matching: " entries.
+    ex: https://github.com/oscar-system/libsingular-julia/pull/55
+
 ## updating the Singular kernel
 
 Suppose the Singular kernel needs an update. This involves updating both build
