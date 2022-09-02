@@ -47,7 +47,7 @@ The CI should show some "matching: " entries.
 ## updating the Singular kernel
 
 Suppose the Singular kernel needs an update. This involves updating both build
-scripts because `libsingular_julia_jll` will need point to the new `Singular_jll`.
+scripts because `libsingular_julia_jll` will need to point to the new `Singular_jll`.
 
 1. Update the Singular build script with the commit SHA of the singular sources (https://github.com/Singular/Singular)
     ex: https://github.com/JuliaPackaging/Yggdrasil/commit/1996668f09e89bc8da0cc498c59d905821b150c8
