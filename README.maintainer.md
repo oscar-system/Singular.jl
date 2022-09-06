@@ -1,46 +1,92 @@
 # Directions for updating Singular.jl
 
-(please edit this file as the process changes)
+`Singular.jl` depends on the Singular kernel and various C++ wrappers maintained
+in `libsingular_julia`. These come as binary artifacts `Singular_jll` and
+`libsingular_julia_jll` respectively.
 
-Here is a record of how we solved
-oscar-system/Singular.jl#261
-by getting the commit
-Singular/Singular@48c4ba6
-into `Singular.jl`.
+The build scripts for each of these:
 
-`Singular.jl` depends on two binary artifacts:
-`Singular_jll` for the actual binaries of Singular, and
-`libsingular_julia_jll` for the cxx-wrapped portion.
+https://github.com/JuliaPackaging/Yggdrasil/blob/master/S/Singular/build_tarballs.jl
+https://github.com/JuliaPackaging/Yggdrasil/blob/master/L/libsingular_julia/build_tarballs.jl
 
-First, the pull request
-JuliaPackaging/Yggdrasil#1622
-bumps the SHA to an appropriate version of the Singular sources
-and the version `4.1.3p4` in the comment is actually `4.1.3+3` (the 4 is off by one).
-After the changes are merged, the repo
-https://github.com/JuliaBinaryWrappers/Singular_jll.jl
-is automagically updated and `Singular_jll` version `4.1.3+3` is usable from julia.
+The sources:
 
-Next, since the bug fix in Singular is in a header file which also happens
-to be included by the cxx wrappers, `libsingular_julia_jll` needs to be updated
-as well. This involves making a new release of the repo
+https://github.com/Singular/Singular
 https://github.com/oscar-system/libsingular-julia
-Since this is now version `0.2.0`, the version and the SHA needs to be updated by
-JuliaPackaging/Yggdrasil#1643
-After this is merged, the repo
-https://github.com/JuliaBinaryWrappers/libsingular_julia_jll.jl
-is automagically updated and `libsingular_julia_jll` version `0.2.0` is usable.
 
-Finally, an updated `Singular.jl` is make by bumping the versions in
-oscar-system/Singular.jl@56ebe7b
-It is important to ping the JuliaRegistrator so that version `0.4.1` is usable.
+## updating libsingular_julia
 
-## new for libsingular_julia process as of 2021:
-update libsingular_julia/common.jl and version 1.3
-JuliaPackaging/Yggdrasil#2535
-once this is merged in the registry (i.e. JuliaRegistries/General#29881), a dummy commit for version 1.4
-JuliaPackaging/Yggdrasil#2536
-once this is merged in the registry, another dummy commit for version 1.5
-JuliaPackaging/Yggdrasil#2537
+Suppose just the C++ wrappers need to be updated, without any changes to the
+Singular kernel itself. 
+
+1. Commit changes to the `libsingular_julia` source
+    ex: https://github.com/oscar-system/libsingular-julia/commit/65a12e7fb8546851d3296244aeacc5de1d97af2c
+
+2. Update the `libsingular_julia` build script with a new version number the commit SHA
+    ex: https://github.com/JuliaPackaging/Yggdrasil/commit/dd9d775f530b1164dd1cf6135677846dcb25fafc
+
+3. Wait for this to be merged into Yggdrasil, and then wait for the registry to pick up the new version of `libsingular_julia_jll`
+    ex: https://github.com/JuliaRegistries/General/commit/00624106c204ccb28fb2c834877fb6005c653ce7
+
+4. Bump the dependence in `Singular.jl` to whatever version number was used in Step 2.
+    ex: https://github.com/oscar-system/Singular.jl/commit/f669cea1aa4fc73082d8e8c08a1e33a7c22882ed
+
+   Version compatibility notation: https://pkgdocs.julialang.org/v1/compatibility/
+
+5. Release a new `Singular.jl`. This is done by pinging JuliaRegistrator in the comments of a commit.
+    ex: https://github.com/oscar-system/Singular.jl/commit/cbc04de26507b386e27d2bd7a23a2f913903d9cc
+
+After the new version of `Singular.jl` is picked up by the registry, it may be used
+in further downstream packages.
+
+Note: if you would like test simultaneous changes to both `libsingular_julia` and
+`Singular.jl`, create pull requests against both with the same branch name.
+The CI should show some "matching: " entries.
+    ex: https://github.com/oscar-system/libsingular-julia/pull/55
+
+## updating the Singular kernel
+
+Suppose the Singular kernel needs an update. This involves updating both build
+scripts because `libsingular_julia_jll` will need to point to the new `Singular_jll`.
+
+1. Update the Singular build script with the commit SHA of the singular sources (https://github.com/Singular/Singular)
+    ex: https://github.com/JuliaPackaging/Yggdrasil/commit/1996668f09e89bc8da0cc498c59d905821b150c8
+
+   In this specific commit, `FLINT_jll` was also updated, but this is not necessary to update singular.
+   Any build issues need to be communicated to https://github.com/Singular/Singular
+   until you get a commit that builds on all targets.
+
+2. Wait for the Yggdrasil merge, and wait for the registry.
+    ex: https://github.com/JuliaRegistries/General/commit/c73ad5d2ec0483113ffc2eca9b623049a7d8e81a
+
+3. Update the `libsingular_julia` build scripts with a new version and `Singular_jll` dependency.
+    ex: https://github.com/JuliaPackaging/Yggdrasil/commit/cc75959bcf85b016625d9e528db277fd4d3b32d9
+
+   Supposedly, Yggdrasil does not like new versions with the same commit SHA.
+   Therefore, if `https://github.com/oscar-system/libsingular-julia.git` has not
+   changed since the last version, add a dummy commit and use the new SHA.
+
+At this point, we have a new `libsingular_julia_jll` in the works, and the steps
+are essentially Steps 3-5 in the pervious section.
+
+4. The usual waiting.
+    ex: https://github.com/JuliaRegistries/General/commit/5c91a1184ed468d2a014c149f19caf84748fb83f
+
+5. Bump the `libsingular_julia_jll` and `Singular_jll` dependencies in `Singular.jl`.
+    ex: https://github.com/oscar-system/Singular.jl/commit/138eeb12b5105e252c086bc45f259704e74c9885
+
+   This commit also bumps `AbstractAlgebra` and `Nemo`, but this is not necessary
+   just to update Singular.
+
+6. Release new `Singular.jl` version.
+    ex: https://github.com/oscar-system/Singular.jl/commit/12f3b6b8689177d55f3952a8e5f9dccf233be885
+
+## updating both libsingular_julia and the Singular kernel
+
+Since updating the Singular kernel requires an update to `libsingular_julia`, the
+steps here are the same as in the previous section. Just make sure that in
+Step 3, the commit SHA used to update the `libsingular_julia` build scripts
+contains all of the desired changes to `libsingular_julia`.
 
 # Overriding the libsingular_julia_jll artifact
 
