@@ -605,4 +605,16 @@ void singular_define_rings(jlcxx::Module & Singular)
 		       {  res = -1;}
 		       return res; 
     });
+
+    // creates an opposite algebra of R
+    // ring rOpposite(ring src)
+    Singular.method("rOpposite", rOpposite);
+
+    // opposes a vector p from Rop to currRing (dst!)
+    // poly pOppose(ring Rop, poly p, const ring dst)
+    Singular.method("pOppose", pOppose);
+
+    // opposes a module I from Rop to currRing(dst)
+    // ideal idOppose(ring Rop, ideal I, const ring dst)
+    Singular.method("idOppose", idOppose);
 }
