@@ -249,7 +249,10 @@ jl_value_t * get_ring_content(ring r)
         jl_arrayset(current, jl_box_int64(IDTYP(h)), 0);
         jl_arrayset(current,
                     reinterpret_cast<jl_value_t *>(jl_symbol(IDID(h))), 1);
-        jl_arrayset(current, jl_box_voidpointer(IDDATA(h)), 2);
+        {
+            sleftv x; x.Copy((leftv)h);
+            jl_arrayset(current, jl_box_voidpointer(x.data), 2);
+        }
         jl_arrayset(result, reinterpret_cast<jl_value_t *>(current), nr);
         h = IDNEXT(h);
         nr++;
