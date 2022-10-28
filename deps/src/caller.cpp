@@ -234,6 +234,9 @@ jl_value_t * get_julia_type_from_sleftv(leftv ret)
 
 jl_value_t * get_ring_content(ring r)
 {
+    ring save = currRing;
+    rChangeCurrRing(r);
+
     // count elements
     idhdl h = r->idroot;
     int   nr = 0;
@@ -257,6 +260,8 @@ jl_value_t * get_ring_content(ring r)
         h = IDNEXT(h);
         nr++;
     }
+
+    rChangeCurrRing(save);
     return reinterpret_cast<jl_value_t *>(result);
 }
 
