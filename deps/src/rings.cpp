@@ -538,6 +538,22 @@ void singular_define_rings(jlcxx::Module & Singular)
                         rChangeCurrRing(origin);
                         return res;
                     });
+    Singular.method("p_Reduce",
+                    [](spolyrec * p, sip_sideal * G, ip_sring * R, int flag) {
+                        const ring origin = currRing;
+                        rChangeCurrRing(R);
+                        poly res = kNF(G, R->qideal, p, 0, flag);
+                        rChangeCurrRing(origin);
+                        return res;
+                    });
+    Singular.method("p_Reduce",
+                    [](sip_sideal * p, sip_sideal * G, ip_sring * R, int flag) {
+                        const ring origin = currRing;
+                        rChangeCurrRing(R);
+                        ideal res = kNF(G, R->qideal, p, 0, flag);
+                        rChangeCurrRing(origin);
+                        return res;
+                    });
 
     Singular.method("letterplace_ring_helper",
                     [](ip_sring * r, long block_size) {
