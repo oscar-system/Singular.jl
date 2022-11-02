@@ -3,7 +3,7 @@ export sideal, IdealSet, syz, lead, normalize!, is_constant, is_zerodim, fglm,
        independent_sets, maximal_independent_set, ngens, sres, intersection,
        quotient, reduce, eliminate, kernel, equal, contains, is_var_generated,
        saturation, satstd, slimgb, std, vdim, interreduce, degree, mult,
-       hilbert_series, is_homogeneous
+       hilbert_series, is_homogeneous, division
 
 ###############################################################################
 #
@@ -644,6 +644,20 @@ function reduce(a::T, b::T) where T <: SPolyUnion
    G = sideal{T}(R, b)
    ptr = GC.@preserve a G R libSingular.p_Reduce(a.ptr, G.ptr, R.ptr)
    return R(ptr)
+end
+
+@doc Markdown.doc"""
+    division(I::sideal{S}, G::sideal{S}) where S <: SPolyUnion
+
+Computes a division with remainder.
+returns a list T,Rest,U where matrix(I)*matrix(U)=matrix(G)*matrix(T)+matrix(Rest)
+"""
+function division(I::sideal{S}, G::sideal{S}) where S <: SPolyUnion
+   check_parent(I, G)
+   R = base_ring(I)
+   ptr_T,ptr_Rest,ptr_U = GC.@preserve I G R libSingular.id_Lift(G.ptr, I.ptr,
+                                                      true,false,true,R.ptr)
+   return (smodule{S}(R,ptr_T), sideal{S}(R,ptr_Rest), smodule{S}(R,ptr_U))
 end
 
 ###############################################################################
