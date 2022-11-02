@@ -497,6 +497,7 @@ void singular_define_ideals(jlcxx::Module & Singular)
         {
           a.push_back(content[j]);
         }
+        delete v;
         rChangeCurrRing(origin);
     });
     Singular.method("scHilbWeighted", [](ideal I, ring r, jlcxx::ArrayRef<int> weights, jlcxx::ArrayRef<int> a) {
