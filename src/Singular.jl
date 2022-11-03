@@ -212,6 +212,8 @@ include("AbstractTypes.jl")
 
 include("LibSingular.jl")
 
+import .libSingular: call_interpreter
+
 include("Number.jl")
 
 include("poly/OrderingTypes.jl")

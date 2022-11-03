@@ -393,8 +393,10 @@ end
 @doc Markdown.doc"""
     lookup_library_symbol(package::String, name::String)
 
-Attempt to look up a symbol in a particular package and return its value as a
-usable Singular.jl object.
+Attempt to look up a symbol in a particular Singular interpreter package and
+return its value as a usable Singular.jl object. The package at the top level
+is called "Top", and ring dependent objects are contained in their basering,
+which is returned as a dictionary.
 """
 function lookup_library_symbol(pack::String, name::String)
     (err::Int, res) = libSingular.lookup_singular_library_symbol_wo_rng(pack, name)
