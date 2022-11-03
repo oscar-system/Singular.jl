@@ -70,7 +70,17 @@ julia> Singular.LibCentral.center(A, 3)   # base ring cannot be inferred from th
 Singular ideal over Singular G-Algebra (QQ),(x,y,z,t),(dp(4),C) with generators (t, 4*x*y + z^2 - 2*z)
 ```
 
-## Global variables
+## Global Interpreter Variables
+
+The function `Singular.call_interpreter` can be used to execute arbitrary
+strings inside the Singular interpreter, and the function
+`Singular.lookup_library_symbol` fetches results from the interpreter.
+
+```@docs
+Singular.lookup_library_symbol(package::String, name::String)
+```
+
+## Global Kernel Variables
 
 The global variables `degBound` and `multBound` can be used in a local fashion.
 As with any global variable, their usage should be accompanied with caution.
