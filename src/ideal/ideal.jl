@@ -649,8 +649,11 @@ end
 @doc Markdown.doc"""
     division(I::sideal{S}, G::sideal{S}) where S <: SPolyUnion
 
-Computes a division with remainder.
-returns a list T,Rest,U where matrix(I)*matrix(U)=matrix(G)*matrix(T)+matrix(Rest)
+Computes a division with remainder by representing the generators of `I` in
+terms of the generators of `G`. Returns a tuple (Quo, Rem, U) where
+  `Matrix(I)*Matrix(U) = Matrix(G)*Matrix(Quo) + Matrix(Rem)`
+and `Rem = normalform(I, std(G))`. `U` is a diagonal matrix of units differing
+from the identity matrix only for local ring orderings.
 """
 function division(I::sideal{S}, G::sideal{S}) where S <: SPolyUnion
    check_parent(I, G)
