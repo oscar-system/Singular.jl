@@ -397,6 +397,21 @@ Attempt to look up a symbol in a particular Singular interpreter package and
 return its value as a usable Singular.jl object. The package at the top level
 is called "Top", and ring dependent objects are contained in their basering,
 which is returned as a dictionary.
+
+# Examples
+```julia
+julia> Singular.call_interpreter("bigint a = 42;");
+
+julia> a = Singular.lookup_library_symbol("Top", "a"); (a, typeof(a))
+(42, BigInt)
+
+julia> Singular.call_interpreter("ring r=0,(x,y,z),dp; poly f = (x+y)^2;");
+
+julia> Singular.lookup_library_symbol("Top", "r")
+2-element Vector{Any}:
+ Singular Polynomial Ring (QQ),(x,y,z),(dp(3),C)
+ Dict{Symbol, spoly{n_Q}}(:f => x^2 + 2*x*y + y^2)
+```
 """
 function lookup_library_symbol(pack::String, name::String)
     (err::Int, res) = libSingular.lookup_singular_library_symbol_wo_rng(pack, name)

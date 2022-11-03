@@ -80,22 +80,6 @@ strings inside the Singular interpreter, and the function
 Singular.lookup_library_symbol(package::String, name::String)
 ```
 
-**Examples**
-
-```julia
-julia> Singular.call_interpreter("bigint a = 42;");
-
-julia> a = Singular.lookup_library_symbol("Top", "a"); (a, typeof(a))
-(42, BigInt)
-
-julia> Singular.call_interpreter("ring r=0,(x,y,z),dp; poly f = (x+y)^2;");
-
-julia> Singular.lookup_library_symbol("Top", "r")
-2-element Vector{Any}:
- Singular Polynomial Ring (QQ),(x,y,z),(dp(3),C)
- Dict{Symbol, spoly{n_Q}}(:f => x^2 + 2*x*y + y^2)
-```
-
 ## Global Kernel Variables
 
 The global variables `degBound` and `multBound` can be used in a local fashion.
