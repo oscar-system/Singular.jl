@@ -56,7 +56,7 @@ of the ring $R$.
 
 The entries of the matrices $C$ and $D$ on or below the main diagonal are
 ignored. A non-matrix argument `a` for either `C` or `D` is turned into a
-matrix with all relevent entries set to `a`.
+matrix with all relevant entries set to `a`.
 
 !!! note
     The conditions that assure that multiplication is associative in the
@@ -111,7 +111,7 @@ differential operators are named by simply appending the letter "d" to each of
 the strings in `x`. The second variant takes the names of the $x_i$ from the
 first row of the matrix and the names of the $\partial_i$ from the second row
 of the matrix. Note that the functionality of this constructor can be achieved
-with the `GAlgebra` constructor: it is provided only for convience. Note also
+with the `GAlgebra` constructor: it is provided only for convenience. Note also
 that due to the ordering constraint on G-algebras, the orderings `:neglex`,
 `:negdeglex`, `:negdevrevlex` are excluded.
 

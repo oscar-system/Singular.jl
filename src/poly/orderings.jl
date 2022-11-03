@@ -234,7 +234,7 @@ ordering_C(dummy::Int = 0) = _basic_ordering(Singular.ringorder_C, 0)
 @doc Markdown.doc"""
     ordering_c()
 
-Represents a decending ordering on vector components `gen(1) > gen(2) > ...`.
+Represents a descending ordering on vector components `gen(1) > gen(2) > ...`.
 All monomial block orderings preceding the component ordering have higher
 precedence, and all succeeding monomial block orderings have lower precedence.
 """

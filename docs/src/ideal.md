@@ -14,7 +14,7 @@ Ideals objects have a parent object which represents the set of ideals they belo
 the data for which is given by the polynomial ring their generators belong to.
 
 The types of ideals and associated parent objects are given in the following table
-according to the library provding them.
+according to the library providing them.
 
  Library        | Element type  | Parent type
 ----------------|---------------|-----------------------

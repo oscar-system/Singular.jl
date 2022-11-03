@@ -106,7 +106,7 @@ function __init__()
    libSingular.set_printlevel(-100)
 
    # At this point we have Kstd1_mu = 2^31-1 and OPT_MULTBOUND unset, which is
-   # a slightly inconsistent state. The singular intepreter variable "multBound"
+   # a slightly inconsistent state. The singular interpreter variable "multBound"
    # simply reads Kstd1_mu and assigning to "multBound" assigns to Kstd1_mu
    # and sets OPT_MULTBOUND if it is nonzero, and unsets OPT_MULTBOUND if it is
    # zero. Since we want to be able to easily restore the multBound to a
@@ -201,7 +201,7 @@ const VERSION_NUMBER = pkgversion(@__MODULE__)
 #     you need a PolyRing R and matrices over R, and in order to create a
 #     quotient ring you need the polynomial ring and an ideal.
 #     The matrix code requires some module code, which requires some ideal
-#     code, which requies some poly code. Therefore, we include all of the
+#     code, which requires some poly code. Therefore, we include all of the
 #     poly/matrix/module/ideal types before including the methods.
 #
 ###############################################################################

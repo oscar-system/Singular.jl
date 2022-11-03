@@ -21,7 +21,7 @@
 # these julia objects can be distinguished from the normal (non-list) values
 # and tuples of normal values by seeing if the first argument is a Bool.
 
-# Finally the really fun part: When coverting everything back to something for
+# Finally the really fun part: When converting everything back to something for
 # julia, the following both produce the same julia result [a, b]:
 #     - (a,b): a tuple of length 2 returned by a procedure
 #     - list(a,b): a list of length 2 returned by a procedure

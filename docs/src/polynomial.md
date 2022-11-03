@@ -70,7 +70,7 @@ The options for polynomial term ordering are, `:lex`, `:deglex`, `:degrevlex`,
 `:neglex`, `:negdeglex` and `:negdegrevlex`, and the options for module component ordering
 are `comp1min` and `comp1max`.
 
-If the first ordering `ordering` is specifed as a non-symbol, the second ordering
+If the first ordering `ordering` is specified as a non-symbol, the second ordering
 `ordering2` will be ignored. For specifying non-symbolic term orderings, please
 see the Term orderings section below.
 

@@ -1150,7 +1150,7 @@ end
     homogenize(p::spoly{T}, v::spoly{T}) where T <: Nemo.RingElem
 
 Multiply each monomial in p by a suitable power of the
-variable `v` and return the corresponding homogenous polynomial.
+variable `v` and return the corresponding homogeneous polynomial.
 The variable `v` must have weight `1`.
 """
 function homogenize(p::spoly{T}, v::spoly{T}) where T <: Nemo.RingElem

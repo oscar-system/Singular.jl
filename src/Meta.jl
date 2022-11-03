@@ -10,7 +10,7 @@ include("libraryfuncdictionary.jl")
 
 #=
    In the dictionary `input_manipulator_funcs` for each library a dictionary
-   can be added, and for each function in this library a preprocesing function
+   can be added, and for each function in this library a preprocessing function
    can be added. The function gets executed on the input, before the library function
    is called.
 =#

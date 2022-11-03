@@ -5,7 +5,7 @@ CurrentModule = Singular
 # Nemo rings and fields
 
 Any type that satisfies AbstractAlgebra.jl Ring or Field interface, such as all Nemo
-ring and field types, can be used as coefficient rings in Singular.jl. Theses are
+ring and field types, can be used as coefficient rings in Singular.jl. These are
 implemented via the Singular `n_RingElem{T}` and `n_FieldElem{T}` types, parameterised
 by the given Nemo/AbstractAlgebra element type.
 

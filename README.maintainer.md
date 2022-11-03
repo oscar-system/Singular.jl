@@ -67,7 +67,7 @@ scripts because `libsingular_julia_jll` will need to point to the new `Singular_
    changed since the last version, add a dummy commit and use the new SHA.
 
 At this point, we have a new `libsingular_julia_jll` in the works, and the steps
-are essentially Steps 3-5 in the pervious section.
+are essentially Steps 3-5 in the previous section.
 
 4. The usual waiting.
     ex: https://github.com/JuliaRegistries/General/commit/5c91a1184ed468d2a014c149f19caf84748fb83f

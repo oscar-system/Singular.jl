@@ -63,10 +63,10 @@ julia> D[1,2] = -z; D[1,3] = 2*x; D[2,3] = -2*y;
 
 julia> A, (x, y, z, t) = GAlgebra(AA, 1, D);
 
-julia> Singular.LibNctools.isCentral(x)   # base ring A is infered from x
+julia> Singular.LibNctools.isCentral(x)   # base ring A is inferred from x
 0
 
-julia> Singular.LibCentral.center(A, 3)   # base ring cannot be infered from the plain Int 3
+julia> Singular.LibCentral.center(A, 3)   # base ring cannot be inferred from the plain Int 3
 Singular ideal over Singular G-Algebra (QQ),(x,y,z,t),(dp(4),C) with generators (t, 4*x*y + z^2 - 2*z)
 ```
 
