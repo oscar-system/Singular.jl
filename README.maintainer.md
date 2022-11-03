@@ -6,18 +6,18 @@ in `libsingular_julia`. These come as binary artifacts `Singular_jll` and
 
 The build scripts for each of these:
 
-https://github.com/JuliaPackaging/Yggdrasil/blob/master/S/Singular/build_tarballs.jl
-https://github.com/JuliaPackaging/Yggdrasil/blob/master/L/libsingular_julia/build_tarballs.jl
+- <https://github.com/JuliaPackaging/Yggdrasil/blob/master/S/Singular/build_tarballs.jl>
+- <https://github.com/JuliaPackaging/Yggdrasil/blob/master/L/libsingular_julia/build_tarballs.jl>
 
 The sources:
 
-https://github.com/Singular/Singular
-https://github.com/oscar-system/libsingular-julia
+- <https://github.com/Singular/Singular>
+- <https://github.com/oscar-system/libsingular-julia>
 
 ## updating libsingular_julia
 
 Suppose just the C++ wrappers need to be updated, without any changes to the
-Singular kernel itself. 
+Singular kernel itself.
 
 1. Commit changes to the `libsingular_julia` source
     ex: https://github.com/oscar-system/libsingular-julia/commit/65a12e7fb8546851d3296244aeacc5de1d97af2c
