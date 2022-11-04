@@ -223,3 +223,14 @@ end
     A, (x, y, z, t) = GAlgebra(AA, 1, D)
     @test Singular.LibCentral.center(A, 3) isa sideal
 end
+
+@testset "#595" begin
+    Singular.libSingular.call_interpreter("ring r=0,(x,y,z),dp;")
+    a = Singular.lookup_library_symbol("Top", "r")
+    Singular.libSingular.call_interpreter("poly f = x;")
+    a = Singular.lookup_library_symbol("Top", "r")
+    Singular.libSingular.call_interpreter("ideal I = y;")
+    a = Singular.lookup_library_symbol("Top", "r")
+    GC.gc(true)
+    @test length(string(a)) > 2
+end
