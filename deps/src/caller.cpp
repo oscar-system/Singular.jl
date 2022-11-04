@@ -43,16 +43,19 @@ static jl_value_t * get_type_mapper()
 
     jl_array_t * return_array = jl_alloc_array_1d(
         jl_array_any_type, sizeof(types) / sizeof(types[0]));
-
+    JL_GC_PUSH1(&return_array);
     for (int i = 0; i < sizeof(types) / sizeof(types[0]); i++) {
         jl_array_t * current_return = jl_alloc_array_1d(jl_array_any_type, 2);
+        JL_GC_PUSH1(&current_return);
         jl_arrayset(current_return, jl_box_int64(types[i].cmd), 0);
         jl_arrayset(current_return,
                     reinterpret_cast<jl_value_t *>(jl_symbol(types[i].name)),
                     1);
+        JL_GC_POP();
         jl_arrayset(return_array,
                     reinterpret_cast<jl_value_t *>(current_return), i);
     }
+    JL_GC_POP();
     return reinterpret_cast<jl_value_t *>(return_array);
 }
 
@@ -89,20 +92,21 @@ static inline void * get_ptr_from_cxxwrap_obj(jl_value_t * obj)
 
 jl_value_t * intvec_to_jl_array(intvec * v)
 {
-    int          size = v->length();
+    int size = v->length();
     jl_array_t * result = jl_alloc_array_1d(jl_int64_vector_type, size);
-    int *        v_content = v->ivGetVec();
+    JL_GC_PUSH1(&result);
+    int * content = v->ivGetVec();
     for (int i = 0; i < size; i++) {
-        jl_arrayset(result, jl_box_int64(static_cast<int64_t>(v_content[i])),
-                    i);
+        jl_arrayset(result, jl_box_int64(static_cast<int64_t>(content[i])), i);
     }
+    JL_GC_POP();
     return reinterpret_cast<jl_value_t *>(result);
 }
 
 jl_value_t * intmat_to_jl_array(intvec * v)
 {
-    int          rows = v->rows();
-    int          cols = v->cols();
+    int rows = v->rows();
+    int cols = v->cols();
     jl_array_t * result = jl_alloc_array_2d(jl_int64_matrix_type, rows, cols);
     int64_t * result_ptr = reinterpret_cast<int64_t *> jl_array_data(result);
     for (int i = 0; i < rows; i++) {
@@ -245,10 +249,12 @@ jl_value_t * get_ring_content(ring r)
         h = IDNEXT(h);
     }
     jl_array_t * result = jl_alloc_array_1d(jl_array_any_type, nr);
+    JL_GC_PUSH1(&result);
     h = r->idroot;
     nr = 0;
     while (h != NULL) {
         jl_array_t * current = jl_alloc_array_1d(jl_array_any_type, 3);
+        JL_GC_PUSH1(&current);
         jl_arrayset(current, jl_box_int64(IDTYP(h)), 0);
         jl_arrayset(current,
                     reinterpret_cast<jl_value_t *>(jl_symbol(IDID(h))), 1);
@@ -256,11 +262,12 @@ jl_value_t * get_ring_content(ring r)
             sleftv x; x.Copy((leftv)h);
             jl_arrayset(current, jl_box_voidpointer(x.data), 2);
         }
+        JL_GC_POP();
         jl_arrayset(result, reinterpret_cast<jl_value_t *>(current), nr);
         h = IDNEXT(h);
         nr++;
     }
-
+    JL_GC_POP();
     rChangeCurrRing(save);
     return reinterpret_cast<jl_value_t *>(result);
 }
@@ -288,6 +295,7 @@ jl_value_t * call_singular_library_procedure(
     if (ret->next != NULL) {
         int          len = ret->listLength();
         jl_array_t * list = jl_alloc_array_1d(jl_array_any_type, len + 1);
+        JL_GC_PUSH1(&list);
         jl_arrayset(list, jl_true, 0);
         for (int i = 0; i < len; ++i) {
             leftv next = ret->next;
@@ -297,6 +305,7 @@ jl_value_t * call_singular_library_procedure(
                 omFreeBin(ret, sleftv_bin);
             ret = next;
         }
+        JL_GC_POP();
         retObj = reinterpret_cast<jl_value_t *>(list);
     }
     else {
@@ -319,6 +328,7 @@ jl_value_t * lookup_singular_library_symbol_wo_rng(
     int err = 2;
     jl_value_t * res = jl_nothing;
     jl_array_t * answer = jl_alloc_array_1d(jl_array_any_type, 2);
+    JL_GC_PUSH1(&answer);
     leftv u = (leftv) IDROOT->get(pack.c_str(),0);
     if (u != NULL)
     {
@@ -338,6 +348,7 @@ jl_value_t * lookup_singular_library_symbol_wo_rng(
     // err=2: package not found, res is junk
     jl_arrayset(answer, jl_box_int64(err), 0);
     jl_arrayset(answer, res, 1);
+    JL_GC_POP();
     return reinterpret_cast<jl_value_t *>(answer);
 }
 
@@ -346,6 +357,7 @@ jl_value_t * convert_nested_list(void * l_void)
     lists        l = reinterpret_cast<lists>(l_void);
     int          len = lSize(l) + 1;
     jl_array_t * result_array = jl_alloc_array_1d(jl_array_any_type, len);
+    JL_GC_PUSH1(&result_array);
     for (int i = 0; i < len; i++) {
         leftv current = &(l->m[i]);
         if (current->Typ() == LIST_CMD) {
@@ -358,6 +370,7 @@ jl_value_t * convert_nested_list(void * l_void)
             jl_arrayset(result_array, get_julia_type_from_sleftv(current), i);
         }
     }
+    JL_GC_POP();
     return reinterpret_cast<jl_value_t *>(result_array);
 }
 
