@@ -1,4 +1,4 @@
-export jet, minimal_generating_set, ModuleClass, rank, smodule, slimgb, eliminate, modulo, lift
+export jet, minimal_generating_set, ModuleClass, rank, smodule, slimgb, eliminate, modulo, lift, division
 
 ###############################################################################
 #
@@ -175,6 +175,23 @@ function reduce(M::smodule, G::smodule)
    R = base_ring(M)
    ptr = GC.@preserve M G R libSingular.p_Reduce(M.ptr, G.ptr, R.ptr)
    return Module(R, ptr)
+end
+
+@doc Markdown.doc"""
+    division(I::smodule{S}, G::smodule{S}) where S
+
+Computes a division with remainder by representing the generators of `I` in
+terms of the generators of `G`. Returns a tuple (Quo, Rem, U) where
+  `Matrix(I)*Matrix(U) = Matrix(G)*Matrix(Quo) + Matrix(Rem)`
+where `Rem = normalform(I, std(G))`. `U` is a diagonal matrix of units differing
+from the identity matrix only for local ring orderings.
+"""
+function division(I::smodule{S}, G::smodule{S}) where S
+   check_parent(I, G)
+   R = base_ring(I)
+   ptr_T,ptr_Rest,ptr_U = GC.@preserve I G R libSingular.id_Lift(G.ptr, I.ptr,
+                                                      true,false,true,R.ptr)
+   return (smodule{S}(R,ptr_T), smodule{S}(R,ptr_Rest), smodule{S}(R,ptr_U))
 end
 
 ###############################################################################

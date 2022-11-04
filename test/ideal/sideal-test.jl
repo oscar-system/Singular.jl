@@ -584,6 +584,20 @@ end
    @test typeof(L2) == Vector{Vector{spoly{n_Q}}}
 end
 
+@testset "sideal.lift" begin
+  R,(x,y) = PolynomialRing(QQ, ["x", "y"], ordering = ordering_ds())
+  f = x^5 + x^2*y^2 + y^5
+  G = Ideal(R, derivative(f, x), derivative(f, y))
+
+  for I in [Ideal(R, f), Ideal(R, f^2)]
+    (T, rest, U) = division(I, G)
+    @test Matrix(I)*Matrix(U) == Matrix(G)*Matrix(T) + Matrix(rest)
+
+    (T, rest, U) = lift(G, I, true, false, true)
+    @test Matrix(I)*U == Matrix(G)*Matrix(T) + Matrix(rest)
+  end
+end
+
 @testset "sideal.lift_std" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
