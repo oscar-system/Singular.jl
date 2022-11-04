@@ -234,7 +234,7 @@ end
 #
 ###############################################################################
 
-function _FreeAlgebra(R, s::Vector{String}, degree_bound, ordering, ordering2, cached)
+function _FreeAlgebra(R, s::Union{Vector{String},Vector{Symbol}}, degree_bound, ordering, ordering2, cached)
    T = elem_type(R)
    if isa(ordering, Symbol)
       ord1 = sym2ringorder[ordering]
@@ -256,13 +256,13 @@ function _FreeAlgebra(R, s::Vector{String}, degree_bound, ordering, ordering2, c
    return (parent_obj, gens(parent_obj))
 end
 
-function FreeAlgebra(R::Union{Ring, Field}, s::Vector{String}, degree_bound::Int;
+function FreeAlgebra(R::Union{Ring, Field}, s::Union{Vector{String},Vector{Symbol}}, degree_bound::Int;
                      ordering = :degrevlex, ordering2::Symbol = :comp1min,
                      cached::Bool = true)
    return _FreeAlgebra(R, s, degree_bound, ordering, ordering2, cached)
 end
 
-function FreeAlgebra(R::Nemo.Ring, s::Vector{String}, degree_bound::Int;
+function FreeAlgebra(R::Nemo.Ring, s::Union{Vector{String},Vector{Symbol}}, degree_bound::Int;
                      ordering = :degrevlex, ordering2::Symbol = :comp1min,
                      cached::Bool = true)
    R = CoefficientRing(R)
