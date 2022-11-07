@@ -96,11 +96,11 @@ julia> Q, (x, y) = QuotientRing(G, std(I))
 ### WeylAlgebra
 
 ```julia
-function WeylAlgebra(R::Union{Ring, Field}, s::Vector{String};
+function WeylAlgebra(R::Union{Ring, Field}, s::Union{Vector{String}, Vector{Symbol}};
                      ordering = :degrevlex, ordering2::Symbol = :comp1min,
                      cached::Bool = true, degree_bound::Int = 0)
 
-function WeylAlgebra(R::Union{Ring, Field}, s::Matrix{String};
+function WeylAlgebra(R::Union{Ring, Field}, s::Union{Matrix{String}, Vector{Symbol}};
                      ordering = :degrevlex, ordering2::Symbol = :comp1min,
                      cached::Bool = true, degree_bound::Int = 0)
 ```
@@ -145,7 +145,7 @@ julia> gens(std(Ideal(R, [x1^2*d2^2 + x2^2*d3^2, x1*d2 + x3])))
 ### FreeAlgebra
 
 ```julia
-FreeAlgebra(R::Field, s::Vector{String}, degree_bound::Int;
+FreeAlgebra(R::Field, s::Union{Vector{String}, Vector{Symbol}}, degree_bound::Int;
             ordering = :degrevlex, ordering2::Symbol = :comp1min,
             cached::Bool = true)
 ```

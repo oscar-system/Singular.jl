@@ -384,7 +384,7 @@ function FunctionField(F::Singular.Field, S::Union{Vector{String},Vector{Symbol}
    isa(F, Rationals) || isa(F, N_ZpField) ||
              error("Only transcendental extensions of Q and Fp are supported.")
    isempty(S) && throw(ArgumentError("array must be non-empty"))
-   R = N_FField(F, Symbol.(S), cached)
+   R = N_FField(F, map(Symbol, S), cached)
    return tuple(R, transcendence_basis(R))
 end
 

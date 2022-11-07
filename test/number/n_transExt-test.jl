@@ -2,13 +2,16 @@
    F, _ = FunctionField(QQ, ["a", "b", "c"])
    F1, _ = FunctionField(QQ, ["a", "b", "c"])
    F2, _ = FunctionField(QQ, ["a", "b", "c"], cached = false)
+   F3, _ = FunctionField(QQ, [:a, :b, :c])
 
    @test F isa Singular.Field
    @test F1 isa Singular.Field
    @test F2 isa Singular.Field
+   @test F3 isa Singular.Field
    @test F == F1
    @test F != F2
    @test F1 != F2
+   @test F == F3
 
    @test_throws ArgumentError FunctionField(QQ, String[])
 

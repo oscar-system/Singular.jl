@@ -1,6 +1,10 @@
 @testset "weyl.constructors" begin
 
    R, (x, y, z, dx, dy, dz) = WeylAlgebra(QQ, ["x", "y", "z"])
+   R1 = WeylAlgebra(QQ, [:x, :y, :z])
+   R2 = WeylAlgebra(QQ, [:x :y :z; :dx :dy :dz])
+   @test R == R1
+   @test R == R2
 
    @test typeof(R) == PluralRing{n_Q}
    @test elem_type(R) == spluralg{n_Q}

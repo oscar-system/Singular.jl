@@ -1588,8 +1588,9 @@ function get_fancy_ordering(ordering, ordering2)
 end
 
 function _PolynomialRing(R, s::Union{Vector{String},Vector{Symbol}}, ordering, ordering2, cached, degree_bound)
+   s = map(Symbol, s)
    sord = get_fancy_ordering(ordering, ordering2)
-   z = PolyRing{elem_type(R)}(R, Symbol.(s), sord, cached, degree_bound)
+   z = PolyRing{elem_type(R)}(R, s, sord, cached, degree_bound)
    return (z, gens(z))
 end
 

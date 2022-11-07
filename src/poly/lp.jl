@@ -235,6 +235,7 @@ end
 ###############################################################################
 
 function _FreeAlgebra(R, s::Union{Vector{String},Vector{Symbol}}, degree_bound, ordering, ordering2, cached)
+   s = map(Symbol, s)
    T = elem_type(R)
    if isa(ordering, Symbol)
       ord1 = sym2ringorder[ordering]
@@ -252,7 +253,7 @@ function _FreeAlgebra(R, s::Union{Vector{String},Vector{Symbol}}, degree_bound, 
    else
       error("ordering must be a Symbol or an sordering")
    end
-   parent_obj = LPRing{T}(R, Symbol.(s), degree_bound, fancy_ordering, cached)
+   parent_obj = LPRing{T}(R, s, degree_bound, fancy_ordering, cached)
    return (parent_obj, gens(parent_obj))
 end
 
