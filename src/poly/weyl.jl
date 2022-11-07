@@ -31,11 +31,11 @@ end
 function WeylAlgebra(R::Union{Ring, Field}, s::Union{Vector{String}, Vector{Symbol}};
                      ordering = :degrevlex, ordering2::Symbol = :comp1min,
                      cached::Bool = true, degree_bound::Int = 0)
-   s = vcat(s, ["d"*sym for sym in s])
+   s = vcat(map(Symbol, s), [Symbol('d', sym) for sym in s])
    return _WeylAlgebra(R, s, ordering, ordering2, cached, degree_bound)
 end
 
-function WeylAlgebra(R::Union{Ring, Field}, s::Union{Matrix{String}, Vector{Symbol}};
+function WeylAlgebra(R::Union{Ring, Field}, s::Union{Matrix{String}, Matrix{Symbol}};
                      ordering = :degrevlex, ordering2::Symbol = :comp1min,
                      cached::Bool = true, degree_bound::Int = 0)
    s = vcat(view(s, 1, :), view(s, 2, :))
@@ -46,7 +46,7 @@ function WeylAlgebra(R::Nemo.Ring, s::Union{Vector{String}, Vector{Symbol}};
                      ordering = :degrevlex, ordering2::Symbol = :comp1min,
                      cached::Bool = true, degree_bound::Int = 0)
    RR = CoefficientRing(R)
-   s = vcat(s, ["d"*sym for sym in s])
+   s = vcat(map(Symbol, s), [Symbol('d', sym) for sym in s])
    return _WeylAlgebra(RR, s, ordering, ordering2, cached, degree_bound)
 end
 

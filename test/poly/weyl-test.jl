@@ -1,16 +1,23 @@
 @testset "weyl.constructors" begin
 
    R, (x, y, z, dx, dy, dz) = WeylAlgebra(QQ, ["x", "y", "z"])
-   R1 = WeylAlgebra(QQ, [:x, :y, :z])
-   R2 = WeylAlgebra(QQ, [:x :y :z; :dx :dy :dz])
+   R1, _ = WeylAlgebra(QQ, [:x, :y, :z])
+   R2, _ = WeylAlgebra(QQ, [:x :y :z; :dx :dy :dz])
+   R3, _ = WeylAlgebra(QQ, ["x" "y" "z"; "dx" "dy" "dz"])
+   R4, _ = WeylAlgebra(QQ, ["x" "y" "z"; "X" "Y" "Z"])
    @test R == R1
    @test R == R2
+   @test R == R3
+   @test R != R4
 
    @test typeof(R) == PluralRing{n_Q}
    @test elem_type(R) == spluralg{n_Q}
    @test elem_type(PluralRing{n_Q}) == spluralg{n_Q}
    @test parent_type(spluralg{n_Q}) == PluralRing{n_Q}
    @test base_ring(R) == QQ
+   @test base_ring(R1) == QQ
+   @test base_ring(R2) == QQ
+   @test base_ring(R3) == QQ
 
    @test R isa Nemo.AbstractAlgebra.NCRing
 

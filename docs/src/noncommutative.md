@@ -100,7 +100,7 @@ function WeylAlgebra(R::Union{Ring, Field}, s::Union{Vector{String}, Vector{Symb
                      ordering = :degrevlex, ordering2::Symbol = :comp1min,
                      cached::Bool = true, degree_bound::Int = 0)
 
-function WeylAlgebra(R::Union{Ring, Field}, s::Union{Matrix{String}, Vector{Symbol}};
+function WeylAlgebra(R::Union{Ring, Field}, s::Union{Matrix{String}, Matrix{Symbol}};
                      ordering = :degrevlex, ordering2::Symbol = :comp1min,
                      cached::Bool = true, degree_bound::Int = 0)
 ```
