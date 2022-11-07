@@ -34,14 +34,15 @@ already listed at the given link.
 The following constructors are available to create function fields and their elements.
 
 ```@docs
-Singular.FunctionField(::Field, ::Vector{String}; ::Bool)
+Singular.FunctionField(::Field, ::Vector{String}; cached::Bool = true)
+Singular.FunctionField(::Field, ::Vector{Symbol}; cached::Bool = true)
 ```
 
 In case the user does not want to specify a transcendence basis the following
 constructor can be used.
 
 ```@docs
-Singular.FunctionField(::Field, ::Int; ::Bool)
+Singular.FunctionField(::Field, ::Int; cached::Bool = true)
 ```
 
 Given a function field $F$, we also have the following coercions in addition to the

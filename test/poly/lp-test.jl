@@ -1,6 +1,10 @@
 @testset "lp.constructors" begin
 
    R, (x, y, z) = FreeAlgebra(QQ, ["x", "y", "z"], 2)
+   R1, _ = FreeAlgebra(QQ, [:x, :y, :z], 2)
+   R2, _ = FreeAlgebra(QQ, [:x, :y, :z], 3)
+   @test R == R1
+   @test R != R2
 
    @test elem_type(R) == slpalg{n_Q}
    @test elem_type(LPRing{n_Q}) == slpalg{n_Q}

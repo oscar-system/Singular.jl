@@ -1,5 +1,7 @@
 @testset "poly.constructors" begin
    R, (x, ) = PolynomialRing(ZZ, ["x", ])
+   R1, (x, ) = PolynomialRing(ZZ, [:x, ])
+   @test R == R1
 
    @test elem_type(R) == spoly{n_Z}
    @test elem_type(PolyRing{n_Z}) == spoly{n_Z}

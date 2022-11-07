@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-const PluralRingID = Dict{Tuple{PolyRing, smatrix, smatrix, Array{Symbol, 1}},
+const PluralRingID = Dict{Tuple{PolyRing, smatrix, smatrix, Vector{Symbol}},
                          AbstractAlgebra.NCRing}()
 
 mutable struct PluralRing{T <: Nemo.RingElem} <: AbstractAlgebra.NCRing
@@ -26,7 +26,7 @@ mutable struct PluralRing{T <: Nemo.RingElem} <: AbstractAlgebra.NCRing
 end
 
 function PluralRing{T}(R::PolyRing{T}, C::smatrix{spoly{T}}, D::smatrix{spoly{T}},
-                      s::Array{Symbol, 1}, cached::Bool = true) where T <: Nemo.RingElem
+                      s::Vector{Symbol}, cached::Bool = true) where T <: Nemo.RingElem
    isempty(s) && error("need at least one indeterminate")
    if cached && haskey(PluralRingID, (R, C, D, s))
       return PluralRingID[R, C, D, s]::PluralRing{T}

@@ -887,7 +887,7 @@ function div(x::SPolyUnion{T}, y::SPolyUnion{T}) where T <: Nemo.FieldElem
       return q
    end
 end
-                                                          
+
 function divrem(a::spoly{T}, b::spoly{T}) where T <: Nemo.FieldElem
     check_parent(a, b)
     iszero(b) && throw(DivideError())
@@ -1180,7 +1180,7 @@ Return a Singular (multivariate) polynomial ring over the base ring of $R$ in va
 function AsEquivalentSingularPolynomialRing(R::AbstractAlgebra.Generic.MPolyRing{T}; cached::Bool = true,
       ordering::Symbol = :degrevlex, ordering2::Symbol = :comp1min,
       degree_bound::Int = 0)  where {T <: RingElem}
-   return PolynomialRing(AbstractAlgebra.Generic.base_ring(R), [string(v) for v in AbstractAlgebra.Generic.symbols(R)], cached=cached, ordering=ordering, ordering2=ordering2, degree_bound=degree_bound)
+   return PolynomialRing(AbstractAlgebra.Generic.base_ring(R), AbstractAlgebra.Generic.symbols(R), cached=cached, ordering=ordering, ordering2=ordering2, degree_bound=degree_bound)
 end
 
 @doc Markdown.doc"""
@@ -1190,7 +1190,7 @@ Return an AbstractAlgebra (multivariate) polynomial ring over the base ring of $
 """
 function AsEquivalentAbstractAlgebraPolynomialRing(R::Singular.PolyRing{T}; ordering::Symbol = :degrevlex) where T <: Singular.n_unknown
    return AbstractAlgebra.Generic.PolynomialRing(base_ring(R).base_ring,
-	       [String(s) for s in symbols(R)], ordering=ordering)
+	       symbols(R), ordering=ordering)
 end
 
 
@@ -1411,8 +1411,7 @@ end
 ###############################################################################
 
 function change_base_ring(C::T, p::spoly) where T <: Union{Ring, Field}
-   S, = Singular.PolynomialRing(C, [String(v) for v in symbols(parent(p))],
-				             ordering = parent(p).ord)
+   S, = Singular.PolynomialRing(C, symbols(parent(p)), ordering = parent(p).ord)
    return change_base_ring(C, p, parent = S)
 end
 
@@ -1588,20 +1587,21 @@ function get_fancy_ordering(ordering, ordering2)
    return fancy_ordering::sordering
 end
 
-function _PolynomialRing(R, s::Vector{String}, ordering, ordering2, cached, degree_bound)
+function _PolynomialRing(R, s::Union{Vector{String},Vector{Symbol}}, ordering, ordering2, cached, degree_bound)
+   s = map(Symbol, s)
    sord = get_fancy_ordering(ordering, ordering2)
-   z = PolyRing{elem_type(R)}(R, Symbol.(s), sord, cached, degree_bound)
+   z = PolyRing{elem_type(R)}(R, s, sord, cached, degree_bound)
    return (z, gens(z))
 end
 
 # keyword arguments do not participate in dispatch
-function PolynomialRing(R::Union{Ring, Field}, s::Vector{String};
+function PolynomialRing(R::Union{Ring, Field}, s::Union{Vector{String},Vector{Symbol}};
                         ordering = :degrevlex, ordering2::Symbol = :comp1min,
                         cached::Bool = true, degree_bound::Int = 0)
    return _PolynomialRing(R, s, ordering, ordering2, cached, degree_bound)
 end
 
-function PolynomialRing(R::Nemo.Ring, s::Vector{String};
+function PolynomialRing(R::Nemo.Ring, s::Union{Vector{String},Vector{Symbol}};
                         ordering = :degrevlex, ordering2::Symbol = :comp1min,
                         cached::Bool = true, degree_bound::Int = 0)
    R = CoefficientRing(R)

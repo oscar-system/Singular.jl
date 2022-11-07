@@ -3,12 +3,12 @@ export WeylAlgebra
 const WeylAlgebraID = Dict{Tuple{Union{Ring, Field}, Vector{Symbol},
                                   Vector{Cint}, Int}, AbstractAlgebra.NCRing}()
 
-function _WeylAlgebra(R, s::Vector{String}, ordering, ordering2, cached, degree_bound)
+function _WeylAlgebra(R, s::Union{Vector{String},Vector{Symbol}}, ordering, ordering2, cached, degree_bound)
+   s = map(Symbol, s)
    bitmask = Culong(degree_bound)
    nvars = length(s)
    nvars > 0 && iseven(nvars) || error("need an even number of indeterminates")
    ord = get_fancy_ordering(ordering, ordering2)
-   s = Symbol.(s)
    deg_bound_fix = Int(libSingular.rGetExpSize(bitmask, Cint(nvars)))
    sord = serialize_ordering(nvars, ord)
    T = elem_type(R)
@@ -28,29 +28,29 @@ function _WeylAlgebra(R, s::Vector{String}, ordering, ordering2, cached, degree_
    return (z, gens(z))
 end
 
-function WeylAlgebra(R::Union{Ring, Field}, s::Vector{String};
+function WeylAlgebra(R::Union{Ring, Field}, s::Union{Vector{String}, Vector{Symbol}};
                      ordering = :degrevlex, ordering2::Symbol = :comp1min,
                      cached::Bool = true, degree_bound::Int = 0)
-   s = vcat(s, ["d"*sym for sym in s])
+   s = vcat(map(Symbol, s), [Symbol('d', sym) for sym in s])
    return _WeylAlgebra(R, s, ordering, ordering2, cached, degree_bound)
 end
 
-function WeylAlgebra(R::Union{Ring, Field}, s::Matrix{String};
+function WeylAlgebra(R::Union{Ring, Field}, s::Union{Matrix{String}, Matrix{Symbol}};
                      ordering = :degrevlex, ordering2::Symbol = :comp1min,
                      cached::Bool = true, degree_bound::Int = 0)
    s = vcat(view(s, 1, :), view(s, 2, :))
    return _WeylAlgebra(R, s, ordering, ordering2, cached, degree_bound)
 end
 
-function WeylAlgebra(R::Nemo.Ring, s::Vector{String};
+function WeylAlgebra(R::Nemo.Ring, s::Union{Vector{String}, Vector{Symbol}};
                      ordering = :degrevlex, ordering2::Symbol = :comp1min,
                      cached::Bool = true, degree_bound::Int = 0)
    RR = CoefficientRing(R)
-   s = vcat(s, ["d"*sym for sym in s])
+   s = vcat(map(Symbol, s), [Symbol('d', sym) for sym in s])
    return _WeylAlgebra(RR, s, ordering, ordering2, cached, degree_bound)
 end
 
-function WeylAlgebra(R::Nemo.Ring, s2::Matrix{String};
+function WeylAlgebra(R::Nemo.Ring, s2::Union{Matrix{String}, Matrix{Symbol}};
                      ordering = :degrevlex, ordering2::Symbol = :comp1min,
                      cached::Bool = true, degree_bound::Int = 0)
    RR = CoefficientRing(R)
