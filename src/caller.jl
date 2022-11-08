@@ -27,7 +27,7 @@
 #     - list(a,b): a list of length 2 returned by a procedure
 # Therefore, the user has to know how to interpret the result.
 
-casting_functions = nothing
+const casting_functions = Dict{Int64, Function}()
 
 function create_casting_functions()
     return Dict(

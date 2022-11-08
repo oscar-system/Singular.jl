@@ -87,7 +87,7 @@ const libsingula_julia = libsingular_julia_jll.libsingular_julia
 const libflint = Nemo.libflint
 const libantic = Nemo.libantic
 
-mapping_types_reversed = nothing
+const mapping_types_reversed = Dict{Symbol, Int64}()
 
 function __init__()
    if Sys.iswindows()
@@ -162,8 +162,8 @@ function __init__()
      :comp1min => ringorder_C
    )
    global mapping_types_reversed, casting_functions
-   mapping_types_reversed = Dict( i[2] => i[1] for i in libSingular.get_type_mapper() )
-   casting_functions = create_casting_functions()
+   merge!(mapping_types_reversed, Dict( i[2] => i[1] for i in libSingular.get_type_mapper() ))
+   merge!(casting_functions, create_casting_functions())
 
    # Respect the -q and --banner flag
    allowbanner = Base.JLOptions().banner != 0
