@@ -417,12 +417,16 @@ for (rw, rew) in [(:RingWrapper, :RingElemWrapper),
    end
 
    function addeq!(z::($rew){S, T}, a::($rew){S, T}) where {S, T}
-      addeq!(z.data, a.data)
+      z.data = addeq!(z.data, a.data)
       return z
    end
 
+   function add!(z::($rew){S, T}, a::($rew){S, T}, b::($rew){S, T}) where {S, T}
+      z.data = add!(z.data, a.data, b.data)
+      return z
+   end
    function mul!(z::($rew){S, T}, a::($rew){S, T}, b::($rew){S, T}) where {S, T}
-      mul!(z.data, a.data, b.data)
+      z.data = mul!(z.data, a.data, b.data)
       return z
    end
 end
