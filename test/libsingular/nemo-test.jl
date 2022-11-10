@@ -357,6 +357,16 @@ end
    @test ngens(std(I)) == 3
 end
 
+@testset "Nemo.nmod" begin
+  R = ResidueRing(Singular.Nemo.ZZ, 15)
+  S, (x, y) = Singular.PolynomialRing(R, ["x", "y"])
+  p = x*2
+  @test string(p) == "2*x"
+  @test leading_coefficient(p) == 2
+  p = (x*3)*5
+  @test_broken is_zero(p)
+end
+
 @testset "Nemo.fmpz_mod" begin
 
    U = Nemo.ResidueRing(Nemo.ZZ, Nemo.fmpz(11))
