@@ -34,6 +34,13 @@
    end
 end
 
+@testset "sideal.oscar#1702" begin
+   F, (b2, b3, d1, d2, d3, m1, m2, e, k, k2, k3) = FunctionField(QQ, ["b2", "b3", "d1", "d2", "d3", "m1", "m2", "e", "k", "k2", "k3"]);
+   R, (H, S, C) = PolynomialRing(F, ["H", "S", "C"]; ordering = ordering_lp());
+   I = Ideal(R,-e*H*S - m1*k*H*C + m1*C, -e*H*S - m2*k2*S*C + m2*C, e*H*S - b3*k3*C^2 + b3*C);
+   @test dimension(std(I)) == 1
+end
+
 @testset "sideal.spoly.manipulation" begin
    R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
