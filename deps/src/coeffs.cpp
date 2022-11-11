@@ -7,8 +7,8 @@ auto transExt_helper(coeffs cf, jlcxx::ArrayRef<uint8_t *> param)
     for (int i = 0; i < len; i++) {
         param_ptr[i] = reinterpret_cast<char *>(param[i]);
     }
-    ring r = rDefault(cf, len, param_ptr);
-    r->order[0] = ringorder_dp;
+    // use lex because the ordering doesn't matter for coefficient operations
+    ring r = rDefault(cf, len, param_ptr, ringorder_lp);
     delete[] param_ptr;
     TransExtInfo extParam;
     extParam.r = r;
