@@ -251,3 +251,19 @@ end
    @test length(F) == 3
 end
 
+
+@testset "smodule.vdim" begin
+   R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"])
+   v1 = vector(R, x, R(0))
+   v2 = vector(R, R(0), x)
+   v3 = vector(R, y, R(0))
+   v4 = vector(R, R(0), y)
+   @test vdim(std(Singular.Module(R, v1, v2, v3, v4))) == -1
+
+   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   v1 = vector(R, x, R(0))
+   v2 = vector(R, R(0), x)
+   v3 = vector(R, y, R(0))
+   v4 = vector(R, R(0), y)
+   @test vdim(std(Singular.Module(R, v1, v2, v3, v4))) == 2
+end

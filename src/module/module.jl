@@ -418,3 +418,9 @@ function modulo(A::smodule, B::smodule)
    return Module(R, ptr)
 end
 
+
+function vdim(I::smodule)
+   I.isGB || error("Not a Groebner basis")
+   R = base_ring(I)
+   GC.@preserve I R return Int(libSingular.id_vdim(I.ptr, R.ptr))
+end
