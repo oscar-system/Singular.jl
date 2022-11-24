@@ -480,7 +480,10 @@ end
 for op in (:divides, )
    @eval begin
       function ($op)(a::($rew){S, T}, b::($rew){S, T}) where {S, T}
+println("divides called")
+@show (a.data, b.data)
          res1, res2 = ($op)(a.data, b.data)
+@show (res1, res2)
          return (res1, ($rew){S, T}(res2, a.parent))
       end
    end
