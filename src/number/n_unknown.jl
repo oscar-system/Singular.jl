@@ -432,7 +432,7 @@ for (rw, rew) in [(:RingWrapper, :RingElemWrapper),
 end
 
 # one input, one non-wrapped output
-for op in (:iszero, :isone)
+for op in (:iszero, :isone, :(AbstractAlgebra.is_zero_divisor))
    @eval begin
       function ($op)(a::($rew){S, T}) where {S, T}
          return ($op)(a.data)
@@ -476,14 +476,21 @@ for op in (:divexact, )
    end
 end
 
+# one input, one non-wrapped and one wrapped output
+for op in (:(AbstractAlgebra.is_zero_divisor_with_annihilator), )
+   @eval begin
+      function ($op)(a::($rew){S, T}) where {S, T}
+         res1, res2 = ($op)(a.data)
+         return (res1, ($rew){S, T}(res2, a.parent))
+      end
+   end
+end
+
 # two inputs, one non-wrapped and one wrapped output
 for op in (:divides, )
    @eval begin
       function ($op)(a::($rew){S, T}, b::($rew){S, T}) where {S, T}
-println("divides called")
-@show (a.data, b.data)
          res1, res2 = ($op)(a.data, b.data)
-@show (res1, res2)
          return (res1, ($rew){S, T}(res2, a.parent))
       end
    end

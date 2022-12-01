@@ -158,6 +158,23 @@ end
 
 ###############################################################################
 #
+#   Annihilator
+#
+###############################################################################
+
+function nemoRingAnn(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
+   n = julia(a)
+   f, b = AbstractAlgebra.is_zero_divisor_with_annihilator(n)
+   return f ? number(b) : number(zero(parent(n)))
+end
+
+function nemoDomainAnn(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
+   n = julia(a)
+   return number(iszero(n) ? one(parent(n)) : zero(parent(n)))
+end
+
+###############################################################################
+#
 #   GCD
 #
 ###############################################################################
@@ -230,6 +247,7 @@ function nemoRingInitChar(cf::Ptr{Cvoid}, p::Ptr{Cvoid})
     ring_struct.cfDiv = @cfunction(nemoRingDiv, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
     ring_struct.cfDivBy = @cfunction(nemoRingDivBy, Cint, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
     ring_struct.cfInvers = @cfunction(nemoRingInvers, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfAnn = @cfunction(nemoRingAnn, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}))
     ring_struct.cfGcd = @cfunction(nemoRingGcd, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
     ring_struct.cfExtGcd = @cfunction(nemoRingExtGcd, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Ptr{Cvoid}}, Ptr{Ptr{Cvoid}}, Ptr{Cvoid}))
     ring_struct.cfGreater = @cfunction(nemoRingGreater, Cint, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
@@ -270,6 +288,7 @@ function nemoDomainInitChar(cf::Ptr{Cvoid}, p::Ptr{Cvoid})
     ring_struct.cfDiv = @cfunction(nemoRingDiv, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
     ring_struct.cfDivBy = @cfunction(nemoRingDivBy, Cint, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
     ring_struct.cfInvers = @cfunction(nemoRingInvers, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfAnn = @cfunction(nemoDomainAnn, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}))
     ring_struct.cfGcd = @cfunction(nemoRingGcd, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
     ring_struct.cfExtGcd = @cfunction(nemoRingExtGcd, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Ptr{Cvoid}}, Ptr{Ptr{Cvoid}}, Ptr{Cvoid}))
     ring_struct.cfGreater = @cfunction(nemoRingGreater, Cint, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))

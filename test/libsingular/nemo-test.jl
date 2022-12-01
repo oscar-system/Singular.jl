@@ -367,14 +367,10 @@ end
   @test string(p) == "0"
   @test length(p) == 0
   @test is_zero(p)
-println("done1")
 end
 
 @testset "Nemo.fmpz_mod" begin
-println("starting2")
-
    U = Nemo.ResidueRing(Nemo.ZZ, Nemo.fmpz(11))
-
    R, (x, y) = PolynomialRing(U, ["x", "y"])
 
    wrappedUtype = Singular.n_RingElem{Singular.RingElemWrapper{Nemo.FmpzModRing, Nemo.fmpz_mod}}
