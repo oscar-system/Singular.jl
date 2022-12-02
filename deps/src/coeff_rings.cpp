@@ -21,6 +21,7 @@ typedef struct __singular_coeff_ring_struct {
       void* cfDiv;
       void* cfDivBy;
       void* cfInvers;
+      void* cfAnn;
       void* cfGcd;
       void* cfSubringGcd;
       void* cfExtGcd;
@@ -59,6 +60,7 @@ void fill_coeffs_with_function_data(jl_value_t* coeff_struct, void* cf_void){
     cf->cfDiv = (numberfunc) cf_input->cfDiv;
     cf->cfDivBy = (BOOLEAN (*)(number, number, const coeffs)) cf_input->cfDivBy;
     cf->cfInvers = (number (*)(number, const coeffs)) cf_input->cfInvers;
+    cf->cfAnn = (number (*)(number, const coeffs)) cf_input->cfAnn;
     cf->cfGcd = (numberfunc) cf_input->cfGcd;
     cf->cfSubringGcd = (numberfunc) cf_input->cfSubringGcd;
     cf->cfExtGcd = (number (*)(number, number, number *, number *, const coeffs)) cf_input->cfExtGcd;
