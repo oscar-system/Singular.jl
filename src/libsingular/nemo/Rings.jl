@@ -120,6 +120,9 @@ end
 function nemoRingDivBy(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n1 = julia(a)
    n2 = julia(b)
+   if Nemo.iszero(n1)
+     return Cint(Nemo.is_zero_divisor(n2))
+   end
    return Cint(Nemo.divides(n1, n2)[1])
 end
 
