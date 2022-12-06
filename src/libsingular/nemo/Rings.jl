@@ -158,6 +158,23 @@ end
 
 ###############################################################################
 #
+#   Annihilator
+#
+###############################################################################
+
+function nemoRingAnn(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
+   n = julia(a)
+   f, b = AbstractAlgebra.is_zero_divisor_with_annihilator(n)
+   return f ? number(b) : number(zero(parent(n)))
+end
+
+function nemoDomainAnn(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
+   n = julia(a)
+   return number(iszero(n) ? one(parent(n)) : zero(parent(n)))
+end
+
+###############################################################################
+#
 #   GCD
 #
 ###############################################################################
@@ -206,8 +223,48 @@ end
 #   InitChar
 #
 ###############################################################################
-
 function nemoRingInitChar(cf::Ptr{Cvoid}, p::Ptr{Cvoid})
+
+    ring_struct = singular_coeff_ring_struct()
+
+    ring_struct.has_simple_alloc = 0
+    ring_struct.has_simple_inverse = 0
+    ring_struct.is_field = 0
+    ring_struct.is_domain = 0
+    ring_struct.ch = 0
+    ring_struct.data = p
+    ring_struct.cfInit = @cfunction(nemoRingInit, Ptr{Cvoid}, (Clong, Ptr{Cvoid}))
+    ring_struct.cfInt = @cfunction(nemoRingInt, Clong, (Ptr{Ptr{Cvoid}}, Ptr{Cvoid}))
+    ring_struct.cfMPZ = @cfunction(nemoRingMPZ, Cvoid, (BigInt, Ptr{Ptr{Cvoid}}, Ptr{Cvoid}))
+    ring_struct.cfInpNeg = @cfunction(nemoRingInpNeg, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfCopy = @cfunction(nemoRingCopy, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfDelete = @cfunction(nemoRingDelete, Cvoid, (Ptr{Ptr{Cvoid}}, Ptr{Cvoid}))
+    ring_struct.cfAdd = @cfunction(nemoRingAdd, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfInpAdd = @cfunction(nemoRingInpAdd, Cvoid, (Ptr{Ptr{Cvoid}}, Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfSub = @cfunction(nemoRingSub, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfMult = @cfunction(nemoRingMult, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfInpMult = @cfunction(nemoRingInpMult, Cvoid, (Ptr{Ptr{Cvoid}}, Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfDiv = @cfunction(nemoRingDiv, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfDivBy = @cfunction(nemoRingDivBy, Cint, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfInvers = @cfunction(nemoRingInvers, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfAnn = @cfunction(nemoRingAnn, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfGcd = @cfunction(nemoRingGcd, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfExtGcd = @cfunction(nemoRingExtGcd, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Ptr{Cvoid}}, Ptr{Ptr{Cvoid}}, Ptr{Cvoid}))
+    ring_struct.cfGreater = @cfunction(nemoRingGreater, Cint, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfEqual = @cfunction(nemoRingEqual, Cint, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfIsZero = @cfunction(nemoRingIsZero, Cint, (Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfIsOne = @cfunction(nemoRingIsOne, Cint, (Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfIsMOne = @cfunction(nemoRingIsMOne, Cint, (Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfGreaterZero = @cfunction(nemoRingGreaterZero, Cint, (Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfWriteLong = @cfunction(nemoRingWrite, Cvoid, (Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfCoeffWrite = @cfunction(nemoRingCoeffWrite, Cvoid, (Ptr{Cvoid}, Cint))
+
+    fill_coeffs_with_function_data(ring_struct,cf)
+
+    return Cint(0)
+end
+
+function nemoDomainInitChar(cf::Ptr{Cvoid}, p::Ptr{Cvoid})
 
     ring_struct = singular_coeff_ring_struct()
 
@@ -231,6 +288,7 @@ function nemoRingInitChar(cf::Ptr{Cvoid}, p::Ptr{Cvoid})
     ring_struct.cfDiv = @cfunction(nemoRingDiv, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
     ring_struct.cfDivBy = @cfunction(nemoRingDivBy, Cint, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
     ring_struct.cfInvers = @cfunction(nemoRingInvers, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfAnn = @cfunction(nemoDomainAnn, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}))
     ring_struct.cfGcd = @cfunction(nemoRingGcd, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
     ring_struct.cfExtGcd = @cfunction(nemoRingExtGcd, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Ptr{Cvoid}}, Ptr{Ptr{Cvoid}}, Ptr{Cvoid}))
     ring_struct.cfGreater = @cfunction(nemoRingGreater, Cint, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
@@ -248,6 +306,10 @@ function nemoRingInitChar(cf::Ptr{Cvoid}, p::Ptr{Cvoid})
 end
 
 function register(R::Nemo.Ring)
-   c = @cfunction(nemoRingInitChar, Cint, (Ptr{Cvoid}, Ptr{Cvoid}))
+   if AbstractAlgebra.is_domain_type(AbstractAlgebra.elem_type(R))
+      c = @cfunction(nemoDomainInitChar, Cint, (Ptr{Cvoid}, Ptr{Cvoid}))
+   else
+      c = @cfunction(nemoRingInitChar, Cint, (Ptr{Cvoid}, Ptr{Cvoid}))
+   end
    return nRegister(n_unknown, c)
 end
