@@ -72,39 +72,6 @@ auto id_Slimgb_helper(ideal a, ring b, bool complete_reduction = false)
         id = idInit(0, a->rank);
     return id;
 }
-auto id_StdHilb_helper(ideal a, ring b, jlcxx::ArrayRef<int> h, bool complete_reduction = false)
-{
-    int sz = h.size();
-    intvec * hilb = new intvec(sz);
-    int * hi = hilb->ivGetVec();
-    for (int i=0; i< sz; i++) {
-      hi[i] = h[i];
-    }
-
-    unsigned int crbit;
-    if (complete_reduction)
-        crbit = Sy_bit(OPT_REDSB);
-    else
-        crbit = 0;
-    ideal id = NULL;
-    if (!idIs0(a)) {
-        intvec *     n = NULL;
-        tHomog       h = testHomog;
-        const ring   origin = currRing;
-        unsigned int save_opt = si_opt_1;
-        si_opt_1 |= crbit;
-        rChangeCurrRing(b);
-        id = kStd(a, b->qideal, h, &n, hilb );
-        si_opt_1 = save_opt;
-        rChangeCurrRing(origin);
-        if (n != NULL)
-            delete n;
-    }
-    else
-        id = idInit(0, a->rank);
-    delete hilb;
-    return id;
-}
 
 auto id_InterRed_helper(ideal a, ring b)
 {
@@ -144,6 +111,82 @@ auto id_Std_helper(ideal a, ring b, bool complete_reduction = false)
     }
     else
         id = idInit(0, a->rank);
+    return id;
+}
+
+intvec* to_intvec(jlcxx::ArrayRef<int> a)
+{
+    int sz = a.size();
+    intvec * w = new intvec(sz);
+    int * hi = w->ivGetVec();
+    for (int i=0; i<sz; i++)
+        hi[i] = a[i];
+    return w;
+}
+
+auto id_StdHilb_helper(ideal a, ring b, jlcxx::ArrayRef<int> h, bool complete_reduction = false)
+{
+    intvec* hilb = to_intvec(h);
+
+    unsigned int crbit;
+    if (complete_reduction)
+        crbit = Sy_bit(OPT_REDSB);
+    else
+        crbit = 0;
+    ideal id = NULL;
+    if (!idIs0(a)) {
+        intvec *     n = NULL;
+        tHomog       h = testHomog;
+        const ring   origin = currRing;
+        unsigned int save_opt = si_opt_1;
+        si_opt_1 |= crbit;
+        rChangeCurrRing(b);
+        id = kStd(a, b->qideal, h, &n, hilb);
+        si_opt_1 = save_opt;
+        rChangeCurrRing(origin);
+        if (n != NULL)
+            delete n;
+    }
+    else
+        id = idInit(0, a->rank);
+    delete hilb;
+    return id;
+}
+
+auto id_StdHilbWeighted_helper(ideal a, ring b, jlcxx::ArrayRef<int> h, jlcxx::ArrayRef<int> vw, bool complete_reduction = false)
+{
+    intvec* hilb = to_intvec(h);
+    intvec* varweights = to_intvec(vw);
+
+    unsigned int crbit;
+    if (complete_reduction)
+        crbit = Sy_bit(OPT_REDSB);
+    else
+        crbit = 0;
+    ideal id = NULL;
+    if (!idIs0(a)) {
+        intvec *     n = NULL;
+        tHomog       h = testHomog;
+        const ring   origin = currRing;
+        unsigned int save_opt = si_opt_1;
+        si_opt_1 |= crbit;
+        rChangeCurrRing(b);
+        id = kStd(a,
+              currRing->qideal,
+              h,
+              &n,           // module weights
+              hilb,         // hilbert series
+              0,0,          // syzComp, newIdeal
+              varweights);  // weights of vars
+        si_opt_1 = save_opt;
+        rChangeCurrRing(origin);
+        if (n != NULL)
+            delete n;
+    }
+    else
+        id = idInit(0, a->rank);
+    delete hilb;
+    delete varweights;
     return id;
 }
 
@@ -249,6 +292,7 @@ void singular_define_ideals(jlcxx::Module & Singular)
     Singular.method("id_TwoStd", &id_TwoStd_helper);
     Singular.method("id_Std", &id_Std_helper);
     Singular.method("id_StdHilb", &id_StdHilb_helper);
+    Singular.method("id_StdHilbWeighted", &id_StdHilbWeighted_helper);
 
     Singular.method("id_InterRed", &id_InterRed_helper);
 
@@ -444,11 +488,7 @@ void singular_define_ideals(jlcxx::Module & Singular)
     {
         const ring origin = currRing;
         rChangeCurrRing(R);
-        int sz = w.size();
-        intvec * module_w = new intvec(sz);
-        int * wi = module_w->ivGetVec();
-        for (int i=0; i<sz; i++)
-            wi[i] = w[i];
+        intvec * module_w = to_intvec(w);
         SPrintStart();
         scDegree(I, module_w, R->qideal);
         delete module_w;
@@ -494,19 +534,12 @@ void singular_define_ideals(jlcxx::Module & Singular)
         intvec *v=hFirstSeries(I,NULL,r->qideal);
         int * content = v->ivGetVec();
         for(int j = 0; j < v->length(); j++)
-        {
           a.push_back(content[j]);
-        }
         delete v;
         rChangeCurrRing(origin);
     });
     Singular.method("scHilbWeighted", [](ideal I, ring r, jlcxx::ArrayRef<int> weights, jlcxx::ArrayRef<int> a) {
-        int sz = weights.size();
-        intvec * w = new intvec(sz);
-        int * hi = w->ivGetVec();
-        for (int i=0; i< sz; i++) {
-          hi[i] = weights[i];
-        }
+        intvec * w = to_intvec(weights);
         const ring origin = currRing;
         rChangeCurrRing(r);
         intvec *v=hFirstSeries(I,NULL,r->qideal,w);
