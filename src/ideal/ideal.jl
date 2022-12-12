@@ -3,7 +3,7 @@ export sideal, IdealSet, syz, lead, normalize!, is_constant, is_zerodim, fglm,
        independent_sets, maximal_independent_set, ngens, sres, intersection,
        quotient, reduce, eliminate, kernel, equal, contains, is_var_generated,
        saturation, satstd, slimgb, std, vdim, interreduce, degree, mult,
-       hilbert_series, is_homogeneous, division
+       hilbert_series, std_hilbert, is_homogeneous, division
 
 ###############################################################################
 #
@@ -1131,5 +1131,32 @@ function hilbert_series(I::sideal{spoly{T}}, w::Vector{<:Integer}) where T <: Ne
    z = Vector{Int32}()
    GC.@preserve I R libSingular.scHilbWeighted(I.ptr, R.ptr, w, z)
    return z
+end
+
+@doc Markdown.doc"""
+    std_hilbert(I::sideal{spoly{T}}, hs::Vector{Int32}; complete_reduction::Bool=false) where T <: Nemo.FieldElem
+
+As per `std(I; complete_reduction)` but takes the hilbert series `hs`
+as computed by `hilbert_series(I)`.
+"""
+function std_hilbert(I::sideal{spoly{T}}, hs::Vector{Int32}; complete_reduction::Bool=false) where T <: Nemo.FieldElem
+   R = base_ring(I)
+   ptr = GC.@preserve I R libSingular.id_StdHilb(I.ptr, R.ptr, hs, complete_reduction)
+   libSingular.idSkipZeroes(ptr)
+   return sideal{spoly{T}}(R, ptr, true)
+end
+
+@doc Markdown.doc"""
+    std_hilbert(I::sideal{spoly{T}}, hs::Vector{Int32}, w::Vector{<:Integer}; complete_reduction::Bool=false) where T <: Nemo.FieldElem
+
+As per `std(I; complete_reduction)` but takes the weighted hilbert series `hs`
+as computed by `hilbert_series(I, w)`.
+"""
+function std_hilbert(I::sideal{spoly{T}}, hs::Vector{Int32}, w::Vector{<:Integer}; complete_reduction::Bool=false) where T <: Nemo.FieldElem
+   R = base_ring(I)
+   w = convert(Vector{Int32}, w)
+   ptr = GC.@preserve I R libSingular.id_StdHilbWeighted(I.ptr, R.ptr, hs, w, complete_reduction)
+   libSingular.idSkipZeroes(ptr)
+   return sideal{spoly{T}}(R, ptr, true)
 end
 

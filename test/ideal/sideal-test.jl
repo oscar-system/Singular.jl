@@ -638,6 +638,34 @@ end
    p = hilbert_series(std(Ideal(R, x, y, z)), [1, 2, 3])
    pop!(p)
    @test p == [1,-1,-1,0,1,1,-1]
+
+   R, (x, y, z) = PolynomialRing(Fp(32003), ["x", "y", "z"], ordering = ordering_dp(3))
+   i = Ideal(R, [1*x^2*y+151*x*y*z^10+169*y^21,
+                 1*x*z^14+6*x^2*y^4+3*z^24,
+                 5*y^10*z^10*x+2*y^20*z^10+y^10*z^20+11*x^3])
+   h = hilbert_series(std(i))
+
+   R, (x, y, z) = PolynomialRing(Fp(32003), ["x", "y", "z"], ordering = ordering_lp(3))
+   j = Ideal(R, [1*x^2*y+151*x*y*z^10+169*y^21,
+                 1*x*z^14+6*x^2*y^4+3*z^24,
+                 5*y^10*z^10*x+2*y^20*z^10+y^10*z^20+11*x^3])
+   @test ngens(std_hilbert(j, h, complete_reduction = true)) ==
+         ngens(std(j, complete_reduction = true))
+
+
+   R, (x, y, z) = PolynomialRing(Fp(32003), ["x", "y", "z"], ordering = ordering_dp(3))
+   i = Ideal(R, [1*x^2*y+151*x*y*z^10+169*y^21,
+                 1*x*z^14+6*x^2*y^4+3*z^24,
+                 5*y^10*z^10*x+2*y^20*z^10+y^10*z^20+11*x^3])
+   w = [10,1,1]
+   h = hilbert_series(std(i), w)
+   R, (x, y, z) = PolynomialRing(Fp(32003), ["x", "y", "z"], ordering = ordering_lp(3))
+   j = Ideal(R, [1*x^2*y+151*x*y*z^10+169*y^21,
+                 1*x*z^14+6*x^2*y^4+3*z^24,
+                 5*y^10*z^10*x+2*y^20*z^10+y^10*z^20+11*x^3])
+
+   @test ngens(std_hilbert(j, h, w, complete_reduction = true)) == 
+         ngens(std(j, complete_reduction = true))
 end
 
 @testset "sideal.oscar#1702" begin
