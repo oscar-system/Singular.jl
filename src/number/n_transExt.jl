@@ -218,8 +218,6 @@ function ==(x::n_transExt, y::n_transExt)
    GC.@preserve x y c return c == parent(y) && libSingular.n_Equal(x.ptr, y.ptr, c.ptr)
 end
 
-isequal(x::n_transExt, y::n_transExt) = (x == y)
-
 ###############################################################################
 #
 #   Powering

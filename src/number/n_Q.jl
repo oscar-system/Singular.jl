@@ -184,8 +184,6 @@ function ==(x::n_Q, y::n_Q)
    GC.@preserve x y c return libSingular.n_Equal(x.ptr, y.ptr, c.ptr)
 end
 
-isequal(x::n_Q, y::n_Q) = (x == y)
-
 ###############################################################################
 #
 #   Ad hoc comparison
@@ -195,10 +193,6 @@ isequal(x::n_Q, y::n_Q) = (x == y)
 ==(x::n_Q, y::Integer) = (x ==  parent(x)(y))
 
 ==(x::Integer, y::n_Q) = (parent(y)(x) == y)
-
-isequal(x::n_Q, y::Integer) = (x == y)
-
-isequal(x::Integer, y::n_Q) = (x == y)
 
 isless(x::n_Q, y::Integer) = isless(x, parent(x)(y))
 

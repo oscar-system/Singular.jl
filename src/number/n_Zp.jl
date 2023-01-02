@@ -125,8 +125,6 @@ function ==(x::n_Zp, y::n_Zp)
    GC.@preserve x y c return libSingular.n_Equal(x.ptr, y.ptr, c.ptr)
 end
 
-isequal(x::n_Zp, y::n_Zp) = (x == y)
-
 ###############################################################################
 #
 #   Ad hoc comparison
