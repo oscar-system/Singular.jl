@@ -168,8 +168,6 @@ function ==(x::n_algExt, y::n_algExt)
    GC.@preserve x y c return libSingular.n_Equal(x.ptr, y.ptr, c.ptr)
 end
 
-isequal(x::n_algExt, y::n_algExt) = (x == y)
-
 ###############################################################################
 #
 #   Powering

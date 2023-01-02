@@ -164,8 +164,6 @@ function ==(x::n_Z, y::n_Z)
    GC.@preserve x y c return libSingular.n_Equal(x.ptr, y.ptr, c.ptr)
 end
 
-isequal(x::n_Z, y::n_Z) = (x == y)
-
 ###############################################################################
 #
 #   Ad hoc comparison
@@ -178,10 +176,6 @@ isequal(x::n_Z, y::n_Z) = (x == y)
 
 ==(x::n_Z, y::Nemo.fmpz) = Nemo.fmpz(convert(BigInt, x)) == y
 ==(x::Nemo.fmpz, y::n_Z) = y == x
-
-isequal(x::n_Z, y::Integer) = (x == y)
-
-isequal(x::Integer, y::n_Z) = (x == y)
 
 isless(x::n_Z, y::Integer) = isless(x, parent(x)(y))
 
