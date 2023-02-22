@@ -45,7 +45,7 @@ import Random: rand
 using RandomExtensions: RandomExtensions, make, Make2
 
 import AbstractAlgebra: AbstractAlgebra, diagonal_matrix, factor,
-                        identity_matrix, kernel, lead, ncols, ngens, nrows, order,
+                        identity_matrix, kernel, ncols, ngens, nrows, order,
                         preimage, zero_matrix, expressify
 
 import Nemo: add!, addeq!, base_ring, canonical_unit,
