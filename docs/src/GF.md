@@ -41,7 +41,7 @@ Given a finite field $R$, we also have the following coercions in addition to th
 standard ones expected.
 
 ```julia
-R(n::fmpz)
+R(n::ZZRingElem)
 ```
 
 Coerce a Flint integer value into the field.

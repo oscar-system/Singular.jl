@@ -33,7 +33,7 @@ an array $x$ of variables from which elements of the algebra can be constructed.
 
 For constructors taking an ordering, two orderings can be specified by symbol,
 one for term ordering, and a second one for ordering of module components. The
-first ordering can also be specified by a non-symbol as with `PolynomialRing`,
+first ordering can also be specified by a non-symbol as with `polynomial_ring`,
 in which case the second ordering is ignored.
 
 By default there will only be one parent object in the system for each
@@ -66,7 +66,7 @@ matrix with all relevant entries set to `a`.
 **Examples**
 
 ```julia
-julia> R, (x, y) = PolynomialRing(QQ, ["x", "y"]);
+julia> R, (x, y) = polynomial_ring(QQ, ["x", "y"]);
 
 julia> G, (x, y) = GAlgebra(R, 2, Singular.Matrix(R, [0 x; 0 0]))
 (Singular G-Algebra (QQ),(x,y),(dp(2),C), spluralg{n_Q}[x, y])

@@ -124,7 +124,7 @@ end
 end
 
 @testset "n_Q.Polynomials" begin
-   R, x = Nemo.PolynomialRing(QQ, "x")
+   R, x = Nemo.polynomial_ring(QQ, "x")
 
    f = 1 + 2x + 3x^2
 
@@ -144,9 +144,9 @@ end
    @test 1//2 == Rational{Int}(s) isa Rational{Int}
    @test 1//2 == convert(Rational{Int}, s) isa Rational{Int}
 
-   @test 1//2 == Nemo.QQ(s) isa Nemo.fmpq
-   @test 1//2 == Nemo.fmpq(s) isa Nemo.fmpq
-   @test 1//2 == convert(Nemo.fmpq, s) isa Nemo.fmpq
+   @test 1//2 == Nemo.QQ(s) isa Nemo.QQFieldElem
+   @test 1//2 == Nemo.QQFieldElem(s) isa Nemo.QQFieldElem
+   @test 1//2 == convert(Nemo.QQFieldElem, s) isa Nemo.QQFieldElem
 end
 
 @testset "n_Q.rand" begin

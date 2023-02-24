@@ -584,7 +584,7 @@ function fglm(I::sideal{spoly{T}}, ordering::Symbol) where T <: Nemo.RingElem
    Rdest = base_ring(I)
    !has_global_ordering(Rdest) && error("Algorithm works only for global orderings")
    n = nvars(Rdest)
-   Rsrc, = PolynomialRing(base_ring(Rdest), ["$i" for i in gens(Rdest)];
+   Rsrc, = polynomial_ring(base_ring(Rdest), ["$i" for i in gens(Rdest)];
         ordering = ordering)
    !has_global_ordering(Rsrc) && error("Algorithm works only for global orderings")
 

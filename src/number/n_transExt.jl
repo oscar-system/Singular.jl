@@ -114,7 +114,7 @@ is_unit(n::n_transExt) = !iszero(n)
 
 function _tExt_to_poly(R::N_FField, cached)
    n = transcendence_degree(R)
-   P, = PolynomialRing(base_ring(R), map(string, symbols(R)), cached = cached)
+   P, = polynomial_ring(base_ring(R), map(string, symbols(R)), cached = cached)
    return P
 end
 
@@ -330,9 +330,9 @@ promote_rule(C::Type{n_transExt}, ::Type{T}) where T <: Integer = n_transExt
 
 promote_rule(C::Type{n_transExt}, ::Type{T}) where T <: Rational = n_transExt
 
-promote_rule(C::Type{n_transExt}, ::Type{Nemo.fmpz}) = n_transExt
+promote_rule(C::Type{n_transExt}, ::Type{Nemo.ZZRingElem}) = n_transExt
 
-promote_rule(C::Type{n_transExt}, ::Type{Nemo.fmpq}) = n_transExt
+promote_rule(C::Type{n_transExt}, ::Type{Nemo.QQFieldElem}) = n_transExt
 
 promote_rule(C::Type{n_transExt}, ::Type{n_Z}) = n_transExt
 
@@ -351,14 +351,14 @@ function (R::N_FField)(n::n_transExt)
    return n
 end
 
-function (F::Singular.N_FField)(x::gfp_elem)
+function (F::Singular.N_FField)(x::fpFieldElem)
    if characteristic(F) != characteristic(parent(x))
       throw(ArgumentError("wrong characteristic"))
    end
    return n_transExt(F, x.data)
 end
 
-function (F::Singular.N_FField)(x::Union{n_Q, Nemo.fmpq, Rational})
+function (F::Singular.N_FField)(x::Union{n_Q, Nemo.QQFieldElem, Rational})
    return F(numerator(x)) // F(denominator(x))
 end
 

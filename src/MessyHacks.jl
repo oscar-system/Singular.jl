@@ -86,11 +86,11 @@ end
 =#
 
 let zero_parameter_types = [
-      Nemo.FlintIntegerRing => Nemo.fmpz,
-      Nemo.FlintRationalField => Nemo.fmpq,
-      Nemo.FmpzPolyRing => Nemo.fmpz_poly,
-      Nemo.FqNmodFiniteField => Nemo.fq_nmod,
-      Nemo.FqFiniteField => Nemo.fq,
+      Nemo.ZZRing => Nemo.ZZRingElem,
+      Nemo.QQField => Nemo.QQFieldElem,
+      Nemo.ZZPolyRing => Nemo.ZZPolyRingElem,
+      Nemo.fqPolyRepField => Nemo.fqPolyRepFieldElem,
+      Nemo.FqPolyRepField => Nemo.FqPolyRepFieldElem,
       Nemo.AnticNumberField => Nemo.nf_elem
    ],
 

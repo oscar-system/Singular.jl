@@ -4,7 +4,7 @@
 #   matrix(n_Z, [1 2; 3 4])
 # return a matrix over the wrong integers. Nor does it make sense to make a new
 # ring of integers for use in Singular.jl. Therefore, we keep the api very
-# simple and allow conversions between fmpz_mat and Matrix{BigInt}.
+# simple and allow conversions between ZZMatrix and Matrix{BigInt}.
 
 function sbigintmat(r::Int, c::Int)
    return sbigintmat(libSingular.bigintmat_init(r, c))
@@ -31,7 +31,7 @@ function Base.getindex(m::sbigintmat, i::Int, j::Int)
    end
 end
 
-function Base.setindex!(m::sbigintmat, a::Union{Integer, fmpz}, i::Int, j::Int)
+function Base.setindex!(m::sbigintmat, a::Union{Integer, ZZRingElem}, i::Int, j::Int)
    (0 < i <= nrows(m) && 0 < j <= ncols(m)) || error("index out of range")
    # rawset consumes our ptr
    ptr = libSingular.number_ptr(a, libSingular.get_coeffs_BIGINT())
@@ -57,8 +57,8 @@ end
 
 # conversion to bigintmat
 
-function sbigintmat(a::Union{Nemo.MatElem{ <: Union{Nemo.Integer, Nemo.fmpz}},
-                          Nemo.MatAlgElem{ <: Union{Nemo.Integer, Nemo.fmpz}}})
+function sbigintmat(a::Union{Nemo.MatElem{ <: Union{Nemo.Integer, Nemo.ZZRingElem}},
+                          Nemo.MatAlgElem{ <: Union{Nemo.Integer, Nemo.ZZRingElem}}})
    (r, c) = (nrows(a), ncols(a))
    z = sbigintmat(r, c)
    for i in 1:r, j in 1:c

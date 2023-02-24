@@ -10,7 +10,7 @@ rings described above.
 The default multivariate polynomial type in Singular.jl is the Singular `spoly` type.
 
 The associated polynomial ring is represented by a parent object which can be
-constructed by a call to the `PolynomialRing` constructor.
+constructed by a call to the `polynomial_ring` constructor.
 
 The types of the polynomial ring parent objects and elements thereof are given in the
 following table according to the library providing them.
@@ -22,7 +22,7 @@ Singular        | `spoly{T}`    | `Singular.PolyRing{T}`
 These types are parameterised by the type of elements in the coefficient ring of the
 polynomials.
 
-All polynomial types belong directly to the abstract type `MPolyElem` and
+All polynomial types belong directly to the abstract type `MPolyRingElem` and
 all the polynomial ring parent object types belong to the abstract type `MPolyRing`.
 
 ## Multivariate polynomial functionality
@@ -47,7 +47,7 @@ polynomials that is not documented in the general multivariate interface.
 ### Constructors
 
 ```julia
-PolynomialRing(R::Union{Ring, Field}, s::Union{Vector{String}, Vector{Symbol}};
+polynomial_ring(R::Union{Ring, Field}, s::Union{Vector{String}, Vector{Symbol}};
                cached::Bool = true, ordering = :degrevlex,
                ordering2::Symbol = :comp1min, degree_bound::Int = 0)
 ```
@@ -88,11 +88,11 @@ increase the amount of storage required.
 **Examples**
 
 ```julia
-R, (x, y, z) = PolynomialRing(ZZ, ["x", "y", "z"])
+R, (x, y, z) = polynomial_ring(ZZ, ["x", "y", "z"])
 
-S, vars = PolynomialRing(QQ, ["x", "y"]; ordering=:deglex)
+S, vars = polynomial_ring(QQ, ["x", "y"]; ordering=:deglex)
 
-T, x = PolynomialRing(ZZ, ["x$i" for i in 1:5];
+T, x = polynomial_ring(ZZ, ["x$i" for i in 1:5];
        ordering=:comp1max, ordering2=:degrevlex, degree_bound=5)
 ```
 
@@ -102,7 +102,7 @@ The following function allows creating a Singular polynomial ring from a given
 polynomial ring of type AbstractAlgebra.Generic.MPolyRing:
 
 ```julia
-PolynomialRing(R::AbstractAlgebra.Generic.MPolyRing{T}; cached::Bool = true, ordering::Symbol = :degrevlex, ordering2::Symbol = :comp1min, degree_bound::Int = 0)  where {T <: RingElement}
+polynomial_ring(R::AbstractAlgebra.Generic.MPolyRing{T}; cached::Bool = true, ordering::Symbol = :degrevlex, ordering2::Symbol = :comp1min, degree_bound::Int = 0)  where {T <: RingElement}
 ```
 
 Polynomials can be constructed using arithmetic operations on the generators,
@@ -115,7 +115,7 @@ documentation:
 **Examples**
 
 ```julia
-R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+R, (x, y) = polynomial_ring(ZZ, ["x", "y"])
 C = MPolyBuildCtx(R)
 
 push_term!(C, ZZ(1), [1, 2])
@@ -196,9 +196,9 @@ ordering_c()
 **Examples**
 
 ```julia
-PolynomialRing(QQ, "x".*string.(1:8), ordering = ordering_M([1 2; 3 5])*ordering_lp(3)*ordering_wp([1, 2, 3]))
+polynomial_ring(QQ, "x".*string.(1:8), ordering = ordering_M([1 2; 3 5])*ordering_lp(3)*ordering_wp([1, 2, 3]))
 
-PolynomialRing(QQ, "x".*string.(1:5), ordering = ordering_dp(3)*ordering_dp())
+polynomial_ring(QQ, "x".*string.(1:5), ordering = ordering_dp(3)*ordering_dp())
 ```
 
 ### Polynomial ring macros
@@ -213,7 +213,7 @@ The macros are designed for simple use cases, and do not offer the full power of
 most general constructor above.
 
 ```julia
-@PolynomialRing(R, s, n, o)
+@polynomial_ring(R, s, n, o)
 ```
 
 Given a coefficient ring $R$, a root variable name, e.g. `"x"`, a number of variable
@@ -221,7 +221,7 @@ $n$ and a polynomial term ordering `o`, create the variables `x1, x2, ..., xn` a
 inject them into scope, and return the corresponding polynomial ring `S`.
 
 ```julia
-@PolynomialRing(R, s, n)
+@polynomial_ring(R, s, n)
 ```
 
 As per the previous macro, with a default of `:degrevlex` for the polynomial term
@@ -230,9 +230,9 @@ ordering.
 **Examples**
 
 ```julia
-S = @PolynomialRing(ZZ, "x", 5, :deglex)
+S = @polynomial_ring(ZZ, "x", 5, :deglex)
 
-T = @PolynomialRing(QQ, "y", 10)
+T = @polynomial_ring(QQ, "y", 10)
 ```
 
 ### Basic manipulation
@@ -264,7 +264,7 @@ order(p::spoly)
 **Examples**
 
 ```
-R = @PolynomialRing(ZZ, "x", 3)
+R = @polynomial_ring(ZZ, "x", 3)
 
 n = ngens(R)
 has_global_ordering(R) == true
@@ -307,7 +307,7 @@ jacobian_matrix(A::Vector{spoly{T}}) where T <: Nemo.RingElem
 **Examples**
 
 ```julia
-R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"])
+R, (x, y, z) = polynomial_ring(QQ, ["x", "y", "z"])
 
 f = x^2*y*z + z^2*x + x*y*z
 
@@ -340,7 +340,7 @@ Singular.content(x::spoly)
 **Examples**
 
 ```julia
-R = @PolynomialRing(ZZ, "x", 2)
+R = @polynomial_ring(ZZ, "x", 2)
 
 f = 3x1^2 + 3x1*x2 + 6x2^2
 
@@ -362,7 +362,7 @@ squarefree factorization is available.
 **Examples**
 
 ```julia
-R = @PolynomialRing(QQ, "x", 4)
+R = @polynomial_ring(QQ, "x", 4)
 
 f = 123*(57*x2^3 + x4^5)^3*(x1^2 + x1+1)^2*(x1 + x2*x3)^2
 
@@ -375,7 +375,7 @@ multivariate factorization is available.
 **Examples**
 
 ```julia
-R = @PolynomialRing(ZZ, "x", 4)
+R = @polynomial_ring(ZZ, "x", 4)
 
 f = 123*(57*x2^3 + x4^5)^3*(x1^2 + x1+1)^2*(x1 + x2*x3)^2
 
@@ -390,7 +390,7 @@ the function 'change_base_ring'.
 **Examples**
 
 ```julia
-R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+R, (x, y) = polynomial_ring(ZZ, ["x", "y"])
 
 p = x^5 + y^3+1
 
@@ -403,7 +403,7 @@ via `CoefficientRing`.
 **Examples**
 
 ```julia
-R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+R, (x, y) = polynomial_ring(ZZ, ["x", "y"])
 
 p = x^5 + y^3+1
 
@@ -431,7 +431,7 @@ Conversion of generic AbstractAlgebra polynomials to Singular.jl polynomials:
 
 ```julia
 K = Nemo.ZZ
-R, (x, y) = AbstractAlgebra.Generic.PolynomialRing(K, ["x", "y"]);
+R, (x, y) = AbstractAlgebra.Generic.polynomial_ring(K, ["x", "y"]);
 Rsing, vars_Rsing = Singular.AsEquivalentSingularPolynomialRing(R);
 Rsing(x + y) == Rsing(x) + Rsing(y)
 ```
@@ -440,7 +440,7 @@ Conversion of Singular.jl polynomials to generic AbstractAlgebra polynomials:
 
 ```julia
 K = Nemo.ZZ
-S, (u, v) = Singular.PolynomialRing(K, ["u", "v"])
+S, (u, v) = Singular.polynomial_ring(K, ["u", "v"])
 Saa, (uu, vv) = Singular.AsEquivalentAbstractAlgebraPolynomialRing(S)
 Saa(u) + Saa(v) == Saa(u) + Saa(v)
 ```

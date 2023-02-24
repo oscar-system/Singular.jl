@@ -291,9 +291,9 @@ function prepare_argument(x::sbigintmat)
 end
 
 function prepare_argument(x::Union{
-                          Matrix{ <: Union{Nemo.Integer, Nemo.fmpz}},
-                          Nemo.MatElem{ <: Union{Nemo.Integer, Nemo.fmpz}},
-                          Nemo.MatAlgElem{ <: Union{Nemo.Integer, Nemo.fmpz}}})
+                          Matrix{ <: Union{Nemo.Integer, Nemo.ZZRingElem}},
+                          Nemo.MatElem{ <: Union{Nemo.Integer, Nemo.ZZRingElem}},
+                          Nemo.MatAlgElem{ <: Union{Nemo.Integer, Nemo.ZZRingElem}}})
     return prepare_argument(sbigintmat(x))
 end
 

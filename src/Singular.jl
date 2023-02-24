@@ -63,12 +63,12 @@ import Nemo: add!, addeq!, base_ring, canonical_unit,
              parent, primpart, promote_rule, push_term!,
              reconstruct, remove, sort_terms!,
              symbols, tail, terms, total_degree, trailing_coefficient, valuation,
-             var_index, vars, zero!, ResidueRing
+             var_index, vars, zero!, residue_ring
 
 export base_ring, elem_type, parent_type, parent
 
-export ResidueRing, PolynomialRing, ExteriorAlgebra, WeylAlgebra, Ideal,
-       MaximalIdeal, FreeModule, @PolynomialRing, @WeylAlgebra,
+export residue_ring, polynomial_ring, ExteriorAlgebra, WeylAlgebra, Ideal,
+       MaximalIdeal, FreeModule, @polynomial_ring, @WeylAlgebra,
        @ExteriorAlgebra
 
 export ZZ, QQ, FiniteField, FunctionField, CoefficientRing, Fp

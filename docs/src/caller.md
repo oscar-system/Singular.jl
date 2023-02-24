@@ -41,7 +41,7 @@ specifying the base ring in the first argument.
 This example illustrates passing Singular lists and providing the base ring.
 
 ```julia
-julia> r0, (x, y, z, t) = PolynomialRing(QQ, ["x", "y", "z", "t"], ordering=ordering_lp());
+julia> r0, (x, y, z, t) = polynomial_ring(QQ, ["x", "y", "z", "t"], ordering=ordering_lp());
 
 julia> Singular.LibGeneral.sort([x, y])
 ERROR: `intvec` may be passed in as Vector{Int}. All other vectors (`list` in Singular) must be passed in as Vector{Any} along with an explicit base ring in the first argument
@@ -55,7 +55,7 @@ julia> Singular.LibGeneral.sort(r0, Any[x, y])
 This example illustrates the base ring inference:
 
 ```julia
-julia> AA, (x, y, z, t) = PolynomialRing(QQ, ["x", "y", "z", "t"]);
+julia> AA, (x, y, z, t) = polynomial_ring(QQ, ["x", "y", "z", "t"]);
 
 julia> D = zero_matrix(AA, 4, 4);
 
@@ -105,7 +105,7 @@ fastHC, infRedTail, lazy, length, notBuckets, prot, qringNF, redTail, redThrough
 **Examples**
 
 ```julia
-julia> r, (x,y,z) = PolynomialRing(QQ, ["x", "y", "z"], ordering=ordering_ds());
+julia> r, (x,y,z) = polynomial_ring(QQ, ["x", "y", "z"], ordering=ordering_ds());
 
 julia> i = Ideal(r, [x^7+y^7+z^6,x^6+y^8+z^7,x^7+y^5+z^8,x^2*y^3+y^2*z^3+x^3*z^2,x^3*y^2+y^3*z^2+x^2*z^3]);
 
@@ -143,7 +143,7 @@ julia> gens(with_degBound(5) do; return std(i); end)
  x^6 + z^7 + y^8
  z^6 + x^7 + y^7
 
-julia> R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+julia> R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 (Singular Polynomial Ring (QQ),(x,y),(dp(2),C), spoly{n_Q}[x, y])
 
 julia> with_prot(true) do; return std(Ideal(R, x^5 - y*x + 1, y^6*x + x^2 + y^3)); end

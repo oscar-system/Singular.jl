@@ -281,9 +281,9 @@ promote_rule(C::Type{n_algExt}, ::Type{T}) where T <: Integer = n_algExt
 
 promote_rule(C::Type{n_algExt}, ::Type{T}) where T <: Rational = n_algExt
 
-promote_rule(C::Type{n_algExt}, ::Type{Nemo.fmpz}) = n_algExt
+promote_rule(C::Type{n_algExt}, ::Type{Nemo.ZZRingElem}) = n_algExt
 
-promote_rule(C::Type{n_algExt}, ::Type{Nemo.fmpq}) = n_algExt
+promote_rule(C::Type{n_algExt}, ::Type{Nemo.QQFieldElem}) = n_algExt
 
 promote_rule(C::Type{n_algExt}, ::Type{n_Z}) = n_algExt
 
@@ -312,7 +312,7 @@ function (K::Singular.Nemo.AnticNumberField)(a::Singular.n_algExt)
   res = zero(K)
   Ka = gen(K)
   for (c, e) in zip(coefficients(numSa), exponent_vectors(numSa))
-    res += Singular.Nemo.fmpq(c//denSa)*Ka^e[1]
+    res += Singular.Nemo.QQFieldElem(c//denSa)*Ka^e[1]
   end
   return res
 end
@@ -346,7 +346,7 @@ function (K::N_AlgExtField)(a::IntegerLikeTypes = 0)
   return n_algExt(K, a)
 end
 
-function (K::Singular.N_AlgExtField)(a::Union{n_Q, Nemo.fmpq, Rational})
+function (K::Singular.N_AlgExtField)(a::Union{n_Q, Nemo.QQFieldElem, Rational})
   return K(numerator(a))//K(denominator(a))
 end
 

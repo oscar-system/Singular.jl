@@ -1,6 +1,6 @@
 @testset "plural.constructors" begin
 
-   r, (x, y) = PolynomialRing(QQ, ["x", "y"], ordering = :degrevlex)
+   r, (x, y) = polynomial_ring(QQ, ["x", "y"], ordering = :degrevlex)
    R, (x, y) = GAlgebra(r, Singular.Matrix(r, [1 1; 0 1]),
                            Singular.Matrix(r, [0 x; 0 0]))
 
@@ -56,7 +56,7 @@
 end
 
 @testset "plural.printing" begin
-   r, (x, y) = PolynomialRing(QQ, ["x", "y"], ordering = :degrevlex)
+   r, (x, y) = polynomial_ring(QQ, ["x", "y"], ordering = :degrevlex)
    R, (x, y) = GAlgebra(r, Singular.Matrix(r, [1 1; 0 1]),
                            Singular.Matrix(r, [0 x; 0 0]))
 
@@ -67,7 +67,7 @@ end
 
 @testset "sglpoly.rename" begin
    s = ["x[1]", "x[2]"]
-   r, x = PolynomialRing(QQ, s, ordering = :degrevlex)
+   r, x = polynomial_ring(QQ, s, ordering = :degrevlex)
    R, x = GAlgebra(r, Singular.Matrix(r, [1 1; 0 1]),
                       Singular.Matrix(r, [0 x[1]; 0 0]))
    @test String.(symbols(R)) == s
@@ -75,7 +75,7 @@ end
 end
 
 @testset "plural.manipulation" begin
-   r, (x, y) = PolynomialRing(QQ, ["x", "y"], ordering = :degrevlex)
+   r, (x, y) = polynomial_ring(QQ, ["x", "y"], ordering = :degrevlex)
    R, (x, y) = GAlgebra(r, Singular.Matrix(r, [1 1; 0 1]),
                            Singular.Matrix(r, [0 x; 0 0]))
 
@@ -115,7 +115,7 @@ end
    end
    @test pol == r
 
-   r, (x, y) = PolynomialRing(Fp(5), ["x", "y"], ordering = :degrevlex)
+   r, (x, y) = polynomial_ring(Fp(5), ["x", "y"], ordering = :degrevlex)
    R, (x, y) = GAlgebra(r, Singular.Matrix(r, [1 1; 0 1]),
                            Singular.Matrix(r, [0 x; 0 0]))
 
@@ -155,12 +155,12 @@ end
 
 @testset "plural.binary_ops" begin
 
-   r, (x, y) = PolynomialRing(QQ, ["x", "y"], ordering = :degrevlex)
+   r, (x, y) = polynomial_ring(QQ, ["x", "y"], ordering = :degrevlex)
    R, (x, y) = GAlgebra(r, Singular.Matrix(r, [1 1; 0 1]),
                            Singular.Matrix(r, [0 x; 0 0]))
    @test y*x == x*y + x
 
-   r, (x, y) = PolynomialRing(QQ, ["x", "y"], ordering = :degrevlex)
+   r, (x, y) = polynomial_ring(QQ, ["x", "y"], ordering = :degrevlex)
    R, (x, y) = GAlgebra(r, Singular.Matrix(r, [1 1; 0 1]),
                            Singular.Matrix(r, [0 x+1; 0 0]))
 
@@ -170,7 +170,7 @@ end
 end
 
 @testset "plural.hash" begin
-   r, (x, y) = PolynomialRing(QQ, ["x", "y"], ordering = :degrevlex)
+   r, (x, y) = polynomial_ring(QQ, ["x", "y"], ordering = :degrevlex)
    R, (x, y) = GAlgebra(r, Singular.Matrix(r, [1 1; 0 1]),
                            Singular.Matrix(r, [0 x; 0 0]))
 
@@ -180,7 +180,7 @@ end
 end
 
 @testset "plural.recognition" begin
-   r, (x, y) = PolynomialRing(QQ, ["x", "y"], ordering = :degrevlex)
+   r, (x, y) = polynomial_ring(QQ, ["x", "y"], ordering = :degrevlex)
    R, (x, y) = GAlgebra(r, Singular.Matrix(r, [1 1; 0 1]),
                            Singular.Matrix(r, [0 x; 0 0]))
 

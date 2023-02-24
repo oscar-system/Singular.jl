@@ -31,7 +31,7 @@ end
    @test sprint(show, "text/plain", t) == "3*a*b + 2*c"
    @test string(t) == "3*a*b + 2*c"
 
-   R, (x, y, z) = PolynomialRing(F, ["x", "y", "z"])
+   R, (x, y, z) = polynomial_ring(F, ["x", "y", "z"])
 
    p = (3*a*b+2*c)*x+(c^2)*y+b*z
    q = (a+b//c)*x^2
@@ -53,7 +53,7 @@ end
    F, (a, b, c) = FunctionField(Fp(5), ["a", "b", "c"])
    x = (a*b+c^2) // (a+b)
 
-   R, (x1, x2, x3) = PolynomialRing(Fp(5), ["x1", "x2", "x3"])
+   R, (x1, x2, x3) = polynomial_ring(Fp(5), ["x1", "x2", "x3"])
    p = x1*x2 + x3^2
 
    @test numerator(x) == a*b+c^2
@@ -143,7 +143,7 @@ end
 
 @testset "n_transExt.Polynomials" begin
    F, (a, b, c) = FunctionField(Fp(5), ["a", "b", "c"])
-   R, (x, ) = PolynomialRing(F, ["x"])
+   R, (x, ) = polynomial_ring(F, ["x"])
 
    f = (1 + 2x)*a^2 + 3x*b*c + (x + 1)
 

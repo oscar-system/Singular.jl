@@ -33,10 +33,10 @@ IdentityAlgebraHomomorphism(D::PolyRing)
 ```julia
 L = FiniteField(3, 2, String("a"))
 
-R, (x, y, z, w) = PolynomialRing(L[1], ["x", "y", "z", "w"];
+R, (x, y, z, w) = polynomial_ring(L[1], ["x", "y", "z", "w"];
                              ordering=:negdegrevlex)
 
-S, (a, b, c) = PolynomialRing(L[1], ["a", "b", "c"];
+S, (a, b, c) = polynomial_ring(L[1], ["a", "b", "c"];
                              ordering=:degrevlex)
 
 V = [a, a + b^2, b - c, c + b]
@@ -51,10 +51,10 @@ It is possible to act on polynomials and ideals via algebra homomorphisms.
 **Examples**
 
 ```
-R, (x, y, z, w) = PolynomialRing(Nemo.ZZ, ["x", "y", "z", "w"];
+R, (x, y, z, w) = polynomial_ring(Nemo.ZZ, ["x", "y", "z", "w"];
                              ordering=:negdegrevlex)
 
-S, (a, b, c) = PolynomialRing(Nemo.ZZ, ["a", "b", "c"];
+S, (a, b, c) = polynomial_ring(Nemo.ZZ, ["a", "b", "c"];
                              ordering=:degrevlex)
 
 V = [a, a + b^2, b - c, c + b]
@@ -85,10 +85,10 @@ A short command for the composition of $f$ and $g$ is `f*g`, which is the same a
 **Examples**
 
 ```
-R, (x, y, z, w) = PolynomialRing(QQ, ["x", "y", "z", "w"];
+R, (x, y, z, w) = polynomial_ring(QQ, ["x", "y", "z", "w"];
                              ordering=:negdegrevlex)
 
-S, (a, b, c) = PolynomialRing(QQ, ["a", "b", "c"];
+S, (a, b, c) = polynomial_ring(QQ, ["a", "b", "c"];
                              ordering=:degrevlex)
 
 V = [a, a + b^2, b - c, c + b]
@@ -131,10 +131,10 @@ kernel(f::SAlgHom)
 **Examples**
 
 ```
-R, (x, y, z, w) = PolynomialRing(QQ, ["x", "y", "z", "w"];
+R, (x, y, z, w) = polynomial_ring(QQ, ["x", "y", "z", "w"];
                              ordering=:negdegrevlex)
 
-S, (a, b, c) = PolynomialRing(QQ, ["a", "b", "c"];
+S, (a, b, c) = polynomial_ring(QQ, ["a", "b", "c"];
                              ordering=:degrevlex)
 
 I = Ideal(S, [a, a + b^2, b - c, c + b])

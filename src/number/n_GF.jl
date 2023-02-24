@@ -308,7 +308,7 @@ Random.gentype(::Type{N_GField}) = elem_type(N_GField)
 
 promote_rule(C::Type{n_GF}, ::Type{T}) where T <: Integer = n_GF
 
-promote_rule(C::Type{n_GF}, ::Type{Nemo.fmpz}) = n_GF
+promote_rule(C::Type{n_GF}, ::Type{Nemo.ZZRingElem}) = n_GF
 
 promote_rule(C::Type{n_GF}, ::Type{n_Z}) = n_GF
 
@@ -344,7 +344,7 @@ desired behaviour, one can pass `false` for the optional `cached` parameter.
 """
 function FiniteField(p::Int, n::Int, S::String; cached=true)
    p >= 2^8 && throw(DomainError(p, "p must be < 256"))
-   !Nemo.isprime(Nemo.fmpz(p)) && throw(DomainError(p, "p must be prime"))
+   !Nemo.isprime(Nemo.ZZRingElem(p)) && throw(DomainError(p, "p must be prime"))
    (n*log(p) >= 20*log(2) || p^n >= 2^16) &&
       throw(DomainError("p^n must be < 2^16"))
    par = N_GField(p, n, Symbol(S), cached)

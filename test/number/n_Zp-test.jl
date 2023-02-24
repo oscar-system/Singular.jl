@@ -95,7 +95,7 @@ end
 
 @testset "n_Zp.Polynomials" begin
    R = Fp(5)
-   S, x = Nemo.PolynomialRing(R, "x")
+   S, x = Nemo.polynomial_ring(R, "x")
 
    f = 1 + 2x + 3x^2
 

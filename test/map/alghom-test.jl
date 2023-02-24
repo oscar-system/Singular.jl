@@ -1,8 +1,8 @@
 @testset "alghom.constructors" begin
    L = Singular.FiniteField(3, 2, String("a"))
-   R, (x, y, z, w) = Singular.PolynomialRing(L[1], ["x", "y", "z", "w"];
+   R, (x, y, z, w) = Singular.polynomial_ring(L[1], ["x", "y", "z", "w"];
                              ordering=:negdegrevlex)
-   S, (a, b, c) = Singular.PolynomialRing(L[1], ["a", "b", "c"];
+   S, (a, b, c) = Singular.polynomial_ring(L[1], ["a", "b", "c"];
                              ordering=:degrevlex)
    I = [a, a + b^2, b - c, c + b]
    f = Singular.AlgebraHomomorphism(R, S, I)
@@ -13,9 +13,9 @@
 end
 
 @testset "alghom.apply" begin
-   R, (x, y, z, w) = Singular.PolynomialRing(Singular.Fp(3), ["x", "y", "z", "w"];
+   R, (x, y, z, w) = Singular.polynomial_ring(Singular.Fp(3), ["x", "y", "z", "w"];
                              ordering=:negdegrevlex)
-   S, (a, b, c) = Singular.PolynomialRing(Singular.Fp(3), ["a", "b", "c"];
+   S, (a, b, c) = Singular.polynomial_ring(Singular.Fp(3), ["a", "b", "c"];
                              ordering=:degrevlex)
    I = Ideal(S, [a, a + b^2, b - c, c + b])
    f = Singular.AlgebraHomomorphism(R, S, gens(I))
@@ -34,9 +34,9 @@ end
 end
 
 @testset "alghom.compose" begin
-   R, (x, y, z, w) = Singular.PolynomialRing(Singular.QQ, ["x", "y", "z", "w"];
+   R, (x, y, z, w) = Singular.polynomial_ring(Singular.QQ, ["x", "y", "z", "w"];
                              ordering=:negdegrevlex)
-   S, (a, b, c) = Singular.PolynomialRing(Singular.QQ, ["a", "b", "c"];
+   S, (a, b, c) = Singular.polynomial_ring(Singular.QQ, ["a", "b", "c"];
                              ordering=:degrevlex)
    V = [a, a + b^2, b - c, c + b]
    W = [x^2, x + y + z, z*y]
@@ -61,9 +61,9 @@ end
 end
 
 @testset "alghom.preimage" begin
-   R, (x, y, z, w) = Singular.PolynomialRing(Singular.QQ, ["x", "y", "z", "w"];
+   R, (x, y, z, w) = Singular.polynomial_ring(Singular.QQ, ["x", "y", "z", "w"];
                              ordering=:negdegrevlex)
-   S, (a, b, c) = Singular.PolynomialRing(Singular.QQ, ["a", "b", "c"];
+   S, (a, b, c) = Singular.polynomial_ring(Singular.QQ, ["a", "b", "c"];
                              ordering=:degrevlex)
    I = Ideal(S, [a, a + b^2, b - c, c + b])
 

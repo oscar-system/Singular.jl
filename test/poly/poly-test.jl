@@ -1,6 +1,6 @@
 @testset "poly.constructors" begin
-   R, (x, ) = PolynomialRing(ZZ, ["x", ])
-   R1, (x, ) = PolynomialRing(ZZ, [:x, ])
+   R, (x, ) = polynomial_ring(ZZ, ["x", ])
+   R1, (x, ) = polynomial_ring(ZZ, [:x, ])
    @test R == R1
 
    @test elem_type(R) == spoly{n_Z}
@@ -37,27 +37,27 @@
 
    @test isa(g, spoly)
 
-   S, (y, ) = PolynomialRing(QQ, ["y", ])
+   S, (y, ) = polynomial_ring(QQ, ["y", ])
 
    h = S(ZZ(123))
 
    @test isa(h, spoly)
 
-   T, (z, ) = PolynomialRing(Nemo.ZZ, ["z", ])
+   T, (z, ) = polynomial_ring(Nemo.ZZ, ["z", ])
 
    k = T(123)
 
    @test isa(k, spoly)
 
-   S = @PolynomialRing(ZZ, "x", 50)
+   S = @polynomial_ring(ZZ, "x", 50)
 
    @test isa(x17, spoly)
 
-   T = @PolynomialRing(ZZ, "y", 50, :lex)
+   T = @polynomial_ring(ZZ, "y", 50, :lex)
 
    @test isa(y7, spoly)
 
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
    @test is_gen(x)
    @test is_gen(y)
@@ -74,7 +74,7 @@
    @test length(symbols(R)) == 2
    @test symbols(R) == [:x, :y]
 
-   R, (x, y) = PolynomialRing(ZZ, ["x", "y"]; ordering=:lex)
+   R, (x, y) = polynomial_ring(ZZ, ["x", "y"]; ordering=:lex)
 
    M = MPolyBuildCtx(R)
    push_term!(M, ZZ(2), [1, 2])
@@ -86,47 +86,47 @@
 end
 
 @testset "poly.printing" begin
-   R, (x, ) = PolynomialRing(ZZ, ["x", ])
+   R, (x, ) = polynomial_ring(ZZ, ["x", ])
 
    @test length(string(3x^2 + 2x + 1)) > 3
    @test length(sprint(show, "text/plain", 3x^2 + 2x + 1)) > 3
 
-   R, (x, ) = PolynomialRing(QQ, ["x", ])
+   R, (x, ) = polynomial_ring(QQ, ["x", ])
 
    @test length(string(3x^2 + 2x + 1)) > 3
    @test length(sprint(show, "text/plain", 3x^2 + 2x + 1)) > 3
 
-   R, (x, ) = PolynomialRing(Fp(5), ["x", ])
+   R, (x, ) = polynomial_ring(Fp(5), ["x", ])
 
    @test length(string(3x^2 + 2x + 1)) > 3
    @test length(sprint(show, "text/plain", 3x^2 + 2x + 1)) > 3
 
-   R, (x, ) = PolynomialRing(ResidueRing(ZZ, 5), ["x", ])
+   R, (x, ) = polynomial_ring(residue_ring(ZZ, 5), ["x", ])
 
    @test length(string(3x^2 + 2x + 1)) > 3
    @test length(sprint(show, "text/plain", 3x^2 + 2x + 1)) > 3
 
-   R, (x, ) = PolynomialRing(FiniteField(5, 3, "a")[1], ["x", ])
+   R, (x, ) = polynomial_ring(FiniteField(5, 3, "a")[1], ["x", ])
    @test string(x) == "x"
 
    # the answers should be printed in reduced form.
-   R, (x,) = PolynomialRing(QQ, ["x"])
+   R, (x,) = polynomial_ring(QQ, ["x"])
    @test string((QQ(1//2) + QQ(3//2)*x)(1)) == "2"
 
    Qa, (a,) = FunctionField(QQ, ["a"])
-   R, (x,) = PolynomialRing(Qa, ["x"])
+   R, (x,) = polynomial_ring(Qa, ["x"])
    @test string((1//a + (1)//(a-1)*x + (a-1)//a*x^2)(1)) == "a//(a - 1)"
    @test string((1//a + (1)//(a-1)*x + (a^2-3*a+1)//(a^2-a)*x^2)(1)) == "1"
 end
 
 @testset "poly.rename" begin
    s = ["x[1]", "x[2]", "x[3]"]
-   R, x = PolynomialRing(QQ, s)
+   R, x = polynomial_ring(QQ, s)
    @test String.(symbols(R)) == s
    @test String.(Singular.singular_symbols(R)) == ["x_1", "x_2", "x_3"]
 
    s = ["x[1][2]", "\$", "x[2][3]", "x[3][4]"]
-   R, x = PolynomialRing(QQ, s)
+   R, x = polynomial_ring(QQ, s)
    @test String.(symbols(R)) == s
    @test String.(Singular.singular_symbols(R)) == ["x_1_2", "x", "x_2_3", "x_3_4"]
 
@@ -136,7 +136,7 @@ end
    @test String.(Singular.singular_symbols(F)) == ["t_1", "t", "t_2", "t_3", "t_1@1"]
 
    s = ["t[1]", "\$", "t[2]", "t[3]", "t[1]"]
-   R, x = PolynomialRing(F, s)
+   R, x = polynomial_ring(F, s)
    @test String.(symbols(R)) == s
    @test String.(Singular.singular_symbols(R)) == ["t_1@2", "x", "t_2@1", "t_3@1", "t_1@3"]
 
@@ -145,14 +145,14 @@ end
 
    F, a = FiniteField(3, 2, "\$")
    s = ["a", "\$", "t[1]", "t[2]", "t[1]"]
-   R, x = PolynomialRing(F, s)
+   R, x = polynomial_ring(F, s)
    @test String.(Singular.singular_symbols(F)) == ["a"]
    @test String.(symbols(R)) == s
    @test String.(Singular.singular_symbols(R)) == ["a@1", "x", "t_1", "t_2", "t_1@1"]
 end
 
 @testset "poly.manipulation" begin
-   R, (x, ) = PolynomialRing(ZZ, ["x", ])
+   R, (x, ) = polynomial_ring(ZZ, ["x", ])
 
    @test isone(one(R))
    @test iszero(zero(R))
@@ -191,11 +191,11 @@ end
 
    @test pol == r
 
-   R, (x, ) = PolynomialRing(ResidueRing(ZZ, 6), ["x", ])
+   R, (x, ) = polynomial_ring(residue_ring(ZZ, 6), ["x", ])
 
    @test characteristic(R) == 6
 
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
    p = x + y
    q = x
    @test Singular.substitute_variable(p, 2, q) == 2*x
@@ -235,7 +235,7 @@ end
 end
 
 @testset "poly.change_base_ring" begin
-   R1, (x, ) = PolynomialRing(ZZ, ["x", ])
+   R1, (x, ) = polynomial_ring(ZZ, ["x", ])
 
    a1 = x^2 + 3x + 1
 
@@ -243,13 +243,13 @@ end
 
    @test isa(b1, spoly{n_Q})
 
-   R2, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+   R2, (x, y) = polynomial_ring(ZZ, ["x", "y"])
    a2 = x^5 + y^3 + 1
 
-   R3, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R3, (x, y) = polynomial_ring(QQ, ["x", "y"])
    a3 = x^5+y^3+1
 
-   R4, (x, y) = PolynomialRing(Nemo.QQ, ["x", "y"])
+   R4, (x, y) = polynomial_ring(Nemo.QQ, ["x", "y"])
    a4 = x^5+y^3+1
 
    a5 = change_base_ring(QQ, a2)
@@ -260,7 +260,7 @@ end
 end
 
 @testset "poly.multivariate_coeff" begin
-   R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+   R, (x, y) = polynomial_ring(ZZ, ["x", "y"])
 
    f = 2x^2*y^2 + 3x*y^2 - x^2*y + 4x*y - 5y + 1
 
@@ -269,7 +269,7 @@ end
 end
 
 @testset "poly.unary_ops" begin
-   R, (x, ) = PolynomialRing(ZZ, ["x", ])
+   R, (x, ) = polynomial_ring(ZZ, ["x", ])
 
    a = x^2 + 3x + 1
 
@@ -277,7 +277,7 @@ end
 end
 
 @testset "poly.binary_ops" begin
-   R, (x, ) = PolynomialRing(ZZ, ["x", ])
+   R, (x, ) = polynomial_ring(ZZ, ["x", ])
 
    a = x^2 + 3x + 1
    b = 2x + 4
@@ -288,7 +288,7 @@ end
 end
 
 @testset "poly.comparison" begin
-   R, (x, ) = PolynomialRing(ZZ, ["x", ])
+   R, (x, ) = polynomial_ring(ZZ, ["x", ])
 
    a = x^2 + 3x + 1
 
@@ -297,7 +297,7 @@ end
 end
 
 @testset "poly.powering" begin
-   R, (x, ) = PolynomialRing(ZZ, ["x", ])
+   R, (x, ) = polynomial_ring(ZZ, ["x", ])
 
    a = x^2 + 3x + 1
 
@@ -312,7 +312,7 @@ end
 end
 
 @testset "poly.exact_division" begin
-   R, (x, ) = PolynomialRing(ZZ, ["x", ])
+   R, (x, ) = polynomial_ring(ZZ, ["x", ])
 
    a = x^2 + 3x + 1
    b = 2x + 4
@@ -321,7 +321,7 @@ end
 end
 
 @testset "poly.adhoc_exact_division" begin
-   R, (x, ) = PolynomialRing(ZZ, ["x", ])
+   R, (x, ) = polynomial_ring(ZZ, ["x", ])
 
    a = x^2 + 3x + 1
 
@@ -329,7 +329,7 @@ end
    @test divexact(2a, BigInt(2)) == a
    @test divexact(2a, ZZ(2)) == a
 
-   R, (x, ) = PolynomialRing(QQ, ["x", ])
+   R, (x, ) = polynomial_ring(QQ, ["x", ])
 
    a = x^2 + 3x + 1
 
@@ -342,7 +342,7 @@ end
 end
 
 @testset "poly.adhoc_binary_operation" begin
-   R, (x, ) = PolynomialRing(QQ, ["x", ])
+   R, (x, ) = polynomial_ring(QQ, ["x", ])
 
    a = x^2 + 3x + 1
 
@@ -355,7 +355,7 @@ end
 
 @testset "poly.euclidean_division" begin
    for k in [QQ, Nemo.QQ]
-      R, (x, y) = PolynomialRing(k, ["x", "y"])
+      R, (x, y) = polynomial_ring(k, ["x", "y"])
 
       a = x^2*y^2 + 3x + 1
       b = x*y + 1
@@ -369,7 +369,7 @@ end
 
 @testset "poly.divides" begin
    for k in [QQ, Nemo.QQ]
-      R, (x, y) = PolynomialRing(k, ["x", "y"])
+      R, (x, y) = polynomial_ring(k, ["x", "y"])
 
       a = x^2 + 3x + 1
       b = x*y + 1
@@ -389,7 +389,7 @@ end
 end
 
 @testset "poly.gcd_lcm" begin
-   R, (x, ) = PolynomialRing(ZZ, ["x", ])
+   R, (x, ) = polynomial_ring(ZZ, ["x", ])
    a = x^2 + 3x + 1
    b = 2x + 4
    c = 2x^2 + 1
@@ -405,7 +405,7 @@ end
 
 @testset "poly.extended_gcd" begin
    for k in [QQ, Nemo.QQ]
-      R, (x, ) = PolynomialRing(k, ["x", ])
+      R, (x, ) = polynomial_ring(k, ["x", ])
 
       a = x^2 + 3x + 1
       b = 2x + 4
@@ -421,7 +421,7 @@ end
 end
 
 @testset "poly.evaluate" begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
    f = x^2*y + 2x + 1
 
@@ -434,7 +434,7 @@ end
 end
 
 @testset "poly.inflation_deflation" begin
-   R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+   R, (x, y) = polynomial_ring(ZZ, ["x", "y"])
 
    f = x^7*y^7 + 3x^4*y^4 + 2x*y
 
@@ -442,9 +442,9 @@ end
 end
 
 @testset "poly.Polynomials" begin
-   R, (x, ) = PolynomialRing(ZZ, ["x", ])
+   R, (x, ) = polynomial_ring(ZZ, ["x", ])
 
-   S, y = Nemo.PolynomialRing(R, "y")
+   S, y = Nemo.polynomial_ring(R, "y")
 
    f = (1 + 2x + 3x^2)*y + (2x + 3)
 
@@ -458,7 +458,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = AbstractAlgebra.rand_ordering()
 
-      R, vars_R = AbstractAlgebra.Generic.PolynomialRing(Nemo.ZZ, var_names; ordering=ord)
+      R, vars_R = AbstractAlgebra.Generic.polynomial_ring(Nemo.ZZ, var_names; ordering=ord)
       Rsing, vars_Rsing = Singular.AsEquivalentSingularPolynomialRing(R)
       for iter in 1:10
          f = AbstractAlgebra.Generic.rand(R, 5:10, 1:10, -100:100)
@@ -469,7 +469,7 @@ end
          @test R(Rsing(f)) == f
       end
 
-      S, vars_S = Singular.PolynomialRing(Nemo.ZZ, var_names; ordering=ord)
+      S, vars_S = Singular.polynomial_ring(Nemo.ZZ, var_names; ordering=ord)
       SAA, vars_SAA = Singular.AsEquivalentAbstractAlgebraPolynomialRing(S)
       # FIXME: Better generate random polynomials
       f = 1 + vars_S[1]*vars_S[2]
@@ -482,8 +482,8 @@ end
 end
 
 @testset "poly.convert_Nemo.MPoly_to_Singular.spoly" begin
-   R, (x, y, z) = Nemo.PolynomialRing(Nemo.QQ, ["x", "y", "z"])
-   S, (a, b, c) = PolynomialRing(QQ, ["a", "b", "c"])
+   R, (x, y, z) = Nemo.polynomial_ring(Nemo.QQ, ["x", "y", "z"])
+   S, (a, b, c) = polynomial_ring(QQ, ["a", "b", "c"])
 
    f = x^2+y^3+z^5
 
@@ -491,7 +491,7 @@ end
 end
 
 @testset "poly.test_spoly_differential" begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
    f = x^3 + y^6
 
@@ -529,14 +529,14 @@ end
 end
 
 @testset "poly.homogeneous" begin
-   R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"])
+   R, (x, y, z) = polynomial_ring(QQ, ["x", "y", "z"])
    @test divides(homogenize(x + y^2, z), x*z + y^2)[1]
 
-   R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"], ordering = ordering_wp([2,3,1]))
+   R, (x, y, z) = polynomial_ring(QQ, ["x", "y", "z"], ordering = ordering_wp([2,3,1]))
    @test divides(homogenize(x + y^2, z), x*z^4 + y^2)[1]
    @test is_homogeneous(Ideal(R, [homogenize(x + y^2, z)]))
 
-   R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"], ordering = ordering_wp([1,2,3]))
+   R, (x, y, z) = polynomial_ring(QQ, ["x", "y", "z"], ordering = ordering_wp([1,2,3]))
    @test_throws ErrorException homogenize(x + y^2, z)
 end
 
@@ -544,23 +544,23 @@ end
    # everything works for QQ, Fp, and extensions of these by a minpoly
    # factor_squarefree strangely does not work for ZZ
 
-   R, (x, y, z, w) = PolynomialRing(QQ, ["x", "y", "z", "w"]; ordering=:negdegrevlex)
+   R, (x, y, z, w) = polynomial_ring(QQ, ["x", "y", "z", "w"]; ordering=:negdegrevlex)
    f1 = 113*(2*y^7 + w^2)^3*(1 + x)^2*(x + y*z)^2
 
-   R, (x, y, z, w) = PolynomialRing(ZZ, ["x", "y", "z", "w"]; ordering=:negdegrevlex)
+   R, (x, y, z, w) = polynomial_ring(ZZ, ["x", "y", "z", "w"]; ordering=:negdegrevlex)
    f2 = 123*(57*y^3 + w^5)^3*(x^2 + x+1)^2*(x + y*z)^2
 
-   R, (x, y, z, w) = PolynomialRing(Fp(3), ["x", "y", "z", "w"]; ordering=:negdegrevlex)
+   R, (x, y, z, w) = polynomial_ring(Fp(3), ["x", "y", "z", "w"]; ordering=:negdegrevlex)
    f3 = 7*(y^3 + w^3)*(1 + x)^2*(x + y*z)^2
 
    Qa, (a,) = FunctionField(QQ, ["a"])
    K, a = AlgebraicExtensionField(Qa, a^2 + 1)
-   R, (x, y, z) = PolynomialRing(K, ["x", "y", "z"])
+   R, (x, y, z) = polynomial_ring(K, ["x", "y", "z"])
    f4 = (x^4 + y^4*z^4)*(1 + x + a*y + a^2*z)^2
 
    F7a, (a,) = FunctionField(Fp(7), ["a"])
    K, a = AlgebraicExtensionField(F7a, a^2 + 1)
-   R, (x, y, z) = PolynomialRing(K, ["x", "y", "z"])
+   R, (x, y, z) = polynomial_ring(K, ["x", "y", "z"])
    f5 = (x^4 + y^4*z^4)*(1 + x + a*y + a^2*z)^2
 
    for f in [f1, f2, f3, f4, f5]
@@ -579,7 +579,7 @@ end
    # as the kernel lacks the conversion functions
 
    Fq, a = FiniteField(19, 3, "a")
-   R, (x, y, z) = PolynomialRing(Fq, ["x", "y", "z"])
+   R, (x, y, z) = polynomial_ring(Fq, ["x", "y", "z"])
    f = x^3*y^3*z^3 - a^3
 
    @test_throws Exception factor(f)
@@ -587,7 +587,7 @@ end
 end
 
 @testset "poly.hash" begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
    @test hash(x) == hash(x+y-y)
    @test hash(x,zero(UInt)) == hash(x+y-y,zero(UInt))
@@ -595,7 +595,7 @@ end
 end
 
 @testset "poly.errors" begin
-   R, (x,) = PolynomialRing(QQ, ["x"])
+   R, (x,) = polynomial_ring(QQ, ["x"])
    @test_throws Exception div(R(), R())
    @test !iszero(std(Ideal(R, R(1))))
 end
@@ -604,16 +604,16 @@ end
 
    touni = Singular.AbstractAlgebra.to_univariate
 
-   S, t = Singular.AbstractAlgebra.PolynomialRing(Singular.QQ, "t")
+   S, t = Singular.AbstractAlgebra.polynomial_ring(Singular.QQ, "t")
 
-   R,(x,y) = PolynomialRing(QQ, ["x", "y"], ordering=:deglex)
+   R,(x,y) = polynomial_ring(QQ, ["x", "y"], ordering=:deglex)
    @test touni(S, 0*x) == zero(S)
    @test touni(S, 1+0*x) == one(S)
    @test touni(S, y+2*y^2+3*y^3) == t+2*t^2+3*t^3
    @test touni(S, x+2*x^2+3*x^3) == t+2*t^2+3*t^3
    @test_throws Exception touni(S, (1+x)*(1+y))
 
-   R,(x,y) = PolynomialRing(QQ, ["x", "y"], ordering=:neglex)
+   R,(x,y) = polynomial_ring(QQ, ["x", "y"], ordering=:neglex)
    @test touni(S, 0*x) == zero(S)
    @test touni(S, 1+0*x) == one(S)
    @test touni(S, (1+2*y)^6) == (1+2*t)^6

@@ -1,13 +1,13 @@
 @testset "smatrix.constructors" begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
    I = Ideal(R, x, y)
    M = Singular.Matrix(I)
    S = parent(M)
 
    @test elem_type(S) == smatrix{spoly{n_Q}}
-   @test elem_type(MatrixSpace{spoly{n_Q}}) == smatrix{spoly{n_Q}}
-   @test parent_type(smatrix{spoly{n_Q}}) == MatrixSpace{spoly{n_Q}}
+   @test elem_type(matrix_space{spoly{n_Q}}) == smatrix{spoly{n_Q}}
+   @test parent_type(smatrix{spoly{n_Q}}) == matrix_space{spoly{n_Q}}
 
    @test base_ring(S) == R
    @test base_ring(M) == R
@@ -42,14 +42,14 @@
    @test D[1, 1] == x+y
    @test D[1, 2] == 0
 
-   Rx, _ = PolynomialRing(QQ, ["x"])
+   Rx, _ = polynomial_ring(QQ, ["x"])
    Z = zero_matrix(Rx, 2, 3)
    @test_throws ArgumentError S(Z)
    @test_throws Exception S(Z[1, 1])
 end
 
 @testset "smatrix.manipulation" begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
    I = Ideal(R, x, y)
    M = Singular.Matrix(I)
@@ -74,7 +74,7 @@ end
 end
 
 @testset "smatrix.binary_ops" begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
    I1 = Ideal(R, x, y)
    I2 = Ideal(R, x*y + 1, x^2 + 1)
@@ -90,7 +90,7 @@ end
 end
 
 @testset "smatrix.comparison" begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
    I1 = Ideal(R, x, y)
    I2 = Ideal(R, x*y + 1, x^2 + 1)

@@ -5,7 +5,7 @@
 ###############################################################################
 
 function fmpqInit(i::Clong, cf::Ptr{Cvoid})
-   return number(Nemo.fmpq(i))
+   return number(Nemo.QQFieldElem(i))
 end
 
 function fmpqDelete(ptr::Ptr{Ptr{Cvoid}}, cf::Ptr{Cvoid})
@@ -15,7 +15,7 @@ function fmpqDelete(ptr::Ptr{Ptr{Cvoid}}, cf::Ptr{Cvoid})
 end
 
 function fmpqCopy(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
-   n = julia(a)::Nemo.fmpq
+   n = julia(a)::Nemo.QQFieldElem
    return number(deepcopy(n))
 end
 
@@ -26,7 +26,7 @@ end
 ###############################################################################
 
 function fmpqGreaterZero(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
-   n = julia(a)::Nemo.fmpq
+   n = julia(a)::Nemo.QQFieldElem
    return Cint(n > 0)
 end
 
@@ -39,7 +39,7 @@ function fmpqCoeffWrite(cf::Ptr{Cvoid}, d::Cint)
 end
 
 function fmpqWrite(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
-   n = julia(a)::Nemo.fmpq
+   n = julia(a)::Nemo.QQFieldElem
    libSingular.StringAppendS(AbstractAlgebra.obj_to_string_wrt_times(n))
    nothing
 end
@@ -51,57 +51,57 @@ end
 ###############################################################################
 
 function fmpqNeg(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
-   n = julia(a)::Nemo.fmpq
+   n = julia(a)::Nemo.QQFieldElem
    return number(-n)
 end
 
 function fmpqInpNeg(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
-    ccall((:fmpq_neg, libflint), Cvoid, (Ptr{Nemo.fmpq}, Ptr{Nemo.fmpq}), a, a)
+    ccall((:fmpq_neg, libflint), Cvoid, (Ptr{Nemo.QQFieldElem}, Ptr{Nemo.QQFieldElem}), a, a)
     return a
 end
 
 function fmpqInvers(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
-   n = julia(a)::Nemo.fmpq
+   n = julia(a)::Nemo.QQFieldElem
    return number(Nemo.inv(n))
 end
 
 function fmpqMult(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
-   n1 = julia(a)::Nemo.fmpq
-   n2 = julia(b)::Nemo.fmpq
+   n1 = julia(a)::Nemo.QQFieldElem
+   n2 = julia(b)::Nemo.QQFieldElem
    return number(n1*n2)
 end
 
 function fmpqInpMult(a::Ptr{Ptr{Cvoid}}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    r = unsafe_load(a)
-   aa = julia(r)::Nemo.fmpq
-   bb = julia(b)::Nemo.fmpq
+   aa = julia(r)::Nemo.QQFieldElem
+   bb = julia(b)::Nemo.QQFieldElem
    Nemo.mul!(aa, aa, bb)
    nothing
 end
 
 function fmpqAdd(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
-   n1 = julia(a)::Nemo.fmpq
-   n2 = julia(b)::Nemo.fmpq
+   n1 = julia(a)::Nemo.QQFieldElem
+   n2 = julia(b)::Nemo.QQFieldElem
    return number(n1 + n2)
 end
 
 function fmpqInpAdd(a::Ptr{Ptr{Cvoid}}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    r = unsafe_load(a)
-   aa = julia(r)::Nemo.fmpq
-   bb = julia(b)::Nemo.fmpq
+   aa = julia(r)::Nemo.QQFieldElem
+   bb = julia(b)::Nemo.QQFieldElem
    Nemo.addeq!(aa, bb)
    nothing
 end
 
 function fmpqSub(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
-   n1 = julia(a)::Nemo.fmpq
-   n2 = julia(b)::Nemo.fmpq
+   n1 = julia(a)::Nemo.QQFieldElem
+   n2 = julia(b)::Nemo.QQFieldElem
    return number(n1 - n2)
 end
 
 function fmpqDiv(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
-   n1 = julia(a)::Nemo.fmpq
-   n2 = julia(b)::Nemo.fmpq
+   n1 = julia(a)::Nemo.QQFieldElem
+   n2 = julia(b)::Nemo.QQFieldElem
    return number(Nemo.divexact(n1, n2))
 end
 
@@ -112,29 +112,29 @@ end
 ###############################################################################
 
 function fmpqGreater(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
-   n1 = julia(a)::Nemo.fmpq
-   n2 = julia(b)::Nemo.fmpq
+   n1 = julia(a)::Nemo.QQFieldElem
+   n2 = julia(b)::Nemo.QQFieldElem
    return Cint(n1 > n2)
 end
 
 function fmpqEqual(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
-   n1 = julia(a)::Nemo.fmpq
-   n2 = julia(b)::Nemo.fmpq
+   n1 = julia(a)::Nemo.QQFieldElem
+   n2 = julia(b)::Nemo.QQFieldElem
    return Cint(n1 == n2)
 end
 
 function fmpqIsZero(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
-   n = julia(a)::Nemo.fmpq
+   n = julia(a)::Nemo.QQFieldElem
    return Cint(Nemo.iszero(n))
 end
 
 function fmpqIsOne(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
-   n = julia(a)::Nemo.fmpq
+   n = julia(a)::Nemo.QQFieldElem
    return Cint(Nemo.isone(n))
 end
 
 function fmpqIsMOne(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
-   n = julia(a)::Nemo.fmpq
+   n = julia(a)::Nemo.QQFieldElem
    return Cint(n == -1)
 end
 
@@ -145,8 +145,8 @@ end
 ###############################################################################
 
 function fmpqGcd(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
-   n1 = julia(a)::Nemo.fmpq
-   n2 = julia(b)::Nemo.fmpq
+   n1 = julia(a)::Nemo.QQFieldElem
+   n2 = julia(b)::Nemo.QQFieldElem
    return number(Nemo.gcd(n1, n2))
 end
 
@@ -157,9 +157,9 @@ end
 ###############################################################################
 
 function fmpqSubringGcd(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
-   n1 = numerator(julia(a)::Nemo.fmpq)
-   n2 = numerator(julia(b)::Nemo.fmpq)
-   return number(Nemo.fmpq(Nemo.gcd(n1, n2)))
+   n1 = numerator(julia(a)::Nemo.QQFieldElem)
+   n2 = numerator(julia(b)::Nemo.QQFieldElem)
+   return number(Nemo.QQFieldElem(Nemo.gcd(n1, n2)))
 end
 
 ###############################################################################
@@ -170,7 +170,7 @@ end
 
 function fmpqInt(ptr::Ptr{Ptr{Cvoid}}, cf::Ptr{Cvoid})
     ptr_load = unsafe_load(ptr)
-    n = julia(ptr_load)::Nemo.fmpq
+    n = julia(ptr_load)::Nemo.QQFieldElem
     ret_val = Clong(n)
     number_pop!(nemoNumberID, ptr_load)
     return ret_val
@@ -178,7 +178,7 @@ end
 
 function fmpqMPZ(b::BigInt, ptr::Ptr{Ptr{Cvoid}}, cf::Ptr{Cvoid})
     ptr_load = unsafe_load(ptr)
-    n = julia(unsafe_load(ptr))::Nemo.fmpz
+    n = julia(unsafe_load(ptr))::Nemo.ZZRingElem
     z = convert(BigInt, Nemo.numerator(n))
     GC.@preserve b z begin
         bptr = reinterpret(Ptr{Cvoid}, pointer_from_objref(b))
@@ -232,7 +232,7 @@ function fmpqInitChar(cf::Ptr{Cvoid}, p::Ptr{Cvoid})
     return Cint(0)
 end
 
-function register(R::Nemo.FlintRationalField)
+function register(R::Nemo.QQField)
    c = @cfunction(fmpqInitChar, Cint, (Ptr{Cvoid}, Ptr{Cvoid}))
    return nRegister(n_unknown, c)
 end

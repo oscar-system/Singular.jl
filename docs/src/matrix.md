@@ -20,7 +20,7 @@ according to the library providing them.
 
  Library        | Element type    | Parent type
 ----------------|-----------------|--------------------------
-Singular        | `smatrix{T}`    | `Singular.MatrixSpace{T}`
+Singular        | `smatrix{T}`    | `Singular.matrix_space{T}`
 
 These types are parameterised by the type of elements in the polynomial ring $R$ over
 which the matrices are defined.
@@ -46,7 +46,7 @@ The following parts of the Matrix interface from AbstractAlgebra are also implem
 **Examples**
 
 ```julia
-R, (x, y, u, v, w) = Singular.PolynomialRing(Singular.QQ, ["x", "y", "u", "v", "w"])
+R, (x, y, u, v, w) = Singular.polynomial_ring(Singular.QQ, ["x", "y", "u", "v", "w"])
 
 identity_matrix(R, 4)
 

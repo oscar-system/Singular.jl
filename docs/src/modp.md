@@ -51,7 +51,7 @@ addition to the standard ones expected.
 
 ```julia
 R(n::n_Z)
-R(n::fmpz)
+R(n::ZZRingElem)
 ```
 
 Coerce a Singular or Flint integer value into the field.

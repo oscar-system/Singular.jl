@@ -199,11 +199,11 @@ function promote_rule(::Type{n_FieldElem{T}}, ::Type{U}) where {T <: Nemo.FieldE
    promote_rule(T, U) == T ? n_FieldElem{T} : promote_rule1(U, n_FieldElem{T})
 end
 
-promote_rule(::Type{n_RingElem{S}}, ::Type{Nemo.fmpz}) where {S <: Nemo.RingElem} = n_RingElem{S}
-promote_rule(::Type{n_FieldElem{S}}, ::Type{Nemo.fmpz}) where {S <: Nemo.FieldElem} = n_FieldElem{S}
+promote_rule(::Type{n_RingElem{S}}, ::Type{Nemo.ZZRingElem}) where {S <: Nemo.RingElem} = n_RingElem{S}
+promote_rule(::Type{n_FieldElem{S}}, ::Type{Nemo.ZZRingElem}) where {S <: Nemo.FieldElem} = n_FieldElem{S}
 
-promote_rule(::Type{n_RingElem{S}}, ::Type{Nemo.fmpq}) where {S <: Nemo.RingElem} = n_RingElem{S}
-promote_rule(::Type{n_FieldElem{S}}, ::Type{Nemo.fmpq}) where {S <: Nemo.FieldElem} = n_FieldElem{S}
+promote_rule(::Type{n_RingElem{S}}, ::Type{Nemo.QQFieldElem}) where {S <: Nemo.RingElem} = n_RingElem{S}
+promote_rule(::Type{n_FieldElem{S}}, ::Type{Nemo.QQFieldElem}) where {S <: Nemo.FieldElem} = n_FieldElem{S}
 
 ###############################################################################
 #
@@ -318,16 +318,16 @@ function promote_rule(::Type{n_FieldElem{FieldElemWrapper{S, T}}}, ::Type{T}) wh
 end
 
 # julia says the above are ambiguous on these cases
-function promote_rule(::Type{Singular.n_RingElem{Singular.RingElemWrapper{S, Nemo.fmpz}}}, ::Type{Nemo.fmpz}) where S
-   return Singular.n_RingElem{Singular.RingElemWrapper{S, Nemo.fmpz}}
+function promote_rule(::Type{Singular.n_RingElem{Singular.RingElemWrapper{S, Nemo.ZZRingElem}}}, ::Type{Nemo.ZZRingElem}) where S
+   return Singular.n_RingElem{Singular.RingElemWrapper{S, Nemo.ZZRingElem}}
 end
 
-function promote_rule(::Type{Singular.n_FieldElem{Singular.FieldElemWrapper{S, Nemo.fmpq}}}, ::Type{Nemo.fmpz}) where S
-   return Singular.n_FieldElem{Singular.FieldElemWrapper{S, Nemo.fmpq}}
+function promote_rule(::Type{Singular.n_FieldElem{Singular.FieldElemWrapper{S, Nemo.QQFieldElem}}}, ::Type{Nemo.ZZRingElem}) where S
+   return Singular.n_FieldElem{Singular.FieldElemWrapper{S, Nemo.QQFieldElem}}
 end
 
-function promote_rule(::Type{Singular.n_FieldElem{Singular.FieldElemWrapper{S, Nemo.fmpq}}}, ::Type{Nemo.fmpq}) where S
-   return Singular.n_FieldElem{Singular.FieldElemWrapper{S, Nemo.fmpq}}
+function promote_rule(::Type{Singular.n_FieldElem{Singular.FieldElemWrapper{S, Nemo.QQFieldElem}}}, ::Type{Nemo.QQFieldElem}) where S
+   return Singular.n_FieldElem{Singular.FieldElemWrapper{S, Nemo.QQFieldElem}}
 end
 
 

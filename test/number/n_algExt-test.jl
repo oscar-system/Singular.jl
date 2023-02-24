@@ -25,7 +25,7 @@ end
    @test sprint(show, "text/plain", a+1) == "a + 1"
    @test string(a+1) == "a + 1"
 
-   R, (x, y, z) = PolynomialRing(F, ["x", "y", "z"])
+   R, (x, y, z) = polynomial_ring(F, ["x", "y", "z"])
 
    p = (3*a+2)*x+(2*a^2)*y+a*z
    q = (a+1)*x^2
@@ -66,8 +66,8 @@ end
    F1, (a,) = FunctionField(QQ, ["a"])
    K1, a = AlgebraicExtensionField(F1, a^4 + 1)
 
-   F2, b = Singular.Nemo.PolynomialRing(Singular.Nemo.QQ, "b")
-   K2, b = Singular.Nemo.NumberField(b^4 + 1, "b")
+   F2, b = Singular.Nemo.polynomial_ring(Singular.Nemo.QQ, "b")
+   K2, b = Singular.Nemo.number_field(b^4 + 1, "b")
 
    @assert K1(1//2) == 1//2
    @assert K1(1//2) == big(1//2)
@@ -159,7 +159,7 @@ end
 
    F, (a,) = FunctionField(QQ,["a"])
    K, a = AlgebraicExtensionField(F, a^2 + 1)
-   R, (x, y, z) = PolynomialRing(K, ["x", "y", "z"])
+   R, (x, y, z) = polynomial_ring(K, ["x", "y", "z"])
    S = Singular.create_ring_from_singular_ring(Singular.libSingular.rCopy(R.ptr))
 
    @test isa(S, Singular.PolyRing{n_algExt})

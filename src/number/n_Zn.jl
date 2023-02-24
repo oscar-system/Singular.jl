@@ -269,7 +269,7 @@ end
 
 promote_rule(C::Type{n_Zn}, ::Type{T}) where {T <: Integer} = n_Zn
 
-promote_rule(C::Type{n_Zn}, ::Type{Nemo.fmpz}) = n_Zn
+promote_rule(C::Type{n_Zn}, ::Type{Nemo.ZZRingElem}) = n_Zn
 
 promote_rule(C::Type{n_Zn}, ::Type{n_Z}) = n_Zn
 
@@ -286,13 +286,13 @@ promote_rule(C::Type{n_Zn}, ::Type{n_Z}) = n_Zn
 # take ownership of the pointer - not for general users
 (R::N_ZnRing)(n::libSingular.number_ptr) = n_Zn(R, n)
 
-(R::N_ZnRing)(n::Nemo.nmod) = n_Zn(R, lift(n))
+(R::N_ZnRing)(n::Nemo.zzModRingElem) = n_Zn(R, lift(n))
 
-(R::N_ZnRing)(n::Nemo.fmpz_mod) = n_Zn(R, lift(n))
+(R::N_ZnRing)(n::Nemo.ZZModRingElem) = n_Zn(R, lift(n))
 
-(R::Nemo.NmodRing)(n::n_Zn) = R(BigInt(n))
+(R::Nemo.zzModRing)(n::n_Zn) = R(BigInt(n))
 
-(R::Nemo.FmpzModRing)(n::n_Zn) = R(BigInt(n))
+(R::Nemo.ZZModRing)(n::n_Zn) = R(BigInt(n))
 
 ###############################################################################
 #
@@ -300,6 +300,6 @@ promote_rule(C::Type{n_Zn}, ::Type{n_Z}) = n_Zn
 #
 ###############################################################################
 
-ResidueRing(R::Integers, a::Int; cached=true) = N_ZnRing(BigInt(a), cached)
+residue_ring(R::Integers, a::Int; cached=true) = N_ZnRing(BigInt(a), cached)
 
-ResidueRing(R::Integers, a::BigInt; cached=true) = N_ZnRing(a, cached)
+residue_ring(R::Integers, a::BigInt; cached=true) = N_ZnRing(a, cached)
