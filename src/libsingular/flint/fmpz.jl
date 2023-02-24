@@ -5,7 +5,7 @@
 ###############################################################################
 
 function fmpzInit(i::Clong, cf::Ptr{Cvoid})
-   return number(Nemo.fmpz(i))
+   return number(Nemo.ZZRingElem(i))
 end
 
 function fmpzDelete(ptr::Ptr{Ptr{Cvoid}}, cf::Ptr{Cvoid})
@@ -15,7 +15,7 @@ function fmpzDelete(ptr::Ptr{Ptr{Cvoid}}, cf::Ptr{Cvoid})
 end
 
 function fmpzCopy(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
-    n = julia(a)::Nemo.fmpz
+    n = julia(a)::Nemo.ZZRingElem
     return number(deepcopy(n))
 end
 
@@ -26,7 +26,7 @@ end
 ###############################################################################
 
 function fmpzGreaterZero(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
-    n = julia(a)::Nemo.fmpz
+    n = julia(a)::Nemo.ZZRingElem
     return Cint(n > 0)
 end
 
@@ -39,7 +39,7 @@ function fmpzCoeffWrite(cf::Ptr{Cvoid}, d::Cint)
 end
 
 function fmpzWrite(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
-   n = julia(a)::Nemo.fmpz
+   n = julia(a)::Nemo.ZZRingElem
    libSingular.StringAppendS(AbstractAlgebra.obj_to_string_wrt_times(n))
    nothing
 end
@@ -51,63 +51,63 @@ end
 ###############################################################################
 
 function fmpzNeg(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
-    n = julia(a)::Nemo.fmpz
+    n = julia(a)::Nemo.ZZRingElem
     return number(-n)
 end
 
 function fmpzInpNeg(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
-    ccall((:fmpz_neg, libflint), Cvoid, (Ptr{Nemo.fmpz}, Ptr{Nemo.fmpz}), a, a)
+    ccall((:fmpz_neg, libflint), Cvoid, (Ptr{Nemo.ZZRingElem}, Ptr{Nemo.ZZRingElem}), a, a)
     return a
 end
 
 function fmpzInvers(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
-    n = julia(a)::Nemo.fmpz
+    n = julia(a)::Nemo.ZZRingElem
     return number(Nemo.divexact(1, n))
 end
 
 function fmpzMult(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
-    n1 = julia(a)::Nemo.fmpz
-    n2 = julia(b)::Nemo.fmpz
+    n1 = julia(a)::Nemo.ZZRingElem
+    n2 = julia(b)::Nemo.ZZRingElem
     return number(n1*n2)
 end
 
 function fmpzInpMult(a::Ptr{Ptr{Cvoid}}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
     r = unsafe_load(a)
-    aa = julia(r)::Nemo.fmpz
-    bb = julia(b)::Nemo.fmpz
+    aa = julia(r)::Nemo.ZZRingElem
+    bb = julia(b)::Nemo.ZZRingElem
     Nemo.mul!(aa, aa, bb)
     nothing
 end
 
 function fmpzAdd(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
-    n1 = julia(a)::Nemo.fmpz
-    n2 = julia(b)::Nemo.fmpz
+    n1 = julia(a)::Nemo.ZZRingElem
+    n2 = julia(b)::Nemo.ZZRingElem
     return number(n1 + n2)
 end
 
 function fmpzInpAdd(a::Ptr{Ptr{Cvoid}}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
     r = unsafe_load(a)
-    aa = julia(r)::Nemo.fmpz
-    bb = julia(b)::Nemo.fmpz
+    aa = julia(r)::Nemo.ZZRingElem
+    bb = julia(b)::Nemo.ZZRingElem
     Nemo.addeq!(aa, bb)
     nothing
 end
 
 function fmpzSub(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
-    n1 = julia(a)::Nemo.fmpz
-    n2 = julia(b)::Nemo.fmpz
+    n1 = julia(a)::Nemo.ZZRingElem
+    n2 = julia(b)::Nemo.ZZRingElem
     return number(n1 - n2)
 end
 
 function fmpzDiv(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
-    n1 = julia(a)::Nemo.fmpz
-    n2 = julia(b)::Nemo.fmpz
+    n1 = julia(a)::Nemo.ZZRingElem
+    n2 = julia(b)::Nemo.ZZRingElem
     return number(Nemo.divexact(n1, n2))
 end
 
 function fmpzDivBy(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
-    n1 = julia(a)::Nemo.fmpz
-    n2 = julia(b)::Nemo.fmpz
+    n1 = julia(a)::Nemo.ZZRingElem
+    n2 = julia(b)::Nemo.ZZRingElem
     return Cint(Nemo.divides(n1, n2)[1])
 end
 
@@ -118,29 +118,29 @@ end
 ###############################################################################
 
 function fmpzGreater(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
-    n1 = julia(a)::Nemo.fmpz
-    n2 = julia(b)::Nemo.fmpz
+    n1 = julia(a)::Nemo.ZZRingElem
+    n2 = julia(b)::Nemo.ZZRingElem
     return Cint(n1 > n2)
 end
 
 function fmpzEqual(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
-   n1 = julia(a)::Nemo.fmpz
-   n2 = julia(b)::Nemo.fmpz
+   n1 = julia(a)::Nemo.ZZRingElem
+   n2 = julia(b)::Nemo.ZZRingElem
    return Cint(n1 == n2)
 end
 
 function fmpzIsZero(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
-   n = julia(a)::Nemo.fmpz
+   n = julia(a)::Nemo.ZZRingElem
    return Cint(Nemo.iszero(n))
 end
 
 function fmpzIsOne(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
-    n = julia(a)::Nemo.fmpz
+    n = julia(a)::Nemo.ZZRingElem
     return Cint(Nemo.isone(n))
 end
 
 function fmpzIsMOne(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
-    n = julia(a)::Nemo.fmpz
+    n = julia(a)::Nemo.ZZRingElem
     return Cint(n == -1)
 end
 
@@ -151,8 +151,8 @@ end
 ###############################################################################
 
 function fmpzGcd(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
-    n1 = julia(a)::Nemo.fmpz
-    n2 = julia(b)::Nemo.fmpz
+    n1 = julia(a)::Nemo.ZZRingElem
+    n2 = julia(b)::Nemo.ZZRingElem
     return number(Nemo.gcd(n1, n2))
 end
 
@@ -163,8 +163,8 @@ end
 ###############################################################################
 
 function fmpzExtGcd(a::Ptr{Cvoid}, b::Ptr{Cvoid}, s::Ptr{Ptr{Cvoid}}, t::Ptr{Ptr{Cvoid}}, cf::Ptr{Cvoid})
-   n1 = julia(a)::Nemo.fmpz
-   n2 = julia(b)::Nemo.fmpz
+   n1 = julia(a)::Nemo.ZZRingElem
+   n2 = julia(b)::Nemo.ZZRingElem
    g1, s1, t1 = Nemo.gcdx(n1, n2)
    setindex_internal_void(reinterpret(Ptr{Cvoid}, s), number(s1))
    setindex_internal_void(reinterpret(Ptr{Cvoid}, t), number(t1))
@@ -179,7 +179,7 @@ end
 
 function fmpzInt(ptr::Ptr{Ptr{Cvoid}}, cf::Ptr{Cvoid})
     ptr_load = unsafe_load(ptr)
-    n = julia(ptr_load)::Nemo.fmpz
+    n = julia(ptr_load)::Nemo.ZZRingElem
     ret_val = Clong(n)
     number_pop!(nemoNumberID, ptr_load)
     return ret_val
@@ -187,7 +187,7 @@ end
 
 function fmpzMPZ(b::BigInt, ptr::Ptr{Ptr{Cvoid}}, cf::Ptr{Cvoid})
     ptr_load = unsafe_load(ptr)
-    n = julia(unsafe_load(ptr))::Nemo.fmpz
+    n = julia(unsafe_load(ptr))::Nemo.ZZRingElem
     z = convert(BigInt, n)
     GC.@preserve b z begin
         bptr = reinterpret(Ptr{Cvoid}, pointer_from_objref(b))
@@ -244,7 +244,7 @@ function fmpzInitChar(cf::Ptr{Cvoid}, p::Ptr{Cvoid})
     return Cint(0)
 end
 
-function register(R::Nemo.FlintIntegerRing)
+function register(R::Nemo.ZZRing)
    c = @cfunction(fmpzInitChar, Cint, (Ptr{Cvoid}, Ptr{Cvoid}))
    return nRegister(n_unknown, c)
 end

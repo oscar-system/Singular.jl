@@ -29,7 +29,7 @@ Singular.jl provides the following constructors.
 
 ```
 QQ(n::n_Z)
-QQ(n::fmpz)
+QQ(n::ZZRingElem)
 ```
 
 Construct a Singular rational from the given integer $n$.

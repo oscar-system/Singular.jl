@@ -11,7 +11,7 @@ export spoly, PolyRing, change_base_ring, coeff, coefficients,
        leading_monomial, lead_exponent,
        monomials, MPolyBuildCtx,
        nvars, order, ordering, ordering_as_symbol, ordering_size, ordering_weights,
-       @PolynomialRing, primpart, push_term!,
+       @polynomial_ring, primpart, push_term!,
        remove, sort_terms!, symbols,
        tail, terms, total_degree, trailing_coefficient,
        valuation, var_index, vars
@@ -125,7 +125,7 @@ ordering_as_symbol(R::PolyRing) = ordering_as_symbol(R.ord)
 Return the internal degree bound in each variable, enforced by Singular. This is the
 largest positive value any degree can have before an overflow will occur. This
 internal bound may be higher than the bound requested by the user via the
-`degree_bound` parameter of the `PolynomialRing` constructor.
+`degree_bound` parameter of the `polynomial_ring` constructor.
 """
 function degree_bound(R::PolyRing)
    GC.@preserve R return Int(libSingular.rBitmask(R.ptr))
@@ -719,11 +719,11 @@ function ==(a::T, b::SPolyUnion{T}) where T <: Nemo.RingElem
    return parent(b)(a) == a
 end
 
-function ==(a::SPolyUnion, b::Union{Integer, fmpz, Rational, fmpq})
+function ==(a::SPolyUnion, b::Union{Integer, ZZRingElem, Rational, QQFieldElem})
    return a == parent(a)(b)
 end
 
-function ==(a::Union{Integer, fmpz, Rational, fmpq}, b::SPolyUnion)
+function ==(a::Union{Integer, ZZRingElem, Rational, QQFieldElem}, b::SPolyUnion)
    return parent(b)(a) == a
 end
 
@@ -798,36 +798,36 @@ end
 #
 ################################################################################
 
-# We cannot use the promote_rule mechanism, since n_Q and fmpq have no and
+# We cannot use the promote_rule mechanism, since n_Q and QQFieldElem have no and
 # should not have a promote_rule
 
 # cast the integers/rationals to just the coefficient ring, as more efficient
 # scalar binary operators are available
-function +(x::SPolyUnion, y::Union{Integer, fmpz, Rational, fmpq})
+function +(x::SPolyUnion, y::Union{Integer, ZZRingElem, Rational, QQFieldElem})
   return x + base_ring(x)(y)
 end
 
-function +(x::Union{Integer, fmpz, Rational, fmpq}, y::SPolyUnion)
+function +(x::Union{Integer, ZZRingElem, Rational, QQFieldElem}, y::SPolyUnion)
   return base_ring(y)(x) + y
 end
 
-function -(x::SPolyUnion, y::Union{Integer, fmpz, Rational, fmpq})
+function -(x::SPolyUnion, y::Union{Integer, ZZRingElem, Rational, QQFieldElem})
   return x - base_ring(x)(y)
 end
 
-function -(x::Union{Integer, fmpz, Rational, fmpq}, y::SPolyUnion)
+function -(x::Union{Integer, ZZRingElem, Rational, QQFieldElem}, y::SPolyUnion)
   return base_ring(y)(x) - y
 end
 
-function *(x::SPolyUnion, y::Union{Integer, fmpz, Rational, fmpq})
+function *(x::SPolyUnion, y::Union{Integer, ZZRingElem, Rational, QQFieldElem})
   return x * base_ring(x)(y)
 end
 
-function *(x::Union{Integer, fmpz, Rational, fmpq}, y::SPolyUnion)
+function *(x::Union{Integer, ZZRingElem, Rational, QQFieldElem}, y::SPolyUnion)
   return base_ring(y)(x) * y
 end
 
-function divexact(x::SPolyUnion, y::Union{Integer, fmpz, Rational, fmpq}; check::Bool=true)
+function divexact(x::SPolyUnion, y::Union{Integer, ZZRingElem, Rational, QQFieldElem}; check::Bool=true)
   return divexact(x, base_ring(x)(y), check=check)
 end
 
@@ -1180,7 +1180,7 @@ Return a Singular (multivariate) polynomial ring over the base ring of $R$ in va
 function AsEquivalentSingularPolynomialRing(R::AbstractAlgebra.Generic.MPolyRing{T}; cached::Bool = true,
       ordering::Symbol = :degrevlex, ordering2::Symbol = :comp1min,
       degree_bound::Int = 0)  where {T <: RingElem}
-   return PolynomialRing(AbstractAlgebra.Generic.base_ring(R), AbstractAlgebra.Generic.symbols(R), cached=cached, ordering=ordering, ordering2=ordering2, degree_bound=degree_bound)
+   return polynomial_ring(AbstractAlgebra.Generic.base_ring(R), AbstractAlgebra.Generic.symbols(R), cached=cached, ordering=ordering, ordering2=ordering2, degree_bound=degree_bound)
 end
 
 @doc Markdown.doc"""
@@ -1189,7 +1189,7 @@ end
 Return an AbstractAlgebra (multivariate) polynomial ring over the base ring of $R$ in variables having the same names as those of R.
 """
 function AsEquivalentAbstractAlgebraPolynomialRing(R::Singular.PolyRing{T}; ordering::Symbol = :degrevlex) where T <: Singular.n_unknown
-   return AbstractAlgebra.Generic.PolynomialRing(base_ring(R).base_ring,
+   return AbstractAlgebra.Generic.polynomial_ring(base_ring(R).base_ring,
 	       symbols(R), ordering=ordering)
 end
 
@@ -1411,7 +1411,7 @@ end
 ###############################################################################
 
 function change_base_ring(C::T, p::spoly) where T <: Union{Ring, Field}
-   S, = Singular.PolynomialRing(C, symbols(parent(p)), ordering = parent(p).ord)
+   S, = Singular.polynomial_ring(C, symbols(parent(p)), ordering = parent(p).ord)
    return change_base_ring(C, p, parent = S)
 end
 
@@ -1541,7 +1541,7 @@ function (R::PolyRing{T})(n::T) where T <: n_unknown
    return spoly{T}(R, n)
 end
 
-function (R::PolyRing)(f::T) where T <: Nemo.MPolyElem
+function (R::PolyRing)(f::T) where T <: Nemo.MPolyRingElem
   parent(f) == R && return f
   B = base_ring(R)
   g = MPolyBuildCtx(R)
@@ -1562,7 +1562,7 @@ end
 
 ###############################################################################
 #
-#   PolynomialRing constructor
+#   polynomial_ring constructor
 #
 ###############################################################################
 
@@ -1595,34 +1595,34 @@ function _PolynomialRing(R, s::Union{Vector{String},Vector{Symbol}}, ordering, o
 end
 
 # keyword arguments do not participate in dispatch
-function PolynomialRing(R::Union{Ring, Field}, s::Union{Vector{String},Vector{Symbol}};
+function polynomial_ring(R::Union{Ring, Field}, s::Union{Vector{String},Vector{Symbol}};
                         ordering = :degrevlex, ordering2::Symbol = :comp1min,
                         cached::Bool = true, degree_bound::Int = 0)
    return _PolynomialRing(R, s, ordering, ordering2, cached, degree_bound)
 end
 
-function PolynomialRing(R::Nemo.Ring, s::Union{Vector{String},Vector{Symbol}};
+function polynomial_ring(R::Nemo.Ring, s::Union{Vector{String},Vector{Symbol}};
                         ordering = :degrevlex, ordering2::Symbol = :comp1min,
                         cached::Bool = true, degree_bound::Int = 0)
    R = CoefficientRing(R)
    return _PolynomialRing(R, s, ordering, ordering2, cached, degree_bound)
 end
 
-macro PolynomialRing(R, s, n, o)
+macro polynomial_ring(R, s, n, o)
    S = gensym()
    y = gensym()
    v0 = [s*string(i) for i in 1:n]
-   exp1 = :(($S, $y) = PolynomialRing($R, $v0; ordering=$o))
+   exp1 = :(($S, $y) = polynomial_ring($R, $v0; ordering=$o))
    v = [:($(Symbol(s, i)) = $y[$i]) for i in 1:n]
    v1 = Expr(:block, exp1, v..., S)
    return esc(v1)
 end
 
-macro PolynomialRing(R, s, n)
+macro polynomial_ring(R, s, n)
    S = gensym()
    y = gensym()
    v0 = [s*string(i) for i in 1:n]
-   exp1 = :(($S, $y) = PolynomialRing($R, $v0))
+   exp1 = :(($S, $y) = polynomial_ring($R, $v0))
    v = [:($(Symbol(s, i)) = $y[$i]) for i in 1:n]
    v1 = Expr(:block, exp1, v..., S)
    return esc(v1)

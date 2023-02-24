@@ -1,5 +1,5 @@
-@testset "Nemo.fmpq" begin
-   R, (x, y) = PolynomialRing(Nemo.QQ, ["x", "y"])
+@testset "Nemo.QQFieldElem" begin
+   R, (x, y) = polynomial_ring(Nemo.QQ, ["x", "y"])
 
    f1 = 3x*y + x^2 + 2y
    f2 = y^2 + 1
@@ -8,8 +8,8 @@
    f1c = [c for c in coefficients(f1)]
 
 # disable this until we figure out if QQ is mutable or not
-#   @test isa(f1c[1], Singular.n_FieldElem{Singular.FieldElemWrapper{Nemo.FlintRationalField, Nemo.fmpq}})
-   @test isa(Nemo.QQ(f1c[1]), Nemo.fmpq)
+#   @test isa(f1c[1], Singular.n_FieldElem{Singular.FieldElemWrapper{Nemo.QQField, Nemo.QQFieldElem}})
+   @test isa(Nemo.QQ(f1c[1]), Nemo.QQFieldElem)
    @test !isempty(string(f1c[1]))
    @test leading_coefficient(f1) == f1c[1]
 
@@ -52,8 +52,8 @@
    @test canonical_unit(f1c[1]) != 0
 end
 
-@testset "Nemo.fmpz" begin
-   R, (x, y) = PolynomialRing(Nemo.ZZ, ["x", "y"])
+@testset "Nemo.ZZRingElem" begin
+   R, (x, y) = polynomial_ring(Nemo.ZZ, ["x", "y"])
 
    f1 = 3x*y + x^2 + 2y
    f2 = y^2 + 1
@@ -61,8 +61,8 @@ end
 
    f1c = [c for c in coefficients(f1)]
 # disable this until we figure out if ZZ is mutable or not
-#   @test f1c[1] isa Singular.n_RingElem{Singular.RingElemWrapper{Nemo.FlintIntegerRing, Nemo.fmpz}}
-   @test Nemo.ZZ(f1c[1]) isa Nemo.fmpz
+#   @test f1c[1] isa Singular.n_RingElem{Singular.RingElemWrapper{Nemo.ZZRing, Nemo.ZZRingElem}}
+   @test Nemo.ZZ(f1c[1]) isa Nemo.ZZRingElem
    @test !isempty(string(f1c[1]))
    @test leading_coefficient(f1) == f1c[1]
 
@@ -101,22 +101,22 @@ end
    @test deepcopy(f1c[1]) == f1c[1]
 end
 
-@testset "Nemo.fq_nmod" begin
+@testset "Nemo.fqPolyRepFieldElem" begin
    F, _ = Nemo.FiniteField(Nemo.next_prime(fld(typemax(Int),2)), 2, "a")
-   R, _ = PolynomialRing(F, ["x", "y"])
-   @test R isa Singular.PolyRing{Singular.n_FieldElem{Nemo.fq_nmod}}
+   R, _ = polynomial_ring(F, ["x", "y"])
+   @test R isa Singular.PolyRing{Singular.n_FieldElem{Nemo.fqPolyRepFieldElem}}
 
    F, a = Nemo.FiniteField(7, 2, "a")
 
-   R, (x, y) = PolynomialRing(F, ["x", "y"])
+   R, (x, y) = polynomial_ring(F, ["x", "y"])
 
    f1 = 3x*y + x^2 + 2y
    f2 = y^2 + 1
    f3 = x^2 + 2x + 1
 
    f1c = [c for c in coefficients(f1)]
-   @test f1c[1] isa Singular.n_FieldElem{Nemo.fq_nmod}
-   @test F(f1c[1]) isa Nemo.fq_nmod
+   @test f1c[1] isa Singular.n_FieldElem{Nemo.fqPolyRepFieldElem}
+   @test F(f1c[1]) isa Nemo.fqPolyRepFieldElem
    @test !isempty(string(f1c[1]))
    @test leading_coefficient(f1) == f1c[1]
 
@@ -161,22 +161,22 @@ end
    @test AbstractAlgebra.expressify((x+a*y)^2) isa Expr
 end
 
-@testset "Nemo.fq" begin
+@testset "Nemo.FqPolyRepFieldElem" begin
    F, _ = Nemo.FiniteField(Nemo.next_prime(Nemo.ZZ(10)^50), 2, "a")
-   R, _ = PolynomialRing(F, ["x", "y"])
-   @test R isa Singular.PolyRing{Singular.n_FieldElem{Nemo.fq}}
+   R, _ = polynomial_ring(F, ["x", "y"])
+   @test R isa Singular.PolyRing{Singular.n_FieldElem{Nemo.FqPolyRepFieldElem}}
 
    F, a = Nemo.FiniteField(Nemo.ZZ(7), 2, "a")
 
-   R, (x, y) = PolynomialRing(F, ["x", "y"])
+   R, (x, y) = polynomial_ring(F, ["x", "y"])
 
    f1 = 3x*y + x^2 + 2y
    f2 = y^2 + 1
    f3 = x^2 + 2x + 1
 
    f1c = [c for c in coefficients(f1)]
-   @test f1c[1] isa Singular.n_FieldElem{Nemo.fq}
-   @test F(f1c[1]) isa Nemo.fq
+   @test f1c[1] isa Singular.n_FieldElem{Nemo.FqPolyRepFieldElem}
+   @test F(f1c[1]) isa Nemo.FqPolyRepFieldElem
    @test !isempty(string(f1c[1]))
    @test leading_coefficient(f1) == f1c[1]
 
@@ -220,10 +220,10 @@ end
 end
 
 @testset "Nemo.nf_elem" begin
-   U, z = Nemo.PolynomialRing(Nemo.QQ, "z")
-   K, a = Nemo.NumberField(z^3 + 3z + 1, "a")
+   U, z = Nemo.polynomial_ring(Nemo.QQ, "z")
+   K, a = Nemo.number_field(z^3 + 3z + 1, "a")
 
-   R, (x, y) = PolynomialRing(K, ["x", "y"])
+   R, (x, y) = polynomial_ring(K, ["x", "y"])
 
    f1 = 3x*y + x^2 + 2y
    f2 = y^2 + 1
@@ -274,13 +274,13 @@ end
    @test deepcopy(f1c[1]) == f1c[1]
 end
 
-@testset "Nemo.gfp_fmpz_mod.PolynomialRing" begin
+@testset "Nemo.gfp_fmpz_mod.polynomial_ring" begin
 
-   U = Nemo.GF(Nemo.fmpz(11))
+   U = Nemo.GF(Nemo.ZZRingElem(11))
 
-   R, (x, y) = PolynomialRing(U, ["x", "y"])
+   R, (x, y) = polynomial_ring(U, ["x", "y"])
 
-   wrappedUtype = Singular.n_FieldElem{Singular.FieldElemWrapper{Nemo.GaloisFmpzField, Nemo.gfp_fmpz_elem}}
+   wrappedUtype = Singular.n_FieldElem{Singular.FieldElemWrapper{Nemo.FpField, Nemo.FpFieldElem}}
 
    f1 = 3x*y + x^2 + 2y
    f2 = y^2 + 1
@@ -288,7 +288,7 @@ end
 
    f1c = [c for c in coefficients(f1)]
    @test f1c[1] isa wrappedUtype
-   @test U(f1c[1]) isa Nemo.gfp_fmpz_elem
+   @test U(f1c[1]) isa Nemo.FpFieldElem
    @test !isempty(string(f1c[1]))
    @test leading_coefficient(f1) == f1c[1]
    @test base_ring(R)(U(3)) isa wrappedUtype
@@ -318,11 +318,11 @@ end
 
 @testset "Nemo.gfp_fmpz_mod.WeylAlgebra" begin
 
-   U = Nemo.GF(Nemo.fmpz(11))
+   U = Nemo.GF(Nemo.ZZRingElem(11))
 
    R, (x, y, dx, dy) = @inferred WeylAlgebra(U, ["x", "y"])
 
-   wrappedUtype = Singular.n_FieldElem{Singular.FieldElemWrapper{Nemo.GaloisFmpzField, Nemo.gfp_fmpz_elem}}
+   wrappedUtype = Singular.n_FieldElem{Singular.FieldElemWrapper{Nemo.FpField, Nemo.FpFieldElem}}
 
    f1 = 3x*y + x^2 + 2y
    f2 = y^2 + 1
@@ -330,7 +330,7 @@ end
 
    f1c = [c for c in coefficients(f1)]
    @test f1c[1] isa wrappedUtype
-   @test U(f1c[1]) isa Nemo.gfp_fmpz_elem
+   @test U(f1c[1]) isa Nemo.FpFieldElem
    @test !isempty(string(f1c[1]))
    @test leading_coefficient(f1) == f1c[1]
    @test base_ring(R)(U(3)) isa wrappedUtype
@@ -357,9 +357,9 @@ end
    @test ngens(std(I)) == 3
 end
 
-@testset "Nemo.nmod" begin
-  R = ResidueRing(Nemo.ZZ, 15)
-  S, (x, y) = PolynomialRing(R, ["x", "y"])
+@testset "Nemo.zzModRingElem" begin
+  R = residue_ring(Nemo.ZZ, 15)
+  S, (x, y) = polynomial_ring(R, ["x", "y"])
   p = x*2
   @test string(p) == "2*x"
   @test leading_coefficient(p) == 2
@@ -369,11 +369,11 @@ end
   @test is_zero(p)
 end
 
-@testset "Nemo.fmpz_mod" begin
-   U = Nemo.ResidueRing(Nemo.ZZ, Nemo.fmpz(11))
-   R, (x, y) = PolynomialRing(U, ["x", "y"])
+@testset "Nemo.ZZModRingElem" begin
+   U = Nemo.residue_ring(Nemo.ZZ, Nemo.ZZRingElem(11))
+   R, (x, y) = polynomial_ring(U, ["x", "y"])
 
-   wrappedUtype = Singular.n_RingElem{Singular.RingElemWrapper{Nemo.FmpzModRing, Nemo.fmpz_mod}}
+   wrappedUtype = Singular.n_RingElem{Singular.RingElemWrapper{Nemo.ZZModRing, Nemo.ZZModRingElem}}
 
    f1 = 3x*y + x^2 + 2y
    f2 = y^2 + 1
@@ -381,7 +381,7 @@ end
 
    f1c = [c for c in coefficients(f1)]
    @test f1c[1] isa wrappedUtype
-   @test U(f1c[1]) isa Nemo.fmpz_mod
+   @test U(f1c[1]) isa Nemo.ZZModRingElem
    @test !isempty(string(f1c[1]))
    @test leading_coefficient(f1) == f1c[1]
    @test base_ring(R)(U(3)) isa wrappedUtype
@@ -409,18 +409,18 @@ end
    @test ngens(std(I)) == 3
 end
 
-@testset "Nemo.NemoField.PolynomialRing" begin
-   U = Nemo.Generic.FractionField(Nemo.ZZ)
+@testset "Nemo.NemoField.polynomial_ring" begin
+   U = Nemo.Generic.fraction_field(Nemo.ZZ)
 
-   R, (x, y) = PolynomialRing(U, ["x", "y"])
+   R, (x, y) = polynomial_ring(U, ["x", "y"])
 
    f1 = 3x*y + x^2 + 2y
    f2 = y^2 + 1
    f3 = x^2 + 2x + 1
 
    f1c = [c for c in coefficients(f1)]
-   @test f1c[1] isa Singular.n_FieldElem{AbstractAlgebra.Generic.Frac{Nemo.fmpz}}
-   @test U(f1c[1]) isa AbstractAlgebra.Generic.Frac{Nemo.fmpz}
+   @test f1c[1] isa Singular.n_FieldElem{AbstractAlgebra.Generic.Frac{Nemo.ZZRingElem}}
+   @test U(f1c[1]) isa AbstractAlgebra.Generic.Frac{Nemo.ZZRingElem}
    @test !isempty(string(f1c[1]))
    @test leading_coefficient(f1) == f1c[1]
    @test f1 + 2 == 2 + f1
@@ -445,7 +445,7 @@ end
 end
 
 @testset "Nemo.NemoField.FreeAlgebra" begin
-   U = Nemo.Generic.FractionField(Nemo.ZZ)
+   U = Nemo.Generic.fraction_field(Nemo.ZZ)
 
    R, (x, y) = @inferred FreeAlgebra(U, ["x", "y"], 13)
 
@@ -454,8 +454,8 @@ end
    f3 = x^2 + 2x + 1
 
    f1c = [c for c in coefficients(f1)]
-   @test f1c[1] isa Singular.n_FieldElem{AbstractAlgebra.Generic.Frac{Nemo.fmpz}}
-   @test U(f1c[1]) isa AbstractAlgebra.Generic.Frac{Nemo.fmpz}
+   @test f1c[1] isa Singular.n_FieldElem{AbstractAlgebra.Generic.Frac{Nemo.ZZRingElem}}
+   @test U(f1c[1]) isa AbstractAlgebra.Generic.Frac{Nemo.ZZRingElem}
    @test !isempty(string(f1c[1]))
    @test leading_coefficient(f1) == f1c[1]
    @test f1 + 2 == 2 + f1
@@ -482,17 +482,17 @@ end
 end
 
 @testset "Nemo.NemoRing" begin
-   U, z = Nemo.PolynomialRing(Nemo.ZZ, "z")
+   U, z = Nemo.polynomial_ring(Nemo.ZZ, "z")
 
-   R, (x, y) = PolynomialRing(U, ["x", "y"])
+   R, (x, y) = polynomial_ring(U, ["x", "y"])
 
    f1 = 3x*y + x^2 + 2y
    f2 = y^2 + 1
    f3 = x^2 + 2x + 1
 
    f1c = [c for c in coefficients(f1)]
-   @test f1c[1] isa Singular.n_RingElem{Nemo.fmpz_poly}
-   @test U(f1c[1]) isa Nemo.fmpz_poly
+   @test f1c[1] isa Singular.n_RingElem{Nemo.ZZPolyRingElem}
+   @test U(f1c[1]) isa Nemo.ZZPolyRingElem
    @test !isempty(string(f1c[1]))
    @test leading_coefficient(f1) == f1c[1]
 

@@ -213,7 +213,7 @@ end
 
 @testset "n_GF.Polynomials" begin
    R, x = FiniteField(5, 2, "x")
-   S, y = Nemo.PolynomialRing(R, "y")
+   S, y = Nemo.polynomial_ring(R, "y")
 
    f = (1 + 2x)*y^2 + 3x*y + (x + 1)
 

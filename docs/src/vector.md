@@ -64,7 +64,7 @@ parameters.
 **Examples**
 
 ```julia
-R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
 M = FreeModule(R, 3)
 v2 = M([x + 1, x*y + 1, y])
@@ -86,7 +86,7 @@ gens{T <: AbstractAlgebra.RingElem}(::FreeMod{T})
 **Examples**
 
 ```
-R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
 M = FreeModule(R, 5)
 
@@ -106,7 +106,7 @@ Array{T <: Nemo.RingElem}(v::svector{spoly{T}})
 **Examples**
 
 ```julia
-R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
 v1 = vector(R, x + 1, x*y + 1, y)
 
@@ -121,7 +121,7 @@ jet{T <: AbstractAlgebra.RingElem}(::svector{spoly{T}}, ::Int)
 
 **Examples**
 ```julia
-R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
 v = vector(R, x^5 + 1, 2x^3 + 3y^2, x^2)
 w = jet(v, 3)

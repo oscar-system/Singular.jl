@@ -49,7 +49,7 @@ Given a function field $F$, we also have the following coercions in addition to 
 standard ones expected.
 
 ```julia
-F(n::fmpz)
+F(n::ZZRingElem)
 ```
 
 Coerce a Flint integer value into the field.
@@ -99,7 +99,7 @@ is_unit(x)
 char = characteristic(F1)
 d = transcendence_degree(F1)
 
-S, = PolynomialRing(QQ, ["a", "b", "c"])
+S, = polynomial_ring(QQ, ["a", "b", "c"])
 
 p = n_transExt_to_spoly(y, parent_ring = S)
 

@@ -1,5 +1,5 @@
 @testset "svector.constructors" begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
    v1 = vector(R, x + 1, x*y + 1, y)
    S1 = parent(v1)
@@ -28,7 +28,7 @@
 end
 
 @testset "svector.jet" begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
    a = vector(R, x^5 + 1, 2x^3 + 3y^2, x^2)
 
@@ -40,7 +40,7 @@ end
 end
 
 @testset "svector.manipulation" begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
    M = FreeModule(R, 3)
 
@@ -58,7 +58,7 @@ end
 end
 
 @testset "svector.unary_ops" begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
    v = vector(R, x, y, R(2))
 
@@ -66,7 +66,7 @@ end
 end
 
 @testset "svector.iszero" begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
    v = vector(R, x, y, R(2))
 
@@ -82,7 +82,7 @@ end
 end
 
 @testset "svector.binary_ops" begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
    v1 = vector(R, x, y, R(2))
    v2 = vector(R, x^2 + 1, x*y, y + 1)
@@ -92,7 +92,7 @@ end
 end
 
 @testset "svector.adhoc_binary" begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
    v1 = vector(R, x, y, R(2))
    v2 = vector(R, x^2 + 1, x*y, y + 1)
@@ -103,7 +103,7 @@ end
 end
 
 @testset "svector.comparison" begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
    v1 = vector(R, x, y, R(2))
    v2 = vector(R, x^2 + 1, x*y, y + 1)
@@ -113,7 +113,7 @@ end
 end
 
 @testset "svector.conversion" begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
    v1 = vector(R, x, y, R(2))
 

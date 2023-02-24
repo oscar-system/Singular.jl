@@ -38,7 +38,7 @@ Here is an example of using Singular.jl
 ```julia
 julia> using Singular
 
-julia> R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+julia> R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 (Singular Polynomial Ring (QQ),(x,y),(dp(2),C), Singular.spoly{Singular.n_Q}[x, y])
 
 julia> I = Ideal(R, x^2 + 1, x*y + 1)

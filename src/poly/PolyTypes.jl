@@ -54,7 +54,7 @@ function _PolyRing_clear_fn(R)
    end
 end
 
-mutable struct spoly{T <: Nemo.RingElem} <: Nemo.MPolyElem{T}
+mutable struct spoly{T <: Nemo.RingElem} <: Nemo.MPolyRingElem{T}
    ptr::libSingular.poly_ptr
    parent::PolyRing{T}
 

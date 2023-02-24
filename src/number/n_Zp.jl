@@ -246,7 +246,7 @@ end
 #
 ###############################################################################
 
-# define rand(::GaloisField)
+# define rand(::fpField)
 
 Random.gentype(::Type{N_ZpField}) = elem_type(N_ZpField)
 
@@ -278,7 +278,7 @@ rand(R::N_ZpField, b::AbstractArray{<:Integer}) = rand(Random.GLOBAL_RNG, R, b)
 
 promote_rule(C::Type{n_Zp}, ::Type{T}) where {T <: Integer} = n_Zp
 
-promote_rule(C::Type{n_Zp}, ::Type{Nemo.fmpz}) = n_Zp
+promote_rule(C::Type{n_Zp}, ::Type{Nemo.ZZRingElem}) = n_Zp
 
 promote_rule(C::Type{n_Zp}, ::Type{n_Z}) = n_Zp
 
@@ -305,7 +305,7 @@ function Fp(a::Int; cached=true)
    a == 0 && throw(DivideError(a))
    a < 0 && throw(DomainError(a, "prime must be positive"))
    a > 2^29 && throw(DomainError(a, "prime must be <= 2^29"))
-   !Nemo.isprime(Nemo.fmpz(a)) && throw(DomainError(a, "characteristic must be prime"))
+   !Nemo.isprime(Nemo.ZZRingElem(a)) && throw(DomainError(a, "characteristic must be prime"))
 
    return N_ZpField(a, cached)
 end

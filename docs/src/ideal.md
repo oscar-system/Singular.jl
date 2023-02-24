@@ -62,7 +62,7 @@ empty, resulting in the zero ideal.
 **Examples**
 
 ```julia
-R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+R, (x, y) = polynomial_ring(ZZ, ["x", "y"])
 
 I1 = Ideal(R, x*y + 1, x^2)
 I2 = Ideal(R, [x*y + 1, x^2])
@@ -116,7 +116,7 @@ interreduce(I::sideal{S}) where {T <: Nemo.RingElem, S <: Union{spoly{T}, splura
 **Examples**
 
 ```
-R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+R, (x, y) = polynomial_ring(ZZ, ["x", "y"])
 
 I = Ideal(R, x^2 + 1, x*y)
 
@@ -127,7 +127,7 @@ is_constant(I) == false
 is_var_generated(I) == false
 is_zerodim(I) == false
 
-S, (u, v) = PolynomialRing(QQ, ["u", "v"])
+S, (u, v) = polynomial_ring(QQ, ["u", "v"])
 J = Ideal(S, u^2 + 1, u*v)
 dimension(std(J)) == 0
 ```
@@ -141,7 +141,7 @@ contains{T <: AbstractAlgebra.RingElem}(::sideal{T}, ::sideal{T})
 **Examples**
 
 ```julia
-R, (x , y) = PolynomialRing(QQ, ["x", "y"])
+R, (x , y) = polynomial_ring(QQ, ["x", "y"])
 
 I = Ideal(R, x^2 + 1, x*y)
 J = Ideal(R, x^2 + 1)
@@ -166,7 +166,7 @@ equal(I1::sideal{S}, I2::sideal{S}) where S <: SPolyUnion
 **Examples**
 
 ```julia
-R, (x , y) = PolynomialRing(QQ, ["x", "y"])
+R, (x , y) = polynomial_ring(QQ, ["x", "y"])
 
 I = Ideal(R, x^2 + 1, x*y)
 J = Ideal(R, x^2 + x*y + 1, x^2 - x*y + 1)
@@ -184,7 +184,7 @@ intersection(I::sideal{S}, J::sideal{S}) where {T <: Nemo.RingElem, S <: Union{s
 **Examples**
 
 ```julia
-R, (x , y) = PolynomialRing(QQ, ["x", "y"])
+R, (x , y) = polynomial_ring(QQ, ["x", "y"])
 
 I = Ideal(R, x^2 + 1, x*y)
 J = Ideal(R, x^2 + x*y + 1, x^2 - x*y + 1)
@@ -205,7 +205,7 @@ quotient(I::sideal{S}, J::sideal{S}) where S <: spluralg
 **Examples**
 
 ```julia
-R, (x , y) = PolynomialRing(QQ, ["x", "y"])
+R, (x , y) = polynomial_ring(QQ, ["x", "y"])
 
 I = Ideal(R, x^2 + 1, x*y)
 J = Ideal(R, x + y)
@@ -222,7 +222,7 @@ lead(I::sideal{S}) where S <: SPolyUnion
 **Examples**
 
 ```julia
-R, (x , y) = PolynomialRing(QQ, ["x", "y"])
+R, (x , y) = polynomial_ring(QQ, ["x", "y"])
 
 I = Ideal(R, x^2 + 1, x*y)
 
@@ -248,7 +248,7 @@ saturation(I::sideal{T}, J::sideal{T}) where T <: Nemo.RingElem
 **Examples**
 
 ```julia
-R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
 I = Ideal(R, (x^2 + x*y + 1)*(2y^2+1)^3, (2y^2 + 3)*(2y^2+1)^2)
 J = Ideal(R, 2y^2 + 1)
@@ -281,21 +281,21 @@ lift_std_syz(M::sideal{S}; complete_reduction::Bool = false) where S <: spoly
 **Examples**
 
 ```julia
-R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
 I = Ideal(R, x^2 + x*y + 1, 2y^2 + 3)
 J = Ideal(R, 2*y^2 + 3, x^2 + x*y + 1)
 
 A = std(I)
 
-R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
 I = Ideal(R, (x*y + 1)*(2x^2*y^2 + x*y - 2) + 2x*y^2 + x, 2x*y + 1)
 J = Ideal(R, x)
 
 B = satstd(I, J)
 
-R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"], ordering = :lex)
+R, (x, y, z) = polynomial_ring(QQ, ["x", "y", "z"], ordering = :lex)
 I = Ideal(R, y^3+x^2, x^2*y+x^2, x^3-x^2, z^4-x^2-y)
 J = fglm(I, :degrevlex)
 ```
@@ -313,7 +313,7 @@ reduce(p::S, G::sideal{S}) where S <: SPolyUnion
 **Examples**
 
 ```julia
-R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
 f = x^2*y + 2y + 1
 g = y^2 + 1
@@ -337,7 +337,7 @@ eliminate(I::sideal{S}, polys::S...) where {T <: Nemo.RingElem, S <: Union{spoly
 **Examples**
 
 ```julia
-R, (x, y, t) = PolynomialRing(QQ, ["x", "y", "t"])
+R, (x, y, t) = polynomial_ring(QQ, ["x", "y", "t"])
 
 I = Ideal(R, x - t^2, y - t^3)
 
@@ -353,7 +353,7 @@ syz(::sideal)
 **Examples**
 
 ```julia
-R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
 I = Ideal(R, x^2*y + 2y + 1, y^2 + 1)
 
@@ -379,7 +379,7 @@ sres{T <: Nemo.FieldElem}(::sideal{spoly{T}}, ::Int)
 **Examples**
 
 ```julia
-R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
 I = Ideal(R, x^2*y + 2y + 1, y^2 + 1)
 
@@ -396,7 +396,7 @@ jet(I::sideal{S}, n::Int) where {T <: Nemo.RingElem, S <: Union{spoly{T}, splura
 **Examples**
 
 ```julia
-R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"])
+R, (x, y, z) = polynomial_ring(QQ, ["x", "y", "z"])
 
 I = Ideal(R, x^5 - y^2, y^3 - x^6 + z^3)
 
@@ -420,7 +420,7 @@ highcorner(I::sideal{S}) where {T <: Nemo.FieldElem, S <: Union{spoly{T}, splura
 **Examples**
 
 ```julia
-R, (x, y) = PolynomialRing(QQ, ["x", "y"]; ordering=:negdegrevlex)
+R, (x, y) = polynomial_ring(QQ, ["x", "y"]; ordering=:negdegrevlex)
 
 I = Ideal(R, 3*x^2 + y^3, x*y^2)
 
@@ -443,7 +443,7 @@ minimal_generating_set(I::sideal{S}) where S <: spoly
 **Examples**
 
 ```julia
-R, (x, y) = PolynomialRing(QQ, ["x", "y"]; ordering=:negdegrevlex)
+R, (x, y) = polynomial_ring(QQ, ["x", "y"]; ordering=:negdegrevlex)
 
 has_local_ordering(R) == true
 
@@ -473,7 +473,7 @@ maximal_independent_set(I::sideal{spoly{T}}; all::Bool = false) where T <: Nemo.
 ```
 
 ```julia
-R, (x, y, u, v, w) = PolynomialRing(QQ, ["x", "y", "u", "v", "w"])
+R, (x, y, u, v, w) = polynomial_ring(QQ, ["x", "y", "u", "v", "w"])
 
 has_local_ordering(R) == true
 

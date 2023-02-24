@@ -1,5 +1,5 @@
 @testset "smodule.constructors" begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
    v1 = vector(R, x + 1, x*y + 1, y)
    v2 = vector(R, x^2 + 1, 2x + 3y, x)
@@ -22,7 +22,7 @@
 end
 
 @testset "smodule.jet" begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
    v1 = vector(R, x + 1, x*y + 1, y)
    v2 = vector(R, x^5 + 1, 2x^3 + 3y^2, x^2)
@@ -41,7 +41,7 @@ end
 end
 
 @testset "smodule.local" begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"], ordering=:negdegrevlex)
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"], ordering=:negdegrevlex)
 
    v1 = vector(R, x, y^2)
    v2 = vector(R, y - x, y - y^2)
@@ -57,7 +57,7 @@ end
 end
 
 @testset "smodule.manipulation" begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
    v1 = vector(R, x + 1, x*y + 1, y)
    v2 = vector(R, x^2 + 1, 2x + 3y, x)
@@ -80,7 +80,7 @@ end
 end
 
 @testset "smodule.lead" begin
-   R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"], ordering = ordering_c()*ordering_ds())
+   R, (x, y, z) = polynomial_ring(QQ, ["x", "y", "z"], ordering = ordering_c()*ordering_ds())
 
    v = vector(R, 2*x^10, 2*x^2 + 3*y + 4*z^3, R(0))
    @test lead(v) == vector(R, 2*x^10, R(0), R(0))
@@ -92,7 +92,7 @@ end
 end
 
 #= @testset "smodule.slimgb" begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
    v1 = vector(R, x + 1, x*y + 1, y)
    v2 = vector(R, x^2 + 1, 2x + 3y, x)
@@ -117,7 +117,7 @@ end
 end =#
 
 @testset "smodule.std" begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
    v1 = vector(R, x + 1, x*y + 1, y)
    v2 = vector(R, x^2 + 1, 2x + 3y, x)
@@ -142,7 +142,7 @@ end =#
 end
 
 @testset "smodule.syz" begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
    v1 = vector(R, (x + 1)*y, (x*y + 1)*y, y)
    v2 = vector(R, (x + 1)*x, (x*y + 1)*x, x)
@@ -157,7 +157,7 @@ end
 end
 
 @testset "smodule.modulo" begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
    v1 = vector(R, x)
    v2 = vector(R, y)
@@ -174,7 +174,7 @@ end
 end
 
 @testset "smodule.lift" begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
    v1 = vector(R, x)
    v2 = vector(R, y)
@@ -189,7 +189,7 @@ end
 end
 
 @testset "smodule.eliminate" begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
    v1 = vector(R, x)
    v2 = vector(R, y)
@@ -202,7 +202,7 @@ end
 end
 
 @testset "smodule.sres" begin
-   R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"])
+   R, (x, y, z) = polynomial_ring(QQ, ["x", "y", "z"])
 
    I = Singular.Ideal(R, y*z + z^2, y^2 + x*z, x*y + z^2, z^3, x*z^2, x^2*z)
    M = std(syz(I))
@@ -253,14 +253,14 @@ end
 
 
 @testset "smodule.vdim" begin
-   R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"])
+   R, (x, y, z) = polynomial_ring(QQ, ["x", "y", "z"])
    v1 = vector(R, x, R(0))
    v2 = vector(R, R(0), x)
    v3 = vector(R, y, R(0))
    v4 = vector(R, R(0), y)
    @test vdim(std(Singular.Module(R, v1, v2, v3, v4))) == -1
 
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
    v1 = vector(R, x, R(0))
    v2 = vector(R, R(0), x)
    v3 = vector(R, y, R(0))

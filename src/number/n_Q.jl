@@ -340,7 +340,7 @@ end
 
 promote_rule(C::Type{n_Q}, ::Type{T}) where {T <: Integer} = n_Q
 
-promote_rule(C::Type{n_Q}, ::Type{Nemo.fmpz}) = n_Q
+promote_rule(C::Type{n_Q}, ::Type{Nemo.ZZRingElem}) = n_Q
 
 promote_rule(C::Type{n_Q}, ::Type{n_Z}) = n_Q
 
@@ -349,9 +349,9 @@ Rational(x::n_Q) = Integer(numerator(x)) // Integer(denominator(x))
 
 convert(::Type{T}, x::n_Q) where {T <: Rational} = T(x)
 
-Nemo.fmpq(x::n_Q) = fmpq(fmpz(numerator(x)), fmpz(denominator(x)))
-convert(::Type{fmpq}, x::n_Q) = fmpq(x)
-(::FlintRationalField)(x::n_Q) = fmpq(x)
+Nemo.QQFieldElem(x::n_Q) = QQFieldElem(ZZRingElem(numerator(x)), ZZRingElem(denominator(x)))
+convert(::Type{QQFieldElem}, x::n_Q) = QQFieldElem(x)
+(::QQField)(x::n_Q) = QQFieldElem(x)
 
 ###############################################################################
 #
@@ -387,7 +387,7 @@ rand(R::Rationals, n) = rand(Random.GLOBAL_RNG, R, n)
 
 (::Rationals)() = n_Q()
 
-(R::Rationals)(n::Union{Integer,fmpz,n_Z}, m::Union{Integer,fmpz,n_Z}) = R(n) // R(m)
+(R::Rationals)(n::Union{Integer,ZZRingElem,n_Z}, m::Union{Integer,ZZRingElem,n_Z}) = R(n) // R(m)
 
 # take ownership of the pointer - not for general users
 (::Rationals)(n::libSingular.number_ptr) = n_Q(n)
@@ -400,6 +400,6 @@ rand(R::Rationals, n) = rand(Random.GLOBAL_RNG, R, n)
 
 (::Rationals)(x::Rational{Int}) = n_Q(numerator(x)) // n_Q(denominator(x))
 
-(R::Rationals)(x::Union{Rational,fmpq}) = R(numerator(x)) // R(denominator(x))
+(R::Rationals)(x::Union{Rational,QQFieldElem}) = R(numerator(x)) // R(denominator(x))
 
 (::Rationals)(n::n_Q) = n

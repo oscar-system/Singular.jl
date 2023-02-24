@@ -5,7 +5,7 @@ CurrentModule = Singular
 ```@meta
 DocTestSetup = quote
   using Singular
-  using Singular: PolynomialRing, vector, std, reduce
+  using Singular: polynomial_ring, vector, std, reduce
 end
 ```
 
@@ -64,7 +64,7 @@ from `Base.Module`.
 **Examples**
 
 ```julia
-R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
 v1 = vector(R, x + 1, x*y + 1, y)
 v2 = vector(R, x^2 + 1, 2x + 3y, x)
@@ -96,7 +96,7 @@ iszero(::smodule)
 **Examples**
 
 ```
-R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
 v1 = vector(R, x + 1, x*y + 1, y)
 v2 = vector(R, x^2 + 1, 2x + 3y, x)
@@ -125,7 +125,7 @@ lift_std_syz(::smodule; ::Bool)
 **Examples**
 
 ```julia
-R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
 v1 = vector(R, x + 1, x*y + 1, y)
 v2 = vector(R, x^2 + 1, 2x + 3y, x)
@@ -145,7 +145,7 @@ reduce(::smodule, ::smodule)
 **Examples**
 
 ```jldoctest
-julia> R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"])
+julia> R, (x, y, z) = polynomial_ring(QQ, ["x", "y", "z"])
 (Singular Polynomial Ring (QQ),(x,y,z),(dp(3),C), spoly{n_Q}[x, y, z])
 
 julia> v1 = vector(R, R(0), z, -y)
@@ -192,7 +192,7 @@ syz(::smodule)
 **Examples**
 
 ```julia
-R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
 v1 = vector(R, (x + 1)*y, (x*y + 1)*y, y)
 v2 = vector(R, (x + 1)*x, (x*y + 1)*x, x)
@@ -211,7 +211,7 @@ sres{T <: Singular.FieldElem}(::smodule{spoly{T}}, ::Int)
 **Examples**
 
 ```julia
-R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
 v1 = vector(R, x + 1, x*y + 1, y)
 v2 = vector(R, x^2 + 1, 2x + 3y, x)
@@ -236,7 +236,7 @@ jet(::smodule, ::Int)
 **Examples**
 
 ```julia
-R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
 v1 = vector(R, x + 1, x*y + 1, y)
 v2 = vector(R, x^5 + 1, 2x^3 + 3y^2, x^2)
@@ -257,7 +257,7 @@ minimal_generating_set(::smodule)
 **Examples**
 
 ```julia
-R, (x, y) = PolynomialRing(QQ, ["x", "y"]; ordering=:negdegrevlex)
+R, (x, y) = polynomial_ring(QQ, ["x", "y"]; ordering=:negdegrevlex)
 
 has_local_ordering(R) == true
 

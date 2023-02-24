@@ -184,7 +184,7 @@ function number_ptr(n::Integer, c::coeffs_ptr)
    end
 end
 
-function number_ptr(x::Nemo.fmpz, c::coeffs_ptr)
+function number_ptr(x::Nemo.ZZRingElem, c::coeffs_ptr)
    if Nemo._fmpz_is_small(x)
       n_Init(x.d, c)
    else

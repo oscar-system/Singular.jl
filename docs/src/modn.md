@@ -8,7 +8,7 @@ Integers mod $n$ are implemented via the Singular `n_Zn` type for any positive m
 that can fit in a Julia `Int`.
 
 The associated ring of integers mod $n$ is represented by a parent object which can
-be constructed by a call to the `ResidueRing` constructor.
+be constructed by a call to the `residue_ring` constructor.
 
 The types of the parent objects and elements of the associated rings of integers modulo
 n are given in the following table according to the library providing them.
@@ -44,7 +44,7 @@ addition to the standard ones expected.
 
 ```julia
 R(n::n_Z)
-R(n::fmpz)
+R(n::ZZRingElem)
 ```
 
 Coerce a Singular or Flint integer value into the ring.
@@ -54,7 +54,7 @@ Coerce a Singular or Flint integer value into the ring.
 **Examples**
 
 ```
-R = ResidueRing(ZZ, 26)
+R = residue_ring(ZZ, 26)
 a = R(5)
 
 is_unit(a)

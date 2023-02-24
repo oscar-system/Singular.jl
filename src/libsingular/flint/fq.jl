@@ -6,7 +6,7 @@
 
 function fqInit(i::Clong, cf::Ptr{Cvoid})
    cf_ptr = get_coeff_data_void(cf)
-   R = julia(cf_ptr)::Nemo.FqFiniteField
+   R = julia(cf_ptr)::Nemo.FqPolyRepField
    return number(R(Int(i)))
 end
 
@@ -17,7 +17,7 @@ function fqDelete(ptr::Ptr{Ptr{Cvoid}}, cf::Ptr{Cvoid})
 end
 
 function fqCopy(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
-   n = julia(a)::Nemo.fq
+   n = julia(a)::Nemo.FqPolyRepFieldElem
    return number(deepcopy(n))
 end
 
@@ -40,7 +40,7 @@ function fqCoeffWrite(cf::Ptr{Cvoid}, d::Cint)
 end
 
 function fqWrite(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
-   n = julia(a)::Nemo.fq
+   n = julia(a)::Nemo.FqPolyRepFieldElem
    libSingular.StringAppendS(AbstractAlgebra.obj_to_string_wrt_times(n))
    nothing
 end
@@ -52,60 +52,60 @@ end
 ###############################################################################
 
 function fqNeg(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
-   n = julia(a)::Nemo.fq
+   n = julia(a)::Nemo.FqPolyRepFieldElem
    return number(-n)
 end
 
 function fqInpNeg(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    cf_ptr = get_coeff_data_void(cf)
    ccall((:fq_neg, libflint), Cvoid,
-	 (Ptr{Nemo.fq}, Ptr{Nemo.fq}, Ptr{Nemo.FqFiniteField}),
+	 (Ptr{Nemo.FqPolyRepFieldElem}, Ptr{Nemo.FqPolyRepFieldElem}, Ptr{Nemo.FqPolyRepField}),
 	   a, a, cf_ptr)
    return a
 end
 
 function fqInvers(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
-   n = julia(a)::Nemo.fq
+   n = julia(a)::Nemo.FqPolyRepFieldElem
    return number(Nemo.inv(n))
 end
 
 function fqMult(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
-   n1 = julia(a)::Nemo.fq
-   n2 = julia(b)::Nemo.fq
+   n1 = julia(a)::Nemo.FqPolyRepFieldElem
+   n2 = julia(b)::Nemo.FqPolyRepFieldElem
    return number(n1*n2)
 end
 
 function fqInpMult(a::Ptr{Ptr{Cvoid}}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    r = unsafe_load(a)
-   aa = julia(r)::Nemo.fq
-   bb = julia(b)::Nemo.fq
+   aa = julia(r)::Nemo.FqPolyRepFieldElem
+   bb = julia(b)::Nemo.FqPolyRepFieldElem
    Nemo.mul!(aa, aa, bb)
    nothing
 end
 
 function fqAdd(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
-   n1 = julia(a)::Nemo.fq
-   n2 = julia(b)::Nemo.fq
+   n1 = julia(a)::Nemo.FqPolyRepFieldElem
+   n2 = julia(b)::Nemo.FqPolyRepFieldElem
    return number(n1 + n2)
 end
 
 function fqInpAdd(a::Ptr{Ptr{Cvoid}}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    r = unsafe_load(a)
-   aa = julia(r)::Nemo.fq
-   bb = julia(b)::Nemo.fq
+   aa = julia(r)::Nemo.FqPolyRepFieldElem
+   bb = julia(b)::Nemo.FqPolyRepFieldElem
    Nemo.addeq!(aa, bb)
    nothing
 end
 
 function fqSub(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
-   n1 = julia(a)::Nemo.fq
-   n2 = julia(b)::Nemo.fq
+   n1 = julia(a)::Nemo.FqPolyRepFieldElem
+   n2 = julia(b)::Nemo.FqPolyRepFieldElem
    return number(n1 - n2)
 end
 
 function fqDiv(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
-   n1 = julia(a)::Nemo.fq
-   n2 = julia(b)::Nemo.fq
+   n1 = julia(a)::Nemo.FqPolyRepFieldElem
+   n2 = julia(b)::Nemo.FqPolyRepFieldElem
    return number(Nemo.divexact(n1, n2))
 end
 
@@ -116,29 +116,29 @@ end
 ###############################################################################
 
 function fqGreater(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
-   n1 = julia(a)::Nemo.fq
-   n2 = julia(b)::Nemo.fq
+   n1 = julia(a)::Nemo.FqPolyRepFieldElem
+   n2 = julia(b)::Nemo.FqPolyRepFieldElem
    return Cint(n1 != n2)
 end
 
 function fqEqual(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
-   n1 = julia(a)::Nemo.fq
-   n2 = julia(b)::Nemo.fq
+   n1 = julia(a)::Nemo.FqPolyRepFieldElem
+   n2 = julia(b)::Nemo.FqPolyRepFieldElem
    return Cint(n1 == n2)
 end
 
 function fqIsZero(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
-   n = julia(a)::Nemo.fq
+   n = julia(a)::Nemo.FqPolyRepFieldElem
    return Cint(Nemo.iszero(n))
 end
 
 function fqIsOne(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
-   n = julia(a)::Nemo.fq
+   n = julia(a)::Nemo.FqPolyRepFieldElem
    return Cint(Nemo.isone(n))
 end
 
 function fqIsMOne(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
-   n = julia(a)::Nemo.fq
+   n = julia(a)::Nemo.FqPolyRepFieldElem
    return Cint(n == -1)
 end
 
@@ -149,8 +149,8 @@ end
 ###############################################################################
 
 function fqGcd(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
-   n1 = julia(a)::Nemo.fq
-   n2 = julia(b)::Nemo.fq
+   n1 = julia(a)::Nemo.FqPolyRepFieldElem
+   n2 = julia(b)::Nemo.FqPolyRepFieldElem
    return number(Nemo.gcd(n1, n2))
 end
 
@@ -222,7 +222,7 @@ function fqInitChar(cf::Ptr{Cvoid}, p::Ptr{Cvoid})
     return Cint(0)
 end
 
-function register(R::Nemo.FqFiniteField)
+function register(R::Nemo.FqPolyRepField)
    c = @cfunction(fqInitChar, Cint, (Ptr{Cvoid}, Ptr{Cvoid}))
    return nRegister(n_unknown, c)
 end

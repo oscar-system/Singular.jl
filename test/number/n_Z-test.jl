@@ -70,11 +70,11 @@ end
    @test isequal(ZZ(2), 2)
    @test isequal(2, ZZ(2))
 
-   # fmpz
-   @test ZZ(3) == Nemo.fmpz(3)
-   @test Nemo.fmpz(3) == ZZ(3)
-   @test ZZ(3)^42 == Nemo.fmpz(3)^42
-   @test Nemo.fmpz(3)^42 == ZZ(3)^42
+   # ZZRingElem
+   @test ZZ(3) == Nemo.ZZRingElem(3)
+   @test Nemo.ZZRingElem(3) == ZZ(3)
+   @test ZZ(3)^42 == Nemo.ZZRingElem(3)^42
+   @test Nemo.ZZRingElem(3)^42 == ZZ(3)^42
 end
 
 @testset "n_Z.powering" begin
@@ -123,7 +123,7 @@ end
 end
 
 @testset "n_Z.Polynomials" begin
-   R, x = Nemo.PolynomialRing(ZZ, "x")
+   R, x = Nemo.polynomial_ring(ZZ, "x")
 
    f = 1 + 2x + 3x^2
 
@@ -143,9 +143,9 @@ end
       end
       @test convert(Int128, N) == n
       @test Int128(N) == n
-      @test ZZ(Nemo.fmpz(N)) == N
+      @test ZZ(Nemo.ZZRingElem(N)) == N
       @test ZZ(Nemo.ZZ(N)) == N
-      @test ZZ(convert(Nemo.fmpz, N)) == N
+      @test ZZ(convert(Nemo.ZZRingElem, N)) == N
       if n >= 0
          @test convert(UInt128, N) == n
          @test UInt128(N) == n
@@ -197,7 +197,7 @@ end
 end
 
 @testset "n_Z.recognition" begin
-   r, _ = PolynomialRing(ZZ, ["x", "y"])
+   r, _ = polynomial_ring(ZZ, ["x", "y"])
    l = Singular.LibRing.addvarsTo(r, r, Any["a", "b"], 0)
    @test l[1] isa Singular.PolyRing{n_Z}
 end

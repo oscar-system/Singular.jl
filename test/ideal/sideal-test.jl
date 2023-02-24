@@ -1,5 +1,5 @@
 @testset "sideal.constructors" begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
    I = Ideal(R, x, y)
    S = parent(I)
@@ -35,7 +35,7 @@
 end
 
 @testset "sideal.spoly.manipulation" begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
    I0 = Ideal(R)
    I1 = Ideal(R, x, y)
@@ -67,7 +67,7 @@ end
    @test !is_var_generated(Ideal(R, R(1)))
    @test !is_var_generated(Ideal(R, x + y))
 
-   R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+   R, (x, y) = polynomial_ring(ZZ, ["x", "y"])
    @test -1 == dimension(std(Ideal(R, R(-1))))
    @test -1 == dimension(std(Ideal(R, x, R(1))))
    @test 0 == dimension(std(Ideal(R, x, y, R(3))))
@@ -76,24 +76,24 @@ end
    @test 2 == dimension(std(Ideal(R, R(5))))
    @test 2 == dimension(std(Ideal(R, R(35))))
 
-   R, (x, y, z) = PolynomialRing(Fp(32003), ["x", "y", "z"], ordering = ordering_ds())
+   R, (x, y, z) = polynomial_ring(Fp(32003), ["x", "y", "z"], ordering = ordering_ds())
    a, b, c, t = 11, 10, 3, 1
    f = x^a+y^b+z^(3*c)+x^(c+2)*y^(c-1)+x^(c-1)*y^(c-1)*z^3+x^(c-2)*y^c*(y^2+t*x)^2
    i = @inferred jacobian_ideal(f)
    i0 = @inferred std(i)
    @test degree(i0) == (0, 314)
 
-   R, (x, y) = PolynomialRing(Fp(32003), ["x", "y"], ordering = ordering_ds())
+   R, (x, y) = polynomial_ring(Fp(32003), ["x", "y"], ordering = ordering_ds())
    f = (x^3+y^5)^2+x^2*y^7
    @test mult(std(@inferred jacobian_ideal(f))) == 46
    @test mult(std(Ideal(R, f))) == 6
    
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"]; ordering= :lex)
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"]; ordering= :lex)
    @test_throws ErrorException iszerodim(Ideal(R, x+y,x^2))
 end
 
 @testset "sideal.spoly.homogeneous" begin
-   R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"])
+   R, (x, y, z) = polynomial_ring(QQ, ["x", "y", "z"])
    I = Ideal(R, x^2+y^3+z^4, x^5+y^4+z^3)
    @test !is_homogeneous(I)
    @test is_homogeneous(homogenize(I, z))
@@ -101,7 +101,7 @@ end
    @test is_homogeneous(I)
    @test is_homogeneous(homogenize(I, z))
 
-   R, (x, y, z, w) = PolynomialRing(QQ, ["x", "y", "z", "w"], ordering = ordering_wp([6,4,3,1]))
+   R, (x, y, z, w) = polynomial_ring(QQ, ["x", "y", "z", "w"], ordering = ordering_wp([6,4,3,1]))
    I = Ideal(R, x^2+y^3+z^4, x^1+z^2)
    @test is_homogeneous(I)
    @test is_homogeneous(homogenize(I, w))
@@ -112,7 +112,7 @@ end
 
 @testset "sideal.spluralg.manipulation" begin
 
-   r, (x, y) = PolynomialRing(QQ, ["x", "y"], ordering = :degrevlex)
+   r, (x, y) = polynomial_ring(QQ, ["x", "y"], ordering = :degrevlex)
    R, (x, y) = GAlgebra(r, Singular.Matrix(r, [1 1; 0 1]),
                            Singular.Matrix(r, [0 x + y; 0 0]))
 
@@ -179,7 +179,7 @@ end
 end
 
 @testset "sideal.binary_ops" begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
    I1 = @inferred Ideal(R, x)
    I2 = @inferred Ideal(R, y)
@@ -206,7 +206,7 @@ end
 end
 
 @testset "sideal.powering" begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
    I = Ideal(R, x^2, x*y + 1)
 
@@ -226,12 +226,12 @@ end
 end
 
 @testset "sideal.contains" begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
    @test contains(Ideal(R, x, y), Ideal(R, x))
    @test !contains(Ideal(R, x), Ideal(R, x, y))
 
-   r, (x, y) = PolynomialRing(QQ, ["x", "y"], ordering = :degrevlex)
+   r, (x, y) = polynomial_ring(QQ, ["x", "y"], ordering = :degrevlex)
    R, (x, y) = GAlgebra(r, Singular.Matrix(r, [1 1; 0 1]),
                            Singular.Matrix(r, [0 x + y; 0 0]))
 
@@ -245,14 +245,14 @@ end
 end
 
 @testset "sideal.comparison" begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
    @test equal(Ideal(R, x, y, x - y), Ideal(R, x, y, x + y))
    @test !equal(Ideal(R, x), Ideal(R, x, y))
    @test !isequal(Ideal(R, x, y, x - y), Ideal(R, x, y, x + y))
    @test isequal(Ideal(R, x, y), Ideal(R, x, y))
 
-   r, (x, y) = PolynomialRing(Fp(7), ["x", "y"], ordering = :degrevlex)
+   r, (x, y) = polynomial_ring(Fp(7), ["x", "y"], ordering = :degrevlex)
    R, (x, y) = GAlgebra(r, Singular.Matrix(r, [1 1; 0 1]),
                            Singular.Matrix(r, [0 x + y; 0 0]))
 
@@ -270,12 +270,12 @@ end
 end
 
 @testset "sideal.lead" begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
    i1 = @inferred lead(Ideal(R, x^2 + x*y + 1, 2y^2 + 3, R(7)))
    i2 = @inferred Ideal(R, x^2, 2y^2, R(7))
    @test isequal(i1, i2) || equal(i1, i2)
 
-   r, (x, y) = PolynomialRing(Fp(7), ["x", "y"], ordering = :degrevlex)
+   r, (x, y) = polynomial_ring(Fp(7), ["x", "y"], ordering = :degrevlex)
    R, (x, y) = GAlgebra(r, Singular.Matrix(r, [1 1; 0 1]),
                            Singular.Matrix(r, [0 x + y; 0 0]))
    i1 = @inferred lead(Ideal(R, x^2 + x*y + 1, 2y^2 + 3, R(7)))
@@ -289,7 +289,7 @@ end
 end
 
 @testset "sideal.local" begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"], ordering=:negdegrevlex)
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"], ordering=:negdegrevlex)
 
    I = Ideal(R, y, x^2, (1 + y^3) * (x^2 - y))
    M = @inferred Singular.minimal_generating_set(I)
@@ -298,7 +298,7 @@ end
 end
 
 @testset "sideal.intersection" begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
    I1 = @inferred Ideal(R, x^2 + x*y + 1, 2y^2 + 3, R(7))
    I2 = @inferred Ideal(R, x*y^2 + x + 1, 2x*y + 1, 7x + 1)
@@ -314,7 +314,7 @@ end
    @test equal(I, @inferred intersection(intersection(I1, I2), I3))
    @test equal(I, @inferred intersection(I1, intersection(I2, I3)))
 
-   r, (x, y) = PolynomialRing(Fp(7), ["x", "y"], ordering = :degrevlex)
+   r, (x, y) = polynomial_ring(Fp(7), ["x", "y"], ordering = :degrevlex)
    R, (x, y) = GAlgebra(r, Singular.Matrix(r, [1 1; 0 1]),
                            Singular.Matrix(r, [0 x + y; 0 0]))
 
@@ -329,7 +329,7 @@ end
 end
 
 @testset "sideal.quotient" begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
    I = @inferred Ideal(R, x^2 + x*y + 1, 2y^2 + 3)
    J = @inferred Ideal(R, x*y^2 + x + 1, 2x*y + 1)
@@ -341,7 +341,7 @@ end
    @test equal(A, B)
 
    F, (q,) = FunctionField(QQ, ["q"])
-   r, (x, y) = PolynomialRing(F, ["x", "y"], ordering = :degrevlex)
+   r, (x, y) = polynomial_ring(F, ["x", "y"], ordering = :degrevlex)
    R, (x, y) = GAlgebra(r, Singular.Matrix(r, [0 q; 0 0]),
                            Singular.Matrix(r, [0 0; 0 0]))
 
@@ -352,7 +352,7 @@ end
 end
 
 @testset "sideal.saturation" begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
    I = Ideal(R, (x^2 + x*y + 1)*(2y^2+1)^3, (2y^2 + 3)*(2y^2+1)^2)
    J = Ideal(R, 2y^2 + 1)
@@ -368,14 +368,14 @@ end
    b = @inferred std(S)
    @test equal(a, b)
 
-   r, (x, y) = PolynomialRing(ZZ, ["x", "y"], ordering = ordering_dp())
+   r, (x, y) = polynomial_ring(ZZ, ["x", "y"], ordering = ordering_dp())
    I = Ideal(r, x^5 + x^4, y^2 + y)
    @test equal(satstd(I), Ideal(r, x + 1, y + 1))
 
 end
 
 @testset "sideal.slimgb" begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
    I = Ideal(R, x^2 + x*y + 1, 2y^2 + 3)
    J = Ideal(R, 2*y^2 + 3, x^2 + x*y + 1)
@@ -395,7 +395,7 @@ end
 end
 
 @testset "sideal.std" begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
    I = Ideal(R, x^2 + x*y + 1, 2y^2 + 3)
    J = Ideal(R, 2*y^2 + 3, x^2 + x*y + 1)
@@ -414,13 +414,13 @@ end
 end
 
 @testset "sideal.interreduce" begin
-   R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"])
+   R, (x, y, z) = polynomial_ring(QQ, ["x", "y", "z"])
 
    I = @inferred Ideal(R, z*x + y^3, z + y^3, z + x*y)
    A = @inferred interreduce(I)
    @test equal(A, I)
 
-   r, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"], ordering = :degrevlex)
+   r, (x, y, z) = polynomial_ring(QQ, ["x", "y", "z"], ordering = :degrevlex)
    R, (x, y, z) = GAlgebra(r, Singular.Matrix(r, [0 1 1; 0 0 1; 0 0 0]),
                               Singular.Matrix(r, [0 x z; 0 0 y; 0 0 1]))
 
@@ -430,7 +430,7 @@ end
 end
 
 @testset "sideal.fglm" begin
-   R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"], ordering = :lex)
+   R, (x, y, z) = polynomial_ring(QQ, ["x", "y", "z"], ordering = :lex)
    I = Ideal(R, y^3+x^2, x^2*y+x^2, x^3-x^2, z^4-x^2-y)
    J1 = @inferred std(I, complete_reduction = true)
    J2 = @inferred fglm(I, :degrevlex)
@@ -439,7 +439,7 @@ end
 end
 
 @testset "sideal.reduction" begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
    f = x^2*y + 2y + 1
    g = y^2 + 1
@@ -455,7 +455,7 @@ end
 end
 
 @testset "sideal.free_resolution" begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
    I = Ideal(R, x^2*y + 2y + 1, y^2 + 1)
 
@@ -482,7 +482,7 @@ end
 end
 
 @testset "sideal.syzygy" begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
    I = Ideal(R, x^2*y + 2y + 1, y^2 + 1)
 
@@ -497,15 +497,15 @@ end
 
 @testset "sideal.kernel" begin
    # twisted cubic
-   P1, (t_0, t_1) = PolynomialRing(QQ, ["t_0", "t_1"])
-   P3, (x, y, z, w) = PolynomialRing(QQ, ["x", "y", "z", "w"])
+   P1, (t_0, t_1) = polynomial_ring(QQ, ["t_0", "t_1"])
+   P3, (x, y, z, w) = polynomial_ring(QQ, ["x", "y", "z", "w"])
    I = @inferred Ideal(P1, t_0^3, t_0^2*t_1, t_0*t_1^2, t_1^3)
    J = @inferred kernel(P3, I)
    @test ngens(J) == 3 && J[1] == z^2-y*w && J[2] == y*z-x*w && J[3] == y^2-x*z
 end
 
 @testset "sideal.eliminate" begin
-   R, (x, y, t) = PolynomialRing(QQ, ["x", "y", "t"])
+   R, (x, y, t) = polynomial_ring(QQ, ["x", "y", "t"])
 
    I = Ideal(R, x - t^2, y - t^3)
    J = @inferred eliminate(I, t)
@@ -513,7 +513,7 @@ end
    K = @inferred eliminate(I, t, x)
    @test equal(K, Ideal(R))
 
-   r, (e, f, h, a) = PolynomialRing(QQ, ["e", "f", "h", "a"], ordering = :deglex)
+   r, (e, f, h, a) = polynomial_ring(QQ, ["e", "f", "h", "a"], ordering = :deglex)
    R, (e, f, h, a) = GAlgebra(r, Singular.Matrix(r, [0 1 1 1; 0 0 1 1; 0 0 0 1; 0 0 0 0]),
                                  Singular.Matrix(r, [0 -h 2*e 0; 0 0 -2*f 0; 0 0 0 0; 0 0 0 0]))
 
@@ -523,7 +523,7 @@ end
 end
 
 @testset "sideal.jet" begin
-   R, (x, y, z) = PolynomialRing(QQ, ["x", "y", "z"])
+   R, (x, y, z) = polynomial_ring(QQ, ["x", "y", "z"])
 
    I = Ideal(R, x^5 - y^2, y^3 - x^6 + z^3)
    J = @inferred jet(I, 3)
@@ -537,7 +537,7 @@ end
 end
 
 @testset "sideal.zerodim" begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"]; ordering=:negdegrevlex)
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"]; ordering=:negdegrevlex)
 
    I = Ideal(R, 3*x^2 + y^3, x*y^2)
 
@@ -560,12 +560,12 @@ end
    #Check highcorner
    @test f == y^4
 
-   R, (x, y, z) = PolynomialRing(Fp(32003), ["x", "y", "z"])
+   R, (x, y, z) = polynomial_ring(Fp(32003), ["x", "y", "z"])
    @test ngens(kbase(std(Ideal(R, x^2, y^3, x*y*z)), 2)) == 5
 end
 
 @testset "sideal.independent_set" begin
-   R, (x, y, u, v, w) = PolynomialRing(QQ, ["x", "y", "u", "v", "w"])
+   R, (x, y, u, v, w) = polynomial_ring(QQ, ["x", "y", "u", "v", "w"])
 
    I = Ideal(R, x*y*w, y*v*w, u*y*w, x*v)
 
@@ -585,7 +585,7 @@ end
 end
 
 @testset "sideal.lift" begin
-  R,(x,y) = PolynomialRing(QQ, ["x", "y"], ordering = ordering_ds())
+  R,(x,y) = polynomial_ring(QQ, ["x", "y"], ordering = ordering_ds())
   f = x^5 + x^2*y^2 + y^5
   G = Ideal(R, derivative(f, x), derivative(f, y))
 
@@ -599,7 +599,7 @@ end
 end
 
 @testset "sideal.lift_std" begin
-   R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
    I = Ideal(R, x, y)
    G, T = @inferred Singular.lift_std(I)
@@ -629,23 +629,23 @@ end
 end
 
 @testset "sideal.hilbert_series" begin
-   R, (x, y, z) = PolynomialRing(Fp(32003), ["x", "y", "z"])
+   R, (x, y, z) = polynomial_ring(Fp(32003), ["x", "y", "z"])
    p = hilbert_series(std(Ideal(R, x^2, y^2, z^2)))
    pop!(p)
    @test p == [1,0,-3,0,3,0,-1]
 
-   R, (x, y, z) = PolynomialRing(Fp(32003), ["x", "y", "z"])
+   R, (x, y, z) = polynomial_ring(Fp(32003), ["x", "y", "z"])
    p = hilbert_series(std(Ideal(R, x, y, z)), [1, 2, 3])
    pop!(p)
    @test p == [1,-1,-1,0,1,1,-1]
 
-   R, (x, y, z) = PolynomialRing(Fp(32003), ["x", "y", "z"], ordering = ordering_dp(3))
+   R, (x, y, z) = polynomial_ring(Fp(32003), ["x", "y", "z"], ordering = ordering_dp(3))
    i = Ideal(R, [1*x^2*y+151*x*y*z^10+169*y^21,
                  1*x*z^14+6*x^2*y^4+3*z^24,
                  5*y^10*z^10*x+2*y^20*z^10+y^10*z^20+11*x^3])
    h = hilbert_series(std(i))
 
-   R, (x, y, z) = PolynomialRing(Fp(32003), ["x", "y", "z"], ordering = ordering_lp(3))
+   R, (x, y, z) = polynomial_ring(Fp(32003), ["x", "y", "z"], ordering = ordering_lp(3))
    j = Ideal(R, [1*x^2*y+151*x*y*z^10+169*y^21,
                  1*x*z^14+6*x^2*y^4+3*z^24,
                  5*y^10*z^10*x+2*y^20*z^10+y^10*z^20+11*x^3])
@@ -653,13 +653,13 @@ end
          ngens(std(j, complete_reduction = true))
 
 
-   R, (x, y, z) = PolynomialRing(Fp(32003), ["x", "y", "z"], ordering = ordering_dp(3))
+   R, (x, y, z) = polynomial_ring(Fp(32003), ["x", "y", "z"], ordering = ordering_dp(3))
    i = Ideal(R, [1*x^2*y+151*x*y*z^10+169*y^21,
                  1*x*z^14+6*x^2*y^4+3*z^24,
                  5*y^10*z^10*x+2*y^20*z^10+y^10*z^20+11*x^3])
    w = [10,1,1]
    h = hilbert_series(std(i), w)
-   R, (x, y, z) = PolynomialRing(Fp(32003), ["x", "y", "z"], ordering = ordering_lp(3))
+   R, (x, y, z) = polynomial_ring(Fp(32003), ["x", "y", "z"], ordering = ordering_lp(3))
    j = Ideal(R, [1*x^2*y+151*x*y*z^10+169*y^21,
                  1*x*z^14+6*x^2*y^4+3*z^24,
                  5*y^10*z^10*x+2*y^20*z^10+y^10*z^20+11*x^3])
@@ -670,7 +670,7 @@ end
 
 @testset "sideal.oscar#1702" begin
    F, (b2, b3, d1, d2, d3, m1, m2, e, k, k2, k3) = FunctionField(QQ, ["b2", "b3", "d1", "d2", "d3", "m1", "m2", "e", "k", "k2", "k3"]);
-   R, (H, S, C) = PolynomialRing(F, ["H", "S", "C"]; ordering = ordering_lp());
+   R, (H, S, C) = polynomial_ring(F, ["H", "S", "C"]; ordering = ordering_lp());
    I = Ideal(R,-e*H*S - m1*k*H*C + m1*C, -e*H*S - m2*k2*S*C + m2*C, e*H*S - b3*k3*C^2 + b3*C);
    @test dimension(std(I)) == 1
 end

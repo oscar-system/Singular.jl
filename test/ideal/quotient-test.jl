@@ -1,5 +1,5 @@
-@testset "quotient.PolynomialRing" begin
-   R, (x, y, z) = @inferred PolynomialRing(QQ, ["x", "y", "z"])
+@testset "quotient.polynomial_ring" begin
+   R, (x, y, z) = @inferred polynomial_ring(QQ, ["x", "y", "z"])
    Q, (x, y, z) = @inferred QuotientRing(R, Ideal(R, x^2 - y*z))
 
    @test is_quotient_ring(Q)
@@ -12,7 +12,7 @@ end
 
 @testset "quotient.GAlgebra" begin
 
-   R, _ = @inferred PolynomialRing(QQ, ["z", "u", "v", "w"])
+   R, _ = @inferred polynomial_ring(QQ, ["z", "u", "v", "w"])
 
    G, (z, u, v, w) = @inferred GAlgebra(R, Singular.Matrix(R, [0 -1 -1 -1; 0 0 -1 -1; 0 0 0 -1; 0 0 0 0]),
                                            Singular.Matrix(R, [0 0 0 0; 0 0 0 0; 0 0 0 0; 0 0 0 0]))

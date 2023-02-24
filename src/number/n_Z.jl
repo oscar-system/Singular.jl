@@ -174,8 +174,8 @@ end
 
 ==(x::Integer, y::n_Z) = (parent(y)(x) == y)
 
-==(x::n_Z, y::Nemo.fmpz) = Nemo.fmpz(convert(BigInt, x)) == y
-==(x::Nemo.fmpz, y::n_Z) = y == x
+==(x::n_Z, y::Nemo.ZZRingElem) = Nemo.ZZRingElem(convert(BigInt, x)) == y
+==(x::Nemo.ZZRingElem, y::n_Z) = y == x
 
 isless(x::n_Z, y::Integer) = isless(x, parent(x)(y))
 
@@ -358,7 +358,7 @@ end
 
 promote_rule(C::Type{n_Z}, ::Type{T}) where {T <: Integer} = n_Z
 
-promote_rule(C::Type{n_Z}, ::Type{Nemo.fmpz}) = n_Z
+promote_rule(C::Type{n_Z}, ::Type{Nemo.ZZRingElem}) = n_Z
 
 BigInt(n::n_Z) = libSingular.n_GetMPZ(n.ptr, parent(n).ptr)
 Integer(n::n_Z) = BigInt(n)
@@ -366,10 +366,10 @@ Integer(n::n_Z) = BigInt(n)
 
 convert(::Type{T}, n::n_Z) where {T <: Integer} = T(n)
 
-# fmpz
-Nemo.fmpz(n::n_Z) = Nemo.fmpz(BigInt(n))
-convert(::Type{Nemo.fmpz}, n::n_Z) = Nemo.fmpz(n)
-(::FlintIntegerRing)(n::n_Z) = Nemo.fmpz(n)
+# ZZRingElem
+Nemo.ZZRingElem(n::n_Z) = Nemo.ZZRingElem(BigInt(n))
+convert(::Type{Nemo.ZZRingElem}, n::n_Z) = Nemo.ZZRingElem(n)
+(::ZZRing)(n::n_Z) = Nemo.ZZRingElem(n)
 
 ###############################################################################
 #

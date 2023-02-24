@@ -53,7 +53,7 @@ Resolution(::Vector{smodule{T}}) where T <: AbstractAlgebra.FieldElem
 **Example**
 
 ```julia
-R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
 M1 = Singular.Module(R, vector(R, x), vector(R, y))
 M2 = Singular.Module(R, vector(R, y, -x))
@@ -84,7 +84,7 @@ F[n::Int]
 **Examples**
 
 ```julia
-R, (w, x, y, z) = PolynomialRing(QQ, ["w", "x", "y", "z"])
+R, (w, x, y, z) = polynomial_ring(QQ, ["w", "x", "y", "z"])
 
 I = Ideal(R, w^2 - x*z, w*x - y*z, x^2 - w*y, x*y - z^2, y^2 - w*z)
 F = fres(std(I), 0)
@@ -102,7 +102,7 @@ betti(::sresolution)
 **Examples**
 
 ```julia
-R, (w, x, y, z) = PolynomialRing(QQ, ["w", "x", "y", "z"])
+R, (w, x, y, z) = polynomial_ring(QQ, ["w", "x", "y", "z"])
 
 I = Ideal(R, w^2 - x*z, w*x - y*z, x^2 - w*y, x*y - z^2, y^2 - w*z)
 F = fres(std(I), 3)
@@ -120,7 +120,7 @@ minres{T <: Nemo.FieldElem}(::sresolution{spoly{T}})
 **Examples**
 
 ```julia
-R, (w, x, y, z) = PolynomialRing(QQ, ["w", "x", "y", "z"])
+R, (w, x, y, z) = polynomial_ring(QQ, ["w", "x", "y", "z"])
 
 I = Ideal(R, w^2 - x*z, w*x - y*z, x^2 - w*y, x*y - z^2, y^2 - w*z)
 F = fres(std(I), 3)

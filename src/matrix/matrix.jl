@@ -1,4 +1,4 @@
-export identity_matrix, MatrixSpace, nrows, ncols, smatrix, zero_matrix
+export identity_matrix, matrix_space, nrows, ncols, smatrix, zero_matrix
 
 ###############################################################################
 #
@@ -11,18 +11,18 @@ nrows(M::smatrix) = Int(libSingular.nrows(M.ptr))
 ncols(M::smatrix) = Int(libSingular.ncols(M.ptr))
 
 function parent(M::smatrix{T}) where T <: AbstractAlgebra.RingElem
-   return MatrixSpace{T}(M.base_ring, nrows(M), ncols(M))
+   return matrix_space{T}(M.base_ring, nrows(M), ncols(M))
 end
 
-base_ring(S::MatrixSpace) = S.base_ring
+base_ring(S::matrix_space) = S.base_ring
 
 base_ring(M::smatrix) = M.base_ring
 
-elem_type(::Type{MatrixSpace{T}}) where T <: AbstractAlgebra.RingElem = smatrix{T}
+elem_type(::Type{matrix_space{T}}) where T <: AbstractAlgebra.RingElem = smatrix{T}
 
-elem_type(::MatrixSpace{T}) where T <: AbstractAlgebra.RingElem = smatrix{T}
+elem_type(::matrix_space{T}) where T <: AbstractAlgebra.RingElem = smatrix{T}
 
-parent_type(::Type{smatrix{T}}) where T <: AbstractAlgebra.RingElem = MatrixSpace{T}
+parent_type(::Type{smatrix{T}}) where T <: AbstractAlgebra.RingElem = matrix_space{T}
 
 function getindex(M::smatrix{T}, i::Int, j::Int) where T <: AbstractAlgebra.RingElem
    (i > nrows(M) || j > ncols(M)) && error("Incompatible dimensions")
@@ -79,7 +79,7 @@ end
 #
 ###############################################################################
 
-function show(io::IO, S::MatrixSpace)
+function show(io::IO, S::matrix_space)
    print(io, "Space of ", S.nrows, "x", S.ncols, " Singular Matrices over ")
    show(io, base_ring(S))
 end
@@ -177,20 +177,20 @@ end
 ###############################################################################
 
 # take ownership of the pointer - not for general users
-function (S::MatrixSpace{T})(ptr::libSingular.matrix_ptr) where T <: AbstractAlgebra.RingElem
+function (S::matrix_space{T})(ptr::libSingular.matrix_ptr) where T <: AbstractAlgebra.RingElem
    M = smatrix{T}(base_ring(S), ptr)
    (S.ncols != ncols(M) || S.nrows != nrows(M)) && error("Incompatible dimensions")
    return M
 end
 
-(S::MatrixSpace)() = zero_matrix(S.base_ring, S.nrows, S.ncols)
+(S::matrix_space)() = zero_matrix(S.base_ring, S.nrows, S.ncols)
 
-(S::MatrixSpace)(a::smatrix) =
+(S::matrix_space)(a::smatrix) =
    S.base_ring == a.base_ring && S.nrows == nrows(a) && S.ncols == ncols(a) ?
       a :
       throw(ArgumentError("unable to coerce matrix"))
 
-(S::MatrixSpace)(x::RingElement) = diagonal_matrix(S.base_ring(x), S.nrows, S.ncols)
+(S::matrix_space)(x::RingElement) = diagonal_matrix(S.base_ring(x), S.nrows, S.ncols)
 
 ###############################################################################
 #

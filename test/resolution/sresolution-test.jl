@@ -1,5 +1,5 @@
 @testset "sresolution.constructors" begin
-   R, (w, x, y, z) = PolynomialRing(QQ, ["w", "x", "y", "z"])
+   R, (w, x, y, z) = polynomial_ring(QQ, ["w", "x", "y", "z"])
 
    I = Ideal(R, w^2 - x*z, w*x - y*z, x^2 - w*y, x*y - z^2, y^2 - w*z)
    F = fres(std(I), 3)
@@ -19,7 +19,7 @@
 end
 
 @testset "sresolution.manipulation" begin
-   R, (w, x, y, z) = PolynomialRing(QQ, ["w", "x", "y", "z"])
+   R, (w, x, y, z) = polynomial_ring(QQ, ["w", "x", "y", "z"])
 
    I = Ideal(R, w^2 - x*z, w*x - y*z, x^2 - w*y, x*y - z^2, y^2 - w*z)
    F = fres(std(I), 1)
@@ -49,7 +49,7 @@ end
 end
 
 @testset "sresolution.betti" begin
-   R, (w, x, y, z) = PolynomialRing(QQ, ["w", "x", "y", "z"])
+   R, (w, x, y, z) = polynomial_ring(QQ, ["w", "x", "y", "z"])
 
    I = Ideal(R, w^2 - x*z, w*x - y*z, x^2 - w*y, x*y - z^2, y^2 - w*z)
    F = fres(std(I), 3)
@@ -65,7 +65,7 @@ end
 end
 
 @testset "sresolution.minres" begin
-   R, (w, x, y, z) = PolynomialRing(QQ, ["w", "x", "y", "z"])
+   R, (w, x, y, z) = polynomial_ring(QQ, ["w", "x", "y", "z"])
 
    I = Ideal(R, w^2 - x*z, w*x - y*z, x^2 - w*y, x*y - z^2, y^2 - w*z)
    F = fres(std(I), 3)

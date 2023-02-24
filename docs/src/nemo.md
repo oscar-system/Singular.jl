@@ -64,7 +64,7 @@ elements, the Singular.jl coefficient ring can be used to coerce them to a Singu
 **Examples**
 
 ```julia
-R, x = Nemo.PolynomialRing(ZZ, "x")
+R, x = Nemo.polynomial_ring(ZZ, "x")
 S = CoefficientRing(R)
 t = S(x)
 ```
