@@ -13,7 +13,7 @@ windows_error() = error("""
 
     This package unfortunately does not run natively under Windows.
     Please install Julia using Windows subsystem for Linux and try again.
-    See also https://oscar.computeralgebra.de/install/.
+    See also https://www.oscar-system.org/install/.
     """)
 
 if Sys.iswindows()
