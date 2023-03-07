@@ -6,6 +6,9 @@
 #include <Singular/lists.h>
 #include <misc/intvec.h>
 
+// Internal singular interpreter variable
+extern int         inerror;
+
 static jl_value_t * jl_int64_vector_type;
 static jl_value_t * jl_int64_matrix_type;
 static jl_value_t * jl_singular_number_type;
@@ -290,6 +293,8 @@ jl_value_t * call_singular_library_procedure(
     jl_value_t * retObj;
     leftv        ret = ii_CallLibProcM(s.c_str(), args, argtypes, r, err);
     if (err) {
+        inerror = 0;
+        errorreported = 0;
         jl_error("Could not call function");
     }
     if (ret->next != NULL) {
