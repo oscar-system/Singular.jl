@@ -48,6 +48,10 @@ void singular_define_matrices(jlcxx::Module & Singular)
         return mp_InitP(n, n, p_Copy(p, R), R);
     });
 
+    Singular.method("mp_Wedge", [](matrix M,int n, ring R) {
+        return mp_Wedge(M, n, R);
+    });
+
     Singular.method("irrCharSeries", &singclap_irrCharSeries);
 
     Singular.method("iiStringMatrix", [](matrix I, int d, ring o) {
