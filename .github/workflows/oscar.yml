@@ -1,6 +1,9 @@
 name: OscarCI
 
 on:
+  push:
+    branches:
+      - master
    pull_request:
      branches:
        - master
@@ -47,6 +50,7 @@ jobs:
                                    active_repo=\"${GITHUB_REPOSITORY}\");
                  @show cimat;
                  println(github_json(cimat));"
+
   test-oscar:
     needs: generatematrix
     name: ${{ join(matrix.*.name) }} - ${{ matrix.os }}, julia ${{ matrix.julia-version}}
@@ -93,6 +97,7 @@ jobs:
                    github_env_run_doctests(meta;
                                            varname=\"oscar_run_doctests\",
                                            filename=\"${GITHUB_ENV}\");"
+
       - name: "Run tests"
         run: |
           echo '${{ env.oscar_run_tests }}'
