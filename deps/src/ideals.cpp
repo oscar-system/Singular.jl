@@ -114,6 +114,35 @@ auto id_Std_helper(ideal a, ring b, bool complete_reduction = false)
     return id;
 }
 
+auto id_MinStd_helper(ideal a, ring b, bool complete_reduction = false)
+{
+    // bool complete_reduction= false;
+    unsigned int crbit;
+    if (complete_reduction)
+        crbit = Sy_bit(OPT_REDSB);
+    else
+        crbit = 0;
+    ideal id = NULL;
+    ideal m = NULL;
+    if (!idIs0(a))
+    {
+        tHomog       h = testHomog;
+        const ring   origin = currRing;
+        unsigned int save_opt = si_opt_1;
+        si_opt_1 |= crbit;
+        rChangeCurrRing(b);
+        id = kMin_std(a, b->qideal, h, NULL, m);
+        si_opt_1 = save_opt;
+        rChangeCurrRing(origin);
+    }
+    else
+    {
+        id = idInit(0, a->rank);
+        m = idInit(0, a->rank);
+    }
+    return std::make_tuple(id, m);
+}
+
 intvec* to_intvec(jlcxx::ArrayRef<int> a)
 {
     int sz = a.size();
@@ -289,6 +318,7 @@ void singular_define_ideals(jlcxx::Module & Singular)
 
     Singular.method("id_Slimgb", &id_Slimgb_helper);
 
+    Singular.method("id_MinStd", &id_MinStd_helper);
     Singular.method("id_TwoStd", &id_TwoStd_helper);
     Singular.method("id_Std", &id_Std_helper);
     Singular.method("id_StdHilb", &id_StdHilb_helper);
