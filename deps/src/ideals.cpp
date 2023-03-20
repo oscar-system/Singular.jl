@@ -334,6 +334,25 @@ void singular_define_ideals(jlcxx::Module & Singular)
         return res;
     });
 
+    Singular.method("id_DivRem", [](ideal m, ideal sm, ring o) {
+        const ring origin = currRing;
+        rChangeCurrRing(o);
+        ideal factors;
+        ideal res = idDivRem(sm, m, factors, NULL);
+        rChangeCurrRing(origin);
+        return std::make_tuple(res, factors);
+    });
+
+    Singular.method("id_DivRem_Unit", [](ideal m, ideal sm, ring o) {
+        const ring origin = currRing;
+        rChangeCurrRing(o);
+        ideal factors;
+        ideal unit;
+        ideal res = idDivRem(sm, m, factors, &unit);
+        rChangeCurrRing(origin);
+        return std::make_tuple(res, factors, unit);
+    });
+
     Singular.method("id_Lift", [](ideal m, ideal sm, ring o) {
         const ring origin = currRing;
         rChangeCurrRing(o);
