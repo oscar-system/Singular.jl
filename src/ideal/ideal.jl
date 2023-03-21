@@ -3,7 +3,7 @@ export sideal, IdealSet, syz, lead, normalize!, is_constant, is_zerodim, fglm,
        independent_sets, maximal_independent_set, ngens, sres, intersection,
        quotient, reduce, eliminate, kernel, equal, contains, is_var_generated,
        saturation, satstd, slimgb, std, vdim, interreduce, degree, mult,
-       hilbert_series, std_hilbert, is_homogeneous, division, divrem, mstd
+       hilbert_series, std_hilbert, is_homogeneous, division
 
 ###############################################################################
 #
@@ -543,24 +543,6 @@ function std(I::sideal{S}; complete_reduction::Bool=false) where S <: SPolyUnion
 end
 
 @doc Markdown.doc"""
-    mstd(I::sideal{S}; complete_reduction::Bool=false) where S <: SPolyUnion
-
-Compute a Groebner basis for the ideal $I$ and a minimal generating set.
-Note that without `complete_reduction` set to `true`,
-the generators of the Groebner basis
-only have unique leading terms (up to permutation and multiplication by
-constants). If `complete_reduction` is set to `true` (and the ordering is
-a global ordering) then the Groebner basis is unique.
-"""
-function mstd(I::sideal{S}; complete_reduction::Bool=false) where S <: SPolyUnion
-   R = base_ring(I)
-   ptr,ptr_min = GC.@preserve I R libSingular.id_MinStd(I.ptr, R.ptr, complete_reduction)
-   libSingular.idSkipZeroes(ptr)
-   libSingular.idSkipZeroes(ptr_min)
-   return (sideal{S}(R, ptr), sideal{S}(R, ptr_min))
-end
-
-@doc Markdown.doc"""
     interreduce(I::sideal{S}) where {T <: Nemo.RingElem, S <: Union{spoly{T}, spluralg{T}}}
 
 Interreduce the elements of I such that no leading term is divisible by another
@@ -678,23 +660,6 @@ function division(I::sideal{S}, G::sideal{S}) where S <: SPolyUnion
    R = base_ring(I)
    ptr_T,ptr_Rest,ptr_U = GC.@preserve I G R libSingular.id_Lift(G.ptr, I.ptr,
                                                       true,false,true,R.ptr)
-   return (smodule{S}(R,ptr_T), sideal{S}(R,ptr_Rest), smodule{S}(R,ptr_U))
-end
-
-@doc Markdown.doc"""
-    divrem(I::sideal{S}, G::sideal{S}) where S <: SPolyUnion
-
-Computes a division with remainder of the generators of `I` by
-the generators of `G`. Returns a tuple (Quo, Rem, U) where
-  `Matrix(I)*Matrix(U) = Matrix(G)*Matrix(Quo) + Matrix(Rem)`
-and `Rem = normalform(I, G)`. `U` is a diagonal matrix of units differing
-from the identity matrix only for local ring orderings.
-"""
-function divrem(I::sideal{S}, G::sideal{S}) where S <: SPolyUnion
-   check_parent(I, G)
-   R = base_ring(I)
-   ptr_T,ptr_Rest,ptr_U = GC.@preserve I G R libSingular.id_DivRem_Unit(I.ptr, G.ptr,
-                                                      R.ptr)
    return (smodule{S}(R,ptr_T), sideal{S}(R,ptr_Rest), smodule{S}(R,ptr_U))
 end
 
