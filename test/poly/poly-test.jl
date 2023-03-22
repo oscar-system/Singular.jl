@@ -455,21 +455,21 @@ end
 
 @testset "poly.convert_MPoly_to_SingularPoly" begin
    for num_vars = 2:10
-      var_names = ["x$j" for j in 1:num_vars]
+      var_names = [Symbol("x$j") for j in 1:num_vars]
       ord = AbstractAlgebra.rand_ordering()
 
-      R, vars_R = AbstractAlgebra.Generic.polynomial_ring(Nemo.ZZ, var_names; ordering=ord)
-      Rsing, vars_Rsing = Singular.AsEquivalentSingularPolynomialRing(R)
+      R = AbstractAlgebra.Generic.MPolyRing{Nemo.ZZRingElem}(Nemo.ZZ, var_names, ord, false)
+      Rsing, _ = Singular.AsEquivalentSingularPolynomialRing(R)
       for iter in 1:10
-         f = AbstractAlgebra.Generic.rand(R, 5:10, 1:10, -100:100)
-         g = AbstractAlgebra.Generic.rand(R, 5:10, 1:10, -100:100)
+         f = rand(R, 5:10, 1:10, -100:100)
+         g = rand(R, 5:10, 1:10, -100:100)
          @test Rsing(f * g) == Rsing(f) * Rsing(g)
          @test Rsing(f + g) == Rsing(f) + Rsing(g)
          @test Rsing(f - g) == Rsing(f) - Rsing(g)
          @test R(Rsing(f)) == f
       end
 
-      S, vars_S = Singular.polynomial_ring(Nemo.ZZ, var_names; ordering=ord)
+      S, vars_S = Singular.polynomial_ring(Nemo.ZZ, var_names; ordering=ord, cached=false)
       SAA, vars_SAA = Singular.AsEquivalentAbstractAlgebraPolynomialRing(S)
       # FIXME: Better generate random polynomials
       f = 1 + vars_S[1]*vars_S[2]
