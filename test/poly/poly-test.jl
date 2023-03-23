@@ -453,34 +453,6 @@ end
    @test g == (9*x^4+12*x^3+10*x^2+4*x+1)*y^2+(12*x^3+26*x^2+16*x+6)*y+(4*x^2+12*x+9)
 end
 
-@testset "poly.convert_MPoly_to_SingularPoly" begin
-   for num_vars = 2:10
-      var_names = ["x$j" for j in 1:num_vars]
-      ord = AbstractAlgebra.rand_ordering()
-
-      R, vars_R = AbstractAlgebra.Generic.polynomial_ring(Nemo.ZZ, var_names; ordering=ord)
-      Rsing, vars_Rsing = Singular.AsEquivalentSingularPolynomialRing(R)
-      for iter in 1:10
-         f = AbstractAlgebra.Generic.rand(R, 5:10, 1:10, -100:100)
-         g = AbstractAlgebra.Generic.rand(R, 5:10, 1:10, -100:100)
-         @test Rsing(f * g) == Rsing(f) * Rsing(g)
-         @test Rsing(f + g) == Rsing(f) + Rsing(g)
-         @test Rsing(f - g) == Rsing(f) - Rsing(g)
-         @test R(Rsing(f)) == f
-      end
-
-      S, vars_S = Singular.polynomial_ring(Nemo.ZZ, var_names; ordering=ord)
-      SAA, vars_SAA = Singular.AsEquivalentAbstractAlgebraPolynomialRing(S)
-      # FIXME: Better generate random polynomials
-      f = 1 + vars_S[1]*vars_S[2]
-      g = vars_S[1]^2 + vars_S[2]^3
-      @test SAA(f * g) == SAA(f) * SAA(g)
-      @test SAA(f + g) == SAA(f) + SAA(g)
-      @test SAA(f - g) == SAA(f) - SAA(g)
-      @test S(SAA(f)) == f
-   end
-end
-
 @testset "poly.convert_Nemo.MPoly_to_Singular.spoly" begin
    R, (x, y, z) = Nemo.polynomial_ring(Nemo.QQ, ["x", "y", "z"])
    S, (a, b, c) = polynomial_ring(QQ, ["a", "b", "c"])

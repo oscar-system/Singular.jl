@@ -409,38 +409,3 @@ p = x^5 + y^3+1
 
 change_base_ring(CoefficientRing(Nemo.QQ), p)
 ```
-
-### Conversion between Singular.jl polynomials and MPoly polynomials
-
-There are conversion functions between the polynomial ring implementation
-from Singular.jl and the generic MPoly implementation from AbstractAlgebra.jl.
-
-```@docs
-AsEquivalentSingularPolynomialRing(R::AbstractAlgebra.Generic.MPolyRing{T}; cached::Bool = true,
-      ordering::Symbol = :degrevlex, ordering2::Symbol = :comp1min,
-      degree_bound::Int = 0)  where {T <: RingElem}
-```
-
-```@docs
-AsEquivalentAbstractAlgebraPolynomialRing(R::Singular.PolyRing{T}; ordering::Symbol = :degrevlex) where T <: Singular.n_unknown
-```
-
-**Examples**
-
-Conversion of generic AbstractAlgebra polynomials to Singular.jl polynomials:
-
-```julia
-K = Nemo.ZZ
-R, (x, y) = AbstractAlgebra.Generic.polynomial_ring(K, ["x", "y"]);
-Rsing, vars_Rsing = Singular.AsEquivalentSingularPolynomialRing(R);
-Rsing(x + y) == Rsing(x) + Rsing(y)
-```
-
-Conversion of Singular.jl polynomials to generic AbstractAlgebra polynomials:
-
-```julia
-K = Nemo.ZZ
-S, (u, v) = Singular.polynomial_ring(K, ["u", "v"])
-Saa, (uu, vv) = Singular.AsEquivalentAbstractAlgebraPolynomialRing(S)
-Saa(u) + Saa(v) == Saa(u) + Saa(v)
-```
