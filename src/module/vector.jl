@@ -18,14 +18,14 @@ elem_type(::Type{FreeMod{T}}) where {T <: Nemo.RingElem} = svector{T}
 
 parent_type(::Type{svector{T}}) where {T <: Nemo.RingElem} = FreeMod{T}
 
-@doc Markdown.doc"""
+@doc raw"""
     rank(M::FreeMod)
 
 Return the rank of the given free module.
 """
 rank(M::FreeMod) = M.rank
 
-@doc Markdown.doc"""
+@doc raw"""
     gens{T <: AbstractAlgebra.RingElem}(M::FreeMod{T})
 
 Return a Julia array whose entries are the generators of the given free module.
@@ -164,7 +164,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     lead(a::svector{T}) where T <: Nemo.RingElem
 
 Return the initial terms of $a$.
@@ -290,7 +290,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     jet(x::svector{spoly{T}}, n::Int)
 
 Given a vector $x$ this function truncates each entry of $x$ up to degree $n$.

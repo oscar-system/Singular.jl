@@ -57,7 +57,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     compose(f::AbstractAlgebra.Map(Singular.SAlgHom),
                          g::AbstractAlgebra.Map(Singular.SAlgHom))
 
@@ -94,7 +94,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     preimage(f::AbstractAlgebra.Map(SAlgHom), I::sideal)
 
 Returns the preimage of the ideal $I$ under the algebra homomorphism $f$.
@@ -115,7 +115,7 @@ function preimage(f::Map(SAlgHom), I::sideal)
                         f.ptr, I.ptr, f.domain.ptr))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     kernel(f::AbstractAlgebra.Map(SAlgHom))
 
 Returns the kernel of the algebra homomorphism $f$.
@@ -130,7 +130,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     AlgebraHomomorphism(D::PolyRing, C::PolyRing, V::Vector)
 
 Constructs an algebra homomorphism $f: D \to C$, where the $i$-th variable of

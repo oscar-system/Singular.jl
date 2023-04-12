@@ -6,7 +6,7 @@
 
 export with_degBound, with_multBound
 
-@doc Markdown.doc"""
+@doc raw"""
     with_degBound(f, degb::Integer)
 
 Evaluate and return `f()` with the Singular global setting `degBound = degb`. The
@@ -25,7 +25,7 @@ function with_degBound(f, degb::Integer)
    return g
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     with_multBound(f, mu::Integer)
 
 Evaluate and return `f()` with the Singular global setting `multBound = mu`. The

@@ -60,7 +60,7 @@ elem_type(::Type{LPRing{T}}) where T <: Nemo.RingElem = slpalg{T}
 
 parent_type(::Type{slpalg{T}}) where T <: Nemo.RingElem = LPRing{T}
 
-@doc Markdown.doc"""
+@doc raw"""
     degree_bound(R::LPRing)
 
 Return the maximum length of a monomial word as requested by the user via the

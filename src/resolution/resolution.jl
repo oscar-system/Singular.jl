@@ -41,7 +41,7 @@ function getindex(r::sresolution, i::Int)
    end
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     length(r::sresolution)
 
 Return the length of the resolution. This is what is mathematically meant by the
@@ -71,7 +71,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     betti(r::sresolution)
 
 Return the Betti numbers, i.e. the ranks of the free modules in the given
@@ -97,7 +97,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     minres{T <: Nemo.FieldElem}(r::sresolution{spoly{T}})
 
 Return a minimal free resolution, given any free resolution. In the graded
@@ -169,7 +169,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     Resolution(C::Vector{smodule{T}}) where T <: AbstractAlgebra.RingElem
 
 Create a new resolution whose maps are given by the elements of an array C of

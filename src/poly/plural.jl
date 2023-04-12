@@ -14,7 +14,7 @@ elem_type(::Type{PluralRing{T}}) where T <: Nemo.RingElem = spluralg{T}
 
 parent_type(::Type{spluralg{T}}) where T <: Nemo.RingElem = PluralRing{T}
 
-@doc Markdown.doc"""
+@doc raw"""
     degree_bound(R::PluralRing)
 
 Return the internal degree bound in each variable, enforced by Singular. This is the

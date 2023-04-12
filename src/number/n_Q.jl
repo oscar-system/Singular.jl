@@ -54,7 +54,7 @@ end
 
 is_unit(n::n_Q) = !iszero(n)
 
-@doc Markdown.doc"""
+@doc raw"""
     numerator(x::n_Q)
 
 Return in `ZZ` the numerator of $x$.
@@ -71,7 +71,7 @@ function numerator(x::n_Q)
    end
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     denominator(x::n_Q)
 
 Return in `ZZ` the denominator of $x$.
@@ -270,7 +270,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     reconstruct(x::n_Z, y::n_Z)
 
 Given $x$ modulo $y$, find $r/s$ such that $x \equiv r/s \pmod{y}$ for values

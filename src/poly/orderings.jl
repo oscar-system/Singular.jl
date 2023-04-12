@@ -90,7 +90,7 @@ function _local_weighted_ordering(t::libSingular.rRingOrder_t, v::Vector{Int})
    return sordering([sorder_block(t, len, v)])
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     ordering_lp(nvars::Int = 1)
 
 Represents a block of at least `nvars` variables with the
@@ -98,7 +98,7 @@ lexicographical ordering (:lex).
 """
 ordering_lp(nvars::Int = 1) = _basic_ordering(Singular.ringorder_lp, nvars)
 
-@doc Markdown.doc"""
+@doc raw"""
     ordering_rp(nvars::Int = 1)
 
 Represents a block of at least `nvars` variables with the
@@ -106,7 +106,7 @@ reverse lexicographical ordering (:revlex).
 """
 ordering_rp(nvars::Int = 1) = _basic_ordering(Singular.ringorder_rp, nvars)
 
-@doc Markdown.doc"""
+@doc raw"""
     ordering_dp(nvars::Int = 1)
 
 Represents a block of at least `nvars` variables with the
@@ -114,7 +114,7 @@ degree reverse lexicographical ordering (:degrevlex).
 """
 ordering_dp(nvars::Int = 1) = _basic_ordering(Singular.ringorder_dp, nvars)
 
-@doc Markdown.doc"""
+@doc raw"""
     ordering_Dp(nvars::Int = 1)
 
 Represents a block of at least `nvars` variables with the
@@ -122,7 +122,7 @@ degree lexicographical ordering (:deglex).
 """
 ordering_Dp(nvars::Int = 1) = _basic_ordering(Singular.ringorder_Dp, nvars)
 
-@doc Markdown.doc"""
+@doc raw"""
     ordering_wp(w::Vector{Int})
 
 Represents a block of variables with the
@@ -131,7 +131,7 @@ The weight vector `w` is expected to consist of positive integers only.
 """
 ordering_wp(w::Vector{Int}) = _global_weighted_ordering(Singular.ringorder_wp, w)
 
-@doc Markdown.doc"""
+@doc raw"""
     ordering_Wp(w::Vector{Int})
 
 Represents a block of variables with the
@@ -140,7 +140,7 @@ The weight vector is expected to consist of positive integers only.
 """
 ordering_Wp(w::Vector{Int}) = _global_weighted_ordering(Singular.ringorder_Wp, w)
 
-@doc Markdown.doc"""
+@doc raw"""
     ordering_ls(nvars::Int = 1)
 
 Represents a block of at least `nvars` variables with the
@@ -148,7 +148,7 @@ negative lexicographical ordering (:neglex).
 """
 ordering_ls(nvars::Int = 1) = _basic_ordering(Singular.ringorder_ls, nvars)
 
-@doc Markdown.doc"""
+@doc raw"""
     ordering_rs(nvars::Int = 1)
 
 Represents a block of at least `nvars` variables with the
@@ -156,7 +156,7 @@ negative reverse lexicographical ordering (:negrevlex).
 """
 ordering_rs(nvars::Int = 1) = _basic_ordering(Singular.ringorder_rs, nvars)
 
-@doc Markdown.doc"""
+@doc raw"""
     ordering_ds(nvars::Int = 1)
 
 Represents a block of at least `nvars` variables with the
@@ -164,7 +164,7 @@ negative degree reverse lexicographical ordering (:negdegrevlex).
 """
 ordering_ds(nvars::Int = 1) = _basic_ordering(Singular.ringorder_ds, nvars)
 
-@doc Markdown.doc"""
+@doc raw"""
     ordering_Ds(nvars::Int = 1)
 
 Represents a block of at least `nvars` variables with the
@@ -172,7 +172,7 @@ negative degree reverse lexicographical ordering (:negdeglex).
 """
 ordering_Ds(nvars::Int = 1) = _basic_ordering(Singular.ringorder_Ds, nvars)
 
-@doc Markdown.doc"""
+@doc raw"""
     ordering_ws(w::Vector{Int})
 
 Represents a block of variables with the
@@ -181,7 +181,7 @@ The weight vector `w` is expected to have a nonzero first entry.
 """
 ordering_ws(w::Vector{Int}) = _local_weighted_ordering(Singular.ringorder_ws, w)
 
-@doc Markdown.doc"""
+@doc raw"""
     ordering_Ws(w::Vector{Int})
 
 Represents a block of variables with the
@@ -190,7 +190,7 @@ The weight vector `w` is expected to have a nonzero first entry.
 """
 ordering_Ws(w::Vector{Int}) = _local_weighted_ordering(Singular.ringorder_Ws, w)
 
-@doc Markdown.doc"""
+@doc raw"""
     ordering_a(w::Vector{Int})
 
 Represents an extra weight vector that may precede any monomial ordering.
@@ -200,7 +200,7 @@ weights into the ordering matrix.
 """
 ordering_a(w::Vector{Int}) = sordering([sorder_block(ringorder_a, 0, w)])
 
-@doc Markdown.doc"""
+@doc raw"""
     ordering_M(m::Matrix{Int}; checked::Bool = true)
 
 Represents a block of variables with a general matrix ordering.
@@ -220,7 +220,7 @@ end
 
 # C, c, and S can take a dummy int in singular, but they do nothing with it?
 
-@doc Markdown.doc"""
+@doc raw"""
     ordering_C()
 
 Represents an ascending ordering on vector components `gen(1) < gen(2) < ...`.
@@ -231,7 +231,7 @@ automatically to an ordering lacking a component specification.
 """
 ordering_C(dummy::Int = 0) = _basic_ordering(Singular.ringorder_C, 0)
 
-@doc Markdown.doc"""
+@doc raw"""
     ordering_c()
 
 Represents a descending ordering on vector components `gen(1) > gen(2) > ...`.
@@ -243,7 +243,7 @@ ordering_c(dummy::Int = 0) = _basic_ordering(Singular.ringorder_c, 0)
 ordering_S(dummy::Int = 0) = _basic_ordering(Singular.ringorder_S, 0)
 ordering_s(syz_comp::Int = 0) = sordering([sorder_block(Singular.ringorder_s, syz_comp, Int[])])
 
-@doc Markdown.doc"""
+@doc raw"""
     *(a::sordering, b::sordering)
 
 Return the concatenation two orderings. Some simplification may take place,
@@ -263,7 +263,7 @@ function _ispure_block(a::sordering)
    end
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     ordering_size(a::sordering)
 
 Return the size of the block of the ordering `a`, which must be a pure block.
@@ -273,7 +273,7 @@ function ordering_size(a::sordering)
    return a.data[1].size
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     ordering_weights(a::sordering)
 
 Return the weights of the ordering `a`, which must be a pure block.
@@ -289,7 +289,7 @@ end
 
 is_ordering_symbolic(a::sordering) = is_ordering_symbolic_with_symbol(a)[1]
 
-@doc Markdown.doc"""
+@doc raw"""
     ordering_as_symbol(a::sordering)
 
 If the ordering `a` is a pure block, return a symbol representing its type.
