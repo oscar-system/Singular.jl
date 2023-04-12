@@ -17,14 +17,14 @@ base_ring(a::n_transExt) = base_ring(parent(a))
 
 base_ring(a::N_FField) = a.base_ring
 
-@doc Markdown.doc"""
+@doc raw"""
     transcendence_degree(F::N_FField)
 
 Return the transcendence degree of the given function field.
 """
 transcendence_degree(F::N_FField) = Int(libSingular.rPar(F.ptr))
 
-@doc Markdown.doc"""
+@doc raw"""
     basis(F::N_FField)
 
 Return the transcendence basis of the given function field.
@@ -70,7 +70,7 @@ one(R::N_FField) = R(1)
 
 zero(R::N_FField) = R(0)
 
-@doc Markdown.doc"""
+@doc raw"""
     numerator(x::n_transExt)
 
 Return the numerator of $x$.
@@ -85,7 +85,7 @@ function numerator(x::n_transExt)
    end
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     denominator(x::n_transExt)
 
 Return the denominator of $x$.
@@ -118,7 +118,7 @@ function _tExt_to_poly(R::N_FField, cached)
    return P
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     n_transExt_to_spoly(x::n_transExt; parent::PolyRing)
 
 Returns the numerator of `x` as a polynomial in a polynomial ring with at least
@@ -371,7 +371,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     FunctionField(F::Singular.Field, S::Vector{String})
     FunctionField(F::Singular.Field, S::Vector{Symbol})
 
@@ -386,7 +386,7 @@ function FunctionField(F::Singular.Field, S::Union{Vector{String},Vector{Symbol}
    return tuple(R, transcendence_basis(R))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     FunctionField(F::Singular.Field, n::Int)
 
 Returns a tuple $K, a$ consisting of a function field $K$ over the field $F$

@@ -390,7 +390,7 @@ function low_level_caller(lib::String, name::String, args...)
     return convert_return(return_value, rng)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     lookup_library_symbol(package::String, name::String)
 
 Attempt to look up a symbol in a particular Singular interpreter package and

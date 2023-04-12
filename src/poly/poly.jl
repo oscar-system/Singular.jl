@@ -37,7 +37,7 @@ elem_type(::Type{PolyRing{T}}) where T <: Nemo.RingElem = spoly{T}
 
 parent_type(::Type{spoly{T}}) where T <: Nemo.RingElem = PolyRing{T}
 
-@doc Markdown.doc"""
+@doc raw"""
     has_global_ordering(R::PolyRingUnion)
 
 Return `true` if the given ring has a global ordering, i.e. if $1 < x$ for
@@ -48,7 +48,7 @@ function has_global_ordering(R::PolyRingUnion)
    GC.@preserve R return Bool(libSingular.rHasGlobalOrdering(R.ptr))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     has_mixed_ordering(R::PolyRingUnion)
 
 Return `true` if the given ring has a mixed ordering, i.e. if $1 < x_i$ for
@@ -58,7 +58,7 @@ function has_mixed_ordering(R::PolyRingUnion)
    GC.@preserve R return Bool(libSingular.rHasMixedOrdering(R.ptr))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     has_local_ordering(R::PolyRingUnion)
 
 Return `true` if the given ring has a local ordering, i.e. if $1 > x$ for
@@ -105,21 +105,21 @@ function ordering(R::PolyRingUnion)
    return R.ord
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_ordering_symbolic(R::PolyRing)
 
 Return `true` if the ordering of `R` can be represented as a symbol.
 """
 is_ordering_symbolic(R::PolyRing) = is_ordering_symbolic(R.ord)
 
-@doc Markdown.doc"""
+@doc raw"""
     ordering_as_symbol(R::PolyRing)
 
 Assuming the ordering of `R` can be represented as a symbol, return that symbol.
 """
 ordering_as_symbol(R::PolyRing) = ordering_as_symbol(R.ord)
 
-@doc Markdown.doc"""
+@doc raw"""
     degree_bound(R::PolyRing)
 
 Return the internal degree bound in each variable, enforced by Singular. This is the
@@ -219,7 +219,7 @@ end
 
 length(p::SPolyUnion) = Int(libSingular.pLength(p.ptr))
 
-@doc Markdown.doc"""
+@doc raw"""
     total_degree(p::spoly)
 
 Return the total degree (largest sum of exponents of any monomial) of $p$.
@@ -229,7 +229,7 @@ function total_degree(p::spoly)
    GC.@preserve p R return libSingular.pLDeg(p.ptr, R.ptr)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     order(p::spoly)
 
 Returns the order of $p$.
@@ -943,7 +943,7 @@ function lcm(x::spoly{T}, y::spoly{T}) where T <: Nemo.RingElem
    return divexact(x*y, gcd(x, y))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     primpart(x::SPolyUnion)
 
 Return the primitive part of the polynomial, i.e. the polynomial divided by the GCD
@@ -956,7 +956,7 @@ function primpart(x::SPolyUnion)
    return p
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     content(x::SPolyUnion)
 
 Return the content of the polynomial, i.e. the GCD of its coefficients.
@@ -1112,7 +1112,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     substitute_variable(p::SPolyUnion,i::Int64,q::spoly)
 
 Substitutes the `i`-th variable of the polynomial `p` with the polynomial `q`.
@@ -1124,7 +1124,7 @@ function substitute_variable(p::SPolyUnion, i::Int64, q::SPolyUnion)
     GC.@preserve p q R return R(libSingular.p_Subst(p.ptr,i, q.ptr, R.ptr))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     permute_variables(p::SPolyUnion, perm::Vector{Int64}, new_ring::PolyRing)
 
 Permutes the indeterminates of `p` according to `perm` to the indeterminates
@@ -1146,7 +1146,7 @@ function permute_variables(p::SPolyUnion, perm::Vector{Int64}, new_ring::PolyRin
    end
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     homogenize(p::spoly{T}, v::spoly{T}) where T <: Nemo.RingElem
 
 Multiply each monomial in p by a suitable power of the
@@ -1171,7 +1171,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     (R::PolyRing){T <: RingElem}(p::AbstractAlgebra.Generic.MPoly{T})
 
 Return a Singular polynomial in $R$ with the same coefficients and exponents as $p$.
@@ -1186,7 +1186,7 @@ function (R::PolyRing)(p::AbstractAlgebra.Generic.MPoly{T}) where T <: Nemo.Ring
    return finish(B)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     (R::AbstractAlgebra.Generic.MPolyRing{T}) where T <: Nemo.RingElem
 
 Return an AbstractAlgebra polynomial in the ring $R$ with the same
@@ -1243,7 +1243,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     jet(x::spoly{T}, n::Int) where T <: Nemo.RingElem
 
 Return the truncation of $x$ up to degree $n$.
@@ -1253,7 +1253,7 @@ function jet(x::spoly{T}, n::Int) where T <: Nemo.RingElem
    GC.@preserve x R return R(libSingular.p_Jet(x.ptr, Cint(n), R.ptr))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     derivative(x::spoly{T}, n::Int) where T <: Nemo.RingElem
 
 Return the derivative of $x$ with respect to the variable of index $n$.
@@ -1264,7 +1264,7 @@ function derivative(x::spoly{T}, n::Int) where T <: Nemo.RingElem
    GC.@preserve x R return R(libSingular.p_Diff(x.ptr, Cint(n), R.ptr))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     derivative(x::spoly{T}, v::spoly{T}) where T <: Nemo.RingElem
 
 Return the derivative of $x$ with respect to the variable $v$.
@@ -1275,7 +1275,7 @@ function derivative(x::spoly{T}, v::spoly{T}) where T <: Nemo.RingElem
    return derivative(x, var_index(v))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     jacobian_ideal(p::spoly{T}) where T <: Nemo.RingElem
 
 Returns the ideal generated by all partial derivatives of $x$.
@@ -1286,7 +1286,7 @@ function jacobian_ideal(p::spoly{T}) where T <: Nemo.RingElem
    return Ideal(R, spoly{T}[derivative(p, i) for i in 1:n])
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     jacobian_matrix(p::spoly{T}) where T <: Nemo.RingElem
 
 Returns the column matrix $\{\frac{\partial p}{\partial x_i}\}_i$ of partial derivatives.
@@ -1301,7 +1301,7 @@ function jacobian_matrix(p::spoly{T}) where T <: Nemo.RingElem
    return J
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     jacobian_matrix(a::Vector{spoly{T}}) where T <: Nemo.RingElem
 
 Returns the matrix $\{\frac{\partial a_i}{\partial x_j}\}_{ij}$ of partial derivatives.

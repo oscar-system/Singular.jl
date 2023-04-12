@@ -27,7 +27,7 @@ function singular_symbols(R::N_GField)
    GC.@preserve R return [Symbol(libSingular.n_ParameterName(0, R.ptr))]
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     degree(R::N_GField)
 
 Return the degree of the field as an extension of $\mathbb{F}_p$.
@@ -331,7 +331,7 @@ promote_rule(C::Type{n_GF}, ::Type{n_Z}) = n_GF
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     FiniteField(p::Int, n::Int, S::String; cached=true)
 
 Returns a tuple `K, a` consisting of a finite field `K` of characteristic $p$

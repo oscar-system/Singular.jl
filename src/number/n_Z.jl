@@ -49,7 +49,7 @@ end
 
 is_unit(n::n_Z) = n == 1 || n == -1
 
-@doc Markdown.doc"""
+@doc raw"""
     numerator(n::n_Z)
 
 Return the numerator of $n$ (which is $n$ itself).
@@ -60,7 +60,7 @@ function numerator(n::n_Z)
    return c(ptr)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     denominator(n::n_Z)
 
 Return the denominator of $n$ (which will always be $1$).

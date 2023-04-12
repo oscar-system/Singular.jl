@@ -1,6 +1,6 @@
 export is_quotient_ring, QuotientRing, quotient_ideal
 
-@doc Markdown.doc"""
+@doc raw"""
     is_quotient_ring(R::PolyRingUnion)
 
 Return `true` if the given ring is the quotient of a polynomial ring with
@@ -10,7 +10,7 @@ function is_quotient_ring(R::PolyRingUnion)
    GC.@preserve R return Bool(Singular.libSingular.rIsQuotientRing(R.ptr))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     quotient_ideal(Q::PolyRing{T}) where T <: Nemo.RingElem
 
 Return `I` for a given quotient ring `Q = R/I`.

@@ -16,7 +16,7 @@ base_ring(a::n_algExt) = base_ring(parent(a))
 
 base_ring(a::N_AlgExtField) = base_ring(a.minpoly)
 
-@doc Markdown.doc"""
+@doc raw"""
     gen(F::N_AlgExtField)
 
 Return the generator the given algebraic extension.
@@ -361,7 +361,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     AlgebraicExtensionField(F::Singular.N_FField, a::n_transExt)
 
 Given a function field F = R(x) in one variable and a defining polynomial a
