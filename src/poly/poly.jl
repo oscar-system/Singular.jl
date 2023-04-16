@@ -1564,21 +1564,24 @@ function get_fancy_ordering(ordering, ordering2)
    return fancy_ordering::sordering
 end
 
-function _PolynomialRing(R, s::Union{Vector{String},Vector{Symbol}}, ordering, ordering2, cached, degree_bound)
-   s = map(Symbol, s)
+function _PolynomialRing(R, s::AbstractVector{<:VarName}, ordering, ordering2, cached, degree_bound)
+   return _PolynomialRing(R, map(Symbol, s), ordering, ordering2, cached, degree_bound)
+end
+
+function _PolynomialRing(R, s::Vector{Symbol}, ordering, ordering2, cached, degree_bound)
    sord = get_fancy_ordering(ordering, ordering2)
    z = PolyRing{elem_type(R)}(R, s, sord, cached, degree_bound)
    return (z, gens(z))
 end
 
 # keyword arguments do not participate in dispatch
-function polynomial_ring(R::Union{Ring, Field}, s::Union{Vector{String},Vector{Symbol}};
+function polynomial_ring(R::Union{Ring, Field}, s::AbstractVector{<:VarName};
                         ordering = :degrevlex, ordering2::Symbol = :comp1min,
                         cached::Bool = true, degree_bound::Int = 0)
    return _PolynomialRing(R, s, ordering, ordering2, cached, degree_bound)
 end
 
-function polynomial_ring(R::Nemo.Ring, s::Union{Vector{String},Vector{Symbol}};
+function polynomial_ring(R::Nemo.Ring, s::AbstractVector{<:VarName};
                         ordering = :degrevlex, ordering2::Symbol = :comp1min,
                         cached::Bool = true, degree_bound::Int = 0)
    R = CoefficientRing(R)

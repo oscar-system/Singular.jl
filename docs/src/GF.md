@@ -34,7 +34,7 @@ already listed at the given link.
 The following constructors are available to create finite fields and their elements.
 
 ```@docs
-Singular.FiniteField(::Int, ::Int, ::String; ::Bool)
+Singular.FiniteField(::Int, ::Int, ::VarName; ::Bool)
 ```
 
 Given a finite field $R$, we also have the following coercions in addition to the

@@ -372,17 +372,16 @@ end
 ###############################################################################
 
 @doc raw"""
-    FunctionField(F::Singular.Field, S::Vector{String})
-    FunctionField(F::Singular.Field, S::Vector{Symbol})
+    FunctionField(F::Singular.Field, S::AbstractVector{<:VarName})
 
 Returns a tuple $K, a$ consisting of a function field $K$ over the field $F$
 with transcendence basis stored in the array $S$.
 """
-function FunctionField(F::Singular.Field, S::Union{Vector{String},Vector{Symbol}}; cached::Bool=true)
+function FunctionField(F::Singular.Field, S::AbstractVector{<:VarName}; cached::Bool=true)
    isa(F, Rationals) || isa(F, N_ZpField) ||
              error("Only transcendental extensions of Q and Fp are supported.")
    isempty(S) && throw(ArgumentError("array must be non-empty"))
-   R = N_FField(F, map(Symbol, S), cached)
+   R = N_FField(F, S, cached)
    return tuple(R, transcendence_basis(R))
 end
 
@@ -393,6 +392,6 @@ Returns a tuple $K, a$ consisting of a function field $K$ over the field $F$
 with transcendence degree $n$ and transcendence basis $a1, ..., an$.
 """
 function FunctionField(F::Singular.Field, n::Int; cached::Bool=true)
-   S = ["a$i" for i in 1:n]
+   S = [Symbol(:a, i) for i in 1:n]
    return FunctionField(F, S, cached = cached)
 end

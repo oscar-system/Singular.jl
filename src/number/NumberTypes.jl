@@ -314,6 +314,10 @@ mutable struct N_FField <: Field
    end
 end
 
+function N_FField(F::Field, S::AbstractVector{<:VarName}, cached::Bool = true)
+   N_FField(F, map(Symbol, S), cached)
+end
+
 mutable struct n_transExt <: Nemo.FieldElem
    ptr::libSingular.number_ptr
    parent::N_FField

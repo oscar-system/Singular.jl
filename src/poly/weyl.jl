@@ -3,8 +3,10 @@ export WeylAlgebra
 const WeylAlgebraID = Dict{Tuple{Union{Ring, Field}, Vector{Symbol},
                                   Vector{Cint}, Int}, AbstractAlgebra.NCRing}()
 
-function _WeylAlgebra(R, s::Union{Vector{String},Vector{Symbol}}, ordering, ordering2, cached, degree_bound)
-   s = map(Symbol, s)
+function _WeylAlgebra(R, s::AbstractVector{<:VarName}, ordering, ordering2, cached, degree_bound)
+   return _WeylAlgebra(R, map(Symbol, s), ordering, ordering2, cached, degree_bound)
+end
+function _WeylAlgebra(R, s::Vector{Symbol}, ordering, ordering2, cached, degree_bound)
    bitmask = Culong(degree_bound)
    nvars = length(s)
    nvars > 0 && iseven(nvars) || error("need an even number of indeterminates")
@@ -28,34 +30,36 @@ function _WeylAlgebra(R, s::Union{Vector{String},Vector{Symbol}}, ordering, orde
    return (z, gens(z))
 end
 
-function WeylAlgebra(R::Union{Ring, Field}, s::Union{Vector{String}, Vector{Symbol}};
+function WeylAlgebra(R::Union{Ring, Field}, s::AbstractVector{<:VarName};
                      ordering = :degrevlex, ordering2::Symbol = :comp1min,
                      cached::Bool = true, degree_bound::Int = 0)
    s = vcat(map(Symbol, s), [Symbol('d', sym) for sym in s])
    return _WeylAlgebra(R, s, ordering, ordering2, cached, degree_bound)
 end
 
-function WeylAlgebra(R::Union{Ring, Field}, s::Union{Matrix{String}, Matrix{Symbol}};
+function WeylAlgebra(R::Union{Ring, Field}, s::AbstractMatrix{<:VarName};
                      ordering = :degrevlex, ordering2::Symbol = :comp1min,
                      cached::Bool = true, degree_bound::Int = 0)
+   size(s)[1] == 2 || throw(ArgumentError("s must be either a vector or a matrix with two rows"))
    s = vcat(view(s, 1, :), view(s, 2, :))
-   return _WeylAlgebra(R, s, ordering, ordering2, cached, degree_bound)
+   return _WeylAlgebra(R, map(Symbol, s), ordering, ordering2, cached, degree_bound)
 end
 
-function WeylAlgebra(R::Nemo.Ring, s::Union{Vector{String}, Vector{Symbol}};
+function WeylAlgebra(R::Nemo.Ring, s::AbstractVector{<:VarName};
                      ordering = :degrevlex, ordering2::Symbol = :comp1min,
                      cached::Bool = true, degree_bound::Int = 0)
-   RR = CoefficientRing(R)
    s = vcat(map(Symbol, s), [Symbol('d', sym) for sym in s])
-   return _WeylAlgebra(RR, s, ordering, ordering2, cached, degree_bound)
+   RR = CoefficientRing(R)
+   return _WeylAlgebra(RR, map(Symbol, s), ordering, ordering2, cached, degree_bound)
 end
 
-function WeylAlgebra(R::Nemo.Ring, s2::Union{Matrix{String}, Matrix{Symbol}};
+function WeylAlgebra(R::Nemo.Ring, s::AbstractMatrix{<:VarName};
                      ordering = :degrevlex, ordering2::Symbol = :comp1min,
                      cached::Bool = true, degree_bound::Int = 0)
-   RR = CoefficientRing(R)
+   size(s)[1] == 2 || throw(ArgumentError("s must be either a vector or a matrix with two rows"))
    s = vcat(view(s, 1, :), view(s, 2, :))
-   return _WeylAlgebra(RR, s, ordering, ordering2, cached, degree_bound)
+   RR = CoefficientRing(R)
+   return _WeylAlgebra(RR, map(Symbol, s), ordering, ordering2, cached, degree_bound)
 end
 
 macro WeylAlgebra(R, s, n, o)
