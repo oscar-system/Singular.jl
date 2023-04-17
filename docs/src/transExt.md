@@ -34,8 +34,7 @@ already listed at the given link.
 The following constructors are available to create function fields and their elements.
 
 ```@docs
-Singular.FunctionField(::Field, ::Vector{String}; cached::Bool = true)
-Singular.FunctionField(::Field, ::Vector{Symbol}; cached::Bool = true)
+Singular.FunctionField(::Field, ::AbstractVector{<:VarName}; cached::Bool = true)
 ```
 
 In case the user does not want to specify a transcendence basis the following

@@ -332,7 +332,7 @@ promote_rule(C::Type{n_GF}, ::Type{n_Z}) = n_GF
 ###############################################################################
 
 @doc raw"""
-    FiniteField(p::Int, n::Int, S::String; cached=true)
+    FiniteField(p::Int, n::Int, S::VarName; cached=true)
 
 Returns a tuple `K, a` consisting of a finite field `K` of characteristic $p$
 and degree $n$, and its generator `a`. The string used to print the
@@ -342,7 +342,7 @@ fields are cached globally, so that there is only one finite field in the
 system with given characteristic, degree and string. If this is not the
 desired behaviour, one can pass `false` for the optional `cached` parameter.
 """
-function FiniteField(p::Int, n::Int, S::String; cached=true)
+function FiniteField(p::Int, n::Int, S::VarName; cached=true)
    p >= 2^8 && throw(DomainError(p, "p must be < 256"))
    !Nemo.isprime(Nemo.ZZRingElem(p)) && throw(DomainError(p, "p must be prime"))
    (n*log(p) >= 20*log(2) || p^n >= 2^16) &&

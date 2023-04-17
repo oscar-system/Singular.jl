@@ -31,7 +31,7 @@ IdentityAlgebraHomomorphism(D::PolyRing)
 **Examples**
 
 ```julia
-L = FiniteField(3, 2, String("a"))
+L = FiniteField(3, 2, "a")
 
 R, (x, y, z, w) = polynomial_ring(L[1], ["x", "y", "z", "w"];
                              ordering=:negdegrevlex)
