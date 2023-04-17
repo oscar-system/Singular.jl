@@ -1,5 +1,8 @@
 ```@meta
 CurrentModule = Singular
+DocTestSetup = quote
+  using Singular
+end
 ```
 
 # Interpreter Functionality
@@ -40,7 +43,7 @@ specifying the base ring in the first argument.
 
 This example illustrates passing Singular lists and providing the base ring.
 
-```julia
+```jldoctest
 julia> r0, (x, y, z, t) = polynomial_ring(QQ, ["x", "y", "z", "t"], ordering=ordering_lp());
 
 julia> Singular.LibGeneral.sort([x, y])
@@ -54,7 +57,7 @@ julia> Singular.LibGeneral.sort(r0, Any[x, y])
 
 This example illustrates the base ring inference:
 
-```julia
+```jldoctest
 julia> AA, (x, y, z, t) = polynomial_ring(QQ, ["x", "y", "z", "t"]);
 
 julia> D = zero_matrix(AA, 4, 4);
@@ -104,7 +107,7 @@ fastHC, infRedTail, lazy, length, notBuckets, prot, qringNF, redTail, redThrough
 
 **Examples**
 
-```julia
+```jldoctest
 julia> r, (x,y,z) = polynomial_ring(QQ, ["x", "y", "z"], ordering=ordering_ds());
 
 julia> i = Ideal(r, [x^7+y^7+z^6,x^6+y^8+z^7,x^7+y^5+z^8,x^2*y^3+y^2*z^3+x^3*z^2,x^3*y^2+y^3*z^2+x^2*z^3]);
@@ -147,7 +150,7 @@ julia> R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 (Singular Polynomial Ring (QQ),(x,y),(dp(2),C), spoly{n_Q}[x, y])
 
 julia> with_prot(true) do; return std(Ideal(R, x^5 - y*x + 1, y^6*x + x^2 + y^3)); end
-[65535:2]5s7s11s1214-s15
+[4294967295:2]5s7s11s1214-s15
 product criterion:1 chain criterion:1
 Singular ideal over Singular Polynomial Ring (QQ),(x,y),(dp(2),C) with generators (x^5 - x*y + 1, x*y^6 + y^3 + x^2, x^4*y^3 - y^6 - y^4 - x, y^9 + y^7 + x^3*y^3 + x*y^3 + x*y - 1)
 ```

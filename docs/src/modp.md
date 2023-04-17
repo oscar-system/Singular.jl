@@ -1,5 +1,8 @@
 ```@meta
 CurrentModule = Singular
+DocTestSetup = quote
+  using Singular
+end
 ```
 
 # Integers mod p
@@ -60,12 +63,18 @@ Coerce a Singular or Flint integer value into the field.
 
 **Examples**
 
-```julia
-R = Fp(23)
-a = R(5)
+```jldoctest
+julia> R = Fp(23)
+Finite Field of Characteristic 23
 
-is_unit(a)
-c = characteristic(R)
+julia> a = R(5)
+5
+
+julia> is_unit(a)
+true
+
+julia> c = characteristic(R)
+23
 ```
 
 ### Conversions
@@ -79,10 +88,14 @@ $[0, p)$.
 
 **Examples**
 
-```
-R = Fp(23)
-a = R(5)
+```jldoctest
+julia> R = Fp(23)
+Finite Field of Characteristic 23
 
-b = Int(a)
+julia> a = R(5)
+5
+
+julia> b = Int(a)
+5
 ```
 

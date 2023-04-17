@@ -1,5 +1,8 @@
 ```@meta
 CurrentModule = Singular
+DocTestSetup = quote
+  using Singular
+end
 ```
 
 # Integers
@@ -60,13 +63,21 @@ numerator(::n_Z)
 
 **Examples**
 
-```
-a = ZZ(-12)
+```jldoctest
+julia> a = ZZ(-12)
+-12
 
-is_unit(a)
-n = numerator(a)
-d = denominator(a)
-c = abs(a)
+julia> is_unit(a)
+false
+
+julia> n = numerator(a)
+-12
+
+julia> d = denominator(a)
+1
+
+julia> c = abs(a)
+12
 ```
 
 ### Euclidean division
@@ -87,13 +98,21 @@ Function                    | Return | Rounding
 
 **Examples**
 
-```julia
-a = ZZ(-12)
-b = ZZ(5)
+```jldoctest
+julia> a = ZZ(-12)
+-12
 
-q, r = divrem(a, b)
-r = mod(a, b)
-c = a % b
+julia> b = ZZ(5)
+5
+
+julia> q, r = divrem(a, b)
+(-2, -2)
+
+julia> r = mod(a, b)
+3
+
+julia> c = a % b
+-2
 ```
 
 ### Comparison
@@ -115,13 +134,23 @@ Function                     |
 
 **Examples**
 
-```julia
-a = ZZ(12)
-b = ZZ(3)
+```jldoctest
+julia> a = ZZ(12)
+12
 
-a < b
-a != b
-a > 4
-5 <= b
+julia> b = ZZ(3)
+3
+
+julia> a < b
+false
+
+julia> a != b
+true
+
+julia> a > 4
+true
+
+julia> 5 <= b
+false
 ```
 

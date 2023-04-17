@@ -1,5 +1,8 @@
 ```@meta
 CurrentModule = Singular
+DocTestSetup = quote
+  using Singular
+end
 ```
 
 # Resolutions
@@ -52,15 +55,29 @@ Resolution(::Vector{smodule{T}}) where T <: AbstractAlgebra.FieldElem
 
 **Example**
 
-```julia
-R, (x, y) = polynomial_ring(QQ, ["x", "y"])
+```jldoctest
+julia> R, (x, y) = polynomial_ring(QQ, ["x", "y"])
+(Singular Polynomial Ring (QQ),(x,y),(dp(2),C), spoly{n_Q}[x, y])
 
-M1 = Singular.Module(R, vector(R, x), vector(R, y))
-M2 = Singular.Module(R, vector(R, y, -x))
+julia> M1 = Singular.Module(R, vector(R, x), vector(R, y))
+Singular Module over Singular Polynomial Ring (QQ),(x,y),(dp(2),C), with Generators:
+x*gen(1)
+y*gen(1)
 
-F = Resolution([M1, M2])
-F[1]
-F[2]
+julia> M2 = Singular.Module(R, vector(R, y, -x))
+Singular Module over Singular Polynomial Ring (QQ),(x,y),(dp(2),C), with Generators:
+-x*gen(2)+y*gen(1)
+
+julia> F = Resolution([M1, M2]);
+
+julia> F[1]
+Singular Module over Singular Polynomial Ring (QQ),(x,y),(dp(2),C), with Generators:
+x*gen(1)
+y*gen(1)
+
+julia> F[2]
+Singular Module over Singular Polynomial Ring (QQ),(x,y),(dp(2),C), with Generators:
+-x*gen(2)+y*gen(1)
 ```
 
 Alternatively, resolutions can be refined to minimal resolutions, as described below.
@@ -83,14 +100,22 @@ F[n::Int]
 
 **Examples**
 
-```julia
-R, (w, x, y, z) = polynomial_ring(QQ, ["w", "x", "y", "z"])
+```jldoctest
+julia> R, (w, x, y, z) = polynomial_ring(QQ, ["w", "x", "y", "z"])
+(Singular Polynomial Ring (QQ),(w,x,y,z),(dp(4),C), spoly{n_Q}[w, x, y, z])
 
-I = Ideal(R, w^2 - x*z, w*x - y*z, x^2 - w*y, x*y - z^2, y^2 - w*z)
-F = fres(std(I), 0)
+julia> I = Ideal(R, w^2 - x*z, w*x - y*z, x^2 - w*y, x*y - z^2, y^2 - w*z)
+Singular ideal over Singular Polynomial Ring (QQ),(w,x,y,z),(dp(4),C) with generators (w^2 - x*z, w*x - y*z, x^2 - w*y, x*y - z^2, y^2 - w*z)
 
-n = length(F)
-M1 = F[1]
+julia> F = fres(std(I), 0)
+Singular Resolution:
+R^1 <- R^5 <- R^6 <- R^2
+
+julia> n = length(F)
+3
+
+julia> M1 = F[1]
+Singular ideal over Singular Polynomial Ring (QQ),(w,x,y,z),(dp(4),C) with generators (y^2 - w*z, x*y - z^2, x^2 - w*y, w*x - y*z, w^2 - x*z)
 ```
 
 ### Betti numbers
@@ -101,14 +126,26 @@ betti(::sresolution)
 
 **Examples**
 
-```julia
-R, (w, x, y, z) = polynomial_ring(QQ, ["w", "x", "y", "z"])
+```jldoctest
+julia> R, (w, x, y, z) = polynomial_ring(QQ, ["w", "x", "y", "z"])
+(Singular Polynomial Ring (QQ),(w,x,y,z),(dp(4),C), spoly{n_Q}[w, x, y, z])
 
-I = Ideal(R, w^2 - x*z, w*x - y*z, x^2 - w*y, x*y - z^2, y^2 - w*z)
-F = fres(std(I), 3)
-M = minres(F)
+julia> I = Ideal(R, w^2 - x*z, w*x - y*z, x^2 - w*y, x*y - z^2, y^2 - w*z)
+Singular ideal over Singular Polynomial Ring (QQ),(w,x,y,z),(dp(4),C) with generators (w^2 - x*z, w*x - y*z, x^2 - w*y, x*y - z^2, y^2 - w*z)
 
-B = betti(M)
+julia> F = fres(std(I), 3)
+Singular Resolution:
+R^1 <- R^5 <- R^6 <- R^2
+
+julia> M = minres(F)
+Singular Resolution:
+R^1 <- R^5 <- R^5 <- R^1
+
+julia> B = betti(M)
+3×4 Matrix{Int32}:
+ 1  0  0  0
+ 0  5  5  0
+ 0  0  0  1
 ```
 
 ### Minimal resolutions
@@ -119,11 +156,19 @@ minres{T <: Nemo.FieldElem}(::sresolution{spoly{T}})
 
 **Examples**
 
-```julia
-R, (w, x, y, z) = polynomial_ring(QQ, ["w", "x", "y", "z"])
+```jldoctest
+julia> R, (w, x, y, z) = polynomial_ring(QQ, ["w", "x", "y", "z"])
+(Singular Polynomial Ring (QQ),(w,x,y,z),(dp(4),C), spoly{n_Q}[w, x, y, z])
 
-I = Ideal(R, w^2 - x*z, w*x - y*z, x^2 - w*y, x*y - z^2, y^2 - w*z)
-F = fres(std(I), 3)
-M = minres(F)
+julia> I = Ideal(R, w^2 - x*z, w*x - y*z, x^2 - w*y, x*y - z^2, y^2 - w*z)
+Singular ideal over Singular Polynomial Ring (QQ),(w,x,y,z),(dp(4),C) with generators (w^2 - x*z, w*x - y*z, x^2 - w*y, x*y - z^2, y^2 - w*z)
+
+julia> F = fres(std(I), 3)
+Singular Resolution:
+R^1 <- R^5 <- R^6 <- R^2
+
+julia> M = minres(F)
+Singular Resolution:
+R^1 <- R^5 <- R^5 <- R^1
 ```
 

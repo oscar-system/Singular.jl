@@ -1,3 +1,10 @@
+```@meta
+CurrentModule = Singular
+DocTestSetup = quote
+  using Singular
+end
+```
+
 # Getting Started
 
 Singular.jl is a Julia interface to the Singular computer algebra system. It was
@@ -30,15 +37,12 @@ how to obtain julia for your system.
 At the Julia prompt simply type
 
 ```
-julia> using Pkg
-julia> Pkg.add("Singular")
+julia> using Pkg; Pkg.add("Singular")
 ```
 
 Here is an example of using Singular.jl
 
-```julia
-julia> using Singular
-
+```jldoctest
 julia> R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 (Singular Polynomial Ring (QQ),(x,y),(dp(2),C), spoly{n_Q}[x, y])
 

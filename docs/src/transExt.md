@@ -1,5 +1,8 @@
 ```@meta
 CurrentModule = Singular
+DocTestSetup = quote
+  using Singular
+end
 ```
 
 # Function fields
@@ -55,14 +58,18 @@ Coerce a Flint integer value into the field.
 
 **Examples**
 
-```julia
-F1, (a, b, c) = FunctionField(QQ, ["a", "b", "c"])
+```jldoctest
+julia> F1, (a, b, c) = FunctionField(QQ, ["a", "b", "c"])
+(Function Field over Rational Field with transcendence basis n_transExt[a, b, c], n_transExt[a, b, c])
 
-x1 = a*b + c
+julia> x1 = a*b + c
+a*b + c
 
-F2, (a1, a2, a3) = FunctionField(Fp(5), 3)
+julia> F2, (a1, a2, a3) = FunctionField(Fp(5), 3)
+(Function Field over Finite Field of Characteristic 5 with transcendence basis n_transExt[a1, a2, a3], n_transExt[a1, a2, a3])
 
-x2 = a1^5 + a2*a3^4
+julia> x2 = a1^5 + a2*a3^4
+a1^5 + a2*a3^4
 ```
 
 ### Basic manipulation
@@ -89,20 +96,39 @@ n_transExt_to_spoly(x::n_transExt; parent::PolyRing)
 
 **Examples**
 
-```julia
-F1, (a, b, c) = FunctionField(QQ, ["a", "b", "c"])
-x = F1(5)*a
-y = a^2 *b+a*b+b^2
+```jldoctest
+julia> F1, (a, b, c) = FunctionField(QQ, ["a", "b", "c"])
+(Function Field over Rational Field with transcendence basis n_transExt[a, b, c], n_transExt[a, b, c])
 
-is_unit(x)
-char = characteristic(F1)
-d = transcendence_degree(F1)
+julia> x = F1(5)*a
+5*a
 
-S, = polynomial_ring(QQ, ["a", "b", "c"])
+julia> y = a^2 *b+a*b+b^2
+a^2*b + a*b + b^2
 
-p = n_transExt_to_spoly(y, parent_ring = S)
+julia> is_unit(x)
+true
 
-F2, = FunctionField(Fp(7), 4)
-B = transcendence_basis(F2)
+julia> char = characteristic(F1)
+0
+
+julia> d = transcendence_degree(F1)
+3
+
+julia> S, = polynomial_ring(QQ, ["a", "b", "c"])
+(Singular Polynomial Ring (QQ),(a,b,c),(dp(3),C), spoly{n_Q}[a, b, c])
+
+julia> p = n_transExt_to_spoly(y, parent_ring = S)
+a^2*b + a*b + b^2
+
+julia> F2, = FunctionField(Fp(7), 4)
+(Function Field over Finite Field of Characteristic 7 with transcendence basis n_transExt[a1, a2, a3, a4], n_transExt[a1, a2, a3, a4])
+
+julia> B = transcendence_basis(F2)
+4-element Vector{n_transExt}:
+ a1
+ a2
+ a3
+ a4
 ```
 

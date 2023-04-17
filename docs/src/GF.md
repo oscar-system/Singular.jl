@@ -1,5 +1,8 @@
 ```@meta
 CurrentModule = Singular
+DocTestSetup = quote
+  using Singular
+end
 ```
 
 # Finite fields
@@ -54,13 +57,23 @@ Singular.degree(::N_GField)
 
 **Examples**
 
-```julia
-R,w = FiniteField(7, 2, "w")
-w^48 == 1
-a = R(5)
+```jldoctest
+julia> R,w = FiniteField(7, 2, "w")
+(Finite Field of Characteristic 7 and degree 2, w)
 
-is_unit(a)
-c = characteristic(R)
-d = degree(R)
+julia> w^48 == 1
+true
+
+julia> a = R(5)
+w^40
+
+julia> is_unit(a)
+true
+
+julia> c = characteristic(R)
+7
+
+julia> d = degree(R)
+2
 ```
 

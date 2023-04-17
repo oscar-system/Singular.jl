@@ -1,5 +1,8 @@
 ```@meta
 CurrentModule = Singular
+DocTestSetup = quote
+  using Singular
+end
 ```
 
 # Noncommutative algebras
@@ -65,7 +68,7 @@ matrix with all relevant entries set to `a`.
 
 **Examples**
 
-```julia
+```jldoctest GAlgebra
 julia> R, (x, y) = polynomial_ring(QQ, ["x", "y"]);
 
 julia> G, (x, y) = GAlgebra(R, 2, Singular.Matrix(R, [0 x; 0 0]))
@@ -77,7 +80,7 @@ julia> y*x
 
 Associativity can be checked via [Interpreter Functionality](@ref).
 
-```
+```jldoctest GAlgebra
 julia> iszero(Singular.LibNctools.ndcond(G))
 true
 ```
@@ -85,7 +88,7 @@ true
 The construction of a GR-algebra proceeds by taking the quotient of a G-algebra
 by a two-sided ideal. Continuing with the above example:
 
-```
+```jldoctest GAlgebra
 julia> I = Ideal(G, [x^2 + y^2], twosided = true)
 Singular two-sided ideal over Singular G-Algebra (QQ),(x,y),(dp(2),C) with generators (x^2 + y^2)
 
@@ -117,7 +120,7 @@ that due to the ordering constraint on G-algebras, the orderings `:neglex`,
 
 **Examples**
 
-```julia
+```jldoctest
 julia> R, (x, y, dx, dy) = WeylAlgebra(ZZ, ["x", "y"])
 (Singular G-Algebra (ZZ),(x,y,dx,dy),(dp(4),C), spluralg{n_Z}[x, y, dx, dy])
 
@@ -127,7 +130,7 @@ julia> (dx*x, dx*y, dy*x, dy*y)
 
 The ideals of G-algebras are left ideals by default.
 
-```julia
+```jldoctest
 julia> R, (x1, x2, x3, d1, d2, d3) = WeylAlgebra(QQ, ["x1" "x2" "x3"; "d1" "d2" "d3"])
 (Singular G-Algebra (QQ),(x1,x2,x3,d1,d2,d3),(dp(6),C), spluralg{n_Q}[x1, x2, x3, d1, d2, d3])
 
@@ -161,7 +164,7 @@ ordering must be global.
 
 **Examples**
 
-```julia
+```jldoctest
 julia> R, (x, y) = FreeAlgebra(QQ, ["x", "y"], 5)
 (Singular letterplace Ring (QQ),(x,y,x,y,x,y,x,y,x,y),(dp(10),C,L(3)), slpalg{n_Q}[x, y])
 
@@ -175,7 +178,7 @@ ERROR: degree bound of Letterplace ring is 5, but at least 6 is needed for this 
 The ideals are two-sided by default for this algebra, and there is currently no
 possibility of constructing one-sided ideals.
 
-```julia
+```jldoctest
 julia> R, (x, y, z) = FreeAlgebra(QQ, ["x", "y", "z"], 4)
 (Singular letterplace Ring (QQ),(x,y,z,x,y,z,x,y,z,x,y,z),(dp(12),C,L(3)), slpalg{n_Q}[x, y, z])
 
@@ -199,7 +202,7 @@ represented using commutative data structures, and the function
 
 **Examples**
 
-```julia
+```jldoctest
 julia> R, (x, y, dx, dy) = WeylAlgebra(QQ, ["x", "y"])
 (Singular G-Algebra (QQ),(x,y,dx,dy),(dp(4),C), spluralg{n_Q}[x, y, dx, dy])
 
@@ -218,7 +221,7 @@ iterators have the same behavior as in the commutative case.
 
 **Examples**
 
-```julia
+```jldoctest
 julia> R, (x, y, z) = FreeAlgebra(QQ, ["x", "y", "z"], 6)
 (Singular letterplace Ring (QQ),(x,y,z,x,y,z,x,y,z,x,y,z,x,y,z,x,y,z),(dp(18),C,L(3)), slpalg{n_Q}[x, y, z])
 
@@ -238,7 +241,7 @@ julia> show(collect(exponent_words(p)))
 [[1, 3, 1, 3], [1, 3, 2], [2, 1, 3], [2, 2], [1, 3], [2], Int64[]]
 
 julia> B = MPolyBuildCtx(R)
-Builder for a polynomial in Singular letterplace Ring (QQ),(x,y,z,x,y,z,x,y,z,x,y,z,x,y,z,x,y,z),(dp(18),C,L(3))
+Builder for an element of Singular letterplace Ring (QQ),(x,y,z,x,y,z,x,y,z,x,y,z,x,y,z,x,y,z),(dp(18),C,L(3))
 
 julia> push_term!(B, QQ(2), [3,2,1,3]);
 
@@ -247,4 +250,3 @@ julia> push_term!(B, QQ(-1), Int[]);
 julia> finish(B)
 2*z*y*x*z - 1
 ```
-
