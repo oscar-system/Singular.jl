@@ -23,7 +23,7 @@ julia> using Singular
 
 Documentation is available here:
 
-<https://oscar-system.github.io/Singular.jl/latest/index.html>
+<https://oscar-system.github.io/Singular.jl/stable/>
 
 ## Funding
 

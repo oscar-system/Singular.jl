@@ -3,11 +3,12 @@
 Singular.jl is a Julia interface to the Singular computer algebra system. It was
 written by Oleksandr Motsak, William Hart and other contributors, and is maintained by
 William Hart, Hans Schoenemann and Andreas Steenpas. It is part of the Oscar project which is
-funded by the DFG TRR 195 program.
+supported by the Deutsche Forschungsgemeinschaft DFG within the
+[Collaborative Research Center TRR 195](https://www.computeralgebra.de/sfb/).
 
 - <https://www.singular.uni-kl.de/> (Singular website)
 - <https://github.com/oscar-system/Singular.jl> (Singular.jl source code)
-- <https://oscar-system.github.io/Singular.jl/> (Singular.jl online documentation)
+- <https://oscar-system.github.io/Singular.jl/stable/> (Singular.jl online documentation)
 
 The features of Singular so far include:
 
@@ -39,13 +40,13 @@ Here is an example of using Singular.jl
 julia> using Singular
 
 julia> R, (x, y) = polynomial_ring(QQ, ["x", "y"])
-(Singular Polynomial Ring (QQ),(x,y),(dp(2),C), Singular.spoly{Singular.n_Q}[x, y])
+(Singular Polynomial Ring (QQ),(x,y),(dp(2),C), spoly{n_Q}[x, y])
 
 julia> I = Ideal(R, x^2 + 1, x*y + 1)
-Singular Ideal over Singular Polynomial Ring (QQ),(x,y),(dp(2),C) with generators (x^2+1, x*y+1)
+Singular ideal over Singular Polynomial Ring (QQ),(x,y),(dp(2),C) with generators (x^2 + 1, x*y + 1)
 
 julia> G = std(I)
-Singular Ideal over Singular Polynomial Ring (QQ),(x,y),(dp(2),C) with generators (x-y, y^2+1)
+Singular ideal over Singular Polynomial Ring (QQ),(x,y),(dp(2),C) with generators (x - y, y^2 + 1)
 
 julia> Z = syz(G)
 Singular Module over Singular Polynomial Ring (QQ),(x,y),(dp(2),C), with Generators:
@@ -56,8 +57,5 @@ Singular Resolution:
 R^1 <- R^2 <- R^1
 
 julia> F[1]
-Singular Module over Singular Polynomial Ring (QQ),(x,y),(dp(2),C), with Generators:
-x-y
-y^2+1
+Singular ideal over Singular Polynomial Ring (QQ),(x,y),(dp(2),C) with generators (x - y, y^2 + 1)
 ```
-
