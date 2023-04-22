@@ -399,7 +399,7 @@ is called "Top", and ring dependent objects are contained in their basering,
 which is returned as a dictionary.
 
 # Examples
-```julia
+```jldoctest; setup = :(using Singular)
 julia> Singular.call_interpreter("bigint a = 42;");
 
 julia> a = Singular.lookup_library_symbol("Top", "a"); (a, typeof(a))

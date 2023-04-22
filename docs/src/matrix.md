@@ -1,5 +1,8 @@
 ```@meta
 CurrentModule = Singular
+DocTestSetup = quote
+  using Singular
+end
 ```
 
 # Matrices
@@ -45,24 +48,45 @@ The following parts of the Matrix interface from AbstractAlgebra are also implem
 
 **Examples**
 
-```julia
-R, (x, y, u, v, w) = Singular.polynomial_ring(Singular.QQ, ["x", "y", "u", "v", "w"])
+```jldoctest
+julia> R, (x, y, u, v, w) = Singular.polynomial_ring(Singular.QQ, ["x", "y", "u", "v", "w"])
+(Singular Polynomial Ring (QQ),(x,y,u,v,w),(dp(5),C), spoly{n_Q}[x, y, u, v, w])
 
-identity_matrix(R, 4)
+julia> identity_matrix(R, 4)
+[1, 0, 0, 0
+0, 1, 0, 0
+0, 0, 1, 0
+0, 0, 0, 1]
 
-zero_matrix(R, 3, 8)
+julia> zero_matrix(R, 3, 8)
+[0, 0, 0, 0, 0, 0, 0, 0
+0, 0, 0, 0, 0, 0, 0, 0
+0, 0, 0, 0, 0, 0, 0, 0]
 
-M = identity_matrix(R, 4)
+julia> M = identity_matrix(R, 4)
+[1, 0, 0, 0
+0, 1, 0, 0
+0, 0, 1, 0
+0, 0, 0, 1]
 
-nrows(M)
+julia> nrows(M)
+4
 
-ncols(M)
+julia> ncols(M)
+4
 
-iszero(M)
+julia> iszero(M)
+false
 
-M[3, 4] = x*y + 5*u*w
+julia> M[3, 4] = x*y + 5*u*w
+x*y + 5*u*w
 
-N = transpose(M)
+julia> N = transpose(M)
+[1, 0, 0, 0
+0, 1, 0, 0
+0, 0, 1, 0
+0, 0, x*y + 5*u*w, 1]
 
-N[4, 3]
+julia> N[4, 3]
+x*y + 5*u*w
 ```

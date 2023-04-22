@@ -1,5 +1,8 @@
 ```@meta
 CurrentModule = Singular
+DocTestSetup = quote
+  using Singular
+end
 ```
 
 # Integers mod n
@@ -53,11 +56,17 @@ Coerce a Singular or Flint integer value into the ring.
 
 **Examples**
 
-```
-R = residue_ring(ZZ, 26)
-a = R(5)
+```jldoctest
+julia> R = residue_ring(ZZ, 26)
+Residue Ring of Integer Ring modulo 26
 
-is_unit(a)
-c = characteristic(R)
+julia> a = R(5)
+5
+
+julia> is_unit(a)
+true
+
+julia> c = characteristic(R)
+26
 ```
 

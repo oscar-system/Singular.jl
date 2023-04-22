@@ -1,5 +1,8 @@
 ```@meta
 CurrentModule = Singular
+DocTestSetup = quote
+  using Singular
+end
 ```
 
 # Multivariate polynomials
@@ -87,13 +90,16 @@ increase the amount of storage required.
 
 **Examples**
 
-```julia
-R, (x, y, z) = polynomial_ring(ZZ, ["x", "y", "z"])
+```jldoctest
+julia> R, (x, y, z) = polynomial_ring(ZZ, ["x", "y", "z"])
+(Singular Polynomial Ring (ZZ),(x,y,z),(dp(3),C), spoly{n_Z}[x, y, z])
 
-S, vars = polynomial_ring(QQ, ["x", "y"]; ordering=:deglex)
+julia> S, vars = polynomial_ring(QQ, ["x", "y"]; ordering=:deglex)
+(Singular Polynomial Ring (QQ),(x,y),(Dp(2),C), spoly{n_Q}[x, y])
 
-T, x = polynomial_ring(ZZ, ["x$i" for i in 1:5];
-       ordering=:comp1max, ordering2=:degrevlex, degree_bound=5)
+julia> T, x = polynomial_ring(ZZ, ["x$i" for i in 1:5];
+              ordering=:comp1max, ordering2=:degrevlex, degree_bound=5)
+(Singular Polynomial Ring (ZZ),(x1,x2,x3,x4,x5),(c,dp(5),L(5)), spoly{n_Z}[x1, x2, x3, x4, x5])
 ```
 
 See also the convenience macros below for simple use cases.
@@ -114,14 +120,24 @@ documentation:
 
 **Examples**
 
-```julia
-R, (x, y) = polynomial_ring(ZZ, ["x", "y"])
-C = MPolyBuildCtx(R)
+```jldoctest
+julia> R, (x, y) = polynomial_ring(ZZ, ["x", "y"])
+(Singular Polynomial Ring (ZZ),(x,y),(dp(2),C), spoly{n_Z}[x, y])
 
-push_term!(C, ZZ(1), [1, 2])
-push_term!(C, ZZ(3), [1, 1])
-push_term!(C, -ZZ(1), [0, 1])
-f = finish(C)
+julia> C = MPolyBuildCtx(R)
+Builder for an element of Singular Polynomial Ring (ZZ),(x,y),(dp(2),C)
+
+julia> push_term!(C, ZZ(1), [1, 2])
+x*y^2
+
+julia> push_term!(C, ZZ(3), [1, 1])
+x*y^2 + 3*x*y
+
+julia> push_term!(C, -ZZ(1), [0, 1])
+x*y^2 + 3*x*y - y
+
+julia> f = finish(C)
+x*y^2 + 3*x*y - y
 ```
 
 ### Term orderings
@@ -229,10 +245,12 @@ ordering.
 
 **Examples**
 
-```julia
-S = @polynomial_ring(ZZ, "x", 5, :deglex)
+```jldoctest
+julia> S = @polynomial_ring(ZZ, "x", 5, :deglex)
+Singular Polynomial Ring (ZZ),(x1,x2,x3,x4,x5),(Dp(5),C)
 
-T = @polynomial_ring(QQ, "y", 10)
+julia> T = @polynomial_ring(QQ, "y", 10)
+Singular Polynomial Ring (QQ),(y1,y2,y3,y4,y5,y6,y7,y8,y9,y10),(dp(10),C)
 ```
 
 ### Basic manipulation
@@ -263,16 +281,33 @@ order(p::spoly)
 
 **Examples**
 
-```
-R = @polynomial_ring(ZZ, "x", 3)
+```jldoctest
+julia> R = @polynomial_ring(ZZ, "x", 3)
+Singular Polynomial Ring (ZZ),(x1,x2,x3),(dp(3),C)
 
-n = ngens(R)
-has_global_ordering(R) == true
-c = characteristic(R)
-L = degree_bound(R)
-exps = leading_exponent_vector(x1*x2 + 3x1*x2^2 + x3 + 2)
-deg = total_degree(x1*x2 + 3x1*x2^2 + x3 + 2)
-ord = order(x1*x2 + 3x1*x2^2 + x3 + 2)
+julia> n = nvars(R)
+3
+
+julia> has_global_ordering(R) == true
+true
+
+julia> c = characteristic(R)
+0
+
+julia> L = degree_bound(R)
+1048575
+
+julia> exps = leading_exponent_vector(x1*x2 + 3x1*x2^2 + x3 + 2)
+3-element Vector{Int64}:
+ 1
+ 2
+ 0
+
+julia> deg = total_degree(x1*x2 + 3x1*x2^2 + x3 + 2)
+3
+
+julia> ord = order(x1*x2 + 3x1*x2^2 + x3 + 2)
+0
 ```
 
 ### Differential functions
@@ -306,22 +341,33 @@ jacobian_matrix(A::Vector{spoly{T}}) where T <: Nemo.RingElem
 
 **Examples**
 
-```julia
-R, (x, y, z) = polynomial_ring(QQ, ["x", "y", "z"])
+```jldoctest
+julia> R, (x, y, z) = polynomial_ring(QQ, ["x", "y", "z"])
+(Singular Polynomial Ring (QQ),(x,y,z),(dp(3),C), spoly{n_Q}[x, y, z])
 
-f = x^2*y*z + z^2*x + x*y*z
+julia> f = x^2*y*z + z^2*x + x*y*z
+x^2*y*z + x*y*z + x*z^2
 
-g = jet(f, 3)
+julia> g = jet(f, 3)
+x*y*z + x*z^2
 
-derivative(f, 1)
+julia> derivative(f, 1)
+2*x*y*z + y*z + z^2
 
-derivative(f, y)
+julia> derivative(f, y)
+x^2*z + x*z
 
-J = jacobian_ideal(f)
+julia> J = jacobian_ideal(f)
+Singular ideal over Singular Polynomial Ring (QQ),(x,y,z),(dp(3),C) with generators (2*x*y*z + y*z + z^2, x^2*z + x*z, x^2*y + x*y + 2*x*z)
 
-Jf1 = jacobian_matrix(f)
+julia> Jf1 = jacobian_matrix(f)
+[2*x*y*z + y*z + z^2
+x^2*z + x*z
+x^2*y + x*y + 2*x*z]
 
-Jf2 = jacobian_matrix([f, g])
+julia> Jf2 = jacobian_matrix([f, g])
+[2*x*y*z + y*z + z^2, x^2*z + x*z, x^2*y + x*y + 2*x*z
+y*z + z^2, x*z, x*y + 2*x*z]
 ```
 
 ### Content and primitive part
@@ -339,13 +385,18 @@ Singular.content(x::spoly)
 
 **Examples**
 
-```julia
-R = @polynomial_ring(ZZ, "x", 2)
+```jldoctest
+julia> R = @polynomial_ring(ZZ, "x", 2)
+Singular Polynomial Ring (ZZ),(x1,x2),(dp(2),C)
 
-f = 3x1^2 + 3x1*x2 + 6x2^2
+julia> f = 3x1^2 + 3x1*x2 + 6x2^2
+3*x1^2 + 3*x1*x2 + 6*x2^2
 
-p = primpart(f)
-c = content(f)
+julia> p = primpart(f)
+x1^2 + x1*x2 + 2*x2^2
+
+julia> c = content(f)
+3
 ```
 
 ### Homogeneous polynomials
@@ -362,11 +413,13 @@ squarefree factorization is available.
 **Examples**
 
 ```julia
-R = @polynomial_ring(QQ, "x", 4)
+julia> R = @polynomial_ring(QQ, "x", 4)
+Singular Polynomial Ring (QQ),(x1,x2,x3,x4),(dp(4),C)
 
-f = 123*(57*x2^3 + x4^5)^3*(x1^2 + x1+1)^2*(x1 + x2*x3)^2
+julia> f = 123*(57*x2^3 + x4^5)^3*(x1^2 + x1+1)^2*(x1 + x2*x3)^2;
 
-Fac = factor(f)
+julia> Fac = factor(f)
+123 * (x4^5 + 57*x2^3)^3 * (x1^2 + x1 + 1)^2 * (x2*x3 + x1)^2
 ```
 
 For the Singular base rings `QQ`, `ZZ` and `Fp` a function to compute the
@@ -375,11 +428,13 @@ multivariate factorization is available.
 **Examples**
 
 ```julia
-R = @polynomial_ring(ZZ, "x", 4)
+julia> R = @polynomial_ring(ZZ, "x", 4)
+Singular Polynomial Ring (ZZ),(x1,x2,x3,x4),(dp(4),C)
 
-f = 123*(57*x2^3 + x4^5)^3*(x1^2 + x1+1)^2*(x1 + x2*x3)^2
+julia> f = 123*(57*x2^3 + x4^5)^3*(x1^2 + x1+1)^2*(x1 + x2*x3)^2;
 
-Fac = factor(f)
+julia> Fac = factor(f)
+123 * (x2*x3 + x1)^2 * (x4^5 + 57*x2^3)^3 * (x1^2 + x1 + 1)^2
 ```
 
 ### Change of coefficient rings
@@ -389,12 +444,18 @@ the function 'change_base_ring'.
 
 **Examples**
 
-```julia
-R, (x, y) = polynomial_ring(ZZ, ["x", "y"])
+```jldoctest
+julia> R, (x, y) = polynomial_ring(ZZ, ["x", "y"])
+(Singular Polynomial Ring (ZZ),(x,y),(dp(2),C), spoly{n_Z}[x, y])
 
-p = x^5 + y^3+1
+julia> p = x^5 + y^3+1
+x^5 + y^3 + 1
 
-change_base_ring(QQ, p)
+julia> p2 = change_base_ring(QQ, p)
+x^5 + y^3 + 1
+
+julia> parent(p2)
+Singular Polynomial Ring (QQ),(x,y),(dp(2),C)
 ```
 
 It also possible to work with Nemo rings by casting to a suitable Singular type
@@ -407,5 +468,5 @@ R, (x, y) = polynomial_ring(ZZ, ["x", "y"])
 
 p = x^5 + y^3+1
 
-change_base_ring(CoefficientRing(Nemo.QQ), p)
+p2 change_base_ring(CoefficientRing(Nemo.QQ), p)
 ```

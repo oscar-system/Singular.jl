@@ -1,5 +1,8 @@
 ```@meta
 CurrentModule = Singular
+DocTestSetup = quote
+  using Singular
+end
 ```
 
 # Free modules and vectors
@@ -63,13 +66,18 @@ parameters.
 
 **Examples**
 
-```julia
-R, (x, y) = polynomial_ring(QQ, ["x", "y"])
+```jldoctest
+julia> R, (x, y) = polynomial_ring(QQ, ["x", "y"])
+(Singular Polynomial Ring (QQ),(x,y),(dp(2),C), spoly{n_Q}[x, y])
 
-M = FreeModule(R, 3)
-v2 = M([x + 1, x*y + 1, y])
+julia> M = FreeModule(R, 3)
+Free Module of rank 3 over Singular Polynomial Ring (QQ),(x,y),(dp(2),C)
 
-v1 = vector(R, x + 1, x*y + 1, y)
+julia> v2 = M([x + 1, x*y + 1, y])
+x*y*gen(2)+x*gen(1)+y*gen(3)+gen(2)+gen(1)
+
+julia> v1 = vector(R, x + 1, x*y + 1, y)
+x*y*gen(2)+x*gen(1)+y*gen(3)+gen(2)+gen(1)
 ```
 
 ### Basic manipulation
@@ -85,13 +93,23 @@ gens{T <: AbstractAlgebra.RingElem}(::FreeMod{T})
 
 **Examples**
 
-```
-R, (x, y) = polynomial_ring(QQ, ["x", "y"])
+```jldoctest
+julia> R, (x, y) = polynomial_ring(QQ, ["x", "y"])
+(Singular Polynomial Ring (QQ),(x,y),(dp(2),C), spoly{n_Q}[x, y])
 
-M = FreeModule(R, 5)
+julia> M = FreeModule(R, 5)
+Free Module of rank 5 over Singular Polynomial Ring (QQ),(x,y),(dp(2),C)
 
-v = gens(M)
-r = rank(M)
+julia> v = gens(M)
+5-element Vector{svector{spoly{n_Q}}}:
+ gen(1)
+ gen(2)
+ gen(3)
+ gen(4)
+ gen(5)
+
+julia> r = rank(M)
+5
 ```
 
 ### Conversions
@@ -105,12 +123,18 @@ Array{T <: Nemo.RingElem}(v::svector{spoly{T}})
 
 **Examples**
 
-```julia
-R, (x, y) = polynomial_ring(QQ, ["x", "y"])
+```jldoctest
+julia> R, (x, y) = polynomial_ring(QQ, ["x", "y"])
+(Singular Polynomial Ring (QQ),(x,y),(dp(2),C), spoly{n_Q}[x, y])
 
-v1 = vector(R, x + 1, x*y + 1, y)
+julia> v1 = vector(R, x + 1, x*y + 1, y)
+x*y*gen(2)+x*gen(1)+y*gen(3)+gen(2)+gen(1)
 
-V = Array(v1)
+julia> V = Array(v1)
+3-element Vector{spoly{n_Q}}:
+ x + 1
+ x*y + 1
+ y
 ```
 
 ### Jet of vectors
@@ -120,10 +144,14 @@ jet{T <: AbstractAlgebra.RingElem}(::svector{spoly{T}}, ::Int)
 ```
 
 **Examples**
-```julia
-R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
-v = vector(R, x^5 + 1, 2x^3 + 3y^2, x^2)
-w = jet(v, 3)
+```jldoctest
+julia> R, (x, y) = polynomial_ring(QQ, ["x", "y"])
+(Singular Polynomial Ring (QQ),(x,y),(dp(2),C), spoly{n_Q}[x, y])
+
+julia> v = vector(R, x^5 + 1, 2x^3 + 3y^2, x^2)
+x^5*gen(1)+2*x^3*gen(2)+x^2*gen(3)+3*y^2*gen(2)+gen(1)
+
+julia> w = jet(v, 3)
+2*x^3*gen(2)+x^2*gen(3)+3*y^2*gen(2)+gen(1)
 ```
-

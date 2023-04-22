@@ -1,5 +1,8 @@
 ```@meta
 CurrentModule = Singular
+DocTestSetup = quote
+  using Singular
+end
 ```
 
 # Rational field
@@ -36,18 +39,36 @@ Construct a Singular rational from the given integer $n$.
 
 **Examples**
 
-```julia
-f = QQ(-12, 7)
-h = numerator(QQ)
-k = denominator(QQ)
-m = abs(f)
+```jldoctest
+julia> f = QQ(-12, 7)
+-12//7
 
-a = QQ(12, 7)
-b = QQ(-3, 5)
-a > b
-a != b
-a > 1
-5 >= b
+julia> h = numerator(f)
+-12
+
+julia> k = denominator(f)
+7
+
+julia> m = abs(f)
+12//7
+
+julia> a = QQ(12, 7)
+12//7
+
+julia> b = QQ(-3, 5)
+-3//5
+
+julia> a > b
+true
+
+julia> a != b
+true
+
+julia> a > 1
+true
+
+julia> 5 >= b
+true
 ```
 
 ### Rational reconstruction
@@ -65,7 +86,10 @@ reconstruct(::Integer, ::n_Z)
 
 **Examples**
 
-```julia
-q1 = reconstruct(ZZ(7), ZZ(3))
-q2 = reconstruct(ZZ(7), 5)
+```jldoctest
+julia> q1 = reconstruct(ZZ(7), ZZ(3))
+1
+
+julia> q2 = reconstruct(ZZ(7), 5)
+-1//2
 ```

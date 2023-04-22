@@ -1,5 +1,8 @@
 ```@meta
 CurrentModule = Singular
+DocTestSetup = quote
+  using Singular
+end
 ```
 
 # Quotient Rings
@@ -15,7 +18,7 @@ quotient_ideal(Q::PolyRing{T}) where T <: Nemo.RingElem
 
 **Examples**
 
-```julia
+```jldoctest
 julia> R, (x, y) = polynomial_ring(QQ, ["x", "y"]);
 
 julia> is_quotient_ring(R)

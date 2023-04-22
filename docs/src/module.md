@@ -1,5 +1,8 @@
 ```@meta
 CurrentModule = Singular
+DocTestSetup = quote
+  using Singular
+end
 ```
 
 ```@meta
@@ -63,13 +66,20 @@ from `Base.Module`.
 
 **Examples**
 
-```julia
-R, (x, y) = polynomial_ring(QQ, ["x", "y"])
+```jldoctest
+julia> R, (x, y) = polynomial_ring(QQ, ["x", "y"])
+(Singular Polynomial Ring (QQ),(x,y),(dp(2),C), spoly{n_Q}[x, y])
 
-v1 = vector(R, x + 1, x*y + 1, y)
-v2 = vector(R, x^2 + 1, 2x + 3y, x)
+julia> v1 = vector(R, x + 1, x*y + 1, y)
+x*y*gen(2)+x*gen(1)+y*gen(3)+gen(2)+gen(1)
 
-M = Singular.Module(R, v1, v2)
+julia> v2 = vector(R, x^2 + 1, 2x + 3y, x)
+x^2*gen(1)+x*gen(3)+2*x*gen(2)+3*y*gen(2)+gen(1)
+
+julia> M = Singular.Module(R, v1, v2)
+Singular Module over Singular Polynomial Ring (QQ),(x,y),(dp(2),C), with Generators:
+x*y*gen(2)+x*gen(1)+y*gen(3)+gen(2)+gen(1)
+x^2*gen(1)+x*gen(3)+2*x*gen(2)+3*y*gen(2)+gen(1)
 ```
 
 ### Basic manipulation
@@ -95,18 +105,32 @@ iszero(::smodule)
 
 **Examples**
 
-```
-R, (x, y) = polynomial_ring(QQ, ["x", "y"])
+```jldoctest
+julia> R, (x, y) = polynomial_ring(QQ, ["x", "y"])
+(Singular Polynomial Ring (QQ),(x,y),(dp(2),C), spoly{n_Q}[x, y])
 
-v1 = vector(R, x + 1, x*y + 1, y)
-v2 = vector(R, x^2 + 1, 2x + 3y, x)
+julia> v1 = vector(R, x + 1, x*y + 1, y)
+x*y*gen(2)+x*gen(1)+y*gen(3)+gen(2)+gen(1)
 
-M = Singular.Module(R, v1, v2)
+julia> v2 = vector(R, x^2 + 1, 2x + 3y, x)
+x^2*gen(1)+x*gen(3)+2*x*gen(2)+3*y*gen(2)+gen(1)
 
-iszero(M) == false
-M[1] == v1
-n = rank(M)
-d = ngens(M)
+julia> M = Singular.Module(R, v1, v2)
+Singular Module over Singular Polynomial Ring (QQ),(x,y),(dp(2),C), with Generators:
+x*y*gen(2)+x*gen(1)+y*gen(3)+gen(2)+gen(1)
+x^2*gen(1)+x*gen(3)+2*x*gen(2)+3*y*gen(2)+gen(1)
+
+julia> iszero(M) == false
+true
+
+julia> M[1] == v1
+true
+
+julia> n = rank(M)
+3
+
+julia> d = ngens(M)
+2
 ```
 
 ### Standard basis
@@ -124,16 +148,30 @@ lift_std_syz(::smodule; ::Bool)
 ```
 **Examples**
 
-```julia
-R, (x, y) = polynomial_ring(QQ, ["x", "y"])
+```jldoctest
+julia> R, (x, y) = polynomial_ring(QQ, ["x", "y"])
+(Singular Polynomial Ring (QQ),(x,y),(dp(2),C), spoly{n_Q}[x, y])
 
-v1 = vector(R, x + 1, x*y + 1, y)
-v2 = vector(R, x^2 + 1, 2x + 3y, x)
-v3 = x*v1 + y*v2 + vector(R, x, y + 1, y^2)
+julia> v1 = vector(R, x + 1, x*y + 1, y)
+x*y*gen(2)+x*gen(1)+y*gen(3)+gen(2)+gen(1)
 
-M = Singular.Module(R, v1, v2, v3)
+julia> v2 = vector(R, x^2 + 1, 2x + 3y, x)
+x^2*gen(1)+x*gen(3)+2*x*gen(2)+3*y*gen(2)+gen(1)
 
-G = std(M; complete_reduction=true)
+julia> v3 = x*v1 + y*v2 + vector(R, x, y + 1, y^2)
+x^2*y*gen(2)+x^2*y*gen(1)+x^2*gen(1)+2*x*y*gen(3)+2*x*y*gen(2)+y^2*gen(3)+3*y^2*gen(2)+x*gen(2)+2*x*gen(1)+y*gen(2)+y*gen(1)+gen(2)
+
+julia> M = Singular.Module(R, v1, v2, v3)
+Singular Module over Singular Polynomial Ring (QQ),(x,y),(dp(2),C), with Generators:
+x*y*gen(2)+x*gen(1)+y*gen(3)+gen(2)+gen(1)
+x^2*gen(1)+x*gen(3)+2*x*gen(2)+3*y*gen(2)+gen(1)
+x^2*y*gen(2)+x^2*y*gen(1)+x^2*gen(1)+2*x*y*gen(3)+2*x*y*gen(2)+y^2*gen(3)+3*y^2*gen(2)+x*gen(2)+2*x*gen(1)+y*gen(2)+y*gen(1)+gen(2)
+
+julia> G = std(M; complete_reduction=true)
+Singular Module over Singular Polynomial Ring (QQ),(x,y),(dp(2),C), with Generators:
+y^2*gen(3)+x*gen(1)+y*gen(2)+gen(2)
+x*y*gen(2)+x*gen(1)+y*gen(3)+gen(2)+gen(1)
+x^2*gen(1)+x*gen(3)+2*x*gen(2)+3*y*gen(2)+gen(1)
 ```
 
 ### Reduction
@@ -191,15 +229,24 @@ syz(::smodule)
 
 **Examples**
 
-```julia
-R, (x, y) = polynomial_ring(QQ, ["x", "y"])
+```jldoctest
+julia> R, (x, y) = polynomial_ring(QQ, ["x", "y"])
+(Singular Polynomial Ring (QQ),(x,y),(dp(2),C), spoly{n_Q}[x, y])
 
-v1 = vector(R, (x + 1)*y, (x*y + 1)*y, y)
-v2 = vector(R, (x + 1)*x, (x*y + 1)*x, x)
+julia> v1 = vector(R, (x + 1)*y, (x*y + 1)*y, y)
+x*y^2*gen(2)+x*y*gen(1)+y*gen(3)+y*gen(2)+y*gen(1)
 
-M = Singular.Module(R, v1, v2)
+julia> v2 = vector(R, (x + 1)*x, (x*y + 1)*x, x)
+x^2*y*gen(2)+x^2*gen(1)+x*gen(3)+x*gen(2)+x*gen(1)
 
-Z = syz(M)
+julia> M = Singular.Module(R, v1, v2)
+Singular Module over Singular Polynomial Ring (QQ),(x,y),(dp(2),C), with Generators:
+x*y^2*gen(2)+x*y*gen(1)+y*gen(3)+y*gen(2)+y*gen(1)
+x^2*y*gen(2)+x^2*gen(1)+x*gen(3)+x*gen(2)+x*gen(1)
+
+julia> Z = syz(M)
+Singular Module over Singular Polynomial Ring (QQ),(x,y),(dp(2),C), with Generators:
+x*gen(1)-y*gen(2)
 ```
 
 ### Free resolutions
@@ -210,21 +257,36 @@ sres{T <: Singular.FieldElem}(::smodule{spoly{T}}, ::Int)
 
 **Examples**
 
-```julia
-R, (x, y) = polynomial_ring(QQ, ["x", "y"])
+```jldoctest
+julia> R, (x, y) = polynomial_ring(QQ, ["x", "y"])
+(Singular Polynomial Ring (QQ),(x,y),(dp(2),C), spoly{n_Q}[x, y])
 
-v1 = vector(R, x + 1, x*y + 1, y)
-v2 = vector(R, x^2 + 1, 2x + 3y, x)
+julia> v1 = vector(R, x + 1, x*y + 1, y)
+x*y*gen(2)+x*gen(1)+y*gen(3)+gen(2)+gen(1)
 
-M = std(Singular.Module(R, v1, v2))
+julia> v2 = vector(R, x^2 + 1, 2x + 3y, x)
+x^2*gen(1)+x*gen(3)+2*x*gen(2)+3*y*gen(2)+gen(1)
 
-F = sres(M, 0)
+julia> M = std(Singular.Module(R, v1, v2))
+Singular Module over Singular Polynomial Ring (QQ),(x,y),(dp(2),C), with Generators:
+x*y*gen(2)+x*gen(1)+y*gen(3)+gen(2)+gen(1)
+x^2*gen(1)+x*gen(3)+2*x*gen(2)+3*y*gen(2)+gen(1)
 
-M1 = Singular.Matrix(M)
-M2 = Singular.Matrix(F[2])
+julia> F = sres(M, 0)
+Singular Resolution:
+R^3 <- R^2
 
-# test we have a complex
-iszero(M1*M2)
+julia> M1 = Singular.Matrix(M)
+[x + 1, x^2 + 1
+x*y + 1, 2*x + 3*y
+y, x]
+
+julia> M2 = Singular.Matrix(F[2])
+[0
+0]
+
+julia> iszero(M1*M2) # test we have a complex
+true
 ```
 
 ### Jet of module
@@ -235,14 +297,25 @@ jet(::smodule, ::Int)
 
 **Examples**
 
-```julia
-R, (x, y) = polynomial_ring(QQ, ["x", "y"])
+```jldoctest
+julia> R, (x, y) = polynomial_ring(QQ, ["x", "y"])
+(Singular Polynomial Ring (QQ),(x,y),(dp(2),C), spoly{n_Q}[x, y])
 
-v1 = vector(R, x + 1, x*y + 1, y)
-v2 = vector(R, x^5 + 1, 2x^3 + 3y^2, x^2)
+julia> v1 = vector(R, x + 1, x*y + 1, y)
+x*y*gen(2)+x*gen(1)+y*gen(3)+gen(2)+gen(1)
 
-M = Singular.Module(R, v1, v2)
-N = jet(M,3)
+julia> v2 = vector(R, x^5 + 1, 2x^3 + 3y^2, x^2)
+x^5*gen(1)+2*x^3*gen(2)+x^2*gen(3)+3*y^2*gen(2)+gen(1)
+
+julia> M = Singular.Module(R, v1, v2)
+Singular Module over Singular Polynomial Ring (QQ),(x,y),(dp(2),C), with Generators:
+x*y*gen(2)+x*gen(1)+y*gen(3)+gen(2)+gen(1)
+x^5*gen(1)+2*x^3*gen(2)+x^2*gen(3)+3*y^2*gen(2)+gen(1)
+
+julia> N = jet(M,3)
+Singular Module over Singular Polynomial Ring (QQ),(x,y),(dp(2),C), with Generators:
+x*y*gen(2)+x*gen(1)+y*gen(3)+gen(2)+gen(1)
+2*x^3*gen(2)+x^2*gen(3)+3*y^2*gen(2)+gen(1)
 ```
 
 ### Operations over local rings
@@ -256,16 +329,30 @@ minimal_generating_set(::smodule)
 
 **Examples**
 
-```julia
-R, (x, y) = polynomial_ring(QQ, ["x", "y"]; ordering=:negdegrevlex)
+```jldoctest
+julia> R, (x, y) = polynomial_ring(QQ, ["x", "y"]; ordering=:negdegrevlex)
+(Singular Polynomial Ring (QQ),(x,y),(ds(2),C), spoly{n_Q}[x, y])
 
-has_local_ordering(R) == true
+julia> has_local_ordering(R) == true
+true
 
-v1 = vector(R, x, y^2)
-v2 = vector(R, y - x, y - y^2)
-v3 = v1 + v2
+julia> v1 = vector(R, x, y^2)
+x*gen(1)+y^2*gen(2)
 
-M = Singular.Module(R, v1, v2, v3)
+julia> v2 = vector(R, y - x, y - y^2)
+-x*gen(1)+y*gen(2)+y*gen(1)-y^2*gen(2)
 
-min = minimal_generating_set(M)
+julia> v3 = v1 + v2
+y*gen(2)+y*gen(1)
+
+julia> M = Singular.Module(R, v1, v2, v3)
+Singular Module over Singular Polynomial Ring (QQ),(x,y),(ds(2),C), with Generators:
+x*gen(1)+y^2*gen(2)
+-x*gen(1)+y*gen(2)+y*gen(1)-y^2*gen(2)
+y*gen(2)+y*gen(1)
+
+julia> min = minimal_generating_set(M)
+2-element Vector{svector{spoly{n_Q}}}:
+ y*gen(2)+y*gen(1)
+ x*gen(1)-y*gen(2)-y*gen(1)+y^2*gen(2)
 ```
