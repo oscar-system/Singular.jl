@@ -36,6 +36,15 @@ function gens(M::FreeMod{T}) where T <: AbstractAlgebra.RingElem
    return [svector{T}(R, M.rank, libSingular.getindex(ptr, Cint(i - 1))) for i in 1:M.rank]
 end
 
+function gen(M::FreeMod{T}, i::Int) where T <: AbstractAlgebra.RingElem
+   1 <= i <= M.rank || error("index out of range")
+   R = base_ring(M)
+   ptr = GC.@preserve R libSingular.id_FreeModule(Cint(M.rank), R.ptr)
+   return svector{T}(R, M.rank, libSingular.getindex(ptr, Cint(i - 1)))
+end
+
+ngens(M::FreeMod{T}) where T <: AbstractAlgebra.RingElem = rank(M)
+
 function deepcopy_internal(p::svector{T}, dict::IdDict) where T <: AbstractAlgebra.RingElem
    R = base_ring(p)
    p2 = GC.@preserve p R libSingular.p_Copy(p.ptr, R.ptr)

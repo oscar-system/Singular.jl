@@ -60,12 +60,14 @@ function setindex!(I::sideal{S}, p::S, i::Int) where S <: SPolyUnion
    end
 end
 
-function getindex(I::sideal{S}, i::Int) where S <: SPolyUnion
+function gen(I::sideal{S}, i::Int) where S <: SPolyUnion
    checkbounds(I, i)
    R = base_ring(I)
    GC.@preserve I p = libSingular.getindex(I.ptr, Cint(i - 1))
    GC.@preserve R return R(libSingular.p_Copy(p, R.ptr))::S
 end
+
+getindex(I::sideal{S}, i::Int) where S <: SPolyUnion = gen(I, i)
 
 @doc raw"""
     iszero(I::sideal)
