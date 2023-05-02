@@ -9,7 +9,7 @@ end
 
 Singular.jl is a Julia interface to the Singular computer algebra system. It was
 written by Oleksandr Motsak, William Hart and other contributors, and is maintained by
-William Hart, Hans Schoenemann and Andreas Steenpas. It is part of the Oscar project which is
+Hans Schoenemann and Max Horn. It is part of the Oscar project which is
 supported by the Deutsche Forschungsgemeinschaft DFG within the
 [Collaborative Research Center TRR 195](https://www.computeralgebra.de/sfb/).
 
