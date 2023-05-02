@@ -64,7 +64,7 @@ function gen(I::sideal{S}, i::Int) where S <: SPolyUnion
    checkbounds(I, i)
    R = base_ring(I)
    GC.@preserve I p = libSingular.getindex(I.ptr, Cint(i - 1))
-   GC.@preserve R return R(libSingular.p_Copy(p, R.ptr))::S
+   GC.@preserve I return R(libSingular.p_Copy(p, R.ptr))::S
 end
 
 getindex(I::sideal{S}, i::Int) where S <: SPolyUnion = gen(I, i)
