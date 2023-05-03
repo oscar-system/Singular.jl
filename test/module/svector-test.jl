@@ -25,6 +25,10 @@
    if sizeof(Cint) < sizeof(Int)
       @test_throws DomainError FreeModule(R, typemax(Int))
    end
+
+   @test gen(M,1) == gens(M)[1]
+   @test_throws ErrorException gen(M,0)
+   @test_throws ErrorException gen(M,ngens(M)+1)
 end
 
 @testset "svector.jet" begin
