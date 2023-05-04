@@ -22,10 +22,10 @@ function regenerate_libraryfuncdictionary(prefixpath)
     filenames = filter(x -> endswith(x, ".lib"), readdir(library_dir))
     output_filename = abspath(@__DIR__, "libraryfuncdictionary.jl")
 
-    @info "Regenerating $(output_filename)"
+    @debug "Regenerating $(output_filename)"
 
     #=
-      Loops over all libraries and executes libparse on it.
+      Loops over all libraries and executes libparse on each.
       The first three lines of the libparse output are general information
       about the library, so we ignore it. We are only interested in the
       first column (library name) and the third column (globally exposed or not).
