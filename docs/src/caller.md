@@ -50,7 +50,7 @@ julia> Singular.LibGeneral.sort([x, y])
 ERROR: `intvec` may be passed in as Vector{Int}. All other vectors (`list` in Singular) must be passed in as Vector{Any} along with an explicit base ring in the first argument
 
 julia> Singular.LibGeneral.sort(r0, Any[x, y])
-2-element Vector{Vector{T} where T}:
+2-element Vector{Vector}:
  spoly{n_Q}[y, x]
  [2, 1]
 ```
