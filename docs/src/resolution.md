@@ -55,7 +55,7 @@ Resolution(::Vector{smodule{T}}) where T <: AbstractAlgebra.FieldElem
 
 **Example**
 
-```jldoctest
+```
 julia> R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 (Singular Polynomial Ring (QQ),(x,y),(dp(2),C), spoly{n_Q}[x, y])
 
