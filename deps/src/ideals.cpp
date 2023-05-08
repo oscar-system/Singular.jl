@@ -620,22 +620,22 @@ void singular_define_ideals(jlcxx::Module & Singular)
         delete v;
         rChangeCurrRing(origin);
     });
-    Singular.method("scHilbWeighted", [](ideal I, ring r, jlcxx::ArrayRef<int> weights, jlcxx::ArrayRef<int> shifts, jlcxx::ArrayRef<int> a) {
-        intvec * w = to_intvec(weights);
-        intvec * sh = to_intvec(shifts);
-        const ring origin = currRing;
-        rChangeCurrRing(r);
-        intvec *v=hFirstSeries(I,sh,r->qideal,w);
-        delete sh;
-        delete w;
-        int * content = v->ivGetVec();
-        for(int j = 0; j < v->length(); j++)
-        {
-          a.push_back(content[j]);
-        }
-        delete v;
-        rChangeCurrRing(origin);
-    });
+    Singular.method("scHilbWeighted", [](ideal I, ring r, jlcxx::ArrayRef<int> weights, jlcxx::ArrayRef<int> shifts, jlcxx::ArrayRef<int> a) {
+        intvec * w = to_intvec(weights);
+        intvec * sh = to_intvec(shifts);
+        const ring origin = currRing;
+        rChangeCurrRing(r);
+        intvec *v=hFirstSeries(I,sh,r->qideal,w);
+	delete sh;
+        delete w;
+        int * content = v->ivGetVec();
+        for(int j = 0; j < v->length(); j++)
+        {
+          a.push_back(content[j]);
+        }
+        delete v;
+        rChangeCurrRing(origin);
+    });
     Singular.method("id_Homogen", id_Homogen);
     Singular.method("id_HomModule", [](jlcxx::ArrayRef<int> weights, ideal I, ring r) {
         intvec* w = NULL;
