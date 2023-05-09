@@ -3,4 +3,4 @@ Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 Singular = "bcd08a7b-43d2-5ff7-b6d4-c458787f915c"
 
 [compat]
-Documenter = "0.28"
+Documenter = "0.27"
