@@ -536,6 +536,15 @@ function show(io::IO, R::PolyRing)
    end
 end
 
+function show(io::IO, ::MIME"text/plain", R::PolyRing)
+   s = libSingular.rString(R.ptr)
+   if libSingular.rIsQuotientRing(R.ptr)
+      print(io, "Singular Polynomial Quotient Ring ", s)
+   else
+      print(io, "Singular Polynomial Ring ", s)
+   end
+end
+
 function expressify(a::Union{spoly, spluralg}, x = symbols(parent(a)); context = nothing)
    sum = Expr(:call, :+)
    for (c, v) in zip(coefficients(a), exponent_vectors(a))
