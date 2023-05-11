@@ -343,12 +343,31 @@ void singular_define_ideals(jlcxx::Module & Singular)
         return std::make_tuple(res, factors);
     });
 
+    Singular.method("id_DivRem", [](ideal m, ideal sm, ring o, int flag) {
+        const ring origin = currRing;
+        rChangeCurrRing(o);
+        ideal factors;
+        ideal res = idDivRem(sm, m, factors, NULL,flag);
+        rChangeCurrRing(origin);
+        return std::make_tuple(res, factors);
+    });
+
     Singular.method("id_DivRem_Unit", [](ideal m, ideal sm, ring o) {
         const ring origin = currRing;
         rChangeCurrRing(o);
         ideal factors;
         ideal unit;
         ideal res = idDivRem(sm, m, factors, &unit);
+        rChangeCurrRing(origin);
+        return std::make_tuple(res, factors, unit);
+    });
+
+    Singular.method("id_DivRem_Unit", [](ideal m, ideal sm, ring o, int flag) {
+        const ring origin = currRing;
+        rChangeCurrRing(o);
+        ideal factors;
+        ideal unit;
+        ideal res = idDivRem(sm, m, factors, &unit, flag);
         rChangeCurrRing(origin);
         return std::make_tuple(res, factors, unit);
     });
@@ -592,6 +611,22 @@ void singular_define_ideals(jlcxx::Module & Singular)
         const ring origin = currRing;
         rChangeCurrRing(r);
         intvec *v=hFirstSeries(I,NULL,r->qideal,w);
+        delete w;
+        int * content = v->ivGetVec();
+        for(int j = 0; j < v->length(); j++)
+        {
+          a.push_back(content[j]);
+        }
+        delete v;
+        rChangeCurrRing(origin);
+    });
+    Singular.method("scHilbWeighted", [](ideal I, ring r, jlcxx::ArrayRef<int> weights, jlcxx::ArrayRef<int> shifts, jlcxx::ArrayRef<int> a) {
+        intvec * w = to_intvec(weights);
+        intvec * sh = to_intvec(shifts);
+        const ring origin = currRing;
+        rChangeCurrRing(r);
+        intvec *v=hFirstSeries(I,sh,r->qideal,w);
+	delete sh;
         delete w;
         int * content = v->ivGetVec();
         for(int j = 0; j < v->length(); j++)
