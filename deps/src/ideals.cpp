@@ -35,7 +35,7 @@ auto id_res_helper(sip_sideal * I, int n, int minimize, ring R)
 {
     auto origin = currRing;
     rChangeCurrRing(R);
-    syStrategy s = syResolution(I, n, minimize);
+    syStrategy s = syResolution(I, n, NULL, (BOOLEAN)minimize);
     rChangeCurrRing(origin);
     auto r = s->minres;
     bool minimal = true;
