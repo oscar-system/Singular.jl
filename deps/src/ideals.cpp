@@ -31,6 +31,20 @@ auto id_fres_helper(sip_sideal * I, int n, std::string method, ring R)
     return std::make_tuple(s, minimal);
 }
 
+auto id_res_helper(sip_sideal * I, int n, int minimize, ring R)
+{
+    auto origin = currRing;
+    rChangeCurrRing(R);
+    syStrategy s = syResolution(I, n, minimize);
+    rChangeCurrRing(origin);
+    auto r = s->minres;
+    bool minimal = true;
+    if (r == NULL) {
+        r = s->fullres;
+        minimal = false;
+    }
+    return std::make_tuple(s, minimal);
+}
 
 ideal id_Syzygies_internal(ideal m, ring o)
 {
@@ -315,6 +329,8 @@ void singular_define_ideals(jlcxx::Module & Singular)
     Singular.method("id_sres", &id_sres_helper);
 
     Singular.method("id_fres", &id_fres_helper);
+
+    Singular.method("id_res", &id_res_helper);
 
     Singular.method("id_Slimgb", &id_Slimgb_helper);
 
