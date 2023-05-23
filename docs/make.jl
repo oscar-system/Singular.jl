@@ -1,4 +1,5 @@
-using Documenter, Singular
+using Documenter
+using Singular
 
 makedocs(
          format = Documenter.HTML(),
