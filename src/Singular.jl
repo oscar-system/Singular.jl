@@ -81,7 +81,7 @@ export ZZ, QQ, FiniteField, FunctionField, CoefficientRing, Fp
 const libsingular = Singular_jll.libsingular
 const binSingular = Singular_jll.Singular_path
 
-const libsingula_julia = libsingular_julia_jll.libsingular_julia
+const libsingular_julia = libsingular_julia_jll.libsingular_julia
 
 const libflint = Nemo.libflint
 const libantic = Nemo.libantic
