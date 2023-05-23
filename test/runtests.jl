@@ -1,23 +1,22 @@
 using Singular
 
-using Random: Random, MersenneTwister
+using Singular.Random: Random, MersenneTwister
 const rng = MersenneTwister()
 
-using RandomExtensions: make
+using Singular.RandomExtensions: make
 
-import AbstractAlgebra
-import Nemo
+import Singular.AbstractAlgebra
+import Singular.Nemo
 
 using Test
 
-include("../test/number-test.jl")
-include("../test/poly-test.jl")
-include("../test/ideal-test.jl")
-include("../test/map-test.jl")
-include("../test/matrix-test.jl")
-include("../test/resolution-test.jl")
-include("../test/module-test.jl")
-include("../test/call_interpreter-test.jl")
-include("../test/caller-test.jl")
-include("../test/libsingular-test.jl")
-
+include("number-test.jl")
+include("poly-test.jl")
+include("ideal-test.jl")
+include("map-test.jl")
+include("matrix-test.jl")
+include("resolution-test.jl")
+include("module-test.jl")
+include("call_interpreter-test.jl")
+include("caller-test.jl")
+include("libsingular-test.jl")
