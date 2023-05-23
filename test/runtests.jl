@@ -1,12 +1,12 @@
 using Singular
 
-using Random: Random, MersenneTwister
+using Singular.Random: Random, MersenneTwister
 const rng = MersenneTwister()
 
-using RandomExtensions: make
+using Singular.RandomExtensions: make
 
-import AbstractAlgebra
-import Nemo
+import Singular.AbstractAlgebra
+import Singular.Nemo
 
 using Test
 
