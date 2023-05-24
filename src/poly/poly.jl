@@ -1007,22 +1007,23 @@ function evaluate(a::SPolyUnion{T}, C::Vector{n_Z}) where T <: Nemo.RingElem
    return evaluate(a, C2)
 end
 
-function (a::SPolyUnion{T})(vals::T...) where T <: RingElem
-   length(vals) != nvars(parent(a)) && error("Number of variables does not match number o
-f values")
-   return evaluate(a, [vals...])
+function (a::SPolyUnion{T})() where T <: RingElem
+   0 != nvars(parent(a)) && error("Number of variables does not match number of values")
+   return evaluate(a, T[])
 end
 
-function (a::SPolyUnion{T})(vals::U...) where {T <: RingElem, U <: Union{Integer, Rational,
- AbstractFloat}}
-   length(vals) != nvars(parent(a)) && error("Number of variables does not match number o
-f values")
-   return evaluate(a, [vals...])
+function (a::SPolyUnion{T})(val::T, vals::T...) where T <: RingElem
+   1 + length(vals) != nvars(parent(a)) && error("Number of variables does not match number of values")
+   return evaluate(a, T[val, vals...])
+end
+
+function (a::SPolyUnion{T})(val::U, vals::U...) where {T <: RingElem, U <: Union{Integer, Rational, AbstractFloat}}
+   1 + length(vals) != nvars(parent(a)) && error("Number of variables does not match number of values")
+   return evaluate(a, U[val, vals...])
 end
 
 function (a::SPolyUnion{T})(vals::Union{Nemo.NCRingElem, Nemo.RingElement}...) where T <: RingElem
-   length(vals) != nvars(parent(a)) && error("Number of variables does not match number o
-f values")
+   length(vals) != nvars(parent(a)) && error("Number of variables does not match number of values")
    R = base_ring(a)
    # The best we can do here is to cache previously used powers of the values
    # being substituted, as we cannot assume anything about the relative
