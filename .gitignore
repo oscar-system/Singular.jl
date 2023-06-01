@@ -2,6 +2,8 @@
 *.jl.cov
 *.jl.mem
 /bin/
+/deps/build*/
+/deps/install*/
 /docs/build/
 /gh-pages/
 /local/*

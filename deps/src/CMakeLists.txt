@@ -1,21 +1,19 @@
 cmake_minimum_required(VERSION 3.01)
 
-# I don't know why I need the following, but it works
-if(POLICY CMP0025)
-    cmake_policy(SET CMP0025 NEW)
-endif()
-
 project(libsingular_julia)
+
+set(JL_TARGET singular_julia)
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 
 find_package(JlCxx REQUIRED)
+get_target_property(JlCxx_location JlCxx::cxxwrap_julia LOCATION)
+get_filename_component(JlCxx_location ${JlCxx_location} DIRECTORY)
+message(STATUS "Found JlCxx at ${JlCxx_location}")
 
 include(CheckCXXCompilerFlag)
 
 set(CMAKE_CXX_STANDARD 14)
-
-set(JLSINGULAR_TARGET singular_julia)
 
 # avoid gcc 9 internal compiler error,
 # see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=90998
@@ -28,25 +26,47 @@ endif()
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 set(CMAKE_INSTALL_LIBDIR "lib")
 
-get_target_property(JlCxx_location JlCxx::cxxwrap_julia LOCATION)
-get_filename_component(JlCxx_location ${JlCxx_location} DIRECTORY)
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib;${JlCxx_location}")
 
-message(STATUS "Found JlCxx at ${JlCxx_location}")
+include_directories(
+    ${Singular_PREFIX}/include
+    ${Singular_PREFIX}/include/singular
+    ${gmp_prefix}/include
+    )
 
-include_directories(${CMAKE_INSTALL_PREFIX})
-include_directories(${Singular_PREFIX}/include/singular)
+link_directories(
+    ${Singular_PREFIX}/lib
+    ${gmp_prefix}/lib
+    )
 
-SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g ${extra_cppflags} -I${CMAKE_INSTALL_PREFIX}/include -I${Singular_PREFIX}/include/" )
-SET( CMAKE_SHARED_LINKER_FLAGS  "${CMAKE_SHARED_LINKER_FLAGS} -v ${extra_ldflags} -L${CMAKE_INSTALL_PREFIX}/lib -Wl,-rpath,${CMAKE_INSTALL_PREFIX}/lib -L${Singular_PREFIX}/lib -Wl,-rpath,${Singular_PREFIX}/lib" )
+#SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g ${extra_cppflags}" )
+#SET( CMAKE_SHARED_LINKER_FLAGS  "${CMAKE_SHARED_LINKER_FLAGS} -v ${extra_ldflags} )
 
 
-add_library(${JLSINGULAR_TARGET} SHARED singular.cpp rings.cpp coeffs.cpp ideals.cpp matrices.cpp caller.cpp coeff_rings.cpp threading.cpp)
+add_library(${JL_TARGET} SHARED
+    singular.cpp
+    rings.cpp
+    coeffs.cpp
+    ideals.cpp
+    matrices.cpp
+    caller.cpp
+    coeff_rings.cpp
+    threading.cpp
+    )
 
-target_link_libraries(${JLSINGULAR_TARGET} JlCxx::cxxwrap_julia -lSingular -lpolys -lsingular_resources -lfactory -lomalloc -ldl -lgmp)
+target_link_libraries(${JL_TARGET}
+    JlCxx::cxxwrap_julia
+    -lSingular
+    -lpolys
+    -lsingular_resources
+    -lfactory
+    -lomalloc
+    -ldl
+    -lgmp
+    )
 
 install(TARGETS
-  ${JLSINGULAR_TARGET}
+  ${JL_TARGET}
 ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
