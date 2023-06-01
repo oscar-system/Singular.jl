@@ -25,8 +25,6 @@ end
 #
 ###############################################################################
 
-using CxxWrap
-
 const IntegersID = Dict{Symbol, Ring}()
 
 mutable struct Integers <: Ring
