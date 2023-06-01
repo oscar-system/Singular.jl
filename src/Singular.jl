@@ -66,9 +66,8 @@ import Nemo: add!, addeq!, base_ring, canonical_unit,
 
 export base_ring, elem_type, parent_type, parent
 
-export residue_ring, polynomial_ring, ExteriorAlgebra, WeylAlgebra, Ideal,
-       MaximalIdeal, FreeModule, @polynomial_ring, @WeylAlgebra,
-       @ExteriorAlgebra
+export residue_ring, polynomial_ring, WeylAlgebra, Ideal,
+       MaximalIdeal, FreeModule, @polynomial_ring, @WeylAlgebra
 
 export ZZ, QQ, FiniteField, FunctionField, CoefficientRing, Fp
 

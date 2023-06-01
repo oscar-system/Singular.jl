@@ -10,6 +10,8 @@ import Singular.Nemo
 
 using Test
 
+include("Aqua.jl")
+
 include("number-test.jl")
 include("poly-test.jl")
 include("ideal-test.jl")
