@@ -66,14 +66,17 @@ const nemoNumberID = Base.Dict{UInt, live_cache}()
 
 function julia(cf::coeffs_ptr)
    ptr = get_coeff_data(cf)
+   @assert ptr != C_NULL
    return unsafe_pointer_to_objref(ptr)
 end
 
 function julia(p::Ptr{Cvoid})
+    @assert p != C_NULL
     return unsafe_pointer_to_objref(p)
 end
 
 function number_pop!(D::Base.Dict{UInt, live_cache}, ptr::Ptr{Cvoid})
+    @assert ptr != C_NULL
     iptr = reinterpret(UInt, ptr) >> 24
     if haskey(D, iptr)
         val = D[iptr]
@@ -88,6 +91,7 @@ end
 # j alive because it is going into nemoNumberID
 function number(j::T) where {T <: Nemo.RingElem}
     ptr = pointer_from_objref(j)
+    @assert ptr != C_NULL
     iptr = reinterpret(UInt, ptr) >> 24
     if !haskey(nemoNumberID, iptr)
        nemoNumberID[iptr] = live_cache(0, Array{Nemo.RingElem}(undef, 64))
