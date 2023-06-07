@@ -439,6 +439,6 @@ function hilbert_series(M::smodule{spoly{T}}, w::Vector{<:Integer}, shifts::Vect
   w = convert(Vector{Int32}, w)
   shifts = convert(Vector{Int32}, shifts)
   z = Vector{Int32}()
-  GC.@preserve M R libSingular.scHilWeighted(M.ptr, R.ptr, w, shiifts, z)
+  GC.@preserve M R libSingular.scHilWeighted(M.ptr, R.ptr, w, shifts, z)
   return z
 end
