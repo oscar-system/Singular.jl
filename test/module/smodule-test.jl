@@ -267,3 +267,14 @@ end
    v4 = vector(R, R(0), y)
    @test vdim(std(Singular.Module(R, v1, v2, v3, v4))) == 2
 end
+
+@testset "smodule.hilbert_series" begin
+   R, (x, y, z) = polynomial_ring(QQ, ["x", "y", "z"])
+   v1 = vector(R, x^2, R(0))
+   v2 = vector(R, y^2, R(0))
+   v3 = vector(R, z^2, R(0))
+   v4 = vector(R, R(0), R(1))
+   M = Singular.Module(R, v1, v2, v3, v4)
+   M.isGB = true
+   @test hilbert_series(M,[1,1,1],[0,0]) == [1,0,-3,0,3,0,-1,0]
+end   

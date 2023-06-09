@@ -424,3 +424,21 @@ function vdim(I::smodule)
    R = base_ring(I)
    GC.@preserve I R return Int(libSingular.id_vdim(I.ptr, R.ptr))
 end
+
+###############################################################################
+#
+#   Hilbert series
+#
+###############################################################################
+
+function hilbert_series(M::smodule{spoly{T}}, w::Vector{<:Integer}, shifts::Vector{<:Integer}) where T <: Nemo.FieldElem
+  M.isGB || error("Not a Groebner basis")
+  R = base_ring(M)
+  length(w) == nvars(R) || error("wrong number of weights")
+  all(x -> x>0, w) || error("weights must be positive")
+  w = convert(Vector{Int32}, w)
+  shifts = convert(Vector{Int32}, shifts)
+  z = Vector{Int32}()
+  GC.@preserve M R libSingular.scHilbWeighted(M.ptr, R.ptr, w, shifts, z)
+  return z
+end
