@@ -43,6 +43,14 @@ auto id_res_helper(sip_sideal * I, int n, int minimize, ring R)
         r = s->fullres;
         minimal = false;
     }
+    for(int i=0;i<=n+1;i++)
+    {
+      if (r[i]==NULL)
+      {
+        r[i]=idInit(1,1);
+        break;
+      }
+    }
     return std::make_tuple(s, minimal);
 }
 
@@ -642,7 +650,7 @@ void singular_define_ideals(jlcxx::Module & Singular)
         const ring origin = currRing;
         rChangeCurrRing(r);
         intvec *v=hFirstSeries(I,sh,r->qideal,w);
-	delete sh;
+        delete sh;
         delete w;
         int * content = v->ivGetVec();
         for(int j = 0; j < v->length(); j++)

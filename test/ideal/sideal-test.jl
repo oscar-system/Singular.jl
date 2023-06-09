@@ -461,14 +461,20 @@ end
 
    F1 = @inferred fres(std(I), 4)
    F2 = @inferred sres(std(I), 4)
+   F3 = @inferred nres(I, 4)
+   F4 = @inferred mres(I, 4)
 
    # check resolution is of the correct length
    @test (@inferred length(F1)) == 2
    @test (@inferred length(F2)) == 2
+   @test (@inferred length(F3)) == 2
+   @test (@inferred length(F4)) == 2
 
    # check index 1 is an ideal
    @test F1[1] isa sideal
    @test F2[1] isa sideal
+   @test F3[1] isa sideal
+   @test F4[1] isa sideal
 
    M1 = @inferred Singular.Matrix(F1[1])
    N1 = @inferred Singular.Matrix(F1[2])
@@ -476,9 +482,17 @@ end
    M2 = @inferred Singular.Matrix(F2[1])
    N2 = @inferred Singular.Matrix(F2[2])
 
+   M3 = @inferred Singular.Matrix(F3[1])
+   N3 = @inferred Singular.Matrix(F3[2])
+
+   M4 = @inferred Singular.Matrix(F4[1])
+   N4 = @inferred Singular.Matrix(F4[2])
+
    # check we have a complex
    @test iszero(M1*N1)
    @test iszero(M2*N2)
+   @test iszero(M3*N3)
+   @test iszero(M4*N4)
 end
 
 @testset "sideal.syzygy" begin
