@@ -277,4 +277,4 @@ end
    M = Singular.Module(R, v1, v2, v3, v4)
    M.isGB = true
    @test hilbert_series(M,[1,1,1],[0,0]) == [1,0,-3,0,3,0,-1,0]
-end   
+end
