@@ -90,7 +90,7 @@ end
 @doc raw"""
     preimage(f::AbstractAlgebra.Map(SIdAlgHom), I::sideal)
 
-Returns the preimage of the ideal $I$ under the identity algebra homomorphism.
+Return the preimage of the ideal $I$ under the identity algebra homomorphism.
 """
 function preimage(f::Map(SIdAlgHom), I::sideal)
 
@@ -104,7 +104,7 @@ end
 @doc raw"""
     kernel(f::AbstractAlgebra.Map(SIdAlgHom))
 
-Returns the kernel of the identity algebra homomorphism.
+Return the kernel of the identity algebra homomorphism.
 """
 function kernel(f::Map(SIdAlgHom))
    return Ideal(f.domain, )

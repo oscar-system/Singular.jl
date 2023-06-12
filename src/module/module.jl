@@ -145,7 +145,7 @@ end
 Given a module $I$ this function computes a Groebner basis for it.
 Compared to `std`, `slimgb` uses different strategies for choosing
 a reducer.
->
+
 If the optional parameter `complete_reduction` is set to `true` the
 function computes a reduced Gröbner basis for $I$.
 """
@@ -165,7 +165,8 @@ end
 ###############################################################################
 
 @doc raw"""
-   reduce(M::smodule, G::smodule)
+    reduce(M::smodule, G::smodule)
+
 Return a submodule whose generators are the generators of $M$ reduced by the
 submodule $G$. The submodule $G$ need not be a Groebner basis. The returned
 submodule will have the same number of generators as $M$, even if they are zero.
@@ -221,7 +222,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    sres{T <: Singular.FieldElem}(I::smodule{spoly{T}}, max_length::Int)
+    sres(I::smodule{spoly{T}}, max_length::Int) where T <: Singular.FieldElem
 
 Compute a free resolution of the given module $I$ of length up to the given
 maximum length. If `max_length` is set to zero, a full length free
@@ -261,7 +262,8 @@ end
 ###############################################################################
 
 @doc raw"""
-   jet(M::smodule, n::Int)
+    jet(M::smodule, n::Int)
+
 Given a module $M$ this function truncates the generators of $M$
 up to degree $n$.
 """
@@ -279,9 +281,9 @@ end
 ###############################################################################
 
 @doc raw"""
-   minimal_generating_set(M::smodule)
-Given a module $M$ in ring $R$ with local ordering, this returns an array
-containing the minimal generators of $M$.
+    minimal_generating_set(M::smodule)
+
+Return a vector containing the minimal generators of $M$.
 """
 function minimal_generating_set(M::smodule)
    R = base_ring(M)
@@ -302,9 +304,8 @@ end
 @doc raw"""
     eliminate(M::smodule, polys::spoly...)
 
-Given a list of polynomials which are variables, construct the
-the intersection of M with the free module
-where those variables have been eliminated.
+Given a module `M` and a list of polynomials which are variables, construct the
+intersection of `M` with the free module where those variables have been eliminated.
 """
 function eliminate(M::smodule, polys::spoly...)
    R = base_ring(M)
@@ -379,9 +380,8 @@ end
 @doc raw"""
     lift_std_syz(M::smodule)
 
-computes the Groebner base G of M, the transformation matrix T and the syzygies of M.
-Returns G,T,S
-(Matrix(G) = Matrix(M) * T, 0=Matrix(M)*Matrix(S))
+Computes the Groebner base `G` of `M`, the transformation matrix `T` and the syzygies of M.
+Returns a tuple `(G,T,S)` satisfying `(Matrix(G) = Matrix(M) * T, 0=Matrix(M)*Matrix(S))`.
 """
 function lift_std_syz(M::smodule; complete_reduction::Bool = false)
    R = base_ring(M)
@@ -392,8 +392,8 @@ end
 @doc raw"""
     lift_std(M::smodule)
 
-computes the Groebner base G of M and the transformation matrix T such that
-(Matrix(G) = Matrix(M) * T)
+Computes the Groebner base `G` of `M` and the transformation matrix `T` such that
+`(Matrix(G) = Matrix(M) * T)`.
 """
 function lift_std(M::smodule; complete_reduction::Bool = false)
    R = base_ring(M)
@@ -410,7 +410,7 @@ end
 @doc raw"""
     modulo(A::smodule, B:smodule)
 
-represents  A/(A intersect B) (isomorphic to (A+B)/B)
+Represents  A/(A intersect B) (isomorphic to (A+B)/B)
 """
 function modulo(A::smodule, B::smodule)
    R = base_ring(A)

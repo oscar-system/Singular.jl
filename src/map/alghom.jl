@@ -61,7 +61,7 @@ end
     compose(f::AbstractAlgebra.Map(Singular.SAlgHom),
                          g::AbstractAlgebra.Map(Singular.SAlgHom))
 
-Returns an algebra homomorphism $h: domain(f) \to codomain(g)$,
+Return an algebra homomorphism $h: domain(f) \to codomain(g)$,
 where $h = g(f)$.
 """
 function compose(f::Map(SAlgHom), g::Map(SAlgHom))
@@ -97,7 +97,7 @@ end
 @doc raw"""
     preimage(f::AbstractAlgebra.Map(SAlgHom), I::sideal)
 
-Returns the preimage of the ideal $I$ under the algebra homomorphism $f$.
+Return the preimage of the ideal $I$ under the algebra homomorphism $f$.
 """
 function preimage(f::Map(SAlgHom), I::sideal)
 
@@ -118,7 +118,7 @@ end
 @doc raw"""
     kernel(f::AbstractAlgebra.Map(SAlgHom))
 
-Returns the kernel of the algebra homomorphism $f$.
+Return the kernel of the algebra homomorphism $f$.
 """
 function kernel(f::Map(SAlgHom))
    return preimage(f, Ideal(f.codomain, ))

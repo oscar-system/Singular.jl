@@ -121,7 +121,7 @@ end
 @doc raw"""
     n_transExt_to_spoly(x::n_transExt; parent::PolyRing)
 
-Returns the numerator of `x` as a polynomial in a polynomial ring with at least
+Return the numerator of `x` as a polynomial in a polynomial ring with at least
 as many variables as the transcendence degree of `parent(x)`. If a ring `parent`
 is given to the function, it will be the parent ring of the output.
 """
@@ -374,7 +374,7 @@ end
 @doc raw"""
     FunctionField(F::Singular.Field, S::AbstractVector{<:VarName})
 
-Returns a tuple $K, a$ consisting of a function field $K$ over the field $F$
+Return a tuple $K, a$ consisting of a function field $K$ over the field $F$
 with transcendence basis stored in the array $S$.
 """
 function FunctionField(F::Singular.Field, S::AbstractVector{<:VarName}; cached::Bool=true)
@@ -388,7 +388,7 @@ end
 @doc raw"""
     FunctionField(F::Singular.Field, n::Int)
 
-Returns a tuple $K, a$ consisting of a function field $K$ over the field $F$
+Return a tuple $K, a$ consisting of a function field $K$ over the field $F$
 with transcendence degree $n$ and transcendence basis $a1, ..., an$.
 """
 function FunctionField(F::Singular.Field, n::Int; cached::Bool=true)
