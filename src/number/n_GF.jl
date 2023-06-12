@@ -334,7 +334,7 @@ promote_rule(C::Type{n_GF}, ::Type{n_Z}) = n_GF
 @doc raw"""
     FiniteField(p::Int, n::Int, S::VarName; cached=true)
 
-Returns a tuple `K, a` consisting of a finite field `K` of characteristic $p$
+Return a tuple `K, a` consisting of a finite field `K` of characteristic $p$
 and degree $n$, and its generator `a`. The string used to print the
 generator is given by `S`. If the finite field is not listed in the Conway
 tables included in Singular, an error will be raised. By default, finite
