@@ -1,4 +1,4 @@
-name: Check treehash matches
+name: Treehash
 
 on:
   push:
@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   treehash:
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: "Set up Julia"
@@ -27,10 +27,6 @@ jobs:
         uses: julia-actions/cache@v1
       - name: "Build package"
         uses: julia-actions/julia-buildpkg@latest
-      - name: "Run tests"
-        uses: julia-actions/julia-runtest@latest
-        with:
-          depwarn: error
       - name: "Check treehash match"
         run: |
           julia --project --color=yes -e '
