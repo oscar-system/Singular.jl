@@ -26,9 +26,6 @@ function regenerate_libraryfuncdictionary(prefixpath)
 
     library_dir = get(ENV, "SINGULAR_LIBRARY_DIR", abspath(prefixpath, "share", "singular", "LIB"))
     filenames = filter(x -> endswith(x, ".lib"), readdir(library_dir))
-    output_filename = abspath(@__DIR__, "libraryfuncdictionary.jl")
-
-    @debug "Regenerating $(output_filename)"
 
     #=
       Loops over all libraries and executes libparse on each.
@@ -38,31 +35,23 @@ function regenerate_libraryfuncdictionary(prefixpath)
       All other columns (containing info such as line numbers, library name, etc)
       are ignored.
     =#
-    io = IOBuffer()
+    dict = Dict{Symbol, Vector{Tuple{String, String}}}()
     cd(abspath(prefixpath, "bin")) do
-       println(io, "libraryfunctiondictionary = Dict(")
        for libfile in filenames
+           libname = Symbol(libfile[1:end - 4]) # strip the '.lib' suffix
            full_path = joinpath(library_dir, libfile)
            output = Singular_jll.libparse() do exe
                read(`$exe $full_path`, String)
            end
            libs_splitted = split(output,"\n")[4:end - 1]
            libs_splitted = [split(i, " ", keepempty = false) for i in libs_splitted]
-           println(io, ":$(libfile[1:end - 4]) => [")
-           for j in libs_splitted
-               println(io, """[ "$(j[1])", "$(j[3])" ],""")
-           end
-           println(io, "],\n")
+           dict[libname] = [(j[1], j[3]) for j in libs_splitted]
        end
-       println(io, ")\n")
     end
-    data = String(take!(io))
-    if !isfile(output_filename) || read(output_filename, String) != data
-       write(output_filename, data)
-    end
+    return dict
 end
 
-regenerate_libraryfuncdictionary(Singular_jll.find_artifact_dir())
+const libraryfunctiondictionary = regenerate_libraryfuncdictionary(Singular_jll.find_artifact_dir())
 
 function jll_artifact_dir(the_jll::Module)
     artifacts_toml = joinpath(dirname(dirname(Base.pathof(the_jll))), "StdlibArtifacts.toml")

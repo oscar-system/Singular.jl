@@ -4,10 +4,6 @@
    to avoid confusion between the LIBRARYNAME modules and other types, for example "Ideal" or "Poly".
 =#
 
-# This script calls singulars parse_libs and creates a dictionary
-# containing Singulars libraries and the functions contained in those libraries.
-include("libraryfuncdictionary.jl")
-
 #=
    In the dictionary `input_manipulator_funcs` for each library a dictionary
    can be added, and for each function in this library a preprocessing function
@@ -35,7 +31,7 @@ output_manipulator_funcs = Dict(
    ring can be determined from the input arguments. Furthermore, if applicable, input and output manipulator
    functions are added to the call.
 =#
-for (name, funcs) in libraryfunctiondictionary
+for (name, funcs) in Setup.libraryfunctiondictionary
     name_caps = Symbol( "Lib" * uppercasefirst(string(name)))
     func_calls = Any[]
     name_string = string(name) * ".lib"
