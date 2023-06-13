@@ -4,7 +4,7 @@ using CxxWrap
 
 import ..Singular: libflint, libantic, libsingular_julia, AbstractAlgebra
 
-@wrapmodule(libsingular_julia)
+@wrapmodule(libsingular_julia())
 
 function __init__()
    @initcxx

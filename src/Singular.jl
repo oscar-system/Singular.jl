@@ -26,7 +26,6 @@ using Nemo
 using Pkg
 using lib4ti2_jll
 using Singular_jll
-using libsingular_julia_jll
 
 import Base: abs, checkbounds, convert, deepcopy, deepcopy_internal,
              denominator, div, divrem, exponent,
@@ -77,10 +76,12 @@ export ZZ, QQ, FiniteField, FunctionField, CoefficientRing, Fp
 #
 ###############################################################################
 
-const libsingular = Singular_jll.libsingular
+include("setup.jl")
+
 const binSingular = Singular_jll.Singular_path
 
-const libsingular_julia = libsingular_julia_jll.libsingular_julia
+const _libsingular_julia = Ref(Setup.locate_libsingular())
+libsingular_julia() = _libsingular_julia[]
 
 const libflint = Nemo.libflint
 const libantic = Nemo.libantic
@@ -91,6 +92,8 @@ function __init__()
    if Sys.iswindows()
       windows_error()
    end
+
+   _libsingular_julia[] = Setup.locate_libsingular()
 
    # Initialise Singular
    ENV["SINGULAR_EXECUTABLE"] = binSingular
@@ -203,8 +206,6 @@ const VERSION_NUMBER = pkgversion(@__MODULE__)
 #     poly/matrix/module/ideal types before including the methods.
 #
 ###############################################################################
-
-include("setup.jl")
 
 include("AbstractTypes.jl")
 
