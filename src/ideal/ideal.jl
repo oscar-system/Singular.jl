@@ -901,7 +901,8 @@ function sres(I::sideal{spoly{T}}, max_length::Int) where T <: Nemo.FieldElem
 end
 
 @doc raw"""
-     mres{T <: Nemo.FieldElem}(id::sideal{spoly{T}}, max_length::Int)
+    mres(id::sideal{spoly{T}}, max_length::Int) where T <: Nemo.FieldElem
+
 Compute a minimal (free) resolution of the given ideal up to the maximum
 given length. The ideal must be over a polynomial ring over a field.
 The result is given as a resolution, whose i-th entry is
