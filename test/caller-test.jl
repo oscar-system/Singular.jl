@@ -224,6 +224,15 @@ end
     @test Singular.LibCentral.center(A, 3) isa sideal
 end
 
+@testset "#647" begin
+    R, (x, y, z) = polynomial_ring(QQ, ["x","y","z"])
+    v = vector(R,zero(R))
+    M = Singular.Module(R,v)
+    S = Singular.LibSheafcoh.sheafCohBGG(M,-3,10)
+    T = reshape(Int64[1,-1,-1,0,0,-1,0,0,0,0,0,1,0,0,3,0,0,6,0,0,10,0,0,15,0,0,21,0,0,28,0,0,36,0,0,45,-1,0,55,-1,-1,66], 3, 14)
+    @test S == T
+end
+
 @testset "#595" begin
     Singular.libSingular.call_interpreter("ring r=0,(x,y,z),dp;")
     a = Singular.lookup_library_symbol("Top", "r")

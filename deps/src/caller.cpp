@@ -114,7 +114,7 @@ jl_value_t * intmat_to_jl_array(intvec * v)
     int64_t * result_ptr = reinterpret_cast<int64_t *> jl_array_data(result);
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
-            result_ptr[j + (i * cols)] = IMATELEM(*v, i, j);
+            result_ptr[i + (j * rows)] = IMATELEM(*v, i+1, j+1);
         }
     }
     return reinterpret_cast<jl_value_t *>(result);
