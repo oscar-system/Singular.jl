@@ -31,8 +31,8 @@ jobs:
         run: |
           julia --project --color=yes -e '
             using Pkg
-            using Singular
-            path = Singular.Setup.libsingular_julia_jll.find_artifact_dir()
+            using libsingular_julia_jll
+            path = libsingular_julia_jll.find_artifact_dir()
             path = joinpath(path, "lib", "libsingular_julia.treehash")
             jll_hash = chomp(read(path, String))
             src_hash = bytes2hex(Pkg.GitTools.tree_hash(joinpath("deps", "src")))
