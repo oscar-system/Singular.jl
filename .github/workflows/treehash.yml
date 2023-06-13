@@ -1,0 +1,44 @@
+name: Check treehash matches
+
+on:
+  push:
+    branches:
+      - 'master'
+      - 'release-'
+    tags: '*'
+
+concurrency:
+  # group by workflow and ref; the last slightly strange component ensures that for pull
+  # requests, we limit to 1 concurrent job, but for the master branch we don't
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.ref != 'refs/heads/master' || github.run_number }}
+  # Cancel intermediate builds, but only if it is a pull request build.
+  cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
+
+jobs:
+  treehash:
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: "Set up Julia"
+        uses: julia-actions/setup-julia@v1
+        with:
+          version: 1
+      - name: "Cache artifacts"
+        uses: julia-actions/cache@v1
+      - name: "Build package"
+        uses: julia-actions/julia-buildpkg@latest
+      - name: "Run tests"
+        uses: julia-actions/julia-runtest@latest
+        with:
+          depwarn: error
+      - name: "Check treehash match"
+        run: |
+          julia --project --color=yes -e '
+            using Pkg
+            using Singular
+            path = Singular.Setup.libsingular_julia_jll.find_artifact_dir()
+            path = joinpath(path, "lib", "libsingular_julia.treehash")
+            jll_hash = chomp(read(path, String))
+            src_hash = bytes2hex(Pkg.GitTools.tree_hash(joinpath("deps", "src")))
+            jll_hash == src_hash || error("tree hash is $src_hash, but JLL uses $jll_hash")
+            '
