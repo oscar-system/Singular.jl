@@ -255,7 +255,7 @@ function mres(I::smodule{spoly{T}}, max_length::Int) where T <: Nemo.FieldElem
         # TODO: consider qrings
    end
    r, minimal = GC.@preserve I R libSingular.id_res(I.ptr, Cint(max_length + 1), 1, R.ptr)
-   return sresolution{spoly{T}}(R, r, Bool(minimal), true)
+   return sresolution{spoly{T}}(R, r, Bool(minimal), false)
 end
 
 @doc raw"""
@@ -275,7 +275,7 @@ function nres(I::smodule{spoly{T}}, max_length::Int) where T <: Nemo.FieldElem
         # TODO: consider qrings
    end
    r, minimal = GC.@preserve I R libSingular.id_res(I.ptr, Cint(max_length + 1), 0, R.ptr)
-   return sresolution{spoly{T}}(R, r, Bool(minimal), true)
+   return sresolution{spoly{T}}(R, r, Bool(minimal), false)
 end
 
 ###############################################################################
