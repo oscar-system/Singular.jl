@@ -178,21 +178,13 @@ function rename_symbol(prev::Base.Set{String}, x::String, def::String)
       end
    end
 
-   # x in prev || return Symbol(x)
-
    i = 0
    while (i += 1) < 2^32
       xi = x*"@"*string(i)
       xi in prev || return Symbol(xi)
    end
 
-   error("There should not be this many variables to rename")
-
-   # i = BigInt(i)
-   # while true
-   #    xi = x*"@"*string(i)
-   #    xi in prev || return Symbol(xi)
-   # end
+   error("There should not be this many symbols to rename")
 end
 
 function rename_symbol(x::String, def::String)
