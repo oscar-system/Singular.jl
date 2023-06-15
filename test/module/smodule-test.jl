@@ -208,6 +208,8 @@ end
    M = std(syz(I))
 
    F = sres(M, 0)
+   F2 = mres(M,0)
+   F3 = nres(M,0)
 
    # We have R^6 <- R^9 <- R^5 <- R^1
    # All references agree that when written as follows:
@@ -216,12 +218,30 @@ end
 
    @test length(F) == 3
    @test F[1] isa smodule
+   @test length(F2) == 3
+   @test F2[1] isa smodule
+   @test length(Fi3) == 3
+   @test F3[1] isa smodule
 
    M1 = Singular.Matrix(F[1])
    M2 = Singular.Matrix(F[2])
    M3 = Singular.Matrix(F[3])
 
    @test Singular.Matrix(Singular.Module(M1)) == M1
+
+   @test iszero(M1*M2)
+   @test iszero(M2*M3)
+
+   M1 = Singular.Matrix(F2[1])
+   M2 = Singular.Matrix(F2[2])
+   M3 = Singular.Matrix(F2[3])
+
+   @test iszero(M1*M2)
+   @test iszero(M2*M3)
+
+   M1 = Singular.Matrix(F3[1])
+   M2 = Singular.Matrix(F3[2])
+   M3 = Singular.Matrix(F3[3])
 
    @test iszero(M1*M2)
    @test iszero(M2*M3)
