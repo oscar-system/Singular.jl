@@ -102,10 +102,10 @@ F[n::Int]
 
 ```jldoctest
 julia> R, (w, x, y, z) = polynomial_ring(QQ, ["w", "x", "y", "z"])
-(Singular Polynomial Ring (QQ),(w,x,y,z),(dp(4),C), spoly{n_Q}[w, x, y, z])
+(Singular Polynomial Ring (QQ),(@OSCAR@w@1,@OSCAR@x@1,@OSCAR@y@1,@OSCAR@z@1),(dp(4),C), spoly{n_Q}[w, x, y, z])
 
 julia> I = Ideal(R, w^2 - x*z, w*x - y*z, x^2 - w*y, x*y - z^2, y^2 - w*z)
-Singular ideal over Singular Polynomial Ring (QQ),(w,x,y,z),(dp(4),C) with generators (w^2 - x*z, w*x - y*z, x^2 - w*y, x*y - z^2, y^2 - w*z)
+Singular ideal over Singular Polynomial Ring (QQ),(@OSCAR@w@1,@OSCAR@x@1,@OSCAR@y@1,@OSCAR@z@1),(dp(4),C) with generators (w^2 - x*z, w*x - y*z, x^2 - w*y, x*y - z^2, y^2 - w*z)
 
 julia> F = fres(std(I), 0)
 Singular Resolution:
@@ -115,7 +115,7 @@ julia> n = length(F)
 3
 
 julia> M1 = F[1]
-Singular ideal over Singular Polynomial Ring (QQ),(w,x,y,z),(dp(4),C) with generators (y^2 - w*z, x*y - z^2, x^2 - w*y, w*x - y*z, w^2 - x*z)
+Singular ideal over Singular Polynomial Ring (QQ),(@OSCAR@w@1,@OSCAR@x@1,@OSCAR@y@1,@OSCAR@z@1),(dp(4),C) with generators (y^2 - w*z, x*y - z^2, x^2 - w*y, w*x - y*z, w^2 - x*z)
 ```
 
 ### Betti numbers
@@ -128,10 +128,10 @@ betti(::sresolution)
 
 ```jldoctest
 julia> R, (w, x, y, z) = polynomial_ring(QQ, ["w", "x", "y", "z"])
-(Singular Polynomial Ring (QQ),(w,x,y,z),(dp(4),C), spoly{n_Q}[w, x, y, z])
+(Singular Polynomial Ring (QQ),(@OSCAR@w@1,@OSCAR@x@1,@OSCAR@y@1,@OSCAR@z@1),(dp(4),C), spoly{n_Q}[w, x, y, z])
 
 julia> I = Ideal(R, w^2 - x*z, w*x - y*z, x^2 - w*y, x*y - z^2, y^2 - w*z)
-Singular ideal over Singular Polynomial Ring (QQ),(w,x,y,z),(dp(4),C) with generators (w^2 - x*z, w*x - y*z, x^2 - w*y, x*y - z^2, y^2 - w*z)
+Singular ideal over Singular Polynomial Ring (QQ),(@OSCAR@w@1,@OSCAR@x@1,@OSCAR@y@1,@OSCAR@z@1),(dp(4),C) with generators (w^2 - x*z, w*x - y*z, x^2 - w*y, x*y - z^2, y^2 - w*z)
 
 julia> F = fres(std(I), 3)
 Singular Resolution:
@@ -158,10 +158,10 @@ minres{T <: Nemo.FieldElem}(::sresolution{spoly{T}})
 
 ```jldoctest
 julia> R, (w, x, y, z) = polynomial_ring(QQ, ["w", "x", "y", "z"])
-(Singular Polynomial Ring (QQ),(w,x,y,z),(dp(4),C), spoly{n_Q}[w, x, y, z])
+(Singular Polynomial Ring (QQ),(@OSCAR@w@1,@OSCAR@x@1,@OSCAR@y@1,@OSCAR@z@1),(dp(4),C), spoly{n_Q}[w, x, y, z])
 
 julia> I = Ideal(R, w^2 - x*z, w*x - y*z, x^2 - w*y, x*y - z^2, y^2 - w*z)
-Singular ideal over Singular Polynomial Ring (QQ),(w,x,y,z),(dp(4),C) with generators (w^2 - x*z, w*x - y*z, x^2 - w*y, x*y - z^2, y^2 - w*z)
+Singular ideal over Singular Polynomial Ring (QQ),(@OSCAR@w@1,@OSCAR@x@1,@OSCAR@y@1,@OSCAR@z@1),(dp(4),C) with generators (w^2 - x*z, w*x - y*z, x^2 - w*y, x*y - z^2, y^2 - w*z)
 
 julia> F = fres(std(I), 3)
 Singular Resolution:

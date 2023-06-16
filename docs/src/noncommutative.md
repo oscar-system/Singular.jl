@@ -72,7 +72,7 @@ matrix with all relevant entries set to `a`.
 julia> R, (x, y) = polynomial_ring(QQ, ["x", "y"]);
 
 julia> G, (x, y) = GAlgebra(R, 2, Singular.Matrix(R, [0 x; 0 0]))
-(Singular G-Algebra (QQ),(x,y),(dp(2),C), spluralg{n_Q}[x, y])
+(Singular G-Algebra (QQ),(@OSCAR@x@1,@OSCAR@y@1),(dp(2),C), spluralg{n_Q}[x, y])
 
 julia> y*x
 2*x*y + x
@@ -90,10 +90,10 @@ by a two-sided ideal. Continuing with the above example:
 
 ```jldoctest GAlgebra
 julia> I = Ideal(G, [x^2 + y^2], twosided = true)
-Singular two-sided ideal over Singular G-Algebra (QQ),(x,y),(dp(2),C) with generators (x^2 + y^2)
+Singular two-sided ideal over Singular G-Algebra (QQ),(@OSCAR@x@1,@OSCAR@y@1),(dp(2),C) with generators (x^2 + y^2)
 
 julia> Q, (x, y) = QuotientRing(G, std(I))
-(Singular G-Algebra Quotient Ring (QQ),(x,y),(dp(2),C), spluralg{n_Q}[x, y])
+(Singular G-Algebra Quotient Ring (QQ),(@OSCAR@x@1,@OSCAR@y@1),(dp(2),C), spluralg{n_Q}[x, y])
 ```
 
 ### WeylAlgebra
@@ -122,7 +122,7 @@ that due to the ordering constraint on G-algebras, the orderings `:neglex`,
 
 ```jldoctest
 julia> R, (x, y, dx, dy) = WeylAlgebra(ZZ, ["x", "y"])
-(Singular G-Algebra (ZZ),(x,y,dx,dy),(dp(4),C), spluralg{n_Z}[x, y, dx, dy])
+(Singular G-Algebra (ZZ),(@OSCAR@x@1,@OSCAR@y@1,@OSCAR@dx@1,@OSCAR@dy@1),(dp(4),C), spluralg{n_Z}[x, y, dx, dy])
 
 julia> (dx*x, dx*y, dy*x, dy*y)
 (x*dx + 1, y*dx, x*dy, y*dy + 1)
@@ -132,7 +132,7 @@ The ideals of G-algebras are left ideals by default.
 
 ```jldoctest
 julia> R, (x1, x2, x3, d1, d2, d3) = WeylAlgebra(QQ, ["x1" "x2" "x3"; "d1" "d2" "d3"])
-(Singular G-Algebra (QQ),(x1,x2,x3,d1,d2,d3),(dp(6),C), spluralg{n_Q}[x1, x2, x3, d1, d2, d3])
+(Singular G-Algebra (QQ),(@OSCAR@x1@1,@OSCAR@x2@1,@OSCAR@x3@1,@OSCAR@d1@1,@OSCAR@d2@1,@OSCAR@d3@1),(dp(6),C), spluralg{n_Q}[x1, x2, x3, d1, d2, d3])
 
 julia> gens(std(Ideal(R, [x1^2*d2^2 + x2^2*d3^2, x1*d2 + x3])))
 7-element Vector{spluralg{n_Q}}:
@@ -166,7 +166,7 @@ ordering must be global.
 
 ```jldoctest
 julia> R, (x, y) = FreeAlgebra(QQ, ["x", "y"], 5)
-(Singular letterplace Ring (QQ),(x,y,x,y,x,y,x,y,x,y),(dp(10),C,L(3)), slpalg{n_Q}[x, y])
+(Singular letterplace Ring (QQ),(@OSCAR@x@1,@OSCAR@y@1,@OSCAR@x@1,@OSCAR@y@1,@OSCAR@x@1,@OSCAR@y@1,@OSCAR@x@1,@OSCAR@y@1,@OSCAR@x@1,@OSCAR@y@1),(dp(10),C,L(3)), slpalg{n_Q}[x, y])
 
 julia> (x*y)^2
 x*y*x*y
@@ -180,7 +180,7 @@ possibility of constructing one-sided ideals.
 
 ```jldoctest
 julia> R, (x, y, z) = FreeAlgebra(QQ, ["x", "y", "z"], 4)
-(Singular letterplace Ring (QQ),(x,y,z,x,y,z,x,y,z,x,y,z),(dp(12),C,L(3)), slpalg{n_Q}[x, y, z])
+(Singular letterplace Ring (QQ),(@OSCAR@x@1,@OSCAR@y@1,@OSCAR@z@1,@OSCAR@x@1,@OSCAR@y@1,@OSCAR@z@1,@OSCAR@x@1,@OSCAR@y@1,@OSCAR@z@1,@OSCAR@x@1,@OSCAR@y@1,@OSCAR@z@1),(dp(12),C,L(3)), slpalg{n_Q}[x, y, z])
 
 julia> gens(std(Ideal(R, [x*y + y*z, x*x + x*y - y*x - y*y])))
 8-element Vector{slpalg{n_Q}}:
@@ -204,7 +204,7 @@ represented using commutative data structures, and the function
 
 ```jldoctest
 julia> R, (x, y, dx, dy) = WeylAlgebra(QQ, ["x", "y"])
-(Singular G-Algebra (QQ),(x,y,dx,dy),(dp(4),C), spluralg{n_Q}[x, y, dx, dy])
+(Singular G-Algebra (QQ),(@OSCAR@x@1,@OSCAR@y@1,@OSCAR@dx@1,@OSCAR@dy@1),(dp(4),C), spluralg{n_Q}[x, y, dx, dy])
 
 julia> p = (dx + dy)*(x + y)
 x*dx + y*dx + x*dy + y*dy + 2
@@ -223,7 +223,7 @@ iterators have the same behavior as in the commutative case.
 
 ```jldoctest
 julia> R, (x, y, z) = FreeAlgebra(QQ, ["x", "y", "z"], 6)
-(Singular letterplace Ring (QQ),(x,y,z,x,y,z,x,y,z,x,y,z,x,y,z,x,y,z),(dp(18),C,L(3)), slpalg{n_Q}[x, y, z])
+(Singular letterplace Ring (QQ),(@OSCAR@x@1,@OSCAR@y@1,@OSCAR@z@1,@OSCAR@x@1,@OSCAR@y@1,@OSCAR@z@1,@OSCAR@x@1,@OSCAR@y@1,@OSCAR@z@1,@OSCAR@x@1,@OSCAR@y@1,@OSCAR@z@1,@OSCAR@x@1,@OSCAR@y@1,@OSCAR@z@1,@OSCAR@x@1,@OSCAR@y@1,@OSCAR@z@1),(dp(18),C,L(3)), slpalg{n_Q}[x, y, z])
 
 julia> p = (1 + x*z + y)^2
 x*z*x*z + x*z*y + y*x*z + y^2 + 2*x*z + 2*y + 1
@@ -241,7 +241,7 @@ julia> show(collect(exponent_words(p)))
 [[1, 3, 1, 3], [1, 3, 2], [2, 1, 3], [2, 2], [1, 3], [2], Int64[]]
 
 julia> B = MPolyBuildCtx(R)
-Builder for an element of Singular letterplace Ring (QQ),(x,y,z,x,y,z,x,y,z,x,y,z,x,y,z,x,y,z),(dp(18),C,L(3))
+Builder for an element of Singular letterplace Ring (QQ),(@OSCAR@x@1,@OSCAR@y@1,@OSCAR@z@1,@OSCAR@x@1,@OSCAR@y@1,@OSCAR@z@1,@OSCAR@x@1,@OSCAR@y@1,@OSCAR@z@1,@OSCAR@x@1,@OSCAR@y@1,@OSCAR@z@1,@OSCAR@x@1,@OSCAR@y@1,@OSCAR@z@1,@OSCAR@x@1,@OSCAR@y@1,@OSCAR@z@1),(dp(18),C,L(3))
 
 julia> push_term!(B, QQ(2), [3,2,1,3]);
 

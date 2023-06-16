@@ -92,14 +92,14 @@ increase the amount of storage required.
 
 ```jldoctest
 julia> R, (x, y, z) = polynomial_ring(ZZ, ["x", "y", "z"])
-(Singular Polynomial Ring (ZZ),(x,y,z),(dp(3),C), spoly{n_Z}[x, y, z])
+(Singular Polynomial Ring (ZZ),(@OSCAR@x@1,@OSCAR@y@1,@OSCAR@z@1),(dp(3),C), spoly{n_Z}[x, y, z])
 
 julia> S, vars = polynomial_ring(QQ, ["x", "y"]; ordering=:deglex)
-(Singular Polynomial Ring (QQ),(x,y),(Dp(2),C), spoly{n_Q}[x, y])
+(Singular Polynomial Ring (QQ),(@OSCAR@x@1,@OSCAR@y@1),(Dp(2),C), spoly{n_Q}[x, y])
 
 julia> T, x = polynomial_ring(ZZ, ["x$i" for i in 1:5];
               ordering=:comp1max, ordering2=:degrevlex, degree_bound=5)
-(Singular Polynomial Ring (ZZ),(x1,x2,x3,x4,x5),(c,dp(5),L(5)), spoly{n_Z}[x1, x2, x3, x4, x5])
+(Singular Polynomial Ring (ZZ),(@OSCAR@x1@1,@OSCAR@x2@1,@OSCAR@x3@1,@OSCAR@x4@1,@OSCAR@x5@1),(c,dp(5),L(5)), spoly{n_Z}[x1, x2, x3, x4, x5])
 ```
 
 See also the convenience macros below for simple use cases.
@@ -122,10 +122,10 @@ documentation:
 
 ```jldoctest
 julia> R, (x, y) = polynomial_ring(ZZ, ["x", "y"])
-(Singular Polynomial Ring (ZZ),(x,y),(dp(2),C), spoly{n_Z}[x, y])
+(Singular Polynomial Ring (ZZ),(@OSCAR@x@1,@OSCAR@y@1),(dp(2),C), spoly{n_Z}[x, y])
 
 julia> C = MPolyBuildCtx(R)
-Builder for an element of Singular Polynomial Ring (ZZ),(x,y),(dp(2),C)
+Builder for an element of Singular Polynomial Ring (ZZ),(@OSCAR@x@1,@OSCAR@y@1),(dp(2),C)
 
 julia> push_term!(C, ZZ(1), [1, 2])
 x*y^2
@@ -247,10 +247,10 @@ ordering.
 
 ```jldoctest
 julia> S = @polynomial_ring(ZZ, "x", 5, :deglex)
-Singular Polynomial Ring (ZZ),(x1,x2,x3,x4,x5),(Dp(5),C)
+Singular Polynomial Ring (ZZ),(@OSCAR@x1@1,@OSCAR@x2@1,@OSCAR@x3@1,@OSCAR@x4@1,@OSCAR@x5@1),(Dp(5),C)
 
 julia> T = @polynomial_ring(QQ, "y", 10)
-Singular Polynomial Ring (QQ),(y1,y2,y3,y4,y5,y6,y7,y8,y9,y10),(dp(10),C)
+Singular Polynomial Ring (QQ),(@OSCAR@y1@1,@OSCAR@y2@1,@OSCAR@y3@1,@OSCAR@y4@1,@OSCAR@y5@1,@OSCAR@y6@1,@OSCAR@y7@1,@OSCAR@y8@1,@OSCAR@y9@1,@OSCAR@y10@1),(dp(10),C)
 ```
 
 ### Basic manipulation
@@ -283,7 +283,7 @@ order(p::spoly)
 
 ```jldoctest
 julia> R = @polynomial_ring(ZZ, "x", 3)
-Singular Polynomial Ring (ZZ),(x1,x2,x3),(dp(3),C)
+Singular Polynomial Ring (ZZ),(@OSCAR@x1@1,@OSCAR@x2@1,@OSCAR@x3@1),(dp(3),C)
 
 julia> n = nvars(R)
 3
@@ -343,7 +343,7 @@ jacobian_matrix(A::Vector{spoly{T}}) where T <: Nemo.RingElem
 
 ```jldoctest
 julia> R, (x, y, z) = polynomial_ring(QQ, ["x", "y", "z"])
-(Singular Polynomial Ring (QQ),(x,y,z),(dp(3),C), spoly{n_Q}[x, y, z])
+(Singular Polynomial Ring (QQ),(@OSCAR@x@1,@OSCAR@y@1,@OSCAR@z@1),(dp(3),C), spoly{n_Q}[x, y, z])
 
 julia> f = x^2*y*z + z^2*x + x*y*z
 x^2*y*z + x*y*z + x*z^2
@@ -358,7 +358,7 @@ julia> derivative(f, y)
 x^2*z + x*z
 
 julia> J = jacobian_ideal(f)
-Singular ideal over Singular Polynomial Ring (QQ),(x,y,z),(dp(3),C) with generators (2*x*y*z + y*z + z^2, x^2*z + x*z, x^2*y + x*y + 2*x*z)
+Singular ideal over Singular Polynomial Ring (QQ),(@OSCAR@x@1,@OSCAR@y@1,@OSCAR@z@1),(dp(3),C) with generators (2*x*y*z + y*z + z^2, x^2*z + x*z, x^2*y + x*y + 2*x*z)
 
 julia> Jf1 = jacobian_matrix(f)
 [2*x*y*z + y*z + z^2
@@ -387,7 +387,7 @@ Singular.content(x::spoly)
 
 ```jldoctest
 julia> R = @polynomial_ring(ZZ, "x", 2)
-Singular Polynomial Ring (ZZ),(x1,x2),(dp(2),C)
+Singular Polynomial Ring (ZZ),(@OSCAR@x1@1,@OSCAR@x2@1),(dp(2),C)
 
 julia> f = 3x1^2 + 3x1*x2 + 6x2^2
 3*x1^2 + 3*x1*x2 + 6*x2^2
@@ -446,7 +446,7 @@ the function 'change_base_ring'.
 
 ```jldoctest
 julia> R, (x, y) = polynomial_ring(ZZ, ["x", "y"])
-(Singular Polynomial Ring (ZZ),(x,y),(dp(2),C), spoly{n_Z}[x, y])
+(Singular Polynomial Ring (ZZ),(@OSCAR@x@1,@OSCAR@y@1),(dp(2),C), spoly{n_Z}[x, y])
 
 julia> p = x^5 + y^3+1
 x^5 + y^3 + 1
@@ -455,7 +455,7 @@ julia> p2 = change_base_ring(QQ, p)
 x^5 + y^3 + 1
 
 julia> parent(p2)
-Singular Polynomial Ring (QQ),(x,y),(dp(2),C)
+Singular Polynomial Ring (QQ),(@OSCAR@x@1,@OSCAR@y@1),(dp(2),C)
 ```
 
 It also possible to work with Nemo rings by casting to a suitable Singular type
