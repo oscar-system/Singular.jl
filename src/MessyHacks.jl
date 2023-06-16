@@ -178,9 +178,10 @@ function rename_symbol(prev::Base.Set{String}, x::String, def::String)
       end
    end
 
+   x0 = "@OSCAR@"*x*"@"
    i = 0
    while (i += 1) < 2^32
-      xi = x*"@"*string(i)
+      xi = x0*string(i)
       xi in prev || return Symbol(xi)
    end
 
