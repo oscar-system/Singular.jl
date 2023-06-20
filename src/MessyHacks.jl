@@ -157,7 +157,7 @@ function all_singular_symbols(R::PolyRingUnion)
 end
 
 function is_bad_name(x::String)
-   if !occursin(r"\A[@a-zA-Z\']([@a-zA-Z\']*[0-9]*_*)*\Z", x)
+   if !occursin(r"\A[@a-zA-Z\'][@a-zA-Z0-9_\']*\Z", x)
       return true
    end
    # insert list of reserved identifier names here
