@@ -168,23 +168,25 @@ end
 # bad singular interpreter names and does not conflict with prev.
 # gensym generates truly awful names, so cannot use that
 function rename_symbol(prev::Base.Set{String}, x::String, def::String)
-   if is_bad_name(x)
-      x = replace(replace(replace(x, "[" => "_"), "]" => ""), "," => "_")
-      if is_bad_name(x)
-         x = replace(replace(replace(x, "(" => "_"), ")" => ""), "-" => "m")
-         if is_bad_name(x)
-            x = def
-         end
-      end
-   end
+   # if is_bad_name(x)
+   #    x = replace(replace(replace(x, "[" => "_"), "]" => ""), "," => "_")
+   #    if is_bad_name(x)
+   #       x = replace(replace(replace(x, "(" => "_"), ")" => ""), "-" => "m")
+   #       if is_bad_name(x)
+   #          x = def
+   #       end
+   #    end
+   # end
 
-   x0 = "@OSCAR@"*x*"@"
+   # Best to assume all names are bad and replace with def. 
+   x = def
+
+   x *= "_"
    i = 0
    while (i += 1) < 2^32
-      xi = x0*string(i)
+      xi = x*string(i)
       xi in prev || return Symbol(xi)
    end
-
    error("There should not be this many symbols to rename")
 end
 
