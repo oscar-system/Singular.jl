@@ -68,16 +68,16 @@ parameters.
 
 ```jldoctest
 julia> R, (x, y) = polynomial_ring(QQ, ["x", "y"])
-(Singular Polynomial Ring (QQ),(@OSCAR@x@1,@OSCAR@y@1),(dp(2),C), spoly{n_Q}[x, y])
+(Singular Polynomial Ring (QQ),(x_1,x_2),(dp(2),C), spoly{n_Q}[x, y])
 
 julia> M = FreeModule(R, 3)
-Free Module of rank 3 over Singular Polynomial Ring (QQ),(@OSCAR@x@1,@OSCAR@y@1),(dp(2),C)
+Free Module of rank 3 over Singular Polynomial Ring (QQ),(x_1,x_2),(dp(2),C)
 
 julia> v2 = M([x + 1, x*y + 1, y])
-@OSCAR@x@1*@OSCAR@y@1*gen(2)+@OSCAR@x@1*gen(1)+@OSCAR@y@1*gen(3)+gen(2)+gen(1)
+x_1*x_2*gen(2)+x_1*gen(1)+x_2*gen(3)+gen(2)+gen(1)
 
 julia> v1 = vector(R, x + 1, x*y + 1, y)
-@OSCAR@x@1*@OSCAR@y@1*gen(2)+@OSCAR@x@1*gen(1)+@OSCAR@y@1*gen(3)+gen(2)+gen(1)
+x_1*x_2*gen(2)+x_1*gen(1)+x_2*gen(3)+gen(2)+gen(1)
 ```
 
 ### Basic manipulation
@@ -95,10 +95,10 @@ gens{T <: AbstractAlgebra.RingElem}(::FreeMod{T})
 
 ```jldoctest
 julia> R, (x, y) = polynomial_ring(QQ, ["x", "y"])
-(Singular Polynomial Ring (QQ),(@OSCAR@x@1,@OSCAR@y@1),(dp(2),C), spoly{n_Q}[x, y])
+(Singular Polynomial Ring (QQ),(x_1,x_2),(dp(2),C), spoly{n_Q}[x, y])
 
 julia> M = FreeModule(R, 5)
-Free Module of rank 5 over Singular Polynomial Ring (QQ),(@OSCAR@x@1,@OSCAR@y@1),(dp(2),C)
+Free Module of rank 5 over Singular Polynomial Ring (QQ),(x_1,x_2),(dp(2),C)
 
 julia> v = gens(M)
 5-element Vector{svector{spoly{n_Q}}}:
@@ -125,10 +125,10 @@ Array{T <: Nemo.RingElem}(v::svector{spoly{T}})
 
 ```jldoctest
 julia> R, (x, y) = polynomial_ring(QQ, ["x", "y"])
-(Singular Polynomial Ring (QQ),(@OSCAR@x@1,@OSCAR@y@1),(dp(2),C), spoly{n_Q}[x, y])
+(Singular Polynomial Ring (QQ),(x_1,x_2),(dp(2),C), spoly{n_Q}[x, y])
 
 julia> v1 = vector(R, x + 1, x*y + 1, y)
-@OSCAR@x@1*@OSCAR@y@1*gen(2)+@OSCAR@x@1*gen(1)+@OSCAR@y@1*gen(3)+gen(2)+gen(1)
+x_1*x_2*gen(2)+x_1*gen(1)+x_2*gen(3)+gen(2)+gen(1)
 
 julia> V = Array(v1)
 3-element Vector{spoly{n_Q}}:
@@ -147,11 +147,11 @@ jet{T <: AbstractAlgebra.RingElem}(::svector{spoly{T}}, ::Int)
 
 ```jldoctest
 julia> R, (x, y) = polynomial_ring(QQ, ["x", "y"])
-(Singular Polynomial Ring (QQ),(@OSCAR@x@1,@OSCAR@y@1),(dp(2),C), spoly{n_Q}[x, y])
+(Singular Polynomial Ring (QQ),(x_1,x_2),(dp(2),C), spoly{n_Q}[x, y])
 
 julia> v = vector(R, x^5 + 1, 2x^3 + 3y^2, x^2)
-@OSCAR@x@1^5*gen(1)+2*@OSCAR@x@1^3*gen(2)+@OSCAR@x@1^2*gen(3)+3*@OSCAR@y@1^2*gen(2)+gen(1)
+x_1^5*gen(1)+2*x_1^3*gen(2)+x_1^2*gen(3)+3*x_2^2*gen(2)+gen(1)
 
 julia> w = jet(v, 3)
-2*@OSCAR@x@1^3*gen(2)+@OSCAR@x@1^2*gen(3)+3*@OSCAR@y@1^2*gen(2)+gen(1)
+2*x_1^3*gen(2)+x_1^2*gen(3)+3*x_2^2*gen(2)+gen(1)
 ```

@@ -50,7 +50,7 @@ The following parts of the Matrix interface from AbstractAlgebra are also implem
 
 ```jldoctest
 julia> R, (x, y, u, v, w) = Singular.polynomial_ring(Singular.QQ, ["x", "y", "u", "v", "w"])
-(Singular Polynomial Ring (QQ),(@OSCAR@x@1,@OSCAR@y@1,@OSCAR@u@1,@OSCAR@v@1,@OSCAR@w@1),(dp(5),C), spoly{n_Q}[x, y, u, v, w])
+(Singular Polynomial Ring (QQ),(x_1,x_2,x_3,x_4,x_5),(dp(5),C), spoly{n_Q}[x, y, u, v, w])
 
 julia> identity_matrix(R, 4)
 [1, 0, 0, 0

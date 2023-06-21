@@ -30,12 +30,12 @@ julia> is_quotient_ring(Q1)
 true
 
 julia> quotient_ideal(Q1)
-Singular ideal over Singular Polynomial Ring (QQ),(@OSCAR@x@1,@OSCAR@y@1),(dp(2),C) with generators (x^2 + y^2)
+Singular ideal over Singular Polynomial Ring (QQ),(x_1,x_2),(dp(2),C) with generators (x^2 + y^2)
 
 julia> Q2, (x, y) = QuotientRing(Q1, std(Ideal(Q1, x*y)));
 
 julia> quotient_ideal(Q2)
-Singular ideal over Singular Polynomial Ring (QQ),(@OSCAR@x@1,@OSCAR@y@1),(dp(2),C) with generators (x*y, y^3, x^2 + y^2)
+Singular ideal over Singular Polynomial Ring (QQ),(x_1,x_2),(dp(2),C) with generators (x*y, y^3, x^2 + y^2)
 
 julia> base_ring(quotient_ideal(Q1)) == base_ring(quotient_ideal(Q2))
 true

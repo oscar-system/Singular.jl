@@ -68,18 +68,18 @@ from `Base.Module`.
 
 ```jldoctest
 julia> R, (x, y) = polynomial_ring(QQ, ["x", "y"])
-(Singular Polynomial Ring (QQ),(@OSCAR@x@1,@OSCAR@y@1),(dp(2),C), spoly{n_Q}[x, y])
+(Singular Polynomial Ring (QQ),(x_1,x_2),(dp(2),C), spoly{n_Q}[x, y])
 
 julia> v1 = vector(R, x + 1, x*y + 1, y)
-@OSCAR@x@1*@OSCAR@y@1*gen(2)+@OSCAR@x@1*gen(1)+@OSCAR@y@1*gen(3)+gen(2)+gen(1)
+x_1*x_2*gen(2)+x_1*gen(1)+x_2*gen(3)+gen(2)+gen(1)
 
 julia> v2 = vector(R, x^2 + 1, 2x + 3y, x)
-@OSCAR@x@1^2*gen(1)+@OSCAR@x@1*gen(3)+2*@OSCAR@x@1*gen(2)+3*@OSCAR@y@1*gen(2)+gen(1)
+x_1^2*gen(1)+x_1*gen(3)+2*x_1*gen(2)+3*x_2*gen(2)+gen(1)
 
 julia> M = Singular.Module(R, v1, v2)
-Singular Module over Singular Polynomial Ring (QQ),(@OSCAR@x@1,@OSCAR@y@1),(dp(2),C), with Generators:
-@OSCAR@x@1*@OSCAR@y@1*gen(2)+@OSCAR@x@1*gen(1)+@OSCAR@y@1*gen(3)+gen(2)+gen(1)
-@OSCAR@x@1^2*gen(1)+@OSCAR@x@1*gen(3)+2*@OSCAR@x@1*gen(2)+3*@OSCAR@y@1*gen(2)+gen(1)
+Singular Module over Singular Polynomial Ring (QQ),(x_1,x_2),(dp(2),C), with Generators:
+x_1*x_2*gen(2)+x_1*gen(1)+x_2*gen(3)+gen(2)+gen(1)
+x_1^2*gen(1)+x_1*gen(3)+2*x_1*gen(2)+3*x_2*gen(2)+gen(1)
 ```
 
 ### Basic manipulation
@@ -107,18 +107,18 @@ iszero(::smodule)
 
 ```jldoctest
 julia> R, (x, y) = polynomial_ring(QQ, ["x", "y"])
-(Singular Polynomial Ring (QQ),(@OSCAR@x@1,@OSCAR@y@1),(dp(2),C), spoly{n_Q}[x, y])
+(Singular Polynomial Ring (QQ),(x_1,x_2),(dp(2),C), spoly{n_Q}[x, y])
 
 julia> v1 = vector(R, x + 1, x*y + 1, y)
-@OSCAR@x@1*@OSCAR@y@1*gen(2)+@OSCAR@x@1*gen(1)+@OSCAR@y@1*gen(3)+gen(2)+gen(1)
+x_1*x_2*gen(2)+x_1*gen(1)+x_2*gen(3)+gen(2)+gen(1)
 
 julia> v2 = vector(R, x^2 + 1, 2x + 3y, x)
-@OSCAR@x@1^2*gen(1)+@OSCAR@x@1*gen(3)+2*@OSCAR@x@1*gen(2)+3*@OSCAR@y@1*gen(2)+gen(1)
+x_1^2*gen(1)+x_1*gen(3)+2*x_1*gen(2)+3*x_2*gen(2)+gen(1)
 
 julia> M = Singular.Module(R, v1, v2)
-Singular Module over Singular Polynomial Ring (QQ),(@OSCAR@x@1,@OSCAR@y@1),(dp(2),C), with Generators:
-@OSCAR@x@1*@OSCAR@y@1*gen(2)+@OSCAR@x@1*gen(1)+@OSCAR@y@1*gen(3)+gen(2)+gen(1)
-@OSCAR@x@1^2*gen(1)+@OSCAR@x@1*gen(3)+2*@OSCAR@x@1*gen(2)+3*@OSCAR@y@1*gen(2)+gen(1)
+Singular Module over Singular Polynomial Ring (QQ),(x_1,x_2),(dp(2),C), with Generators:
+x_1*x_2*gen(2)+x_1*gen(1)+x_2*gen(3)+gen(2)+gen(1)
+x_1^2*gen(1)+x_1*gen(3)+2*x_1*gen(2)+3*x_2*gen(2)+gen(1)
 
 julia> iszero(M) == false
 true
@@ -150,28 +150,28 @@ lift_std_syz(::smodule; ::Bool)
 
 ```jldoctest
 julia> R, (x, y) = polynomial_ring(QQ, ["x", "y"])
-(Singular Polynomial Ring (QQ),(@OSCAR@x@1,@OSCAR@y@1),(dp(2),C), spoly{n_Q}[x, y])
+(Singular Polynomial Ring (QQ),(x_1,x_2),(dp(2),C), spoly{n_Q}[x, y])
 
 julia> v1 = vector(R, x + 1, x*y + 1, y)
-@OSCAR@x@1*@OSCAR@y@1*gen(2)+@OSCAR@x@1*gen(1)+@OSCAR@y@1*gen(3)+gen(2)+gen(1)
+x_1*x_2*gen(2)+x_1*gen(1)+x_2*gen(3)+gen(2)+gen(1)
 
 julia> v2 = vector(R, x^2 + 1, 2x + 3y, x)
-@OSCAR@x@1^2*gen(1)+@OSCAR@x@1*gen(3)+2*@OSCAR@x@1*gen(2)+3*@OSCAR@y@1*gen(2)+gen(1)
+x_1^2*gen(1)+x_1*gen(3)+2*x_1*gen(2)+3*x_2*gen(2)+gen(1)
 
 julia> v3 = x*v1 + y*v2 + vector(R, x, y + 1, y^2)
-@OSCAR@x@1^2*@OSCAR@y@1*gen(2)+@OSCAR@x@1^2*@OSCAR@y@1*gen(1)+@OSCAR@x@1^2*gen(1)+2*@OSCAR@x@1*@OSCAR@y@1*gen(3)+2*@OSCAR@x@1*@OSCAR@y@1*gen(2)+@OSCAR@y@1^2*gen(3)+3*@OSCAR@y@1^2*gen(2)+@OSCAR@x@1*gen(2)+2*@OSCAR@x@1*gen(1)+@OSCAR@y@1*gen(2)+@OSCAR@y@1*gen(1)+gen(2)
+x_1^2*x_2*gen(2)+x_1^2*x_2*gen(1)+x_1^2*gen(1)+2*x_1*x_2*gen(3)+2*x_1*x_2*gen(2)+x_2^2*gen(3)+3*x_2^2*gen(2)+x_1*gen(2)+2*x_1*gen(1)+x_2*gen(2)+x_2*gen(1)+gen(2)
 
 julia> M = Singular.Module(R, v1, v2, v3)
-Singular Module over Singular Polynomial Ring (QQ),(@OSCAR@x@1,@OSCAR@y@1),(dp(2),C), with Generators:
-@OSCAR@x@1*@OSCAR@y@1*gen(2)+@OSCAR@x@1*gen(1)+@OSCAR@y@1*gen(3)+gen(2)+gen(1)
-@OSCAR@x@1^2*gen(1)+@OSCAR@x@1*gen(3)+2*@OSCAR@x@1*gen(2)+3*@OSCAR@y@1*gen(2)+gen(1)
-@OSCAR@x@1^2*@OSCAR@y@1*gen(2)+@OSCAR@x@1^2*@OSCAR@y@1*gen(1)+@OSCAR@x@1^2*gen(1)+2*@OSCAR@x@1*@OSCAR@y@1*gen(3)+2*@OSCAR@x@1*@OSCAR@y@1*gen(2)+@OSCAR@y@1^2*gen(3)+3*@OSCAR@y@1^2*gen(2)+@OSCAR@x@1*gen(2)+2*@OSCAR@x@1*gen(1)+@OSCAR@y@1*gen(2)+@OSCAR@y@1*gen(1)+gen(2)
+Singular Module over Singular Polynomial Ring (QQ),(x_1,x_2),(dp(2),C), with Generators:
+x_1*x_2*gen(2)+x_1*gen(1)+x_2*gen(3)+gen(2)+gen(1)
+x_1^2*gen(1)+x_1*gen(3)+2*x_1*gen(2)+3*x_2*gen(2)+gen(1)
+x_1^2*x_2*gen(2)+x_1^2*x_2*gen(1)+x_1^2*gen(1)+2*x_1*x_2*gen(3)+2*x_1*x_2*gen(2)+x_2^2*gen(3)+3*x_2^2*gen(2)+x_1*gen(2)+2*x_1*gen(1)+x_2*gen(2)+x_2*gen(1)+gen(2)
 
 julia> G = std(M; complete_reduction=true)
-Singular Module over Singular Polynomial Ring (QQ),(@OSCAR@x@1,@OSCAR@y@1),(dp(2),C), with Generators:
-@OSCAR@y@1^2*gen(3)+@OSCAR@x@1*gen(1)+@OSCAR@y@1*gen(2)+gen(2)
-@OSCAR@x@1*@OSCAR@y@1*gen(2)+@OSCAR@x@1*gen(1)+@OSCAR@y@1*gen(3)+gen(2)+gen(1)
-@OSCAR@x@1^2*gen(1)+@OSCAR@x@1*gen(3)+2*@OSCAR@x@1*gen(2)+3*@OSCAR@y@1*gen(2)+gen(1)
+Singular Module over Singular Polynomial Ring (QQ),(x_1,x_2),(dp(2),C), with Generators:
+x_2^2*gen(3)+x_1*gen(1)+x_2*gen(2)+gen(2)
+x_1*x_2*gen(2)+x_1*gen(1)+x_2*gen(3)+gen(2)+gen(1)
+x_1^2*gen(1)+x_1*gen(3)+2*x_1*gen(2)+3*x_2*gen(2)+gen(1)
 ```
 
 ### Reduction
@@ -184,39 +184,39 @@ reduce(::smodule, ::smodule)
 
 ```jldoctest
 julia> R, (x, y, z) = polynomial_ring(QQ, ["x", "y", "z"])
-(Singular Polynomial Ring (QQ),(@OSCAR@x@1,@OSCAR@y@1,@OSCAR@z@1),(dp(3),C), spoly{n_Q}[x, y, z])
+(Singular Polynomial Ring (QQ),(x_1,x_2,x_3),(dp(3),C), spoly{n_Q}[x, y, z])
 
 julia> v1 = vector(R, R(0), z, -y)
--@OSCAR@y@1*gen(3)+@OSCAR@z@1*gen(2)
+-x_2*gen(3)+x_3*gen(2)
 
 julia> v2 = vector(R, -z, R(0), x)
-@OSCAR@x@1*gen(3)-@OSCAR@z@1*gen(1)
+x_1*gen(3)-x_3*gen(1)
 
 julia> v3 = vector(R, y, x, R(0))
-@OSCAR@x@1*gen(2)+@OSCAR@y@1*gen(1)
+x_1*gen(2)+x_2*gen(1)
 
 julia> v = y*v1+x*v2+z*v3
-@OSCAR@x@1^2*gen(3)-@OSCAR@y@1^2*gen(3)+@OSCAR@x@1*@OSCAR@z@1*gen(2)-@OSCAR@x@1*@OSCAR@z@1*gen(1)+@OSCAR@y@1*@OSCAR@z@1*gen(2)+@OSCAR@y@1*@OSCAR@z@1*gen(1)
+x_1^2*gen(3)-x_2^2*gen(3)+x_1*x_3*gen(2)-x_1*x_3*gen(1)+x_2*x_3*gen(2)+x_2*x_3*gen(1)
 
 julia> M = Singular.Module(R, v1, v2, v3)
-Singular Module over Singular Polynomial Ring (QQ),(@OSCAR@x@1,@OSCAR@y@1,@OSCAR@z@1),(dp(3),C), with Generators:
--@OSCAR@y@1*gen(3)+@OSCAR@z@1*gen(2)
-@OSCAR@x@1*gen(3)-@OSCAR@z@1*gen(1)
-@OSCAR@x@1*gen(2)+@OSCAR@y@1*gen(1)
+Singular Module over Singular Polynomial Ring (QQ),(x_1,x_2,x_3),(dp(3),C), with Generators:
+-x_2*gen(3)+x_3*gen(2)
+x_1*gen(3)-x_3*gen(1)
+x_1*gen(2)+x_2*gen(1)
 
 julia> B = std(M; complete_reduction=true)
-Singular Module over Singular Polynomial Ring (QQ),(@OSCAR@x@1,@OSCAR@y@1,@OSCAR@z@1),(dp(3),C), with Generators:
-@OSCAR@y@1*gen(3)-@OSCAR@z@1*gen(2)
-@OSCAR@x@1*gen(2)+@OSCAR@y@1*gen(1)
-@OSCAR@x@1*gen(3)-@OSCAR@z@1*gen(1)
-@OSCAR@y@1*@OSCAR@z@1*gen(1)
+Singular Module over Singular Polynomial Ring (QQ),(x_1,x_2,x_3),(dp(3),C), with Generators:
+x_2*gen(3)-x_3*gen(2)
+x_1*gen(2)+x_2*gen(1)
+x_1*gen(3)-x_3*gen(1)
+x_2*x_3*gen(1)
 
 julia> V = Singular.Module(R, v)
-Singular Module over Singular Polynomial Ring (QQ),(@OSCAR@x@1,@OSCAR@y@1,@OSCAR@z@1),(dp(3),C), with Generators:
-@OSCAR@x@1^2*gen(3)-@OSCAR@y@1^2*gen(3)+@OSCAR@x@1*@OSCAR@z@1*gen(2)-@OSCAR@x@1*@OSCAR@z@1*gen(1)+@OSCAR@y@1*@OSCAR@z@1*gen(2)+@OSCAR@y@1*@OSCAR@z@1*gen(1)
+Singular Module over Singular Polynomial Ring (QQ),(x_1,x_2,x_3),(dp(3),C), with Generators:
+x_1^2*gen(3)-x_2^2*gen(3)+x_1*x_3*gen(2)-x_1*x_3*gen(1)+x_2*x_3*gen(2)+x_2*x_3*gen(1)
 
 julia> reduce(V,B)
-Singular Module over Singular Polynomial Ring (QQ),(@OSCAR@x@1,@OSCAR@y@1,@OSCAR@z@1),(dp(3),C), with Generators:
+Singular Module over Singular Polynomial Ring (QQ),(x_1,x_2,x_3),(dp(3),C), with Generators:
 0
 
 ```
@@ -231,22 +231,22 @@ syz(::smodule)
 
 ```jldoctest
 julia> R, (x, y) = polynomial_ring(QQ, ["x", "y"])
-(Singular Polynomial Ring (QQ),(@OSCAR@x@1,@OSCAR@y@1),(dp(2),C), spoly{n_Q}[x, y])
+(Singular Polynomial Ring (QQ),(x_1,x_2),(dp(2),C), spoly{n_Q}[x, y])
 
 julia> v1 = vector(R, (x + 1)*y, (x*y + 1)*y, y)
-@OSCAR@x@1*@OSCAR@y@1^2*gen(2)+@OSCAR@x@1*@OSCAR@y@1*gen(1)+@OSCAR@y@1*gen(3)+@OSCAR@y@1*gen(2)+@OSCAR@y@1*gen(1)
+x_1*x_2^2*gen(2)+x_1*x_2*gen(1)+x_2*gen(3)+x_2*gen(2)+x_2*gen(1)
 
 julia> v2 = vector(R, (x + 1)*x, (x*y + 1)*x, x)
-@OSCAR@x@1^2*@OSCAR@y@1*gen(2)+@OSCAR@x@1^2*gen(1)+@OSCAR@x@1*gen(3)+@OSCAR@x@1*gen(2)+@OSCAR@x@1*gen(1)
+x_1^2*x_2*gen(2)+x_1^2*gen(1)+x_1*gen(3)+x_1*gen(2)+x_1*gen(1)
 
 julia> M = Singular.Module(R, v1, v2)
-Singular Module over Singular Polynomial Ring (QQ),(@OSCAR@x@1,@OSCAR@y@1),(dp(2),C), with Generators:
-@OSCAR@x@1*@OSCAR@y@1^2*gen(2)+@OSCAR@x@1*@OSCAR@y@1*gen(1)+@OSCAR@y@1*gen(3)+@OSCAR@y@1*gen(2)+@OSCAR@y@1*gen(1)
-@OSCAR@x@1^2*@OSCAR@y@1*gen(2)+@OSCAR@x@1^2*gen(1)+@OSCAR@x@1*gen(3)+@OSCAR@x@1*gen(2)+@OSCAR@x@1*gen(1)
+Singular Module over Singular Polynomial Ring (QQ),(x_1,x_2),(dp(2),C), with Generators:
+x_1*x_2^2*gen(2)+x_1*x_2*gen(1)+x_2*gen(3)+x_2*gen(2)+x_2*gen(1)
+x_1^2*x_2*gen(2)+x_1^2*gen(1)+x_1*gen(3)+x_1*gen(2)+x_1*gen(1)
 
 julia> Z = syz(M)
-Singular Module over Singular Polynomial Ring (QQ),(@OSCAR@x@1,@OSCAR@y@1),(dp(2),C), with Generators:
-@OSCAR@x@1*gen(1)-@OSCAR@y@1*gen(2)
+Singular Module over Singular Polynomial Ring (QQ),(x_1,x_2),(dp(2),C), with Generators:
+x_1*gen(1)-x_2*gen(2)
 ```
 
 ### Free resolutions
@@ -259,18 +259,18 @@ sres{T <: Singular.FieldElem}(::smodule{spoly{T}}, ::Int)
 
 ```jldoctest
 julia> R, (x, y) = polynomial_ring(QQ, ["x", "y"])
-(Singular Polynomial Ring (QQ),(@OSCAR@x@1,@OSCAR@y@1),(dp(2),C), spoly{n_Q}[x, y])
+(Singular Polynomial Ring (QQ),(x_1,x_2),(dp(2),C), spoly{n_Q}[x, y])
 
 julia> v1 = vector(R, x + 1, x*y + 1, y)
-@OSCAR@x@1*@OSCAR@y@1*gen(2)+@OSCAR@x@1*gen(1)+@OSCAR@y@1*gen(3)+gen(2)+gen(1)
+x_1*x_2*gen(2)+x_1*gen(1)+x_2*gen(3)+gen(2)+gen(1)
 
 julia> v2 = vector(R, x^2 + 1, 2x + 3y, x)
-@OSCAR@x@1^2*gen(1)+@OSCAR@x@1*gen(3)+2*@OSCAR@x@1*gen(2)+3*@OSCAR@y@1*gen(2)+gen(1)
+x_1^2*gen(1)+x_1*gen(3)+2*x_1*gen(2)+3*x_2*gen(2)+gen(1)
 
 julia> M = std(Singular.Module(R, v1, v2))
-Singular Module over Singular Polynomial Ring (QQ),(@OSCAR@x@1,@OSCAR@y@1),(dp(2),C), with Generators:
-@OSCAR@x@1*@OSCAR@y@1*gen(2)+@OSCAR@x@1*gen(1)+@OSCAR@y@1*gen(3)+gen(2)+gen(1)
-@OSCAR@x@1^2*gen(1)+@OSCAR@x@1*gen(3)+2*@OSCAR@x@1*gen(2)+3*@OSCAR@y@1*gen(2)+gen(1)
+Singular Module over Singular Polynomial Ring (QQ),(x_1,x_2),(dp(2),C), with Generators:
+x_1*x_2*gen(2)+x_1*gen(1)+x_2*gen(3)+gen(2)+gen(1)
+x_1^2*gen(1)+x_1*gen(3)+2*x_1*gen(2)+3*x_2*gen(2)+gen(1)
 
 julia> F = sres(M, 0)
 Singular Resolution:
@@ -299,23 +299,23 @@ jet(::smodule, ::Int)
 
 ```jldoctest
 julia> R, (x, y) = polynomial_ring(QQ, ["x", "y"])
-(Singular Polynomial Ring (QQ),(@OSCAR@x@1,@OSCAR@y@1),(dp(2),C), spoly{n_Q}[x, y])
+(Singular Polynomial Ring (QQ),(x_1,x_2),(dp(2),C), spoly{n_Q}[x, y])
 
 julia> v1 = vector(R, x + 1, x*y + 1, y)
-@OSCAR@x@1*@OSCAR@y@1*gen(2)+@OSCAR@x@1*gen(1)+@OSCAR@y@1*gen(3)+gen(2)+gen(1)
+x_1*x_2*gen(2)+x_1*gen(1)+x_2*gen(3)+gen(2)+gen(1)
 
 julia> v2 = vector(R, x^5 + 1, 2x^3 + 3y^2, x^2)
-@OSCAR@x@1^5*gen(1)+2*@OSCAR@x@1^3*gen(2)+@OSCAR@x@1^2*gen(3)+3*@OSCAR@y@1^2*gen(2)+gen(1)
+x_1^5*gen(1)+2*x_1^3*gen(2)+x_1^2*gen(3)+3*x_2^2*gen(2)+gen(1)
 
 julia> M = Singular.Module(R, v1, v2)
-Singular Module over Singular Polynomial Ring (QQ),(@OSCAR@x@1,@OSCAR@y@1),(dp(2),C), with Generators:
-@OSCAR@x@1*@OSCAR@y@1*gen(2)+@OSCAR@x@1*gen(1)+@OSCAR@y@1*gen(3)+gen(2)+gen(1)
-@OSCAR@x@1^5*gen(1)+2*@OSCAR@x@1^3*gen(2)+@OSCAR@x@1^2*gen(3)+3*@OSCAR@y@1^2*gen(2)+gen(1)
+Singular Module over Singular Polynomial Ring (QQ),(x_1,x_2),(dp(2),C), with Generators:
+x_1*x_2*gen(2)+x_1*gen(1)+x_2*gen(3)+gen(2)+gen(1)
+x_1^5*gen(1)+2*x_1^3*gen(2)+x_1^2*gen(3)+3*x_2^2*gen(2)+gen(1)
 
 julia> N = jet(M,3)
-Singular Module over Singular Polynomial Ring (QQ),(@OSCAR@x@1,@OSCAR@y@1),(dp(2),C), with Generators:
-@OSCAR@x@1*@OSCAR@y@1*gen(2)+@OSCAR@x@1*gen(1)+@OSCAR@y@1*gen(3)+gen(2)+gen(1)
-2*@OSCAR@x@1^3*gen(2)+@OSCAR@x@1^2*gen(3)+3*@OSCAR@y@1^2*gen(2)+gen(1)
+Singular Module over Singular Polynomial Ring (QQ),(x_1,x_2),(dp(2),C), with Generators:
+x_1*x_2*gen(2)+x_1*gen(1)+x_2*gen(3)+gen(2)+gen(1)
+2*x_1^3*gen(2)+x_1^2*gen(3)+3*x_2^2*gen(2)+gen(1)
 ```
 
 ### Operations over local rings
@@ -331,28 +331,28 @@ minimal_generating_set(::smodule)
 
 ```jldoctest
 julia> R, (x, y) = polynomial_ring(QQ, ["x", "y"]; ordering=:negdegrevlex)
-(Singular Polynomial Ring (QQ),(@OSCAR@x@1,@OSCAR@y@1),(ds(2),C), spoly{n_Q}[x, y])
+(Singular Polynomial Ring (QQ),(x_1,x_2),(ds(2),C), spoly{n_Q}[x, y])
 
 julia> has_local_ordering(R) == true
 true
 
 julia> v1 = vector(R, x, y^2)
-@OSCAR@x@1*gen(1)+@OSCAR@y@1^2*gen(2)
+x_1*gen(1)+x_2^2*gen(2)
 
 julia> v2 = vector(R, y - x, y - y^2)
--@OSCAR@x@1*gen(1)+@OSCAR@y@1*gen(2)+@OSCAR@y@1*gen(1)-@OSCAR@y@1^2*gen(2)
+-x_1*gen(1)+x_2*gen(2)+x_2*gen(1)-x_2^2*gen(2)
 
 julia> v3 = v1 + v2
-@OSCAR@y@1*gen(2)+@OSCAR@y@1*gen(1)
+x_2*gen(2)+x_2*gen(1)
 
 julia> M = Singular.Module(R, v1, v2, v3)
-Singular Module over Singular Polynomial Ring (QQ),(@OSCAR@x@1,@OSCAR@y@1),(ds(2),C), with Generators:
-@OSCAR@x@1*gen(1)+@OSCAR@y@1^2*gen(2)
--@OSCAR@x@1*gen(1)+@OSCAR@y@1*gen(2)+@OSCAR@y@1*gen(1)-@OSCAR@y@1^2*gen(2)
-@OSCAR@y@1*gen(2)+@OSCAR@y@1*gen(1)
+Singular Module over Singular Polynomial Ring (QQ),(x_1,x_2),(ds(2),C), with Generators:
+x_1*gen(1)+x_2^2*gen(2)
+-x_1*gen(1)+x_2*gen(2)+x_2*gen(1)-x_2^2*gen(2)
+x_2*gen(2)+x_2*gen(1)
 
 julia> min = minimal_generating_set(M)
 2-element Vector{svector{spoly{n_Q}}}:
- @OSCAR@y@1*gen(2)+@OSCAR@y@1*gen(1)
- @OSCAR@x@1*gen(1)-@OSCAR@y@1*gen(2)-@OSCAR@y@1*gen(1)+@OSCAR@y@1^2*gen(2)
+ x_2*gen(2)+x_2*gen(1)
+ x_1*gen(1)-x_2*gen(2)-x_2*gen(1)+x_2^2*gen(2)
 ```

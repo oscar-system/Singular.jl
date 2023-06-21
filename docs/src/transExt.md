@@ -116,7 +116,7 @@ julia> d = transcendence_degree(F1)
 3
 
 julia> S, = polynomial_ring(QQ, ["a", "b", "c"])
-(Singular Polynomial Ring (QQ),(@OSCAR@a@1,@OSCAR@b@1,@OSCAR@c@1),(dp(3),C), spoly{n_Q}[a, b, c])
+(Singular Polynomial Ring (QQ),(x_1,x_2,x_3),(dp(3),C), spoly{n_Q}[a, b, c])
 
 julia> p = n_transExt_to_spoly(y, parent_ring = S)
 a^2*b + a*b + b^2
