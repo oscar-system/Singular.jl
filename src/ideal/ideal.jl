@@ -506,14 +506,14 @@ end
     saturation2(I::sideal{T}, J::sideal{T}) where T <: Nemo.RingElem
 
 Return the saturation of the ideal $I$ with respect to $J$, i.e. returns
-the quotient ideal $(I:J^\infty)$.
+the quotient ideal $(I:J^\infty)$ and the number of iterations.
 """
 function saturation2(I::sideal{T}, J::sideal{T}) where T <: Nemo.RingElem
    check_parent(I, J)
    has_global_ordering(base_ring(I)) || error("Must be over a ring with global ordering")
    R = base_ring(I)
-   ptr_res=libSingular.id_Saturation(I.ptr,J.ptr,R.ptr)
-   return (sideal{T}(R,ptr_res))
+   ptr_res,k=libSingular.id_Saturation(I.ptr,J.ptr,R.ptr)
+   return (sideal{T}(R,ptr_res)),k
 end
 
 ###############################################################################

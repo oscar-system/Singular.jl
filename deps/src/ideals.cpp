@@ -469,7 +469,7 @@ void singular_define_ideals(jlcxx::Module & Singular)
         int d;
         ideal res = idSaturate(I, J, d, TRUE);
         rChangeCurrRing(origin);
-        return res;
+        return std::make_tuple(res,d);
     });
 
     Singular.method("id_Array2Vector", [](void * p, int a, ring o) {

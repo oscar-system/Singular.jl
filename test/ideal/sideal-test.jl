@@ -360,7 +360,7 @@ end
    S, k = @inferred saturation(I, J)
    @test equal(S, Ideal(R, 2y^2 + 3, x^2 + x*y + 1))
 
-   S2 = @inferred saturation2(I, J)
+   S2, k = @inferred saturation2(I, J)
    @test equal(S, S2)
 
    I = Ideal(R, (x*y + 1)*(2x^2*y^2 + x*y - 2) + 2x*y^2 + x, 2x*y + 1)
@@ -371,7 +371,7 @@ end
    b = @inferred std(S)
    @test equal(a, b)
 
-   S2 = @inferred saturation2(I, J)
+   S2, k = @inferred saturation2(I, J)
    @test equal(S, S2)
 
    r, (x, y) = polynomial_ring(ZZ, ["x", "y"], ordering = ordering_dp())
