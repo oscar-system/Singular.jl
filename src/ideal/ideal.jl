@@ -1,7 +1,7 @@
 export sideal, IdealSet, syz, lead, normalize!, is_constant, is_zerodim, fglm,
        fres, dimension, highcorner, jet, kbase, minimal_generating_set,
        independent_sets, maximal_independent_set, mres, ngens, nres, sres,
-       intersection,
+       intersection, homogenize_ideal, homogenize_ideal_with_weights,
        quotient, reduce, eliminate, kernel, equal, contains, is_var_generated,
        saturation, satstd, slimgb, std, vdim, interreduce, degree, mult,
        hilbert_series, std_hilbert, is_homogeneous, division, divrem, mstd
@@ -205,7 +205,7 @@ of a suitable Groebner Basis of `I` by the variable `v` and
 return the corresponding homogeneous ideal.
 The variable `v` must have weight `1`.
 """
-function homogenize(I::sideal{S}, v::S) where S <: spoly
+function homogenize_ideal(I::sideal{S}, v::S) where S <: spoly
    R = base_ring(I)
    R == parent(v) || error("incompatible parents")
    i = var_index(v)
@@ -218,14 +218,14 @@ function homogenize(I::sideal{S}, v::S) where S <: spoly
 end
 
 @doc raw"""
-    homogenize_ideal(I::sideal{S}, v::S, w::Vector{Int32}) where S <: spoly
+    homogenize_ideal_with_weights(I::sideal{S}, v::S, w::Vector{Int32}) where S <: spoly
 
 Homogenization of the ideal `I` wrt. weights `w` by homogenization of the
 generators of a suitable Groebner Basis of `I` by the variable `v` and
 return the corresponding homogeneous ideal.
 The variable `v` must have weight `1`.
 """
-function homogenize(I::sideal{S}, v::S) where S <: spoly
+function homogenize_ideal_with_weights(I::sideal{S}, v::S,  w::Vector{Int32}) where S <: spoly
    R = base_ring(I)
    R == parent(v) || error("incompatible parents")
    i = var_index(v)
