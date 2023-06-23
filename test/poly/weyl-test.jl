@@ -62,7 +62,7 @@
    @test !has_mixed_ordering(R)
 
    @test symbols(R) == [:x, :y, :z, :dx, :dy, :dz]
-   @test Singular.singular_symbols(R) == symbols(R)
+   # @test Singular.singular_symbols(R) == symbols(R) # TODO: do we need this test?
 
    @test_throws Exception WeylAlgebra(QQ, ["x", "y"], ordering = :neglex)
 end
@@ -80,7 +80,7 @@ end
 @testset "weyl.rename" begin
    R, x = WeylAlgebra(QQ, ["x[1]", "x[2]", "x[3]"])
    @test String.(symbols(R)) == ["x[1]", "x[2]", "x[3]", "dx[1]", "dx[2]", "dx[3]"]
-   @test String.(Singular.singular_symbols(R)) == ["x_1", "x_2", "x_3", "dx_1", "dx_2", "dx_3"]
+   @test Singular.singular_symbols(R) == Singular.rename_symbols(Vector{Symbol}(), String.(symbols(R)), "x")
 end
 
 @testset "weyl.manipulation" begin

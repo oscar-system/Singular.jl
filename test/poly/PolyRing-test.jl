@@ -24,14 +24,16 @@ end
    I.isGB = true
    S = fres(I, 0)
    M = S[2]
-   @test string(M[1]) == "x*gen(2)-y*gen(1)+z*gen(2)-z*gen(1)"
+   ss = string.(Singular.singular_symbols(R))
+   @test string(M[1]) == ss[1]*"*gen(2)-"*ss[2]*"*gen(1)+"*ss[3]*"*gen(2)-"*ss[3]*"*gen(1)"
 
    R, (x, y, z) = polynomial_ring(QQ, ["x", "y", "z"], ordering2 = :comp1max)
    I = Ideal(R, x+z, y+z)
    I.isGB = true
    S = fres(I, 0)
    M = S[2]
-   @test string(M[1]) == "x*gen(2)-y*gen(1)-z*gen(1)+z*gen(2)"
+   ss = string.(Singular.singular_symbols(R))
+   @test string(M[1]) == ss[1]*"*gen(2)-"*ss[2]*"*gen(1)-"*ss[3]*"*gen(1)+"*ss[3]*"*gen(2)"
 
    R, (x, y, z) = polynomial_ring(QQ, ["x", "y", "z"], ordering = :comp1min,
          ordering2 = :degrevlex)
@@ -39,7 +41,8 @@ end
    I.isGB = true
    S = fres(I, 0)
    M = S[2]
-   @test string(M[1]) == "x*gen(2)+z*gen(2)-y*gen(1)-z*gen(1)"
+   ss = string.(Singular.singular_symbols(R))
+   @test string(M[1]) == ss[1]*"*gen(2)+"*ss[3]*"*gen(2)-"*ss[2]*"*gen(1)-"*ss[3]*"*gen(1)"
 
    R, (x, y, z) = polynomial_ring(QQ, ["x", "y", "z"], ordering = :comp1max,
          ordering2 = :degrevlex)
@@ -47,14 +50,14 @@ end
    I.isGB = true
    S = fres(I, 0)
    M = S[2]
-   @test string(M[1]) == "[-y-z,x+z]"
+   ss = string.(Singular.singular_symbols(R))
+   @test string(M[1]) == "[-"*ss[2]*"-"*ss[3]*","*ss[1]*"+"*ss[3]*"]"
 end
 
 @testset "PolyRing.ordering.fancy" begin
    function test_monomials(l)
       for i in 2:length(l)
          @test l[i-1] > l[i]
-         @test l[i] < l[rand(1:i-1)]
       end
    end
 

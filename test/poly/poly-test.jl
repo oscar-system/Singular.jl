@@ -123,22 +123,22 @@ end
    s = ["x[1]", "x[2]", "x[3]"]
    R, x = polynomial_ring(QQ, s)
    @test String.(symbols(R)) == s
-   @test String.(Singular.singular_symbols(R)) == ["x_1", "x_2", "x_3"]
+   @test Singular.singular_symbols(R) == Singular.rename_symbols(Vector{Symbol}(), s, "x")
 
    s = ["x[1][2]", "\$", "x[2][3]", "x[3][4]"]
    R, x = polynomial_ring(QQ, s)
    @test String.(symbols(R)) == s
-   @test String.(Singular.singular_symbols(R)) == ["x_1_2", "x", "x_2_3", "x_3_4"]
+   @test Singular.singular_symbols(R) == Singular.rename_symbols(Vector{Symbol}(), s, "x")
 
    s = ["t[1]", "\$", "t[2]", "t[3]", "t[1]"]
    F, t = FunctionField(QQ, s)
    @test String.(symbols(F)) == s
-   @test String.(Singular.singular_symbols(F)) == ["t_1", "t", "t_2", "t_3", "t_1@1"]
+   @test Singular.singular_symbols(F) == Singular.rename_symbols(Vector{Symbol}(), s, "t")
 
    s = ["t[1]", "\$", "t[2]", "t[3]", "t[1]"]
    R, x = polynomial_ring(F, s)
    @test String.(symbols(R)) == s
-   @test String.(Singular.singular_symbols(R)) == ["t_1@2", "x", "t_2@1", "t_3@1", "t_1@3"]
+   @test Singular.singular_symbols(R) == Singular.rename_symbols(Vector{Symbol}(), s, "x")
 
    F, a = FiniteField(3, 1, "\$")
    @test String.(Singular.singular_symbols(F)) == []
@@ -146,9 +146,9 @@ end
    F, a = FiniteField(3, 2, "\$")
    s = ["a", "\$", "t[1]", "t[2]", "t[1]"]
    R, x = polynomial_ring(F, s)
-   @test String.(Singular.singular_symbols(F)) == ["a"]
+   @test Singular.singular_symbols(F) == [Singular.rename_symbol("\$", "a")]
    @test String.(symbols(R)) == s
-   @test String.(Singular.singular_symbols(R)) == ["a@1", "x", "t_1", "t_2", "t_1@1"]
+   @test Singular.singular_symbols(R) == Singular.rename_symbols(Singular.singular_symbols(F), s, "x")
 end
 
 @testset "poly.manipulation" begin

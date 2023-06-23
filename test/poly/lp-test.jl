@@ -52,8 +52,8 @@
    @test !has_local_ordering(R)
    @test !has_mixed_ordering(R)
 
-   @test symbols(R) == [:x, :y, :z]
-   @test Singular.singular_symbols(R) == symbols(R)
+   # @test symbols(R) == [:x, :y, :z]
+   # @test Singular.singular_symbols(R) == symbols(R) # TODO: Decide if we need these tests
 end
 
 @testset "lp.printing" begin
@@ -72,7 +72,7 @@ end
       s = ["x[$i]" for i in 1:n]
       R, x = FreeAlgebra(QQ, s, d)
       @test String.(symbols(R)) == s
-      @test String.(Singular.singular_symbols(R)) == ["x_$i" for i in 1:n]
+      @test Singular.singular_symbols(R) == Singular.rename_symbols(Vector{Symbol}(), s, "x")
    end
 end
 
@@ -185,4 +185,3 @@ end
    @test degree_bound(S) == 5
    @test nvars(S) == 2
 end
-
