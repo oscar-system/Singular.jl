@@ -308,6 +308,14 @@ void singular_define_ideals(jlcxx::Module & Singular)
 
     Singular.method("rank", [](ideal m) { return (int)m->rank; });
 
+    Singular.method("id_Homogenize", &id_Homogenize);
+
+    Singular.method("id_HomogenizeW", [](ideal a, int v, jlcxx::ArrayRef<int> w, ring r) {
+        intvec * ww = to_intvec(w);
+        ideal id = id_HomogenizeW(a, v, ww, r);
+        return id;
+    });
+
     Singular.method("id_Quotient", [](ideal a, ideal b, bool c, ring d) {
         const ring origin = currRing;
         rChangeCurrRing(d);

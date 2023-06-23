@@ -197,6 +197,46 @@ function homogenize(I::sideal{S}, v::S) where S <: spoly
     end
 end
 
+@doc raw"""
+    homogenize_ideal(I::sideal{S}, v::S) where S <: spoly
+
+Homogenization of the ideal `I` by homogenization of the generators
+of a suitable Groebner Basis of `I` by the variable `v` and
+return the corresponding homogeneous ideal.
+The variable `v` must have weight `1`.
+"""
+function homogenize(I::sideal{S}, v::S) where S <: spoly
+   R = base_ring(I)
+   R == parent(v) || error("incompatible parents")
+   i = var_index(v)
+   GC.@preserve I v R begin
+      isone(libSingular.p_WTotaldegree(v.ptr, R.ptr)) ||
+               error("variable must have weight 1")
+      ptr = libSingular.id_Homogenize(I.ptr, i, R.ptr)
+      return sideal{S}(R, ptr)
+    end
+end
+
+@doc raw"""
+    homogenize_ideal(I::sideal{S}, v::S, w::Vector{Int32}) where S <: spoly
+
+Homogenization of the ideal `I` wrt. weights `w` by homogenization of the
+generators of a suitable Groebner Basis of `I` by the variable `v` and
+return the corresponding homogeneous ideal.
+The variable `v` must have weight `1`.
+"""
+function homogenize(I::sideal{S}, v::S) where S <: spoly
+   R = base_ring(I)
+   R == parent(v) || error("incompatible parents")
+   i = var_index(v)
+   GC.@preserve I v R begin
+      isone(libSingular.p_WTotaldegree(v.ptr, R.ptr)) ||
+               error("variable must have weight 1")
+      ptr = libSingular.id_HomogenizeW(I.ptr, i, w, R.ptr)
+      return sideal{S}(R, ptr)
+    end
+end
+
 
 @doc raw"""
     normalize!(I::sideal)
