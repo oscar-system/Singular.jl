@@ -463,6 +463,15 @@ void singular_define_ideals(jlcxx::Module & Singular)
 
     Singular.method("id_Satstd", &id_Satstd);
 
+    Singular.method("id_Saturation", [](ideal I, ideal J, ring r) {
+        const ring origin = currRing;
+        rChangeCurrRing(r);
+        int d;
+        ideal res = idSaturate(I, J, d, TRUE);
+        rChangeCurrRing(origin);
+        return std::make_tuple(res,d);
+    });
+
     Singular.method("id_Array2Vector", [](void * p, int a, ring o) {
         return id_Array2Vector(reinterpret_cast<poly *>(p), a, o);
     });
