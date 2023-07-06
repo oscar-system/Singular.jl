@@ -1,6 +1,6 @@
 name = "Singular"
 uuid = "bcd08a7b-43d2-5ff7-b6d4-c458787f915c"
-version = "0.18.7"
+version = "0.18.8"
 
 [deps]
 AbstractAlgebra = "c3fe647b-3220-5bb0-a1ea-a7954cac585d"
@@ -28,4 +28,4 @@ RandomExtensions = "0.4.2"
 Singular_jll = "~403.203.202"
 julia = "1.6"
 lib4ti2_jll = "1.6.10"
-libsingular_julia_jll = "~0.34.0"
+libsingular_julia_jll = "~0.35.0"
