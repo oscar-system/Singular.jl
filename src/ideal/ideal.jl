@@ -1,9 +1,9 @@
 export sideal, IdealSet, syz, lead, normalize!, is_constant, is_zerodim, fglm,
        fres, dimension, highcorner, jet, kbase, minimal_generating_set,
        independent_sets, maximal_independent_set, mres, ngens, nres, sres,
-       intersection,
+       intersection, homogenize_ideal, homogenize_ideal_with_weights,
        quotient, reduce, eliminate, kernel, equal, contains, is_var_generated,
-       saturation, satstd, slimgb, std, vdim, interreduce, degree, mult,
+       saturation, saturation2, satstd, slimgb, std, vdim, interreduce, degree, mult,
        hilbert_series, std_hilbert, is_homogeneous, division, divrem, mstd
 
 ###############################################################################
@@ -193,6 +193,46 @@ function homogenize(I::sideal{S}, v::S) where S <: spoly
       isone(libSingular.p_WTotaldegree(v.ptr, R.ptr)) ||
                error("variable must have weight 1")
       ptr = libSingular.id_Homogen(I.ptr, i, R.ptr)
+      return sideal{S}(R, ptr)
+    end
+end
+
+@doc raw"""
+    homogenize_ideal(I::sideal{S}, v::S) where S <: spoly
+
+Homogenization of the ideal `I` by homogenization of the generators
+of a suitable Groebner Basis of `I` by the variable `v` and
+return the corresponding homogeneous ideal.
+The variable `v` must have weight `1`.
+"""
+function homogenize_ideal(I::sideal{S}, v::S) where S <: spoly
+   R = base_ring(I)
+   R == parent(v) || error("incompatible parents")
+   i = var_index(v)
+   GC.@preserve I v R begin
+      isone(libSingular.p_WTotaldegree(v.ptr, R.ptr)) ||
+               error("variable must have weight 1")
+      ptr = libSingular.id_Homogenize(I.ptr, i, R.ptr)
+      return sideal{S}(R, ptr)
+    end
+end
+
+@doc raw"""
+    homogenize_ideal_with_weights(I::sideal{S}, v::S, w::Vector{Int32}) where S <: spoly
+
+Homogenization of the ideal `I` wrt. weights `w` by homogenization of the
+generators of a suitable Groebner Basis of `I` by the variable `v` and
+return the corresponding homogeneous ideal.
+The variable `v` must have weight `1`.
+"""
+function homogenize_ideal_with_weights(I::sideal{S}, v::S,  w::Vector{Int32}) where S <: spoly
+   R = base_ring(I)
+   R == parent(v) || error("incompatible parents")
+   i = var_index(v)
+   GC.@preserve I v R begin
+      isone(libSingular.p_WTotaldegree(v.ptr, R.ptr)) ||
+               error("variable must have weight 1")
+      ptr = libSingular.id_HomogenizeW(I.ptr, i, w, R.ptr)
       return sideal{S}(R, ptr)
     end
 end
@@ -500,6 +540,20 @@ function saturation(I::sideal{T}, J::sideal{T}) where T <: Nemo.RingElem
       k += 1
    end
    return I, k - 1
+end
+
+@doc raw"""
+    saturation2(I::sideal{T}, J::sideal{T}) where T <: Nemo.RingElem
+
+Return the saturation of the ideal $I$ with respect to $J$, i.e. returns
+the quotient ideal $(I:J^\infty)$ and the number of iterations.
+"""
+function saturation2(I::sideal{T}, J::sideal{T}) where T <: Nemo.RingElem
+   check_parent(I, J)
+   R = base_ring(I)
+   has_global_ordering(R) || error("Must be over a ring with global ordering")
+   ptr_res,k=libSingular.id_Saturation(I.ptr,J.ptr,R.ptr)
+   return (sideal{T}(R,ptr_res)),k
 end
 
 ###############################################################################

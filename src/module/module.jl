@@ -239,6 +239,45 @@ function sres(I::smodule{spoly{T}}, max_length::Int) where T <: Singular.FieldEl
    return sresolution{spoly{T}}(R, r, Bool(minimal))
 end
 
+@doc raw"""
+    mres(id::smodule{spoly{T}}, max_length::Int) where T <: Nemo.FieldElem
+
+Compute a minimal (free) resolution of the given module up to the maximum
+given length. The module must be over a polynomial ring over a field.
+The result is given as a resolution, whose i-th entry is
+the syzygy module of the previous module, starting with the given module.
+The `max_length` can be set to $0$ if the full free resolution is required.
+"""
+function mres(I::smodule{spoly{T}}, max_length::Int) where T <: Nemo.FieldElem
+   R = base_ring(I)
+   if max_length == 0
+        max_length = nvars(R)
+        # TODO: consider qrings
+   end
+   r, minimal = GC.@preserve I R libSingular.id_res(I.ptr, Cint(max_length + 1), 1, R.ptr)
+   return sresolution{spoly{T}}(R, r, Bool(minimal), false)
+end
+
+@doc raw"""
+    nres(id::smodule{spoly{T}}, max_length::Int) where T <: Nemo.FieldElem
+
+Compute a minimal (free) resolution of the given module up to the maximum
+given length (keeping the initial module).
+The module must be over a polynomial ring over a field.
+The result is given as a resolution, whose i-th entry is
+the syzygy module of the previous module, starting with the given module.
+The `max_length` can be set to $0$ if the full free resolution is required.
+"""
+function nres(I::smodule{spoly{T}}, max_length::Int) where T <: Nemo.FieldElem
+   R = base_ring(I)
+   if max_length == 0
+        max_length = nvars(R)
+        # TODO: consider qrings
+   end
+   r, minimal = GC.@preserve I R libSingular.id_res(I.ptr, Cint(max_length + 1), 0, R.ptr)
+   return sresolution{spoly{T}}(R, r, Bool(minimal), false)
+end
+
 ###############################################################################
 #
 #   Module constructors
