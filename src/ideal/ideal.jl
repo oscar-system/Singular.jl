@@ -747,11 +747,16 @@ the generators of `G`. Returns a tuple (Quo, Rem, U) where
 and `Rem = normalform(I, G)`. `U` is a diagonal matrix of units differing
 from the identity matrix only for local ring orderings.
 """
-function divrem(I::sideal{S}, G::sideal{S}) where S <: SPolyUnion
+function divrem(I::sideal{S}, G::sideal{S}; complete_reduction::Bool = false) where S <: SPolyUnion
    check_parent(I, G)
    R = base_ring(I)
-   ptr_T,ptr_Rest,ptr_U = GC.@preserve I G R libSingular.id_DivRem_Unit(I.ptr, G.ptr,
-                                                      R.ptr)
+   if complete_reduction
+     ptr_T,ptr_Rest,ptr_U = GC.@preserve I G R libSingular.id_DivRem_Unit(I.ptr, G.ptr,
+                                                      R.ptr,0)
+   else
+     ptr_T,ptr_Rest,ptr_U = GC.@preserve I G R libSingular.id_DivRem_Unit(I.ptr, G.ptr,
+                                                      R.ptr,1)
+   end
    return (smodule{S}(R,ptr_T), sideal{S}(R,ptr_Rest), smodule{S}(R,ptr_U))
 end
 
