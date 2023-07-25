@@ -689,10 +689,14 @@ left reduction, and hence cannot be used to test containment in a two-sided idea
 For LETTERPLACE rings (S <: slpalg, FreeAlgebra), the reduction is two-sided as
 only two-sided ideals can be constructed here.
 """
-function reduce(I::sideal{S}, G::sideal{S}) where S <: SPolyUnion
+function reduce(I::sideal{S}, G::sideal{S};complete_reduction::Bool = true) where S <: SPolyUnion
    check_parent(I, G)
    R = base_ring(I)
-   ptr = GC.@preserve I G R libSingular.p_Reduce(I.ptr, G.ptr, R.ptr)
+   if complete_reduction
+      ptr = GC.@preserve I G R libSingular.p_Reduce(I.ptr, G.ptr, R.ptr)
+   else
+      ptr = GC.@preserve I G R libSingular.p_Reduce(I.ptr, G.ptr, R.ptr,1)
+   end
    return sideal{S}(R, ptr, false, I.isTwoSided)
 end
 
@@ -706,10 +710,14 @@ left reduction, and hence cannot be used to test membership in a two-sided ideal
 For LETTERPLACE rings (S <: slpalg, FreeAlgebra), the reduction is the full
 two-sided reduction as only two-sided ideals can be constructed here.
 """
-function reduce(p::S, G::sideal{S}) where S <: SPolyUnion
+function reduce(p::S, G::sideal{S};complete_reduction = true) where S <: SPolyUnion
    R = parent(p)
    R == base_ring(G) || error("Incompatible base rings")
-   ptr = GC.@preserve p G R libSingular.p_Reduce(p.ptr, G.ptr, R.ptr)
+   if complete_reduction
+     ptr = GC.@preserve p G R libSingular.p_Reduce(p.ptr, G.ptr, R.ptr)
+   else
+     ptr = GC.@preserve p G R libSingular.p_Reduce(p.ptr, G.ptr, R.ptr,1)
+   end
    return R(ptr)
 end
 
