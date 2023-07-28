@@ -229,6 +229,20 @@ JLCXX_MODULE define_julia_module(jlcxx::Module & Singular)
         return old_mu;
     });
 
+    Singular.method("set_randomseed", [](int m) {
+        int old_m=siSeed;
+        if (m != 0)
+        {
+          siSeed=m;
+          factoryseed(m);
+        }
+        return old_m;
+    });
+
+    Singular.method("random", []() {
+        return siRand();
+    });
+
     singular_define_coeffs(Singular);
     singular_define_rings(Singular);
     singular_define_ideals(Singular);
