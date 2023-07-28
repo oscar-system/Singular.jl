@@ -243,3 +243,9 @@ end
     GC.gc(true)
     @test length(string(a)) > 2
 end
+
+@testset "random" begin
+    Singular.libSingular.set_randomseed(1)
+    @test Singular.libSingular.random() == 16807
+    @test Singular.libSingular.random() == 282475249
+end
