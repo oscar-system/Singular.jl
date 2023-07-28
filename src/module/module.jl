@@ -1,4 +1,4 @@
-export jet, minimal_generating_set, ModuleClass, rank, smodule, slimgb, eliminate, modulo, lift, division
+export jet, minimal_generating_set, ModuleClass, rank, smodule, slimgb, eliminate, modulo, lift, division, divrem
 
 ###############################################################################
 #
@@ -193,6 +193,27 @@ function division(I::smodule{S}, G::smodule{S}) where S
    ptr_T,ptr_Rest,ptr_U = GC.@preserve I G R libSingular.id_Lift(G.ptr, I.ptr,
                                                       true,false,true,R.ptr)
    return (smodule{S}(R,ptr_T), smodule{S}(R,ptr_Rest), smodule{S}(R,ptr_U))
+end
+
+@doc raw"""
+    divrem(I::smodule{S}, G::smodule{S}; complete_reduction::Bool = false) where S <: SPolyUnion
+
+Computes a division with remainder of the generators of `I` by
+the generators of `G`. Returns a tuple (Quo, Rem, U) where
+  `Matrix(I)*U = Matrix(G)*Matrix(Quo) + Matrix(Rem)`
+and `Rem = normalform(I, G)`. `U` is a diagonal matrix of units differing
+from the identity matrix only for local ring orderings.
+"""
+function divrem(I::smodule{S}, G::smodule{S}; complete_reduction::Bool = false) where S <: SPolyUnion
+   check_parent(I, G)
+   R = base_ring(I)
+   old_redsb=libSingular.set_option("OPT_REDSB",complete_reduction)
+   old_redtail=libSingular.set_option("OPT_REDTAIL",complete_reduction)
+   ptr_T,ptr_Rest,ptr_U = GC.@preserve I G R libSingular.id_Lift(G.ptr, I.ptr, true,
+                                                                   false, true, R.ptr)
+   libSingular.set_option("OPT_REDSB",old_redsb)
+   libSingular.set_option("OPT_REDTAIL",old_redtail)
+   return (smodule{S}(R,ptr_T), smodule{S}(R,ptr_Rest), smatrix{S}(R,ptr_U))
 end
 
 ###############################################################################
