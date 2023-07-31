@@ -495,6 +495,7 @@ function hilbert_series(M::smodule{spoly{T}}, w::Vector{<:Integer}, shifts::Vect
   M.isGB || error("Not a Groebner basis")
   R = base_ring(M)
   length(w) == nvars(R) || error("wrong number of weights")
+  length(shifts) == rank(M) || error("wrong number of weights")
   all(x -> x>0, w) || error("weights must be positive")
   w = convert(Vector{Int32}, w)
   shifts = convert(Vector{Int32}, shifts)
