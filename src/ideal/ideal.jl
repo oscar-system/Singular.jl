@@ -751,7 +751,7 @@ end
 
 Computes a division with remainder of the generators of `I` by
 the generators of `G`. Returns a tuple (Quo, Rem, U) where
-  `Matrix(I)*U = Matrix(G)*Matrix(Quo) + Matrix(Rem)`
+`Matrix(I)*Matrix(U) = Matrix(G)*Matrix(Quo) + Matrix(Rem)`
 and `Rem = normalform(I, G)`. `U` is a diagonal matrix of units differing
 from the identity matrix only for local ring orderings.
 """
@@ -764,7 +764,7 @@ function divrem(I::sideal{S}, G::sideal{S}; complete_reduction::Bool = false) wh
                                                                    false, true, R.ptr)
    libSingular.set_option("OPT_REDSB",old_redsb)
    libSingular.set_option("OPT_REDTAIL",old_redtail)
-   return (smodule{S}(R,ptr_T), sideal{S}(R,ptr_Rest), smatrix{S}(R,ptr_U))
+   return (smodule{S}(R,ptr_T), sideal{S}(R,ptr_Rest), smodule{S}(R,ptr_U))
 end
 
 ###############################################################################
