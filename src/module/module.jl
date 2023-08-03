@@ -165,16 +165,20 @@ end
 ###############################################################################
 
 @doc raw"""
-    reduce(M::smodule, G::smodule)
+    reduce(M::smodule, G::smodule; complete_reduction::Bool = true)
 
 Return a submodule whose generators are the generators of $M$ reduced by the
 submodule $G$. The submodule $G$ need not be a Groebner basis. The returned
 submodule will have the same number of generators as $M$, even if they are zero.
 """
-function reduce(M::smodule, G::smodule)
+function reduce(M::smodule, G::smodule; complete_reduction::Bool = true)
    check_parent(M, G)
    R = base_ring(M)
-   ptr = GC.@preserve M G R libSingular.p_Reduce(M.ptr, G.ptr, R.ptr)
+   if complete_reduction
+      ptr = GC.@preserve M G R libSingular.p_Reduce(M.ptr, G.ptr, R.ptr)
+   else
+      ptr = GC.@preserve M G R libSingular.p_Reduce(M.ptr, G.ptr, R.ptr,1)
+   end
    return Module(R, ptr)
 end
 
