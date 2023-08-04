@@ -1279,6 +1279,36 @@ function hilbert_series(I::sideal{spoly{T}}, w::Vector{<:Integer}) where T <: Ne
 end
 
 @doc raw"""
+    hilbert_series(I::sideal{spoly{T}}, Qt::PolyRing) where T <: Nemo.FieldElem
+
+Return the polynomial $Q(t)$ as element of Qt where `Q(t)/(1-t)^nvars(base_ring(I))`
+is the Hilbert-Poincare series of $I$ for weights $(1, \dots, 1)$.
+"""
+function hilbert_series(I::sideal{spoly{T}}, Qt::PolyRing) where T <: Nemo.FieldElem
+   I.isGB || error("Not a Groebner basis")
+   R = base_ring(I)
+   GC.@preserve I R new_ptr = libSingular.scHilbPoly(I.ptr, R.ptr, Qt.ptr)
+   return Qt(new_ptr)
+end
+
+@doc raw"""
+    hilbert_series(I::sideal{spoly{T}}, w::Vector{<:Integer}) where T <: Nemo.FieldElem
+
+Return the polynomial $Q(t)$ of Qt where $\frac{Q(t)}{\prod_i (1-t^{w_i})}$
+is the Hilbert-Poincare series of $I$ for weights $\{w_i\}$. Each weight must be
+positive $w_i > 0$.
+"""
+function hilbert_series(I::sideal{spoly{T}}, w::Vector{<:Integer}, Qt::PolyRing) where T <: Nemo.FieldElem
+   I.isGB || error("Not a Groebner basis")
+   R = base_ring(I)
+   length(w) == nvars(R) || error("wrong number of weights")
+   all(x -> x > 0, w) || error("weights must be positive")
+   w = convert(Vector{Int32}, w)
+   GC.@preserve I R new_ptr = libSingular.scHilbPolyWeighted(I.ptr, R.ptr, w, Qt.ptr)
+   return Qt(new_ptr)
+end
+
+@doc raw"""
     std_hilbert(I::sideal{spoly{T}}, hs::Vector{Int32}; complete_reduction::Bool=false) where T <: Nemo.FieldElem
 
 As per `std(I; complete_reduction)` but takes the hilbert series `hs`
