@@ -241,6 +241,35 @@ end
 #   Resolutions
 #
 ###############################################################################
+@doc raw"""
+    fres(id::smodule{spoly{T}}, max_length::Int, method::String="complete") where T <: Nemo.FieldElem
+
+Compute a free resolution of the given module up to the maximum given
+length. The module must be over a polynomial ring over a field, and
+a Groebner basis.
+The possible methods are "complete", "frame", "extended frame" and
+"single module". The result is given as a resolution, whose i-th entry is
+the syzygy module of the previous module, starting with the given
+ideal/module.
+The `max_length` can be set to $0$ if the full free resolution is required.
+"""
+function fres(id::smodule{spoly{T}}, max_length::Int, method::String = "complete") where T <: Nemo.FieldElem
+   id.isGB || error("Not a Groebner basis")
+   max_length < 0 && error("length for fres must not be negative")
+   R = base_ring(id)
+   if max_length == 0
+        max_length = nvars(R)
+        # TODO: consider qrings
+   end
+   if (method != "complete"
+         && method != "frame"
+         && method != "extended frame"
+         && method != "single module")
+      error("wrong optional argument for fres")
+   end
+   r, minimal = GC.@preserve id R libSingular.id_fres(id.ptr, Cint(max_length + 1), method, R.ptr)
+   return sresolution{spoly{T}}(R, r, Bool(minimal), false)
+end
 
 @doc raw"""
     sres(I::smodule{spoly{T}}, max_length::Int) where T <: Singular.FieldElem

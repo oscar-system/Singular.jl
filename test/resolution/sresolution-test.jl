@@ -81,3 +81,29 @@ end
    @test iszero(M1*M2)
 end
 
+@testset "sresolution.fres_module" begin
+   R, (x, y, z) = polynomial_ring(QQ, ["x", "y", "z"])
+
+   I = Singular.Ideal(R, y*z + z^2, y^2 + x*z, x*y + z^2, z^3, x*z^2, x^2*z)
+   M = std(syz(I))
+
+   F = fres(M, 0)
+
+   # We have R^6 <- R^9 <- R^5 <- R^1
+   # All references agree that when written as follows:
+   # 0 <- M <- R^6 <- R^9 <- R^5 <- R^1 <- 0
+   # the length is 3, as numbering starts at index 0 with R^6
+
+   @test length(F) == 3
+   @test F[1] isa smodule
+   @test F[2] isa smodule
+
+   M1 = Singular.Matrix(F[1])
+   M2 = Singular.Matrix(F[2])
+   M3 = Singular.Matrix(F[3])
+
+   @test Singular.Matrix(Singular.Module(M1)) == M1
+
+   @test iszero(M1*M2)
+   @test iszero(M2*M3)
+end
