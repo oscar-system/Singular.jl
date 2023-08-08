@@ -87,7 +87,7 @@ end
    f = (x^3+y^5)^2+x^2*y^7
    @test mult(std(@inferred jacobian_ideal(f))) == 46
    @test mult(std(Ideal(R, f))) == 6
-   
+
    R, (x, y) = polynomial_ring(QQ, ["x", "y"]; ordering= :lex)
    @test_throws ErrorException iszerodim(Ideal(R, x+y,x^2))
 end
@@ -684,7 +684,7 @@ end
                  1*x*z^14+6*x^2*y^4+3*z^24,
                  5*y^10*z^10*x+2*y^20*z^10+y^10*z^20+11*x^3])
 
-   @test ngens(std_hilbert(j, h, w, complete_reduction = true)) == 
+   @test ngens(std_hilbert(j, h, w, complete_reduction = true)) ==
          ngens(std(j, complete_reduction = true))
 end
 
@@ -693,4 +693,14 @@ end
    R, (H, S, C) = polynomial_ring(F, ["H", "S", "C"]; ordering = ordering_lp());
    I = Ideal(R,-e*H*S - m1*k*H*C + m1*C, -e*H*S - m2*k2*S*C + m2*C, e*H*S - b3*k3*C^2 + b3*C);
    @test dimension(std(I)) == 1
+end
+
+@testset "sideal.divrem and reduce" begin
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
+   a = Ideal(R,[x^3+y^3+x*y])
+   b = Ideal(R, [x])
+   q,r,u = divrem(a, b)
+   @test Singular.Matrix(a)*Singular.Matrix(u) == Singular.Matrix(b)*Singular.Matrix(q)+Singular.Matrix(r)
+   @test gens(reduce(a, b, complete_reduction=false))[1] ==y^3+x*y
+   @test gens(reduce(a, b, complete_reduction=true))[1] == y^3
 end

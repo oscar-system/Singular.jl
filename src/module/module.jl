@@ -165,16 +165,20 @@ end
 ###############################################################################
 
 @doc raw"""
-    reduce(M::smodule, G::smodule)
+    reduce(M::smodule, G::smodule; complete_reduction::Bool = true)
 
 Return a submodule whose generators are the generators of $M$ reduced by the
 submodule $G$. The submodule $G$ need not be a Groebner basis. The returned
 submodule will have the same number of generators as $M$, even if they are zero.
 """
-function reduce(M::smodule, G::smodule)
+function reduce(M::smodule, G::smodule; complete_reduction::Bool = true)
    check_parent(M, G)
    R = base_ring(M)
-   ptr = GC.@preserve M G R libSingular.p_Reduce(M.ptr, G.ptr, R.ptr)
+   if complete_reduction
+      ptr = GC.@preserve M G R libSingular.p_Reduce(M.ptr, G.ptr, R.ptr)
+   else
+      ptr = GC.@preserve M G R libSingular.p_Reduce(M.ptr, G.ptr, R.ptr,1)
+   end
    return Module(R, ptr)
 end
 
@@ -200,7 +204,7 @@ end
 
 Computes a division with remainder of the generators of `I` by
 the generators of `G`. Returns a tuple (Quo, Rem, U) where
-  `Matrix(I)*U = Matrix(G)*Matrix(Quo) + Matrix(Rem)`
+`Matrix(I)*Matrix(U) = Matrix(G)*Matrix(Quo) + Matrix(Rem)`
 and `Rem = normalform(I, G)`. `U` is a diagonal matrix of units differing
 from the identity matrix only for local ring orderings.
 """
@@ -213,7 +217,7 @@ function divrem(I::smodule{S}, G::smodule{S}; complete_reduction::Bool = false) 
                                                                    false, true, R.ptr)
    libSingular.set_option("OPT_REDSB",old_redsb)
    libSingular.set_option("OPT_REDTAIL",old_redtail)
-   return (smodule{S}(R,ptr_T), smodule{S}(R,ptr_Rest), smatrix{S}(R,ptr_U))
+   return (smodule{S}(R,ptr_T), smodule{S}(R,ptr_Rest), smodule{S}(R,ptr_U))
 end
 
 ###############################################################################
