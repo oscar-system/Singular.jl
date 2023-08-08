@@ -45,7 +45,6 @@ static void WarningS_for_julia(const char * s)
 */
 static void WerrorS_and_reset(const char * s)
 {
-    errorreported = 0;
     if (singular_error_log.size() > 9)
     {
         for (auto & si : singular_error_log)
@@ -124,6 +123,8 @@ JLCXX_MODULE define_julia_module(jlcxx::Module & Singular)
     });
 
     Singular.method("get_and_clear_error", []() {
+        errorreported = 0;
+        inerror = 0;
         std::stringstream ss;
         for (auto & si : singular_error_log)
             ss << si << std::endl;
