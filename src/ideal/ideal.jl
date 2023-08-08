@@ -918,11 +918,10 @@ end
 ###############################################################################
 
 @doc raw"""
-    fres(id::Union{sideal{spoly{T}}, smodule{spoly{T}}},
-      max_length::Int, method::String="complete") where T <: Nemo.FieldElem
+    fres(id::sideal{spoly{T}}, max_length::Int, method::String="complete") where T <: Nemo.FieldElem
 
-Compute a free resolution of the given ideal/module up to the maximum given
-length. The ideal/module must be over a polynomial ring over a field, and
+Compute a free resolution of the given ideal up to the maximum given
+length. The ideal must be over a polynomial ring over a field, and
 a Groebner basis.
 The possible methods are "complete", "frame", "extended frame" and
 "single module". The result is given as a resolution, whose i-th entry is
@@ -930,7 +929,7 @@ the syzygy module of the previous module, starting with the given
 ideal/module.
 The `max_length` can be set to $0$ if the full free resolution is required.
 """
-function fres(id::Union{sideal{spoly{T}}, smodule{spoly{T}}}, max_length::Int, method::String = "complete") where T <: Nemo.FieldElem
+function fres(id::sideal{spoly{T}}, max_length::Int, method::String = "complete") where T <: Nemo.FieldElem
    id.isGB || error("Not a Groebner basis")
    max_length < 0 && error("length for fres must not be negative")
    R = base_ring(id)
