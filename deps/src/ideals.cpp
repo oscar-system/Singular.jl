@@ -146,22 +146,14 @@ auto id_MinStd_helper(ideal a, ring b, bool complete_reduction = false)
         crbit = 0;
     ideal id = NULL;
     ideal m = NULL;
-    if (!idIs0(a))
-    {
-        tHomog       h = testHomog;
-        const ring   origin = currRing;
-        unsigned int save_opt = si_opt_1;
-        si_opt_1 |= crbit;
-        rChangeCurrRing(b);
-        id = kMin_std(a, b->qideal, h, NULL, m);
-        si_opt_1 = save_opt;
-        rChangeCurrRing(origin);
-    }
-    else
-    {
-        id = idInit(0, a->rank);
-        m = idInit(0, a->rank);
-    }
+    tHomog       h = testHomog;
+    const ring   origin = currRing;
+    unsigned int save_opt = si_opt_1;
+    si_opt_1 |= crbit;
+    rChangeCurrRing(b);
+    id = kMin_std(a, b->qideal, h, NULL, m);
+    si_opt_1 = save_opt;
+    rChangeCurrRing(origin);
     return std::make_tuple(id, m);
 }
 
