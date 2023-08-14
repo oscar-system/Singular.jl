@@ -686,11 +686,11 @@ end
 
    @test ngens(std_hilbert(j, h, w, complete_reduction = true)) == 
          ngens(std(j, complete_reduction = true))
-    Qt,(t)= polynomial_ring(QQ, ["t"])
-    t=gens(Qt)[1]
-    I=Ideal(R,x,y,z)
-    I=std(I)
-    @test hilbert_series(I,Qt) == -t^3+3*t^2-3*t+1
+   Qt,(t)= polynomial_ring(QQ, ["t"])
+   t=gen(Qt,1)
+   I=Ideal(R,[x,y,z])
+   I=std(I)
+   @test hilbert_series(I,Qt) == -t^3+3*t^2-3*t+1
 end
 
 @testset "sideal.oscar#1702" begin
