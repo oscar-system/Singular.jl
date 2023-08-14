@@ -690,7 +690,7 @@ end
     t=gens(Qt)[1]
     I=Ideal(R,x,y,z)
     I=std(I)
-    @test hilbert_series(I,Qt) == -t^3+3*t^2+3*t+1
+    @test hilbert_series(I,Qt) == -t^3+3*t^2-3*t+1
 end
 
 @testset "sideal.oscar#1702" begin
