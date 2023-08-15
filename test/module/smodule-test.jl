@@ -294,3 +294,15 @@ end
    M.isGB = true
    @test hilbert_series(M,[1,1,1],[0,0]) == [1,0,-3,0,3,0,-1,0]
 end
+
+@testset "smodule.divrem and reduce" begin
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
+   a = Singular.Module(R,vector(R, x^3+y^3+x*y, R(1)))
+   b = Singular.Module(R, vector(R, x, R(0)))
+   q,r,u = divrem(a, b)
+   @test Singular.Matrix(a)*Singular.Matrix(u) == Singular.Matrix(b)*Singular.Matrix(q)+Singular.Matrix(r)
+   r = reduce(a, b, complete_reduction=false)
+   @test r[1] == vector(R, y^3+x*y, R(1))
+   r = reduce(a, b, complete_reduction=true)
+   @test r[1] == vector(R, y^3, R(1))
+end

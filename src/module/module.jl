@@ -165,16 +165,20 @@ end
 ###############################################################################
 
 @doc raw"""
-    reduce(M::smodule, G::smodule)
+    reduce(M::smodule, G::smodule; complete_reduction::Bool = true)
 
 Return a submodule whose generators are the generators of $M$ reduced by the
 submodule $G$. The submodule $G$ need not be a Groebner basis. The returned
 submodule will have the same number of generators as $M$, even if they are zero.
 """
-function reduce(M::smodule, G::smodule)
+function reduce(M::smodule, G::smodule; complete_reduction::Bool = true)
    check_parent(M, G)
    R = base_ring(M)
-   ptr = GC.@preserve M G R libSingular.p_Reduce(M.ptr, G.ptr, R.ptr)
+   if complete_reduction
+      ptr = GC.@preserve M G R libSingular.p_Reduce(M.ptr, G.ptr, R.ptr)
+   else
+      ptr = GC.@preserve M G R libSingular.p_Reduce(M.ptr, G.ptr, R.ptr,1)
+   end
    return Module(R, ptr)
 end
 
@@ -200,7 +204,7 @@ end
 
 Computes a division with remainder of the generators of `I` by
 the generators of `G`. Returns a tuple (Quo, Rem, U) where
-  `Matrix(I)*U = Matrix(G)*Matrix(Quo) + Matrix(Rem)`
+`Matrix(I)*Matrix(U) = Matrix(G)*Matrix(Quo) + Matrix(Rem)`
 and `Rem = normalform(I, G)`. `U` is a diagonal matrix of units differing
 from the identity matrix only for local ring orderings.
 """
@@ -213,7 +217,7 @@ function divrem(I::smodule{S}, G::smodule{S}; complete_reduction::Bool = false) 
                                                                    false, true, R.ptr)
    libSingular.set_option("OPT_REDSB",old_redsb)
    libSingular.set_option("OPT_REDTAIL",old_redtail)
-   return (smodule{S}(R,ptr_T), smodule{S}(R,ptr_Rest), smatrix{S}(R,ptr_U))
+   return (smodule{S}(R,ptr_T), smodule{S}(R,ptr_Rest), smodule{S}(R,ptr_U))
 end
 
 ###############################################################################
@@ -241,6 +245,35 @@ end
 #   Resolutions
 #
 ###############################################################################
+@doc raw"""
+    fres(id::smodule{spoly{T}}, max_length::Int, method::String="complete") where T <: Nemo.FieldElem
+
+Compute a free resolution of the given module up to the maximum given
+length. The module must be over a polynomial ring over a field, and
+a Groebner basis.
+The possible methods are "complete", "frame", "extended frame" and
+"single module". The result is given as a resolution, whose i-th entry is
+the syzygy module of the previous module, starting with the given
+ideal/module.
+The `max_length` can be set to $0$ if the full free resolution is required.
+"""
+function fres(id::smodule{spoly{T}}, max_length::Int, method::String = "complete") where T <: Nemo.FieldElem
+   id.isGB || error("Not a Groebner basis")
+   max_length < 0 && error("length for fres must not be negative")
+   R = base_ring(id)
+   if max_length == 0
+        max_length = nvars(R)
+        # TODO: consider qrings
+   end
+   if (method != "complete"
+         && method != "frame"
+         && method != "extended frame"
+         && method != "single module")
+      error("wrong optional argument for fres")
+   end
+   r, minimal = GC.@preserve id R libSingular.id_fres(id.ptr, Cint(max_length + 1), method, R.ptr)
+   return sresolution{spoly{T}}(R, r, Bool(minimal), false)
+end
 
 @doc raw"""
     sres(I::smodule{spoly{T}}, max_length::Int) where T <: Singular.FieldElem

@@ -371,6 +371,10 @@ function low_level_caller_rng(lib::String, name::String, ring, args...)
     end
     arguments = Any[i for (i, j) in arguments]
     return_value = libSingular.call_singular_library_procedure(name, ring.ptr, arguments)
+    if libSingular.have_error()
+      error(libSingular.get_and_clear_error())
+    end
+
     return convert_return(return_value, ring)
 end
 
@@ -387,6 +391,9 @@ function low_level_caller(lib::String, name::String, args...)
     return_values = nothing
     rng_ptr = (rng == nothing) ? C_NULL : rng.ptr
     return_value = libSingular.call_singular_library_procedure(name, rng_ptr, arguments)
+    if libSingular.have_error()
+      error(libSingular.get_and_clear_error())
+    end
     return convert_return(return_value, rng)
 end
 

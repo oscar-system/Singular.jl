@@ -751,7 +751,7 @@ end
 
 Computes a division with remainder of the generators of `I` by
 the generators of `G`. Returns a tuple (Quo, Rem, U) where
-  `Matrix(I)*U = Matrix(G)*Matrix(Quo) + Matrix(Rem)`
+`Matrix(I)*Matrix(U) = Matrix(G)*Matrix(Quo) + Matrix(Rem)`
 and `Rem = normalform(I, G)`. `U` is a diagonal matrix of units differing
 from the identity matrix only for local ring orderings.
 """
@@ -764,7 +764,7 @@ function divrem(I::sideal{S}, G::sideal{S}; complete_reduction::Bool = false) wh
                                                                    false, true, R.ptr)
    libSingular.set_option("OPT_REDSB",old_redsb)
    libSingular.set_option("OPT_REDTAIL",old_redtail)
-   return (smodule{S}(R,ptr_T), sideal{S}(R,ptr_Rest), smatrix{S}(R,ptr_U))
+   return (smodule{S}(R,ptr_T), sideal{S}(R,ptr_Rest), smodule{S}(R,ptr_U))
 end
 
 ###############################################################################
@@ -918,11 +918,10 @@ end
 ###############################################################################
 
 @doc raw"""
-    fres(id::Union{sideal{spoly{T}}, smodule{spoly{T}}},
-      max_length::Int, method::String="complete") where T <: Nemo.FieldElem
+    fres(id::sideal{spoly{T}}, max_length::Int, method::String="complete") where T <: Nemo.FieldElem
 
-Compute a free resolution of the given ideal/module up to the maximum given
-length. The ideal/module must be over a polynomial ring over a field, and
+Compute a free resolution of the given ideal up to the maximum given
+length. The ideal must be over a polynomial ring over a field, and
 a Groebner basis.
 The possible methods are "complete", "frame", "extended frame" and
 "single module". The result is given as a resolution, whose i-th entry is
@@ -930,7 +929,7 @@ the syzygy module of the previous module, starting with the given
 ideal/module.
 The `max_length` can be set to $0$ if the full free resolution is required.
 """
-function fres(id::Union{sideal{spoly{T}}, smodule{spoly{T}}}, max_length::Int, method::String = "complete") where T <: Nemo.FieldElem
+function fres(id::sideal{spoly{T}}, max_length::Int, method::String = "complete") where T <: Nemo.FieldElem
    id.isGB || error("Not a Groebner basis")
    max_length < 0 && error("length for fres must not be negative")
    R = base_ring(id)
