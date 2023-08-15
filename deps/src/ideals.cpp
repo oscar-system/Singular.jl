@@ -682,7 +682,7 @@ void singular_define_ideals(jlcxx::Module & Singular)
         rChangeCurrRing(r);
         poly h=hFirstSeries0p(I,r->qideal,NULL,r,Qt);
         rChangeCurrRing(origin);
-	return h;
+	    return h;
     });
     Singular.method("scHilbPolyWeighted", [](ideal I, ring r, jlcxx::ArrayRef<int> weights, ring Qt) {
         intvec *w = to_intvec(weights);
@@ -691,7 +691,7 @@ void singular_define_ideals(jlcxx::Module & Singular)
         poly h=hFirstSeries0p(I,r->qideal,w,r,Qt);
         delete w;
         rChangeCurrRing(origin);
-	return h;
+	    return h;
     });
     Singular.method("id_Homogen", id_Homogen);
     Singular.method("id_HomModule", [](jlcxx::ArrayRef<int> weights, ideal I, ring r) {
