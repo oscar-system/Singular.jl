@@ -40,9 +40,7 @@ function regenerate_libraryfuncdictionary(prefixpath)
        for libfile in filenames
            libname = Symbol(libfile[1:end - 4]) # strip the '.lib' suffix
            full_path = joinpath(library_dir, libfile)
-           output = Singular_jll.libparse() do exe
-               read(`$exe $full_path`, String)
-           end
+           output = read(`$(Singular_jll.libparse()) $full_path`, String)
            libs_splitted = split(output,"\n")[4:end - 1]
            libs_splitted = [split(i, " ", keepempty = false) for i in libs_splitted]
            dict[libname] = [(j[1], j[3]) for j in libs_splitted]
