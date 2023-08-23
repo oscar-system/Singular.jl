@@ -1,6 +1,7 @@
 export sideal, IdealSet, syz, lead, normalize!, is_constant, is_zerodim, fglm,
        fres, dimension, highcorner, jet, kbase, minimal_generating_set,
-       independent_sets, maximal_independent_set, mres, ngens, nres, sres,
+       independent_sets, maximal_independent_set, mres, mres_with_map,
+       ngens, nres, sres,
        intersection, homogenize_ideal, homogenize_ideal_with_weights,
        quotient, reduce, eliminate, kernel, equal, contains, is_var_generated,
        saturation, saturation2, satstd, slimgb, std, vdim, interreduce, degree, mult,
@@ -984,6 +985,26 @@ function mres(I::sideal{spoly{T}}, max_length::Int) where T <: Nemo.FieldElem
    end
    r, minimal = GC.@preserve I R libSingular.id_res(I.ptr, Cint(max_length + 1), 1, R.ptr)
    return sresolution{spoly{T}}(R, r, Bool(minimal), true)
+end
+
+@doc raw"""
+    mres_with_map(id::sideal{spoly{T}}, max_length::Int) where T <: Nemo.FieldElem
+
+Compute a minimal (free) resolution of the given ideal up to the maximum
+given length. The ideal must be over a polynomial ring over a field.
+The result is given as a resolution, whose i-th entry is
+the syzygy module of the previous module, starting with the given ideal.
+The `max_length` can be set to $0$ if the full free resolution is required.
+Returns the resolution R and the transformation matrix of id to R[1].
+"""
+function mres_with_map(I::sideal{spoly{T}}, max_length::Int) where T <: Nemo.FieldElem
+   R = base_ring(I)
+   if max_length == 0
+        max_length = nvars(R)
+        # TODO: consider qrings
+   end
+   r, TT_ptr = GC.@preserve I R libSingular.id_mres_map(I.ptr, Cint(max_length + 1), R.ptr)
+   return sresolution{spoly{T}}(R, r, true, true),smatrix{spoly{T}}(R,TT_ptr)
 end
 
 @doc raw"""
