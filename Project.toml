@@ -1,6 +1,6 @@
 name = "Singular"
 uuid = "bcd08a7b-43d2-5ff7-b6d4-c458787f915c"
-version = "0.18.11"
+version = "0.18.12"
 
 [deps]
 AbstractAlgebra = "c3fe647b-3220-5bb0-a1ea-a7954cac585d"
