@@ -15,6 +15,13 @@ auto id_sres_helper(sip_sideal * m, int n, ring R)
     return std::make_tuple(s, minimal);
 }
 
+auto qring_simplify_helper(poly p, ring R)
+{
+  if (R->qideal==NULL)
+    return p_Copy(p,R);
+  else
+    return p_Copy(jj_NormalizeQRingP(p_Copy(p,R),R),R);
+}
 
 auto id_fres_helper(sip_sideal * I, int n, std::string method, ring R)
 {
@@ -722,4 +729,5 @@ void singular_define_ideals(jlcxx::Module & Singular)
         }
         return res;
     });
+    Singular.method("qring_simplify", &qring_simplify_helper);
 }
