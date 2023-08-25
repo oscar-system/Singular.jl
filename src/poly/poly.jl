@@ -718,7 +718,7 @@ end
 
 function (x::SPolyUnion{T} == y::SPolyUnion{T}) where T <: Nemo.RingElem
    check_parent(x, y)
-   return(iszero(x-y))
+   return iszero(x-y)
 end
 
 function Base.isless(x::SPolyUnion{T}, y::SPolyUnion{T}) where T <: Nemo.RingElem
