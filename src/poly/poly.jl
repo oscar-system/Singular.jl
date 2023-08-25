@@ -152,7 +152,11 @@ end
 
 function isone(p::SPolyUnion)
    R = parent(p)
-   GC.@preserve R p return Bool(libSingular.p_IsOne(p.ptr, R.ptr))
+   if libSingular.is_qring(R.ptr)
+     return iszero(p-R(1))
+   else
+     GC.@preserve R p return Bool(libSingular.p_IsOne(p.ptr, R.ptr))
+   end
 end
 
 # return 0 for non-generators, otherwise the index of the variable
