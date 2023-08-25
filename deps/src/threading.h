@@ -5,7 +5,7 @@
 #ifdef THREADSAFE_SINGULAR
 
 namespace singularjl {
-    extern std::recursive_mutex global_singular_lock;
+extern std::recursive_mutex global_singular_lock;
 }
 
 #define ENTER_SINGULAR (singularjl::global_singular_lock.lock())
@@ -13,7 +13,7 @@ namespace singularjl {
 
 #else
 
-#define ENTER_SINGULAR ((void) 0)
-#define LEAVE_SINGULAR ((void) 0)
+#define ENTER_SINGULAR ((void)0)
+#define LEAVE_SINGULAR ((void)0)
 
 #endif

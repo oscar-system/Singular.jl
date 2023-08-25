@@ -54,26 +54,16 @@
 #include <Singular/fehelp.h>
 
 namespace jlcxx {
-template <> struct IsMirroredType<n_coeffType> : std::true_type {
-};
-template <> struct IsMirroredType<rRingOrder_t> : std::true_type {
-};
-template <> struct IsMirroredType<n_Procs_s> : std::false_type {
-};
-template <> struct IsMirroredType<snumber> : std::false_type {
-};
-template <> struct IsMirroredType<sip_smap> : std::false_type {
-};
-template <> struct IsMirroredType<ssyStrategy> : std::false_type {
-};
-template <> struct IsMirroredType<ip_smatrix> : std::false_type {
-};
-template <> struct IsMirroredType<sip_sideal> : std::false_type {
-};
-template <> struct IsMirroredType<spolyrec> : std::false_type {
-};
-template <> struct IsMirroredType<__mpz_struct> : std::false_type {
-};
+template <> struct IsMirroredType<n_coeffType> : std::true_type {};
+template <> struct IsMirroredType<rRingOrder_t> : std::true_type {};
+template <> struct IsMirroredType<n_Procs_s> : std::false_type {};
+template <> struct IsMirroredType<snumber> : std::false_type {};
+template <> struct IsMirroredType<sip_smap> : std::false_type {};
+template <> struct IsMirroredType<ssyStrategy> : std::false_type {};
+template <> struct IsMirroredType<ip_smatrix> : std::false_type {};
+template <> struct IsMirroredType<sip_sideal> : std::false_type {};
+template <> struct IsMirroredType<spolyrec> : std::false_type {};
+template <> struct IsMirroredType<__mpz_struct> : std::false_type {};
 }    // namespace jlcxx
 
 #endif
