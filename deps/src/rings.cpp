@@ -344,6 +344,7 @@ void singular_define_rings(jlcxx::Module & Singular)
     });
     Singular.method("rCopy", rCopy);
     Singular.method("r_get_qideal", [](ring r) {return r->qideal;});
+    Singular.method("is_qring", [](ring r) {return bool(r->qideal!=NULL);});
     Singular.method("rQuotientRing", [](ideal i, ring r) {
         // This looks too simple, try make_qring if it doesn't work.
         ring Q = rCopy(r);

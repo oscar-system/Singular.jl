@@ -140,12 +140,23 @@ function one(R::PolyRingUnion)
 end
 
 function iszero(p::SPolyUnion)
-   GC.@preserve p p.ptr.cpp_object == C_NULL
+   R = parent(p)
+   if libSingular.is_qring(R.ptr)
+     GC.@preserve p x = libSingular.qring_simplify(p.ptr,R.ptr)
+     xx = R(x)
+     return xx.ptr.cpp_object == C_NULL
+   else
+     return p.ptr.cpp_object == C_NULL
+   end
 end
 
 function isone(p::SPolyUnion)
    R = parent(p)
-   GC.@preserve R p return Bool(libSingular.p_IsOne(p.ptr, R.ptr))
+   if libSingular.is_qring(R.ptr)
+     return iszero(p-R(1))
+   else
+     GC.@preserve R p return Bool(libSingular.p_IsOne(p.ptr, R.ptr))
+   end
 end
 
 # return 0 for non-generators, otherwise the index of the variable
@@ -711,7 +722,7 @@ end
 
 function (x::SPolyUnion{T} == y::SPolyUnion{T}) where T <: Nemo.RingElem
    check_parent(x, y)
-   GC.@preserve x y return Bool(libSingular.p_EqualPolys(x.ptr, y.ptr, parent(x).ptr))
+   return iszero(x-y)
 end
 
 function Base.isless(x::SPolyUnion{T}, y::SPolyUnion{T}) where T <: Nemo.RingElem

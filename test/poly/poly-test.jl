@@ -234,6 +234,14 @@ end
    @test trailing_coefficient(R()) == 0
 end
 
+@testset "poly.QuotientRing" begin
+    R, (x,y) = polynomial_ring(QQ, ["x", "y"])
+    Q, (a,b) = QuotientRing(R, Ideal(R, x-y))
+    @test iszero(a-b)
+    @test (a-b) == Q(0)
+    @test a == b
+end
+
 @testset "poly.change_base_ring" begin
    R1, (x, ) = polynomial_ring(ZZ, ["x", ])
 
