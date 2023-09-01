@@ -313,6 +313,26 @@ function mres(I::smodule{spoly{T}}, max_length::Int) where T <: Nemo.FieldElem
 end
 
 @doc raw"""
+    mres_with_map(id::smodule{spoly{T}}, max_length::Int) where T <: Nemo.FieldElem
+
+Compute a minimal (free) resolution of the given module up to the maximum
+given length. The module must be over a polynomial ring over a field.
+The result is given as a resolution, whose i-th entry is
+the syzygy module of the previous module, starting with the given module.
+The `max_length` can be set to $0$ if the full free resolution is required.
+Returns the resolution R and the transformation matrix of id to R[1].
+"""
+function mres_with_map(I::smodule{spoly{T}}, max_length::Int) where T <: Nemo.FieldElem
+   R = base_ring(I)
+   if max_length == 0
+        max_length = nvars(R)
+        # TODO: consider qrings
+   end
+   r, TT_ptr = GC.@preserve I R libSingular.id_mres_map(I.ptr, Cint(max_length + 1), R.ptr)
+   return sresolution{spoly{T}}(R, r, true, false),smatrix{spoly{T}}(R,TT_ptr)
+end
+
+@doc raw"""
     nres(id::smodule{spoly{T}}, max_length::Int) where T <: Nemo.FieldElem
 
 Compute a minimal (free) resolution of the given module up to the maximum

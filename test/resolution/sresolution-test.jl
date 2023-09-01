@@ -107,3 +107,15 @@ end
    @test iszero(M1*M2)
    @test iszero(M2*M3)
 end
+
+@testset "sresolution.mres_module" begin
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
+
+   v1 = vector(R, x + 1, x*y + 1, y)
+   v2 = vector(R, x^2 + 1, 2x + 3y, x)
+
+   M = Singular.Module(R, v1, v2)
+   L,TT = mres_with_map(M,0)
+   @test iszero(Singular.Matrix(M)*TT-Singular.Matrix(L[1]))
+   @test iszero(Singular.Matrix(L[1])*Singular.Matrix(L[2]))
+end
