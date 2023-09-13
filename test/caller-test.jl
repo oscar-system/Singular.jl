@@ -245,7 +245,7 @@ end
 end
 
 @testset "random" begin
-    Singular.libSingular.set_randomseed(1)
+    Singular.randseed!(1)
     @test Singular.libSingular.random() == 16807
     @test Singular.libSingular.random() == 282475249
 end

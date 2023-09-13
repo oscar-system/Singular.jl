@@ -469,6 +469,7 @@ end
    F2 = @inferred sres(std(I), 4)
    F3 = @inferred nres(I, 4)
    F4 = @inferred mres(I, 4)
+   F5,TT = @inferred mres_with_map(I, 4)
 
    # check resolution is of the correct length
    @test (@inferred length(F1)) == 2
@@ -494,11 +495,16 @@ end
    M4 = @inferred Singular.Matrix(F4[1])
    N4 = @inferred Singular.Matrix(F4[2])
 
+   M5 = @inferred Singular.Matrix(F5[1])
+   N5 = @inferred Singular.Matrix(F5[2])
+
    # check we have a complex
    @test iszero(M1*N1)
    @test iszero(M2*N2)
    @test iszero(M3*N3)
    @test iszero(M4*N4)
+   @test iszero(M5*N5)
+   @test iszero(Singular.Matrix(I)*TT-M5)
 end
 
 @testset "sideal.syzygy" begin
@@ -686,6 +692,10 @@ end
 
    @test ngens(std_hilbert(j, h, w, complete_reduction = true)) ==
          ngens(std(j, complete_reduction = true))
+   Qt,(t,)= polynomial_ring(QQ, ["t"])
+   I=Ideal(R,[x,y,z])
+   I=std(I)
+   @test hilbert_series(I,Qt) == -t^3+3*t^2-3*t+1
 end
 
 @testset "sideal.oscar#1702" begin

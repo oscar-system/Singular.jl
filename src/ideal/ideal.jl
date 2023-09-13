@@ -1,6 +1,7 @@
 export sideal, IdealSet, syz, lead, normalize!, is_constant, is_zerodim, fglm,
        fres, dimension, highcorner, jet, kbase, minimal_generating_set,
-       independent_sets, maximal_independent_set, mres, ngens, nres, sres,
+       independent_sets, maximal_independent_set, mres, mres_with_map,
+       ngens, nres, sres,
        intersection, homogenize_ideal, homogenize_ideal_with_weights,
        quotient, reduce, eliminate, kernel, equal, contains, is_var_generated,
        saturation, saturation2, satstd, slimgb, std, vdim, interreduce, degree, mult,
@@ -987,6 +988,26 @@ function mres(I::sideal{spoly{T}}, max_length::Int) where T <: Nemo.FieldElem
 end
 
 @doc raw"""
+    mres_with_map(id::sideal{spoly{T}}, max_length::Int) where T <: Nemo.FieldElem
+
+Compute a minimal (free) resolution of the given ideal up to the maximum
+given length. The ideal must be over a polynomial ring over a field.
+The result is given as a resolution, whose i-th entry is
+the syzygy module of the previous module, starting with the given ideal.
+The `max_length` can be set to $0$ if the full free resolution is required.
+Returns the resolution R and the transformation matrix of id to R[1].
+"""
+function mres_with_map(I::sideal{spoly{T}}, max_length::Int) where T <: Nemo.FieldElem
+   R = base_ring(I)
+   if max_length == 0
+        max_length = nvars(R)
+        # TODO: consider qrings
+   end
+   r, TT_ptr = GC.@preserve I R libSingular.id_mres_map(I.ptr, Cint(max_length + 1), R.ptr)
+   return sresolution{spoly{T}}(R, r, true, true),smatrix{spoly{T}}(R,TT_ptr)
+end
+
+@doc raw"""
     nres(id::sideal{spoly{T}}, max_length::Int) where T <: Nemo.FieldElem
 
 Compute a minimal (free) resolution of the given ideal up to the maximum
@@ -1275,6 +1296,38 @@ function hilbert_series(I::sideal{spoly{T}}, w::Vector{<:Integer}) where T <: Ne
    z = Vector{Int32}()
    GC.@preserve I R libSingular.scHilbWeighted(I.ptr, R.ptr, w, z)
    return z
+end
+
+@doc raw"""
+    hilbert_series(I::sideal{spoly{T}}, Qt::PolyRing) where T <: Nemo.FieldElem
+
+Return the polynomial $Q(t)$ as element of Qt where `Q(t)/(1-t)^nvars(base_ring(I))`
+is the Hilbert-Poincare series of $I$ for weights $(1, \dots, 1)$.
+The generators of $I$ must be given as a Groebner basis.
+"""
+function hilbert_series(I::sideal{spoly{T}}, Qt::PolyRing) where T <: Nemo.FieldElem
+   I.isGB || error("Not a Groebner basis")
+   R = base_ring(I)
+   GC.@preserve I R Qt new_ptr = libSingular.scHilbPoly(I.ptr, R.ptr, Qt.ptr)
+   return Qt(new_ptr)
+end
+
+@doc raw"""
+    hilbert_series(I::sideal{spoly{T}}, w::Vector{<:Integer}) where T <: Nemo.FieldElem
+
+Return the polynomial $Q(t)$ of Qt where $\frac{Q(t)}{\prod_i (1-t^{w_i})}$
+is the Hilbert-Poincare series of $I$ for weights $\{w_i\}$. Each weight must be
+positive $w_i > 0$.
+The generators of $I$ must be given as a Groebner basis.
+"""
+function hilbert_series(I::sideal{spoly{T}}, w::Vector{<:Integer}, Qt::PolyRing) where T <: Nemo.FieldElem
+   I.isGB || error("Not a Groebner basis")
+   R = base_ring(I)
+   length(w) == nvars(R) || error("wrong number of weights")
+   all(x -> x > 0, w) || error("weights must be positive")
+   w = convert(Vector{Int32}, w)
+   GC.@preserve I R Qt new_ptr = libSingular.scHilbPolyWeighted(I.ptr, R.ptr, w, Qt.ptr)
+   return Qt(new_ptr)
 end
 
 @doc raw"""

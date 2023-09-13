@@ -280,6 +280,8 @@ include("Meta.jl")
 
 include("Map.jl")
 
+include("rand.jl")
+
 include("MessyHacks.jl")
 
 include("Aliases.jl")
