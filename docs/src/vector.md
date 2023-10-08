@@ -68,10 +68,10 @@ parameters.
 
 ```jldoctest
 julia> R, (x, y) = polynomial_ring(QQ, ["x", "y"])
-(Singular Polynomial Ring (QQ),(x,y),(dp(2),C), spoly{n_Q}[x, y])
+(Singular polynomial ring (QQ),(x,y),(dp(2),C), spoly{n_Q}[x, y])
 
 julia> M = FreeModule(R, 3)
-Free Module of rank 3 over Singular Polynomial Ring (QQ),(x,y),(dp(2),C)
+Free Module of rank 3 over Singular polynomial ring (QQ),(x,y),(dp(2),C)
 
 julia> v2 = M([x + 1, x*y + 1, y])
 x*y*gen(2)+x*gen(1)+y*gen(3)+gen(2)+gen(1)
@@ -95,10 +95,10 @@ gens{T <: AbstractAlgebra.RingElem}(::FreeMod{T})
 
 ```jldoctest
 julia> R, (x, y) = polynomial_ring(QQ, ["x", "y"])
-(Singular Polynomial Ring (QQ),(x,y),(dp(2),C), spoly{n_Q}[x, y])
+(Singular polynomial ring (QQ),(x,y),(dp(2),C), spoly{n_Q}[x, y])
 
 julia> M = FreeModule(R, 5)
-Free Module of rank 5 over Singular Polynomial Ring (QQ),(x,y),(dp(2),C)
+Free Module of rank 5 over Singular polynomial ring (QQ),(x,y),(dp(2),C)
 
 julia> v = gens(M)
 5-element Vector{svector{spoly{n_Q}}}:
@@ -125,7 +125,7 @@ Array{T <: Nemo.RingElem}(v::svector{spoly{T}})
 
 ```jldoctest
 julia> R, (x, y) = polynomial_ring(QQ, ["x", "y"])
-(Singular Polynomial Ring (QQ),(x,y),(dp(2),C), spoly{n_Q}[x, y])
+(Singular polynomial ring (QQ),(x,y),(dp(2),C), spoly{n_Q}[x, y])
 
 julia> v1 = vector(R, x + 1, x*y + 1, y)
 x*y*gen(2)+x*gen(1)+y*gen(3)+gen(2)+gen(1)
@@ -147,7 +147,7 @@ jet{T <: AbstractAlgebra.RingElem}(::svector{spoly{T}}, ::Int)
 
 ```jldoctest
 julia> R, (x, y) = polynomial_ring(QQ, ["x", "y"])
-(Singular Polynomial Ring (QQ),(x,y),(dp(2),C), spoly{n_Q}[x, y])
+(Singular polynomial ring (QQ),(x,y),(dp(2),C), spoly{n_Q}[x, y])
 
 julia> v = vector(R, x^5 + 1, 2x^3 + 3y^2, x^2)
 x^5*gen(1)+2*x^3*gen(2)+x^2*gen(3)+3*y^2*gen(2)+gen(1)

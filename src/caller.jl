@@ -416,7 +416,7 @@ julia> Singular.call_interpreter("ring r=0,(x,y,z),dp; poly f = (x+y)^2;");
 
 julia> Singular.lookup_library_symbol("Top", "r")
 2-element Vector{Any}:
- Singular Polynomial Ring (QQ),(x,y,z),(dp(3),C)
+ Singular polynomial ring (QQ),(x,y,z),(dp(3),C)
  Dict{Symbol, spoly{n_Q}}(:f => x^2 + 2*x*y + y^2)
 ```
 """
