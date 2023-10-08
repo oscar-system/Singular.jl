@@ -44,16 +44,16 @@ Here is an example of using Singular.jl
 
 ```jldoctest
 julia> R, (x, y) = polynomial_ring(QQ, ["x", "y"])
-(Singular Polynomial Ring (QQ),(x,y),(dp(2),C), spoly{n_Q}[x, y])
+(Singular polynomial ring (QQ),(x,y),(dp(2),C), spoly{n_Q}[x, y])
 
 julia> I = Ideal(R, x^2 + 1, x*y + 1)
-Singular ideal over Singular Polynomial Ring (QQ),(x,y),(dp(2),C) with generators (x^2 + 1, x*y + 1)
+Singular ideal over Singular polynomial ring (QQ),(x,y),(dp(2),C) with generators (x^2 + 1, x*y + 1)
 
 julia> G = std(I)
-Singular ideal over Singular Polynomial Ring (QQ),(x,y),(dp(2),C) with generators (x - y, y^2 + 1)
+Singular ideal over Singular polynomial ring (QQ),(x,y),(dp(2),C) with generators (x - y, y^2 + 1)
 
 julia> Z = syz(G)
-Singular Module over Singular Polynomial Ring (QQ),(x,y),(dp(2),C), with Generators:
+Singular Module over Singular polynomial ring (QQ),(x,y),(dp(2),C), with Generators:
 y^2*gen(1)-x*gen(2)+y*gen(2)+gen(1)
 
 julia> F = fres(G, 0)
@@ -61,5 +61,5 @@ Singular Resolution:
 R^1 <- R^2 <- R^1
 
 julia> F[1]
-Singular ideal over Singular Polynomial Ring (QQ),(x,y),(dp(2),C) with generators (x - y, y^2 + 1)
+Singular ideal over Singular polynomial ring (QQ),(x,y),(dp(2),C) with generators (x - y, y^2 + 1)
 ```
