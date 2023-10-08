@@ -278,16 +278,18 @@ end
 ###############################################################################
 
 function show(io::IO, S::IdealSet)
-   print(io, "Set of Singular Ideals over ")
+   io = pretty(io)
+   print(io, "set of Singular ideals over ")
    show(io, base_ring(S))
 end
 
 function show(io::IO, I::sideal{T}) where T <: SPolyUnion
+   io = pretty(io)
    n = ngens(I)
    if !is_default_twosided_ideal(T) && I.isTwoSided
-      print(io, "Singular two-sided ideal over ")
+      print(io, LowercaseOff(), "Singular two-sided ideal over ")
    else
-      print(io, "Singular ideal over ")
+      print(io, LowercaseOff(), "Singular ideal over ")
    end
    show(io, base_ring(I))
    print(io, " with generators (")

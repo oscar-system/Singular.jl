@@ -540,19 +540,21 @@ end
 
 function show(io::IO, R::PolyRing)
    s = libSingular.rString(R.ptr)
+   io = pretty(io)
    if libSingular.rIsQuotientRing(R.ptr)
-      print(io, "Singular Polynomial Quotient Ring ", s)
+      print(io, LowercaseOff(), "Singular Polynomial Quotient Ring ", s)
    else
-      print(io, "Singular Polynomial Ring ", s)
+      print(io, LowercaseOff(), "Singular Polynomial Ring ", s)
    end
 end
 
 function show(io::IO, ::MIME"text/plain", R::PolyRing)
    s = libSingular.rString(R.ptr)
+   io = pretty(io)
    if libSingular.rIsQuotientRing(R.ptr)
-      print(io, "Singular Polynomial Quotient Ring ", s)
+      print(io, LowercaseOff(), "Singular Polynomial Quotient Ring ", s)
    else
-      print(io, "Singular Polynomial Ring ", s)
+      print(io, LowercaseOff(), "Singular Polynomial Ring ", s)
    end
 end
 
