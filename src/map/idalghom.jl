@@ -40,12 +40,22 @@ end
 #
 ###############################################################################
 
-function show(io::IO, M::Map(SIdAlgHom))
-   println(io, "Identity Algebra Homomorphism with")
-   println(io, "")
-   println(io, "Domain: ", domain(M))
-   println(io, "")
-   println(io, "Defining Equations: ", M.image)
+function AbstractAlgebra.show_map_data(io::IO, M::Map(SIdAlgHom))
+   println(io)
+   print(io, "Defining equations: ", M.image)
+end
+
+function Base.show(io::IO, f::Map(SIdAlgHom))
+  io = pretty(io)
+  if get(io, :supercompact, false)
+    # no nested printing
+    print(io, "Identity algebra homomorphism")
+  else
+    # nested printing allowed, preferably supercompact
+    print(io, "Hom: ")
+    print(IOContext(io, :supercompact => true), Lowercase(), domain(f), " -> ")
+    print(IOContext(io, :supercompact => true), Lowercase(), codomain(f))
+  end
 end
 
 ###############################################################################

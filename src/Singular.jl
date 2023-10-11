@@ -46,6 +46,8 @@ import AbstractAlgebra: AbstractAlgebra, diagonal_matrix, factor,
                         identity_matrix, kernel, ncols, ngens, nrows, order,
                         preimage, zero_matrix, expressify
 
+import AbstractAlgebra: pretty, Lowercase, LowercaseOff, Indent, Dedent
+
 import Nemo: add!, addeq!, base_ring, canonical_unit,
              change_base_ring, characteristic, check_parent, codomain,
              coeff, coefficients, compose, constant_coefficient,

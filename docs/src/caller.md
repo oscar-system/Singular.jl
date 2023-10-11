@@ -147,10 +147,10 @@ julia> gens(with_degBound(5) do; return std(i); end)
  z^6 + x^7 + y^7
 
 julia> R, (x, y) = polynomial_ring(QQ, ["x", "y"])
-(Singular Polynomial Ring (QQ),(x,y),(dp(2),C), spoly{n_Q}[x, y])
+(Singular polynomial ring (QQ),(x,y),(dp(2),C), spoly{n_Q}[x, y])
 
 julia> with_prot(true) do; return std(Ideal(R, x^5 - y*x + 1, y^6*x + x^2 + y^3)); end
 [4294967295:2]5s7s11s1214-s15
 product criterion:1 chain criterion:1
-Singular ideal over Singular Polynomial Ring (QQ),(x,y),(dp(2),C) with generators (x^5 - x*y + 1, x*y^6 + y^3 + x^2, x^4*y^3 - y^6 - y^4 - x, y^9 + y^7 + x^3*y^3 + x*y^3 + x*y - 1)
+Singular ideal over Singular polynomial ring (QQ),(x,y),(dp(2),C) with generators (x^5 - x*y + 1, x*y^6 + y^3 + x^2, x^4*y^3 - y^6 - y^4 - x, y^9 + y^7 + x^3*y^3 + x*y^3 + x*y - 1)
 ```

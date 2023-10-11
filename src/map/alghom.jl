@@ -6,14 +6,22 @@ export AlgebraHomomorphism, codomain, compose, domain, kernel, preimage
 #
 ###############################################################################
 
-function show(io::IO, M::Map(SAlgHom))
-   println(io, "Algebra Homomorphism with")
-   println(io, "")
-   println(io, "Domain: ", domain(M))
-   println(io, "")
-   println(io, "Codomain: ", codomain(M))
-   println(io, "")
-   println(io, "Defining Equations: ", M.image)
+function AbstractAlgebra.show_map_data(io::IO, M::Map(SAlgHom))
+   println(io)
+   print(io, "Defining equations: ", M.image)
+end
+
+function Base.show(io::IO, f::Map(SAlgHom))
+  io = pretty(io)
+  if get(io, :supercompact, false)
+    # no nested printing
+    print(io, "Algebra homomorphism")
+  else
+    # nested printing allowed, preferably supercompact
+    print(io, "Hom: ")
+    print(IOContext(io, :supercompact => true), Lowercase(), domain(f), " -> ")
+    print(IOContext(io, :supercompact => true), Lowercase(), codomain(f))
+  end
 end
 
 ###############################################################################
