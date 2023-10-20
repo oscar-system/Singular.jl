@@ -306,3 +306,22 @@ end
    r = reduce(a, b, complete_reduction=true)
    @test r[1] == vector(R, y^3, R(1))
 end
+
+@testset "smodule.prune" begin
+   R, (x, y, z) = polynomial_ring(QQ, ["x", "y", "z"])
+
+   v1 = vector(R, 1,0,0)
+   v2 = vector(R, x,0,0)
+   v3 = vector(R, 0,z,0)
+   v4 = vector(R, 0,0,1)
+
+   M = Singular.Module(R, v1, v2, v3, v4)
+
+   G,T = prune_with_map(M)
+
+   @test ngens(G) == 1
+
+   @test G[1] == vector(R, z)
+   @test T[3,1] == R(1)
+
+end
