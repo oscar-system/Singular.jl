@@ -178,7 +178,7 @@ and that their pairwise composition is the zero map, that is, that the
 created resolution is a complex.
 """
 function Resolution(C::Vector{smodule{T}}) where T <: AbstractAlgebra.RingElem
-    len = size(C, 1)+1
+    len = size(C, 1)
     len > 1 || error("no module specified")
     R = base_ring(C[1])
     CC = (m -> m.ptr).(C)
