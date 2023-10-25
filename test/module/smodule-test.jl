@@ -310,10 +310,10 @@ end
 @testset "smodule.prune" begin
    R, (x, y, z) = polynomial_ring(QQ, ["x", "y", "z"])
 
-   v1 = vector(R, 1,0,0)
-   v2 = vector(R, x,0,0)
-   v3 = vector(R, 0,z,0)
-   v4 = vector(R, 0,0,1)
+   v1 = vector(R, R(1),R(0),R(0))
+   v2 = vector(R, x,R(0),R(0))
+   v3 = vector(R, R(0),z,R(0))
+   v4 = vector(R, R(0),R(0),R(1))
 
    M = Singular.Module(R, v1, v2, v3, v4)
 
