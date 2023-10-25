@@ -347,7 +347,7 @@ JLCXX_MODULE define_julia_module(jlcxx::Module & Singular)
     result->list_length = static_cast<short>(len);
     result->length = static_cast<int>(len);
     resolvente res_cp = (resolvente)omAlloc0((len + 1) * sizeof(ideal));
-    for (int i = 0; i <= len; i++)
+    for (int i = 0; i < len; i++)
     {
       if (res[i] != NULL)
       {
