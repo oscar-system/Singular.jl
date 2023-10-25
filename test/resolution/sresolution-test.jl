@@ -16,6 +16,14 @@
    @test F isa AbstractAlgebra.SetElem
 
    @test isa(F, sresolution)
+   R, ( x, y) = polynomial_ring(QQ, ["x", "y"])
+   v1 = vector(R, x )
+   v2 = vector(R, y)
+   M1 = Singular.Module(R, v1, v2)
+   v3 = vector(R, -y, x)
+   M2 = Singular.Module(R, v3)
+   F=Resolution([M1,M2])
+   @test isa(F, sresolution)
 end
 
 @testset "sresolution.manipulation" begin
