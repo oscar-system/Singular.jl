@@ -1,4 +1,4 @@
-export jet, minimal_generating_set, ModuleClass, rank, smodule, slimgb,s
+export jet, minimal_generating_set, ModuleClass, rank, smodule, slimgb,
        eliminate, modulo, lift, division, divrem, prune_with_map
 
 ###############################################################################
