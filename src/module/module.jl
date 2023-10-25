@@ -343,7 +343,7 @@ and the transformation matrix of id to R.
 function prune_with_map(I::smodule{spoly{T}}) where T <: Nemo.FieldElem
    R = base_ring(I)
    r, TT_ptr = GC.@preserve I R libSingular.id_prune_map(I.ptr, R.ptr)
-   return smaodule{spoly{T}}(R, r),smatrix{spoly{T}}(R,TT_ptr)
+   return smodule{spoly{T}}(R, r),smatrix{spoly{T}}(R,TT_ptr)
 end
 
 @doc raw"""
