@@ -304,7 +304,15 @@ jl_value_t * call_singular_library_procedure(std::string                   s,
   {
     inerror = 0;
     errorreported = 0;
-    jl_error("Could not call function");
+    if (err==2) jl_error("Could not call function");
+    else if(err==1)
+    {
+      std::stringstream ss;
+      for (auto & si : singular_error_log)
+        ss << si << std::endl;
+      singular_error_log.clear();
+      jl_error(ss.str().c_str());
+    }
   }
   if (ret->next != NULL)
   {

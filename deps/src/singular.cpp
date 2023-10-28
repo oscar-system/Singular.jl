@@ -9,7 +9,7 @@
 static std::string              singular_return;
 static std::string              singular_error;
 static std::string              singular_warning;
-static std::vector<std::string> singular_error_log;
+std::vector<std::string> singular_error_log;
 
 // Internal singular interpreter variable
 extern int inerror;
