@@ -1,4 +1,5 @@
-export jet, minimal_generating_set, ModuleClass, rank, smodule, slimgb, eliminate, modulo, lift, division, divrem
+export jet, minimal_generating_set, ModuleClass, rank, smodule, slimgb,
+       eliminate, modulo, lift, division, divrem, prune_with_map
 
 ###############################################################################
 #
@@ -330,6 +331,19 @@ function mres_with_map(I::smodule{spoly{T}}, max_length::Int) where T <: Nemo.Fi
    end
    r, TT_ptr = GC.@preserve I R libSingular.id_mres_map(I.ptr, Cint(max_length + 1), R.ptr)
    return sresolution{spoly{T}}(R, r, true, false),smatrix{spoly{T}}(R,TT_ptr)
+end
+
+@doc raw"""
+    prune_with_map(id::smodule{spoly{T}}) where T <: Nemo.FieldElem
+
+Returns the module R minimally embedded in a free module such that the
+corresponding factor modules are isomorphic
+and the transformation matrix of id to R.
+"""
+function prune_with_map(I::smodule{spoly{T}}) where T <: Nemo.FieldElem
+   R = base_ring(I)
+   r, TT_ptr = GC.@preserve I R libSingular.id_prune_map(I.ptr, R.ptr)
+   return smodule{spoly{T}}(R, r),smatrix{spoly{T}}(R,TT_ptr)
 end
 
 @doc raw"""
