@@ -16,9 +16,10 @@ export spoly, PolyRing, change_base_ring, coeff, coefficients,
        tail, terms, total_degree, trailing_coefficient,
        valuation, var_index, vars
 
-export ordering_lp, ordering_rp, ordering_dp, ordering_Dp, ordering_wp, ordering_Wp,
-       ordering_ls, ordering_rs, ordering_ds, ordering_Ds, ordering_ws, ordering_Ws,
-       ordering_a, ordering_M, ordering_c, ordering_C, ordering_s, ordering_S
+export ordering_lp, ordering_ip, ordering_dp, ordering_Dp, ordering_wp, ordering_Wp,
+       ordering_ls, ordering_is, ordering_ds, ordering_Ds, ordering_ws, ordering_Ws,
+       ordering_a, ordering_M, ordering_c, ordering_C, ordering_s, ordering_S,
+       ordering_Ip
 
 
 ###############################################################################

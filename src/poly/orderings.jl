@@ -9,8 +9,8 @@ function AbstractAlgebra.expressify(a::sordering; context = nothing)
    for i in a.data
       if i.order == ringorder_lp
          this = Expr(:call, :ordering_lp, i.size)
-      elseif i.order == ringorder_rp
-         this = Expr(:call, :ordering_rp, i.size)
+      elseif i.order == ringorder_ip
+         this = Expr(:call, :ordering_ip, i.size)
       elseif i.order == ringorder_dp
          this = Expr(:call, :ordering_dp, i.size)
       elseif i.order == ringorder_Dp
@@ -19,10 +19,12 @@ function AbstractAlgebra.expressify(a::sordering; context = nothing)
          this = Expr(:call, :ordering_wp, string(i.weights))
       elseif i.order == ringorder_Wp
          this = Expr(:call, :ordering_Wp, string(i.weights))
+      elseif i.order == ringorder_Ip
+         this = Expr(:call, :ordering_Ip, i.size)
       elseif i.order == ringorder_ls
          this = Expr(:call, :ordering_ls, i.size)
-      elseif i.order == ringorder_rs
-         this = Expr(:call, :ordering_rs, i.size)
+      elseif i.order == ringorder_is
+         this = Expr(:call, :ordering_is, i.size)
       elseif i.order == ringorder_ds
          this = Expr(:call, :ordering_ds, i.size)
       elseif i.order == ringorder_Ds
@@ -61,9 +63,10 @@ end
 
 function _is_basic_ordering(t::libSingular.rRingOrder_t)
     return t == ringorder_lp || t == ringorder_ls ||
-           t == ringorder_rp || t == ringorder_rs ||
+           t == ringorder_ip || t == ringorder_is ||
            t == ringorder_dp || t == ringorder_ds ||
-           t == ringorder_Dp || t == ringorder_Ds
+           t == ringorder_Dp || t == ringorder_Ds ||
+	   t == ringorder_Ip
 end
 
 function _is_weighted_ordering(t::libSingular.rRingOrder_t)
@@ -99,12 +102,12 @@ lexicographical ordering (:lex).
 ordering_lp(nvars::Int = 1) = _basic_ordering(Singular.ringorder_lp, nvars)
 
 @doc raw"""
-    ordering_rp(nvars::Int = 1)
+    ordering_ip(nvars::Int = 1)
 
 Represents a block of at least `nvars` variables with the
-reverse lexicographical ordering (:revlex).
+inverse lexicographical ordering (:invlex).
 """
-ordering_rp(nvars::Int = 1) = _basic_ordering(Singular.ringorder_rp, nvars)
+ordering_ip(nvars::Int = 1) = _basic_ordering(Singular.ringorder_ip, nvars)
 
 @doc raw"""
     ordering_dp(nvars::Int = 1)
@@ -141,6 +144,14 @@ The weight vector is expected to consist of positive integers only.
 ordering_Wp(w::Vector{Int}) = _global_weighted_ordering(Singular.ringorder_Wp, w)
 
 @doc raw"""
+    ordering_Ip(nvars::Int = 1)
+
+Represents a block of at least `nvars` variables with the
+degree inverse lexicographical ordering (:deginvlex).
+"""
+ordering_Ip(nvars::Int = 1) = _basic_ordering(Singular.ringorder_Ip, nvars)
+
+@doc raw"""
     ordering_ls(nvars::Int = 1)
 
 Represents a block of at least `nvars` variables with the
@@ -149,12 +160,12 @@ negative lexicographical ordering (:neglex).
 ordering_ls(nvars::Int = 1) = _basic_ordering(Singular.ringorder_ls, nvars)
 
 @doc raw"""
-    ordering_rs(nvars::Int = 1)
+    ordering_is(nvars::Int = 1)
 
 Represents a block of at least `nvars` variables with the
-negative reverse lexicographical ordering (:negrevlex).
+negative inverse lexicographical ordering (:neginvlex).
 """
-ordering_rs(nvars::Int = 1) = _basic_ordering(Singular.ringorder_rs, nvars)
+ordering_is(nvars::Int = 1) = _basic_ordering(Singular.ringorder_is, nvars)
 
 @doc raw"""
     ordering_ds(nvars::Int = 1)
@@ -302,16 +313,18 @@ function is_ordering_symbolic_with_symbol(a::sordering)
    o = a.data[1].order
    if o == ringorder_lp
       return (true, :lex)
-   elseif o == ringorder_rp
-      return (true, :revlex)
+   elseif o == ringorder_ip
+      return (true, :invlex)
    elseif o == ringorder_ls
       return (true, :neglex)
-   elseif o == ringorder_rs
-      return (true, :negrevlex)
+   elseif o == ringorder_is
+      return (true, :neginvlex)
    elseif o == ringorder_dp
       return (true, :degrevlex)
    elseif o == ringorder_Dp
       return (true, :deglex)
+   elseif o == ringorder_Ip
+      return (true, :deginvlex)
    elseif o == ringorder_ds
       return (true, :negdegrevlex)
    elseif o == ringorder_Ds

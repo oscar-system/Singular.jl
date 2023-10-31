@@ -99,8 +99,8 @@ end
 
 
    R, (x1, x2, x3, x4) = polynomial_ring(QQ, "x".*string.(1:4), ordering =
-                                             ordering_Wp([1, 2])*ordering_rp())
-   test_ordering(ordering(R), [:wdeglex, :revlex, :comp1min],
+                                             ordering_Wp([1, 2])*ordering_ip())
+   test_ordering(ordering(R), [:wdeglex, :invlex, :comp1min],
                               [2, 2, 0],
                               [Int[1, 2], Int[], Int[]])
    test_monomials([x2^3, x1*x2^2, x1^2*x2, x2^2*x4, x2^2*x3, x2^2, x1^3,
