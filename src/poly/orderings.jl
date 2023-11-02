@@ -9,6 +9,8 @@ function AbstractAlgebra.expressify(a::sordering; context = nothing)
    for i in a.data
       if i.order == ringorder_lp
          this = Expr(:call, :ordering_lp, i.size)
+      elseif i.order == ringorder_rp
+         this = Expr(:call, :ordering_ip, i.size)
       elseif i.order == ringorder_ip
          this = Expr(:call, :ordering_ip, i.size)
       elseif i.order == ringorder_dp
@@ -23,6 +25,8 @@ function AbstractAlgebra.expressify(a::sordering; context = nothing)
          this = Expr(:call, :ordering_Ip, i.size)
       elseif i.order == ringorder_ls
          this = Expr(:call, :ordering_ls, i.size)
+      elseif i.order == ringorder_rs
+         this = Expr(:call, :ordering_is, i.size)
       elseif i.order == ringorder_is
          this = Expr(:call, :ordering_is, i.size)
       elseif i.order == ringorder_ds
@@ -64,6 +68,7 @@ end
 function _is_basic_ordering(t::libSingular.rRingOrder_t)
     return t == ringorder_lp || t == ringorder_ls ||
            t == ringorder_ip || t == ringorder_is ||
+           t == ringorder_rp || t == ringorder_rs ||
            t == ringorder_dp || t == ringorder_ds ||
            t == ringorder_Dp || t == ringorder_Ds ||
 	   t == ringorder_Ip
@@ -100,6 +105,14 @@ Represents a block of at least `nvars` variables with the
 lexicographical ordering (:lex).
 """
 ordering_lp(nvars::Int = 1) = _basic_ordering(Singular.ringorder_lp, nvars)
+
+@doc raw"""
+    ordering_rp(nvars::Int = 1)
+
+Represents a block of at least `nvars` variables with the
+inverse lexicographical ordering (:invlex).
+"""
+ordering_rp(nvars::Int = 1) = _basic_ordering(Singular.ringorder_ip, nvars)
 
 @doc raw"""
     ordering_ip(nvars::Int = 1)
@@ -158,6 +171,14 @@ Represents a block of at least `nvars` variables with the
 negative lexicographical ordering (:neglex).
 """
 ordering_ls(nvars::Int = 1) = _basic_ordering(Singular.ringorder_ls, nvars)
+
+@doc raw"""
+    ordering_rs(nvars::Int = 1)
+
+Represents a block of at least `nvars` variables with the
+negative inverse lexicographical ordering (:neginvlex).
+"""
+ordering_rs(nvars::Int = 1) = _basic_ordering(Singular.ringorder_is, nvars)
 
 @doc raw"""
     ordering_is(nvars::Int = 1)
@@ -313,10 +334,14 @@ function is_ordering_symbolic_with_symbol(a::sordering)
    o = a.data[1].order
    if o == ringorder_lp
       return (true, :lex)
+   elseif o == ringorder_rp
+      return (true, :invlex)
    elseif o == ringorder_ip
       return (true, :invlex)
    elseif o == ringorder_ls
       return (true, :neglex)
+   elseif o == ringorder_rs
+      return (true, :neginvlex)
    elseif o == ringorder_is
       return (true, :neginvlex)
    elseif o == ringorder_dp

@@ -110,8 +110,8 @@ end
 
 
    R, (x1, x2, x3, x4) = polynomial_ring(QQ, "x".*string.(1:4), ordering =
-                                            ordering_rs(2)*ordering_wp([1, 2]))
-   test_ordering(ordering(R), [:negrevlex, :wdegrevlex, :comp1min],
+                                            ordering_is(2)*ordering_wp([1, 2]))
+   test_ordering(ordering(R), [:neginvlex, :wdegrevlex, :comp1min],
                               [2, 2, 0],
                               [Int[], Int[1, 2], Int[]])
    test_monomials([x4^3, x3*x4^2, x3^2*x4, x4^2, x3^3, x3*x4, x3^2, x4, x3,

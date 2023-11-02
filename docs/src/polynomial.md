@@ -150,6 +150,10 @@ ordering_lp(nvars::Int = 1)
 ```
 
 ```@docs
+ordering_rp(nvars::Int = 1)
+```
+
+```@docs
 ordering_ip(nvars::Int = 1)
 ```
 
@@ -175,6 +179,10 @@ ordering_Ip(nvars::Int = 1)
 
 ```@docs
 ordering_ls(nvars::Int = 1)
+```
+
+```@docs
+ordering_rs(nvars::Int = 1)
 ```
 
 ```@docs

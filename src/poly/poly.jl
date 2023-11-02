@@ -19,7 +19,7 @@ export spoly, PolyRing, change_base_ring, coeff, coefficients,
 export ordering_lp, ordering_ip, ordering_dp, ordering_Dp, ordering_wp, ordering_Wp,
        ordering_ls, ordering_is, ordering_ds, ordering_Ds, ordering_ws, ordering_Ws,
        ordering_a, ordering_M, ordering_c, ordering_C, ordering_s, ordering_S,
-       ordering_Ip
+       ordering_Ip, ordering_rp, ordering_rs
 
 
 ###############################################################################
