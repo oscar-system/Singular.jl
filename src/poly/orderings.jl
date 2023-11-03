@@ -68,7 +68,6 @@ end
 function _is_basic_ordering(t::libSingular.rRingOrder_t)
     return t == ringorder_lp || t == ringorder_ls ||
            t == ringorder_ip || t == ringorder_is ||
-           t == ringorder_rp || t == ringorder_rs ||
            t == ringorder_dp || t == ringorder_ds ||
            t == ringorder_Dp || t == ringorder_Ds ||
 	   t == ringorder_Ip
