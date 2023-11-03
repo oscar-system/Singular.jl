@@ -117,8 +117,12 @@ ordering_rp(nvars::Int = 1) = _basic_ordering(Singular.ringorder_ip, nvars)
 @doc raw"""
     ordering_ip(nvars::Int = 1)
 
-Represents a block of at least `nvars` variables with the
-inverse lexicographical ordering (:invlex).
+Represents a block of at least `nvars` variables with the Singular ordering `rp`.
+This stands for what the Singular manual refers to as "reverse lexicographical ordering" (and is elsewhere sometimes called "inverse lexicographical ordering), i.e. a lexicographical ordering from the right with `1 < x_1 < ... <x_n`.
+
+Note that this reverses the "natural" order `x_1 > ... > x_n`.
+
+When using `polynomial_ring`, this ordering can be selected via `ordering=:invlex`.
 """
 ordering_ip(nvars::Int = 1) = _basic_ordering(Singular.ringorder_ip, nvars)
 
