@@ -5,6 +5,7 @@ makedocs(
          format = Documenter.HTML(),
          sitename = "Singular.jl",
          modules = [Singular],
+         warnonly = true,
          clean = true,
          doctest = false,
          pages    = [
