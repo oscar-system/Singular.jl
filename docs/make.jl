@@ -1,12 +1,14 @@
 using Documenter
 using Singular
 
+DocMeta.setdocmeta!(Singular, :DocTestSetup, :(using Singular); recursive = true)
+
 makedocs(
          format = Documenter.HTML(),
          sitename = "Singular.jl",
          modules = [Singular],
          clean = true,
-         doctest = false,
+         doctest = true,
          pages    = [
              "index.md",
              "Coefficient rings" => [
