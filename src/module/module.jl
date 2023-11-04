@@ -117,6 +117,68 @@ end
 
 ###############################################################################
 #
+#   Intersection
+#
+###############################################################################
+
+@doc raw"""
+    intersection(I::smodule{S}, J::smodule{S}) where S <: SPolyUnion
+
+Returns the intersection of the two given modules.
+
+# Examples
+```jldoctest
+julia> R, (x, y) = polynomial_ring(QQ, ["x", "y"])
+(Singular polynomial ring (QQ),(x,y),(dp(2),C), spoly{n_Q}[x, y])
+
+julia> v1 = vector(R, x + 1, x*y + 1, y)
+x*y*gen(2)+x*gen(1)+y*gen(3)+gen(2)+gen(1)
+
+julia> v2 = vector(R, x^2 + 1, 2x + 3y, x)
+x^2*gen(1)+x*gen(3)+2*x*gen(2)+3*y*gen(2)+gen(1)
+
+julia> v3 = x*v1 + y*v2 + vector(R, x, y + 1, y^2)
+x^2*y*gen(2)+x^2*y*gen(1)+x^2*gen(1)+2*x*y*gen(3)+2*x*y*gen(2)+y^2*gen(3)+3*y^2*gen(2)+x*gen(2)+2*x*gen(1)+y*gen(2)+y*gen(1)+gen(2)
+
+julia> M1 = Singular.Module(R, v1, v2);
+
+julia> M2 = Singular.Module(R, v2, v3);
+
+julia> M3 = intersection(M1, M2)
+Singular Module over Singular polynomial ring (QQ),(x,y),(dp(2),C), with Generators:
+x^2*gen(1)+x*gen(3)+2*x*gen(2)+3*y*gen(2)+gen(1)
+
+julia> ngens(M3)
+1
+
+julia> M3[1] == v2
+true
+```
+"""
+function intersection(I::smodule{S}, J::smodule{S}) where S <: SPolyUnion
+   check_parent(I, J)
+   R = base_ring(I)
+   ptr = GC.@preserve I J R libSingular.id_Intersection(I.ptr, J.ptr, R.ptr)
+   return Module(R, ptr)
+end
+
+function intersection(I::smodule{S}, Js::smodule{S}...) where S <: SPolyUnion
+   R = base_ring(I)
+   GC.@preserve I Js R begin
+      CC = Ptr{Nothing}[I.ptr.cpp_object]
+      for J in Js
+         push!(CC, J.ptr.cpp_object)
+      end
+      GC.@preserve CC begin
+         C_ptr = reinterpret(Ptr{Nothing}, pointer(CC))
+         ptr = libSingular.id_MultSect(C_ptr, length(CC), R.ptr)
+      end
+      return smodule{S}(R, ptr)
+   end
+end
+
+###############################################################################
+#
 #   Groebner basis
 #
 ###############################################################################
