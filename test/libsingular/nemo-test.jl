@@ -367,6 +367,30 @@ end
   @test string(p) == "0"
   @test length(p) == 0
   @test is_zero(p)
+
+  R = residue_ring(Nemo.ZZ, 7)
+  F = Fp(7)
+  for i in -10:10
+    @test R(one(F)*i) == one(R)*i
+    @test F(one(R)*i) == one(F)*i
+  end
+
+  S = Nemo.GF(5)
+  @test_throws ErrorException S(one(F))
+  @test_throws ErrorException F(one(S))
+end
+
+@testset "Nemo.fpFieldElem" begin
+  R = Nemo.GF(7)
+  F = Fp(7)
+  for i in -10:10
+    @test R(one(F)*i) == one(R)*i
+    @test F(one(R)*i) == one(F)*i
+  end
+
+  S = Nemo.GF(5)
+  @test_throws ErrorException S(one(F))
+  @test_throws ErrorException F(one(S))
 end
 
 @testset "Nemo.ZZModRingElem" begin
