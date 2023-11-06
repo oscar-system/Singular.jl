@@ -163,22 +163,6 @@ true
 contains{T <: AbstractAlgebra.RingElem}(::sideal{T}, ::sideal{T})
 ```
 
-**Examples**
-
-```jldoctest
-julia> R, (x , y) = polynomial_ring(QQ, ["x", "y"])
-(Singular polynomial ring (QQ),(x,y),(dp(2),C), spoly{n_Q}[x, y])
-
-julia> I = Ideal(R, x^2 + 1, x*y)
-Singular ideal over Singular polynomial ring (QQ),(x,y),(dp(2),C) with generators (x^2 + 1, x*y)
-
-julia> J = Ideal(R, x^2 + 1)
-Singular ideal over Singular polynomial ring (QQ),(x,y),(dp(2),C) with generators (x^2 + 1)
-
-julia> contains(I, J) == true
-true
-```
-
 ### Comparison
 
 Checking whether two ideals are algebraically equal is very expensive, as it usually
@@ -218,22 +202,6 @@ true
 intersection(I::sideal{S}, J::sideal{S}) where {T <: Nemo.RingElem, S <: Union{spoly{T}, spluralg{T}}}
 ```
 
-**Examples**
-
-```jldoctest
-julia> R, (x , y) = polynomial_ring(QQ, ["x", "y"])
-(Singular polynomial ring (QQ),(x,y),(dp(2),C), spoly{n_Q}[x, y])
-
-julia> I = Ideal(R, x^2 + 1, x*y)
-Singular ideal over Singular polynomial ring (QQ),(x,y),(dp(2),C) with generators (x^2 + 1, x*y)
-
-julia> J = Ideal(R, x^2 + x*y + 1, x^2 - x*y + 1)
-Singular ideal over Singular polynomial ring (QQ),(x,y),(dp(2),C) with generators (x^2 + x*y + 1, x^2 - x*y + 1)
-
-julia> V = intersection(I, J)
-Singular ideal over Singular polynomial ring (QQ),(x,y),(dp(2),C) with generators (y, x^2 - x*y + 1)
-```
-
 ### Quotient
 
 ```@docs
@@ -244,39 +212,10 @@ quotient(I::sideal{S}, J::sideal{S}) where S <: spoly
 quotient(I::sideal{S}, J::sideal{S}) where S <: spluralg
 ```
 
-**Examples**
-
-```jldoctest
-julia> R, (x , y) = polynomial_ring(QQ, ["x", "y"])
-(Singular polynomial ring (QQ),(x,y),(dp(2),C), spoly{n_Q}[x, y])
-
-julia> I = Ideal(R, x^2 + 1, x*y)
-Singular ideal over Singular polynomial ring (QQ),(x,y),(dp(2),C) with generators (x^2 + 1, x*y)
-
-julia> J = Ideal(R, x + y)
-Singular ideal over Singular polynomial ring (QQ),(x,y),(dp(2),C) with generators (x + y)
-
-julia> V = quotient(I, J)
-Singular ideal over Singular polynomial ring (QQ),(x,y),(dp(2),C) with generators (y, x^2 + 1)
-```
-
 ### Leading terms
 
 ```@docs
 lead(I::sideal{S}) where S <: SPolyUnion
-```
-
-**Examples**
-
-```jldoctest
-julia> R, (x , y) = polynomial_ring(QQ, ["x", "y"])
-(Singular polynomial ring (QQ),(x,y),(dp(2),C), spoly{n_Q}[x, y])
-
-julia> I = Ideal(R, x^2 + 1, x*y)
-Singular ideal over Singular polynomial ring (QQ),(x,y),(dp(2),C) with generators (x^2 + 1, x*y)
-
-julia> V = lead(I)
-Singular ideal over Singular polynomial ring (QQ),(x,y),(dp(2),C) with generators (x^2, x*y)
 ```
 
 ### Homogeneous ideals
@@ -293,22 +232,6 @@ homogenize(I::sideal{S}, v::S) where S <: spoly
 
 ```@docs
 saturation(I::sideal{T}, J::sideal{T}) where T <: Nemo.RingElem
-```
-
-**Examples**
-
-```jldoctest
-julia> R, (x, y) = polynomial_ring(QQ, ["x", "y"])
-(Singular polynomial ring (QQ),(x,y),(dp(2),C), spoly{n_Q}[x, y])
-
-julia> I = Ideal(R, (x^2 + x*y + 1)*(2y^2+1)^3, (2y^2 + 3)*(2y^2+1)^2)
-Singular ideal over Singular polynomial ring (QQ),(x,y),(dp(2),C) with generators (8*x^2*y^6 + 8*x*y^7 + 12*x^2*y^4 + 12*x*y^5 + 8*y^6 + 6*x^2*y^2 + 6*x*y^3 + 12*y^4 + x^2 + x*y + 6*y^2 + 1, 8*y^6 + 20*y^4 + 14*y^2 + 3)
-
-julia> J = Ideal(R, 2y^2 + 1)
-Singular ideal over Singular polynomial ring (QQ),(x,y),(dp(2),C) with generators (2*y^2 + 1)
-
-julia> S = saturation(I, J)
-(Singular ideal over Singular polynomial ring (QQ),(x,y),(dp(2),C) with generators (2*y^2 + 3, x^2 + x*y + 1), 2)
 ```
 
 ### Standard basis
@@ -414,47 +337,10 @@ x + 1
 eliminate(I::sideal{S}, polys::S...) where {T <: Nemo.RingElem, S <: Union{spoly{T}, spluralg{T}}}
 ```
 
-**Examples**
-
-```jldoctest
-julia> R, (x, y, t) = polynomial_ring(QQ, ["x", "y", "t"])
-(Singular polynomial ring (QQ),(x,y,t),(dp(3),C), spoly{n_Q}[x, y, t])
-
-julia> I = Ideal(R, x - t^2, y - t^3)
-Singular ideal over Singular polynomial ring (QQ),(x,y,t),(dp(3),C) with generators (-t^2 + x, -t^3 + y)
-
-julia> J = eliminate(I, t)
-Singular ideal over Singular polynomial ring (QQ),(x,y,t),(dp(3),C) with generators (x^3 - y^2)
-```
-
 ### Syzygies
 
 ```@docs
 syz(::sideal)
-```
-
-**Examples**
-
-```jldoctest
-julia> R, (x, y) = polynomial_ring(QQ, ["x", "y"])
-(Singular polynomial ring (QQ),(x,y),(dp(2),C), spoly{n_Q}[x, y])
-
-julia> I = Ideal(R, x^2*y + 2y + 1, y^2 + 1)
-Singular ideal over Singular polynomial ring (QQ),(x,y),(dp(2),C) with generators (x^2*y + 2*y + 1, y^2 + 1)
-
-julia> F = syz(I)
-Singular Module over Singular polynomial ring (QQ),(x,y),(dp(2),C), with Generators:
-x^2*y*gen(2)-y^2*gen(1)+2*y*gen(2)+gen(2)-gen(1)
-
-julia> M = Singular.Matrix(I)
-[x^2*y + 2*y + 1, y^2 + 1]
-
-julia> N = Singular.Matrix(F)
-[-y^2 - 1
-x^2*y + 2*y + 1]
-
-julia> iszero(M*N)  # check they are actually syzygies
-true
 ```
 
 ### Free resolutions
@@ -489,19 +375,6 @@ R^1 <- R^2 <- R^1
 
 ```@docs
 jet(I::sideal{S}, n::Int) where {T <: Nemo.RingElem, S <: Union{spoly{T}, spluralg{T}}}
-```
-
-**Examples**
-
-```jldoctest
-julia> R, (x, y, z) = polynomial_ring(QQ, ["x", "y", "z"])
-(Singular polynomial ring (QQ),(x,y,z),(dp(3),C), spoly{n_Q}[x, y, z])
-
-julia> I = Ideal(R, x^5 - y^2, y^3 - x^6 + z^3)
-Singular ideal over Singular polynomial ring (QQ),(x,y,z),(dp(3),C) with generators (x^5 - y^2, -x^6 + y^3 + z^3)
-
-julia> J1 = jet(I, 3)
-Singular ideal over Singular polynomial ring (QQ),(x,y,z),(dp(3),C) with generators (-y^2, y^3 + z^3)
 ```
 
 ### Operations on zero-dimensional ideals
