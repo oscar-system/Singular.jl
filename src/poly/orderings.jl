@@ -9,8 +9,8 @@ function AbstractAlgebra.expressify(a::sordering; context = nothing)
    for i in a.data
       if i.order == ringorder_lp
          this = Expr(:call, :ordering_lp, i.size)
-      elseif i.order == ringorder_rp
-         this = Expr(:call, :ordering_rp, i.size)
+      elseif i.order == ringorder_ip
+         this = Expr(:call, :ordering_ip, i.size)
       elseif i.order == ringorder_dp
          this = Expr(:call, :ordering_dp, i.size)
       elseif i.order == ringorder_Dp
@@ -19,10 +19,12 @@ function AbstractAlgebra.expressify(a::sordering; context = nothing)
          this = Expr(:call, :ordering_wp, string(i.weights))
       elseif i.order == ringorder_Wp
          this = Expr(:call, :ordering_Wp, string(i.weights))
+      elseif i.order == ringorder_Ip
+         this = Expr(:call, :ordering_Ip, i.size)
       elseif i.order == ringorder_ls
          this = Expr(:call, :ordering_ls, i.size)
-      elseif i.order == ringorder_rs
-         this = Expr(:call, :ordering_rs, i.size)
+      elseif i.order == ringorder_is
+         this = Expr(:call, :ordering_is, i.size)
       elseif i.order == ringorder_ds
          this = Expr(:call, :ordering_ds, i.size)
       elseif i.order == ringorder_Ds
@@ -61,9 +63,10 @@ end
 
 function _is_basic_ordering(t::libSingular.rRingOrder_t)
     return t == ringorder_lp || t == ringorder_ls ||
-           t == ringorder_rp || t == ringorder_rs ||
+           t == ringorder_ip || t == ringorder_is ||
            t == ringorder_dp || t == ringorder_ds ||
-           t == ringorder_Dp || t == ringorder_Ds
+           t == ringorder_Dp || t == ringorder_Ds ||
+           t == ringorder_Ip
 end
 
 function _is_weighted_ordering(t::libSingular.rRingOrder_t)
@@ -94,7 +97,7 @@ end
     ordering_lp(nvars::Int = 1)
 
 Represents a block of at least `nvars` variables with the
-lexicographical ordering (:lex).
+lexicographical ordering (:lex)  (the Singular ordering `lp`).
 """
 ordering_lp(nvars::Int = 1) = _basic_ordering(Singular.ringorder_lp, nvars)
 
@@ -102,15 +105,27 @@ ordering_lp(nvars::Int = 1) = _basic_ordering(Singular.ringorder_lp, nvars)
     ordering_rp(nvars::Int = 1)
 
 Represents a block of at least `nvars` variables with the
-reverse lexicographical ordering (:revlex).
+inverse lexicographical ordering (:invlex) (the Singular ordering `ip`).
+
+Note that this reverses the "natural" order `x_1 > ... > x_n`.
 """
-ordering_rp(nvars::Int = 1) = _basic_ordering(Singular.ringorder_rp, nvars)
+ordering_rp(nvars::Int = 1) = _basic_ordering(Singular.ringorder_ip, nvars)
+
+@doc raw"""
+    ordering_ip(nvars::Int = 1)
+
+Represents a block of at least `nvars` variables with the Singular ordering `ip`.
+This stands for what the Singular manual refers to as "reverse lexicographical ordering" (and is elsewhere sometimes called "inverse lexicographical ordering), i.e. a lexicographical ordering from the right with `1 < x_1 < ... <x_n`.
+
+Note that this reverses the "natural" order `x_1 > ... > x_n`.
+"""
+ordering_ip(nvars::Int = 1) = _basic_ordering(Singular.ringorder_ip, nvars)
 
 @doc raw"""
     ordering_dp(nvars::Int = 1)
 
 Represents a block of at least `nvars` variables with the
-degree reverse lexicographical ordering (:degrevlex).
+degree reverse lexicographical ordering (:degrevlex) (the Singular ordering `dp`).
 """
 ordering_dp(nvars::Int = 1) = _basic_ordering(Singular.ringorder_dp, nvars)
 
@@ -118,7 +133,7 @@ ordering_dp(nvars::Int = 1) = _basic_ordering(Singular.ringorder_dp, nvars)
     ordering_Dp(nvars::Int = 1)
 
 Represents a block of at least `nvars` variables with the
-degree lexicographical ordering (:deglex).
+degree lexicographical ordering (:deglex) (the Singular ordering `Dp`).
 """
 ordering_Dp(nvars::Int = 1) = _basic_ordering(Singular.ringorder_Dp, nvars)
 
@@ -128,6 +143,7 @@ ordering_Dp(nvars::Int = 1) = _basic_ordering(Singular.ringorder_Dp, nvars)
 Represents a block of variables with the
 weighted reverse lexicographical ordering.
 The weight vector `w` is expected to consist of positive integers only.
+(the Singular ordering `wp`).
 """
 ordering_wp(w::Vector{Int}) = _global_weighted_ordering(Singular.ringorder_wp, w)
 
@@ -137,14 +153,25 @@ ordering_wp(w::Vector{Int}) = _global_weighted_ordering(Singular.ringorder_wp, w
 Represents a block of variables with the
 weighted lexicographical ordering.
 The weight vector is expected to consist of positive integers only.
+(the Singular ordering `Wp`).
 """
 ordering_Wp(w::Vector{Int}) = _global_weighted_ordering(Singular.ringorder_Wp, w)
+
+@doc raw"""
+    ordering_Ip(nvars::Int = 1)
+
+Represents a block of at least `nvars` variables with the
+degree inverse lexicographical ordering (:deginvlex) (the Singular ordering `Ip`).
+
+Note that this reverses the "natural" order `x_1 > ... > x_n`.
+"""
+ordering_Ip(nvars::Int = 1) = _basic_ordering(Singular.ringorder_Ip, nvars)
 
 @doc raw"""
     ordering_ls(nvars::Int = 1)
 
 Represents a block of at least `nvars` variables with the
-negative lexicographical ordering (:neglex).
+negative lexicographical ordering (:neglex) (the Singular ordering `ls`).
 """
 ordering_ls(nvars::Int = 1) = _basic_ordering(Singular.ringorder_ls, nvars)
 
@@ -152,15 +179,28 @@ ordering_ls(nvars::Int = 1) = _basic_ordering(Singular.ringorder_ls, nvars)
     ordering_rs(nvars::Int = 1)
 
 Represents a block of at least `nvars` variables with the
-negative reverse lexicographical ordering (:negrevlex).
+negative inverse lexicographical ordering (:neginvlex) (the Singular ordering `is`)
+
+Note that this reverses the "natural" order `x_1 > ... > x_n`.
 """
-ordering_rs(nvars::Int = 1) = _basic_ordering(Singular.ringorder_rs, nvars)
+ordering_rs(nvars::Int = 1) = _basic_ordering(Singular.ringorder_is, nvars)
+
+@doc raw"""
+    ordering_is(nvars::Int = 1)
+
+Represents a block of at least `nvars` variables with the
+negative inverse lexicographical ordering (:neginvlex) (the Singular ordering `is`)
+
+Note that this reverses the "natural" order `x_1 > ... > x_n`.
+"""
+ordering_is(nvars::Int = 1) = _basic_ordering(Singular.ringorder_is, nvars)
 
 @doc raw"""
     ordering_ds(nvars::Int = 1)
 
 Represents a block of at least `nvars` variables with the
-negative degree reverse lexicographical ordering (:negdegrevlex).
+negative degree reverse lexicographical ordering (:negdegrevlex)
+(the Singular ordering `ds`).
 """
 ordering_ds(nvars::Int = 1) = _basic_ordering(Singular.ringorder_ds, nvars)
 
@@ -169,6 +209,7 @@ ordering_ds(nvars::Int = 1) = _basic_ordering(Singular.ringorder_ds, nvars)
 
 Represents a block of at least `nvars` variables with the
 negative degree reverse lexicographical ordering (:negdeglex).
+(the Singular ordering `Ds`).
 """
 ordering_Ds(nvars::Int = 1) = _basic_ordering(Singular.ringorder_Ds, nvars)
 
@@ -178,6 +219,7 @@ ordering_Ds(nvars::Int = 1) = _basic_ordering(Singular.ringorder_Ds, nvars)
 Represents a block of variables with the
 general weighted reverse lexicographical ordering.
 The weight vector `w` is expected to have a nonzero first entry.
+(the Singular ordering `ws`).
 """
 ordering_ws(w::Vector{Int}) = _local_weighted_ordering(Singular.ringorder_ws, w)
 
@@ -187,6 +229,7 @@ ordering_ws(w::Vector{Int}) = _local_weighted_ordering(Singular.ringorder_ws, w)
 Represents a block of variables with the
 general weighted lexicographical ordering.
 The weight vector `w` is expected to have a nonzero first entry.
+(the Singular ordering `Ws`).
 """
 ordering_Ws(w::Vector{Int}) = _local_weighted_ordering(Singular.ringorder_Ws, w)
 
@@ -197,6 +240,7 @@ Represents an extra weight vector that may precede any monomial ordering.
 An extra weight vector does not define a monomial ordering by itself: it can
 only be used in combination with other orderings to insert an extra line of
 weights into the ordering matrix.
+(the Singular ordering `a`).
 """
 ordering_a(w::Vector{Int}) = sordering([sorder_block(ringorder_a, 0, w)])
 
@@ -205,6 +249,7 @@ ordering_a(w::Vector{Int}) = sordering([sorder_block(ringorder_a, 0, w)])
 
 Represents a block of variables with a general matrix ordering.
 The matrix `m` is expected to be invertible, and this is checked by default.
+(the Singular ordering `M`).
 """
 function ordering_M(m::Matrix{Int}; check::Bool=true)
    (nr, nc) = size(m)
@@ -228,6 +273,7 @@ All monomial block orderings preceding the component ordering have higher
 precedence, and all succeeding monomial block orderings have lower precedence.
 It is not necessary to specify this ordering explicitly since it appended
 automatically to an ordering lacking a component specification.
+(the Singular ordering `C`).
 """
 ordering_C(dummy::Int = 0) = _basic_ordering(Singular.ringorder_C, 0)
 
@@ -237,6 +283,7 @@ ordering_C(dummy::Int = 0) = _basic_ordering(Singular.ringorder_C, 0)
 Represents a descending ordering on vector components `gen(1) > gen(2) > ...`.
 All monomial block orderings preceding the component ordering have higher
 precedence, and all succeeding monomial block orderings have lower precedence.
+(the Singular ordering `c`).
 """
 ordering_c(dummy::Int = 0) = _basic_ordering(Singular.ringorder_c, 0)
 
@@ -302,16 +349,18 @@ function is_ordering_symbolic_with_symbol(a::sordering)
    o = a.data[1].order
    if o == ringorder_lp
       return (true, :lex)
-   elseif o == ringorder_rp
-      return (true, :revlex)
+   elseif o == ringorder_ip
+      return (true, :invlex)
    elseif o == ringorder_ls
       return (true, :neglex)
-   elseif o == ringorder_rs
-      return (true, :negrevlex)
+   elseif o == ringorder_is
+      return (true, :neginvlex)
    elseif o == ringorder_dp
       return (true, :degrevlex)
    elseif o == ringorder_Dp
       return (true, :deglex)
+   elseif o == ringorder_Ip
+      return (true, :deginvlex)
    elseif o == ringorder_ds
       return (true, :negdegrevlex)
    elseif o == ringorder_Ds

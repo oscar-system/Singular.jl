@@ -133,13 +133,14 @@ function __init__()
 
    global ringorder_no = libSingular.ringorder_no
    global ringorder_lp = libSingular.ringorder_lp
-   global ringorder_rp = libSingular.ringorder_rp
+   global ringorder_ip = libSingular.ringorder_ip
    global ringorder_dp = libSingular.ringorder_dp
    global ringorder_Dp = libSingular.ringorder_Dp
    global ringorder_wp = libSingular.ringorder_wp
    global ringorder_Wp = libSingular.ringorder_Wp
+   global ringorder_Ip = libSingular.ringorder_Ip
    global ringorder_ls = libSingular.ringorder_ls
-   global ringorder_rs = libSingular.ringorder_rs
+   global ringorder_is = libSingular.ringorder_is
    global ringorder_ds = libSingular.ringorder_ds
    global ringorder_Ds = libSingular.ringorder_Ds
    global ringorder_ws = libSingular.ringorder_ws
@@ -154,11 +155,12 @@ function __init__()
 
    global sym2ringorder = Dict{Symbol, libSingular.rRingOrder_t}(
      :lex => ringorder_lp,
-     :revlex => ringorder_rp,
+     :invlex => ringorder_ip,
      :neglex => ringorder_ls,
-     :negrevlex => ringorder_rs,
+     :neginvlex => ringorder_is,
      :degrevlex => ringorder_dp,
      :deglex => ringorder_Dp,
+     :deginvlex => ringorder_Ip,
      :negdegrevlex => ringorder_ds,
      :negdeglex => ringorder_Ds,
      :comp1max => ringorder_c,

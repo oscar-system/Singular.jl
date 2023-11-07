@@ -81,13 +81,14 @@ JLCXX_MODULE define_julia_module(jlcxx::Module & Singular)
   /* monomial orderings */
   Singular.set_const("ringorder_no", ringorder_no);
   Singular.set_const("ringorder_lp", ringorder_lp);
-  Singular.set_const("ringorder_rp", ringorder_rp);
+  Singular.set_const("ringorder_ip", ringorder_ip);
   Singular.set_const("ringorder_dp", ringorder_dp);
   Singular.set_const("ringorder_Dp", ringorder_Dp);
   Singular.set_const("ringorder_wp", ringorder_wp);
   Singular.set_const("ringorder_Wp", ringorder_Wp);
+  Singular.set_const("ringorder_Ip", ringorder_Ip);
   Singular.set_const("ringorder_ls", ringorder_ls);
-  Singular.set_const("ringorder_rs", ringorder_rs);
+  Singular.set_const("ringorder_is", ringorder_is);
   Singular.set_const("ringorder_ds", ringorder_ds);
   Singular.set_const("ringorder_Ds", ringorder_Ds);
   Singular.set_const("ringorder_ws", ringorder_ws);

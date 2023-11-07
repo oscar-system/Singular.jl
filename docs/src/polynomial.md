@@ -150,6 +150,10 @@ ordering_lp(nvars::Int = 1)
 ```
 
 ```@docs
+ordering_ip(nvars::Int = 1)
+```
+
+```@docs
 ordering_rp(nvars::Int = 1)
 ```
 
@@ -170,7 +174,15 @@ ordering_Wp(w::Vector{Int})
 ```
 
 ```@docs
+ordering_Ip(nvars::Int = 1)
+```
+
+```@docs
 ordering_ls(nvars::Int = 1)
+```
+
+```@docs
+ordering_is(nvars::Int = 1)
 ```
 
 ```@docs
