@@ -154,7 +154,7 @@ ordering_ip(nvars::Int = 1)
 ```
 
 ```@docs
-ordering_ip(nvars::Int = 1)
+ordering_rp(nvars::Int = 1)
 ```
 
 ```@docs
@@ -186,7 +186,7 @@ ordering_is(nvars::Int = 1)
 ```
 
 ```@docs
-ordering_is(nvars::Int = 1)
+ordering_rs(nvars::Int = 1)
 ```
 
 ```@docs
