@@ -295,6 +295,27 @@ promote_rule(C::Type{n_Zp}, ::Type{n_Z}) = n_Zp
 # take ownership of the pointer - not for general users
 (R::N_ZpField)(n::libSingular.number_ptr) = n_Zp(R, n)
 
+function (F::N_ZpField)(a::Nemo.fpFieldElem)
+   characteristic(F) == characteristic(parent(a)) || error("characteristic does not match")
+   return F(lift(a))
+end
+
+function (F::N_ZpField)(a::Nemo.zzModRingElem)
+   characteristic(F) == characteristic(parent(a)) || error("characteristic does not match")
+   return F(lift(a))
+end
+
+function (F::Nemo.fpField)(a::n_Zp)
+   characteristic(F) == characteristic(parent(a)) || error("characteristic does not match")
+   return F(Int(a))
+end
+
+function (F::Nemo.zzModRing)(a::n_Zp)
+   characteristic(F) == characteristic(parent(a)) || error("characteristic does not match")
+   return F(Int(a))
+end
+
+
 ###############################################################################
 #
 #   Fp constructor

@@ -59,8 +59,9 @@ jobs:
             using Pkg
             Pkg.develop(PackageSpec(path=pwd()))
             Pkg.instantiate()
-            using Documenter: doctest
+            using Documenter: doctest, DocMeta
             using Singular
+            DocMeta.setdocmeta!(Singular, :DocTestSetup, :(using Singular); recursive = true)
             doctest(Singular)'
       - name: "Process code coverage"
         uses: julia-actions/julia-processcoverage@v1
@@ -85,11 +86,6 @@ jobs:
             using Pkg
             Pkg.develop(PackageSpec(path=pwd()))
             Pkg.instantiate()'
-      - run: |
-          julia --project=docs --color=yes -e '
-            using Documenter: doctest
-            using Singular
-            doctest(Singular)'
       - run: julia --project=docs --color=yes docs/make.jl
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
