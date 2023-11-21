@@ -6,6 +6,8 @@
 #include <Singular/lists.h>
 #include <misc/intvec.h>
 
+using jlcxx::jlcxx_array_data;
+
 // Internal singular interpreter variable
 extern int inerror;
 
@@ -53,11 +55,10 @@ static jl_value_t * get_type_mapper()
   {
     jl_array_t * current_return = jl_alloc_array_1d(jl_array_any_type, 2);
     JL_GC_PUSH1(&current_return);
-    jl_arrayset(current_return, jl_box_int64(types[i].cmd), 0);
-    jl_arrayset(current_return, reinterpret_cast<jl_value_t *>(jl_symbol(types[i].name)),
-                1);
+    jl_array_ptr_set(current_return, 0, jl_box_int64(types[i].cmd));
+    jl_array_ptr_set(current_return, 1, reinterpret_cast<jl_value_t *>(jl_symbol(types[i].name)));
     JL_GC_POP();
-    jl_arrayset(return_array, reinterpret_cast<jl_value_t *>(current_return), i);
+    jl_array_ptr_set(return_array, i, reinterpret_cast<jl_value_t *>(current_return));
   }
   JL_GC_POP();
   return reinterpret_cast<jl_value_t *>(return_array);
@@ -93,11 +94,12 @@ jl_value_t * intvec_to_jl_array(intvec * v)
 {
   int          size = v->length();
   jl_array_t * result = jl_alloc_array_1d(jl_int64_vector_type, size);
+  int64_t* arrdata = jlcxx_array_data<int64_t>(result);
   JL_GC_PUSH1(&result);
   int * content = v->ivGetVec();
   for (int i = 0; i < size; i++)
   {
-    jl_arrayset(result, jl_box_int64(static_cast<int64_t>(content[i])), i);
+    arrdata[i] = content[i];
   }
   JL_GC_POP();
   return reinterpret_cast<jl_value_t *>(result);
@@ -107,8 +109,13 @@ jl_value_t * intmat_to_jl_array(intvec * v)
 {
   int          rows = v->rows();
   int          cols = v->cols();
+#if (JULIA_VERSION_MAJOR * 100 + JULIA_VERSION_MINOR) >= 111
+  size_t dims[]{(size_t) rows, (size_t) cols};
+  jl_array_t * result = jl_alloc_array_nd(jl_int64_matrix_type, dims, 2);
+#else
   jl_array_t * result = jl_alloc_array_2d(jl_int64_matrix_type, rows, cols);
-  int64_t * result_ptr = reinterpret_cast<int64_t *> jl_array_data(result);
+#endif
+  int64_t * result_ptr = jlcxx_array_data<int64_t>(result);
   for (int i = 0; i < rows; i++)
   {
     for (int j = 0; j < cols; j++)
@@ -125,22 +132,21 @@ void * jl_array_to_intvec(jl_value_t * array_val)
   int          size = jl_array_len(array);
   intvec *     result = new intvec(size);
   int *        result_content = result->ivGetVec();
+  if (!jl_subtype(reinterpret_cast<jl_value_t *>(jl_typeof(array_val)),
+                  reinterpret_cast<jl_value_t *>(jl_int64_vector_type)))
+  {
+    jl_error("Input is not an Int64 vector");
+  }
+  int64_t * array_data = jlcxx_array_data<int64_t>(array);
   for (int i = 0; i < size; i++)
   {
-    jl_value_t * current_entry = jl_arrayref(array, i);
-    if (jl_is_int32(current_entry))
+    int64_t current_elem = array_data[i];
+    int     current_elem_32 = static_cast<int>(current_elem);
+    if (current_elem != current_elem_32)
     {
-      result_content[i] = static_cast<int>(jl_unbox_int32(current_entry));
+       jl_error("Input entry does not fit in 32 bit integer");
     }
-    else if (jl_is_int64(current_entry))
-    {
-      int64_t current_int64 = jl_unbox_int64(current_entry);
-      result_content[i] = static_cast<int>(current_int64);
-      if (result_content[i] != current_int64)
-      {
-        jl_error("Input entry does not fit in 32 bit integer");
-      }
-    }
+    result_content[i] = current_elem_32;
   }
   return reinterpret_cast<void *>(result);
 }
@@ -156,7 +162,7 @@ void * jl_array_to_intmat(jl_value_t * array_val)
   {
     jl_error("Input is not an Int64 matrix");
   }
-  int64_t * array_data = reinterpret_cast<int64_t *>(jl_array_data(array));
+  int64_t * array_data = jlcxx_array_data<int64_t>(array);
   int *     vec_data = result->ivGetVec();
   for (int i = 0; i < cols; i++)
   {
@@ -178,14 +184,15 @@ lists jl_array_to_list_helper(jl_value_t * args_val, jl_value_t * types_val)
 {
   jl_array_t * args = reinterpret_cast<jl_array_t *>(args_val);
   jl_array_t * types = reinterpret_cast<jl_array_t *>(types_val);
+  const int64_t* types_arr = jlcxx_array_data<int64_t>(types);
   int          size = jl_array_len(args);
   lists        result = (lists)omAllocBin(slists_bin);
   result->Init(size);
 
   for (int i = 0; i < size; i++)
   {
-    result->m[i].rtyp = static_cast<int>(jl_unbox_int64(jl_arrayref(types, i)));
-    result->m[i].data = jl_unbox_voidpointer(jl_arrayref(args, i));
+    result->m[i].rtyp = static_cast<int>(types_arr[i]);
+    result->m[i].data = jl_unbox_voidpointer(jl_array_ptr_ref(args, i));
   }
   return result;
 }
@@ -225,8 +232,8 @@ static void * copy_string_to_void(std::string s)
 bool translate_singular_type(jl_value_t * obj, void ** args, int * argtypes, int i)
 {
   jl_array_t * array = reinterpret_cast<jl_array_t *>(obj);
-  int          cmd = static_cast<int>(jl_unbox_int64(jl_arrayref(array, 0)));
-  void *       arg = jl_unbox_voidpointer(jl_arrayref(array, 1));
+  int          cmd = static_cast<int>(jl_unbox_int64(jl_array_ptr_ref(array, 0)));
+  void *       arg = jl_unbox_voidpointer(jl_array_ptr_ref(array, 1));
   args[i] = arg;
   argtypes[i] = cmd;
   return true;
@@ -235,10 +242,10 @@ bool translate_singular_type(jl_value_t * obj, void ** args, int * argtypes, int
 jl_value_t * get_julia_type_from_sleftv(leftv ret)
 {
   jl_array_t * result = jl_alloc_array_1d(jl_array_any_type, 3);
-  jl_arrayset(result, jl_false, 0);
-  jl_arrayset(result, jl_box_voidpointer(ret->data), 1);
+  jl_array_ptr_set(result, 0, jl_false);
+  jl_array_ptr_set(result, 1, jl_box_voidpointer(ret->data));
   ret->data = 0;
-  jl_arrayset(result, jl_box_int64(ret->Typ()), 2);
+  jl_array_ptr_set(result, 2, jl_box_int64(ret->Typ()));
   ret->rtyp = 0;
   return reinterpret_cast<jl_value_t *>(result);
 }
@@ -264,15 +271,15 @@ jl_value_t * get_ring_content(ring r)
   {
     jl_array_t * current = jl_alloc_array_1d(jl_array_any_type, 3);
     JL_GC_PUSH1(&current);
-    jl_arrayset(current, jl_box_int64(IDTYP(h)), 0);
-    jl_arrayset(current, reinterpret_cast<jl_value_t *>(jl_symbol(IDID(h))), 1);
+    jl_array_ptr_set(current, 0, jl_box_int64(IDTYP(h)));
+    jl_array_ptr_set(current, 1, reinterpret_cast<jl_value_t *>(jl_symbol(IDID(h))));
     {
       sleftv x;
       x.Copy((leftv)h);
-      jl_arrayset(current, jl_box_voidpointer(x.data), 2);
+      jl_array_ptr_set(current, 2, jl_box_voidpointer(x.data));
     }
     JL_GC_POP();
-    jl_arrayset(result, reinterpret_cast<jl_value_t *>(current), nr);
+    jl_array_ptr_set(result, nr, reinterpret_cast<jl_value_t *>(current));
     h = IDNEXT(h);
     nr++;
   }
@@ -319,12 +326,12 @@ jl_value_t * call_singular_library_procedure(std::string                   s,
     int          len = ret->listLength();
     jl_array_t * list = jl_alloc_array_1d(jl_array_any_type, len + 1);
     JL_GC_PUSH1(&list);
-    jl_arrayset(list, jl_true, 0);
+    jl_array_ptr_set(list, 0, jl_true);
     for (int i = 0; i < len; ++i)
     {
       leftv next = ret->next;
       ret->next = 0;
-      jl_arrayset(list, get_julia_type_from_sleftv(ret), i + 1);
+      jl_array_ptr_set(list, i+1, get_julia_type_from_sleftv(ret));
       if (i > 0)
         omFreeBin(ret, sleftv_bin);
       ret = next;
@@ -369,8 +376,8 @@ jl_value_t * lookup_singular_library_symbol_wo_rng(std::string pack, std::string
   // err=0: no error, res is the value of the symbol
   // err=1: package found but symbol not found, res is junk
   // err=2: package not found, res is junk
-  jl_arrayset(answer, jl_box_int64(err), 0);
-  jl_arrayset(answer, res, 1);
+  jl_array_ptr_set(answer, 0, jl_box_int64(err));
+  jl_array_ptr_set(answer, 1, res);
   JL_GC_POP();
   return reinterpret_cast<jl_value_t *>(answer);
 }
@@ -386,12 +393,12 @@ jl_value_t * convert_nested_list(void * l_void)
     leftv current = &(l->m[i]);
     if (current->Typ() == LIST_CMD)
     {
-      jl_arrayset(result_array,
-                  convert_nested_list(reinterpret_cast<void *>(current->data)), i);
+      jl_array_ptr_set(result_array, i,
+                  convert_nested_list(reinterpret_cast<void *>(current->data)));
     }
     else
     {
-      jl_arrayset(result_array, get_julia_type_from_sleftv(current), i);
+      jl_array_ptr_set(result_array, i, get_julia_type_from_sleftv(current));
     }
   }
   JL_GC_POP();
