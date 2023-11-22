@@ -563,7 +563,7 @@ void singular_define_ideals(jlcxx::Module & Singular)
   Singular.method("id_vdim", [](ideal I, ring r) {
     const ring origin = currRing;
     rChangeCurrRing(r);
-    int n = scMult0Int(I, r->qideal);
+    long n = scMult0Int(I, r->qideal);
     rChangeCurrRing(origin);
     return n;
   });

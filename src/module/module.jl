@@ -611,7 +611,7 @@ end
 function vdim(I::smodule)
    I.isGB || error("Not a Groebner basis")
    R = base_ring(I)
-   GC.@preserve I R return Int(libSingular.id_vdim(I.ptr, R.ptr))
+   GC.@preserve I R return Int64(libSingular.id_vdim(I.ptr, R.ptr))
 end
 
 ###############################################################################
