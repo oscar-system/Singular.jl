@@ -102,11 +102,11 @@ end
 end
 
 @testset "Nemo.fqPolyRepFieldElem" begin
-   F, _ = Nemo.FiniteField(Nemo.next_prime(fld(typemax(Int),2)), 2, "a")
+   F, _ = Nemo.finite_field(Nemo.next_prime(fld(typemax(Int),2)), 2, "a")
    R, _ = polynomial_ring(F, ["x", "y"])
    @test R isa Singular.PolyRing{Singular.n_FieldElem{Nemo.fqPolyRepFieldElem}}
 
-   F, a = Nemo.FiniteField(7, 2, "a")
+   F, a = Nemo.finite_field(7, 2, "a")
 
    R, (x, y) = polynomial_ring(F, ["x", "y"])
 
@@ -162,11 +162,11 @@ end
 end
 
 @testset "Nemo.FqPolyRepFieldElem" begin
-   F, _ = Nemo.FiniteField(Nemo.next_prime(Nemo.ZZ(10)^50), 2, "a")
+   F, _ = Nemo.finite_field(Nemo.next_prime(Nemo.ZZ(10)^50), 2, "a")
    R, _ = polynomial_ring(F, ["x", "y"])
    @test R isa Singular.PolyRing{Singular.n_FieldElem{Nemo.FqPolyRepFieldElem}}
 
-   F, a = Nemo.FiniteField(Nemo.ZZ(7), 2, "a")
+   F, a = Nemo.finite_field(Nemo.ZZ(7), 2, "a")
 
    R, (x, y) = polynomial_ring(F, ["x", "y"])
 
@@ -443,8 +443,8 @@ end
    f3 = x^2 + 2x + 1
 
    f1c = [c for c in coefficients(f1)]
-   @test f1c[1] isa Singular.n_FieldElem{AbstractAlgebra.Generic.Frac{Nemo.ZZRingElem}}
-   @test U(f1c[1]) isa AbstractAlgebra.Generic.Frac{Nemo.ZZRingElem}
+   @test f1c[1] isa Singular.n_FieldElem{AbstractAlgebra.Generic.FracFieldElem{Nemo.ZZRingElem}}
+   @test U(f1c[1]) isa AbstractAlgebra.Generic.FracFieldElem{Nemo.ZZRingElem}
    @test !isempty(string(f1c[1]))
    @test leading_coefficient(f1) == f1c[1]
    @test f1 + 2 == 2 + f1
@@ -478,8 +478,8 @@ end
    f3 = x^2 + 2x + 1
 
    f1c = [c for c in coefficients(f1)]
-   @test f1c[1] isa Singular.n_FieldElem{AbstractAlgebra.Generic.Frac{Nemo.ZZRingElem}}
-   @test U(f1c[1]) isa AbstractAlgebra.Generic.Frac{Nemo.ZZRingElem}
+   @test f1c[1] isa Singular.n_FieldElem{AbstractAlgebra.Generic.FracFieldElem{Nemo.ZZRingElem}}
+   @test U(f1c[1]) isa AbstractAlgebra.Generic.FracFieldElem{Nemo.ZZRingElem}
    @test !isempty(string(f1c[1]))
    @test leading_coefficient(f1) == f1c[1]
    @test f1 + 2 == 2 + f1

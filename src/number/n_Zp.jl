@@ -326,7 +326,7 @@ function Fp(a::Int; cached=true)
    a == 0 && throw(DivideError(a))
    a < 0 && throw(DomainError(a, "prime must be positive"))
    a > 2^29 && throw(DomainError(a, "prime must be <= 2^29"))
-   !Nemo.isprime(Nemo.ZZRingElem(a)) && throw(DomainError(a, "characteristic must be prime"))
+   !Nemo.is_prime(Nemo.ZZRingElem(a)) && throw(DomainError(a, "characteristic must be prime"))
 
    return N_ZpField(a, cached)
 end
