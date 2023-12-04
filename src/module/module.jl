@@ -396,16 +396,20 @@ function mres_with_map(I::smodule{spoly{T}}, max_length::Int) where T <: Nemo.Fi
 end
 
 @doc raw"""
-    prune_with_map(id::smodule{spoly{T}}) where T <: Nemo.FieldElem
+    prune_with_map(I::smodule{spoly{T}}) where T <: Nemo.FieldElem
 
-Returns the module R minimally embedded in a free module such that the
-corresponding factor modules are isomorphic
-and the transformation matrix of id to R.
+Returns the module N minimally embedded in a free module such that the
+corresponding factor modules are isomorphic. Returns
+the transformation matrix M of I to N, and a map of generators A:
+R^n/I -- M --> R^n/N -- A --> R^n'/A(N).
+A  maps as: gen(i) -> gen(A[i])
 """
 function prune_with_map(I::smodule{spoly{T}}) where T <: Nemo.FieldElem
    R = base_ring(I)
-   r, TT_ptr = GC.@preserve I R libSingular.id_prune_map(I.ptr, R.ptr)
-   return smodule{spoly{T}}(R, r),smatrix{spoly{T}}(R,TT_ptr)
+   n = rank(I)
+   A = Array{Int}(undef, n)
+   r, TT_ptr = GC.@preserve I R libSingular.id_prune_v_map(I.ptr, A, R.ptr)
+   return smodule{spoly{T}}(R, r),smatrix{spoly{T}}(R,TT_ptr),A
 end
 
 @doc raw"""
