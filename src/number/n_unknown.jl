@@ -350,8 +350,8 @@ end
 elem_type(::Type{RingWrapper{S, T}}) where {S, T} = RingElemWrapper{S, T}
 elem_type(::Type{FieldWrapper{S, T}}) where {S, T} = FieldElemWrapper{S, T}
 
-parent_type(a::Type{RingElemWrapper{S, T}}) where {S, T} = RingWrapper{S, T}
-parent_type(a::Type{FieldElemWrapper{S, T}}) where {S, T} = FieldWrapper{S, T}
+parent_type(::Type{RingElemWrapper{S, T}}) where {S, T} = RingWrapper{S, T}
+parent_type(::Type{FieldElemWrapper{S, T}}) where {S, T} = FieldWrapper{S, T}
 
 parent(a::RingElemWrapper{S, T}) where {S, T} = a.parent
 parent(a::FieldElemWrapper{S, T}) where {S, T} = a.parent
