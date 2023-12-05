@@ -109,12 +109,7 @@ jl_value_t * intmat_to_jl_array(intvec * v)
 {
   int          rows = v->rows();
   int          cols = v->cols();
-#if (JULIA_VERSION_MAJOR * 100 + JULIA_VERSION_MINOR) >= 111
-  size_t dims[]{(size_t) rows, (size_t) cols};
-  jl_array_t * result = jl_alloc_array_nd(jl_int64_matrix_type, dims, 2);
-#else
   jl_array_t * result = jl_alloc_array_2d(jl_int64_matrix_type, rows, cols);
-#endif
   int64_t * result_ptr = jlcxx_array_data<int64_t>(result);
   for (int i = 0; i < rows; i++)
   {
