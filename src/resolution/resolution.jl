@@ -16,8 +16,6 @@ end
 
 elem_type(::Type{ResolutionSet{T}}) where T <: AbstractAlgebra.RingElem = sresolution{T}
 
-elem_type(::ResolutionSet{T}) where T <: AbstractAlgebra.RingElem = sresolution{T}
-
 parent_type(::Type{sresolution{T}}) where T <: AbstractAlgebra.RingElem = ResolutionSet{T}
 
 function checkbounds(r::sresolution, i::Int)

@@ -20,8 +20,6 @@ base_ring(M::smatrix) = M.base_ring
 
 elem_type(::Type{matrix_space{T}}) where T <: AbstractAlgebra.RingElem = smatrix{T}
 
-elem_type(::matrix_space{T}) where T <: AbstractAlgebra.RingElem = smatrix{T}
-
 parent_type(::Type{smatrix{T}}) where T <: AbstractAlgebra.RingElem = matrix_space{T}
 
 function getindex(M::smatrix{T}, i::Int, j::Int) where T <: AbstractAlgebra.RingElem
