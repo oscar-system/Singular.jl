@@ -12,8 +12,6 @@ base_ring(R::FreeMod) = R.base_ring
 
 base_ring(v::svector) = v.base_ring
 
-elem_type(::FreeMod{T}) where {T <: Nemo.RingElem} = svector{T}
-
 elem_type(::Type{FreeMod{T}}) where {T <: Nemo.RingElem} = svector{T}
 
 parent_type(::Type{svector{T}}) where {T <: Nemo.RingElem} = FreeMod{T}

@@ -98,7 +98,7 @@ let zero_parameter_types = [
       AbstractAlgebra.Generic.LaurentSeriesRing =>
          AbstractAlgebra.Generic.LaurentSeriesRingElem,
       AbstractAlgebra.Generic.FracField =>
-         AbstractAlgebra.Generic.Frac
+         AbstractAlgebra.Generic.FracFieldElem
    ]
 
    for (A, B) in zero_parameter_types
