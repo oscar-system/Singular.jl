@@ -284,10 +284,10 @@ JLCXX_MODULE define_julia_module(jlcxx::Module & Singular)
 
     // get output
     jl_array_t * result = jl_alloc_array_1d(jl_array_any_type, 4);
-    jl_arrayset(result, err ? jl_true : jl_false, 0);
-    jl_arrayset(result, jl_cstr_to_string(singular_return.c_str()), 1);
-    jl_arrayset(result, jl_cstr_to_string(singular_error.c_str()), 2);
-    jl_arrayset(result, jl_cstr_to_string(singular_warning.c_str()), 3);
+    jl_array_ptr_set(result, 0, err ? jl_true : jl_false);
+    jl_array_ptr_set(result, 1, jl_cstr_to_string(singular_return.c_str()));
+    jl_array_ptr_set(result, 2, jl_cstr_to_string(singular_error.c_str()));
+    jl_array_ptr_set(result, 3, jl_cstr_to_string(singular_warning.c_str()));
 
     // restore old callbacks
     PrintS_callback = default_print;
