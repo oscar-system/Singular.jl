@@ -100,6 +100,7 @@ auto id_prune_map_helper(sip_sideal * I, ring R)
   return std::make_tuple(s, TT);
 }
 
+ideal idMinEmbedding_with_map_v(ideal arg,intvec **w, ideal &trans, int* g);
 auto id_prune_map_v_helper(sip_sideal * I, int* v, ring R)
 {
   auto origin = currRing;
