@@ -89,6 +89,28 @@ auto id_mres_map_helper(sip_sideal * I, int n, ring R)
   return std::make_tuple(s, TT);
 }
 
+auto id_prune_map_helper(sip_sideal * I, ring R)
+{
+  auto origin = currRing;
+  rChangeCurrRing(R);
+  ideal      T;
+  ideal s = idMinEmbedding_with_map(I, NULL, T);
+  matrix     TT = id_Module2Matrix(T, currRing);
+  rChangeCurrRing(origin);
+  return std::make_tuple(s, TT);
+}
+
+auto id_prune_map_v_helper(sip_sideal * I, int* v, ring R)
+{
+  auto origin = currRing;
+  rChangeCurrRing(R);
+  ideal      T;
+  ideal s = idMinEmbedding_with_map_v(I, NULL, T, v);
+  matrix     TT = id_Module2Matrix(T, currRing);
+  rChangeCurrRing(origin);
+  return std::make_tuple(s, TT);
+}
+
 ideal id_Syzygies_internal(ideal m, ring o)
 {
   ideal      id = NULL;
@@ -393,6 +415,8 @@ void singular_define_ideals(jlcxx::Module & Singular)
 
   Singular.method("id_res", &id_res_helper);
   Singular.method("id_mres_map", &id_mres_map_helper);
+  Singular.method("id_prune_map", &id_prune_map_helper);
+  Singular.method("id_prune_map_v", &id_prune_map_v_helper);
 
   Singular.method("id_Slimgb", &id_Slimgb_helper);
 
