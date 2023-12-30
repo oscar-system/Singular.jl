@@ -24,8 +24,8 @@ jobs:
       matrix:
         julia-version:
           - '1.6'
-          - '1.9'
-          - '~1.10.0-0'
+          - '1.9'   # to be removed in the near future
+          - '1.10'
           - 'nightly'
         os:
           - ubuntu-latest
@@ -53,7 +53,7 @@ jobs:
         with:
           depwarn: error
       - name: "Run doctests"
-        if: ${{ matrix.julia-version == '1.9' }}
+        if: ${{ matrix.julia-version == '1.10' }}
         run: |
           julia --project=docs --color=yes --code-coverage -e '
             using Pkg
@@ -76,7 +76,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: julia-actions/setup-julia@v1
         with:
-          version: '1.9'
+          version: '1.10'
       - name: "Cache artifacts"
         uses: julia-actions/cache@v1
       - name: "Build package"
