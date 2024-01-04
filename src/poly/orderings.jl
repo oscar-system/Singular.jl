@@ -260,7 +260,7 @@ end
 
 function ordering_M(m::ZZMatrix; check::Bool=true)
    !check || !iszero(Nemo.det(m)) || throw(ArgumentError("weight matrix must nonsingular"))
-   return ordering_M(Int.(m); check=false)
+   return ordering_M(Int.(Matrix(m)); check=false)
 end
 
 # C, c, and S can take a dummy int in singular, but they do nothing with it?
