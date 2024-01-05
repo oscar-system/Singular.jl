@@ -153,8 +153,12 @@ function locate_libsingular()
    # by comparing tree hashes
    src_hash = bytes2hex(Pkg.GitTools.tree_hash(joinpath(@__DIR__, "..", "deps", "src")))
 
-   if jll_hash == src_hash
+   # the uuid is for Singular.jl
+   pkginfo = Pkg.dependencies()[Base.UUID("bcd08a7b-43d2-5ff7-b6d4-c458787f915c")]
+
+   if jll_hash == src_hash || pkginfo.is_tracking_registry
        # if the tree hashes match then we use the JLL
+       # also if we are using a released Singular.jl version
        path = libsingular_julia_jll.get_libsingular_julia_path()
    else
       # tree hashes differ: we use the bundled sources.
