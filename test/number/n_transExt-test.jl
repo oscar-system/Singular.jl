@@ -75,8 +75,8 @@ end
    @test F(1//2) == big(1//2)
    @test F(1//2) == QQ(1//2)
    @test F(1//2) == Nemo.QQ(1//2)
-   @test F(Nemo.GF(5)(3)) == 1//2
-   @test_throws Exception F(Nemo.GF(7)(3))
+   @test F(Nemo.Native.GF(5)(3)) == 1//2
+   @test_throws Exception F(Nemo.Native.GF(7)(3))
 end
 
 @testset "n_transExt.unary_ops" begin

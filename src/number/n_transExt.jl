@@ -358,6 +358,13 @@ function (F::Singular.N_FField)(x::fpFieldElem)
    return n_transExt(F, x.data)
 end
 
+function (F::Singular.N_FField)(x::FqFieldElem)
+   if characteristic(F) != characteristic(parent(x))
+      throw(ArgumentError("wrong characteristic"))
+   end
+   return n_transExt(F, lift(Nemo.ZZ, x))
+end
+
 function (F::Singular.N_FField)(x::Union{n_Q, Nemo.QQFieldElem, Rational})
    return F(numerator(x)) // F(denominator(x))
 end
