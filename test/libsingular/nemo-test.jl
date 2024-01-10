@@ -102,11 +102,11 @@ end
 end
 
 @testset "Nemo.fqPolyRepFieldElem" begin
-   F, _ = Nemo.finite_field(Nemo.next_prime(fld(typemax(Int),2)), 2, "a")
+   F, _ = Nemo.Native.finite_field(Nemo.next_prime(fld(typemax(Int),2)), 2, "a")
    R, _ = polynomial_ring(F, ["x", "y"])
    @test R isa Singular.PolyRing{Singular.n_FieldElem{Nemo.fqPolyRepFieldElem}}
 
-   F, a = Nemo.finite_field(7, 2, "a")
+   F, a = Nemo.Native.finite_field(7, 2, "a")
 
    R, (x, y) = polynomial_ring(F, ["x", "y"])
 
@@ -162,11 +162,11 @@ end
 end
 
 @testset "Nemo.FqPolyRepFieldElem" begin
-   F, _ = Nemo.finite_field(Nemo.next_prime(Nemo.ZZ(10)^50), 2, "a")
+   F, _ = Nemo.Native.finite_field(Nemo.next_prime(Nemo.ZZ(10)^50), 2, "a")
    R, _ = polynomial_ring(F, ["x", "y"])
    @test R isa Singular.PolyRing{Singular.n_FieldElem{Nemo.FqPolyRepFieldElem}}
 
-   F, a = Nemo.finite_field(Nemo.ZZ(7), 2, "a")
+   F, a = Nemo.Native.finite_field(Nemo.ZZ(7), 2, "a")
 
    R, (x, y) = polynomial_ring(F, ["x", "y"])
 
@@ -276,7 +276,7 @@ end
 
 @testset "Nemo.gfp_fmpz_mod.polynomial_ring" begin
 
-   U = Nemo.GF(Nemo.ZZRingElem(11))
+   U = Nemo.Native.GF(Nemo.ZZRingElem(11))
 
    R, (x, y) = polynomial_ring(U, ["x", "y"])
 
@@ -318,7 +318,7 @@ end
 
 @testset "Nemo.gfp_fmpz_mod.WeylAlgebra" begin
 
-   U = Nemo.GF(Nemo.ZZRingElem(11))
+   U = Nemo.Native.GF(Nemo.ZZRingElem(11))
 
    R, (x, y, dx, dy) = @inferred WeylAlgebra(U, ["x", "y"])
 
@@ -375,20 +375,20 @@ end
     @test F(one(R)*i) == one(F)*i
   end
 
-  S = Nemo.GF(5)
+  S = Nemo.Native.GF(5)
   @test_throws ErrorException S(one(F))
   @test_throws ErrorException F(one(S))
 end
 
 @testset "Nemo.fpFieldElem" begin
-  R = Nemo.GF(7)
+  R = Nemo.Native.GF(7)
   F = Fp(7)
   for i in -10:10
     @test R(one(F)*i) == one(R)*i
     @test F(one(R)*i) == one(F)*i
   end
 
-  S = Nemo.GF(5)
+  S = Nemo.Native.GF(5)
   @test_throws ErrorException S(one(F))
   @test_throws ErrorException F(one(S))
 end
