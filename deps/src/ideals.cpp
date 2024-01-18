@@ -105,11 +105,11 @@ auto id_prune_map_v_helper(sip_sideal * I, jlcxx::ArrayRef<int> a, ring R)
   auto origin = currRing;
   rChangeCurrRing(R);
   ideal      T;
-  int *v=omAlloc(I->rank*siseof(int));
+  int *v=omAlloc(I->rank*sizeof(int));
   ideal s = idMinEmbedding_with_map_v(I, NULL, T, v);
   for (int j = 0; j < I->rank; j++)
       a.push_back(v[j]);
-  omFreeSize(v,I->rank*siseof(int));
+  omFreeSize(v,I->rank*sizeof(int));
   matrix     TT = id_Module2Matrix(T, currRing);
   rChangeCurrRing(origin);
   return std::make_tuple(s, TT);
