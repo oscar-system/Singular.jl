@@ -411,7 +411,7 @@ end
 @doc raw"""
     prune_with_map_projection(id::smodule{spoly{T}}) where T <: Nemo.FieldElem
 
-Returns a module `R`, a transformation matrix `M` and a projection map `p`
+Return a module `R`, a transformation matrix `M` and a projection map `p`
 satisfying the following properties: `R` is minimally embedded in a free
 module `parent(R)` such that the quotient `parent(R)/R` is isomorphic to
 `parent(id)/id`, with `M` together with the projection given by the vector `p`
