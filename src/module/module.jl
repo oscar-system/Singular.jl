@@ -411,10 +411,12 @@ end
 @doc raw"""
     prune_with_map_projection(id::smodule{spoly{T}}) where T <: Nemo.FieldElem
 
-Return the module `R` minimally embedded in a free module such that the
-corresponding factor modules are isomorphic,
-the transformation matrix of id to R and a projection p
-which maps gen(i) to gen(p[i]).
+Returns a module `R`, a transformation matrix `M` and a projection map `p`
+satisfying the following properties: `R` is minimally embedded in a free
+module `parent(R)` such that the quotient `parent(R)/R` is isomorphic to
+`parent(id)/id`, with `M` together with the projection given by the vector `p`
+describing this isomorphism.
+`p` maps `gen(parent(id),i)` to `gen(parent(R),p[i])`
 """
 function prune_with_map_projection(I::smodule{spoly{T}}) where T <: Nemo.FieldElem
    R = base_ring(I)
