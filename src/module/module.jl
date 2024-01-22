@@ -411,7 +411,7 @@ end
 @doc raw"""
     prune_with_map_projection(id::smodule{spoly{T}}) where T <: Nemo.FieldElem
 
-Returns the module R minimally embedded in a free module such that the
+Return the module `R` minimally embedded in a free module such that the
 corresponding factor modules are isomorphic,
 the transformation matrix of id to R and a projection p
 which maps gen(i) to gen(p[i]).
