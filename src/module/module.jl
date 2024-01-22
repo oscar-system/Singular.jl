@@ -1,5 +1,6 @@
 export jet, minimal_generating_set, ModuleClass, rank, smodule, slimgb,
-       eliminate, modulo, lift, division, divrem, prune_with_map
+       eliminate, modulo, lift, division, divrem, prune_with_map,
+       prune_with_map_projection
 
 ###############################################################################
 #
@@ -405,6 +406,21 @@ function prune_with_map(I::smodule{spoly{T}}) where T <: Nemo.FieldElem
    a = Vector{Int32}()
    r, TT_ptr = GC.@preserve I R libSingular.id_prune_map_v(I.ptr, a, R.ptr)
    return smodule{spoly{T}}(R, r),smatrix{spoly{T}}(R,TT_ptr)
+end
+
+@doc raw"""
+    prune_with_map_projection(id::smodule{spoly{T}}) where T <: Nemo.FieldElem
+
+Returns the module R minimally embedded in a free module such that the
+corresponding factor modules are isomorphic,
+the transformation matrix of id to R and a projection p
+which maps gen(i) to gen(p[i]).
+"""
+function prune_with_map_projection(I::smodule{spoly{T}}) where T <: Nemo.FieldElem
+   R = base_ring(I)
+   a = Vector{Int32}()
+   r, TT_ptr = GC.@preserve I R libSingular.id_prune_map_v(I.ptr, a, R.ptr)
+   return smodule{spoly{T}}(R, r),smatrix{spoly{T}}(R,TT_ptr),a
 end
 
 @doc raw"""
