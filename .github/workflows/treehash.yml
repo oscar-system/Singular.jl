@@ -39,3 +39,18 @@ jobs:
             src_hash = bytes2hex(Pkg.GitTools.tree_hash(joinpath("deps", "src")))
             jll_hash == src_hash || error("tree hash is $src_hash, but JLL uses $jll_hash")
             '
+      # next force a treehash mismatch and verify that Singular runs in this
+      # setup; as a side effect this also reduce code coverage fluctuation when
+      # updating libsingular_julia_jll
+      - name: "Force treehash mismatch"
+        run: |
+          touch deps/src/FORCE_TREEHASH_MISMATCH
+      - name: "Run tests"
+        uses: julia-actions/julia-runtest@v1
+        with:
+          depwarn: error
+      - name: "Process code coverage"
+        uses: julia-actions/julia-processcoverage@v1
+      - name: "Upload coverage data to Codecov"
+        continue-on-error: true
+        uses: codecov/codecov-action@v3
