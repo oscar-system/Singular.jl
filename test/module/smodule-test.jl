@@ -324,4 +324,9 @@ end
    @test G[1] == vector(R, z)
    @test T[3,1] == R(1)
 
+   G,T,p = prune_with_map_projection(M)
+   @test p[1] == 1
+   @test p[2] == 1
+   @test p[3] == 2
+
 end
