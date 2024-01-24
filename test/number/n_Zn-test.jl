@@ -45,11 +45,11 @@ end
 
    @test deepcopy(R(2)) == R(2)
 
-   NR = Nemo.residue_ring(Nemo.ZZ, 6)
+   NR = Nemo.residue_ring(Nemo.ZZ, 6)[1]
    @test R(2) == R(NR(2))
    @test NR(2) == NR(R(2))
 
-   NR = Nemo.residue_ring(Nemo.ZZ, Nemo.ZZ(6))
+   NR = Nemo.residue_ring(Nemo.ZZ, Nemo.ZZ(6))[1]
    @test R(2) == R(NR(2))
    @test NR(2) == NR(R(2))
 end
