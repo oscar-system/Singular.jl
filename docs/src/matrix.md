@@ -44,7 +44,7 @@ The following parts of the Matrix interface from AbstractAlgebra are also implem
   * construction: `identity_matrix`, `identity_matrix`
   * arithmetic operations: `+`, `-`, `*`
   * comparison: `==`
-  * manipulation: `nrows`, `ncols`, `getindex`, `setindex!`, `transpose`, `iszero`
+  * manipulation: `number_of_rows`, `number_of_columns`, `getindex`, `setindex!`, `transpose`, `iszero`
 
 **Examples**
 
@@ -69,10 +69,10 @@ julia> M = identity_matrix(R, 4)
 0, 0, 1, 0
 0, 0, 0, 1]
 
-julia> nrows(M)
+julia> number_of_rows(M)
 4
 
-julia> ncols(M)
+julia> number_of_columns(M)
 4
 
 julia> iszero(M)

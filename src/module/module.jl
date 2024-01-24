@@ -20,12 +20,12 @@ parent_type(::Type{smodule{T}}) where T <: AbstractAlgebra.RingElem = ModuleClas
 
 
 @doc raw"""
-    ngens(I::smodule)
+    number_of_generators(I::smodule)
 
 Return the number of generators in the current representation of the module (as a list
 of vectors).
 """
-ngens(I::smodule) = I.ptr == C_NULL ? 0 : Int(libSingular.ngens(I.ptr))
+number_of_generators(I::smodule) = I.ptr == C_NULL ? 0 : Int(libSingular.ngens(I.ptr))
 
 @doc raw"""
     rank(I::smodule)

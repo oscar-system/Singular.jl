@@ -10,11 +10,11 @@ function sbigintmat(r::Int, c::Int)
    return sbigintmat(libSingular.bigintmat_init(r, c))
 end
 
-function ncols(m::sbigintmat)
+function number_of_columns(m::sbigintmat)
    return Int(libSingular.bigintmat_ncols(m.ptr))
 end
 
-function nrows(m::sbigintmat)
+function number_of_rows(m::sbigintmat)
    return Int(libSingular.bigintmat_nrows(m.ptr))
 end
 
