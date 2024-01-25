@@ -294,12 +294,16 @@ promote_rule(C::Type{n_Zn}, ::Type{n_Z}) = n_Zn
 
 (R::Nemo.ZZModRing)(n::n_Zn) = R(BigInt(n))
 
+lift(n::n_Zn) = ZZ(BigInt(n))
+
 ###############################################################################
 #
 #   SingularResidueRing constructor
 #
 ###############################################################################
 
-residue_ring(R::Integers, a::Int; cached=true) = N_ZnRing(BigInt(a), cached)
-
-residue_ring(R::Integers, a::BigInt; cached=true) = N_ZnRing(a, cached)
+function residue_ring(R::Integers, a::Integer; cached=true)
+  S = N_ZnRing(BigInt(a), cached)
+  f = Generic.EuclideanRingResidueMap(R, S)
+  return S, f
+end
