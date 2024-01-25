@@ -224,5 +224,5 @@ end
 
 function register(R::Nemo.fqPolyRepField)
    c = @cfunction(fq_nmodInitChar, Cint, (Ptr{Cvoid}, Ptr{Cvoid}))
-   return nRegister(n_unknown, c)
+   return nRegister(n_Nemo_fqPolyRepField, c)
 end

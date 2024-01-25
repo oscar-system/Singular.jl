@@ -314,5 +314,5 @@ function register(R::Nemo.Ring)
    else
       c = @cfunction(nemoRingInitChar, Cint, (Ptr{Cvoid}, Ptr{Cvoid}))
    end
-   return nRegister(n_unknown, c)
+   return nRegister(n_Nemo_Ring, c)
 end

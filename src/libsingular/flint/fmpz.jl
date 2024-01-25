@@ -246,5 +246,5 @@ end
 
 function register(R::Nemo.ZZRing)
    c = @cfunction(fmpzInitChar, Cint, (Ptr{Cvoid}, Ptr{Cvoid}))
-   return nRegister(n_unknown, c)
+   return nRegister(n_Nemo_ZZRing, c)
 end
