@@ -5,6 +5,5 @@ using Aqua
       Singular;
       ambiguities=false,         # TODO: fix ambiguities
       unbound_args=false,        # TODO: fix unbound args
-      piracies=false             # TODO: fix piracy
    )
 end
