@@ -1,7 +1,7 @@
 export sideal, IdealSet, syz, lead, normalize!, is_constant, is_zerodim, fglm,
        fres, dimension, highcorner, jet, kbase, minimal_generating_set,
        independent_sets, maximal_independent_set, mres, mres_with_map,
-       ngens, nres, sres,
+       number_of_generators, ngens, nres, sres,
        intersection, homogenize_ideal, homogenize_ideal_with_weights,
        quotient, reduce, eliminate, kernel, equal, contains, is_var_generated,
        saturation, saturation2, satstd, slimgb, std, vdim, interreduce, degree, mult,
@@ -24,11 +24,11 @@ elem_type(::Type{IdealSet{spoly{T}}}) where T <: Nemo.RingElem = sideal{spoly{T}
 parent_type(::Type{sideal{spoly{T}}}) where T <: Nemo.RingElem = IdealSet{spoly{T}}
 
 @doc raw"""
-    ngens(I::sideal)
+    number_of_generators(I::sideal)
 
 Return the number of generators in the internal representation of the ideal $I$.
 """
-function ngens(I::sideal)
+function number_of_generators(I::sideal)
    GC.@preserve I return Int(libSingular.ngens(I.ptr))
 end
 

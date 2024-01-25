@@ -1,4 +1,4 @@
-export identity_matrix, matrix_space, nrows, ncols, smatrix, zero_matrix
+export identity_matrix, matrix_space, number_of_rows, nrows, number_of_columns, ncols, smatrix, zero_matrix
 
 ###############################################################################
 #
@@ -6,9 +6,9 @@ export identity_matrix, matrix_space, nrows, ncols, smatrix, zero_matrix
 #
 ###############################################################################
 
-nrows(M::smatrix) = Int(libSingular.nrows(M.ptr))
+number_of_rows(M::smatrix) = Int(libSingular.nrows(M.ptr))
 
-ncols(M::smatrix) = Int(libSingular.ncols(M.ptr))
+number_of_columns(M::smatrix) = Int(libSingular.ncols(M.ptr))
 
 function parent(M::smatrix{T}) where T <: AbstractAlgebra.RingElem
    return matrix_space{T}(M.base_ring, nrows(M), ncols(M))

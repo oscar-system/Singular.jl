@@ -85,7 +85,7 @@ x^2*gen(1)+x*gen(3)+2*x*gen(2)+3*y*gen(2)+gen(1)
 ### Basic manipulation
 
 ```@docs
-ngens(::smodule)
+number_of_generators(::smodule)
 ```
 
 ```@docs
@@ -129,7 +129,7 @@ true
 julia> n = rank(M)
 3
 
-julia> d = ngens(M)
+julia> d = number_of_generators(M)
 2
 ```
 

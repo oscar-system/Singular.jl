@@ -43,7 +43,7 @@ import Random: rand
 using RandomExtensions: RandomExtensions, make, Make2
 
 import AbstractAlgebra: AbstractAlgebra, diagonal_matrix, factor,
-                        identity_matrix, kernel, ncols, ngens, nrows, order,
+                        identity_matrix, kernel, number_of_columns, ncols, number_of_generators, ngens, number_of_rows, nrows, order,
                         preimage, zero_matrix, expressify
 
 import AbstractAlgebra: pretty, Lowercase, LowercaseOff, Indent, Dedent
@@ -59,7 +59,7 @@ import Nemo: add!, addeq!, base_ring, canonical_unit,
              is_gen, is_monomial, inflate, is_negative, isone,
              is_term, is_unit, iszero, lift, leading_coefficient,
              leading_term, leading_monomial, monomials,
-             MPolyBuildCtx, mul!, nvars, ordering, parent_type,
+             MPolyBuildCtx, mul!, number_of_variables, nvars, ordering, parent_type,
              parent, primpart, promote_rule, push_term!,
              reconstruct, remove, sort_terms!,
              symbols, tail, terms, total_degree, trailing_coefficient, valuation,
