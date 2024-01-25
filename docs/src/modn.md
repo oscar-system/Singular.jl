@@ -57,8 +57,7 @@ Coerce a Singular or Flint integer value into the ring.
 **Examples**
 
 ```jldoctest
-julia> R = residue_ring(ZZ, 26)
-Residue Ring of Integer Ring modulo 26
+julia> R, = residue_ring(ZZ, 26);
 
 julia> a = R(5)
 5

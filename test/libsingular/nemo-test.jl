@@ -358,7 +358,7 @@ end
 end
 
 @testset "Nemo.zzModRingElem" begin
-  R = residue_ring(Nemo.ZZ, 15)
+  R = residue_ring(Nemo.ZZ, 15)[1]
   S, (x, y) = polynomial_ring(R, ["x", "y"])
   p = x*2
   @test string(p) == "2*x"
@@ -368,7 +368,7 @@ end
   @test length(p) == 0
   @test is_zero(p)
 
-  R = residue_ring(Nemo.ZZ, 7)
+  R = residue_ring(Nemo.ZZ, 7)[1]
   F = Fp(7)
   for i in -10:10
     @test R(one(F)*i) == one(R)*i
@@ -394,7 +394,7 @@ end
 end
 
 @testset "Nemo.ZZModRingElem" begin
-   U = Nemo.residue_ring(Nemo.ZZ, Nemo.ZZRingElem(11))
+   U = Nemo.residue_ring(Nemo.ZZ, Nemo.ZZRingElem(11))[1]
    R, (x, y) = polynomial_ring(U, ["x", "y"])
 
    wrappedUtype = Singular.n_RingElem{Singular.RingElemWrapper{Nemo.ZZModRing, Nemo.ZZModRingElem}}
