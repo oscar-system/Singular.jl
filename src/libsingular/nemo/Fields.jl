@@ -246,5 +246,5 @@ end
 
 function register(R::Nemo.Field)
    c = @cfunction(nemoFieldInitChar, Cint, (Ptr{Cvoid}, Ptr{Cvoid}))
-   return nRegister(n_unknown, c)
+   return nRegister(n_Nemo_Field, c)
 end

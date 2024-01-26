@@ -224,5 +224,5 @@ end
 
 function register(R::Nemo.AnticNumberField)
    c = @cfunction(nf_elemInitChar, Cint, (Ptr{Cvoid}, Ptr{Cvoid}))
-   return nRegister(n_unknown, c)
+   return nRegister(n_Nemo_AnticNumberField, c)
 end

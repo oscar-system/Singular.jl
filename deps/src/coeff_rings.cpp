@@ -35,6 +35,12 @@ typedef struct __singular_coeff_ring_struct {
   void *  cfCoeffWrite;
 } singular_coeff_ring_struct;
 
+static BOOLEAN nCoeffIsEqual(const coeffs r, n_coeffType n, void *d)
+{
+  /* test, if r is an instance of nInitCoeffs(n,parameter) */
+  return (n==r->type) &&(r->data==d);
+}
+
 void fill_coeffs_with_function_data(jl_value_t * coeff_struct, void * cf_void)
 {
 
@@ -48,6 +54,7 @@ void fill_coeffs_with_function_data(jl_value_t * coeff_struct, void * cf_void)
   cf->is_domain = (BOOLEAN)cf_input->is_domain;
   cf->ch = (int)cf_input->ch;
   cf->data = cf_input->data;
+  cf->nCoeffIsEqual = nCoeffIsEqual;
   cf->cfInit = (number(*)(long, const coeffs))cf_input->cfInit;
   cf->cfInt = (long (*)(number &, const coeffs))cf_input->cfInt;
   cf->cfMPZ = (void (*)(__mpz_struct *, number &, const coeffs))cf_input->cfMPZ;
