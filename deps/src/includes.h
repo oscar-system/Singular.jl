@@ -13,6 +13,8 @@
 #include "jlcxx/array.hpp"
 #include "jlcxx/tuple.hpp"
 
+#undef FORCE_INLINE
+
 #include <gmp.h>
 #include <omalloc/omalloc.h>
 #include <misc/intvec.h>
