@@ -337,8 +337,18 @@ JLCXX_MODULE define_julia_module(jlcxx::Module & Singular)
     return result;
   });
 
+  Singular.method("syMinimize_map", [](syStrategy ra, ring o) {
+      const ring origin = currRing;
+      rChangeCurrRing(o);
+      ideal T=NULL;
+      syMinimize_with_map(ra,T);
+      matrix TT=id_Module2Matrix(T,o);
+      rChangeCurrRing(origin);
+      return TT;
+  });
+
   Singular.method("get_minimal_res", [](syStrategy ra) {
-    return reinterpret_cast<void *>(ra->minres);
+        return reinterpret_cast<void *>(ra->minres);
   });
 
   Singular.method("get_full_res", [](syStrategy ra) {
