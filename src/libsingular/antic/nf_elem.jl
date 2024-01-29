@@ -6,7 +6,7 @@
 
 function nf_elemInit(i::Clong, cf::Ptr{Cvoid})
    cf_ptr = get_coeff_data_void(cf)
-   R = julia(cf_ptr)::Nemo.AnticNumberField
+   R = julia(cf_ptr)::Nemo.AbsSimpleNumField
    return number(R(Int(i)))
 end
 
@@ -17,7 +17,7 @@ function nf_elemDelete(ptr::Ptr{Ptr{Cvoid}}, cf::Ptr{Cvoid})
 end
 
 function nf_elemCopy(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
-   n = julia(a)::Nemo.nf_elem
+   n = julia(a)::Nemo.AbsSimpleNumFieldElem
    return number(deepcopy(n))
 end
 
@@ -40,7 +40,7 @@ function nf_elemCoeffWrite(cf::Ptr{Cvoid}, d::Cint)
 end
 
 function nf_elemWrite(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
-   n = julia(a)::Nemo.nf_elem
+   n = julia(a)::Nemo.AbsSimpleNumFieldElem
    libSingular.StringAppendS(AbstractAlgebra.obj_to_string_wrt_times(n))
    nothing
 end
@@ -52,60 +52,60 @@ end
 ###############################################################################
 
 function nf_elemNeg(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
-   n = julia(a)::Nemo.nf_elem
+   n = julia(a)::Nemo.AbsSimpleNumFieldElem
    return number(-n)
 end
 
 function nf_elemInpNeg(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
    cf_ptr = get_coeff_data_void(cf)
    ccall((:nf_elem_neg, libantic), Cvoid,
-	 (Ptr{Nemo.nf_elem}, Ptr{Nemo.nf_elem}, Ptr{Nemo.AnticNumberField}),
+	 (Ptr{Nemo.AbsSimpleNumFieldElem}, Ptr{Nemo.AbsSimpleNumFieldElem}, Ptr{Nemo.AbsSimpleNumField}),
 	   a, a, cf_ptr)
    return a
 end
 
 function nf_elemInvers(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
-   n = julia(a)::Nemo.nf_elem
+   n = julia(a)::Nemo.AbsSimpleNumFieldElem
    return number(Nemo.inv(n))
 end
 
 function nf_elemMult(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
-   n1 = julia(a)::Nemo.nf_elem
-   n2 = julia(b)::Nemo.nf_elem
+   n1 = julia(a)::Nemo.AbsSimpleNumFieldElem
+   n2 = julia(b)::Nemo.AbsSimpleNumFieldElem
    return number(n1*n2)
 end
 
 function nf_elemInpMult(a::Ptr{Ptr{Cvoid}}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    r = unsafe_load(a)
-   aa = julia(r)::Nemo.nf_elem
-   bb = julia(b)::Nemo.nf_elem
+   aa = julia(r)::Nemo.AbsSimpleNumFieldElem
+   bb = julia(b)::Nemo.AbsSimpleNumFieldElem
    Nemo.mul!(aa, aa, bb)
    nothing
 end
 
 function nf_elemAdd(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
-   n1 = julia(a)::Nemo.nf_elem
-   n2 = julia(b)::Nemo.nf_elem
+   n1 = julia(a)::Nemo.AbsSimpleNumFieldElem
+   n2 = julia(b)::Nemo.AbsSimpleNumFieldElem
    return number(n1 + n2)
 end
 
 function nf_elemInpAdd(a::Ptr{Ptr{Cvoid}}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    r = unsafe_load(a)
-   aa = julia(r)::Nemo.nf_elem
-   bb = julia(b)::Nemo.nf_elem
+   aa = julia(r)::Nemo.AbsSimpleNumFieldElem
+   bb = julia(b)::Nemo.AbsSimpleNumFieldElem
    Nemo.addeq!(aa, bb)
    nothing
 end
 
 function nf_elemSub(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
-   n1 = julia(a)::Nemo.nf_elem
-   n2 = julia(b)::Nemo.nf_elem
+   n1 = julia(a)::Nemo.AbsSimpleNumFieldElem
+   n2 = julia(b)::Nemo.AbsSimpleNumFieldElem
    return number(n1 - n2)
 end
 
 function nf_elemDiv(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
-   n1 = julia(a)::Nemo.nf_elem
-   n2 = julia(b)::Nemo.nf_elem
+   n1 = julia(a)::Nemo.AbsSimpleNumFieldElem
+   n2 = julia(b)::Nemo.AbsSimpleNumFieldElem
    return number(Nemo.divexact(n1, n2))
 end
 
@@ -116,29 +116,29 @@ end
 ###############################################################################
 
 function nf_elemGreater(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
-   n1 = julia(a)::Nemo.nf_elem
-   n2 = julia(b)::Nemo.nf_elem
+   n1 = julia(a)::Nemo.AbsSimpleNumFieldElem
+   n2 = julia(b)::Nemo.AbsSimpleNumFieldElem
    return Cint(n1 != n2)
 end
 
 function nf_elemEqual(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
-   n1 = julia(a)::Nemo.nf_elem
-   n2 = julia(b)::Nemo.nf_elem
+   n1 = julia(a)::Nemo.AbsSimpleNumFieldElem
+   n2 = julia(b)::Nemo.AbsSimpleNumFieldElem
    return Cint(n1 == n2)
 end
 
 function nf_elemIsZero(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
-   n = julia(a)::Nemo.nf_elem
+   n = julia(a)::Nemo.AbsSimpleNumFieldElem
    return Cint(Nemo.iszero(n))
 end
 
 function nf_elemIsOne(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
-   n = julia(a)::Nemo.nf_elem
+   n = julia(a)::Nemo.AbsSimpleNumFieldElem
    return Cint(Nemo.isone(n))
 end
 
 function nf_elemIsMOne(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
-   n = julia(a)::Nemo.nf_elem
+   n = julia(a)::Nemo.AbsSimpleNumFieldElem
    return Cint(n == -1)
 end
 
@@ -149,8 +149,8 @@ end
 ###############################################################################
 
 function nf_elemGcd(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
-   n1 = julia(a)::Nemo.nf_elem
-   n2 = julia(b)::Nemo.nf_elem
+   n1 = julia(a)::Nemo.AbsSimpleNumFieldElem
+   n2 = julia(b)::Nemo.AbsSimpleNumFieldElem
    return number(Nemo.gcd(n1, n2))
 end
 
@@ -222,7 +222,7 @@ function nf_elemInitChar(cf::Ptr{Cvoid}, p::Ptr{Cvoid})
     return Cint(0)
 end
 
-function register(R::Nemo.AnticNumberField)
+function register(R::Nemo.AbsSimpleNumField)
    c = @cfunction(nf_elemInitChar, Cint, (Ptr{Cvoid}, Ptr{Cvoid}))
    return nRegister(n_Nemo_AnticNumberField, c)
 end

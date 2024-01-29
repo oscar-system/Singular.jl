@@ -219,7 +219,7 @@ end
    @test deepcopy(f1c[1]) == f1c[1]
 end
 
-@testset "Nemo.nf_elem" begin
+@testset "Nemo.AbsSimpleNumFieldElem" begin
    U, z = Nemo.polynomial_ring(Nemo.QQ, "z")
    K, a = Nemo.number_field(z^3 + 3z + 1, "a")
 
@@ -230,8 +230,8 @@ end
    f3 = x^2 + 2x + 1
 
    f1c = [c for c in coefficients(f1)]
-   @test f1c[1] isa Singular.n_FieldElem{Nemo.nf_elem}
-   @test K(f1c[1]) isa Nemo.nf_elem
+   @test f1c[1] isa Singular.n_FieldElem{Nemo.AbsSimpleNumFieldElem}
+   @test K(f1c[1]) isa Nemo.AbsSimpleNumFieldElem
    @test !isempty(string(f1c[1]))
    @test leading_coefficient(f1) == f1c[1]
 
