@@ -75,7 +75,7 @@ end
    @assert K1(1//2) == Singular.Nemo.QQ(1//2)
 
    @assert K1(b) isa Singular.n_algExt
-   @assert K2(a) isa Singular.Nemo.nf_elem
+   @assert K2(a) isa Singular.Nemo.AbsSimpleNumFieldElem
    @assert a == K1(K2(a))
    @assert b == K2(K1(b))
    @assert 0*a == K1(K2(0*a))

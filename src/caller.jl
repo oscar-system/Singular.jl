@@ -293,7 +293,7 @@ end
 function prepare_argument(x::Union{
                           Matrix{ <: Union{Nemo.Integer, Nemo.ZZRingElem}},
                           Nemo.MatElem{ <: Union{Nemo.Integer, Nemo.ZZRingElem}},
-                          Nemo.MatAlgElem{ <: Union{Nemo.Integer, Nemo.ZZRingElem}}})
+                          Nemo.MatRingElem{ <: Union{Nemo.Integer, Nemo.ZZRingElem}}})
     return prepare_argument(sbigintmat(x))
 end
 
