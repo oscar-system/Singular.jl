@@ -58,7 +58,7 @@ end
 # conversion to bigintmat
 
 function sbigintmat(a::Union{Nemo.MatElem{ <: Union{Nemo.Integer, Nemo.ZZRingElem}},
-                          Nemo.MatAlgElem{ <: Union{Nemo.Integer, Nemo.ZZRingElem}}})
+                          Nemo.MatRingElem{ <: Union{Nemo.Integer, Nemo.ZZRingElem}}})
    (r, c) = (nrows(a), ncols(a))
    z = sbigintmat(r, c)
    for i in 1:r, j in 1:c
@@ -97,7 +97,7 @@ function Nemo.matrix(R::Nemo.Ring, a::sbigintmat)
    return z
 end
 
-function (R::Union{Nemo.MatSpace, Nemo.MatAlgebra})(a::sbigintmat)
+function (R::Union{Nemo.MatSpace, Nemo.MatRing})(a::sbigintmat)
    r = nrows(a)
    c = ncols(a)
    r == nrows(R) && c == ncols(R) || error("wrong matrix dimensions")

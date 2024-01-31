@@ -91,7 +91,7 @@ let zero_parameter_types = [
       Nemo.ZZPolyRing => Nemo.ZZPolyRingElem,
       Nemo.fqPolyRepField => Nemo.fqPolyRepFieldElem,
       Nemo.FqPolyRepField => Nemo.FqPolyRepFieldElem,
-      Nemo.AnticNumberField => Nemo.nf_elem
+      Nemo.AbsSimpleNumField => Nemo.AbsSimpleNumFieldElem
    ],
 
    one_parameter_types = [
