@@ -260,6 +260,10 @@ void singular_define_coeffs(jlcxx::Module & Singular)
     return n->type==n_Nemo_Field;
   });
 
+  Singular.method("nCoeff_is_Nemo_Ring", [](coeffs n) {
+    return n->type==n_Nemo_Ring;
+  });
+
   /* make a copy of a coefficient domain (actually just increments a
    * reference count) */
   Singular.method("nCopyCoeff", &nCopyCoeff);
