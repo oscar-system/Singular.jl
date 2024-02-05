@@ -236,6 +236,30 @@ void singular_define_coeffs(jlcxx::Module & Singular)
     return bool(nCoeff_is_algExt(n));
   });
 
+  Singular.method("nCoeff_is_Nemo_AnticNumberField", [](coeffs n) {
+    return n->type==n_Nemo_AnticNumberField;
+  });
+
+  Singular.method("nCoeff_is_Nemo_QQField", [](coeffs n) {
+    return n->type==n_Nemo_QQField;
+  });
+
+  Singular.method("nCoeff_is_Nemo_ZZRing", [](coeffs n) {
+    return n->type==n_Nemo_ZZRing;
+  });
+
+  Singular.method("nCoeff_is_Nemo_FqPolyRepField", [](coeffs n) {
+    return n->type==n_Nemo_FqPolyRepField;
+  });
+
+  Singular.method("nCoeff_is_Nemo_fqPolyRepField", [](coeffs n) {
+    return n->type==n_Nemo_fqPolyRepField;
+  });
+
+  Singular.method("nCoeff_is_Nemo_Field", [](coeffs n) {
+    return n->type==n_Nemo_Field;
+  });
+
   /* make a copy of a coefficient domain (actually just increments a
    * reference count) */
   Singular.method("nCopyCoeff", &nCopyCoeff);
