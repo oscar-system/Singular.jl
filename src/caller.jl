@@ -195,7 +195,7 @@ function create_ring_from_singular_ring(r::libSingular.ring_ptr)
    elseif libSingular.nCoeff_is_Nemo_Field(c)
       cf = libSingular.nCopyCoeff(c)
       Rcf = libSingular.nGetData(c)
-      basering = N_Field(Ref{Neomo.Field}(Rcf))
+      basering = N_Field(Ref{Nemo.Field}(Rcf))
       T = Nemo.Field
    elseif libSingular.nCoeff_is_Nemo_Ring(c)
       cf = libSingular.nCopyCoeff(c)
