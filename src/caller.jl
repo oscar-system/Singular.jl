@@ -194,13 +194,15 @@ function create_ring_from_singular_ring(r::libSingular.ring_ptr)
       T = n_algExt
    elseif libSingular.nCoeff_is_Nemo_Field(c)
       cf = libSingular.nCopyCoeff(c)
-      Rcf = libSingular.nGetData(c)
-      basering = N_Field(Ref{Nemo.Field}(Rcf))
+      data_ptr = get_coeff_data_void(cf)
+      R = unsafe_pointer_to_objref(data_ptr)
+      basering = N_Field(R)
       T = Nemo.Field
    elseif libSingular.nCoeff_is_Nemo_Ring(c)
       cf = libSingular.nCopyCoeff(c)
-      Rcf = libSingular.nGetData(c)
-      basering = N_Ring(Ref{Nemo.Ring}(Rcf))
+      data_ptr = get_coeff_data_void(cf)
+      R = unsafe_pointer_to_objref(data_ptr)
+      basering = N_Ring(R)
       T = Nemo.Ring
    else
       basering = N_UnknownSingularCoefficientRing(libSingular.nCopyCoeff(c))
