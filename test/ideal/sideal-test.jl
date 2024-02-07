@@ -713,4 +713,6 @@ end
    @test Singular.Matrix(a)*Singular.Matrix(u) == Singular.Matrix(b)*Singular.Matrix(q)+Singular.Matrix(r)
    @test gens(reduce(a, b, complete_reduction=false))[1] ==y^3+x*y
    @test gens(reduce(a, b, complete_reduction=true))[1] == y^3
+   q2,r2,u2 = divrem2(a, b)
+   @test Singular.Matrix(a)*Singular.Matrix(u2) == Singular.Matrix(b)*Singular.Matrix(q2)+Singular.Matrix(r2)
 end

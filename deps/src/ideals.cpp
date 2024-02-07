@@ -473,9 +473,9 @@ void singular_define_ideals(jlcxx::Module & Singular)
     rChangeCurrRing(o);
     ideal factors;
     ideal unit;
-    ideal res = idDivRem(sm, m, factors, &unit, flag);
+    ideal quot = idDivRem(m, sm, factors, &unit, flag);
     rChangeCurrRing(origin);
-    return std::make_tuple(res, factors, unit);
+    return std::make_tuple(quot,factors, unit);
   });
 
   Singular.method("id_Lift", [](ideal m, ideal sm, ring o) {
