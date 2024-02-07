@@ -843,7 +843,7 @@ end
 @doc raw"""
     divrem2(I::sideal{S}, G::sideal{S}; complete_reduction::Bool = false) where S <: SPolyUnion
 
-Computes a normalform of the generators of `I` by the generators of `G`,
+Computes a normal form of the generators of `I` by the generators of `G`,
 keeping track of the reduction. Returns a tuple (Quo, Rem, U) where
 `Matrix(I)*Matrix(U) = Matrix(G)*Matrix(Quo) + Matrix(Rem)`
 and `Rem = normalform(I, G)`. `U` is a diagonal matrix of units differing
