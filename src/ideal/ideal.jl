@@ -837,7 +837,7 @@ function divrem(I::sideal{S}, G::sideal{S}; complete_reduction::Bool = false) wh
                                                                    false, true, R.ptr)
    libSingular.set_option("OPT_REDSB",old_redsb)
    libSingular.set_option("OPT_REDTAIL",old_redtail)
-   return (sideal{S}(R,ptr_T), sideal{S}(R,ptr_Rest), smodule{S}(R,ptr_U))
+   return (smodule{S}(R,ptr_T), sideal{S}(R,ptr_Rest), smodule{S}(R,ptr_U))
 end
 
 @doc raw"""
