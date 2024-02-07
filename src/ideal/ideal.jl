@@ -847,7 +847,7 @@ Computes a normal form of the generators of `I` by the generators of `G`,
 keeping track of the reduction. Returns a tuple (Quo, Rem, U) where
 `Matrix(I)*Matrix(U) = Matrix(G)*Matrix(Quo) + Matrix(Rem)`
 and `Rem = normalform(I, G)`. `U` is a diagonal matrix of units differing
-from the identity matrix only for local ring orderings.
+from the identity matrix only for local monomial orderings.
 Leading terms of `Matrix(G)*Matrix(Quo)` are less or equal to the corresponding terms of `I`.
 No term of `Rem` is divisible by any leading term of `G`.
 `divrem2` is identical to `divrem` if G is given by a Groebner basis.
