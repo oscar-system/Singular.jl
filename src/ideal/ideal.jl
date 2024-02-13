@@ -5,7 +5,7 @@ export sideal, IdealSet, syz, lead, normalize!, is_constant, is_zerodim, fglm,
        intersection, homogenize_ideal, homogenize_ideal_with_weights,
        quotient, reduce, eliminate, kernel, equal, contains, is_var_generated,
        saturation, saturation2, satstd, slimgb, std, vdim, interreduce, degree, mult,
-       hilbert_series, std_hilbert, is_homogeneous, division, divrem, mstd
+       hilbert_series, std_hilbert, is_homogeneous, division, divrem, divrem2, mstd
 
 ###############################################################################
 #
@@ -838,6 +838,25 @@ function divrem(I::sideal{S}, G::sideal{S}; complete_reduction::Bool = false) wh
    libSingular.set_option("OPT_REDSB",old_redsb)
    libSingular.set_option("OPT_REDTAIL",old_redtail)
    return (smodule{S}(R,ptr_T), sideal{S}(R,ptr_Rest), smodule{S}(R,ptr_U))
+end
+
+@doc raw"""
+    divrem2(I::sideal{S}, G::sideal{S}; complete_reduction::Bool = false) where S <: SPolyUnion
+
+Computes a normal form of the generators of `I` by the generators of `G`,
+keeping track of the reduction. Returns a tuple (Quo, Rem, U) where
+`Matrix(I)*Matrix(U) = Matrix(G)*Matrix(Quo) + Matrix(Rem)`
+and `Rem = reduce(I, G; complete_reduction)`. `U` is a diagonal matrix of units differing
+from the identity matrix only for local monomial orderings.
+Leading terms of `Matrix(G)*Matrix(Quo)` are less or equal to the corresponding terms of `I`.
+No term of `Rem` is divisible by any leading term of `G`.
+`divrem2` is identical to `divrem` if G is given by a Groebner basis.
+"""
+function divrem2(I::sideal{S}, G::sideal{S}; complete_reduction::Bool = false) where S <: SPolyUnion
+   check_parent(I, G)
+   R = base_ring(I)
+   ptr_Rest,ptr_T,ptr_U = GC.@preserve I G R libSingular.id_DivRem_Unit(I.ptr, G.ptr, R.ptr, 0)
+   return (smodule{S}(R,ptr_T), sideal{S}(R,ptr_Rest),smodule{S}(R,ptr_U))
 end
 
 ###############################################################################
