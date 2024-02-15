@@ -289,8 +289,8 @@ promote_rule(C::Type{n_algExt}, ::Type{n_Z}) = n_algExt
 
 promote_rule(C::Type{n_algExt}, ::Type{n_Q}) = n_algExt
 
-# TODO really need a hand-crafted nf_elem <-> n_algExt
-function (SK::Singular.N_AlgExtField)(a::Singular.Nemo.nf_elem)
+# TODO really need a hand-crafted AbsSimpleNumFieldElem <-> n_algExt
+function (SK::Singular.N_AlgExtField)(a::Singular.Nemo.AbsSimpleNumFieldElem)
   K = parent(a)
   SKa = gen(SK)
   res = SK(coeff(a, 0))
@@ -301,7 +301,7 @@ function (SK::Singular.N_AlgExtField)(a::Singular.Nemo.nf_elem)
 end
 
 # this is going to be dreadfully slow
-function (K::Singular.Nemo.AnticNumberField)(a::Singular.n_algExt)
+function (K::Singular.Nemo.AbsSimpleNumField)(a::Singular.n_algExt)
   SK = parent(a)
   SF = parent(modulus(SK))
   # it gets even worse: n_transExt_to_spoly only converts the "numerator"

@@ -64,6 +64,13 @@ JLCXX_MODULE define_julia_module(jlcxx::Module & Singular)
   Singular.set_const("n_Zp", n_Zp);
   Singular.set_const("n_GF", n_GF);
   Singular.set_const("n_transExt", n_transExt);
+  Singular.set_const("n_Nemo_AnticNumberField", n_Nemo_AnticNumberField);
+  Singular.set_const("n_Nemo_QQField", n_Nemo_QQField);
+  Singular.set_const("n_Nemo_ZZRing", n_Nemo_ZZRing);
+  Singular.set_const("n_Nemo_FqPolyRepField", n_Nemo_FqPolyRepField);
+  Singular.set_const("n_Nemo_fqPolyRepField", n_Nemo_fqPolyRepField);
+  Singular.set_const("n_Nemo_Field", n_Nemo_Field);
+  Singular.set_const("n_Nemo_Ring", n_Nemo_Ring);
   Singular.set_const("n_unknown", n_unknown);
   Singular.add_type<snumber>("number");
   Singular.add_type<__mpz_struct>("__mpz_struct");
@@ -330,8 +337,18 @@ JLCXX_MODULE define_julia_module(jlcxx::Module & Singular)
     return result;
   });
 
+  Singular.method("syMinimize_map", [](syStrategy ra, ring o) {
+      const ring origin = currRing;
+      rChangeCurrRing(o);
+      ideal T=NULL;
+      syMinimize_with_map(ra,T);
+      matrix TT=id_Module2Matrix(T,o);
+      rChangeCurrRing(origin);
+      return TT;
+  });
+
   Singular.method("get_minimal_res", [](syStrategy ra) {
-    return reinterpret_cast<void *>(ra->minres);
+        return reinterpret_cast<void *>(ra->minres);
   });
 
   Singular.method("get_full_res", [](syStrategy ra) {

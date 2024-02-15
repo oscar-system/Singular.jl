@@ -237,11 +237,13 @@ bool translate_singular_type(jl_value_t * obj, void ** args, int * argtypes, int
 jl_value_t * get_julia_type_from_sleftv(leftv ret)
 {
   jl_array_t * result = jl_alloc_array_1d(jl_array_any_type, 3);
+  JL_GC_PUSH1(&result);
   jl_array_ptr_set(result, 0, jl_false);
   jl_array_ptr_set(result, 1, jl_box_voidpointer(ret->data));
   ret->data = 0;
   jl_array_ptr_set(result, 2, jl_box_int64(ret->Typ()));
   ret->rtyp = 0;
+  JL_GC_POP();
   return reinterpret_cast<jl_value_t *>(result);
 }
 
@@ -353,7 +355,7 @@ jl_value_t * lookup_singular_library_symbol_wo_rng(std::string pack, std::string
   int          err = 2;
   jl_value_t * res = jl_nothing;
   jl_array_t * answer = jl_alloc_array_1d(jl_array_any_type, 2);
-  JL_GC_PUSH1(&answer);
+  JL_GC_PUSH2(&answer, &res);
   leftv u = (leftv)IDROOT->get(pack.c_str(), 0);
   if (u != NULL)
   {

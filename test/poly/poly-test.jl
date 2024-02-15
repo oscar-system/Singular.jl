@@ -101,7 +101,7 @@ end
    @test length(string(3x^2 + 2x + 1)) > 3
    @test length(sprint(show, "text/plain", 3x^2 + 2x + 1)) > 3
 
-   R, (x, ) = polynomial_ring(residue_ring(ZZ, 5), ["x", ])
+   R, (x, ) = polynomial_ring(residue_ring(ZZ, 5)[1], ["x", ])
 
    @test length(string(3x^2 + 2x + 1)) > 3
    @test length(sprint(show, "text/plain", 3x^2 + 2x + 1)) > 3
@@ -191,7 +191,7 @@ end
 
    @test pol == r
 
-   R, (x, ) = polynomial_ring(residue_ring(ZZ, 6), ["x", ])
+   R, (x, ) = polynomial_ring(residue_ring(ZZ, 6)[1], ["x", ])
 
    @test characteristic(R) == 6
 

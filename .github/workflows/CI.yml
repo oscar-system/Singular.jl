@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - 'master'
-      - 'release-'
+      - 'release-*'
     tags: '*'
   pull_request:
 
@@ -24,8 +24,8 @@ jobs:
       matrix:
         julia-version:
           - '1.6'
-          - '1.9'
-          - '~1.10.0-0'
+          - '1.9'   # to be removed in the near future
+          - '1.10'
           - 'nightly'
         os:
           - ubuntu-latest
@@ -35,7 +35,7 @@ jobs:
             os: macOS-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           # For Codecov, we must also fetch the parent of the HEAD commit to
           # be able to properly deal with PRs / merges
@@ -53,7 +53,7 @@ jobs:
         with:
           depwarn: error
       - name: "Run doctests"
-        if: ${{ matrix.julia-version == '1.9' }}
+        if: ${{ matrix.julia-version == '1.10' }}
         run: |
           julia --project=docs --color=yes --code-coverage -e '
             using Pkg
@@ -67,16 +67,18 @@ jobs:
         uses: julia-actions/julia-processcoverage@v1
       - name: "Upload coverage data to Codecov"
         continue-on-error: true
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   docs:
     name: Documentation
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: julia-actions/setup-julia@v1
         with:
-          version: '1.9'
+          version: '1.10'
       - name: "Cache artifacts"
         uses: julia-actions/cache@v1
       - name: "Build package"

@@ -13,7 +13,7 @@ end
    a = BigInt[1 2 3; 4 5 6]
    @test a == Array(Singular.sbigintmat(a))
 
-   R = Nemo.MatrixAlgebra(Nemo.ZZ, 2)
+   R = Nemo.matrix_ring(Nemo.ZZ, 2)
    a = R([1 2; 3 4])
    b = R([5 6; 7 8])
    @test a == R(Singular.sbigintmat(a))

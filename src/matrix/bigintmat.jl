@@ -10,11 +10,11 @@ function sbigintmat(r::Int, c::Int)
    return sbigintmat(libSingular.bigintmat_init(r, c))
 end
 
-function ncols(m::sbigintmat)
+function number_of_columns(m::sbigintmat)
    return Int(libSingular.bigintmat_ncols(m.ptr))
 end
 
-function nrows(m::sbigintmat)
+function number_of_rows(m::sbigintmat)
    return Int(libSingular.bigintmat_nrows(m.ptr))
 end
 
@@ -58,7 +58,7 @@ end
 # conversion to bigintmat
 
 function sbigintmat(a::Union{Nemo.MatElem{ <: Union{Nemo.Integer, Nemo.ZZRingElem}},
-                          Nemo.MatAlgElem{ <: Union{Nemo.Integer, Nemo.ZZRingElem}}})
+                          Nemo.MatRingElem{ <: Union{Nemo.Integer, Nemo.ZZRingElem}}})
    (r, c) = (nrows(a), ncols(a))
    z = sbigintmat(r, c)
    for i in 1:r, j in 1:c
@@ -97,7 +97,7 @@ function Nemo.matrix(R::Nemo.Ring, a::sbigintmat)
    return z
 end
 
-function (R::Union{Nemo.MatSpace, Nemo.MatAlgebra})(a::sbigintmat)
+function (R::Union{Nemo.MatSpace, Nemo.MatRing})(a::sbigintmat)
    r = nrows(a)
    c = ncols(a)
    r == nrows(R) && c == ncols(R) || error("wrong matrix dimensions")

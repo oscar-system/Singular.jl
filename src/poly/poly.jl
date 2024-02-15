@@ -10,7 +10,7 @@ export spoly, PolyRing, change_base_ring, coeff, coefficients,
        leading_coefficient, leading_exponent_vector, leading_term,
        leading_monomial, lead_exponent,
        monomials, MPolyBuildCtx,
-       nvars, order, ordering, ordering_as_symbol, ordering_size, ordering_weights,
+       number_of_variables, nvars, order, ordering, ordering_as_symbol, ordering_size, ordering_weights,
        @polynomial_ring, primpart, push_term!,
        remove, sort_terms!, symbols,
        tail, terms, total_degree, trailing_coefficient,
@@ -73,7 +73,7 @@ function characteristic(R::PolyRingUnion)
    GC.@preserve R return Int(libSingular.rChar(R.ptr))
 end
 
-function nvars(R::PolyRingUnion)
+function number_of_variables(R::PolyRingUnion)
    return length(R.S)
 end
 

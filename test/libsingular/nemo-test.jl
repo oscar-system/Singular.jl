@@ -219,7 +219,7 @@ end
    @test deepcopy(f1c[1]) == f1c[1]
 end
 
-@testset "Nemo.nf_elem" begin
+@testset "Nemo.AbsSimpleNumFieldElem" begin
    U, z = Nemo.polynomial_ring(Nemo.QQ, "z")
    K, a = Nemo.number_field(z^3 + 3z + 1, "a")
 
@@ -230,8 +230,8 @@ end
    f3 = x^2 + 2x + 1
 
    f1c = [c for c in coefficients(f1)]
-   @test f1c[1] isa Singular.n_FieldElem{Nemo.nf_elem}
-   @test K(f1c[1]) isa Nemo.nf_elem
+   @test f1c[1] isa Singular.n_FieldElem{Nemo.AbsSimpleNumFieldElem}
+   @test K(f1c[1]) isa Nemo.AbsSimpleNumFieldElem
    @test !isempty(string(f1c[1]))
    @test leading_coefficient(f1) == f1c[1]
 
@@ -358,7 +358,7 @@ end
 end
 
 @testset "Nemo.zzModRingElem" begin
-  R = residue_ring(Nemo.ZZ, 15)
+  R = residue_ring(Nemo.ZZ, 15)[1]
   S, (x, y) = polynomial_ring(R, ["x", "y"])
   p = x*2
   @test string(p) == "2*x"
@@ -368,7 +368,7 @@ end
   @test length(p) == 0
   @test is_zero(p)
 
-  R = residue_ring(Nemo.ZZ, 7)
+  R = residue_ring(Nemo.ZZ, 7)[1]
   F = Fp(7)
   for i in -10:10
     @test R(one(F)*i) == one(R)*i
@@ -394,7 +394,7 @@ end
 end
 
 @testset "Nemo.ZZModRingElem" begin
-   U = Nemo.residue_ring(Nemo.ZZ, Nemo.ZZRingElem(11))
+   U = Nemo.residue_ring(Nemo.ZZ, Nemo.ZZRingElem(11))[1]
    R, (x, y) = polynomial_ring(U, ["x", "y"])
 
    wrappedUtype = Singular.n_RingElem{Singular.RingElemWrapper{Nemo.ZZModRing, Nemo.ZZModRingElem}}

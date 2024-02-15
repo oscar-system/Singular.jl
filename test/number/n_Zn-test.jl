@@ -1,8 +1,13 @@
 @testset "n_Zn.constructors" begin
-   F = residue_ring(ZZ, 8)
-   F1 = residue_ring(ZZ, 8)
-   F2 = residue_ring(ZZ, 8, cached = false)
+   F, f = residue_ring(ZZ, 8)
+   F1, = residue_ring(ZZ, 8)
+   F2, = residue_ring(ZZ, 8, cached = false)
 
+   @test f(ZZ(1)) == F(1)
+   @test f(preimage(f, f(ZZ(1)))) == F(1)
+
+   @test domain(f) === ZZ
+   @test codomain(f) === F
    @test F isa Singular.Ring
    @test F1 isa Singular.Ring
    @test F2 isa Singular.Ring
@@ -10,9 +15,9 @@
    @test F != F2
    @test F1 != F2
 
-   F = residue_ring(ZZ, BigInt(10)^50)
-   F1 = residue_ring(ZZ, BigInt(10)^50)
-   F2 = residue_ring(ZZ, BigInt(10)^50, cached = false)
+   F, = residue_ring(ZZ, BigInt(10)^50)
+   F1, = residue_ring(ZZ, BigInt(10)^50)
+   F2, = residue_ring(ZZ, BigInt(10)^50, cached = false)
 
    @test F isa Singular.Ring
    @test F1 isa Singular.Ring
@@ -26,7 +31,7 @@
 end
 
 @testset "n_Zn.printing" begin
-   R = residue_ring(ZZ, 5)
+   R, = residue_ring(ZZ, 5)
 
    @test string(R(3)) == "3"
 
@@ -34,7 +39,7 @@ end
 end
 
 @testset "n_Zn.manipulation" begin
-   R = residue_ring(ZZ, 6)
+   R, = residue_ring(ZZ, 6)
 
    @test isone(one(R))
    @test iszero(zero(R))
@@ -45,28 +50,28 @@ end
 
    @test deepcopy(R(2)) == R(2)
 
-   NR = Nemo.residue_ring(Nemo.ZZ, 6)
+   NR = Nemo.residue_ring(Nemo.ZZ, 6)[1]
    @test R(2) == R(NR(2))
    @test NR(2) == NR(R(2))
 
-   NR = Nemo.residue_ring(Nemo.ZZ, Nemo.ZZ(6))
+   NR = Nemo.residue_ring(Nemo.ZZ, Nemo.ZZ(6))[1]
    @test R(2) == R(NR(2))
    @test NR(2) == NR(R(2))
 end
 
 @testset "n_Zn.unary_ops" begin
-   R = residue_ring(ZZ, 5)
+   R, = residue_ring(ZZ, 5)
 
    @test -R(3) == R(2)
    @test -R() == R()
 
-   R = residue_ring(ZZ, BigInt(10)^40)
+   R, = residue_ring(ZZ, BigInt(10)^40)
    @test iszero(R(10)^40)
 
 end
 
 @testset "n_Zn.binary_ops" begin
-   R = residue_ring(ZZ, 5)
+   R, = residue_ring(ZZ, 5)
 
    a = R(2)
    b = R(3)
@@ -77,14 +82,14 @@ end
 end
 
 @testset "n_Zn.comparison" begin
-   R = residue_ring(ZZ, 5)
+   R, = residue_ring(ZZ, 5)
 
    @test R(2) == R(2)
    @test isequal(R(2), R(2))
 end
 
 @testset "n_Zn.ad_hoc_comparison" begin
-   R = residue_ring(ZZ, 5)
+   R, = residue_ring(ZZ, 5)
 
    @test R(2) == 2
    @test 2 == R(2)
@@ -96,14 +101,14 @@ end
 end
 
 @testset "n_Zn.powering" begin
-   R = residue_ring(ZZ, 5)
+   R, = residue_ring(ZZ, 5)
 
    @test R(2)^10 == R(4)
    @test_throws DomainError R(2)^-rand(1:99)
 end
 
 @testset "n_Zn.exact_division" begin
-   R = residue_ring(ZZ, 5)
+   R, = residue_ring(ZZ, 5)
 
    @test_throws ErrorException inv(zero(R))
    @test_throws ErrorException divexact(one(R), zero(R))
@@ -113,14 +118,14 @@ end
 end
 
 @testset "n_Zn.gcd_lcm" begin
-   R = residue_ring(ZZ, 5)
+   R, = residue_ring(ZZ, 5)
 
    @test gcd(R(2), R(3)) == R(1)
    @test gcd(R(0), R(0)) == R(0)
 end
 
 @testset "n_Zn.extended_gcd" begin
-   R = residue_ring(ZZ, 6)
+   R, = residue_ring(ZZ, 6)
 
    g, s, t = gcdx(R(2), R(4))
 
@@ -132,7 +137,7 @@ end
 end
 
 @testset "n_Zn.Polynomials" begin
-   R = residue_ring(ZZ, 5)
+   R, = residue_ring(ZZ, 5)
    S, x = Nemo.polynomial_ring(R, "x")
 
    f = 1 + 2x + 3x^2

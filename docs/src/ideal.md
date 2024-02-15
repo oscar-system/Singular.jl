@@ -78,7 +78,7 @@ Singular ideal over Singular polynomial ring (ZZ),(x,y),(dp(2),C) with generator
 ### Basic manipulation
 
 ```@docs
-ngens(::sideal)
+number_of_generators(::sideal)
 ```
 
 ```@docs
@@ -129,7 +129,7 @@ julia> R, (x, y) = polynomial_ring(ZZ, ["x", "y"])
 julia> I = Ideal(R, x^2 + 1, x*y)
 Singular ideal over Singular polynomial ring (ZZ),(x,y),(dp(2),C) with generators (x^2 + 1, x*y)
 
-julia> n = ngens(I)
+julia> n = number_of_generators(I)
 2
 
 julia> p = I[1]

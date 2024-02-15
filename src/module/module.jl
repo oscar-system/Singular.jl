@@ -1,5 +1,6 @@
 export jet, minimal_generating_set, ModuleClass, rank, smodule, slimgb,
-       eliminate, modulo, lift, division, divrem, prune_with_map
+       eliminate, modulo, lift, division, divrem, prune_with_map,
+       prune_with_map_projection
 
 ###############################################################################
 #
@@ -19,12 +20,12 @@ parent_type(::Type{smodule{T}}) where T <: AbstractAlgebra.RingElem = ModuleClas
 
 
 @doc raw"""
-    ngens(I::smodule)
+    number_of_generators(I::smodule)
 
 Return the number of generators in the current representation of the module (as a list
 of vectors).
 """
-ngens(I::smodule) = I.ptr == C_NULL ? 0 : Int(libSingular.ngens(I.ptr))
+number_of_generators(I::smodule) = I.ptr == C_NULL ? 0 : Int(libSingular.ngens(I.ptr))
 
 @doc raw"""
     rank(I::smodule)
@@ -402,8 +403,26 @@ and the transformation matrix of id to R.
 """
 function prune_with_map(I::smodule{spoly{T}}) where T <: Nemo.FieldElem
    R = base_ring(I)
-   r, TT_ptr = GC.@preserve I R libSingular.id_prune_map(I.ptr, R.ptr)
+   a = Vector{Int32}()
+   r, TT_ptr = GC.@preserve I R libSingular.id_prune_map_v(I.ptr, a, R.ptr)
    return smodule{spoly{T}}(R, r),smatrix{spoly{T}}(R,TT_ptr)
+end
+
+@doc raw"""
+    prune_with_map_projection(id::smodule{spoly{T}}) where T <: Nemo.FieldElem
+
+Return a module `R`, a transformation matrix `M` and a projection map `p`
+satisfying the following properties: `R` is minimally embedded in a free
+module `parent(R)` such that the quotient `parent(R)/R` is isomorphic to
+`parent(id)/id`, with `M` together with the projection given by the vector `p`
+describing this isomorphism.
+`p` maps `gen(parent(id),i)` to `gen(parent(R),p[i])`
+"""
+function prune_with_map_projection(I::smodule{spoly{T}}) where T <: Nemo.FieldElem
+   R = base_ring(I)
+   a = Vector{Int32}()
+   r, TT_ptr = GC.@preserve I R libSingular.id_prune_map_v(I.ptr, a, R.ptr)
+   return smodule{spoly{T}}(R, r),smatrix{spoly{T}}(R,TT_ptr),a
 end
 
 @doc raw"""

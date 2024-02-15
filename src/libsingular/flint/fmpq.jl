@@ -234,5 +234,5 @@ end
 
 function register(R::Nemo.QQField)
    c = @cfunction(fmpqInitChar, Cint, (Ptr{Cvoid}, Ptr{Cvoid}))
-   return nRegister(n_unknown, c)
+   return nRegister(n_Nemo_QQField, c)
 end
