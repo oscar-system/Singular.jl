@@ -196,14 +196,14 @@ function create_ring_from_singular_ring(r::libSingular.ring_ptr)
       cf = libSingular.nCopyCoeff(c)
       data_ptr = libSingular.nGetCoeffData(cf)
       R = unsafe_pointer_to_objref(data_ptr)
-      basering = N_Field(R)
-      T = Nemo.Field
+      T = elem_type(R)
+      basering = N_Field{T}(R)
    elseif libSingular.nCoeff_is_Nemo_Ring(c)
       cf = libSingular.nCopyCoeff(c)
       data_ptr = libSingular.nGetCoeffData(cf)
       R = unsafe_pointer_to_objref(data_ptr)
-      basering = N_Ring(R)
-      T = Nemo.Ring
+      T = elem_type(R)
+      basering = N_Ring{T}(R)
    else
       basering = N_UnknownSingularCoefficientRing(libSingular.nCopyCoeff(c))
       T = n_unknownsingularcoefficient
