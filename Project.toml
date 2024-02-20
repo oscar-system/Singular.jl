@@ -19,7 +19,7 @@ lib4ti2_jll = "1493ae25-0f90-5c0e-a06c-8c5077d6d66f"
 libsingular_julia_jll = "ae4fbd8f-ecdb-54f8-bbce-35570499b30e"
 
 [compat]
-AbstractAlgebra = "0.37, 0.38, 0.39"
+AbstractAlgebra = "0.37, 0.38, 0.39, 0.40"
 BinaryWrappers = "~0.1.1"
 CxxWrap = "0.14"
 Libdl = "1.6"
