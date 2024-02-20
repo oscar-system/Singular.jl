@@ -106,6 +106,9 @@ function ordering(R::PolyRingUnion)
    return R.ord
 end
 
+# For compatibility with AbstractAlgebra
+internal_ordering(R::PolyRingUnion) = ordering(R)
+
 @doc raw"""
     is_ordering_symbolic(R::PolyRing)
 
