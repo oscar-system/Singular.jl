@@ -31,8 +31,6 @@ export ordering_lp, ordering_ip, ordering_dp, ordering_Dp, ordering_wp, ordering
 parent(p::SPolyUnion) = p.parent
 
 base_ring(R::PolyRing{T}) where T <: Nemo.RingElem = R.base_ring::parent_type(T)
-base_ring(R::PolyRing{N_Field{T}}) where T <: Nemo.RingElem = R.base_ring::parent_type(T)
-base_ring(R::PolyRing{N_Ring{T}}) where T <: Nemo.RingElem = R.base_ring::parent_type(T)
 
 base_ring(p::spoly) = base_ring(parent(p))
 
