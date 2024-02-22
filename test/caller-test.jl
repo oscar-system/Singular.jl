@@ -254,5 +254,5 @@ end
     F = Nemo.fraction_field(Nemo.polynomial_ring(Nemo.ZZ)[1])
     R, x = Singular.polynomial_ring(F, [:x])
     S = Singular.create_ring_from_singular_ring(Singular.libSingular.rCopy(R.ptr))
-    @test R.base_ring == S.base_ring
+    @test base_ring(R) == base_ring(S)
 end
