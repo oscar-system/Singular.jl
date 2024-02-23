@@ -249,3 +249,10 @@ end
     @test Singular.libSingular.random() == 16807
     @test Singular.libSingular.random() == 282475249
 end
+
+@testset "Nemo coeffs" begin
+    F = Nemo.fraction_field(Nemo.polynomial_ring(Nemo.ZZ)[1])
+    R, x = Singular.polynomial_ring(F, [:x])
+    S = Singular.create_ring_from_singular_ring(Singular.libSingular.rCopy(R.ptr))
+    @test base_ring(R) == base_ring(S)
+end

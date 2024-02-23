@@ -192,6 +192,12 @@ function create_ring_from_singular_ring(r::libSingular.ring_ptr)
       minpoly = F(libSingular.algExt_GetMinpoly(c, F.ptr))
       basering = N_AlgExtField(libSingular.nCopyCoeff(c), minpoly)
       T = n_algExt
+   elseif libSingular.nCoeff_is_Nemo_Field(c) || libSingular.nCoeff_is_Nemo_Ring(c)
+      cf = libSingular.nCopyCoeff(c)
+      data_ptr = libSingular.nGetCoeffData(cf)
+      R = unsafe_pointer_to_objref(data_ptr)
+      basering = CoefficientRing(R)  # FIXME: should we set cache=false ?
+      T = elem_type(basering)
    else
       basering = N_UnknownSingularCoefficientRing(libSingular.nCopyCoeff(c))
       T = n_unknownsingularcoefficient
