@@ -713,10 +713,12 @@ void singular_define_ideals(jlcxx::Module & Singular)
   Singular.method("scHilb", [](ideal I, ring r, jlcxx::ArrayRef<int> a) {
     const ring origin = currRing;
     rChangeCurrRing(r);
-    intvec * v = hFirstSeries(I, NULL, r->qideal);
-    int *    content = v->ivGetVec();
+    bigintmat * v = hFirstSeries0b(I, r->qideal, NULL,NULL, r,coeffs_BIGINT);
     for (int j = 0; j < v->length(); j++)
-      a.push_back(content[j]);
+    {
+      number n=(*v)[j];
+      a.push_back(n_Int(n,coeffs_BIGINT));
+    }
     delete v;
     rChangeCurrRing(origin);
   });
