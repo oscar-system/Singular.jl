@@ -727,12 +727,12 @@ void singular_define_ideals(jlcxx::Module & Singular)
     intvec *   w = to_intvec(weights);
     const ring origin = currRing;
     rChangeCurrRing(r);
-    intvec * v = hFirstSeries(I, NULL, r->qideal, w);
+    bigintmat * v = hFirstSeries0b(I, r->qideal, w, NULL,r,coeffs_BIGINT);
     delete w;
-    int * content = v->ivGetVec();
     for (int j = 0; j < v->length(); j++)
     {
-      a.push_back(content[j]);
+      number n=(*v)[j];
+      a.push_back(n_Int(n,coeffs_BIGINT));
     }
     delete v;
     rChangeCurrRing(origin);
@@ -744,13 +744,13 @@ void singular_define_ideals(jlcxx::Module & Singular)
     intvec *   sh = to_intvec(shifts);
     const ring origin = currRing;
     rChangeCurrRing(r);
-    intvec * v = hFirstSeries(I, sh, r->qideal, w);
+    bigintmat * v = hFirstSeries0b(I, r->qideal, w, sh,r,coeffs_BIGINT);
     delete sh;
     delete w;
-    int * content = v->ivGetVec();
     for (int j = 0; j < v->length(); j++)
     {
-      a.push_back(content[j]);
+      number n=(*v)[j];
+      a.push_back(n_Int(n,coeffs_BIGINT));
     }
     delete v;
     rChangeCurrRing(origin);
