@@ -1475,12 +1475,13 @@ end
 Return the coeffcients of polynomial $Q(t)$ where $\frac{Q(t)}{\prod_i (1-t)}$
 is the Hilbert-Poincare series of $I$ for weights 1.
 The generators of $I$ must be given as a Groebner basis.
-The coefficients are of type snumbner{n_Z}, i.e. GMP numbers
+The coefficients are of type BigInt
 """
 function hilbert_series_data(I::sideal{spoly{T}}) where T <: Nemo.FieldElem
    Qt,(t,) = polynomial_ring(ZZ, ["t"])
    h = hilbert_series(I,Qt)
-   return [c for c in coefficients(h)]
+   v = [convert(BigInt,c) for c in coefficients(h)]
+   return v
 end
 
 @doc raw"""
@@ -1490,12 +1491,13 @@ Return the coeffcients of polynomial $Q(t)$ where $\frac{Q(t)}{\prod_i (1-t^{w_i
 is the Hilbert-Poincare series of $I$ for weights $\{w_i\}$. Each weight must be
 positive $w_i > 0$.
 The generators of $I$ must be given as a Groebner basis.
-The coefficients are of type snumbner{n_Z}, i.e. GMP numbers
+The coefficients are of type BigInt
 """
 function hilbert_series_data(I::sideal{spoly{T}}, w::Vector{<:Integer}) where T <: Nemo.FieldElem
    Qt,(t,) = polynomial_ring(ZZ, ["t"])
    h = hilbert_series(I,w,Qt)
-   return [c for c in coefficients(h)]
+   v = [convert(BigInt,c) for c in coefficients(h)]
+   return v
 end
 
 @doc raw"""
