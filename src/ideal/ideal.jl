@@ -1475,7 +1475,7 @@ end
 Return the coeffcients of polynomial $Q(t)$ where $\frac{Q(t)}{\prod_i (1-t)}$
 is the Hilbert-Poincare series of $I$ for weights 1.
 The generators of $I$ must be given as a Groebner basis.
-The coefficients are of type BigInt
+The coefficients are of type `BigInt`.
 """
 function hilbert_series_data(I::sideal{spoly{T}}) where T <: Nemo.FieldElem
    Qt,(t,) = polynomial_ring(ZZ, ["t"])
