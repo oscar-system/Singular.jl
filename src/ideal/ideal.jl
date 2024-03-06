@@ -4,7 +4,8 @@ export sideal, IdealSet, syz, lead, normalize!, is_constant, is_zerodim, fglm,
        number_of_generators, ngens, nres, sres,
        intersection, homogenize_ideal, homogenize_ideal_with_weights,
        quotient, reduce, eliminate, kernel, equal, contains, is_var_generated,
-       saturation, saturation2, satstd, slimgb, std, vdim, interreduce, degree, mult,
+       saturation, saturation2, satstd, slimgb, std, std_with_HC,
+       vdim, interreduce, degree, mult,
        hilbert_series, std_hilbert, is_homogeneous, division, divrem, divrem2, mstd
 
 ###############################################################################
@@ -670,6 +671,19 @@ function std(I::sideal{S}; complete_reduction::Bool=false) where S <: SPolyUnion
    end
    libSingular.idSkipZeroes(ptr)
    return sideal{S}(R, ptr, true, I.isTwoSided)
+end
+
+@doc raw"""
+    std_with_HC(I::sideal{{spoly{T}}, HC::spoly{T}) where T <: Nemo.FieldElem
+
+Compute a standard basis for the 0-dimensional ideal $I$
+ignoring all monomial larger than HC wrt. the monomial ordering
+"""
+function std_with_HC(I::sideal{spoly{T}}, HC::spoly{T}) where T <: Nemo.FieldElem
+   R = base_ring(I)
+   ptr = GC.@preserve I R libSingular.id_StdHC(I.ptr, HC.ptr, R.ptr)
+   libSingular.idSkipZeroes(ptr)
+   return sideal{spoly{T}}(R, ptr, true, I.isTwoSided)
 end
 
 @doc raw"""

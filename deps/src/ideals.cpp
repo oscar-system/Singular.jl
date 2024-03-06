@@ -200,6 +200,31 @@ auto id_Std_helper(ideal a, ring b, bool complete_reduction = false)
   return id;
 }
 
+auto id_StdHC_helper(ideal a, poly HC, ring b)
+{
+  ideal id = NULL;
+  if (!idIs0(a))
+  {
+    intvec *     n = NULL;
+    tHomog       h = testHomog;
+    const ring   origin = currRing;
+    rChangeCurrRing(b);
+    p_Delete(&(b->ppNoether),b);
+    poly NN=p_Copy(HC,b);
+    p_IncrExp(NN,b->N,b);
+    p_Setm(NN,b);
+    b->ppNoether=NN;
+    id = kStd(a, b->qideal, h, &n);
+    rChangeCurrRing(origin);
+    if (n != NULL)
+      delete n;
+    p_Delete(&(b->ppNoether),b);
+  }
+  else
+    id = idInit(0, a->rank);
+  return id;
+}
+
 auto id_MinStd_helper(ideal a, ring b, bool complete_reduction = false)
 {
   // bool complete_reduction= false;
@@ -427,6 +452,7 @@ void singular_define_ideals(jlcxx::Module & Singular)
   Singular.method("id_MinStd", &id_MinStd_helper);
   Singular.method("id_TwoStd", &id_TwoStd_helper);
   Singular.method("id_Std", &id_Std_helper);
+  Singular.method("id_StdHC", &id_StdHC_helper);
   Singular.method("id_StdHilb", &id_StdHilb_helper);
   Singular.method("id_StdHilbWeighted", &id_StdHilbWeighted_helper);
 

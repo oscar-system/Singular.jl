@@ -590,6 +590,15 @@ end
    @test ngens(kbase(std(Ideal(R, x^2, y^3, x*y*z)), 2)) == 5
 end
 
+@testset "sideal.std_with_HC" begin
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"], ordering=:negdegrevlex)
+
+   I = Ideal(R, x^2+x^5+x^4*y^4, y^2)
+
+   @test isequal(std_with_HC(I,x*y), Ideal(R, [x^2,y^2]))
+end
+
+
 @testset "sideal.independent_set" begin
    R, (x, y, u, v, w) = polynomial_ring(QQ, ["x", "y", "u", "v", "w"])
 
