@@ -6,7 +6,8 @@ export sideal, IdealSet, syz, lead, normalize!, is_constant, is_zerodim, fglm,
        quotient, reduce, eliminate, kernel, equal, contains, is_var_generated,
        saturation, saturation2, satstd, slimgb, std, std_with_HC,
        vdim, interreduce, degree, mult,
-       hilbert_series, std_hilbert, is_homogeneous, division, divrem, divrem2, mstd
+       hilbert_series, hilbert_series_data, std_hilbert,
+       is_homogeneous, division, divrem, divrem2, mstd
 
 ###############################################################################
 #
@@ -1465,7 +1466,7 @@ function hilbert_series(I::sideal{spoly{T}}, Qt::PolyRing) where T <: Nemo.Field
 end
 
 @doc raw"""
-    hilbert_series(I::sideal{spoly{T}}, w::Vector{<:Integer}) where T <: Nemo.FieldElem
+    hilbert_series(I::sideal{spoly{T}}, w::Vector{<:Integer}, Qt::PolyRing) where T <: Nemo.FieldElem
 
 Return the polynomial $Q(t)$ of Qt where $\frac{Q(t)}{\prod_i (1-t^{w_i})}$
 is the Hilbert-Poincare series of $I$ for weights $\{w_i\}$. Each weight must be
@@ -1480,6 +1481,37 @@ function hilbert_series(I::sideal{spoly{T}}, w::Vector{<:Integer}, Qt::PolyRing)
    w = convert(Vector{Int32}, w)
    GC.@preserve I R Qt new_ptr = libSingular.scHilbPolyWeighted(I.ptr, R.ptr, w, Qt.ptr)
    return Qt(new_ptr)
+end
+
+@doc raw"""
+    hilbert_series_data(I::sideal{spoly{T}}) where T <: Nemo.FieldElem
+
+Return the coeffcients of polynomial $Q(t)$ where $\frac{Q(t)}{\prod_i (1-t)}$
+is the Hilbert-Poincare series of $I$ for weights 1.
+The generators of $I$ must be given as a Groebner basis.
+The coefficients are of type `BigInt`.
+"""
+function hilbert_series_data(I::sideal{spoly{T}}) where T <: Nemo.FieldElem
+   Qt,(t,) = polynomial_ring(ZZ, ["t"])
+   h = hilbert_series(I,Qt)
+   v = [convert(BigInt,c) for c in coefficients(h)]
+   return v
+end
+
+@doc raw"""
+    hilbert_series_data(I::sideal{spoly{T}}, w::Vector{<:Integer}) where T <: Nemo.FieldElem
+
+Return the coeffcients of polynomial $Q(t)$ where $\frac{Q(t)}{\prod_i (1-t^{w_i})}$
+is the Hilbert-Poincare series of $I$ for weights $\{w_i\}$. Each weight must be
+positive $w_i > 0$.
+The generators of $I$ must be given as a Groebner basis.
+The coefficients are of type `BigInt`.
+"""
+function hilbert_series_data(I::sideal{spoly{T}}, w::Vector{<:Integer}) where T <: Nemo.FieldElem
+   Qt,(t,) = polynomial_ring(ZZ, ["t"])
+   h = hilbert_series(I,w,Qt)
+   v = [convert(BigInt,c) for c in coefficients(h)]
+   return v
 end
 
 @doc raw"""
