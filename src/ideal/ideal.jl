@@ -677,7 +677,7 @@ end
     std_with_HC(I::sideal{{spoly{T}}, HC::spoly{T}) where T <: Nemo.FieldElem
 
 Compute a standard basis for the 0-dimensional ideal $I$
-ignoring all monomial larger than HC wrt. the monomial ordering
+ignoring all monomials larger than HC wrt. the monomial ordering.
 """
 function std_with_HC(I::sideal{spoly{T}}, HC::spoly{T}) where T <: Nemo.FieldElem
    R = base_ring(I)
