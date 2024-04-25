@@ -170,35 +170,12 @@ function __init__()
    merge!(mapping_types_reversed, Dict( i[2] => i[1] for i in libSingular.get_type_mapper() ))
    merge!(casting_functions, create_casting_functions())
 
-   # Check if were loaded from another package
-   # if VERSION < 1.7.*, only the "other" package will have the
-   # _tryrequire_from_serialized in the backtrace.
-   # if VERSION >= 1.8, also doing 'using Package' will have
-   # _tryrequire_from_serialized the backtrace.
-   #
-   # To still distinguish both scenarios, notice that
-   # 'using OtherPackage' will either have _tryrequire_from_serialized at least twice,
-   # or one with four arguments (hence five as the function name is the first argument)
-   # 'using Package' serialized will have a version with less arguments
-   bt = Base.process_backtrace(Base.backtrace())
-   filter!(sf -> sf[1].func === :_tryrequire_from_serialized, bt)
-   isinteractive_manual =
-     length(bt) == 0 || (length(bt) == 1 && length(only(bt)[1].linfo.specTypes.parameters) < 4)
-
-   # Respect the -q and --banner flag
-   allowbanner = Base.JLOptions().banner != 0
-
-   show_banner = allowbanner && isinteractive_manual && isinteractive() &&
-                !any(x->x.name in ["Oscar"], keys(Base.package_locks)) &&
-                get(ENV, "SINGULAR_PRINT_BANNER", "true") != "false"
-
    singular_version_nr=Singular.libSingular.version()
    ver = digits(singular_version_nr, base = 10)
-   svn = "$(ver[4]).$(ver[3]).$(ver[2])"
-   if ver[1] > 0
-     svn *= "p$(ver[1])"
-   end
-   if show_banner
+   svn = "$(ver[5]).$(ver[4]).$(ver[3])"
+   svn *= "p$(ver[2])$(ver[1])"
+
+   if AbstractAlgebra.should_show_banner() && get(ENV, "SINGULAR_PRINT_BANNER", "true") != "false"
      println("""Singular.jl, based on
                      SINGULAR                               /
  A Computer Algebra System for Polynomial Computations     /  Singular.jl: $VERSION_NUMBER
