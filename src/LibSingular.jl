@@ -2,7 +2,7 @@ module libSingular
 
 using CxxWrap
 
-import ..Singular: libflint, libantic, libsingular_julia, AbstractAlgebra
+import ..Singular: libflint, libsingular_julia, AbstractAlgebra
 
 @wrapmodule(libsingular_julia)
 
