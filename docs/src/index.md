@@ -53,12 +53,11 @@ julia> G = std(I)
 Singular ideal over Singular polynomial ring (QQ),(x,y),(dp(2),C) with generators (x - y, y^2 + 1)
 
 julia> Z = syz(G)
-Singular Module over Singular polynomial ring (QQ),(x,y),(dp(2),C), with Generators:
+Singular module over Singular polynomial ring (QQ),(x,y),(dp(2),C), with generators:
 y^2*gen(1)-x*gen(2)+y*gen(2)+gen(1)
 
 julia> F = fres(G, 0)
-Singular Resolution:
-R^1 <- R^2 <- R^1
+Singular resolution: R^1 <- R^2 <- R^1
 
 julia> F[1]
 Singular ideal over Singular polynomial ring (QQ),(x,y),(dp(2),C) with generators (x - y, y^2 + 1)

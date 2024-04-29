@@ -71,7 +71,7 @@ julia> R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 (Singular polynomial ring (QQ),(x,y),(dp(2),C), spoly{n_Q}[x, y])
 
 julia> M = FreeModule(R, 3)
-Free Module of rank 3 over Singular polynomial ring (QQ),(x,y),(dp(2),C)
+Free module of rank 3 over Singular polynomial ring (QQ),(x,y),(dp(2),C)
 
 julia> v2 = M([x + 1, x*y + 1, y])
 x*y*gen(2)+x*gen(1)+y*gen(3)+gen(2)+gen(1)
@@ -98,7 +98,7 @@ julia> R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 (Singular polynomial ring (QQ),(x,y),(dp(2),C), spoly{n_Q}[x, y])
 
 julia> M = FreeModule(R, 5)
-Free Module of rank 5 over Singular polynomial ring (QQ),(x,y),(dp(2),C)
+Free module of rank 5 over Singular polynomial ring (QQ),(x,y),(dp(2),C)
 
 julia> v = gens(M)
 5-element Vector{svector{spoly{n_Q}}}:

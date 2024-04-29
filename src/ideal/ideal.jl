@@ -948,7 +948,7 @@ julia> I = Ideal(R, x^2*y + 2y + 1, y^2 + 1)
 Singular ideal over Singular polynomial ring (QQ),(x,y),(dp(2),C) with generators (x^2*y + 2*y + 1, y^2 + 1)
 
 julia> F = syz(I)
-Singular Module over Singular polynomial ring (QQ),(x,y),(dp(2),C), with Generators:
+Singular module over Singular polynomial ring (QQ),(x,y),(dp(2),C), with generators:
 x^2*y*gen(2)-y^2*gen(1)+2*y*gen(2)+gen(2)-gen(1)
 
 julia> M = Singular.Matrix(I)

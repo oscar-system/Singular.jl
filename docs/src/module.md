@@ -77,7 +77,7 @@ julia> v2 = vector(R, x^2 + 1, 2x + 3y, x)
 x^2*gen(1)+x*gen(3)+2*x*gen(2)+3*y*gen(2)+gen(1)
 
 julia> M = Singular.Module(R, v1, v2)
-Singular Module over Singular polynomial ring (QQ),(x,y),(dp(2),C), with Generators:
+Singular module over Singular polynomial ring (QQ),(x,y),(dp(2),C), with generators:
 x*y*gen(2)+x*gen(1)+y*gen(3)+gen(2)+gen(1)
 x^2*gen(1)+x*gen(3)+2*x*gen(2)+3*y*gen(2)+gen(1)
 ```
@@ -116,7 +116,7 @@ julia> v2 = vector(R, x^2 + 1, 2x + 3y, x)
 x^2*gen(1)+x*gen(3)+2*x*gen(2)+3*y*gen(2)+gen(1)
 
 julia> M = Singular.Module(R, v1, v2)
-Singular Module over Singular polynomial ring (QQ),(x,y),(dp(2),C), with Generators:
+Singular module over Singular polynomial ring (QQ),(x,y),(dp(2),C), with generators:
 x*y*gen(2)+x*gen(1)+y*gen(3)+gen(2)+gen(1)
 x^2*gen(1)+x*gen(3)+2*x*gen(2)+3*y*gen(2)+gen(1)
 
@@ -162,13 +162,13 @@ julia> v3 = x*v1 + y*v2 + vector(R, x, y + 1, y^2)
 x^2*y*gen(2)+x^2*y*gen(1)+x^2*gen(1)+2*x*y*gen(3)+2*x*y*gen(2)+y^2*gen(3)+3*y^2*gen(2)+x*gen(2)+2*x*gen(1)+y*gen(2)+y*gen(1)+gen(2)
 
 julia> M = Singular.Module(R, v1, v2, v3)
-Singular Module over Singular polynomial ring (QQ),(x,y),(dp(2),C), with Generators:
+Singular module over Singular polynomial ring (QQ),(x,y),(dp(2),C), with generators:
 x*y*gen(2)+x*gen(1)+y*gen(3)+gen(2)+gen(1)
 x^2*gen(1)+x*gen(3)+2*x*gen(2)+3*y*gen(2)+gen(1)
 x^2*y*gen(2)+x^2*y*gen(1)+x^2*gen(1)+2*x*y*gen(3)+2*x*y*gen(2)+y^2*gen(3)+3*y^2*gen(2)+x*gen(2)+2*x*gen(1)+y*gen(2)+y*gen(1)+gen(2)
 
 julia> G = std(M; complete_reduction=true)
-Singular Module over Singular polynomial ring (QQ),(x,y),(dp(2),C), with Generators:
+Singular module over Singular polynomial ring (QQ),(x,y),(dp(2),C), with generators:
 y^2*gen(3)+x*gen(1)+y*gen(2)+gen(2)
 x*y*gen(2)+x*gen(1)+y*gen(3)+gen(2)+gen(1)
 x^2*gen(1)+x*gen(3)+2*x*gen(2)+3*y*gen(2)+gen(1)
@@ -199,24 +199,24 @@ julia> v = y*v1+x*v2+z*v3
 x^2*gen(3)-y^2*gen(3)+x*z*gen(2)-x*z*gen(1)+y*z*gen(2)+y*z*gen(1)
 
 julia> M = Singular.Module(R, v1, v2, v3)
-Singular Module over Singular polynomial ring (QQ),(x,y,z),(dp(3),C), with Generators:
+Singular module over Singular polynomial ring (QQ),(x,y,z),(dp(3),C), with generators:
 -y*gen(3)+z*gen(2)
 x*gen(3)-z*gen(1)
 x*gen(2)+y*gen(1)
 
 julia> B = std(M; complete_reduction=true)
-Singular Module over Singular polynomial ring (QQ),(x,y,z),(dp(3),C), with Generators:
+Singular module over Singular polynomial ring (QQ),(x,y,z),(dp(3),C), with generators:
 y*gen(3)-z*gen(2)
 x*gen(2)+y*gen(1)
 x*gen(3)-z*gen(1)
 y*z*gen(1)
 
 julia> V = Singular.Module(R, v)
-Singular Module over Singular polynomial ring (QQ),(x,y,z),(dp(3),C), with Generators:
+Singular module over Singular polynomial ring (QQ),(x,y,z),(dp(3),C), with generators:
 x^2*gen(3)-y^2*gen(3)+x*z*gen(2)-x*z*gen(1)+y*z*gen(2)+y*z*gen(1)
 
 julia> reduce(V,B)
-Singular Module over Singular polynomial ring (QQ),(x,y,z),(dp(3),C), with Generators:
+Singular module over Singular polynomial ring (QQ),(x,y,z),(dp(3),C), with generators:
 0
 
 ```
@@ -240,12 +240,12 @@ julia> v2 = vector(R, (x + 1)*x, (x*y + 1)*x, x)
 x^2*y*gen(2)+x^2*gen(1)+x*gen(3)+x*gen(2)+x*gen(1)
 
 julia> M = Singular.Module(R, v1, v2)
-Singular Module over Singular polynomial ring (QQ),(x,y),(dp(2),C), with Generators:
+Singular module over Singular polynomial ring (QQ),(x,y),(dp(2),C), with generators:
 x*y^2*gen(2)+x*y*gen(1)+y*gen(3)+y*gen(2)+y*gen(1)
 x^2*y*gen(2)+x^2*gen(1)+x*gen(3)+x*gen(2)+x*gen(1)
 
 julia> Z = syz(M)
-Singular Module over Singular polynomial ring (QQ),(x,y),(dp(2),C), with Generators:
+Singular module over Singular polynomial ring (QQ),(x,y),(dp(2),C), with generators:
 x*gen(1)-y*gen(2)
 ```
 
@@ -268,13 +268,12 @@ julia> v2 = vector(R, x^2 + 1, 2x + 3y, x)
 x^2*gen(1)+x*gen(3)+2*x*gen(2)+3*y*gen(2)+gen(1)
 
 julia> M = std(Singular.Module(R, v1, v2))
-Singular Module over Singular polynomial ring (QQ),(x,y),(dp(2),C), with Generators:
+Singular module over Singular polynomial ring (QQ),(x,y),(dp(2),C), with generators:
 x*y*gen(2)+x*gen(1)+y*gen(3)+gen(2)+gen(1)
 x^2*gen(1)+x*gen(3)+2*x*gen(2)+3*y*gen(2)+gen(1)
 
 julia> F = sres(M, 0)
-Singular Resolution:
-R^3 <- R^2
+Singular resolution: R^3 <- R^2
 
 julia> M1 = Singular.Matrix(M)
 [x + 1, x^2 + 1
@@ -308,12 +307,12 @@ julia> v2 = vector(R, x^5 + 1, 2x^3 + 3y^2, x^2)
 x^5*gen(1)+2*x^3*gen(2)+x^2*gen(3)+3*y^2*gen(2)+gen(1)
 
 julia> M = Singular.Module(R, v1, v2)
-Singular Module over Singular polynomial ring (QQ),(x,y),(dp(2),C), with Generators:
+Singular module over Singular polynomial ring (QQ),(x,y),(dp(2),C), with generators:
 x*y*gen(2)+x*gen(1)+y*gen(3)+gen(2)+gen(1)
 x^5*gen(1)+2*x^3*gen(2)+x^2*gen(3)+3*y^2*gen(2)+gen(1)
 
 julia> N = jet(M,3)
-Singular Module over Singular polynomial ring (QQ),(x,y),(dp(2),C), with Generators:
+Singular module over Singular polynomial ring (QQ),(x,y),(dp(2),C), with generators:
 x*y*gen(2)+x*gen(1)+y*gen(3)+gen(2)+gen(1)
 2*x^3*gen(2)+x^2*gen(3)+3*y^2*gen(2)+gen(1)
 ```
@@ -346,7 +345,7 @@ julia> v3 = v1 + v2
 y*gen(2)+y*gen(1)
 
 julia> M = Singular.Module(R, v1, v2, v3)
-Singular Module over Singular polynomial ring (QQ),(x,y),(ds(2),C), with Generators:
+Singular module over Singular polynomial ring (QQ),(x,y),(ds(2),C), with generators:
 x*gen(1)+y^2*gen(2)
 -x*gen(1)+y*gen(2)+y*gen(1)-y^2*gen(2)
 y*gen(2)+y*gen(1)

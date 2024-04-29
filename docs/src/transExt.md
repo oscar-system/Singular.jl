@@ -60,13 +60,13 @@ Coerce a Flint integer value into the field.
 
 ```jldoctest
 julia> F1, (a, b, c) = FunctionField(QQ, ["a", "b", "c"])
-(Function Field over Rational Field with transcendence basis n_transExt[a, b, c], n_transExt[a, b, c])
+(Function field over Rational field with transcendence basis n_transExt[a, b, c], n_transExt[a, b, c])
 
 julia> x1 = a*b + c
 a*b + c
 
 julia> F2, (a1, a2, a3) = FunctionField(Fp(5), 3)
-(Function Field over Finite Field of Characteristic 5 with transcendence basis n_transExt[a1, a2, a3], n_transExt[a1, a2, a3])
+(Function field over Finite field of characteristic 5 with transcendence basis n_transExt[a1, a2, a3], n_transExt[a1, a2, a3])
 
 julia> x2 = a1^5 + a2*a3^4
 a1^5 + a2*a3^4
@@ -98,7 +98,7 @@ n_transExt_to_spoly(x::n_transExt; parent::PolyRing)
 
 ```jldoctest
 julia> F1, (a, b, c) = FunctionField(QQ, ["a", "b", "c"])
-(Function Field over Rational Field with transcendence basis n_transExt[a, b, c], n_transExt[a, b, c])
+(Function field over Rational field with transcendence basis n_transExt[a, b, c], n_transExt[a, b, c])
 
 julia> x = F1(5)*a
 5*a
@@ -122,7 +122,7 @@ julia> p = n_transExt_to_spoly(y, parent_ring = S)
 a^2*b + a*b + b^2
 
 julia> F2, = FunctionField(Fp(7), 4)
-(Function Field over Finite Field of Characteristic 7 with transcendence basis n_transExt[a1, a2, a3, a4], n_transExt[a1, a2, a3, a4])
+(Function field over Finite field of characteristic 7 with transcendence basis n_transExt[a1, a2, a3, a4], n_transExt[a1, a2, a3, a4])
 
 julia> B = transcendence_basis(F2)
 4-element Vector{n_transExt}:

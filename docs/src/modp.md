@@ -65,7 +65,7 @@ Coerce a Singular or Flint integer value into the field.
 
 ```jldoctest
 julia> R = Fp(23)
-Finite Field of Characteristic 23
+Finite field of characteristic 23
 
 julia> a = R(5)
 5
@@ -90,7 +90,7 @@ $[0, p)$.
 
 ```jldoctest
 julia> R = Fp(23)
-Finite Field of Characteristic 23
+Finite field of characteristic 23
 
 julia> a = R(5)
 5
