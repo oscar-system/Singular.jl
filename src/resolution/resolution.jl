@@ -125,7 +125,7 @@ end
 function show(io::IO, r::sresolution)
    io = pretty(io)
    GC.@preserve r begin
-      println(io, LowercaseOff(), "Singular resolution:")
+      print(io, LowercaseOff(), "Singular resolution: ")
       len = length(r)
       if len > 0
          ptr = libSingular.getindex_internal(r.ptr, 0, r.minimal)
