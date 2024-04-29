@@ -118,13 +118,14 @@ end
 ###############################################################################
 
 function show(io::IO, R::ResolutionSet)
-   print(io, "Set of Singular Resolutions over ")
-   show(io, R.base_ring)
+   print(io, "Set of Singular resolutions over ")
+   show(terse(io), R.base_ring)
 end
 
 function show(io::IO, r::sresolution)
+   io = pretty(io)
    GC.@preserve r begin
-      println(io, "Singular Resolution:")
+      println(io, LowercaseOff(), "Singular resolution:")
       len = length(r)
       if len > 0
          ptr = libSingular.getindex_internal(r.ptr, 0, r.minimal)

@@ -114,7 +114,7 @@ canonical_unit(x::n_Q) = x
 ###############################################################################
 
 function show(io::IO, c::Rationals)
-   print(io, "Rational Field")
+   print(io, "Rational field")
 end
 
 function expressify(n::n_Q; context = nothing)::Any

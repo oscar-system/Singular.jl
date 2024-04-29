@@ -78,8 +78,8 @@ end
 ###############################################################################
 
 function show(io::IO, S::matrix_space)
-   print(io, "Space of ", S.nrows, "x", S.ncols, " Singular Matrices over ")
-   show(io, base_ring(S))
+   print(io, "Space of ", S.nrows, "x", S.ncols, " Singular matrices over ")
+   show(terse(io), base_ring(S))
 end
 
 function show(io::IO, M::smatrix)

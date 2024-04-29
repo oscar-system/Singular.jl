@@ -46,7 +46,7 @@ import AbstractAlgebra: AbstractAlgebra, diagonal_matrix, factor,
                         identity_matrix, kernel, number_of_columns, ncols, number_of_generators, ngens, number_of_rows, nrows, order,
                         preimage, zero_matrix, expressify
 
-import AbstractAlgebra: pretty, Lowercase, LowercaseOff, Indent, Dedent
+import AbstractAlgebra: pretty, Lowercase, LowercaseOff, Indent, Dedent, terse, is_terse
 
 import Nemo: add!, addeq!, base_ring, canonical_unit,
              change_base_ring, characteristic, check_parent, codomain,

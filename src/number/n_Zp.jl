@@ -68,7 +68,7 @@ canonical_unit(x::n_Zp) = x
 ###############################################################################
 
 function show(io::IO, c::N_ZpField)
-   print(io, "Finite Field of Characteristic ", characteristic(c))
+   print(io, "Finite field of characteristic ", characteristic(c))
 end
 
 function expressify(n::n_Zp; context = nothing)::Any

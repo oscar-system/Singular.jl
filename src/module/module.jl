@@ -79,14 +79,15 @@ end
 ###############################################################################
 
 function show(io::IO, S::ModuleClass)
-   print(io, "Class of Singular Modules over ")
-   show(io, base_ring(S))
+   print(io, "Class of Singular modules over ")
+   show(terse(io), base_ring(S))
 end
 
 function show(io::IO, I::smodule)
-   print(io, "Singular Module over ")
-   show(io, base_ring(I))
-   println(io,", with Generators:")
+   io = pretty(io)
+   print(io, LowercaseOff(), "Singular module over ")
+   show(terse(io), base_ring(I))
+   println(io,", with generators:")
    n = ngens(I)
    for i = 1:n
       show(io, I[i])

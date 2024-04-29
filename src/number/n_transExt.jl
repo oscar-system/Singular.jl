@@ -154,7 +154,7 @@ canonical_unit(x::n_transExt) = x
 ###############################################################################
 
 function show(io::IO, F::N_FField)
-   print(io, "Function Field over ", base_ring(F), " with transcendence basis ", transcendence_basis(F))
+   print(terse(io), "Function field over ", base_ring(F), " with transcendence basis ", transcendence_basis(F))
 end
 
 function expressify(a::n_transExt; context = nothing)::Any

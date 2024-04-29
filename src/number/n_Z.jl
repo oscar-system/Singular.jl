@@ -95,7 +95,7 @@ canonical_unit(x::n_Z) = is_negative(x) ? -one(parent(x)) : one(parent(x))
 ###############################################################################
 
 function show(io::IO, c::Integers)
-   print(io, "Integer Ring")
+   print(io, "Integer ring")
 end
 
 function expressify(n::n_Z; context = nothing)::Any

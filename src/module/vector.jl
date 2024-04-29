@@ -69,8 +69,8 @@ end
 ###############################################################################
 
 function show(io::IO, R::FreeMod)
-   print(io, "Free Module of rank ", R.rank, " over ")
-   show(io, R.base_ring)
+   print(io, "Free module of rank ", R.rank, " over ")
+   show(terse(io), R.base_ring)
 end
 
 function show(io::IO, a::svector)
