@@ -79,14 +79,15 @@ end
 ###############################################################################
 
 function show(io::IO, S::ModuleClass)
-   print(io, "Class of Singular Modules over ")
-   show(io, base_ring(S))
+   print(io, "Class of Singular modules over ")
+   show(terse(io), base_ring(S))
 end
 
 function show(io::IO, I::smodule)
-   print(io, "Singular Module over ")
-   show(io, base_ring(I))
-   println(io,", with Generators:")
+   io = pretty(io)
+   print(io, LowercaseOff(), "Singular module over ")
+   show(terse(io), base_ring(I))
+   println(io,", with generators:")
    n = ngens(I)
    for i = 1:n
       show(io, I[i])
@@ -144,7 +145,7 @@ julia> M1 = Singular.Module(R, v1, v2);
 julia> M2 = Singular.Module(R, v2, v3);
 
 julia> M3 = intersection(M1, M2)
-Singular Module over Singular polynomial ring (QQ),(x,y),(dp(2),C), with Generators:
+Singular module over Singular polynomial ring (QQ),(x,y),(dp(2),C), with generators:
 x^2*gen(1)+x*gen(3)+2*x*gen(2)+3*y*gen(2)+gen(1)
 
 julia> ngens(M3)

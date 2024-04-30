@@ -7,11 +7,12 @@ export slpalg, LPRing, FreeAlgebra
 ###############################################################################
 
 function show(io::IO, R::LPRing)
+   io = pretty(io)
    GC.@preserve R s = libSingular.rString(R.ptr)
    if libSingular.rIsQuotientRing(R.ptr)
-      print(io, "Singular letterplace Quotient Ring ", s)
+      print(io, LowercaseOff(), "Singular letterplace quotient ring ", s)
    else
-      print(io, "Singular letterplace Ring ", s)
+      print(io, LowercaseOff(), "Singular letterplace ring ", s)
    end
 end
 

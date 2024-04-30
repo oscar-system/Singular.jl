@@ -94,7 +94,7 @@ canonical_unit(x::n_GF) = x
 ###############################################################################
 
 function show(io::IO, c::N_GField)
-   print(io, "Finite Field of Characteristic ", characteristic(c), " and degree ", degree(c))
+   print(io, "Finite field of characteristic ", characteristic(c), " and degree ", degree(c))
 end
 
 function expressify(a::n_GF; context = nothing)::Any

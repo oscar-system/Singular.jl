@@ -76,7 +76,7 @@ canonical_unit(x::n_Zn) = x
 ###############################################################################
 
 function show(io::IO, c::N_ZnRing)
-   print(io, "Residue Ring of Integer Ring modulo ", characteristic(c))
+   print(io, "Residue ring of integer ring modulo ", characteristic(c))
 end
 
 function BigInt(n::n_Zn)

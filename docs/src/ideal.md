@@ -363,12 +363,10 @@ julia> I = Ideal(R, x^2*y + 2y + 1, y^2 + 1)
 Singular ideal over Singular polynomial ring (QQ),(x,y),(dp(2),C) with generators (x^2*y + 2*y + 1, y^2 + 1)
 
 julia> F1 = fres(std(I), 0)
-Singular Resolution:
-R^1 <- R^2 <- R^1
+Singular resolution: R^1 <- R^2 <- R^1
 
 julia> F2 = sres(std(I), 2)
-Singular Resolution:
-R^1 <- R^2 <- R^1
+Singular resolution: R^1 <- R^2 <- R^1
 ```
 
 ### Differential operations

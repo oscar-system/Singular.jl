@@ -31,11 +31,12 @@ end
 ###############################################################################
 
 function show(io::IO, R::PluralRing)
+   io = pretty(io)
    s = libSingular.rString(R.ptr)
    if libSingular.rIsQuotientRing(R.ptr)
-     print(io, "Singular G-Algebra Quotient Ring ", s)
+     print(io, LowercaseOff(), "Singular G-algebra quotient ring ", s)
    else
-     print(io, "Singular G-Algebra ", s)
+     print(io, LowercaseOff(), "Singular G-algebra ", s)
    end
 end
 

@@ -70,7 +70,7 @@ julia> Singular.LibNctools.isCentral(x)   # base ring A is inferred from x
 0
 
 julia> Singular.LibCentral.center(A, 3)   # base ring cannot be inferred from the plain Int 3
-Singular ideal over Singular G-Algebra (QQ),(x,y,z,t),(dp(4),C) with generators (t, 4*x*y + z^2 - 2*z)
+Singular ideal over Singular G-algebra (QQ),(x,y,z,t),(dp(4),C) with generators (t, 4*x*y + z^2 - 2*z)
 ```
 
 ## Global Interpreter Variables

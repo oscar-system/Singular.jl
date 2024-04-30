@@ -88,7 +88,7 @@ canonical_unit(x::n_algExt) = x
 ###############################################################################
 
 function show(io::IO, F::N_AlgExtField)
-   print(IOContext(io, :compact => true), "Algebraic Extension of ",
+   print(terse(io), "Algebraic extension of ",
          base_ring(F), " with defining equation ", modulus(F))
 end
 

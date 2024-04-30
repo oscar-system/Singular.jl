@@ -47,14 +47,12 @@ end
 
 function Base.show(io::IO, f::Map(SIdAlgHom))
   io = pretty(io)
-  if get(io, :supercompact, false)
-    # no nested printing
+  if is_terse(io)
     print(io, "Identity algebra homomorphism")
   else
-    # nested printing allowed, preferably supercompact
     print(io, "Hom: ")
-    print(IOContext(io, :supercompact => true), Lowercase(), domain(f), " -> ")
-    print(IOContext(io, :supercompact => true), Lowercase(), codomain(f))
+    print(terse(io), Lowercase(), domain(f), " -> ")
+    print(terse(io), Lowercase(), codomain(f))
   end
 end
 

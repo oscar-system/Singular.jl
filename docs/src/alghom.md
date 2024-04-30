@@ -35,7 +35,7 @@ IdentityAlgebraHomomorphism(D::PolyRing)
 
 ```jldoctest
 julia> L = FiniteField(3, 2, "a")
-(Finite Field of Characteristic 3 and degree 2, a)
+(Finite field of characteristic 3 and degree 2, a)
 
 julia> R, (x, y, z, w) = polynomial_ring(L[1], ["x", "y", "z", "w"];
                                     ordering=:negdegrevlex)

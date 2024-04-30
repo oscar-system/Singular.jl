@@ -51,8 +51,9 @@ end
 ###############################################################################
 
 function show(io::IO, R::N_unknown)
-   print(io, "Singular coefficient ring over ")
-   show(io, R.base_ring)
+   io = pretty(io)
+   print(io, LowercaseOff(), "Singular coefficient ring over ")
+   show(terse(io), R.base_ring)
 end
 
 function expressify(a::n_unknown; context = nothing)

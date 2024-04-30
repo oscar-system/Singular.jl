@@ -280,8 +280,8 @@ end
 
 function show(io::IO, S::IdealSet)
    io = pretty(io)
-   print(io, "set of Singular ideals over ")
-   show(io, base_ring(S))
+   print(io, "Set of Singular ideals over ")
+   show(terse(io), base_ring(S))
 end
 
 function show(io::IO, I::sideal{T}) where T <: SPolyUnion
@@ -292,7 +292,7 @@ function show(io::IO, I::sideal{T}) where T <: SPolyUnion
    else
       print(io, LowercaseOff(), "Singular ideal over ")
    end
-   show(io, base_ring(I))
+   show(terse(io), base_ring(I))
    print(io, " with generators (")
    for i = 1:n
       show(io, I[i])
@@ -948,7 +948,7 @@ julia> I = Ideal(R, x^2*y + 2y + 1, y^2 + 1)
 Singular ideal over Singular polynomial ring (QQ),(x,y),(dp(2),C) with generators (x^2*y + 2*y + 1, y^2 + 1)
 
 julia> F = syz(I)
-Singular Module over Singular polynomial ring (QQ),(x,y),(dp(2),C), with Generators:
+Singular module over Singular polynomial ring (QQ),(x,y),(dp(2),C), with generators:
 x^2*y*gen(2)-y^2*gen(1)+2*y*gen(2)+gen(2)-gen(1)
 
 julia> M = Singular.Matrix(I)

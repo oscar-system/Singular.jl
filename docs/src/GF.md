@@ -59,7 +59,7 @@ Singular.degree(::N_GField)
 
 ```jldoctest
 julia> R,w = FiniteField(7, 2, "w")
-(Finite Field of Characteristic 7 and degree 2, w)
+(Finite field of characteristic 7 and degree 2, w)
 
 julia> w^48 == 1
 true

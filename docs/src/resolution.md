@@ -108,8 +108,7 @@ julia> I = Ideal(R, w^2 - x*z, w*x - y*z, x^2 - w*y, x*y - z^2, y^2 - w*z)
 Singular ideal over Singular polynomial ring (QQ),(w,x,y,z),(dp(4),C) with generators (w^2 - x*z, w*x - y*z, x^2 - w*y, x*y - z^2, y^2 - w*z)
 
 julia> F = fres(std(I), 0)
-Singular Resolution:
-R^1 <- R^5 <- R^6 <- R^2
+Singular resolution: R^1 <- R^5 <- R^6 <- R^2
 
 julia> n = length(F)
 3
@@ -134,12 +133,10 @@ julia> I = Ideal(R, w^2 - x*z, w*x - y*z, x^2 - w*y, x*y - z^2, y^2 - w*z)
 Singular ideal over Singular polynomial ring (QQ),(w,x,y,z),(dp(4),C) with generators (w^2 - x*z, w*x - y*z, x^2 - w*y, x*y - z^2, y^2 - w*z)
 
 julia> F = fres(std(I), 3)
-Singular Resolution:
-R^1 <- R^5 <- R^6 <- R^2
+Singular resolution: R^1 <- R^5 <- R^6 <- R^2
 
 julia> M = minres(F)
-Singular Resolution:
-R^1 <- R^5 <- R^5 <- R^1
+Singular resolution: R^1 <- R^5 <- R^5 <- R^1
 
 julia> B = betti(M)
 3×4 Matrix{Int32}:
@@ -164,11 +161,9 @@ julia> I = Ideal(R, w^2 - x*z, w*x - y*z, x^2 - w*y, x*y - z^2, y^2 - w*z)
 Singular ideal over Singular polynomial ring (QQ),(w,x,y,z),(dp(4),C) with generators (w^2 - x*z, w*x - y*z, x^2 - w*y, x*y - z^2, y^2 - w*z)
 
 julia> F = fres(std(I), 3)
-Singular Resolution:
-R^1 <- R^5 <- R^6 <- R^2
+Singular resolution: R^1 <- R^5 <- R^6 <- R^2
 
 julia> M = minres(F)
-Singular Resolution:
-R^1 <- R^5 <- R^5 <- R^1
+Singular resolution: R^1 <- R^5 <- R^5 <- R^1
 ```
 
