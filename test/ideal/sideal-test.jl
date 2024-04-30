@@ -705,7 +705,7 @@ end
    I=Ideal(R,[x,y,z])
    I=std(I)
    @test hilbert_series(I,Qt) == -t^3+3*t^2-3*t+1
-   @test hilbert_series_data(I) == [BigInt(-1),BigInt(3),BigInt(-3),BigInt(1)]
+   @test hilbert_series_data(I) == BigInt[-1,3,-3,1]
    I=Ideal(R,[x^3])
    I=std(I)
    @test hilbert_series_data(I) == [BigInt(-1),BigInt(0),BigInt(0),BigInt(1)]
