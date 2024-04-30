@@ -1495,7 +1495,12 @@ The coefficients are of type `BigInt`.
 function hilbert_series_data(I::sideal{spoly{T}}) where T <: Nemo.FieldElem
    Qt,(t,) = polynomial_ring(ZZ, ["t"])
    h = hilbert_series(I,Qt)
-   v = [convert(BigInt,c) for c in coefficients(h)]
+   d=total_degree(h)+1
+   v = zeros(BigInt, d)
+   for (c,m) in zip(coefficients(h), monomials(h))
+     e = leading_exponent_vector(m)[1]
+     v[d-e] = convert(BigInt,c)
+   end
    return v
 end
 
@@ -1511,7 +1516,11 @@ The coefficients are of type `BigInt`.
 function hilbert_series_data(I::sideal{spoly{T}}, w::Vector{<:Integer}) where T <: Nemo.FieldElem
    Qt,(t,) = polynomial_ring(ZZ, ["t"])
    h = hilbert_series(I,w,Qt)
-   v = [convert(BigInt,c) for c in coefficients(h)]
+   v = zeros(BigInt, total_degree(h)+1)
+   for (c,m) in zip(coefficients(h), monomials(h))
+     e = leading_exponent_vector(m)[1]
+     v[e+1] = convert(BigInt,c)
+   end
    return v
 end
 
