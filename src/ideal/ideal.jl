@@ -1496,7 +1496,7 @@ function hilbert_series_data(I::sideal{spoly{T}}) where T <: Nemo.FieldElem
    Qt,(t,) = polynomial_ring(ZZ, ["t"])
    h = hilbert_series(I,Qt)
    d=total_degree(h)+1
-   v=[BigInt(0) for i in 1:d]
+   v = zeros(BigInt, d)
    for (c,m) in zip(coefficients(h), monomials(h))
      e = leading_exponent_vector(m)[1]
      v[d-e] = convert(BigInt,c)
