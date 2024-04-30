@@ -1516,7 +1516,7 @@ The coefficients are of type `BigInt`.
 function hilbert_series_data(I::sideal{spoly{T}}, w::Vector{<:Integer}) where T <: Nemo.FieldElem
    Qt,(t,) = polynomial_ring(ZZ, ["t"])
    h = hilbert_series(I,w,Qt)
-   v=[BigInt(0) for i in 1:total_degree(h)+1]
+   v = zeros(BigInt, total_degree(h)+1)
    for (c,m) in zip(coefficients(h), monomials(h))
      e = leading_exponent_vector(m)[1]
      v[e+1] = convert(BigInt,c)
