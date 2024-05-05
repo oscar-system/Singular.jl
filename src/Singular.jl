@@ -86,7 +86,6 @@ const _libsingular_julia = Ref(Setup.locate_libsingular())
 libsingular_julia() = _libsingular_julia[]
 
 const libflint = Nemo.libflint
-const libantic = Nemo.libantic
 
 const mapping_types_reversed = Dict{Symbol, Int64}()
 
