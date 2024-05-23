@@ -5,6 +5,8 @@
 #include <Singular/ipshell.h>
 #include <Singular/lists.h>
 #include <misc/intvec.h>
+#include <Singular/cntrlc.h>
+
 
 using jlcxx::jlcxx_array_data;
 
@@ -303,7 +305,9 @@ jl_value_t * call_singular_library_procedure(std::string                   s,
   }
   BOOLEAN      err;
   jl_value_t * retObj;
+  si_set_signals();
   leftv        ret = ii_CallLibProcM(s.c_str(), args, argtypes, r, err);
+  si_reset_signals();
   if (err)
   {
     inerror = 0;
