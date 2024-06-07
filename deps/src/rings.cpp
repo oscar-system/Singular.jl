@@ -355,6 +355,10 @@ void singular_define_rings(jlcxx::Module & Singular)
     // This looks too simple, try make_qring if it doesn't work.
     ring Q = rCopy(r);
     Q->qideal = id_Copy(i, r);
+    if((i!=NULL) && rIsPluralRing(r))
+    {
+      nc_SetupQuotient(Q, r);
+    }
     return Q;
   });
   Singular.method("make_qring", &make_qring);
