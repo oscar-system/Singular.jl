@@ -1,4 +1,5 @@
 #include "coeffs.h"
+#include "ideals.h"
 
 auto transExt_helper(coeffs cf, jlcxx::ArrayRef<uint8_t *> param)
 {
@@ -26,9 +27,9 @@ poly transExt_to_poly(number a, coeffs cf, ring r)
   ring       ext = cf->extRing;
   nMapFunc   nMap = n_SetMap(ext->cf, r->cf);
   const ring origin = currRing;
-  rChangeCurrRing(r);
+  rChangeCurrRing_wo_options(r);
   poly p = p_PermPoly(NUM((fraction)a), NULL, ext, r, nMap, NULL);
-  rChangeCurrRing(origin);
+  rChangeCurrRing_wo_options(origin);
   return p;
 }
 

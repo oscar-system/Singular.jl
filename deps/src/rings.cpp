@@ -1,4 +1,5 @@
 #include "rings.h"
+#include "ideals.h"
 
 auto rDefault_helper(coeffs cf, jlcxx::ArrayRef<std::string> vars, rRingOrder_t ord)
 {
@@ -176,7 +177,7 @@ ring weylAlgebra(ring r)
 ring make_qring(ring r, ideal id)
 {
   const ring origin = currRing;
-  rChangeCurrRing(r);
+  rChangeCurrRing_wo_options(r);
 
   coeffs newcf = currRing->cf;
 
@@ -188,7 +189,7 @@ ring make_qring(ring r, ideal id)
       newcf = n_CoeffRingQuot1(p_GetCoeff(id->m[cpos], currRing), currRing->cf);
       if (newcf == NULL)
       {
-        rChangeCurrRing(origin);
+        rChangeCurrRing_wo_options(origin);
         return NULL;
       }
     }
@@ -256,7 +257,7 @@ ring make_qring(ring r, ideal id)
   }
 #endif
 
-  rChangeCurrRing(origin);
+  rChangeCurrRing_wo_options(origin);
   return qr;
 }
 
@@ -478,9 +479,9 @@ void singular_define_rings(jlcxx::Module & Singular)
     ideal      I = idInit(1, 1);
     const ring origin = currRing;
     I->m[0] = q;
-    rChangeCurrRing(r);
+    rChangeCurrRing_wo_options(r);
     res = kNF(I, NULL, p, 0, KSTD_NF_LAZY);
-    rChangeCurrRing(origin);
+    rChangeCurrRing_wo_options(origin);
     I->m[0] = NULL;
     id_Delete(&I, r);
     if (res == NULL)
@@ -509,7 +510,7 @@ void singular_define_rings(jlcxx::Module & Singular)
   Singular.method("singclap_sqrfree",
                   [](spolyrec * p, jlcxx::ArrayRef<int> a, ip_sring * r) {
     const ring origin = currRing;
-    rChangeCurrRing(r);
+    rChangeCurrRing_wo_options(r);
     intvec * v = NULL;
     ideal    I = singclap_sqrfree(pCopy(p), &v, 0, currRing);
     int *    content = v->ivGetVec();
@@ -517,14 +518,14 @@ void singular_define_rings(jlcxx::Module & Singular)
     {
       a.push_back(content[i]);
     }
-    rChangeCurrRing(origin);
+    rChangeCurrRing_wo_options(origin);
     delete v;
     return I;
   });
   Singular.method("singclap_factorize",
                   [](spolyrec * p, jlcxx::ArrayRef<int> a, ip_sring * r) {
     const ring origin = currRing;
-    rChangeCurrRing(r);
+    rChangeCurrRing_wo_options(r);
     intvec * v = NULL;
     ideal    I = singclap_factorize(p_Copy(p, r), &v, 0, r);
     int *    content = v->ivGetVec();
@@ -532,7 +533,7 @@ void singular_define_rings(jlcxx::Module & Singular)
     {
       a.push_back(content[i]);
     }
-    rChangeCurrRing(origin);
+    rChangeCurrRing_wo_options(origin);
     delete v;
     return I;
   });
@@ -544,30 +545,30 @@ void singular_define_rings(jlcxx::Module & Singular)
   Singular.method("p_SetExpVLV_internal", p_SetExpVLV);
   Singular.method("p_Reduce", [](spolyrec * p, sip_sideal * G, ip_sring * R) {
     const ring origin = currRing;
-    rChangeCurrRing(R);
+    rChangeCurrRing_wo_options(R);
     poly res = kNF(G, R->qideal, p);
-    rChangeCurrRing(origin);
+    rChangeCurrRing_wo_options(origin);
     return res;
   });
   Singular.method("p_Reduce", [](sip_sideal * p, sip_sideal * G, ip_sring * R) {
     const ring origin = currRing;
-    rChangeCurrRing(R);
+    rChangeCurrRing_wo_options(R);
     ideal res = kNF(G, R->qideal, p);
-    rChangeCurrRing(origin);
+    rChangeCurrRing_wo_options(origin);
     return res;
   });
   Singular.method("p_Reduce", [](spolyrec * p, sip_sideal * G, ip_sring * R, int flag) {
     const ring origin = currRing;
-    rChangeCurrRing(R);
+    rChangeCurrRing_wo_options(R);
     poly res = kNF(G, R->qideal, p, 0, flag);
-    rChangeCurrRing(origin);
+    rChangeCurrRing_wo_options(origin);
     return res;
   });
   Singular.method("p_Reduce", [](sip_sideal * p, sip_sideal * G, ip_sring * R, int flag) {
     const ring origin = currRing;
-    rChangeCurrRing(R);
+    rChangeCurrRing_wo_options(R);
     ideal res = kNF(G, R->qideal, p, 0, flag);
-    rChangeCurrRing(origin);
+    rChangeCurrRing_wo_options(origin);
     return res;
   });
 

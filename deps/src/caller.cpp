@@ -1,4 +1,5 @@
 #include "caller.h"
+#include "ideals.h"
 
 #include <Singular/tok.h>
 #include <Singular/grammar.h>
@@ -252,7 +253,7 @@ jl_value_t * get_julia_type_from_sleftv(leftv ret)
 jl_value_t * get_ring_content(ring r)
 {
   ring save = currRing;
-  rChangeCurrRing(r);
+  rChangeCurrRing_wo_options(r);
 
   // count elements
   idhdl h = r->idroot;
@@ -283,7 +284,7 @@ jl_value_t * get_ring_content(ring r)
     nr++;
   }
   JL_GC_POP();
-  rChangeCurrRing(save);
+  rChangeCurrRing_wo_options(save);
   return reinterpret_cast<jl_value_t *>(result);
 }
 
@@ -409,9 +410,9 @@ jl_value_t * convert_nested_list(void * l_void)
 void * create_syStrategy_data(syStrategy res, ring o)
 {
   const ring origin = currRing;
-  rChangeCurrRing(o);
+  rChangeCurrRing_wo_options(o);
   syStrategy temp = syCopy(res);
-  rChangeCurrRing(origin);
+  rChangeCurrRing_wo_options(origin);
   return reinterpret_cast<void *>(temp);
 }
 
@@ -489,9 +490,9 @@ void singular_define_caller(jlcxx::Module & Singular)
   Singular.method("jl_array_to_void",
                   [](jl_value_t * args_val, jl_value_t * types_val, ring R) {
     auto origin = currRing;
-    rChangeCurrRing(R);
+    rChangeCurrRing_wo_options(R);
     lists l = jl_array_to_list_helper(args_val, types_val);
-    rChangeCurrRing(origin);
+    rChangeCurrRing_wo_options(origin);
     return (void *)l;
   });
 
