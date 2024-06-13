@@ -1,9 +1,12 @@
 #include "ideals.h"
 
+unsigned si_no_ring_opt;
 void rChangeCurrRing_wo_options(ring R)
 {
 #define RING_OPTS (Sy_bit(OPT_REDTAIL) | Sy_bit(OPT_REDTAIL_SYZ)|Sy_bit(OPT_INTSTRATEGY))
   unsigned save_opts=si_opt_1; // save options
+  if (currRing==NULL)
+    si_no_ring_opt=si_opt_1;
   rChangeCurrRing(R);
   si_opt_1 =save_opts;
   if (R!=NULL) 
@@ -24,6 +27,10 @@ void rChangeCurrRing_wo_options(ring R)
     {
       si_opt_1 |= Sy_bit(OPT_REDTHROUGH);
     }
+  }
+  else
+  {
+    si_opt_1=si_no_ring_opt;
   }
 }
 

@@ -118,6 +118,7 @@ JLCXX_MODULE define_julia_module(jlcxx::Module & Singular)
   Singular.method("siInit", [](const char * path) {
     siInit(const_cast<char *>(path));
     WerrorS_callback = WerrorS_and_reset;
+    si_opt_1|=Sy_bit(OPT_REDTAIL);
   });
   Singular.method("versionString", []() {
     return const_cast<const char *>(versionString());
