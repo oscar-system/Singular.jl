@@ -380,9 +380,9 @@ JLCXX_MODULE define_julia_module(jlcxx::Module & Singular)
 
   Singular.method("res_Copy", [](syStrategy ra, ring o) {
     const ring origin = currRing;
-    rChangeCurrRing_wo_options(o);
+    rChangeCurrRing(o);
     syStrategy temp = syCopy(ra);
-    rChangeCurrRing_wo_options(origin);
+    rChangeCurrRing(origin);
     return temp;
   });
 
@@ -396,20 +396,20 @@ JLCXX_MODULE define_julia_module(jlcxx::Module & Singular)
 
   Singular.method("syMinimize", [](syStrategy ra, ring o) {
     const ring origin = currRing;
-    rChangeCurrRing_wo_options(o);
+    rChangeCurrRing(o);
     syStrategy result = syCopy(ra);
     syMinimize(result);
-    rChangeCurrRing_wo_options(origin);
+    rChangeCurrRing(origin);
     return result;
   });
 
   Singular.method("syMinimize_map", [](syStrategy ra, ring o) {
       const ring origin = currRing;
-      rChangeCurrRing_wo_options(o);
+      rChangeCurrRing(o);
       ideal T=NULL;
       syMinimize_with_map(ra,T);
       matrix TT=id_Module2Matrix(T,o);
-      rChangeCurrRing_wo_options(origin);
+      rChangeCurrRing(origin);
       return TT;
   });
 
@@ -445,11 +445,11 @@ JLCXX_MODULE define_julia_module(jlcxx::Module & Singular)
 
   Singular.method("syBetti_internal", [](void * ra, int len, ring o) {
     const ring origin = currRing;
-    rChangeCurrRing_wo_options(o);
+    rChangeCurrRing(o);
     int      dummy;
     intvec * iv =
         syBetti(reinterpret_cast<resolvente>(ra), len, &dummy, NULL, FALSE, NULL);
-    rChangeCurrRing_wo_options(origin);
+    rChangeCurrRing(origin);
     int  nrows = iv->rows();
     int  ncols = iv->cols();
     auto betti = (int *)malloc(ncols * nrows * sizeof(int));

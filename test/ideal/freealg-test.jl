@@ -15,7 +15,7 @@
   cs3 = u13 + u23 + u33 + u43 - 1
   cs4 = u14 + u24 + u34 + u44 - 1
   
-  Singular.libSingular.set_option("OPT_REDTAIL",false)
+  Singular.libSingular.set_option("OPT_REDTAIL",false,R.ptr)
   
   J1 = Ideal(R,[rs2,rs3,rs4,cs1,cs2,cs3,cs4])
   J1=std(J1)
