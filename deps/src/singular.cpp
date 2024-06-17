@@ -207,7 +207,7 @@ JLCXX_MODULE define_julia_module(jlcxx::Module & Singular)
     return old_value;
   });
   // all of the global setters return the previous value
-  Singular.method("set_option", [](std::string opt, bool value, ring r) {
+  Singular.method("set_option", [](std::string opt, bool value, ring r == NULL) {
     bool old_value = false;
     ring oldring=currRing;
     if (r!=NULL) rChangeCurrRing(r);
