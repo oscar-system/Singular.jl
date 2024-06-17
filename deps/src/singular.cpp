@@ -54,6 +54,84 @@ static void WerrorS_and_reset(const char * s)
   singular_error_log.emplace_back(s);
 }
 
+#define SETTER(A, B)                                                                     \
+  else if (opt == #B)                                                                    \
+  {                                                                                      \
+    old_value = (A & Sy_bit(B)) != 0;                                                    \
+    A = value ? (A | Sy_bit(B)) : (A & ~Sy_bit(B));                                      \
+  }
+
+// all of the global setters return the previous value
+auto set_option_helper(std::string opt, bool value, ring r) {
+    bool old_value = false;
+    ring oldring=currRing;
+    if (r!=NULL) rChangeCurrRing(r);
+    if (false)
+      ;
+    SETTER(si_opt_2, V_QUIET)
+    SETTER(si_opt_2, V_QRING)
+    SETTER(si_opt_2, V_SHOW_MEM)
+    SETTER(si_opt_2, V_YACC)
+    SETTER(si_opt_2, V_REDEFINE)
+    SETTER(si_opt_2, V_LOAD_LIB)
+    SETTER(si_opt_2, V_DEBUG_LIB)
+    SETTER(si_opt_2, V_LOAD_PROC)
+    SETTER(si_opt_2, V_DEF_RES)
+    SETTER(si_opt_2, V_SHOW_USE)
+    SETTER(si_opt_2, V_IMAP)
+    SETTER(si_opt_2, V_PROMPT)
+    SETTER(si_opt_2, V_NSB)
+    SETTER(si_opt_2, V_CONTENTSB)
+    SETTER(si_opt_2, V_CANCELUNIT)
+    SETTER(si_opt_2, V_MODPSOLVSB)
+    SETTER(si_opt_2, V_UPTORADICAL)
+    SETTER(si_opt_2, V_FINDMONOM)
+    SETTER(si_opt_2, V_COEFSTRAT)
+    SETTER(si_opt_2, V_IDLIFT)
+    SETTER(si_opt_2, V_LENGTH)
+    SETTER(si_opt_2, V_ALLWARN)
+    SETTER(si_opt_2, V_INTERSECT_ELIM)
+    SETTER(si_opt_2, V_INTERSECT_SYZ)
+    SETTER(si_opt_2, V_DEG_STOP)
+
+    SETTER(si_opt_1, OPT_PROT)
+    SETTER(si_opt_1, OPT_REDSB)
+    SETTER(si_opt_1, OPT_NOT_BUCKETS)
+    SETTER(si_opt_1, OPT_NOT_SUGAR)
+    SETTER(si_opt_1, OPT_INTERRUPT)
+    SETTER(si_opt_1, OPT_SUGARCRIT)
+    SETTER(si_opt_1, OPT_DEBUG)
+    SETTER(si_opt_1, OPT_REDTHROUGH)
+    SETTER(si_opt_1, OPT_NO_SYZ_MINIM)
+    SETTER(si_opt_1, OPT_RETURN_SB)
+    SETTER(si_opt_1, OPT_FASTHC)
+    SETTER(si_opt_1, OPT_OLDSTD)
+    SETTER(si_opt_1, OPT_STAIRCASEBOUND)
+    SETTER(si_opt_1, OPT_MULTBOUND)
+    SETTER(si_opt_1, OPT_DEGBOUND)
+    SETTER(si_opt_1, OPT_REDTAIL)
+    SETTER(si_opt_1, OPT_INTSTRATEGY)
+    SETTER(si_opt_1, OPT_FINDET)
+    SETTER(si_opt_1, OPT_INFREDTAIL)
+    SETTER(si_opt_1, OPT_SB_1)
+    SETTER(si_opt_1, OPT_NOTREGULARITY)
+    SETTER(si_opt_1, OPT_WEIGHTM)
+    else
+    {
+      std::cerr << "unknown option " << opt << std::endl;
+    }
+    if (r!=NULL)
+    {
+      r->options=si_opt_1;
+      rChangeCurrRing(oldring);
+    }
+    return old_value;
+  }
+auto set_option_helper2(std::string opt, bool value) {
+   return set_option_helper(opt,value,NULL);
+  }
+#undef SETTER
+
 JLCXX_MODULE define_julia_module(jlcxx::Module & Singular)
 {
   Singular.add_type<n_Procs_s>("coeffs");
@@ -140,140 +218,9 @@ JLCXX_MODULE define_julia_module(jlcxx::Module & Singular)
     return ss.str();
   });
 
-#define SETTER(A, B)                                                                     \
-  else if (opt == #B)                                                                    \
-  {                                                                                      \
-    old_value = (A & Sy_bit(B)) != 0;                                                    \
-    A = value ? (A | Sy_bit(B)) : (A & ~Sy_bit(B));                                      \
-  }
+  Singular.method("set_option", &set_option_helper2);
+  Singular.method("set_option", &set_option_helper);
 
-  // all of the global setters return the previous value
-  Singular.method("set_option", [](std::string opt, bool value) {
-    bool old_value = false;
-    if (false)
-      ;
-    SETTER(si_opt_2, V_QUIET)
-    SETTER(si_opt_2, V_QRING)
-    SETTER(si_opt_2, V_SHOW_MEM)
-    SETTER(si_opt_2, V_YACC)
-    SETTER(si_opt_2, V_REDEFINE)
-    SETTER(si_opt_2, V_LOAD_LIB)
-    SETTER(si_opt_2, V_DEBUG_LIB)
-    SETTER(si_opt_2, V_LOAD_PROC)
-    SETTER(si_opt_2, V_DEF_RES)
-    SETTER(si_opt_2, V_SHOW_USE)
-    SETTER(si_opt_2, V_IMAP)
-    SETTER(si_opt_2, V_PROMPT)
-    SETTER(si_opt_2, V_NSB)
-    SETTER(si_opt_2, V_CONTENTSB)
-    SETTER(si_opt_2, V_CANCELUNIT)
-    SETTER(si_opt_2, V_MODPSOLVSB)
-    SETTER(si_opt_2, V_UPTORADICAL)
-    SETTER(si_opt_2, V_FINDMONOM)
-    SETTER(si_opt_2, V_COEFSTRAT)
-    SETTER(si_opt_2, V_IDLIFT)
-    SETTER(si_opt_2, V_LENGTH)
-    SETTER(si_opt_2, V_ALLWARN)
-    SETTER(si_opt_2, V_INTERSECT_ELIM)
-    SETTER(si_opt_2, V_INTERSECT_SYZ)
-    SETTER(si_opt_2, V_DEG_STOP)
-
-    SETTER(si_opt_1, OPT_PROT)
-    SETTER(si_opt_1, OPT_REDSB)
-    SETTER(si_opt_1, OPT_NOT_BUCKETS)
-    SETTER(si_opt_1, OPT_NOT_SUGAR)
-    SETTER(si_opt_1, OPT_INTERRUPT)
-    SETTER(si_opt_1, OPT_SUGARCRIT)
-    SETTER(si_opt_1, OPT_DEBUG)
-    SETTER(si_opt_1, OPT_REDTHROUGH)
-    SETTER(si_opt_1, OPT_NO_SYZ_MINIM)
-    SETTER(si_opt_1, OPT_RETURN_SB)
-    SETTER(si_opt_1, OPT_FASTHC)
-    SETTER(si_opt_1, OPT_OLDSTD)
-    SETTER(si_opt_1, OPT_STAIRCASEBOUND)
-    SETTER(si_opt_1, OPT_MULTBOUND)
-    SETTER(si_opt_1, OPT_DEGBOUND)
-    SETTER(si_opt_1, OPT_REDTAIL)
-    SETTER(si_opt_1, OPT_INTSTRATEGY)
-    SETTER(si_opt_1, OPT_FINDET)
-    SETTER(si_opt_1, OPT_INFREDTAIL)
-    SETTER(si_opt_1, OPT_SB_1)
-    SETTER(si_opt_1, OPT_NOTREGULARITY)
-    SETTER(si_opt_1, OPT_WEIGHTM)
-    else
-    {
-      std::cerr << "unknown option " << opt << std::endl;
-    }
-    return old_value;
-  });
-  // all of the global setters return the previous value
-  Singular.method("set_option", [](std::string opt, bool value, ring r == NULL) {
-    bool old_value = false;
-    ring oldring=currRing;
-    if (r!=NULL) rChangeCurrRing(r);
-    if (false)
-      ;
-    SETTER(si_opt_2, V_QUIET)
-    SETTER(si_opt_2, V_QRING)
-    SETTER(si_opt_2, V_SHOW_MEM)
-    SETTER(si_opt_2, V_YACC)
-    SETTER(si_opt_2, V_REDEFINE)
-    SETTER(si_opt_2, V_LOAD_LIB)
-    SETTER(si_opt_2, V_DEBUG_LIB)
-    SETTER(si_opt_2, V_LOAD_PROC)
-    SETTER(si_opt_2, V_DEF_RES)
-    SETTER(si_opt_2, V_SHOW_USE)
-    SETTER(si_opt_2, V_IMAP)
-    SETTER(si_opt_2, V_PROMPT)
-    SETTER(si_opt_2, V_NSB)
-    SETTER(si_opt_2, V_CONTENTSB)
-    SETTER(si_opt_2, V_CANCELUNIT)
-    SETTER(si_opt_2, V_MODPSOLVSB)
-    SETTER(si_opt_2, V_UPTORADICAL)
-    SETTER(si_opt_2, V_FINDMONOM)
-    SETTER(si_opt_2, V_COEFSTRAT)
-    SETTER(si_opt_2, V_IDLIFT)
-    SETTER(si_opt_2, V_LENGTH)
-    SETTER(si_opt_2, V_ALLWARN)
-    SETTER(si_opt_2, V_INTERSECT_ELIM)
-    SETTER(si_opt_2, V_INTERSECT_SYZ)
-    SETTER(si_opt_2, V_DEG_STOP)
-
-    SETTER(si_opt_1, OPT_PROT)
-    SETTER(si_opt_1, OPT_REDSB)
-    SETTER(si_opt_1, OPT_NOT_BUCKETS)
-    SETTER(si_opt_1, OPT_NOT_SUGAR)
-    SETTER(si_opt_1, OPT_INTERRUPT)
-    SETTER(si_opt_1, OPT_SUGARCRIT)
-    SETTER(si_opt_1, OPT_DEBUG)
-    SETTER(si_opt_1, OPT_REDTHROUGH)
-    SETTER(si_opt_1, OPT_NO_SYZ_MINIM)
-    SETTER(si_opt_1, OPT_RETURN_SB)
-    SETTER(si_opt_1, OPT_FASTHC)
-    SETTER(si_opt_1, OPT_OLDSTD)
-    SETTER(si_opt_1, OPT_STAIRCASEBOUND)
-    SETTER(si_opt_1, OPT_MULTBOUND)
-    SETTER(si_opt_1, OPT_DEGBOUND)
-    SETTER(si_opt_1, OPT_REDTAIL)
-    SETTER(si_opt_1, OPT_INTSTRATEGY)
-    SETTER(si_opt_1, OPT_FINDET)
-    SETTER(si_opt_1, OPT_INFREDTAIL)
-    SETTER(si_opt_1, OPT_SB_1)
-    SETTER(si_opt_1, OPT_NOTREGULARITY)
-    SETTER(si_opt_1, OPT_WEIGHTM)
-    else
-    {
-      std::cerr << "unknown option " << opt << std::endl;
-    }
-    if (r!=NULL)
-    {
-      r->options=si_opt_1;
-      rChangeCurrRing(oldring);
-    }
-    return old_value;
-  });
-
-#undef SETTER
 
   // the "printlevel" system variable in Singular
   Singular.method("set_printlevel", [](int level) {
