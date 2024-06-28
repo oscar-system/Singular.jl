@@ -14,17 +14,17 @@
   cs2 = u12 + u22 + u32 + u42 - 1
   cs3 = u13 + u23 + u33 + u43 - 1
   cs4 = u14 + u24 + u34 + u44 - 1
-  
+
   Singular.libSingular.set_option("OPT_REDTAIL",false,R.ptr)
-  
+
   J1 = Ideal(R,[rs2,rs3,rs4,cs1,cs2,cs3,cs4])
-  J1=std(J1)
-  
-  @test J1[7] == u11 + u21 + u31 + u41 - 1
-  
-  J1 = Ideal(R,[rs2,rs3,rs4,cs1,cs2,cs3,cs4])
-  J2=with_redTail(false,R) do
-    return std(J1)
-  end
+  J2 = std(J1)
+
   @test J2[7] == u11 + u21 + u31 + u41 - 1
+
+  J3 = Ideal(R,[rs2,rs3,rs4,cs1,cs2,cs3,cs4])
+  J4 = with_redTail(false,R) do
+    std(J3)
+  end
+  @test J4[7] == u11 + u21 + u31 + u41 - 1
 end
