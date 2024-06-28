@@ -22,4 +22,9 @@
   
   @test J1[7] == u11 + u21 + u31 + u41 - 1
   
+  J1 = Ideal(R,[rs2,rs3,rs4,cs1,cs2,cs3,cs4])
+  J2=with_redTail(false,R) do
+    return std(J1)
+  end
+  @test J2[7] == u11 + u21 + u31 + u41 - 1
 end
