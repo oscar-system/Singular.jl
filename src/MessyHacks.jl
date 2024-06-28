@@ -69,6 +69,28 @@ for (name, str) in [(:with_fastHC, "OPT_FASTHC")
    end
 end
 
+function with_redTail(f, flag::Bool, R::PolyRingUnion)
+ old_flag = libSingular.set_option("OPT_REDTAIL", flag, R.ptr)
+ local g = nothing
+ try
+   g = f()
+ finally
+   libSingular.set_option("OPT_REDTAIL", old_flag, R.ptr)
+ end
+ return g
+end
+
+function with_redThrough(f, flag::Bool, R::PolyRingUnion)
+ old_flag = libSingular.set_option("OPT_REDTHROUGH", flag, R.ptr)
+ local g = nothing
+ try
+   g = f()
+ finally
+   libSingular.set_option("OPT_REDTHROUGH", old_flag, R.ptr)
+ end
+ return g
+end
+
 #=
    messy hack #1:
 
