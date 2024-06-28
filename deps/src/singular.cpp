@@ -55,19 +55,17 @@ static void WerrorS_and_reset(const char * s)
 }
 
 #define SETTER(A, B)                                                                     \
-  else if (opt == #B)                                                                    \
+  if (opt == #B)                                                                         \
   {                                                                                      \
     old_value = (A & Sy_bit(B)) != 0;                                                    \
     A = value ? (A | Sy_bit(B)) : (A & ~Sy_bit(B));                                      \
-  }
+  } else
 
 // all of the global setters return the previous value
 auto set_option_helper(std::string opt, bool value, ring r) {
     bool old_value = false;
     ring oldring=currRing;
     if (r!=NULL) rChangeCurrRing(r);
-    if (false)
-      ;
     SETTER(si_opt_2, V_QUIET)
     SETTER(si_opt_2, V_QRING)
     SETTER(si_opt_2, V_SHOW_MEM)
@@ -116,7 +114,7 @@ auto set_option_helper(std::string opt, bool value, ring r) {
     SETTER(si_opt_1, OPT_SB_1)
     SETTER(si_opt_1, OPT_NOTREGULARITY)
     SETTER(si_opt_1, OPT_WEIGHTM)
-    else
+    // else    <--- not needed, already "provided" by SETTER
     {
       std::cerr << "unknown option " << opt << std::endl;
     }
