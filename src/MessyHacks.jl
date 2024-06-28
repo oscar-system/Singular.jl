@@ -16,13 +16,11 @@ Singular and this is the starting value.
 """
 function with_degBound(f, degb::Integer)
    old_degb = libSingular.set_degBound(Cint(degb))
-   local g = nothing
    try
-      g = f()
+      return f()
    finally
       libSingular.set_degBound(old_degb)
    end
-   return g
 end
 
 @doc raw"""
@@ -35,13 +33,11 @@ bound in Singular and this is the starting value.
 """
 function with_multBound(f, mu::Integer)
    old_mu = libSingular.set_multBound(Cint(mu))
-   local g = nothing
    try
-      g = f()
+      return f()
    finally
       libSingular.set_multBound(old_mu)
    end
-   return g
 end
 
 for (name, str) in [(:with_fastHC, "OPT_FASTHC")
@@ -56,13 +52,11 @@ for (name, str) in [(:with_fastHC, "OPT_FASTHC")
    @eval begin
       function ($name)(f, flag::Bool)
          old_flag = libSingular.set_option($str, flag)
-         local g = nothing
          try
-            g = f()
+            return f()
          finally
             libSingular.set_option($str, old_flag)
          end
-         return g
       end
 
       export $name
@@ -70,25 +64,21 @@ for (name, str) in [(:with_fastHC, "OPT_FASTHC")
 end
 
 function with_redTail(f, flag::Bool, R::PolyRingUnion)
- old_flag = libSingular.set_option("OPT_REDTAIL", flag, R.ptr)
- local g = nothing
- try
-   g = f()
- finally
-   libSingular.set_option("OPT_REDTAIL", old_flag, R.ptr)
- end
- return g
+   old_flag = libSingular.set_option("OPT_REDTAIL", flag, R.ptr)
+   try
+      return f()
+   finally
+      libSingular.set_option("OPT_REDTAIL", old_flag, R.ptr)
+   end
 end
 
 function with_redThrough(f, flag::Bool, R::PolyRingUnion)
- old_flag = libSingular.set_option("OPT_REDTHROUGH", flag, R.ptr)
- local g = nothing
- try
-   g = f()
- finally
-   libSingular.set_option("OPT_REDTHROUGH", old_flag, R.ptr)
- end
- return g
+   old_flag = libSingular.set_option("OPT_REDTHROUGH", flag, R.ptr)
+   try
+      return f()
+   finally
+      libSingular.set_option("OPT_REDTHROUGH", old_flag, R.ptr)
+   end
 end
 
 #=
