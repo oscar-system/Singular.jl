@@ -134,7 +134,7 @@ auto id_Slimgb_helper(ideal a, ring b, bool complete_reduction = false)
   //  bool complete_reduction= false;
   unsigned int crbit;
   if (complete_reduction)
-    auto crbit = Sy_bit(OPT_REDSB);
+    crbit = Sy_bit(OPT_REDSB);
   else
     crbit = 0;
   ideal id = NULL;
@@ -144,11 +144,11 @@ auto id_Slimgb_helper(ideal a, ring b, bool complete_reduction = false)
     tHomog       h = testHomog;
     const ring   origin = currRing;
     unsigned int save_opt = si_opt_1;
-    si_opt_1 |= crbit;
     rChangeCurrRing(b);
+    si_opt_1 |= crbit;
     id = t_rep_gb(b, a, a->rank);
-    si_opt_1 = save_opt;
     rChangeCurrRing(origin);
+    si_opt_1 = save_opt;
     if (n != NULL)
       delete n;
   }
@@ -187,11 +187,11 @@ auto id_Std_helper(ideal a, ring b, bool complete_reduction = false)
     tHomog       h = testHomog;
     const ring   origin = currRing;
     unsigned int save_opt = si_opt_1;
-    si_opt_1 |= crbit;
     rChangeCurrRing(b);
+    si_opt_1 |= crbit;
     id = kStd(a, b->qideal, h, &n);
-    si_opt_1 = save_opt;
     rChangeCurrRing(origin);
+    si_opt_1 = save_opt;
     if (n != NULL)
       delete n;
   }
@@ -238,11 +238,11 @@ auto id_MinStd_helper(ideal a, ring b, bool complete_reduction = false)
   tHomog       h = testHomog;
   const ring   origin = currRing;
   unsigned int save_opt = si_opt_1;
-  si_opt_1 |= crbit;
   rChangeCurrRing(b);
+  si_opt_1 |= crbit;
   id = kMin_std(a, b->qideal, h, NULL, m);
-  si_opt_1 = save_opt;
   rChangeCurrRing(origin);
+  si_opt_1 = save_opt;
   return std::make_tuple(id, m);
 }
 
@@ -275,11 +275,11 @@ auto id_StdHilb_helper(ideal                a,
     tHomog       h = testHomog;
     const ring   origin = currRing;
     unsigned int save_opt = si_opt_1;
-    si_opt_1 |= crbit;
     rChangeCurrRing(b);
+    si_opt_1 |= crbit;
     id = kStd(a, b->qideal, h, &n, hilb);
-    si_opt_1 = save_opt;
     rChangeCurrRing(origin);
+    si_opt_1 = save_opt;
     if (n != NULL)
       delete n;
   }
@@ -310,15 +310,15 @@ auto id_StdHilbWeighted_helper(ideal                a,
     tHomog       h = testHomog;
     const ring   origin = currRing;
     unsigned int save_opt = si_opt_1;
-    si_opt_1 |= crbit;
     rChangeCurrRing(b);
+    si_opt_1 |= crbit;
     id = kStd(a, currRing->qideal, h,
               &n,             // module weights
               hilb,           // hilbert series
               0, 0,           // syzComp, newIdeal
               varweights);    // weights of vars
-    si_opt_1 = save_opt;
     rChangeCurrRing(origin);
+    si_opt_1 = save_opt;
     if (n != NULL)
       delete n;
   }
@@ -528,37 +528,36 @@ void singular_define_ideals(jlcxx::Module & Singular)
 
   Singular.method("id_LiftStd", [](ideal m, ring o, bool complete_reduction = false) {
     const ring origin = currRing;
-    rChangeCurrRing(o);
-    matrix       ma = mpNew(1, 1);
     unsigned int crbit;
     if (complete_reduction)
       crbit = Sy_bit(OPT_REDSB);
     else
       crbit = 0;
     unsigned int save_opt = si_opt_1;
+    rChangeCurrRing(o);
+    matrix       ma = mpNew(1, 1);
     si_opt_1 |= crbit;
     ideal res = idLiftStd(m, &ma, testHomog, NULL);
-    si_opt_1 = save_opt;
     rChangeCurrRing(origin);
+    si_opt_1 = save_opt;
     return std::make_tuple(res, ma);
   });
 
   Singular.method("id_LiftStdSyz", [](ideal m, ring o, bool complete_reduction = false) {
-    const ring origin = currRing;
-    rChangeCurrRing(o);
-    matrix       ma = mpNew(1, 1);
-    ideal        syz = idInit(1, 1);
     unsigned int crbit;
     if (complete_reduction)
       crbit = Sy_bit(OPT_REDSB);
     else
       crbit = 0;
     unsigned int save_opt = si_opt_1;
+    const ring origin = currRing;
+    rChangeCurrRing(o);
+    matrix       ma = mpNew(1, 1);
+    ideal        syz = idInit(1, 1);
     si_opt_1 |= crbit;
     ideal res = idLiftStd(m, &ma, testHomog, &syz);
-    si_opt_1 = save_opt;
-
     rChangeCurrRing(origin);
+    si_opt_1 = save_opt;
     return std::make_tuple(res, ma, syz);
   });
 

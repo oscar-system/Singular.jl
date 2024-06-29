@@ -396,7 +396,7 @@ end
    B = slimgb(I, complete_reduction=true)
 
    @test isequal(B, Ideal(R, 2y^2 + 3, x^2 + x*y + 1)) ||
-         isequal(B, Ideal(x^2 + x*y + 1, 2y^2 + 3))
+         isequal(B, Ideal(R, x^2 + x*y + 1, 2y^2 + 3))
    @test B.isGB == true
 end
 

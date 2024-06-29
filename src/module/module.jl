@@ -274,12 +274,12 @@ from the identity matrix only for local ring orderings.
 function divrem(I::smodule{S}, G::smodule{S}; complete_reduction::Bool = false) where S <: SPolyUnion
    check_parent(I, G)
    R = base_ring(I)
-   old_redsb=libSingular.set_option("OPT_REDSB",complete_reduction)
-   old_redtail=libSingular.set_option("OPT_REDTAIL",complete_reduction)
+   old_redsb=libSingular.set_option("OPT_REDSB",complete_reduction,R.ptr)
+   old_redtail=libSingular.set_option("OPT_REDTAIL",complete_reduction,R.ptr)
    ptr_T,ptr_Rest,ptr_U = GC.@preserve I G R libSingular.id_Lift(G.ptr, I.ptr, true,
                                                                    false, true, R.ptr)
-   libSingular.set_option("OPT_REDSB",old_redsb)
-   libSingular.set_option("OPT_REDTAIL",old_redtail)
+   libSingular.set_option("OPT_REDSB",old_redsb,R.ptr)
+   libSingular.set_option("OPT_REDTAIL",old_redtail,R.ptr)
    return (smodule{S}(R,ptr_T), smodule{S}(R,ptr_Rest), smodule{S}(R,ptr_U))
 end
 

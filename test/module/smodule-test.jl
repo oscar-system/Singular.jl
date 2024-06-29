@@ -48,12 +48,12 @@ end
    v3 = v1 + v2
 
    w1 = vector(R, y, y)
-   w2 = vector(R, x - y, y^2 - y)
+   w2 = vector(R, x, y^2)
 
    M = Singular.Module(R, v1, v2, v3)
    MM = Singular.minimal_generating_set(M)
 
-   @test MM[1] == w1 && MM[2] == w2
+   @test MM[1] == w1 && MM[2] == -v2
 end
 
 @testset "smodule.manipulation" begin
