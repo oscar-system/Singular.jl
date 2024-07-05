@@ -112,7 +112,7 @@ function build_code(src_hash)
    gmp_prefix = jll_artifact_dir(Singular_jll.GMP_jll)
    singular_prefix = jll_artifact_dir(Singular_jll)
 
-   Pidfile.mkpidlock("$installdir.lock") do
+   Pidfile.mkpidlock("$installdir.lock"; stale_age=60) do
       # delete any previous build or install artifacts
       rm(builddir; force=true, recursive=true)
       rm(installdir; force=true, recursive=true)
