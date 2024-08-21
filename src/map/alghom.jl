@@ -39,7 +39,21 @@ function map_ideal(f::Map(SAlgHom), I::sideal)
                 f.ptr, f.codomain.ptr, libSingular.ndCopyMap())
    
    J = Ideal(f.codomain,ptr)
-   J.isGB = I.isGB
+   # compare the orderings of f.domain.ptr and f.codomain.ptr
+   domain_ord=Cint[]
+   libSingular.rOrdering_helper(domain_ord, f.domain.ptr)
+   codomain_ord=Cint[]
+   libSingular.rOrdering_helper(codomain_ord, f.codomain.ptr)
+   equal_ordering=true
+   for i in 1:size(domain_ord,1)
+     if domain_ord[i] != codomain_ord[i]
+       equal_ordering=false
+       break
+     end
+   end
+   if equal_ordering
+     J.isGB = I.isGB
+   end
    return J
 end
 
