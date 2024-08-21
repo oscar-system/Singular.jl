@@ -35,8 +35,12 @@ function map_ideal(f::Map(SAlgHom), I::sideal)
             algebra homomorphism.")
    end
 
-   GC.@preserve I f return Ideal(f.codomain, libSingular.maMapIdeal(I.ptr, f.domain.ptr,
-                f.ptr, f.codomain.ptr, libSingular.ndCopyMap()))
+   ptr = GC.@preserve I f libSingular.maMapIdeal(I.ptr, f.domain.ptr,
+                f.ptr, f.codomain.ptr, libSingular.ndCopyMap())
+   
+   J = Ideal(f.codomain,ptr)
+   J.isGB = I.isGB
+   return J
 end
 
 function map_poly(f::Map(SAlgHom), p::spoly)
