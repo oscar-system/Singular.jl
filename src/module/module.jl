@@ -1,6 +1,6 @@
 export jet, minimal_generating_set, ModuleClass, rank, smodule, slimgb,
        eliminate, modulo, lift, division, divrem, prune_with_map,
-       prune_with_map_projection, quotient
+       prune_with_map_projection, quotient, contains, saturation
 
 ###############################################################################
 #
@@ -654,6 +654,20 @@ end
 
 ###############################################################################
 #
+#   Containment
+#
+###############################################################################
+
+function contains(I::smodule{spoly{T}}, J::smodule{spoly{T}}) where T <: Nemo.FieldElem
+   check_parent(I, J)
+   if !I.isGB
+      I = std(I)
+   end
+   return iszero(reduce(J, I))
+end
+
+###############################################################################
+#
 #   Quotient
 #
 ###############################################################################
@@ -663,4 +677,26 @@ function quotient(I::smodule{spoly{T}}, J::smodule{spoly{T}}) where T <: Nemo.Fi
    S = elem_type(R)
    ptr = GC.@preserve I J R libSingular.id_Quotient(I.ptr, J.ptr, I.isGB, R.ptr)
    return Module(smatrix{spoly{T}}(R, ptr))
+end
+
+###############################################################################
+#
+#   Saturation
+#
+###############################################################################
+function saturation(I::smodule{spoly{T}}, J::smodule{spoly{T}}) where T <: Nemo.FieldElem
+   check_parent(I, J)
+   has_global_ordering(base_ring(I)) || error("Must be over a ring with global ordering")
+   if !I.isGB
+      I = std(I)
+   end
+   k = 0
+   done = false
+   while !done
+      Q = quotient(I, J)
+      done = contains(I, Q)
+      I = std(Q)
+      k += 1
+   end
+   return I, k - 1
 end
