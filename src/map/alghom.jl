@@ -35,8 +35,26 @@ function map_ideal(f::Map(SAlgHom), I::sideal)
             algebra homomorphism.")
    end
 
-   GC.@preserve I f return Ideal(f.codomain, libSingular.maMapIdeal(I.ptr, f.domain.ptr,
-                f.ptr, f.codomain.ptr, libSingular.ndCopyMap()))
+   ptr = GC.@preserve I f libSingular.maMapIdeal(I.ptr, f.domain.ptr,
+                f.ptr, f.codomain.ptr, libSingular.ndCopyMap())
+   
+   J = Ideal(f.codomain,ptr)
+   # compare the orderings of f.domain.ptr and f.codomain.ptr
+   domain_ord=Cint[]
+   libSingular.rOrdering_helper(domain_ord, f.domain.ptr)
+   codomain_ord=Cint[]
+   libSingular.rOrdering_helper(codomain_ord, f.codomain.ptr)
+   equal_ordering=true
+   for i in 1:size(domain_ord,1)
+     if domain_ord[i] != codomain_ord[i]
+       equal_ordering=false
+       break
+     end
+   end
+   if equal_ordering
+     J.isGB = I.isGB
+   end
+   return J
 end
 
 function map_poly(f::Map(SAlgHom), p::spoly)
