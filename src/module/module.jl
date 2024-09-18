@@ -1,6 +1,6 @@
 export jet, minimal_generating_set, ModuleClass, rank, smodule, slimgb,
        eliminate, modulo, lift, division, divrem, prune_with_map,
-       prune_with_map_projection
+       prune_with_map_projection, quotient
 
 ###############################################################################
 #
@@ -446,6 +446,7 @@ function nres(I::smodule{spoly{T}}, max_length::Int) where T <: Nemo.FieldElem
    return sresolution{spoly{T}}(R, r, Bool(minimal), false)
 end
 
+
 ###############################################################################
 #
 #   Module constructors
@@ -649,4 +650,17 @@ function hilbert_series(M::smodule{spoly{T}}, w::Vector{<:Integer}, shifts::Vect
   z = Vector{Int32}()
   GC.@preserve M R libSingular.scHilbWeighted(M.ptr, R.ptr, w, shifts, z)
   return z
+end
+
+###############################################################################
+#
+#   Quotient
+#
+###############################################################################
+
+function quotient(I::smodule{spoly{T}}, J::smodule{spoly{T}}) where T <: Nemo.FieldElem
+   R = base_ring(I)
+   S = elem_type(R)
+   ptr = GC.@preserve I J R libSingular.id_Quotient(I.ptr, J.ptr, I.isGB, R.ptr)
+   return Module(smatrix{spoly{T}}(R, ptr))
 end
