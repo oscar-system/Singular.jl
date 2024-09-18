@@ -331,6 +331,16 @@ end
 
 end
 
+@testset "smodule.contains" begin
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
+
+   I = Singular.Module(R, vector(R,y^3))
+   J = Singular.Module(R, vector(R,y^2))
+
+   @test contains(I, J) == false
+   @test contains(J, I) == true
+end
+
 @testset "smodule.quotient" begin
    R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
