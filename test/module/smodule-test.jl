@@ -330,3 +330,15 @@ end
    @test p[3] == 2
 
 end
+
+@testset "smodule.quotient" begin
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
+
+   I = Singular.Module(R, vector(R,x^2 + x*y + 1), vector(R,2y^2 + 3))
+   J = Singular.Module(R, vector(R,x*y^2 + x + 1), vector(R,2x*y + 1), vector(R,x*y + 1))
+
+   A = quotient(I, J)
+   B = Singular.Module(R, vector(R, 2*y^2+3), vector(R, x^2+x*y+1))
+   @test A[1] == B[1]
+   @test A[2] == B[2]
+end
