@@ -38,7 +38,7 @@ function checkbounds(I::smodule, i::Int)
    (i > ngens(I) || i < 1) && throw(BoundsError(I, i))
 end
 
-function getindex(I::smodule{T}, i::Int) where T <: AbstractAlgebra.RingElem
+function getindex(I::smodule{T}, i::Int) where T 
    checkbounds(I, i)
    R = base_ring(I)
    GC.@preserve I R begin
@@ -457,7 +457,17 @@ function Module(R::PolyRing{T}, vecs::svector{spoly{T}}...) where T <: Nemo.Ring
    return smodule{S}(R, vecs...)
 end
 
+function Module(R::PluralRing, vecs::svector{spluralg{T}}...) where T
+   S = elem_type(R)
+   return smodule{S}(R, vecs...)
+end
+
 function Module(R::PolyRing{T}, id::libSingular.ideal_ptr) where T <: Nemo.RingElem
+   S = elem_type(R)
+   return smodule{S}(R, id)
+end
+
+function Module(R::PluralRing, id::libSingular.ideal_ptr) 
    S = elem_type(R)
    return smodule{S}(R, id)
 end
