@@ -365,4 +365,10 @@ end
    @test A[1] == B[1]
    @test A[2] == B[2]
    @test k == 2
+
+   A,k = saturation2(I, J)
+
+   @test A[1] == B[1]
+   @test A[2] == B[2]
+   @test k == 2
 end
