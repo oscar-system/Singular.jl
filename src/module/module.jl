@@ -1,6 +1,6 @@
 export jet, minimal_generating_set, ModuleClass, rank, smodule, slimgb,
        eliminate, modulo, lift, division, divrem, prune_with_map,
-       prune_with_map_projection, quotient, contains, saturation
+       prune_with_map_projection, quotient, contains, saturation, saturation2
 
 ###############################################################################
 #
@@ -699,4 +699,12 @@ function saturation(I::smodule{spoly{T}}, J::smodule{spoly{T}}) where T <: Nemo.
       k += 1
    end
    return I, k - 1
+end
+
+function saturation2(I::smodule{spoly{T}}, J::smodule{spoly{T}}) where T <: Nemo.FieldElem
+   check_parent(I, J)
+   R = base_ring(I)
+   has_global_ordering(R) || error("Must be over a ring with global ordering")
+   ptr_res,k=libSingular.id_Saturation(I.ptr,J.ptr,R.ptr)
+   return (Module(smatrix{spoly{T}}(R,ptr_res))),k
 end
