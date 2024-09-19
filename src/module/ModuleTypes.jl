@@ -13,7 +13,7 @@ mutable struct FreeMod{T <: Nemo.RingElem} <: Module{T}
    function FreeMod{T}(R::PolyRing, r::Int) where T
       return get!(FreeModID, (R, r)) do
          new(R, r)
-      end
+      end::FreeMod{T}
    end
 end
 
@@ -63,7 +63,7 @@ mutable struct ModuleClass{T <: Nemo.RingElem} <: Set
    function ModuleClass{T}(R::PolyRing) where T
       return get!(ModuleClassID, R) do
          new(R)
-      end
+      end::ModuleClass{T}
    end
 end
 

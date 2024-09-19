@@ -14,7 +14,7 @@ mutable struct matrix_space{T <: Nemo.RingElem} <: Set
    function matrix_space{T}(R::PolyRing, r::Int, c::Int) where T
       return get!(MatrixSpaceID, (R, r, c)) do
          new{T}(R, r, c)
-      end
+      end::matrix_space{T}
    end
 end
 

@@ -38,7 +38,7 @@ mutable struct Integers <: Ring
          IntegersID[:ZZ] = d
          finalizer(_Ring_finalizer, d)
          return d
-      end
+      end::Integers
    end
 end
 
@@ -81,7 +81,7 @@ mutable struct Rationals <: Field
          RationalsID[:QQ] = d
          finalizer(_Ring_finalizer, d)
          return d
-      end
+      end::Rationals
    end
 end
 

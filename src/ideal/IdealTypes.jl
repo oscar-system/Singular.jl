@@ -12,7 +12,7 @@ mutable struct IdealSet{T <: AbstractAlgebra.NCRingElem} <: Set
    function IdealSet{T}(R::PolyRing) where T
       return get!(IdealSetID, R) do
          new(R)
-      end
+      end::IdealSet{T}
    end
 end
 
