@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Finitely generated modules · Singular.jl</title><meta name="title" content="Finitely generated modules · Singular.jl"/><meta property="og:title" content="Finitely generated modules · Singular.jl"/><meta property="twitter:title" content="Finitely generated modules · Singular.jl"/><meta name="description" content="Documentation for Singular.jl."/><meta property="og:description" content="Documentation for Singular.jl."/><meta property="twitter:description" content="Documentation for Singular.jl."/><script data-outdated-warner src="../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../search_index.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../">Singular.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../">Getting Started</a></li><li><span class="tocitem">Coefficient rings</span><ul><li><a class="tocitem" href="../integer/">Integers</a></li><li><a class="tocitem" href="../rational/">Rational field</a></li><li><a class="tocitem" href="../modn/">Integers mod n</a></li><li><a class="tocitem" href="../modp/">Integers mod p</a></li><li><a class="tocitem" href="../transExt/">Function fields</a></li><li><a class="tocitem" href="../GF/">Finite fields</a></li><li><a class="tocitem" href="../nemo/">Nemo rings and fields</a></li></ul></li><li><a class="tocitem" href="../polynomial/">Multivariate polynomials</a></li><li><a class="tocitem" href="../noncommutative/">Noncommutative algebras</a></li><li><a class="tocitem" href="../ideal/">Ideals</a></li><li><a class="tocitem" href="../qring/">Quotient Rings</a></li><li><span class="tocitem">Modules</span><ul><li class="is-active"><a class="tocitem" href>Finitely generated modules</a><ul class="internal"><li><a class="tocitem" href="#Module-functionality"><span>Module functionality</span></a></li></ul></li><li><a class="tocitem" href="../vector/">Free modules and vectors</a></li></ul></li><li><a class="tocitem" href="../alghom/">Algebra Homomorphisms</a></li><li><a class="tocitem" href="../resolution/">Resolutions</a></li><li><a class="tocitem" href="../matrix/">Matrices</a></li><li><a class="tocitem" href="../caller/">Interpreter Functionality</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Modules</a></li><li class="is-active"><a href>Finitely generated modules</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Finitely generated modules</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/oscar-system/Singular.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/oscar-system/Singular.jl/blob/master/docs/src/module.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Finitely-generated-modules"><a class="docs-heading-anchor" href="#Finitely-generated-modules">Finitely generated modules</a><a id="Finitely-generated-modules-1"></a><a class="docs-heading-anchor-permalink" href="#Finitely-generated-modules" title="Permalink"></a></h1><p>Singular.jl allows the creation of submodules of a free module over a Singular polynomial ring, given by a finite generating set. These are internally stored as a list of elements of a free module over a polynomial ring <span>$R$</span>. This list of generators can also have the property of being a Groebner basis.</p><p>The default finitely generated module type in Singular.jl is the Singular <code>smodule</code> type.</p><p>Module objects have a parent object which represents the class of <span>$R$</span>-modules they belong to, the data for which is given by the polynomial ring <span>$R$</span> over which the modules are defined.</p><p>The types of modules and associated parent objects are given in the following table according to the library providing them.</p><table><tr><th style="text-align: right">Library</th><th style="text-align: right">Element type</th><th style="text-align: right">Parent type</th></tr><tr><td style="text-align: right">Singular</td><td style="text-align: right"><code>smodule{T}</code></td><td style="text-align: right"><code>Singular.ModuleClass{T}</code></td></tr></table><p>These types are parameterised by the type of elements in the polynomial ring <span>$R$</span>.</p><p>All module types belong directly to the abstract type <code>Module{T}</code> and all the module class parent object types belong to the abstract type <code>Set</code>.</p><h2 id="Module-functionality"><a class="docs-heading-anchor" href="#Module-functionality">Module functionality</a><a id="Module-functionality-1"></a><a class="docs-heading-anchor-permalink" href="#Module-functionality" title="Permalink"></a></h2><p>Singular.jl modules implement standard operations one would expect on modules. These include:</p><ul><li>Operations common to all AbstractAlgebra objects, such as <code>parent</code>, <code>base_ring</code>, <code>elem_type</code>, <code>parent_type</code>, <code>parent</code>, <code>deepcopy</code>, etc.</li></ul><p>Below, we describe all of the functionality for Singular.jl modules that is not included in this list of basic operations.</p><h3 id="Constructors"><a class="docs-heading-anchor" href="#Constructors">Constructors</a><a id="Constructors-1"></a><a class="docs-heading-anchor-permalink" href="#Constructors" title="Permalink"></a></h3><p>Given a Singular polynomial ring <span>$R$</span>, the following constructors are available for creating modules.</p><pre><code class="language-julia hljs">Module{T &lt;: Nemo.RingElem}(R::PolyRing{T}, vecs::svector{spoly{T}}...)</code></pre><p>Construct the module over the polynomial ring <span>$R$</span> whose generators are given by the given parameter list of vectors (of length <span>$n$</span>), each component of which is a polynomial. These vectors represent elements of the free module <span>$R^n$</span>.</p><p>Note that <code>Module</code> must be prepended with the package name <code>Singular</code> to disambiguate from <code>Base.Module</code>.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl hljs">julia&gt; R, (x, y) = polynomial_ring(QQ, [&quot;x&quot;, &quot;y&quot;])
+(Singular polynomial ring (QQ),(x,y),(dp(2),C), spoly{n_Q}[x, y])
+
+julia&gt; v1 = vector(R, x + 1, x*y + 1, y)
+x*y*gen(2)+x*gen(1)+y*gen(3)+gen(2)+gen(1)
+
+julia&gt; v2 = vector(R, x^2 + 1, 2x + 3y, x)
+x^2*gen(1)+x*gen(3)+2*x*gen(2)+3*y*gen(2)+gen(1)
+
+julia&gt; M = Singular.Module(R, v1, v2)
+Singular module over Singular polynomial ring (QQ),(x,y),(dp(2),C), with generators:
+x*y*gen(2)+x*gen(1)+y*gen(3)+gen(2)+gen(1)
+x^2*gen(1)+x*gen(3)+2*x*gen(2)+3*y*gen(2)+gen(1)</code></pre><h3 id="Basic-manipulation"><a class="docs-heading-anchor" href="#Basic-manipulation">Basic manipulation</a><a id="Basic-manipulation-1"></a><a class="docs-heading-anchor-permalink" href="#Basic-manipulation" title="Permalink"></a></h3><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="AbstractAlgebra.number_of_generators-Tuple{smodule}" href="#AbstractAlgebra.number_of_generators-Tuple{smodule}"><code>AbstractAlgebra.number_of_generators</code></a> — <span class="docstring-category">Method</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">number_of_generators(I::smodule)</code></pre><p>Return the number of generators in the current representation of the module (as a list of vectors).</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/oscar-system/Singular.jl/blob/89c0757eac3462df9ea29c48f57ede31a6ecd92e/src/module/module.jl#L22-L27">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="LinearAlgebra.rank-Tuple{smodule}" href="#LinearAlgebra.rank-Tuple{smodule}"><code>LinearAlgebra.rank</code></a> — <span class="docstring-category">Method</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">rank(I::smodule)</code></pre><p>Return the rank <span>$n$</span> of the ambient space <span>$R^n$</span> of which this module is a submodule.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/oscar-system/Singular.jl/blob/89c0757eac3462df9ea29c48f57ede31a6ecd92e/src/module/module.jl#L30-L34">source</a></section></article><p>Singular.jl overloads the <code>setindex!</code> and <code>getindex</code> functions so that one can access the generators of a module using array notation. Each entry is a vector in <span>$R^n$</span>.</p><pre><code class="language-julia hljs">M[n::Int]</code></pre><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="Base.iszero-Tuple{smodule}" href="#Base.iszero-Tuple{smodule}"><code>Base.iszero</code></a> — <span class="docstring-category">Method</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">iszero(p::smodule)</code></pre><p>Return <code>true</code> if this is algebraically the zero module.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/oscar-system/Singular.jl/blob/89c0757eac3462df9ea29c48f57ede31a6ecd92e/src/module/module.jl#L50-L54">source</a></section></article><p><strong>Examples</strong></p><pre><code class="language-julia-repl hljs">julia&gt; R, (x, y) = polynomial_ring(QQ, [&quot;x&quot;, &quot;y&quot;])
+(Singular polynomial ring (QQ),(x,y),(dp(2),C), spoly{n_Q}[x, y])
+
+julia&gt; v1 = vector(R, x + 1, x*y + 1, y)
+x*y*gen(2)+x*gen(1)+y*gen(3)+gen(2)+gen(1)
+
+julia&gt; v2 = vector(R, x^2 + 1, 2x + 3y, x)
+x^2*gen(1)+x*gen(3)+2*x*gen(2)+3*y*gen(2)+gen(1)
+
+julia&gt; M = Singular.Module(R, v1, v2)
+Singular module over Singular polynomial ring (QQ),(x,y),(dp(2),C), with generators:
+x*y*gen(2)+x*gen(1)+y*gen(3)+gen(2)+gen(1)
+x^2*gen(1)+x*gen(3)+2*x*gen(2)+3*y*gen(2)+gen(1)
+
+julia&gt; iszero(M) == false
+true
+
+julia&gt; M[1] == v1
+true
+
+julia&gt; n = rank(M)
+3
+
+julia&gt; d = number_of_generators(M)
+2</code></pre><h3 id="Standard-basis"><a class="docs-heading-anchor" href="#Standard-basis">Standard basis</a><a id="Standard-basis-1"></a><a class="docs-heading-anchor-permalink" href="#Standard-basis" title="Permalink"></a></h3><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="Statistics.std-Tuple{smodule}" href="#Statistics.std-Tuple{smodule}"><code>Statistics.std</code></a> — <span class="docstring-category">Method</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">std(I::smodule; complete_reduction::Bool=false)</code></pre><p>Compute the Groebner basis of the module <span>$I$</span>. If <code>complete_reduction</code> is set to <code>true</code>, the result is unique, up to permutation of the generators and multiplication by constants. If not, only the leading terms are unique (up to permutation of the generators and multiplication by constants, of course). Presently the polynomial ring used must be over a field or over the Singular integers.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/oscar-system/Singular.jl/blob/89c0757eac3462df9ea29c48f57ede31a6ecd92e/src/module/module.jl#L186-L195">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="Singular.lift_std-Tuple{smodule}" href="#Singular.lift_std-Tuple{smodule}"><code>Singular.lift_std</code></a> — <span class="docstring-category">Method</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">lift_std(M::smodule)</code></pre><p>Computes the Groebner base <code>G</code> of <code>M</code> and the transformation matrix <code>T</code> such that <code>(Matrix(G) = Matrix(M) * T)</code>.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/oscar-system/Singular.jl/blob/89c0757eac3462df9ea29c48f57ede31a6ecd92e/src/module/module.jl#L605-L610">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="Singular.lift_std_syz-Tuple{smodule}" href="#Singular.lift_std_syz-Tuple{smodule}"><code>Singular.lift_std_syz</code></a> — <span class="docstring-category">Method</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">lift_std_syz(M::smodule)</code></pre><p>Computes the Groebner base <code>G</code> of <code>M</code>, the transformation matrix <code>T</code> and the syzygies of M. Returns a tuple <code>(G,T,S)</code> satisfying <code>(Matrix(G) = Matrix(M) * T, 0=Matrix(M)*Matrix(S))</code>.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/oscar-system/Singular.jl/blob/89c0757eac3462df9ea29c48f57ede31a6ecd92e/src/module/module.jl#L593-L598">source</a></section></article><p><strong>Examples</strong></p><pre><code class="language-julia-repl hljs">julia&gt; R, (x, y) = polynomial_ring(QQ, [&quot;x&quot;, &quot;y&quot;])
+(Singular polynomial ring (QQ),(x,y),(dp(2),C), spoly{n_Q}[x, y])
+
+julia&gt; v1 = vector(R, x + 1, x*y + 1, y)
+x*y*gen(2)+x*gen(1)+y*gen(3)+gen(2)+gen(1)
+
+julia&gt; v2 = vector(R, x^2 + 1, 2x + 3y, x)
+x^2*gen(1)+x*gen(3)+2*x*gen(2)+3*y*gen(2)+gen(1)
+
+julia&gt; v3 = x*v1 + y*v2 + vector(R, x, y + 1, y^2)
+x^2*y*gen(2)+x^2*y*gen(1)+x^2*gen(1)+2*x*y*gen(3)+2*x*y*gen(2)+y^2*gen(3)+3*y^2*gen(2)+x*gen(2)+2*x*gen(1)+y*gen(2)+y*gen(1)+gen(2)
+
+julia&gt; M = Singular.Module(R, v1, v2, v3)
+Singular module over Singular polynomial ring (QQ),(x,y),(dp(2),C), with generators:
+x*y*gen(2)+x*gen(1)+y*gen(3)+gen(2)+gen(1)
+x^2*gen(1)+x*gen(3)+2*x*gen(2)+3*y*gen(2)+gen(1)
+x^2*y*gen(2)+x^2*y*gen(1)+x^2*gen(1)+2*x*y*gen(3)+2*x*y*gen(2)+y^2*gen(3)+3*y^2*gen(2)+x*gen(2)+2*x*gen(1)+y*gen(2)+y*gen(1)+gen(2)
+
+julia&gt; G = std(M; complete_reduction=true)
+Singular module over Singular polynomial ring (QQ),(x,y),(dp(2),C), with generators:
+y^2*gen(3)+x*gen(1)+y*gen(2)+gen(2)
+x*y*gen(2)+x*gen(1)+y*gen(3)+gen(2)+gen(1)
+x^2*gen(1)+x*gen(3)+2*x*gen(2)+3*y*gen(2)+gen(1)</code></pre><h3 id="Reduction"><a class="docs-heading-anchor" href="#Reduction">Reduction</a><a id="Reduction-1"></a><a class="docs-heading-anchor-permalink" href="#Reduction" title="Permalink"></a></h3><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="Base.reduce-Tuple{smodule, smodule}" href="#Base.reduce-Tuple{smodule, smodule}"><code>Base.reduce</code></a> — <span class="docstring-category">Method</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">reduce(M::smodule, G::smodule; complete_reduction::Bool = true)</code></pre><p>Return a submodule whose generators are the generators of <span>$M$</span> reduced by the submodule <span>$G$</span>. The submodule <span>$G$</span> need not be a Groebner basis. The returned submodule will have the same number of generators as <span>$M$</span>, even if they are zero.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/oscar-system/Singular.jl/blob/89c0757eac3462df9ea29c48f57ede31a6ecd92e/src/module/module.jl#L230-L236">source</a></section></article><p><strong>Examples</strong></p><pre><code class="language-julia-repl hljs">julia&gt; R, (x, y, z) = polynomial_ring(QQ, [&quot;x&quot;, &quot;y&quot;, &quot;z&quot;])
+(Singular polynomial ring (QQ),(x,y,z),(dp(3),C), spoly{n_Q}[x, y, z])
+
+julia&gt; v1 = vector(R, R(0), z, -y)
+-y*gen(3)+z*gen(2)
+
+julia&gt; v2 = vector(R, -z, R(0), x)
+x*gen(3)-z*gen(1)
+
+julia&gt; v3 = vector(R, y, x, R(0))
+x*gen(2)+y*gen(1)
+
+julia&gt; v = y*v1+x*v2+z*v3
+x^2*gen(3)-y^2*gen(3)+x*z*gen(2)-x*z*gen(1)+y*z*gen(2)+y*z*gen(1)
+
+julia&gt; M = Singular.Module(R, v1, v2, v3)
+Singular module over Singular polynomial ring (QQ),(x,y,z),(dp(3),C), with generators:
+-y*gen(3)+z*gen(2)
+x*gen(3)-z*gen(1)
+x*gen(2)+y*gen(1)
+
+julia&gt; B = std(M; complete_reduction=true)
+Singular module over Singular polynomial ring (QQ),(x,y,z),(dp(3),C), with generators:
+y*gen(3)-z*gen(2)
+x*gen(2)+y*gen(1)
+x*gen(3)-z*gen(1)
+y*z*gen(1)
+
+julia&gt; V = Singular.Module(R, v)
+Singular module over Singular polynomial ring (QQ),(x,y,z),(dp(3),C), with generators:
+x^2*gen(3)-y^2*gen(3)+x*z*gen(2)-x*z*gen(1)+y*z*gen(2)+y*z*gen(1)
+
+julia&gt; reduce(V,B)
+Singular module over Singular polynomial ring (QQ),(x,y,z),(dp(3),C), with generators:
+0
+</code></pre><h3 id="Syzygies"><a class="docs-heading-anchor" href="#Syzygies">Syzygies</a><a id="Syzygies-1"></a><a class="docs-heading-anchor-permalink" href="#Syzygies" title="Permalink"></a></h3><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="Singular.syz-Tuple{smodule}" href="#Singular.syz-Tuple{smodule}"><code>Singular.syz</code></a> — <span class="docstring-category">Method</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">syz(M::smodule)</code></pre><p>Compute the module of syzygies of the given module. This will be given as a set of generators in an ambient space <span>$R^n$</span>, where <span>$n$</span> is the number of generators in <span>$M$</span>.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/oscar-system/Singular.jl/blob/89c0757eac3462df9ea29c48f57ede31a6ecd92e/src/module/module.jl#L292-L298">source</a></section></article><p><strong>Examples</strong></p><pre><code class="language-julia-repl hljs">julia&gt; R, (x, y) = polynomial_ring(QQ, [&quot;x&quot;, &quot;y&quot;])
+(Singular polynomial ring (QQ),(x,y),(dp(2),C), spoly{n_Q}[x, y])
+
+julia&gt; v1 = vector(R, (x + 1)*y, (x*y + 1)*y, y)
+x*y^2*gen(2)+x*y*gen(1)+y*gen(3)+y*gen(2)+y*gen(1)
+
+julia&gt; v2 = vector(R, (x + 1)*x, (x*y + 1)*x, x)
+x^2*y*gen(2)+x^2*gen(1)+x*gen(3)+x*gen(2)+x*gen(1)
+
+julia&gt; M = Singular.Module(R, v1, v2)
+Singular module over Singular polynomial ring (QQ),(x,y),(dp(2),C), with generators:
+x*y^2*gen(2)+x*y*gen(1)+y*gen(3)+y*gen(2)+y*gen(1)
+x^2*y*gen(2)+x^2*gen(1)+x*gen(3)+x*gen(2)+x*gen(1)
+
+julia&gt; Z = syz(M)
+Singular module over Singular polynomial ring (QQ),(x,y),(dp(2),C), with generators:
+x*gen(1)-y*gen(2)</code></pre><h3 id="Free-resolutions"><a class="docs-heading-anchor" href="#Free-resolutions">Free resolutions</a><a id="Free-resolutions-1"></a><a class="docs-heading-anchor-permalink" href="#Free-resolutions" title="Permalink"></a></h3><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="Singular.sres-Union{Tuple{T}, Tuple{smodule{spoly{T}}, Int64}} where T&lt;:AbstractAlgebra.FieldElem" href="#Singular.sres-Union{Tuple{T}, Tuple{smodule{spoly{T}}, Int64}} where T&lt;:AbstractAlgebra.FieldElem"><code>Singular.sres</code></a> — <span class="docstring-category">Method</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">sres(I::smodule{spoly{T}}, max_length::Int) where T &lt;: Singular.FieldElem</code></pre><p>Compute a free resolution of the given module <span>$I$</span> of length up to the given maximum length. If <code>max_length</code> is set to zero, a full length free resolution is computed. Each element of the resolution is itself a module.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/oscar-system/Singular.jl/blob/89c0757eac3462df9ea29c48f57ede31a6ecd92e/src/module/module.jl#L341-L347">source</a></section></article><p><strong>Examples</strong></p><pre><code class="language-julia-repl hljs">julia&gt; R, (x, y) = polynomial_ring(QQ, [&quot;x&quot;, &quot;y&quot;])
+(Singular polynomial ring (QQ),(x,y),(dp(2),C), spoly{n_Q}[x, y])
+
+julia&gt; v1 = vector(R, x + 1, x*y + 1, y)
+x*y*gen(2)+x*gen(1)+y*gen(3)+gen(2)+gen(1)
+
+julia&gt; v2 = vector(R, x^2 + 1, 2x + 3y, x)
+x^2*gen(1)+x*gen(3)+2*x*gen(2)+3*y*gen(2)+gen(1)
+
+julia&gt; M = std(Singular.Module(R, v1, v2))
+Singular module over Singular polynomial ring (QQ),(x,y),(dp(2),C), with generators:
+x*y*gen(2)+x*gen(1)+y*gen(3)+gen(2)+gen(1)
+x^2*gen(1)+x*gen(3)+2*x*gen(2)+3*y*gen(2)+gen(1)
+
+julia&gt; F = sres(M, 0)
+Singular resolution: R^3 &lt;- R^2
+
+julia&gt; M1 = Singular.Matrix(M)
+[x + 1, x^2 + 1
+x*y + 1, 2*x + 3*y
+y, x]
+
+julia&gt; M2 = Singular.Matrix(F[2])
+[0
+0]
+
+julia&gt; iszero(M1*M2) # test we have a complex
+true</code></pre><h3 id="Jet-of-module"><a class="docs-heading-anchor" href="#Jet-of-module">Jet of module</a><a id="Jet-of-module-1"></a><a class="docs-heading-anchor-permalink" href="#Jet-of-module" title="Permalink"></a></h3><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="Singular.jet-Tuple{smodule, Int64}" href="#Singular.jet-Tuple{smodule, Int64}"><code>Singular.jet</code></a> — <span class="docstring-category">Method</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">jet(M::smodule, n::Int)</code></pre><p>Given a module <span>$M$</span> this function truncates the generators of <span>$M$</span> up to degree <span>$n$</span>.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/oscar-system/Singular.jl/blob/89c0757eac3462df9ea29c48f57ede31a6ecd92e/src/module/module.jl#L477-L482">source</a></section></article><p><strong>Examples</strong></p><pre><code class="language-julia-repl hljs">julia&gt; R, (x, y) = polynomial_ring(QQ, [&quot;x&quot;, &quot;y&quot;])
+(Singular polynomial ring (QQ),(x,y),(dp(2),C), spoly{n_Q}[x, y])
+
+julia&gt; v1 = vector(R, x + 1, x*y + 1, y)
+x*y*gen(2)+x*gen(1)+y*gen(3)+gen(2)+gen(1)
+
+julia&gt; v2 = vector(R, x^5 + 1, 2x^3 + 3y^2, x^2)
+x^5*gen(1)+2*x^3*gen(2)+x^2*gen(3)+3*y^2*gen(2)+gen(1)
+
+julia&gt; M = Singular.Module(R, v1, v2)
+Singular module over Singular polynomial ring (QQ),(x,y),(dp(2),C), with generators:
+x*y*gen(2)+x*gen(1)+y*gen(3)+gen(2)+gen(1)
+x^5*gen(1)+2*x^3*gen(2)+x^2*gen(3)+3*y^2*gen(2)+gen(1)
+
+julia&gt; N = jet(M,3)
+Singular module over Singular polynomial ring (QQ),(x,y),(dp(2),C), with generators:
+x*y*gen(2)+x*gen(1)+y*gen(3)+gen(2)+gen(1)
+2*x^3*gen(2)+x^2*gen(3)+3*y^2*gen(2)+gen(1)</code></pre><h3 id="Operations-over-local-rings"><a class="docs-heading-anchor" href="#Operations-over-local-rings">Operations over local rings</a><a id="Operations-over-local-rings-1"></a><a class="docs-heading-anchor-permalink" href="#Operations-over-local-rings" title="Permalink"></a></h3><p>If the base ring <code>R</code> is a local ring, a minimal generating set can be computed using the following function</p><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="Singular.minimal_generating_set-Tuple{smodule}" href="#Singular.minimal_generating_set-Tuple{smodule}"><code>Singular.minimal_generating_set</code></a> — <span class="docstring-category">Method</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">minimal_generating_set(M::smodule)</code></pre><p>Return a vector containing the minimal generators of <span>$M$</span>.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/oscar-system/Singular.jl/blob/89c0757eac3462df9ea29c48f57ede31a6ecd92e/src/module/module.jl#L496-L500">source</a></section></article><p><strong>Examples</strong></p><pre><code class="language-julia-repl hljs">julia&gt; R, (x, y) = polynomial_ring(QQ, [&quot;x&quot;, &quot;y&quot;]; ordering=:negdegrevlex)
+(Singular polynomial ring (QQ),(x,y),(ds(2),C), spoly{n_Q}[x, y])
+
+julia&gt; has_local_ordering(R) == true
+true
+
+julia&gt; v1 = vector(R, x, y^2)
+x*gen(1)+y^2*gen(2)
+
+julia&gt; v2 = vector(R, y - x, y - y^2)
+-x*gen(1)+y*gen(2)+y*gen(1)-y^2*gen(2)
+
+julia&gt; v3 = v1 + v2
+y*gen(2)+y*gen(1)
+
+julia&gt; M = Singular.Module(R, v1, v2, v3)
+Singular module over Singular polynomial ring (QQ),(x,y),(ds(2),C), with generators:
+x*gen(1)+y^2*gen(2)
+-x*gen(1)+y*gen(2)+y*gen(1)-y^2*gen(2)
+y*gen(2)+y*gen(1)
+
+julia&gt; min = minimal_generating_set(M)
+2-element Vector{svector{spoly{n_Q}}}:
+ y*gen(2)+y*gen(1)
+ x*gen(1)-y*gen(2)-y*gen(1)+y^2*gen(2)</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../qring/">« Quotient Rings</a><a class="docs-footer-nextpage" href="../vector/">Free modules and vectors »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.7.0 on <span class="colophon-date" title="Thursday 19 September 2024 14:10">Thursday 19 September 2024</span>. Using Julia version 1.10.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
