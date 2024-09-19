@@ -34,6 +34,7 @@ end
 
 """
     (R::PolyRing{T})(m::libSingular.poly,::Val{:vector}) where T
+
 If R is called with a low-level poly pointer, along with
 Val(:vector), it will interpret the poly pointer as a vector.
 This needs to be indicated due to the fact that Singulars
