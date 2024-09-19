@@ -291,7 +291,7 @@ reconstruct(x::Integer, y::n_Z) = reconstruct(ZZ(x), y)
 #
 ###############################################################################
 
-function addeq!(x::n_Q, y::n_Q)
+function add!(x::n_Q, y::n_Q)
    c = parent(x)
    GC.@preserve x y c begin
       x.ptr = libSingular.n_InpAdd(x.ptr, y.ptr, c.ptr)

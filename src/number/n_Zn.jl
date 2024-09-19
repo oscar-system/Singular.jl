@@ -225,7 +225,7 @@ end
 #
 ###############################################################################
 
-function addeq!(x::n_Zn, y::n_Zn)
+function add!(x::n_Zn, y::n_Zn)
    c = parent(x)
    x.ptr = GC.@preserve x y c libSingular.n_InpAdd(x.ptr, y.ptr, c.ptr)
    return x

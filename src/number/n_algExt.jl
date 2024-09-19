@@ -235,7 +235,7 @@ end
 #
 ###############################################################################
 
-function addeq!(x::n_algExt, y::n_algExt)
+function add!(x::n_algExt, y::n_algExt)
    R = parent(x)
    x.ptr = GC.@preserve x y R libSingular.n_InpAdd(x.ptr, y.ptr, R.ptr)
    return x

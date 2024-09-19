@@ -93,7 +93,7 @@ function nf_elemInpAdd(a::Ptr{Ptr{Cvoid}}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    r = unsafe_load(a)
    aa = julia(r)::Nemo.AbsSimpleNumFieldElem
    bb = julia(b)::Nemo.AbsSimpleNumFieldElem
-   Nemo.addeq!(aa, bb)
+   Nemo.add!(aa, bb)
    nothing
 end
 

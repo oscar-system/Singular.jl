@@ -99,7 +99,7 @@ function nemoFieldInpAdd(a::Ptr{Ptr{Cvoid}}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    r = unsafe_load(a)
    aa = julia(r)
    bb = julia(b)
-   cc = Nemo.addeq!(aa, bb)
+   cc = Nemo.add!(aa, bb)
    n = number(cc, aa)
    setindex_internal_void(reinterpret(Ptr{Cvoid},a), n)
    nothing

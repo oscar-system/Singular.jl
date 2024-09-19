@@ -284,7 +284,7 @@ end
 #
 ###############################################################################
 
-function addeq!(x::n_transExt, y::n_transExt)
+function add!(x::n_transExt, y::n_transExt)
    c = parent(x)
    x.ptr = GC.@preserve x y c libSingular.n_InpAdd(x.ptr, y.ptr, c.ptr)
    return x

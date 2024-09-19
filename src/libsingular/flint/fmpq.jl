@@ -89,7 +89,7 @@ function fmpqInpAdd(a::Ptr{Ptr{Cvoid}}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    r = unsafe_load(a)
    aa = julia(r)::Nemo.QQFieldElem
    bb = julia(b)::Nemo.QQFieldElem
-   Nemo.addeq!(aa, bb)
+   Nemo.add!(aa, bb)
    nothing
 end
 

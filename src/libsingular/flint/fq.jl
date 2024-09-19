@@ -93,7 +93,7 @@ function fqInpAdd(a::Ptr{Ptr{Cvoid}}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    r = unsafe_load(a)
    aa = julia(r)::Nemo.FqPolyRepFieldElem
    bb = julia(b)::Nemo.FqPolyRepFieldElem
-   Nemo.addeq!(aa, bb)
+   Nemo.add!(aa, bb)
    nothing
 end
 

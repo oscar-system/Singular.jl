@@ -1358,7 +1358,7 @@ function sort_terms!(x::SPolyUnion)
    return x
 end
 
-function addeq!(x::SPolyUnion, y::SPolyUnion)
+function add!(x::SPolyUnion, y::SPolyUnion)
    R = parent(x)
    GC.@preserve x y R begin
        if y.ptr == C_NULL
