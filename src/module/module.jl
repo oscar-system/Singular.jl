@@ -8,15 +8,15 @@ export jet, minimal_generating_set, ModuleClass, rank, smodule, slimgb,
 #
 ###############################################################################
 
-parent(a::smodule{T}) where T <: Nemo.RingElem = ModuleClass{T}(a.base_ring)
+parent(a::smodule{T}) where T <: Nemo.NCRingElem = ModuleClass{T}(a.base_ring)
 
 base_ring(S::ModuleClass) = S.base_ring
 
 base_ring(I::smodule) = I.base_ring
 
-elem_type(::Type{ModuleClass{T}}) where T <: AbstractAlgebra.RingElem = smodule{T}
+elem_type(::Type{ModuleClass{T}}) where T <: Nemo.NCRingElem = smodule{T}
 
-parent_type(::Type{smodule{T}}) where T <: AbstractAlgebra.RingElem = ModuleClass{T}
+parent_type(::Type{smodule{T}}) where T <: Nemo.NCRingElem = ModuleClass{T}
 
 
 @doc raw"""
@@ -60,7 +60,7 @@ function deepcopy_internal(I::smodule, dict::IdDict)
    return Module(R, ptr)
 end
 
-function check_parent(I::smodule{T}, J::smodule{T}) where T <: Nemo.RingElem
+function check_parent(I::smodule{T}, J::smodule{T}) where T <: Nemo.NCRingElem
    base_ring(I) != base_ring(J) && error("Incompatible modules")
 end
 
@@ -462,12 +462,7 @@ function Module(R::PluralRing, vecs::svector{spluralg{T}}...) where T
    return smodule{S}(R, vecs...)
 end
 
-function Module(R::PolyRing{T}, id::libSingular.ideal_ptr) where T <: Nemo.RingElem
-   S = elem_type(R)
-   return smodule{S}(R, id)
-end
-
-function Module(R::PluralRing, id::libSingular.ideal_ptr) 
+function Module(R::Nemo.NCRing, id::libSingular.ideal_ptr) 
    S = elem_type(R)
    return smodule{S}(R, id)
 end
