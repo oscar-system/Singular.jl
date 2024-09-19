@@ -6,15 +6,15 @@ export FreeMod, svector, gens, rank, vector, jet
 #
 ###############################################################################
 
-parent(v::svector{T}) where {T <: Nemo.RingElem} = FreeMod{T}(v.base_ring, v.rank)
+parent(v::svector{T}) where {T <: Nemo.NCRingElem} = FreeMod{T}(v.base_ring, v.rank)
 
 base_ring(R::FreeMod) = R.base_ring
 
 base_ring(v::svector) = v.base_ring
 
-elem_type(::Type{FreeMod{T}}) where {T <: Nemo.RingElem} = svector{T}
+elem_type(::Type{FreeMod{T}}) where {T <: Nemo.NCRingElem} = svector{T}
 
-parent_type(::Type{svector{T}}) where {T <: Nemo.RingElem} = FreeMod{T}
+parent_type(::Type{svector{T}}) where {T <: Nemo.NCRingElem} = FreeMod{T}
 
 @doc raw"""
     rank(M::FreeMod)
@@ -28,28 +28,28 @@ rank(M::FreeMod) = M.rank
 
 Return a Julia array whose entries are the generators of the given free module.
 """
-function gens(M::FreeMod{T}) where T <: AbstractAlgebra.RingElem
+function gens(M::FreeMod{T}) where T <: Nemo.NCRingElem
    R = base_ring(M)
    ptr = GC.@preserve R libSingular.id_FreeModule(Cint(M.rank), R.ptr)
    return [svector{T}(R, M.rank, libSingular.getindex(ptr, Cint(i - 1))) for i in 1:M.rank]
 end
 
-function gen(M::FreeMod{T}, i::Int) where T <: AbstractAlgebra.RingElem
+function gen(M::FreeMod{T}, i::Int) where T <: Nemo.NCRingElem
    1 <= i <= M.rank || error("index out of range")
    R = base_ring(M)
    ptr = GC.@preserve R libSingular.id_FreeModule(Cint(M.rank), R.ptr)
    return svector{T}(R, M.rank, libSingular.getindex(ptr, Cint(i - 1)))
 end
 
-number_of_generators(M::FreeMod{T}) where T <: AbstractAlgebra.RingElem = rank(M)
+number_of_generators(M::FreeMod{T}) where T <: Nemo.NCRingElem = rank(M)
 
-function deepcopy_internal(p::svector{T}, dict::IdDict) where T <: AbstractAlgebra.RingElem
+function deepcopy_internal(p::svector{T}, dict::IdDict) where T <: Nemo.NCRingElem
    R = base_ring(p)
    p2 = GC.@preserve p R libSingular.p_Copy(p.ptr, R.ptr)
    return svector{T}(p.base_ring, p.rank, p2)
 end
 
-function check_parent(a::svector{T}, b::svector{T}) where T <: Nemo.RingElem
+function check_parent(a::svector{T}, b::svector{T}) where T <: Nemo.NCRingElem
    base_ring(a) != base_ring(b) && error("Incompatible base rings")
    a.rank != b.rank && error("Vectors of incompatible rank")
 end
@@ -86,7 +86,7 @@ end
 #
 ###############################################################################
 
-function -(a::svector{T}) where T <: AbstractAlgebra.RingElem
+function -(a::svector{T}) where T <: Nemo.NCRingElem
    R = base_ring(a)
    GC.@preserve a R begin
       a1 = libSingular.p_Copy(a.ptr, R.ptr)
@@ -103,7 +103,7 @@ iszero(p::svector) = p.ptr.cpp_object == C_NULL
 #
 ###############################################################################
 
-function +(a::svector{T}, b::svector{T}) where T <: AbstractAlgebra.RingElem
+function +(a::svector{T}, b::svector{T}) where T <: Nemo.NCRingElem
    check_parent(a, b)
    R = base_ring(a)
    GC.@preserve a b R begin
@@ -114,7 +114,7 @@ function +(a::svector{T}, b::svector{T}) where T <: AbstractAlgebra.RingElem
    end
 end
 
-function -(a::svector{T}, b::svector{T}) where T <: AbstractAlgebra.RingElem
+function -(a::svector{T}, b::svector{T}) where T <: Nemo.NCRingElem
    check_parent(a, b)
    R = base_ring(a)
    GC.@preserve a b R begin
@@ -138,6 +138,13 @@ function *(a::svector{spoly{T}}, b::spoly{T}) where T <: AbstractAlgebra.RingEle
    return svector{spoly{T}}(R, a.rank, s)
 end
 
+function *(a::svector{Singular.spluralg{T}}, b::Singular.spluralg{T}) where T <: AbstractAlgebra.RingElem
+   base_ring(a) != parent(b) && error("Incompatible base rings")
+   R = base_ring(a)
+   s = GC.@preserve a b R libSingular.pp_Mult_qq(a.ptr, b.ptr, R.ptr)
+   return svector{spoly{T}}(R, a.rank, s)
+end
+
 function (a::spoly{T} * b::svector{spoly{T}}) where T <: Nemo.RingElem
    base_ring(b) != parent(a) && error("Incompatible base rings")
    R = base_ring(b)
@@ -145,9 +152,18 @@ function (a::spoly{T} * b::svector{spoly{T}}) where T <: Nemo.RingElem
    return svector{spoly{T}}(R, b.rank, s)
 end
 
+function *(b::Singular.spluralg{T}, a::svector{Singular.spluralg{T}}) where T
+   base_ring(a) != parent(b) && error("Incompatible base rings")
+   R = base_ring(a)
+   s = GC.@preserve a b R libSingular.pp_Mult_qq(a.ptr, b.ptr, R.ptr)
+   return svector{spluralg{T}}(R, a.rank, s)
+end
+
 (a::svector{spoly{T}} * b::T) where T <: Nemo.RingElem = a*base_ring(a)(b)
 
 (a::T * b::svector{spoly{T}}) where T <: Nemo.RingElem = base_ring(b)(a)*b
+
+#(a::Singular.spluralg * b::svector{Singular.spluralg}) = base_ring(b)(a)*b
 
 *(a::svector, b::Integer) = a*base_ring(a)(b)
 
@@ -159,7 +175,7 @@ end
 #
 ###############################################################################
 
-function (x::svector{T} == y::svector{T}) where T <: Nemo.RingElem
+function (x::svector{T} == y::svector{T}) where T <: Union{Nemo.RingElem, Singular.spluralg}
    check_parent(x, y)
    R = base_ring(x)
    GC.@preserve x y R return Bool(libSingular.p_EqualPolys(x.ptr, y.ptr, R.ptr))
@@ -188,7 +204,7 @@ end
 #
 ###############################################################################
 
-function (S::FreeMod{T})(a::Vector{T}) where T <: AbstractAlgebra.RingElem
+function (S::FreeMod{T})(a::Vector{T}) where T <: Union{AbstractAlgebra.RingElem, Singular.spluralg}
    R = base_ring(S) # polynomial ring
    GC.@preserve a R begin
       n = size(a)[1]
@@ -198,7 +214,7 @@ function (S::FreeMod{T})(a::Vector{T}) where T <: AbstractAlgebra.RingElem
    end
 end
 
-function (S::FreeMod{T})() where T <: AbstractAlgebra.RingElem
+function (S::FreeMod{T})() where T <: Union{AbstractAlgebra.RingElem, Singular.spluralg}
    R = base_ring(S) # polynomial ring
    n = S.rank
    z = zero(R)
@@ -245,7 +261,39 @@ function Base.iterate(p::svector{spoly{T}}) where T <: Nemo.RingElem
    end
 end
 
+function Base.iterate(p::Singular.svector{Singular.spluralg{T}}) where T 
+   GC.@preserve p begin
+      ptr = p.ptr
+      if ptr.cpp_object == C_NULL
+         return nothing
+      else
+         R = base_ring(p)
+         A = Array{Int}(undef, nvars(R))
+         c = GC.@preserve R libSingular.p_GetExpVLV(ptr, A, R.ptr)
+         S = base_ring(R)
+         a = GC.@preserve S S(libSingular.n_Copy(libSingular.pGetCoeff(ptr), S.ptr))
+         return (c, A, a), ptr
+      end
+   end
+end
+
 function Base.iterate(p::svector{spoly{T}}, state) where T <: Nemo.RingElem
+   GC.@preserve p begin
+      state = libSingular.pNext(state)
+      if state.cpp_object == C_NULL
+         return nothing
+      else
+         R = base_ring(p)
+         A = Array{Int}(undef, nvars(R))
+         c = GC.@preserve R libSingular.p_GetExpVLV(state, A, R.ptr)
+         S = base_ring(R)
+         a = GC.@preserve S S(libSingular.n_Copy(libSingular.pGetCoeff(state), S.ptr))
+         return (c, A, a), state
+      end
+   end
+end
+
+function Base.iterate(p::svector{spluralg{T}}, state) where T
    GC.@preserve p begin
       state = libSingular.pNext(state)
       if state.cpp_object == C_NULL
@@ -285,6 +333,13 @@ end
 
 # free module of rank n
 function FreeModule(R::PolyRing{T}, n::Int) where T <: Nemo.RingElem
+   (n > typemax(Cint) || n < 0) &&
+      throw(DomainError(n, "rank must be non-negative and <= $(typemax(Cint))"))
+   S = elem_type(R)
+   return FreeMod{S}(R, n)
+end
+
+function FreeModule(R::Singular.PluralRing{T}, n::Int) where T <: Singular.n_Q
    (n > typemax(Cint) || n < 0) &&
       throw(DomainError(n, "rank must be non-negative and <= $(typemax(Cint))"))
    S = elem_type(R)

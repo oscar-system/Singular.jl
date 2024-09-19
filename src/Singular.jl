@@ -216,9 +216,9 @@ include("poly/PolyTypes.jl")
 
 include("matrix/MatrixTypes.jl")
 
-include("module/ModuleTypes.jl")
-
 include("poly/PluralTypes.jl")
+
+include("module/ModuleTypes.jl")
 
 include("poly/LPTypes.jl")
 

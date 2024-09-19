@@ -4,25 +4,25 @@
 #
 ###############################################################################
 
-const FreeModID = Dict{Tuple{PolyRing, Int}, Module}()
+const FreeModID = Dict{Tuple{Nemo.NCRing, Int}, Module}()
 
-mutable struct FreeMod{T <: Nemo.RingElem} <: Module{T}
-   base_ring::PolyRing
+mutable struct FreeMod{T <: Nemo.NCRingElem} <: Module{T}
+   base_ring::Nemo.NCRing
    rank::Int
 
-   function FreeMod{T}(R::PolyRing, r::Int) where T
+   function FreeMod{T}(R::Nemo.NCRing, r::Int) where T
       return get!(FreeModID, (R, r)) do
          new(R, r)
       end::FreeMod{T}
    end
 end
 
-mutable struct svector{T <: Nemo.RingElem} <: Nemo.ModuleElem{T}
-   base_ring::PolyRing
+mutable struct svector{T <: Nemo.NCRingElem} <: Nemo.ModuleElem{T}
+   base_ring::Nemo.NCRing
    ptr::libSingular.poly_ptr # not really a polynomial
    rank::Int
 
-   function svector{T}(R::PolyRing, r::Int, p::libSingular.poly_ptr) where T
+   function svector{T}(R::Nemo.NCRing, r::Int, p::libSingular.poly_ptr) where T
       T === elem_type(R) || error("type mismatch")
       z = new(R, p, r)
       R.refcount += 1
@@ -30,6 +30,7 @@ mutable struct svector{T <: Nemo.RingElem} <: Nemo.ModuleElem{T}
       return z
    end
 end
+
 
 """
     (R::PolyRing{T})(m::libSingular.poly,::Val{:vector}) where T
@@ -40,6 +41,10 @@ This needs to be indicated due to the fact that Singulars
 vectors and polys are both stored in the poly data structure.
 """
 function (R::PolyRing{T})(m::libSingular.poly_ptr, ::Val{:vector}) where T
+   return svector{T}(R, 1, m)
+end
+
+function (R::PluralRing{T})(m::libSingular.poly_ptr, ::Val{:vector}) where T
    return svector{T}(R, 1, m)
 end
 
@@ -55,25 +60,25 @@ end
 #
 ###############################################################################
 
-const ModuleClassID = Dict{PolyRing, Set}()
+const ModuleClassID = Dict{Nemo.NCRing, Set}()
 
-mutable struct ModuleClass{T <: Nemo.RingElem} <: Set
-   base_ring::PolyRing
+mutable struct ModuleClass{T <: Nemo.NCRingElem} <: Set
+   base_ring::Nemo.NCRing
 
-   function ModuleClass{T}(R::PolyRing) where T
+   function ModuleClass{T}(R::Nemo.NCRing) where T
       return get!(ModuleClassID, R) do
          new(R)
       end::ModuleClass{T}
    end
 end
 
-mutable struct smodule{T <: Nemo.RingElem} <: Module{T}
-   base_ring::PolyRing
+mutable struct smodule{T <: Nemo.NCRingElem} <: Module{T}
+   base_ring::Nemo.NCRing
    ptr::libSingular.ideal_ptr # ideal and module types are the same in Singular
    isGB::Bool
 
    # take ownership of the pointer - not for general users
-   function smodule{T}(R::PolyRing, m::libSingular.ideal_ptr) where T
+   function smodule{T}(R::Nemo.NCRing, m::libSingular.ideal_ptr) where T
       T === elem_type(R) || error("type mismatch")
       z = new(R, m, false)
       R.refcount += 1
@@ -89,7 +94,7 @@ function smodule{T}(R::PolyRing, m::libSingular.matrix_ptr) where T
    return smodule{T}(R, ptr)
 end
 
-function smodule{T}(R::PolyRing, vecs::svector...) where T
+function smodule{T}(R::Nemo.NCRing, vecs::svector...) where T
    n = length(vecs)
    r = vecs[1].rank;
    for i = 1:n
