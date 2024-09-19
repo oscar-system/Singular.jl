@@ -89,7 +89,7 @@ function fmpzInpAdd(a::Ptr{Ptr{Cvoid}}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
     r = unsafe_load(a)
     aa = julia(r)::Nemo.ZZRingElem
     bb = julia(b)::Nemo.ZZRingElem
-    Nemo.addeq!(aa, bb)
+    Nemo.add!(aa, bb)
     nothing
 end
 

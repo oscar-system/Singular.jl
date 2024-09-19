@@ -417,8 +417,8 @@ for (rw, rew) in [(:RingWrapper, :RingElemWrapper),
       return ($rew){S, T}(one(R.data), R)
    end
 
-   function addeq!(z::($rew){S, T}, a::($rew){S, T}) where {S, T}
-      z.data = addeq!(z.data, a.data)
+   function add!(z::($rew){S, T}, a::($rew){S, T}) where {S, T}
+      z.data = add!(z.data, a.data)
       return z
    end
 

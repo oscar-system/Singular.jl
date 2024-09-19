@@ -48,7 +48,7 @@ import AbstractAlgebra: AbstractAlgebra, diagonal_matrix, factor,
 
 import AbstractAlgebra: pretty, Lowercase, LowercaseOff, Indent, Dedent, terse, is_terse
 
-import Nemo: add!, addeq!, base_ring, canonical_unit,
+import Nemo: add!, base_ring, canonical_unit,
              change_base_ring, characteristic, check_parent, codomain,
              coeff, coefficients, compose, constant_coefficient,
              contains, content, crt,
