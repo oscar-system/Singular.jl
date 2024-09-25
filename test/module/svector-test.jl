@@ -29,6 +29,7 @@
    @test gen(M,1) == gens(M)[1]
    @test_throws ErrorException gen(M,0)
    @test_throws ErrorException gen(M,ngens(M)+1)
+   @test length(v2) == 5
 end
 
 @testset "svector.jet" begin

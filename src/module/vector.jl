@@ -310,6 +310,9 @@ function Base.iterate(p::svector{spluralg{T}}, state) where T
 end
 
 Base.IteratorSize(::svector{spoly{T}}) where {T} = Base.SizeUnknown()
+
+length(p::svector) = Int(libSingular.pLength(p.ptr))
+
 ###############################################################################
 #
 #   Vector constructors
