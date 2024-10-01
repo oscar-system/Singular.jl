@@ -681,6 +681,13 @@ function quotient(I::smodule{spoly{T}}, J::smodule{spoly{T}}) where T <: Nemo.Fi
    R = base_ring(I)
    S = elem_type(R)
    ptr = GC.@preserve I J R libSingular.id_Quotient(I.ptr, J.ptr, I.isGB, R.ptr)
+   return sideal{S}(R, ptr)
+end
+
+function quotient(I::smodule{spoly{T}}, J::sideal{spoly{T}}) where T <: Nemo.FieldElem
+   R = base_ring(I)
+   S = elem_type(R)
+   ptr = GC.@preserve I J R libSingular.id_Quotient_M(I.ptr, J.ptr, I.isGB, R.ptr)
    return Module(smatrix{spoly{T}}(R, ptr))
 end
 
@@ -689,8 +696,10 @@ end
 #   Saturation
 #
 ###############################################################################
-function saturation(I::smodule{spoly{T}}, J::smodule{spoly{T}}) where T <: Nemo.FieldElem
-   check_parent(I, J)
+function saturation(I::smodule{spoly{T}}, J::sideal{spoly{T}}) where T <: Nemo.FieldElem
+   if I.base_ring != J.base_ring
+     error("different base_ring")
+   end
    has_global_ordering(base_ring(I)) || error("Must be over a ring with global ordering")
    if !I.isGB
       I = std(I)
@@ -706,10 +715,12 @@ function saturation(I::smodule{spoly{T}}, J::smodule{spoly{T}}) where T <: Nemo.
    return I, k - 1
 end
 
-function saturation2(I::smodule{spoly{T}}, J::smodule{spoly{T}}) where T <: Nemo.FieldElem
-   check_parent(I, J)
+function saturation2(I::smodule{spoly{T}}, J::sideal{spoly{T}}) where T <: Nemo.FieldElem
+   if I.base_ring != J.base_ring
+     error("different base_ring")
+   end
    R = base_ring(I)
    has_global_ordering(R) || error("Must be over a ring with global ordering")
-   ptr_res,k=libSingular.id_Saturation(I.ptr,J.ptr,R.ptr)
+   ptr_res,k=libSingular.id_Saturation_M(I.ptr,J.ptr,R.ptr)
    return (Module(smatrix{spoly{T}}(R,ptr_res))),k
 end

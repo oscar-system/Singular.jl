@@ -420,6 +420,14 @@ void singular_define_ideals(jlcxx::Module & Singular)
     return id;
   });
 
+  Singular.method("id_Quotient_M", [](ideal a, ideal b, bool c, ring d) {
+    const ring origin = currRing;
+    rChangeCurrRing(d);
+    ideal id = idQuot(a, b, c, FALSE);
+    rChangeCurrRing(origin);
+    return id;
+  });
+
   Singular.method("id_Intersection", [](ideal a, ideal b, ring c) {
     const ring origin = currRing;
     rChangeCurrRing(c);
@@ -576,6 +584,15 @@ void singular_define_ideals(jlcxx::Module & Singular)
     rChangeCurrRing(r);
     int   d;
     ideal res = idSaturate(I, J, d, TRUE);
+    rChangeCurrRing(origin);
+    return std::make_tuple(res, d);
+  });
+
+  Singular.method("id_Saturation_M", [](ideal I, ideal J, ring r) {
+    const ring origin = currRing;
+    rChangeCurrRing(r);
+    int   d;
+    ideal res = idSaturate(I, J, d, FALSE);
     rChangeCurrRing(origin);
     return std::make_tuple(res, d);
   });
