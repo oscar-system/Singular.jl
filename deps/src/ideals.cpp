@@ -240,7 +240,7 @@ auto id_MinStd_helper(ideal a, ring b, bool complete_reduction = false)
   unsigned int save_opt = si_opt_1;
   rChangeCurrRing(b);
   si_opt_1 |= crbit;
-  id = kMin_std(a, b->qideal, h, NULL, m);
+  id = kMin_std(a, b->qideal, h, NULL, m, NULL);
   rChangeCurrRing(origin);
   si_opt_1 = save_opt;
   return std::make_tuple(id, m);
