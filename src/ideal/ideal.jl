@@ -1,7 +1,7 @@
 export sideal, IdealSet, syz, lead, normalize!, is_constant, is_zerodim, fglm,
        fres, dimension, highcorner, jet, kbase, minimal_generating_set,
        independent_sets, maximal_independent_set, mres, mres_with_map,
-       number_of_generators, ngens, nres, sres,
+       modStd, number_of_generators, ngens, nres, sres,
        intersection, homogenize_ideal, homogenize_ideal_with_weights,
        quotient, reduce, eliminate, kernel, equal, contains, is_var_generated,
        saturation, saturation2, satstd, slimgb, std, std_with_HC,
