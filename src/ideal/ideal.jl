@@ -1,7 +1,7 @@
 export sideal, IdealSet, syz, lead, normalize!, is_constant, is_zerodim, fglm,
        fres, dimension, highcorner, jet, kbase, minimal_generating_set,
        independent_sets, maximal_independent_set, mres, mres_with_map,
-       number_of_generators, ngens, nres, sres,
+       modStd, number_of_generators, ngens, nres, sres,
        intersection, homogenize_ideal, homogenize_ideal_with_weights,
        quotient, reduce, eliminate, kernel, equal, contains, is_var_generated,
        saturation, saturation2, satstd, slimgb, std, std_with_HC,
@@ -673,6 +673,30 @@ function std(I::sideal{S}; complete_reduction::Bool=false) where S <: SPolyUnion
    end
    libSingular.idSkipZeroes(ptr)
    return sideal{S}(R, ptr, true, I.isTwoSided)
+end
+
+
+@doc raw"""
+    modStd(I::sideal{S}; nr_cores::Int=1, exact::Bool=false) where S <: SPolyUnion
+
+Compute a Groebner basis for the ideal $I$ over $QQ$ with multi-modular methods.
+The algorithm computes `nr_cores` modular Groebner basis in parallel. If `exact` is `true`,
+`I` is homogeneous or the monomial ordering is local the resulting Groebner basis over `QQ`
+for `I` is ensured to be correct.
+"""
+function modStd(I::sideal{S}; nr_cores::Int=1, exact::Bool=false) where S <: SPolyUnion
+   R = base_ring(I)
+   exactness = exact == false ? 0 : 1
+   ncores = nr_cores > 0 ? nr_cores : 1
+   if base_ring(R) == QQ
+      ncores_old = LibResources.getcores()
+      LibResources.setcores(ncores)
+      G = LibModstd.modStd(I, exactness)
+      LibResources.setcores(ncores_old)
+      return G
+   else
+      error("modStd is only available over QQ.")
+   end
 end
 
 @doc raw"""
