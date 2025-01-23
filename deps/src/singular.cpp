@@ -263,6 +263,10 @@ JLCXX_MODULE define_julia_module(jlcxx::Module & Singular)
     return siRand();
   });
 
+  Singular.method("set_cpus", [](int c) {
+    return siSetCpus(c);
+  });
+
   singular_define_coeffs(Singular);
   singular_define_rings(Singular);
   singular_define_ideals(Singular);
