@@ -23,9 +23,11 @@ function n_Write(n::number_ptr, cf::coeffs_ptr, bShortOut::Bool = false)
 end
 
 function n_ChineseRemainderSym(a::Vector{number_ptr}, b::Vector{number_ptr}, n::Cint, signed::Cint, cf::coeffs_ptr)
-   p1 = reinterpret(Ptr{Nothing}, pointer(a))
-   p2 = reinterpret(Ptr{Nothing}, pointer(b))
-   return n_ChineseRemainderSym_internal(p1, p2, n, signed, cf)
+   GC.@preserve a b begin
+     p1 = reinterpret(Ptr{Nothing}, pointer(a))
+     p2 = reinterpret(Ptr{Nothing}, pointer(b))
+     return n_ChineseRemainderSym_internal(p1, p2, n, signed, cf)
+   end
 end
 
 # create a Singular string environment

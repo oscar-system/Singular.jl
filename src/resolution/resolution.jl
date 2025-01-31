@@ -181,8 +181,10 @@ function Resolution(C::Vector{smodule{T}}) where T <: AbstractAlgebra.RingElem
     len > 1 || error("no module specified")
     R = base_ring(C[1])
     CC = (m -> m.ptr).(C)
-    C_ptr = reinterpret(Ptr{Nothing}, pointer(CC))
-    ptr = GC.@preserve R libSingular.create_SyStrategy(C_ptr, len, R.ptr)
-    return sresolution{T}(R, ptr)
+    GC.@preserve CC R begin
+       C_ptr = reinterpret(Ptr{Nothing}, pointer(CC))
+       ptr = libSingular.create_SyStrategy(C_ptr, len, R.ptr)
+       return sresolution{T}(R, ptr)
+   end
 end
 
