@@ -301,11 +301,13 @@ function crt(r1::n_Z, m1::n_Z, r2::n_Z, m2::n_Z, signed=false)
    # do the crt in coeffs_BIGINT
    r = [r1ptr, r2ptr]
    m = [m1ptr, m2ptr]
-   ptr = libSingular.n_ChineseRemainderSym(reinterpret(Ptr{Nothing},pointer(r)),
-                                           reinterpret(Ptr{Nothing},pointer(m)),
-                                           Cint(2), Cint(signed), Z)
-   # convert output from coeffs_BIGINT to n_Z
-   return n_Z(libSingular.n_GetMPZ(ptr, Z))
+   GC.@preserve r m begin
+      ptr = libSingular.n_ChineseRemainderSym(reinterpret(Ptr{Nothing},pointer(r)),
+                                              reinterpret(Ptr{Nothing},pointer(m)),
+                                              Cint(2), Cint(signed), Z)
+      # convert output from coeffs_BIGINT to n_Z
+      return n_Z(libSingular.n_GetMPZ(ptr, Z))
+   end
 end
 
 ###############################################################################

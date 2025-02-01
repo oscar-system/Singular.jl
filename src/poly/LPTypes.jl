@@ -40,9 +40,9 @@ function LPRing{T}(R::Union{Ring, Field}, s::Vector{Symbol}, deg_bound::Int,
       return LPRingID[R, s, sord, deg_bound]::LPRing{T}
    else
       ss = rename_symbols(all_singular_symbols(R), String.(s), "x")
-      v = [pointer(Base.Vector{UInt8}(string(str)*"\0")) for str in ss]
+      v = [Base.Vector{UInt8}(string(str)*"\0") for str in ss]
       r = libSingular.nCopyCoeff(R.ptr)
-      ptr = libSingular.rDefault_wvhdl_helper(r, v, sord, Culong(1))
+      ptr = GC.@preserve v libSingular.rDefault_wvhdl_helper(r, pointer.(v), sord, Culong(1))
       ptr2 = libSingular.freeAlgebra(ptr, deg_bound, 0)
       if libSingular.have_error()
          libSingular.rDelete(ptr2)

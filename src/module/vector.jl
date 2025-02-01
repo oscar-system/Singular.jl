@@ -209,8 +209,10 @@ function (S::FreeMod{T})(a::Vector{T}) where T <: Union{AbstractAlgebra.RingElem
    GC.@preserve a R begin
       n = size(a)[1]
       aa = [p.ptr.cpp_object for p in a]
-      v = libSingular.id_Array2Vector(reinterpret(Ptr{Nothing},pointer(aa)), n, R.ptr)
-      return svector{T}(R, n, v)
+      GC.@preserve aa begin
+         v = libSingular.id_Array2Vector(reinterpret(Ptr{Nothing},pointer(aa)), n, R.ptr)
+         return svector{T}(R, n, v)
+      end
    end
 end
 
@@ -233,9 +235,11 @@ function Base.Array(v::svector{spoly{T}}) where T <: Nemo.RingElem
    GC.@preserve v R begin
       n = v.rank
       aa_val = Vector{Ptr{Nothing}}(undef, n)
-      libSingular.p_Vector2Array(v.ptr, reinterpret(Ptr{Nothing},pointer(aa_val)), n, R.ptr)
-      aa = [libSingular.internal_void_to_poly_helper(p) for p in aa_val]
-      return [spoly{T}(R, p) for p in aa]
+      GC.@preserve aa_val begin
+         libSingular.p_Vector2Array(v.ptr, reinterpret(Ptr{Nothing},pointer(aa_val)), n, R.ptr)
+         aa = [libSingular.internal_void_to_poly_helper(p) for p in aa_val]
+         return [spoly{T}(R, p) for p in aa]
+      end
    end
 end
 
@@ -261,7 +265,7 @@ function Base.iterate(p::svector{spoly{T}}) where T <: Nemo.RingElem
    end
 end
 
-function Base.iterate(p::Singular.svector{Singular.spluralg{T}}) where T 
+function Base.iterate(p::Singular.svector{Singular.spluralg{T}}) where T
    GC.@preserve p begin
       ptr = p.ptr
       if ptr.cpp_object == C_NULL
@@ -323,8 +327,10 @@ function vector(R::PolyRing{T}, coords::spoly{T}...) where T <: AbstractAlgebra.
    GC.@preserve R coords begin
       n = length(coords)
       aa = [p.ptr.cpp_object for p in coords]
-      v = libSingular.id_Array2Vector(reinterpret(Ptr{Nothing},pointer(aa)), n, R.ptr)
-      return svector{spoly{T}}(R, n, v)
+      GC.@preserve aa begin
+         v = libSingular.id_Array2Vector(reinterpret(Ptr{Nothing},pointer(aa)), n, R.ptr)
+         return svector{spoly{T}}(R, n, v)
+      end
    end
 end
 

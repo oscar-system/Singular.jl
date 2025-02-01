@@ -245,9 +245,10 @@ mutable struct N_GField <: Field
             ptr = libSingular.nInitChar(libSingular.n_Zp, Ptr{Nothing}(p))
          else
             ss = rename_symbol(string(S), "a")
-            gfinfo = GFInfo(Cint(p), Cint(n), pointer(Base.Vector{UInt8}(string(ss)*"\0")))
-            GC.@preserve gfinfo begin
-               ptr = libSingular.nInitChar(libSingular.n_GF, pointer_from_objref(gfinfo))
+            ss0 = Base.Vector{UInt8}(string(ss)*"\0")
+            GC.@preserve ss0 begin
+               gfinfo = GFInfo(Cint(p), Cint(n), pointer(ss0))
+               ptr = GC.@preserve gfinfo libSingular.nInitChar(libSingular.n_GF, pointer_from_objref(gfinfo))
             end
          end
          d = new(ptr, n, libSingular.n_SetMap(ZZ.ptr, ptr),
@@ -300,9 +301,9 @@ mutable struct N_FField <: Field
    function N_FField(F::Field, S::Vector{Symbol}, cached::Bool = true)
       return AbstractAlgebra.get_cached!(N_FFieldID, (F, S), cached) do
          ss = rename_symbols(all_singular_symbols(F), String.(S), "t")
-         v = [pointer(Base.Vector{UInt8}(string(str)*"\0")) for str in ss]
+         v = [Base.Vector{UInt8}(string(str)*"\0") for str in ss]
          cf = libSingular.nCopyCoeff(F.ptr)
-         ptr = libSingular.transExt_helper(cf, v)
+         ptr = GC.@preserve v libSingular.transExt_helper(cf, pointer.(v))
          d = new(ptr, F, 1, S)
          finalizer(_Ring_finalizer, d)
          return d

@@ -38,9 +38,9 @@ function PolyRing{T}(R::Union{Ring, Field}, s::Vector{Symbol},
    sord = serialize_ordering(nvars, ord)
    return get!(PolyRingID, (R, s, sord, deg_bound_fix)) do
       ss = rename_symbols(all_singular_symbols(R), String.(s), "x")
-      v = [pointer(Base.Vector{UInt8}(string(str)*"\0")) for str in ss]
+      v = [Base.Vector{UInt8}(string(str)*"\0") for str in ss]
       r = libSingular.nCopyCoeff(R.ptr)
-      ptr = libSingular.rDefault_wvhdl_helper(r, v, sord, bitmask)
+      ptr = GC.@preserve v libSingular.rDefault_wvhdl_helper(r, pointer.(v), sord, bitmask)
       @assert deg_bound_fix == Int(libSingular.rBitmask(ptr))
       return PolyRing{T}(ptr, R, s)
    end::PolyRing{T}
