@@ -27,7 +27,8 @@ using Pkg
 using lib4ti2_jll
 using Singular_jll
 
-import Base: abs, checkbounds, convert, deepcopy, deepcopy_internal,
+import Base: BigInt, Integer, Matrix, Rational,
+             abs, checkbounds, convert, deepcopy, deepcopy_internal,
              denominator, div, divrem, exponent,
              gcd, gcdx, getindex, hash, inv, isequal, isless, lcm,
              length, mod, numerator, one, reduce, rem, setindex!, show,
@@ -42,7 +43,7 @@ using Random: Random, AbstractRNG, SamplerTrivial, SamplerSimple
 import Random: rand
 using RandomExtensions: RandomExtensions, make, Make2
 
-import AbstractAlgebra: AbstractAlgebra, diagonal_matrix, factor,
+import AbstractAlgebra: AbstractAlgebra, Ideal, diagonal_matrix, factor,
                         identity_matrix, kernel, number_of_columns, ncols, number_of_generators, ngens, number_of_rows, nrows, order,
                         preimage, zero_matrix, expressify
 
