@@ -297,6 +297,18 @@ end
    @test equal(I, Ideal(R, x^2, y))
 end
 
+@testset "sideal.modstd" begin
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
+   I = Ideal(R, x^2 + x*y + 1, 2*x*y^2 + 3)
+   H = Ideal(R, y^2 - 3//2*x - 3//2*y, x^2 + x*y + 1)
+   G = modStd(I)
+   @test equal(G, H)
+   G = modStd(I, exact=true)
+   @test equal(G, H)
+   G = modStd(I, nr_cores=2)
+   @test equal(G, H)
+end
+
 @testset "sideal.intersection" begin
    R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
