@@ -78,6 +78,9 @@ jobs:
           julia --project=oscar-dev -e "using Pkg;
                                         Pkg.develop(PackageSpec(path=\".\"));
                                         Pkg.instantiate();"
+      - name: "workaround libstdc++ issue for julia 1.6"
+         if: matrix.julia-version == '1.6' && runner.os == 'Linux'
+         run: rm -f ${{ steps.setup-julia.outputs.julia-bindir }}/../lib/julia/libstdc++.so.6
       - name: fetch OscarDevTools
         if: github.repository != 'oscar-system/OscarDevTools.jl'
         run: |
