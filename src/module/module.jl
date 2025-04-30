@@ -1,5 +1,5 @@
 export jet, minimal_generating_set, ModuleClass, rank, smodule, slimgb,
-       eliminate, modulo, lift, division, divrem, prune_with_map,
+       eliminate, modulo, lift, dimension, division, divrem, prune_with_map,
        prune_with_map_projection, quotient, contains, saturation, saturation2
 
 ###############################################################################
@@ -655,6 +655,21 @@ function hilbert_series(M::smodule{spoly{T}}, w::Vector{<:Integer}, shifts::Vect
   z = Vector{Int32}()
   GC.@preserve M R libSingular.scHilbWeighted(M.ptr, R.ptr, w, shifts, z)
   return z
+end
+
+@doc raw"""
+    dimension(M::smodule{spoly{T}}) where T <: Nemo.RingElem
+
+Given a module $M$ this function computes the Krull dimension
+of the ring $R^n/M$, where $R$ is the polynomial ring over
+which $M$ is a module and $n$ the rank. The module must be 
+given by a Groebner basis.
+"""
+function dimension(M::smodule{spoly{T}}) where T <: Nemo.RingElem
+   M.isGB || error("Not a Groebner basis")
+   R = base_ring(M)
+   # scDimIntRing does both fields and non-fields
+   GC.@preserve M R return Int(libSingular.scDimIntRing(M.ptr, R.ptr))
 end
 
 ###############################################################################
