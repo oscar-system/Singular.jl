@@ -372,3 +372,17 @@ end
    @test A[2] == B[2]
    @test k == 2
 end
+
+@testset "smodule.dimension" begin
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
+
+   I = Singular.Module(R, vector(R,x^2,R(1)), vector(R,y,R(2)))
+   I = std(I)
+   k = dimension(I)
+   @test k == 1
+
+   I = Singular.Module(R, vector(R,x^2), vector(R,y))
+   I = std(I)
+   k = dimension(I)
+   @test k == 0
+end
