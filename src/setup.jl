@@ -83,8 +83,8 @@ function build_code(src_hash)
    installdir = joinpath(depsdir, "install-$VERSION")
 
    # check if we already built the code and if so, just use that
-   ##lib_path = joinpath(installdir, "lib", "libsingular_julia.$(Libdl.dlext)")
-   ##treehash_path = joinpath(installdir, "lib", "libsingular_julia.treehash")
+   lib_path = joinpath(installdir, "lib", "libsingular_julia.$(Libdl.dlext)")
+   treehash_path = joinpath(installdir, "lib", "libsingular_julia.treehash")
    ##try
    ##   bin_hash = read(treehash_path, String)
    ##   if bin_hash == src_hash
