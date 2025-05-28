@@ -551,6 +551,24 @@ void singular_define_ideals(jlcxx::Module & Singular)
     return std::make_tuple(res, ma);
   });
 
+  Singular.method("id_LiftStd_sparse", [](ideal m, ring o, bool complete_reduction = false) {
+    const ring origin = currRing;
+    unsigned int crbit;
+    if (complete_reduction)
+      crbit = Sy_bit(OPT_REDSB);
+    else
+      crbit = 0;
+    unsigned int save_opt = si_opt_1;
+    rChangeCurrRing(o);
+    matrix       ma = mpNew(1, 1);
+    si_opt_1 |= crbit;
+    ideal res = idLiftStd(m, &ma, testHomog, NULL);
+    ideal mo=id_Matrix2Module(ma,o);
+    rChangeCurrRing(origin);
+    si_opt_1 = save_opt;
+    return std::make_tuple(res, mo);
+  });
+
   Singular.method("id_LiftStdSyz", [](ideal m, ring o, bool complete_reduction = false) {
     unsigned int crbit;
     if (complete_reduction)
