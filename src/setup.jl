@@ -85,14 +85,14 @@ function build_code(src_hash)
    # check if we already built the code and if so, just use that
    lib_path = joinpath(installdir, "lib", "libsingular_julia.$(Libdl.dlext)")
    treehash_path = joinpath(installdir, "lib", "libsingular_julia.treehash")
-   ##try
-   ##   bin_hash = read(treehash_path, String)
-   ##   if bin_hash == src_hash
-   ##      @info "Using already compiled bundled C++ code"
-   ##      return lib_path
-   ##   end
-   ##catch
-   ##end
+   try
+      bin_hash = read(treehash_path, String)
+      if bin_hash == src_hash
+         @info "Using already compiled bundled C++ code"
+         return lib_path
+      end
+   catch
+   end
 
    # TODO: check if this is a dev version of Singular.jl; if so, continue. If
    # not, i.e. if this is a regular version, then refuse to run
