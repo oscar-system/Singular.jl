@@ -738,3 +738,12 @@ end
    @test Singular.Matrix(a)*Singular.Matrix(u2) == Singular.Matrix(b)*Singular.Matrix(q2)+Singular.Matrix(r2)
    @test isequal(r2, reduce(a, b))
 end
+
+@testset "sideal.facstd" begin
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
+   I = Ideal(R,[x*y])
+   V = facstd(I)
+   @test size(V)[1]==2
+   @test V[1][1]==y
+   @test V[2][1]==x
+end
