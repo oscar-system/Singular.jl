@@ -1,5 +1,5 @@
 export sideal, IdealSet, syz, lead, normalize!, is_constant, is_zerodim, fglm,
-       fres, dimension, highcorner, jet, kbase, minimal_generating_set,
+       facstd, fres, dimension, highcorner, jet, kbase, minimal_generating_set,
        independent_sets, maximal_independent_set, mres, mres_with_map,
        number_of_generators, ngens, nres, sres,
        intersection, homogenize_ideal, homogenize_ideal_with_weights,
@@ -1549,5 +1549,26 @@ function std_hilbert(I::sideal{spoly{T}}, hs::Vector{Int32}, w::Vector{<:Integer
    ptr = GC.@preserve I R libSingular.id_StdHilbWeighted(I.ptr, R.ptr, hs, w, complete_reduction)
    libSingular.idSkipZeroes(ptr)
    return sideal{spoly{T}}(R, ptr, true)
+end
+
+@doc raw"""
+    facstd(id::sideal{spoly{T}}) where T <: Nemo.FieldElem
+
+Returns a Vector of sideal computed by the factorizing Groebner basis algorithm.
+The intersection of these ideals has the same zero-set as the input,
+i.e., the intersection of the readicals of the result ideals coincides with the
+radical of the input ideal.
+"""
+function facstd(I::sideal{spoly{T}}) where T <: Nemo.FieldElem
+   R = base_ring(I)
+   a = Vector{Ptr{Nothing}}()
+   GC.@preserve I R libSingular.stdfac(I.ptr, a, R.ptr)
+   b=Vector{sideal{spoly{T}}}()
+   for i in 1:size(a)[1]
+     #julia 1.6 doe ssnot like this, but 1.10 does:
+     #push!(b,sideal{spoly{T}}(R,reinterpret(libSingular.ideal_ptr,a[i]),true))
+     push!(b,sideal{spoly{T}}(R,libSingular.void2ideal(a[i]),true))
+   end
+   return b
 end
 

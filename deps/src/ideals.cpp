@@ -1,4 +1,5 @@
 #include "ideals.h"
+#include <kernel/GBEngine/kstdfac.h>
 
 auto id_sres_helper(sip_sideal * m, int n, ring R)
 {
@@ -762,6 +763,27 @@ void singular_define_ideals(jlcxx::Module & Singular)
     rChangeCurrRing(origin);
     return k;
   });
+  Singular.method("stdfac", [](ideal I, jlcxx::ArrayRef<void*> a, ring r) {
+    const ring origin = currRing;
+    rChangeCurrRing(r);
+    if (idIs0(I))
+    {
+      a.push_back(idInit(1));
+    }
+    else
+    {
+      ideal_list L = kStdfac(I, r->qideal,testHomog,NULL);
+      ideal_list p=L;
+      while(L!=NULL)
+      {
+        a.push_back(p->d);
+        p=p->next;
+        omFreeSize(L,sizeof(*L));
+        L=p;
+      }
+    }
+    rChangeCurrRing(origin);
+  });
   Singular.method("fglmzero", [](ideal Isrc, ring Rsrc, ring Rdest) {
     const ring origin = currRing;
     rChangeCurrRing(Rdest);
@@ -845,4 +867,7 @@ void singular_define_ideals(jlcxx::Module & Singular)
     return res;
   });
   Singular.method("qring_simplify", &qring_simplify_helper);
+  Singular.method("void2ideal", [](void* v) {
+    return (ideal)v;
+  });
 }
