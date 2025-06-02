@@ -867,4 +867,7 @@ void singular_define_ideals(jlcxx::Module & Singular)
     return res;
   });
   Singular.method("qring_simplify", &qring_simplify_helper);
+  Singular.method("void2ideal", [](void* v) {
+    return (ideal)v;
+  });
 }

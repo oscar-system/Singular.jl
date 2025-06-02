@@ -1565,7 +1565,9 @@ function facstd(I::sideal{spoly{T}}) where T <: Nemo.FieldElem
    GC.@preserve I R libSingular.stdfac(I.ptr, a, R.ptr)
    b=Vector{sideal{spoly{T}}}()
    for i in 1:size(a)[1]
-     push!(b,sideal{spoly{T}}(R,reinterpret(libSingular.ideal_ptr,a[i]),true))
+     #julia 1.6 doe ssnot like this, but 1.10 does:
+     #push!(b,sideal{spoly{T}}(R,reinterpret(libSingular.ideal_ptr,a[i]),true))
+     push!(b,sideal{spoly{T}}(R,libSingular.void2ideal(a[i]),true))
    end
    return b
 end
