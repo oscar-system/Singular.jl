@@ -42,7 +42,13 @@ end
 
    @test ngens(I0) == 1
    @test ngens(I1) == 2
-   @test x in gens(I1) && y in gens(I1)
+   @test [x,y] == @inferred gens(I1)
+
+   @test gen(I1,1) == x
+   @test gen(I1,2) == y
+
+   @test_throws BoundsError gen(I1,0)
+   @test_throws BoundsError gen(I1,3)
 
    I2 = @inferred deepcopy(I1)
 
@@ -121,7 +127,13 @@ end
 
    @test ngens(I0) == 1
    @test ngens(I1) == 2
-   @test x in gens(I1) && y in gens(I1)
+   @test [x,y] == @inferred gens(I1)
+
+   @test gen(I1,1) == x
+   @test gen(I1,2) == y
+
+   @test_throws BoundsError gen(I1,0)
+   @test_throws BoundsError gen(I1,3)
 
    I2 = @inferred deepcopy(I1)
 
@@ -154,7 +166,13 @@ end
 
    @test ngens(I0) == 1
    @test ngens(I1) == 2
-   @test x in gens(I1) && y in gens(I1)
+   @test [x,y] == @inferred gens(I1)
+
+   @test gen(I1,1) == x
+   @test gen(I1,2) == y
+
+   @test_throws BoundsError gen(I1,0)
+   @test_throws BoundsError gen(I1,3)
 
    I2 = @inferred deepcopy(I1)
 
