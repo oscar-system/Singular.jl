@@ -34,11 +34,20 @@ Return the rank $n$ of the ambient space $R^n$ of which this module is a submodu
 """
 rank(I::smodule) = Int(GC.@preserve I libSingular.rank(I.ptr))
 
+@doc raw"""
+    gens(I::smodule)
+
+Return the generators in the internal representation of the module $I$ as an array.
+"""
+function gens(I::smodule{T}) where T
+   return svector{T}[@inbounds I[i] for i in 1:ngens(I)]
+end
+
 function checkbounds(I::smodule, i::Int)
    (i > ngens(I) || i < 1) && throw(BoundsError(I, i))
 end
 
-function getindex(I::smodule{T}, i::Int) where T 
+function gen(I::smodule{T}, i::Int) where T
    checkbounds(I, i)
    R = base_ring(I)
    GC.@preserve I R begin
@@ -46,6 +55,8 @@ function getindex(I::smodule{T}, i::Int) where T
       return svector{T}(R, rank(I), libSingular.p_Copy(p, R.ptr))
    end
 end
+
+getindex(I::smodule, i::Int) = gen(I, i)
 
 @doc raw"""
     iszero(p::smodule)
@@ -463,7 +474,7 @@ function Module(R::PluralRing, vecs::svector{spluralg{T}}...) where T
    return smodule{S}(R, vecs...)
 end
 
-function Module(R::Nemo.NCRing, id::libSingular.ideal_ptr) 
+function Module(R::Nemo.NCRing, id::libSingular.ideal_ptr)
    S = elem_type(R)
    return smodule{S}(R, id)
 end
