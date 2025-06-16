@@ -41,8 +41,7 @@ end
 Return the generators in the internal representation of the ideal $I$ as an array.
 """
 function gens(I::sideal{S}) where S
-   ngens(I) == 0 && return S[]
-   return S[I[i] for i in 1:Singular.ngens(I)]
+   return S[@inbounds I[i] for i in 1:ngens(I)]
 end
 
 function checkbounds(I::sideal, i::Int)
@@ -66,11 +65,13 @@ end
 function gen(I::sideal{S}, i::Int) where S <: SPolyUnion
    checkbounds(I, i)
    R = base_ring(I)
-   GC.@preserve I p = libSingular.getindex(I.ptr, Cint(i - 1))
-   GC.@preserve I return R(libSingular.p_Copy(p, R.ptr))::S
+   GC.@preserve I begin
+     p = libSingular.getindex(I.ptr, Cint(i - 1))
+     return R(libSingular.p_Copy(p, R.ptr))::S
+   end
 end
 
-getindex(I::sideal{S}, i::Int) where S <: SPolyUnion = gen(I, i)
+getindex(I::sideal, i::Int) = gen(I, i)
 
 @doc raw"""
     iszero(I::sideal)

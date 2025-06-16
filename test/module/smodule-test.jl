@@ -68,6 +68,14 @@ end
 
    @test ngens(M) == 2
 
+   @test [v1,v2] == @inferred gens(M)
+
+   @test gen(M,1) == v1
+   @test gen(M,2) == v2
+
+   @test_throws BoundsError gen(M,0)
+   @test_throws BoundsError gen(M,3)
+
    @test M[1] == v1
    @test M[2] == v2
 
@@ -75,6 +83,7 @@ end
 
    @test ngens(N) == 2
 
+   @test [v1,v2] == @inferred gens(N)
    @test N[1] == v1
    @test N[2] == v2
 end
