@@ -1,5 +1,6 @@
 export sideal, IdealSet, syz, lead, normalize!, is_constant, is_zerodim, fglm,
-       facstd, fres, dimension, highcorner, jet, kbase, minimal_generating_set,
+       facstd, fres, dimension, highcorner, jet, kbase, lres,
+       minimal_generating_set,
        independent_sets, maximal_independent_set, mres, mres_with_map,
        number_of_generators, ngens, nres, sres,
        intersection, homogenize_ideal, homogenize_ideal_with_weights,
@@ -1108,6 +1109,25 @@ function sres(I::sideal{spoly{T}}, max_length::Int) where T <: Nemo.FieldElem
         # TODO: consider qrings
    end
    r, minimal = GC.@preserve I R libSingular.id_sres(I.ptr, Cint(max_length + 1), R.ptr)
+   return sresolution{spoly{T}}(R, r, Bool(minimal), true)
+end
+
+@doc raw"""
+    lres(id::sideal{spoly{T}}, max_length::Int) where T <: Nemo.FieldElem
+
+Compute a (free) minimal resolution of the given ideal up to the maximum
+given length. The ideal must be over a polynomial ring over a field, and
+homogeneous wrt. the standard grading. The result is given as a resolution, whose i-th entry is
+the syzygy module of the previous module, starting with the given ideal.
+The `max_length` can be set to $0$ if the full free resolution is required.
+"""
+function lres(I::sideal{spoly{T}}, max_length::Int) where T <: Nemo.FieldElem
+   R = base_ring(I)
+   if max_length == 0
+        max_length = nvars(R)
+        # TODO: consider qrings
+   end
+   r, minimal = GC.@preserve I R libSingular.id_lres(I.ptr, Cint(max_length + 1), R.ptr)
    return sresolution{spoly{T}}(R, r, Bool(minimal), true)
 end
 

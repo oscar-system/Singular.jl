@@ -482,18 +482,21 @@ end
    R, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
    I = Ideal(R, x^2*y + 2y + 1, y^2 + 1)
+   I2 = Ideal(R, x^2*y + 2y^3, y^2 + x*y)
 
    F1 = @inferred fres(std(I), 4)
    F2 = @inferred sres(std(I), 4)
    F3 = @inferred nres(I, 4)
    F4 = @inferred mres(I, 4)
    F5,TT = @inferred mres_with_map(I, 4)
+   F6 = @inferred mres(I2, 0)
 
    # check resolution is of the correct length
    @test (@inferred length(F1)) == 2
    @test (@inferred length(F2)) == 2
    @test (@inferred length(F3)) == 2
    @test (@inferred length(F4)) == 2
+   @test (@inferred length(F6)) == 2
 
    # check index 1 is an ideal
    @test F1[1] isa sideal
