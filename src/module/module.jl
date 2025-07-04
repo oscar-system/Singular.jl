@@ -396,13 +396,13 @@ function mres_with_map(I::smodule{spoly{T}}, max_length::Int) where T <: Nemo.Fi
 end
 
 @doc raw"""
-    prune_with_map(id::smodule{spoly{T}}) where T <: Nemo.FieldElem
+    prune_with_map(id::smodule{spoly{T}}) where T <: Nemo.RingElem
 
 Returns the module R minimally embedded in a free module such that the
 corresponding factor modules are isomorphic
 and the transformation matrix of id to R.
 """
-function prune_with_map(I::smodule{spoly{T}}) where T <: Nemo.FieldElem
+function prune_with_map(I::smodule{spoly{T}}) where T <: Nemo.RingElem
    R = base_ring(I)
    a = Vector{Int32}()
    r, TT_ptr = GC.@preserve I R libSingular.id_prune_map_v(I.ptr, a, R.ptr)
@@ -410,7 +410,7 @@ function prune_with_map(I::smodule{spoly{T}}) where T <: Nemo.FieldElem
 end
 
 @doc raw"""
-    prune_with_map_projection(id::smodule{spoly{T}}) where T <: Nemo.FieldElem
+    prune_with_map_projection(id::smodule{spoly{T}}) where T <: Nemo.RingElem
 
 Return a module `R`, a transformation matrix `M` and a projection map `p`
 satisfying the following properties: `R` is minimally embedded in a free
@@ -419,7 +419,7 @@ module `parent(R)` such that the quotient `parent(R)/R` is isomorphic to
 describing this isomorphism.
 `p` maps `gen(parent(id),i)` to `gen(parent(R),p[i])`
 """
-function prune_with_map_projection(I::smodule{spoly{T}}) where T <: Nemo.FieldElem
+function prune_with_map_projection(I::smodule{spoly{T}}) where T <: Nemo.RingElem
    R = base_ring(I)
    a = Vector{Int32}()
    r, TT_ptr = GC.@preserve I R libSingular.id_prune_map_v(I.ptr, a, R.ptr)

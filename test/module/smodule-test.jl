@@ -324,6 +324,27 @@ end
    @test G[1] == vector(R, z)
    @test T[3,1] == R(1)
 
+   R, (x, y, z) = polynomial_ring(ZZ, ["x", "y", "z"])
+
+   v1 = vector(R, R(1),R(0),R(0))
+   v2 = vector(R, x,R(0),R(0))
+   v3 = vector(R, R(0),z,R(0))
+   v4 = vector(R, R(0),R(0),R(1))
+
+   G,T,p = prune_with_map_projection(M)
+   @test p[1] == 1
+   @test p[2] == 1
+   @test p[3] == 2
+
+   M = Singular.Module(R, v1, v2, v3, v4)
+
+   G,T = prune_with_map(M)
+
+   @test ngens(G) == 1
+
+   @test G[1] == vector(R, z)
+   @test T[3,1] == R(1)
+
    G,T,p = prune_with_map_projection(M)
    @test p[1] == 1
    @test p[2] == 1
