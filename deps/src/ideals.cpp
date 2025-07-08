@@ -17,6 +17,23 @@ auto id_sres_helper(sip_sideal * m, int n, ring R)
   return std::make_tuple(s, minimal);
 }
 
+auto id_lres_helper(sip_sideal * m, int n, ring R)
+{
+  auto origin = currRing;
+  rChangeCurrRing(R);
+  int dummy;
+  syStrategy s = syLaScala3(m, &dummy);
+  rChangeCurrRing(origin);
+  auto r = s->minres;
+  bool minimal = true;
+  if (r == NULL)
+  {
+    r = s->fullres;
+    minimal = false;
+  }
+  return std::make_tuple(s, minimal);
+}
+
 auto qring_simplify_helper(poly p, ring R)
 {
   if (R->qideal == NULL)
@@ -452,6 +469,7 @@ void singular_define_ideals(jlcxx::Module & Singular)
   Singular.method("id_fres", &id_fres_helper);
 
   Singular.method("id_res", &id_res_helper);
+  Singular.method("id_lres", &id_lres_helper);
   Singular.method("id_mres_map", &id_mres_map_helper);
   Singular.method("id_prune_map", &id_prune_map_helper);
   Singular.method("id_prune_map_v", &id_prune_map_v_helper);
