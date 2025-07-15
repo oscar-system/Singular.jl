@@ -6,8 +6,8 @@ import libsingular_julia_jll
 
 import BinaryWrappers
 import CxxWrap
+import FileWatching: Pidfile
 import Libdl
-import Pidfile
 import Pkg
 import Pkg.Artifacts
 
