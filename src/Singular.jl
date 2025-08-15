@@ -36,8 +36,6 @@ import Base: BigInt, Integer, Matrix, Rational,
 
 import LinearAlgebra: normalize!, rank
 
-import Statistics: std
-
 using Random: Random, AbstractRNG, SamplerTrivial, SamplerSimple
 import Random: rand
 using RandomExtensions: RandomExtensions, make, Make2
