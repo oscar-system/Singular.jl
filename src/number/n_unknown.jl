@@ -537,11 +537,6 @@ CoefficientRingID = Dict{Nemo.Ring, Any}()
 # To keep it type stable, we use a @generated function to treat being mutable
 # as a property available at compile time.
 
-if VERSION < v"1.7"
-  # This function was added in >= 1.7
-  ismutabletype(::Type{T}) where {T} = T.mutable
-end
-
 @generated function mutable_field_or_ring_type_wrapper(::Type{T}, ::Type{U}) where {T <: Nemo.Ring, U}
   if ismutabletype(T) && ismutabletype(U)
     S = T

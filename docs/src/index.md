@@ -30,7 +30,7 @@ The features of Singular so far include:
 
 ## Installation
 
-To use Singular.jl we require Julia 1.6 or higher. Please see
+To use Singular.jl we require Julia 1.10 or higher. Please see
 <https://julialang.org/downloads/> for instructions on
 how to obtain julia for your system.
 
