@@ -23,7 +23,6 @@ end
 
 import AbstractAlgebra
 using Nemo
-using Pkg
 using lib4ti2_jll
 using Singular_jll
 
@@ -36,8 +35,6 @@ import Base: BigInt, Integer, Matrix, Rational,
              >=, <, >, //, /, !=
 
 import LinearAlgebra: normalize!, rank
-
-import Statistics: std
 
 using Random: Random, AbstractRNG, SamplerTrivial, SamplerSimple
 import Random: rand
@@ -186,9 +183,7 @@ FB Mathematik der Universitaet, D-67653 Kaiserslautern      \\
    end
 end
 
-pkgproject(m::Core.Module) = Pkg.Operations.read_project(Pkg.Types.projectfile_path(pkgdir(m)))
-pkgversion(m::Core.Module) = pkgproject(m).version
-const VERSION_NUMBER = pkgversion(@__MODULE__)
+const VERSION_NUMBER = Base.pkgversion(@__MODULE__)
 
 
 ###############################################################################
