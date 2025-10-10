@@ -15,16 +15,6 @@ extern int inerror;
 
 static jl_value_t * jl_int64_vector_type;
 static jl_value_t * jl_int64_matrix_type;
-static jl_value_t * jl_singular_number_type;
-static jl_value_t * jl_singular_poly_type;
-static jl_value_t * jl_singular_ring_type;
-static jl_value_t * jl_singular_ideal_type;
-static jl_value_t * jl_singular_matrix_type;
-static jl_value_t * jl_singular_bigint_type;
-static jl_value_t * jl_singular_bigintmat_type;
-static jl_value_t * jl_singular_map_type;
-static jl_value_t * jl_singular_resolution_type;
-static jl_value_t * jl_singular_vector_type;
 
 typedef struct {
   int          cmd;
@@ -71,15 +61,6 @@ static void initialize_jl_c_types(jl_value_t * module_value)
   jl_module_t * module = reinterpret_cast<jl_module_t *>(module_value);
   jl_int64_vector_type = jl_apply_array_type((jl_value_t *)jl_int64_type, 1);
   jl_int64_matrix_type = jl_apply_array_type((jl_value_t *)jl_int64_type, 2);
-  jl_singular_number_type = jl_get_global(module, jl_symbol("number"));
-  jl_singular_poly_type = jl_get_global(module, jl_symbol("poly"));
-  jl_singular_ring_type = jl_get_global(module, jl_symbol("ring"));
-  jl_singular_ideal_type = jl_get_global(module, jl_symbol("ideal"));
-  jl_singular_matrix_type = jl_get_global(module, jl_symbol("ip_smatrix"));
-  jl_singular_bigint_type = jl_get_global(module, jl_symbol("__mpz_struct"));
-  jl_singular_bigintmat_type = jl_get_global(module, jl_symbol("bigintmat"));
-  jl_singular_map_type = jl_get_global(module, jl_symbol("sip_smap"));
-  jl_singular_resolution_type = jl_get_global(module, jl_symbol("resolvente"));
 }
 
 static inline void * get_ptr_from_cxxwrap_obj(jl_value_t * obj)
