@@ -59,8 +59,8 @@ Return in `ZZ` the numerator of $x$.
 """
 function numerator(x::n_Q)
    c = parent(x)
-   GC.@preserve x c QQ ZZ begin
-   return ZZ(libSingular.n_GetMPZ(x.ptr,c.ptr))
+   GC.@preserve x c ZZ begin
+     return ZZ(libSingular.n_GetMPZ(x.ptr,c.ptr))
    end
 end
 
