@@ -58,9 +58,8 @@ is_unit(n::n_Q) = !iszero(n)
 Return in `ZZ` the numerator of $x$.
 """
 function numerator(x::n_Q)
-   c = parent(x)
-   GC.@preserve x c begin
-     return ZZ(libSingular.n_GetMPZ(x.ptr,c.ptr))
+   GC.@preserve x begin
+     return ZZ(libSingular.n_GetMPZ(x.ptr, parent(x).ptr))
    end
 end
 
