@@ -133,10 +133,10 @@ julia> gens(std(i))
  x^4*z^2 - y^4*z^2 - x^2*y*z^3 + x*y^2*z^3
  z^6 + x^7 + y^7
  y^4*z^3 - y^3*z^4 - x^2*z^5 - x^9
- x^3*y*z^4 - x^2*y^2*z^4 + x*y^3*z^4 - y^4*z^4 + x^3*z^5 - x^2*y*z^5
- x^3*z^5
+ x^3*y*z^4 - x^2*y^2*z^4 + x*y^3*z^4 - y^4*z^4 - x^2*y*z^5 - y^2*z^6 - y^2*z^7 - y^10 - x^7*y*z^2
+ x^3*z^5 + y^2*z^6 + x^10 + x^7*y*z^2
  x^2*y*z^5 + y^3*z^5 + x^2*z^6
- x*y^3*z^5
+ x*y^3*z^5 - y^4*z^5 - x^3*z^6 - x^2*y*z^6 + x^2*z^7 - 2*y^2*z^7
 
 julia> gens(with_degBound(5) do; return std(i); end)
 5-element Vector{spoly{n_Q}}:
