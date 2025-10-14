@@ -389,12 +389,12 @@ function low_level_caller(lib::String, name::String, args)
     arguments = [prepare_argument(i) for i in args]
     ring = nothing
     for (i, j) in arguments
-        if j != nothing
+        if j !== nothing
             ring = j
         end
     end
     arguments = Any[i for (i, j) in arguments]
-    ring_ptr = (ring == nothing) ? C_NULL : ring.ptr
+    ring_ptr = (ring === nothing) ? C_NULL : ring.ptr
     return_value = libSingular.call_singular_library_procedure(name, ring_ptr, arguments)
     if libSingular.have_error()
       error(libSingular.get_and_clear_error())
