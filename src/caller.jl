@@ -77,7 +77,7 @@ function create_casting_functions()
         mapping_types_reversed[:INT_CMD] =>
             function (vptr, R)
                 cast = libSingular.INT_CMD_CASTER(vptr)
-                return cast
+                return cast::Int
             end
         ,
         mapping_types_reversed[:STRING_CMD] =>
@@ -95,13 +95,13 @@ function create_casting_functions()
         mapping_types_reversed[:INTVEC_CMD] =>
             function (vptr, R)
                 cast = libSingular.INTVEC_CMD_CASTER(vptr)
-                return cast
+                return cast::Vector{Int}
             end
         ,
         mapping_types_reversed[:INTMAT_CMD] =>
             function (vptr, R)
                 cast = libSingular.INTMAT_CMD_CASTER(vptr)
-                return cast
+                return cast::Matrix{Int}
             end
         ,
         mapping_types_reversed[:BIGINT_CMD] =>
