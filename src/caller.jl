@@ -367,6 +367,10 @@ end
 
 function low_level_caller_rng(lib::String, name::String, ring, args)
     libSingular.load_library(lib)
+    return low_level_caller_rng(name, ring, args)
+end
+
+function low_level_caller_rng(name::String, ring, args)
     arguments = Any[]
     for i in args
         if i isa Vector{Any}
@@ -376,7 +380,8 @@ function low_level_caller_rng(lib::String, name::String, ring, args)
         end
         push!(arguments, i)
     end
-    return_value = libSingular.call_singular_library_procedure(name, ring.ptr, arguments)
+    ring_ptr = ring.ptr
+    return_value = libSingular.call_singular_library_procedure(name, ring_ptr, arguments)
     if libSingular.have_error()
       error(libSingular.get_and_clear_error())
     end
@@ -385,6 +390,10 @@ end
 
 function low_level_caller(lib::String, name::String, args)
     libSingular.load_library(lib)
+    return low_level_caller(name, args)
+end
+
+function low_level_caller(name::String, args)
     arguments = Any[]
     ring = nothing
     for i in args
