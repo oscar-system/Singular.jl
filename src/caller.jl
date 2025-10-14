@@ -358,8 +358,8 @@ function prepare_argument(x::Any)
     :ptr in fieldnames(typeof(x)) || error("unrecognized argument $x")
     if x.ptr isa libSingular.number_ptr
         ptr = x.ptr
-        rng = parent(x)
-        new_ptr = libSingular.n_Copy(ptr, rng.ptr)
+        ring_ptr = parent(x).ptr
+        new_ptr = libSingular.n_Copy(ptr, ring_ptr)
         return Any[mapping_types_reversed[:NUMBER_CMD], new_ptr.cpp_object], nothing
     end
     error("unrecognized argument $x")
@@ -387,19 +387,19 @@ end
 function low_level_caller(lib::String, name::String, args)
     libSingular.load_library(lib)
     arguments = [prepare_argument(i) for i in args]
-    rng = nothing
+    ring = nothing
     for (i, j) in arguments
         if j != nothing
-            rng = j
+            ring = j
         end
     end
     arguments = Any[i for (i, j) in arguments]
-    rng_ptr = (rng == nothing) ? C_NULL : rng.ptr
-    return_value = libSingular.call_singular_library_procedure(name, rng_ptr, arguments)
+    ring_ptr = (ring == nothing) ? C_NULL : ring.ptr
+    return_value = libSingular.call_singular_library_procedure(name, ring_ptr, arguments)
     if libSingular.have_error()
       error(libSingular.get_and_clear_error())
     end
-    return convert_return(return_value, rng)
+    return convert_return(return_value, ring)
 end
 
 @doc raw"""
