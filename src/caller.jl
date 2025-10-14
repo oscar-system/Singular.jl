@@ -365,7 +365,7 @@ function prepare_argument(x::Any)
     error("unrecognized argument $x")
 end
 
-function low_level_caller_rng(lib::String, name::String, ring, args...)
+function low_level_caller_rng(lib::String, name::String, ring, args)
     libSingular.load_library(lib)
     arguments = Vector{Any}()
     for i in args
@@ -384,7 +384,7 @@ function low_level_caller_rng(lib::String, name::String, ring, args...)
     return convert_return(return_value, ring)
 end
 
-function low_level_caller(lib::String, name::String, args...)
+function low_level_caller(lib::String, name::String, args)
     libSingular.load_library(lib)
     arguments = [prepare_argument(i) for i in args]
     rng = nothing
