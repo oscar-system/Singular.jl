@@ -394,7 +394,6 @@ function low_level_caller(lib::String, name::String, args)
         end
     end
     arguments = Any[i for (i, j) in arguments]
-    return_values = nothing
     rng_ptr = (rng == nothing) ? C_NULL : rng.ptr
     return_value = libSingular.call_singular_library_procedure(name, rng_ptr, arguments)
     if libSingular.have_error()
