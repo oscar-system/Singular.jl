@@ -8,7 +8,7 @@ export sideal, IdealSet, syz, lead, normalize!, is_constant, is_zerodim, fglm,
        saturation, saturation2, satstd, slimgb, std, std_with_HC,
        vdim, interreduce, degree, mult,
        hilbert_series, hilbert_series_data, std_hilbert,
-       is_homogeneous, division, divrem, divrem2, mstd
+       is_homogeneous, division, divrem, divrem2, mstd, syz_slimgb
 
 
 ###############################################################################
@@ -967,6 +967,18 @@ true
 function syz(I::sideal)
    R = base_ring(I)
    ptr = GC.@preserve I R libSingular.id_Syzygies(I.ptr, R.ptr)
+   libSingular.idSkipZeroes(ptr)
+   return Module(R, ptr)
+end
+
+@doc raw"""
+    syz_slimgb(I::sideal)
+
+Compute the module of syzygies of the ideal via slimgb.
+"""
+function syz_slimgb(I::sideal)
+   R = base_ring(I)
+   ptr = GC.@preserve I R libSingular.id_Syzygies_slimgb(I.ptr, R.ptr)
    libSingular.idSkipZeroes(ptr)
    return Module(R, ptr)
 end

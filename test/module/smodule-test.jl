@@ -163,6 +163,12 @@ end
    @test ngens(Z) == 1
 
    @test Z[1] == vector(R, x, -y)
+
+   Z = syz_slimgb(M)
+
+   @test ngens(Z) == 1
+
+   @test Z[1] == vector(R, x, -y)
 end
 
 @testset "smodule.modulo" begin

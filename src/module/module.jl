@@ -314,6 +314,20 @@ function syz(M::smodule)
    return Module(R, ptr)
 end
 
+@doc raw"""
+    syz_slimgb(M::smodule)
+
+Compute the module of syzygies of the given module via slimgb.
+This will be given as a set of generators in an ambient space $R^n$,
+where $n$ is the number of generators in $M$.
+"""
+function syz_slimgb(M::smodule)
+   R = base_ring(M)
+   ptr = GC.@preserve M R libSingular.id_Syzygies_slimgb(M.ptr, R.ptr)
+   libSingular.idSkipZeroes(ptr)
+   return Module(R, ptr)
+end
+
 ###############################################################################
 #
 #   Resolutions
