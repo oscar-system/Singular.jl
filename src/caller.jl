@@ -367,33 +367,33 @@ end
 
 function low_level_caller_rng(lib::String, name::String, ring, args)
     libSingular.load_library(lib)
-    arguments = Vector{Any}()
+    arguments = Any[]
     for i in args
-       if typeof(i) == Vector{Any}
-          push!(arguments, prepare_argument(i, ring))
-       else
-          push!(arguments, prepare_argument(i))
-       end
+        if i isa Vector{Any}
+           i, _ = prepare_argument(i, ring)
+        else
+           i, _ = prepare_argument(i)
+        end
+        push!(arguments, i)
     end
-    arguments = Any[i for (i, j) in arguments]
     return_value = libSingular.call_singular_library_procedure(name, ring.ptr, arguments)
     if libSingular.have_error()
       error(libSingular.get_and_clear_error())
     end
-
     return convert_return(return_value, ring)
 end
 
 function low_level_caller(lib::String, name::String, args)
     libSingular.load_library(lib)
-    arguments = [prepare_argument(i) for i in args]
+    arguments = Any[]
     ring = nothing
-    for (i, j) in arguments
+    for i in args
+        i, j = prepare_argument(i)
+        push!(arguments, i)
         if j !== nothing
             ring = j
         end
     end
-    arguments = Any[i for (i, j) in arguments]
     ring_ptr = (ring === nothing) ? C_NULL : ring.ptr
     return_value = libSingular.call_singular_library_procedure(name, ring_ptr, arguments)
     if libSingular.have_error()
