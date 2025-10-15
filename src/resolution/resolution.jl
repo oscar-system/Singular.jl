@@ -6,17 +6,16 @@ export Resolution, ResolutionSet, sresolution, betti, minres
 #
 ###############################################################################
 
-base_ring(r::sresolution) = r.base_ring
+base_ring(r::sresolution) = r.base_ring::base_ring_type(r)
+base_ring_type(a::Type{sresolution{T}}) where {T <: Nemo.NCRingElem} = parent_type(T)
 
-base_ring(R::ResolutionSet) = R.base_ring
+base_ring(R::ResolutionSet) = R.base_ring::base_ring_type(R)
+base_ring_type(a::Type{ResolutionSet{T}}) where {T <: Nemo.NCRingElem} = parent_type(T)
 
-function parent(r::sresolution{T}) where T <: AbstractAlgebra.RingElem
-   return ResolutionSet{T}(r.base_ring)
-end
+parent(r::sresolution{T}) where T = ResolutionSet{T}(r.base_ring)
+parent_type(::Type{sresolution{T}}) where T <: AbstractAlgebra.RingElem = ResolutionSet{T}
 
 elem_type(::Type{ResolutionSet{T}}) where T <: AbstractAlgebra.RingElem = sresolution{T}
-
-parent_type(::Type{sresolution{T}}) where T <: AbstractAlgebra.RingElem = ResolutionSet{T}
 
 function checkbounds(r::sresolution, i::Int)
    # structure has 1 more item than the mathematical length

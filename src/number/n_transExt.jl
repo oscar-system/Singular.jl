@@ -10,12 +10,10 @@ export n_transExt, N_FField, transcendence_degree, transcendence_basis,
 elem_type(::Type{N_FField}) = n_transExt
 
 parent(a::n_transExt) = a.parent
-
 parent_type(::Type{n_transExt}) = N_FField
 
-base_ring(a::n_transExt) = base_ring(parent(a))
-
 base_ring(a::N_FField) = a.base_ring
+base_ring_type(::Type{N_FField}) = error("TODO: this type needs type params")
 
 @doc raw"""
     transcendence_degree(F::N_FField)

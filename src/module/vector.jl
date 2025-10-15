@@ -7,14 +7,15 @@ export FreeMod, svector, gens, rank, vector, jet
 ###############################################################################
 
 parent(v::svector{T}) where {T <: Nemo.NCRingElem} = FreeMod{T}(v.base_ring, v.rank)
+parent_type(::Type{svector{T}}) where {T <: Nemo.NCRingElem} = FreeMod{T}
 
-base_ring(R::FreeMod) = R.base_ring
+base_ring(R::FreeMod) = R.base_ring::base_ring_type(R)
+base_ring_type(a::Type{FreeMod{T}}) where {T <: Nemo.NCRingElem} = parent_type(T)
 
-base_ring(v::svector) = v.base_ring
+base_ring(v::svector) = v.base_ring::base_ring_type(v)
+base_ring_type(a::Type{svector{T}}) where {T <: Nemo.NCRingElem} = parent_type(T)
 
 elem_type(::Type{FreeMod{T}}) where {T <: Nemo.NCRingElem} = svector{T}
-
-parent_type(::Type{svector{T}}) where {T <: Nemo.NCRingElem} = FreeMod{T}
 
 @doc raw"""
     rank(M::FreeMod)

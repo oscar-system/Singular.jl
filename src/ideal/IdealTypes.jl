@@ -4,12 +4,12 @@
 #
 ###############################################################################
 
-const IdealSetID = Dict{PolyRing, Set}()
+const IdealSetID = Dict{PolyRingUnion, Set}()
 
 mutable struct IdealSet{T <: AbstractAlgebra.NCRingElem} <: Set
    base_ring::PolyRingUnion
 
-   function IdealSet{T}(R::PolyRing) where T
+   function IdealSet{T}(R::PolyRingUnion) where T
       return get!(IdealSetID, R) do
          new(R)
       end::IdealSet{T}

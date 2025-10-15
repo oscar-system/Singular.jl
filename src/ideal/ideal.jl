@@ -17,15 +17,17 @@ export sideal, IdealSet, syz, lead, normalize!, is_constant, is_zerodim, fglm,
 #
 ###############################################################################
 
-parent(a::sideal{T}) where {T <: Nemo.RingElem} = IdealSet{T}(a.base_ring)
+parent(a::sideal{T}) where T = IdealSet{T}(base_ring(a))
+parent_type(::Type{sideal{T}}) where T = IdealSet{T}
 
-base_ring(S::IdealSet) = S.base_ring
+base_ring(S::IdealSet) = S.base_ring::base_ring_type(S)
+base_ring_type(::Type{IdealSet{T}}) where T = parent_type(T)
 
-base_ring(I::sideal) = I.base_ring
+base_ring(I::sideal) = I.base_ring::base_ring_type(I)
+base_ring_type(::Type{sideal{T}}) where T = parent_type(T)
 
 elem_type(::Type{IdealSet{spoly{T}}}) where T <: Nemo.RingElem = sideal{spoly{T}}
 
-parent_type(::Type{sideal{spoly{T}}}) where T <: Nemo.RingElem = IdealSet{spoly{T}}
 
 @doc raw"""
     number_of_generators(I::sideal)
