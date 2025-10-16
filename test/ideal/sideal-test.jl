@@ -540,6 +540,12 @@ end
 
    # check they are actually syzygies
    @test iszero(M*N)
+   F = syz_slimgb(I) #TODO @inferred broken
+
+   N = @inferred Singular.Matrix(F)
+
+   # check they are actually syzygies
+   @test iszero(M*N)
 end
 
 @testset "sideal.kernel" begin

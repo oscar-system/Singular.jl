@@ -147,6 +147,20 @@ ideal id_Syzygies_internal(ideal m, ring o)
   return id;
 }
 
+ideal id_Syzygies_internal_slimgb(ideal m, ring o)
+{
+  ideal      id = NULL;
+  intvec *   n = NULL;
+  tHomog     h = testHomog;
+  const ring origin = currRing;
+  rChangeCurrRing(o);
+  id = idSyzygies(m, h, &n,TRUE,FALSE,NULL,GbSlimgb);
+  rChangeCurrRing(origin);
+  if (n != NULL)
+    delete n;
+  return id;
+}
+
 auto id_Slimgb_helper(ideal a, ring b, bool complete_reduction = false)
 {
   //  bool complete_reduction= false;
@@ -463,6 +477,7 @@ void singular_define_ideals(jlcxx::Module & Singular)
   });
 
   Singular.method("id_Syzygies", &id_Syzygies_internal);
+  Singular.method("id_Syzygies_slimgb", &id_Syzygies_internal_slimgb);
 
   Singular.method("id_sres", &id_sres_helper);
 
