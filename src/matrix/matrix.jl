@@ -14,9 +14,11 @@ function parent(M::smatrix{T}) where T <: AbstractAlgebra.RingElem
    return matrix_space{T}(M.base_ring, nrows(M), ncols(M))
 end
 
-base_ring(S::matrix_space) = S.base_ring
+base_ring(S::matrix_space) = S.base_ring::base_ring_type(S)
+base_ring_type(a::matrix_space{T}) where T = parent_type(T)
 
-base_ring(M::smatrix) = M.base_ring
+base_ring(M::smatrix) = M.base_ring::base_ring_type(M)
+base_ring_type(a::smatrix{T}) where T = parent_type(T)
 
 elem_type(::Type{matrix_space{T}}) where T <: AbstractAlgebra.RingElem = smatrix{T}
 

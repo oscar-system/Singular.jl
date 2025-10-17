@@ -6,9 +6,8 @@ export spluralg, PluralRing, GAlgebra
 #
 ###############################################################################
 
-base_ring(R::PluralRing{T}) where T <: Nemo.RingElem = R.base_ring
-
-base_ring(p::spluralg) = base_ring(parent(p))
+base_ring(R::PluralRing{T}) where T <: Nemo.RingElem = R.base_ring::base_ring_type(R)
+base_ring_type(::Type{PluralRing{T}}) where T <: Nemo.RingElem = parent_type(T)
 
 elem_type(::Type{PluralRing{T}}) where T <: Nemo.RingElem = spluralg{T}
 

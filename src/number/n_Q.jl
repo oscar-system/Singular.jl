@@ -10,12 +10,10 @@ export n_Q, Rationals, reconstruct, isone, iszero, is_unit, divexact,
 elem_type(::Type{Rationals}) = n_Q
 
 parent(a::n_Q) = QQ
-
 parent_type(::Type{n_Q}) = Rationals
 
-base_ring(a::n_Q) = ZZ
-
 base_ring(a::Rationals) = ZZ
+base_ring_type(::Type{Rationals}) = Integers
 
 characteristic(R::Rationals) = ZZ(0)
 
