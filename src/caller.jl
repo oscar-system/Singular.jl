@@ -161,27 +161,22 @@ function create_ring_from_singular_ring(r::libSingular.ring_ptr)
    c = libSingular.rCoeffPtr(r)
    if libSingular.nCoeff_is_Q(c)
       basering = QQ
-      T = n_Q
    elseif libSingular.nCoeff_is_Zp(c)
       p = Int(libSingular.n_GetChar(c))
       basering = N_ZpField(p)
-      T = n_Zp
    elseif libSingular.nCoeff_is_Z(c)
       basering = ZZ
-      T = n_Z
    elseif libSingular.nCoeff_is_GF(c)
       p = Int(libSingular.n_GetChar(c))
       q = Int(libSingular.nfCharQ(c))
       d = round(Int, log(p, q))
       s = Symbol(libSingular.n_ParameterName(0, c))
       basering = N_GField(p, d, s)
-      T = n_GF
    elseif libSingular.nCoeff_is_transExt(c)
       p = Int(libSingular.n_GetChar(c))
       npars = libSingular.n_NumberOfParameters(c)
       S = [Symbol(libSingular.n_ParameterName(i-1, c)) for i in 1:npars]
       basering = N_FField(iszero(p) ? QQ : N_ZpField(p), S)
-      T = n_transExt
    elseif libSingular.nCoeff_is_algExt(c)
       # first create the univariate transcendental extension
       p = Int(libSingular.n_GetChar(c))
@@ -191,17 +186,15 @@ function create_ring_from_singular_ring(r::libSingular.ring_ptr)
       # now create the extension
       minpoly = F(libSingular.algExt_GetMinpoly(c, F.ptr))
       basering = N_AlgExtField(libSingular.nCopyCoeff(c), minpoly)
-      T = n_algExt
    elseif libSingular.nCoeff_is_Nemo_Field(c) || libSingular.nCoeff_is_Nemo_Ring(c)
       cf = libSingular.nCopyCoeff(c)
       data_ptr = libSingular.nGetCoeffData(cf)
       R = unsafe_pointer_to_objref(data_ptr)
       basering = CoefficientRing(R)  # FIXME: should we set cache=false ?
-      T = elem_type(basering)
    else
       basering = N_UnknownSingularCoefficientRing(libSingular.nCopyCoeff(c))
-      T = n_unknownsingularcoefficient
    end
+   T = elem_type(basering)
    if libSingular.rIsPluralRing(r)
       return PluralRing{T}(r, basering)
    else
