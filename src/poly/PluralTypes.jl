@@ -16,6 +16,7 @@ mutable struct PluralRing{T <: Nemo.RingElem} <: AbstractAlgebra.NCRing
 
    # take ownership of the pointer - not for general users
    function PluralRing{T}(r::libSingular.ring_ptr, R, s::Vector{Symbol}=singular_symbols(r)) where T <: Nemo.RingElem
+      @assert isconcretetype(T)
       @assert r.cpp_object != C_NULL
       ord = Cint[]
       libSingular.rOrdering_helper(ord, r)
