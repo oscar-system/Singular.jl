@@ -42,7 +42,7 @@ for (libname, funcs) in Setup.libraryfunctiondictionary
             input_manipulator = get(get(input_manipulator_funcs, libname, Dict()), symb, identity)
             output_manipulator = get(get(output_manipulator_funcs, libname, Dict()), symb, identity)
             push!(func_calls, :($symb(args...) = $(output_manipulator)(low_level_caller($(libname_dot_lib), $func_name, $(input_manipulator)(args))) ))
-            push!(func_calls, :($symb(ring::PolyRingUnion, args...) = $(output_manipulator)(low_level_caller_rng($(libname_dot_lib), $func_name, ring, $(input_manipulator)(args))) ))
+            push!(func_calls, :($symb(ring::PolyRingUnion, args...) = $(output_manipulator)(low_level_caller_ring($(libname_dot_lib), $func_name, ring, $(input_manipulator)(args))) ))
         end
     end
     eval(:(baremodule $libname_caps
