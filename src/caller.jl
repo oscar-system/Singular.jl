@@ -365,12 +365,12 @@ function prepare_argument(x::Any)
     error("unrecognized argument $x")
 end
 
-function low_level_caller_rng(lib::String, name::String, ring, args)
+function low_level_caller_ring(lib::String, name::String, ring, args)
     libSingular.load_library(lib)
-    return low_level_caller_rng(name, ring, args)
+    return low_level_caller_ring(name, ring, args)
 end
 
-function low_level_caller_rng(name::String, ring, args)
+function low_level_caller_ring(name::String, ring, args)
     arguments = Any[]
     for i in args
         if i isa Vector{Any}
