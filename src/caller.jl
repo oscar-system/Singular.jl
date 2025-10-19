@@ -185,7 +185,7 @@ function create_ring_from_singular_ring(r::libSingular.ring_ptr)
       F = N_FField(iszero(p) ? QQ : N_ZpField(p), S)
       # now create the extension
       minpoly = F(libSingular.algExt_GetMinpoly(c, F.ptr))
-      basering = N_AlgExtField(libSingular.nCopyCoeff(c), minpoly)
+      basering = N_AlgExtField{typeof(base_ring(F))}(libSingular.nCopyCoeff(c), minpoly)
    elseif libSingular.nCoeff_is_Nemo_Field(c) || libSingular.nCoeff_is_Nemo_Ring(c)
       cf = libSingular.nCopyCoeff(c)
       data_ptr = libSingular.nGetCoeffData(cf)

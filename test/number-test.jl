@@ -4,7 +4,7 @@ testrings = [
       (n_Zn, N_ZnRing, ZZ, residue_ring(ZZ, 7)[1]),
       (n_Zp, N_ZpField, Union{}, Fp(7)),
       (n_GF, N_GField, Union{}, FiniteField(7, 2, "x")[1]),
-      (n_transExt, N_FField, QQ, FunctionField(QQ, ["a", "b", "c"])[1]),
+      (n_transExt{Rationals}, N_FField{Rationals}, QQ, FunctionField(QQ, ["a", "b", "c"])[1]),
       ]
 
 

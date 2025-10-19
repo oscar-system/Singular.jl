@@ -6,11 +6,10 @@ export n_algExt, N_AlgExtField, AlgebraicExtensionField, modulus
 #
 ###############################################################################
 
-elem_type(::Type{N_AlgExtField}) = n_algExt
+elem_type(::Type{N_AlgExtField{T}}) where {T <: Field} = n_algExt{T}
 
 parent(a::n_algExt) = a.parent
-
-parent_type(::Type{n_algExt}) = N_AlgExtField
+parent_type(::Type{n_algExt{T}}) where {T <: Field} = N_AlgExtField{T}
 
 base_ring(a::n_algExt) = base_ring(parent(a))
 
@@ -277,17 +276,17 @@ end
 #
 ###############################################################################
 
-promote_rule(C::Type{n_algExt}, ::Type{T}) where T <: Integer = n_algExt
+promote_rule(::Type{C}, ::Type{T}) where {C <: n_algExt, T <: Integer} = C
 
-promote_rule(C::Type{n_algExt}, ::Type{T}) where T <: Rational = n_algExt
+promote_rule(::Type{C}, ::Type{T}) where {C <: n_algExt, T <: Rational} = C
 
-promote_rule(C::Type{n_algExt}, ::Type{Nemo.ZZRingElem}) = n_algExt
+promote_rule(::Type{C}, ::Type{Nemo.ZZRingElem}) where {C <: n_algExt} = C
 
-promote_rule(C::Type{n_algExt}, ::Type{Nemo.QQFieldElem}) = n_algExt
+promote_rule(::Type{C}, ::Type{Nemo.QQFieldElem}) where {C <: n_algExt} = C
 
-promote_rule(C::Type{n_algExt}, ::Type{n_Z}) = n_algExt
+promote_rule(::Type{C}, ::Type{n_Z}) where {C <: n_algExt} = C
 
-promote_rule(C::Type{n_algExt}, ::Type{n_Q}) = n_algExt
+promote_rule(::Type{C}, ::Type{n_Q}) where {C <: n_algExt} = C
 
 # TODO really need a hand-crafted AbsSimpleNumFieldElem <-> n_algExt
 function (SK::Singular.N_AlgExtField)(a::Singular.Nemo.AbsSimpleNumFieldElem)

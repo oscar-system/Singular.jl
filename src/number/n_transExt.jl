@@ -7,11 +7,11 @@ export n_transExt, N_FField, transcendence_degree, transcendence_basis,
 #
 ###############################################################################
 
-elem_type(::Type{N_FField}) = n_transExt
+elem_type(::Type{N_FField{T}}) where {T <: Field} = n_transExt{T}
 
 parent(a::n_transExt) = a.parent
 
-parent_type(::Type{n_transExt}) = N_FField
+parent_type(::Type{n_transExt{T}}) where {T <: Field} = N_FField{T}
 
 base_ring(a::n_transExt) = base_ring(parent(a))
 
@@ -326,17 +326,17 @@ end
 #
 ###############################################################################
 
-promote_rule(C::Type{n_transExt}, ::Type{T}) where T <: Integer = n_transExt
+promote_rule(::Type{C}, ::Type{T}) where {C <: n_transExt, T <: Integer} = C
 
-promote_rule(C::Type{n_transExt}, ::Type{T}) where T <: Rational = n_transExt
+promote_rule(::Type{C}, ::Type{T}) where {C <: n_transExt, T <: Rational} = C
 
-promote_rule(C::Type{n_transExt}, ::Type{Nemo.ZZRingElem}) = n_transExt
+promote_rule(::Type{C}, ::Type{Nemo.ZZRingElem}) where {C <: n_transExt} = C
 
-promote_rule(C::Type{n_transExt}, ::Type{Nemo.QQFieldElem}) = n_transExt
+promote_rule(::Type{C}, ::Type{Nemo.QQFieldElem}) where {C <: n_transExt} = C
 
-promote_rule(C::Type{n_transExt}, ::Type{n_Z}) = n_transExt
+promote_rule(::Type{C}, ::Type{n_Z}) where {C <: n_transExt} = C
 
-promote_rule(C::Type{n_transExt}, ::Type{n_Q}) = n_transExt
+promote_rule(::Type{C}, ::Type{n_Q}) where {C <: n_transExt} = C
 
 ###############################################################################
 #
