@@ -29,14 +29,12 @@ export ordering_lp, ordering_ip, ordering_dp, ordering_Dp, ordering_wp, ordering
 ###############################################################################
 
 parent(p::SPolyUnion) = p.parent
+parent_type(::Type{spoly{T}}) where T <: Nemo.RingElem = PolyRing{T}
 
-base_ring(R::PolyRing{T}) where T <: Nemo.RingElem = R.base_ring::parent_type(T)
-
-base_ring(p::spoly) = base_ring(parent(p))
+base_ring(R::PolyRing) = R.base_ring::base_ring_type(R)
+base_ring_type(::Type{PolyRing{T}}) where T <: Nemo.RingElem = parent_type(T)
 
 elem_type(::Type{PolyRing{T}}) where T <: Nemo.RingElem = spoly{T}
-
-parent_type(::Type{spoly{T}}) where T <: Nemo.RingElem = PolyRing{T}
 
 @doc raw"""
     has_global_ordering(R::PolyRingUnion)

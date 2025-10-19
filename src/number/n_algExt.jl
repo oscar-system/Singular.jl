@@ -11,9 +11,8 @@ elem_type(::Type{N_AlgExtField{T}}) where {T <: Field} = n_algExt{T}
 parent(a::n_algExt) = a.parent
 parent_type(::Type{n_algExt{T}}) where {T <: Field} = N_AlgExtField{T}
 
-base_ring(a::n_algExt) = base_ring(parent(a))
-
-base_ring(a::N_AlgExtField) = base_ring(a.minpoly)
+base_ring(a::N_AlgExtField) = base_ring(a.minpoly)::base_ring_type(a)
+base_ring_type(::Type{N_AlgExtField{T}}) where {T <: Field} = T
 
 @doc raw"""
     gen(F::N_AlgExtField)

@@ -189,3 +189,20 @@ end
    @test nvars(S) == 2
 end
 
+@testset "plural.ideal" begin
+   r, (x, y) = polynomial_ring(QQ, ["x", "y"], ordering = :degrevlex)
+   R, (x, y) = GAlgebra(r, Singular.Matrix(r, [1 1; 0 1]),
+                           Singular.Matrix(r, [0 x; 0 0]))
+
+   S = Singular.create_ring_from_singular_ring(Singular.libSingular.rCopy(R.ptr))
+
+   # zero ideal
+   I = Ideal(S)
+   @test base_ring(I) isa base_ring_type(I)
+   @test parent(I) isa parent_type(I)
+
+   # principal ideal
+   I = Ideal(S, gen(S,1))
+   @test base_ring(I) isa base_ring_type(I)
+   @test parent(I) isa parent_type(I)
+end

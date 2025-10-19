@@ -46,7 +46,7 @@ import AbstractAlgebra: AbstractAlgebra, Ideal, diagonal_matrix, factor,
 
 import AbstractAlgebra: pretty, Lowercase, LowercaseOff, Indent, Dedent, terse, is_terse
 
-import Nemo: add!, base_ring, canonical_unit,
+import Nemo: add!, base_ring, base_ring_type, canonical_unit,
              change_base_ring, characteristic, check_parent, codomain,
              coeff, coefficients, compose, constant_coefficient,
              contains, content, crt,
@@ -63,7 +63,7 @@ import Nemo: add!, base_ring, canonical_unit,
              symbols, tail, terms, total_degree, trailing_coefficient, valuation,
              var_index, vars, zero!, residue_ring
 
-export base_ring, elem_type, parent_type, parent
+export base_ring_type, base_ring, elem_type, parent_type, parent
 
 export residue_ring, polynomial_ring, WeylAlgebra, Ideal,
        MaximalIdeal, FreeModule, @polynomial_ring, @WeylAlgebra

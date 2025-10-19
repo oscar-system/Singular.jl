@@ -9,12 +9,10 @@ export n_Zn, N_ZnRing, characteristic
 elem_type(::Type{N_ZnRing}) = n_Zn
 
 parent(a::n_Zn) = a.parent
-
 parent_type(::Type{n_Zn}) = N_ZnRing
 
-base_ring(a::n_Zn) = ZZ
-
 base_ring(a::N_ZnRing) = ZZ
+base_ring_type(::Type{N_ZnRing}) = Integers
 
 function characteristic(R::N_ZnRing)
    return ZZ(libSingular.n_GetChar(R.ptr))

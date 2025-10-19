@@ -9,12 +9,9 @@ export n_Zp, N_ZpField
 elem_type(::Type{N_ZpField}) = n_Zp
 
 parent(a::n_Zp) = a.parent
-
 parent_type(::Type{n_Zp}) = N_ZpField
 
-base_ring(a::n_Zp) = Union{}
-
-base_ring(a::N_ZpField) = Union{}
+base_ring_type(::Type{N_ZpField}) = Union{}
 
 function characteristic(R::N_ZpField)
    return ZZ(libSingular.n_GetChar(R.ptr))

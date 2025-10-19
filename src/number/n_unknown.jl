@@ -6,14 +6,13 @@
 elem_type(::Type{N_Ring{T}}) where T <: Nemo.RingElem = n_RingElem{T}
 elem_type(::Type{N_Field{T}}) where T <: Nemo.FieldElem = n_FieldElem{T}
 
-parent_type(::Type{n_RingElem{T}}) where T <: Nemo.RingElem = N_Ring{T}
-parent_type(::Type{n_FieldElem{T}}) where T <: Nemo.RingElem = N_Field{T}
-
 parent(a::n_unknown) = a.parent
+parent_type(::Type{n_RingElem{T}}) where T <: Nemo.RingElem = N_Ring{T}
+parent_type(::Type{n_FieldElem{T}}) where T <: Nemo.FieldElem = N_Field{T}
 
-base_ring(R::N_unknown) = R.base_ring
-
-base_ring(a::n_unknown) = base_ring(parent(a))
+base_ring(R::N_unknown) = R.base_ring::base_ring_type(R)
+base_ring_type(::Type{N_Ring{T}}) where T = parent_type(T)
+base_ring_type(::Type{N_Field{T}}) where T = parent_type(T)
 
 function check_parent(a::n_unknown, b::n_unknown)
    parent(a) != parent(b) && error("Incompatible parents")
