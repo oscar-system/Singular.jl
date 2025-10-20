@@ -230,24 +230,6 @@ function convert_return(value::Vector, R = nothing)
     end
 end
 
-function get_ring(arg_list)
-    ring = nothing
-    for i in arg_list
-        current_ptr = nothing
-        try
-            current_ptr = i.ptr
-        catch
-            continue
-        end
-        if current_ptr isa poly
-            return parent(i)
-        elseif current_ptr isa ideal
-            return parent(i).base_ring
-        end
-    end
-    return ring
-end
-
 function prepare_argument(x::Vector{Int64})
     return Any[mapping_types_reversed[:INTVEC_CMD], libSingular.jl_array_to_intvec(x)], nothing
 end
