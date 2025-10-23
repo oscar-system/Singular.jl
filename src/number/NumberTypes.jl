@@ -292,42 +292,48 @@ end
 
 const N_FFieldID = Dict{Tuple{Field, Vector{Symbol}}, Field}()
 
-mutable struct N_FField <: Field
+mutable struct N_FField{T <: Field} <: Field
    ptr::libSingular.coeffs_ptr
-   base_ring::Field
+   base_ring::T
    refcount::Int
    S::Vector{Symbol}
 
-   function N_FField(F::Field, S::Vector{Symbol}, cached::Bool = true)
+   function N_FField{T}(F::T, S::Vector{Symbol}, cached::Bool = true) where {T <: Field}
+      @assert isconcretetype(T)
       return AbstractAlgebra.get_cached!(N_FFieldID, (F, S), cached) do
          ss = rename_symbols(all_singular_symbols(F), String.(S), "t")
          v = [Base.Vector{UInt8}(string(str)*"\0") for str in ss]
          cf = libSingular.nCopyCoeff(F.ptr)
          ptr = GC.@preserve v libSingular.transExt_helper(cf, pointer.(v))
-         d = new(ptr, F, 1, S)
+         d = new{T}(ptr, F, 1, S)
          finalizer(_Ring_finalizer, d)
          return d
-      end::N_FField
+      end::N_FField{T}
    end
+end
+
+function N_FField(F::T, S::Vector{Symbol}, cached::Bool = true) where {T <: Field}
+   N_FField{T}(F, S, cached)
 end
 
 function N_FField(F::Field, S::AbstractVector{<:VarName}, cached::Bool = true)
    N_FField(F, map(Symbol, S), cached)
 end
 
-mutable struct n_transExt <: Nemo.FieldElem
+mutable struct n_transExt{T <: Field} <: Nemo.FieldElem
    ptr::libSingular.number_ptr
-   parent::N_FField
+   parent::N_FField{T}
 
    # take ownership of the pointer - not for general users
-   function n_transExt(c::N_FField, n::libSingular.number_ptr)
-      z = new(n, c)
+   function n_transExt{T}(c::N_FField{T}, n::libSingular.number_ptr) where {T <: Field}
+      z = new{T}(n, c)
       c.refcount += 1
       finalizer(_Elem_finalizer, z)
       return z
    end
 end
 
+n_transExt(c::N_FField{T}, n::libSingular.number_ptr) where {T <: Field} = n_transExt{T}(c, n)
 n_transExt(c::N_FField, n::Integer = 0) = n_transExt(c, libSingular.number_ptr(n, c.ptr))
 n_transExt(c::N_FField, n::Nemo.ZZRingElem) = n_transExt(c, libSingular.number_ptr(n, c.ptr))
 n_transExt(c::N_FField, n::n_Z) = n_transExt(c, BigInt(n))
@@ -343,20 +349,21 @@ const N_AlgExtFieldID = Dict{Tuple{N_FField, n_transExt}, Field}()
 const N_AlgExtFieldIDptr = Dict{libSingular.coeffs_ptr, Field}()
 
 
-mutable struct N_AlgExtField <: Field
+mutable struct N_AlgExtField{T <: Field} <: Field
    ptr::libSingular.coeffs_ptr
-   minpoly::n_transExt
+   minpoly::n_transExt{T}
    refcount::Int
 
    # take ownership of the pointer - not for general users
-   function N_AlgExtField(ptr::libSingular.coeffs_ptr, minpoly::n_transExt,
-                                                          cached::Bool = true)
+   function N_AlgExtField{T}(ptr::libSingular.coeffs_ptr, minpoly::n_transExt,
+                                                          cached::Bool = true) where {T <: Field}
+      @assert isconcretetype(T)
       if libSingular.nCoeff_is_algExt(ptr)
          if cached && haskey(N_AlgExtFieldIDptr, ptr)
             libSingular.nKillChar(ptr)
-            return N_AlgExtFieldIDptr[ptr]::N_AlgExtField
+            return N_AlgExtFieldIDptr[ptr]::N_AlgExtField{T}
          else
-            d = new(ptr, minpoly, 1)
+            d = new{T}(ptr, minpoly, 1)
             finalizer(_Ring_finalizer, d)
             if cached
                N_AlgExtFieldIDptr[ptr] = d
@@ -370,29 +377,30 @@ mutable struct N_AlgExtField <: Field
    end
 
    # constructor for R[x]/minpoly from R(x) and minpoly in R(x)
-   function N_AlgExtField(F::N_FField, minpoly::n_transExt, cached::Bool = true)
+   function N_AlgExtField(F::N_FField{T}, minpoly::n_transExt{T}, cached::Bool = true) where {T <: Field}
       parent(minpoly) == F || error("minpoly parent mismatch")
       transcendence_degree(F) == 1 || error("Only algebraic extensions in one variable are supported")
       return AbstractAlgebra.get_cached!(N_AlgExtFieldID, (F, minpoly), cached) do
          ptr = libSingular.transExt_SetMinpoly(F.ptr, minpoly.ptr)
-         return N_AlgExtField(ptr, minpoly, cached)
-      end::N_AlgExtField
+         return N_AlgExtField{T}(ptr, minpoly, cached)
+      end::N_AlgExtField{T}
    end
 end
 
-mutable struct n_algExt <: Nemo.FieldElem
+mutable struct n_algExt{T <: Field} <: Nemo.FieldElem
    ptr::libSingular.number_ptr
-   parent::N_AlgExtField
+   parent::N_AlgExtField{T}
 
    # take ownership of the pointer - not for general users
-   function n_algExt(c::N_AlgExtField, n::libSingular.number_ptr)
-      z = new(n, c)
+   function n_algExt{T}(c::N_AlgExtField, n::libSingular.number_ptr) where {T <: Field}
+      z = new{T}(n, c)
       c.refcount += 1
       finalizer(_Elem_finalizer, z)
       return z
    end
 end
 
+n_algExt(c::N_AlgExtField{T}, n::libSingular.number_ptr) where {T <: Field} = n_algExt{T}(c, n)
 n_algExt(c::N_AlgExtField, n::Integer = 0) = n_algExt(c, libSingular.number_ptr(n, c.ptr))
 n_algExt(c::N_AlgExtField, n::Nemo.ZZRingElem) = n_algExt(c, libSingular.number_ptr(n, c.ptr))
 n_algExt(c::N_AlgExtField, n::n_Z) = n_algExt(c, BigInt(n))

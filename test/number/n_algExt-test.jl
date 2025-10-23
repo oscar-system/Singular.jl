@@ -74,7 +74,7 @@ end
    @assert K1(1//2) == QQ(1//2)
    @assert K1(1//2) == Singular.Nemo.QQ(1//2)
 
-   @assert K1(b) isa Singular.n_algExt
+   @assert K1(b) isa Singular.n_algExt{Rationals}
    @assert K2(a) isa Singular.Nemo.AbsSimpleNumFieldElem
    @assert a == K1(K2(a))
    @assert b == K2(K1(b))
@@ -162,12 +162,12 @@ end
    R, (x, y, z) = polynomial_ring(K, ["x", "y", "z"])
    S = Singular.create_ring_from_singular_ring(Singular.libSingular.rCopy(R.ptr))
 
-   @test isa(S, Singular.PolyRing{n_algExt})
+   @test isa(S, Singular.PolyRing{n_algExt{Rationals}})
 
    (x, y, z) = gens(S)
    a = gen(base_ring(S))
 
-   @test isa(a*x + y, spoly{n_algExt})
+   @test isa(a*x + y, spoly{n_algExt{Rationals}})
    @test iszero((a*x)^2 + x^2)
 
    @test base_ring(S) == K
