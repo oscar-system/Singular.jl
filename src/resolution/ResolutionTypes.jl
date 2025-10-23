@@ -10,6 +10,7 @@ mutable struct ResolutionSet{T <: Nemo.RingElem} <: Set
    base_ring::PolyRing
 
    function ResolutionSet{T}(R::PolyRing) where T
+      @assert isconcretetype(T)
       return get!(ResolutionSetID, R) do
          new(R)
       end
@@ -27,6 +28,7 @@ mutable struct sresolution{T <: Nemo.RingElem} <: Nemo.SetElem
    function sresolution{T}(R::PolyRing, ptr::libSingular.syStrategy_ptr,
                            minimal::Bool=false,
                            index_1_is_an_ideal::Bool=false) where T
+      @assert isconcretetype(T)
       T === elem_type(R) || error("type mismatch")
       R.refcount += 1
       z = new(R, ptr, minimal, index_1_is_an_ideal)

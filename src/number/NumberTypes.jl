@@ -419,6 +419,7 @@ mutable struct N_Ring{T <: Nemo.RingElem} <: Ring
    base_ring::Nemo.Ring
 
    function N_Ring{T}(R::Nemo.Ring, cached::Bool=true) where T
+      @assert isconcretetype(T)
       return AbstractAlgebra.get_cached!(CoeffRingID, R, cached) do
          c = libSingular.register(R)
          GC.@preserve R begin
@@ -442,6 +443,7 @@ mutable struct N_Field{T <: Nemo.FieldElem} <: Field
    base_ring::Nemo.Field
 
    function N_Field{T}(R::Nemo.Field, cached::Bool=true) where T
+      @assert isconcretetype(T)
       return AbstractAlgebra.get_cached!(CoeffFieldID, R, cached) do
          c = libSingular.register(R)
          GC.@preserve R begin

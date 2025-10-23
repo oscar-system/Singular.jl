@@ -20,6 +20,7 @@ mutable struct LPRing{T <: Nemo.RingElem} <: AbstractAlgebra.NCRing
    # take ownership of the pointer - not for general users
    function LPRing{T}(r::libSingular.ring_ptr, R, deg_bound::Int,
                           s::Vector{Symbol}=singular_symbols(r)) where T
+      @assert isconcretetype(T)
       @assert deg_bound > 0
       @assert r.cpp_object != C_NULL
       ord = Cint[]

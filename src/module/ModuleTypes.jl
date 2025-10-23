@@ -11,6 +11,7 @@ mutable struct FreeMod{T <: Nemo.NCRingElem} <: Module{T}
    rank::Int
 
    function FreeMod{T}(R::Nemo.NCRing, r::Int) where T
+      @assert isconcretetype(T)
       return get!(FreeModID, (R, r)) do
          new(R, r)
       end::FreeMod{T}

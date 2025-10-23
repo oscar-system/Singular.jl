@@ -12,6 +12,7 @@ mutable struct matrix_space{T <: Nemo.RingElem} <: Set
    ncols::Int
 
    function matrix_space{T}(R::PolyRing, r::Int, c::Int) where T
+      @assert isconcretetype(T)
       return get!(MatrixSpaceID, (R, r, c)) do
          new{T}(R, r, c)
       end::matrix_space{T}
@@ -24,6 +25,7 @@ mutable struct smatrix{T <: Nemo.RingElem} <: Nemo.SetElem
 
    # take ownership of the pointer - not for general users
    function smatrix{T}(R::PolyRing, ptr::libSingular.matrix_ptr) where {T}
+      @assert isconcretetype(T)
       T === elem_type(R) || error("type mismatch")
       z = new(ptr, R)
       finalizer(_smatrix_clear_fn, z)
