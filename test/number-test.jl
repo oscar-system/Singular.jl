@@ -8,17 +8,21 @@ testrings = [
       ]
 
 
-@testset "number.parent and type relations for $(elemT)" for (elemT, ringT, parentRing, R) in testrings
+@testset "number.parent and type relations for $(elemT)" for (elemT, ringT, expected_base_ring, R) in testrings
    @test elem_type(R) == elemT
    @test elem_type(ringT) == elemT
    @test parent_type(elemT) == ringT
-   @test base_ring(R) == parentRing
+   if expected_base_ring === Union{}
+     @test base_ring_type(R) === Union{}
+   else
+     @test base_ring(R) == expected_base_ring
+     @test base_ring(R) isa base_ring_type(R)
+   end
    @test R isa ringT
 end
 
-@testset "number.integer_constructors for $(elemT)" for (elemT, ringT, parentRing, R) in testrings
+@testset "number.integer_constructors for $(elemT)" for (elemT, ringT, expected_base_ring, R) in testrings
    a = R()
-   @test base_ring(a) == parentRing
    @test parent(a) == R
    @test a isa elemT
 
@@ -44,7 +48,7 @@ end
 end
 
 # test adhoc arithmetic resp. arithmetic via promotion_rules
-@testset "number.adhoc_binary for $(elemT)" for (elemT, ringT, parentRing, R) in testrings
+@testset "number.adhoc_binary for $(elemT)" for (elemT, ringT, expected_base_ring, R) in testrings
    @testset "number.adhoc_binary for $(elemT) and $T" for T in (Int8, UInt8, Int, BigInt, Nemo.ZZ, ZZ)
 
       a = R(2)

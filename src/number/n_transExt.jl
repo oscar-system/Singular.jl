@@ -10,12 +10,10 @@ export n_transExt, N_FField, transcendence_degree, transcendence_basis,
 elem_type(::Type{N_FField{T}}) where {T <: Field} = n_transExt{T}
 
 parent(a::n_transExt) = a.parent
-
 parent_type(::Type{n_transExt{T}}) where {T <: Field} = N_FField{T}
 
-base_ring(a::n_transExt) = base_ring(parent(a))
-
-base_ring(a::N_FField) = a.base_ring
+base_ring(a::N_FField) = a.base_ring::base_ring_type(a)
+base_ring_type(::Type{N_FField{T}}) where {T <: Field} = T
 
 @doc raw"""
     transcendence_degree(F::N_FField)

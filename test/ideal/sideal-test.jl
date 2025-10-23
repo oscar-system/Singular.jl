@@ -533,14 +533,14 @@ end
 
    I = Ideal(R, x^2*y + 2y + 1, y^2 + 1)
 
-   F = syz(I) #TODO @inferred broken
+   F = @inferred syz(I)
 
    M = @inferred Singular.Matrix(I)
    N = @inferred Singular.Matrix(F)
 
    # check they are actually syzygies
    @test iszero(M*N)
-   F = syz_slimgb(I) #TODO @inferred broken
+   F = @inferred syz_slimgb(I)
 
    N = @inferred Singular.Matrix(F)
 

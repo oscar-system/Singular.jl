@@ -9,12 +9,9 @@ export n_Z, Integers, crt
 elem_type(::Type{Integers}) = n_Z
 
 parent(a::n_Z) = ZZ
-
 parent_type(::Type{n_Z}) = Integers
 
-base_ring(a::n_Z) = Union{}
-
-base_ring(a::Integers) = Union{}
+base_ring_type(::Type{Integers}) = Union{}
 
 characteristic(R::Integers) = ZZ(0)
 

@@ -51,15 +51,14 @@ AbstractAlgebra.@enable_all_show_via_expressify slpalg
 #
 ###############################################################################
 
-parent(p::slpalg) = p.parent
-
-base_ring(R::LPRing{T}) where T <: Nemo.RingElem = R.base_ring::parent_type(T)
-
-base_ring(p::slpalg) = base_ring(parent(p))
-
 elem_type(::Type{LPRing{T}}) where T <: Nemo.RingElem = slpalg{T}
 
+parent(p::slpalg) = p.parent
 parent_type(::Type{slpalg{T}}) where T <: Nemo.RingElem = LPRing{T}
+
+base_ring(R::LPRing{T}) where T <: Nemo.RingElem = R.base_ring::base_ring_type(R)
+base_ring_type(::Type{LPRing{T}}) where T <: Nemo.RingElem = parent_type(T)
+
 
 @doc raw"""
     degree_bound(R::LPRing)

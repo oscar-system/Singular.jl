@@ -9,12 +9,9 @@ export n_GF, N_GField
 elem_type(::Type{N_GField}) = n_GF
 
 parent(a::n_GF) = a.parent
-
 parent_type(::Type{n_GF}) = N_GField
 
-base_ring(a::n_GF) = Union{}
-
-base_ring(a::N_GField) = Union{}
+base_ring_type(::Type{N_GField}) = Union{}
 
 function characteristic(R::N_GField)
    return ZZ(_characteristic(R))

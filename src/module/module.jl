@@ -9,14 +9,15 @@ export jet, minimal_generating_set, ModuleClass, rank, smodule, slimgb,
 ###############################################################################
 
 parent(a::smodule{T}) where T <: Nemo.NCRingElem = ModuleClass{T}(a.base_ring)
+parent_type(::Type{smodule{T}}) where T <: Nemo.NCRingElem = ModuleClass{T}
 
-base_ring(S::ModuleClass) = S.base_ring
+base_ring(S::ModuleClass) = S.base_ring::base_ring_type(S)
+base_ring_type(::Type{ModuleClass{T}}) where T = parent_type(T)
 
-base_ring(I::smodule) = I.base_ring
+base_ring(I::smodule) = I.base_ring::base_ring_type(I)
+base_ring_type(::Type{smodule{T}}) where T = parent_type(T)
 
 elem_type(::Type{ModuleClass{T}}) where T <: Nemo.NCRingElem = smodule{T}
-
-parent_type(::Type{smodule{T}}) where T <: Nemo.NCRingElem = ModuleClass{T}
 
 
 @doc raw"""
