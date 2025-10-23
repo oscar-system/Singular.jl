@@ -333,49 +333,57 @@ function prepare_argument(x::Any)
     :ptr in fieldnames(typeof(x)) || error("unrecognized argument $x")
     if x.ptr isa libSingular.number_ptr
         ptr = x.ptr
-        rng = parent(x)
-        new_ptr = libSingular.n_Copy(ptr, rng.ptr)
+        ring_ptr = parent(x).ptr
+        new_ptr = libSingular.n_Copy(ptr, ring_ptr)
         return Any[mapping_types_reversed[:NUMBER_CMD], new_ptr.cpp_object], nothing
     end
     error("unrecognized argument $x")
 end
 
-function low_level_caller_rng(lib::String, name::String, ring, args...)
+function low_level_caller_ring(lib::String, name::String, ring::PolyRingUnion, args)
     libSingular.load_library(lib)
-    arguments = Vector{Any}()
+    return low_level_caller_ring(name, ring, args)
+end
+
+function low_level_caller_ring(name::String, ring::PolyRingUnion, args)
+    arguments = Any[]
     for i in args
-       if typeof(i) == Vector{Any}
-          push!(arguments, prepare_argument(i, ring))
-       else
-          push!(arguments, prepare_argument(i))
-       end
+        if i isa Vector{Any}
+           i, _ = prepare_argument(i, ring)
+        else
+           i, _ = prepare_argument(i)
+        end
+        push!(arguments, i)
     end
-    arguments = Any[i for (i, j) in arguments]
-    return_value = libSingular.call_singular_library_procedure(name, ring.ptr, arguments)
+    ring_ptr = ring.ptr
+    return_value = libSingular.call_singular_library_procedure(name, ring_ptr, arguments)
     if libSingular.have_error()
       error(libSingular.get_and_clear_error())
     end
-
     return convert_return(return_value, ring)
 end
 
-function low_level_caller(lib::String, name::String, args...)
+function low_level_caller(lib::String, name::String, args)
     libSingular.load_library(lib)
-    arguments = [prepare_argument(i) for i in args]
-    rng = nothing
-    for (i, j) in arguments
-        if j != nothing
-            rng = j
+    return low_level_caller(name, args)
+end
+
+function low_level_caller(name::String, args)
+    arguments = Any[]
+    ring = nothing
+    for i in args
+        i, j = prepare_argument(i)
+        push!(arguments, i)
+        if j !== nothing
+            ring = j
         end
     end
-    arguments = Any[i for (i, j) in arguments]
-    return_values = nothing
-    rng_ptr = (rng == nothing) ? C_NULL : rng.ptr
-    return_value = libSingular.call_singular_library_procedure(name, rng_ptr, arguments)
+    ring_ptr = (ring === nothing) ? C_NULL : ring.ptr
+    return_value = libSingular.call_singular_library_procedure(name, ring_ptr, arguments)
     if libSingular.have_error()
       error(libSingular.get_and_clear_error())
     end
-    return convert_return(return_value, rng)
+    return convert_return(return_value, ring)
 end
 
 @doc raw"""
