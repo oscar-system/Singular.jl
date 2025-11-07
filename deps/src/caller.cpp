@@ -38,7 +38,8 @@ static jl_value_t * get_type_mapper()
                      {RESOLUTION_CMD, "RESOLUTION_CMD"},
                      {MODUL_CMD, "MODUL_CMD"},
                      {VECTOR_CMD, "VECTOR_CMD"},
-                     {INTVEC_CMD, "INTVEC_CMD"}};
+                     {INTVEC_CMD, "INTVEC_CMD"},
+		     {DEF_CMD,"DEF_CMD"}};
 
   jl_array_t * return_array =
       jl_alloc_array_1d(jl_array_any_type, sizeof(types) / sizeof(types[0]));
@@ -457,6 +458,9 @@ void singular_define_caller(jlcxx::Module & Singular)
   });
   Singular.method("RESOLUTION_CMD_CASTER", [](void * obj) {
     return reinterpret_cast<syStrategy>(obj);
+  });
+  Singular.method("DEF_CMD_CASTER", [](void * obj) {
+    return jl_box_int64(reinterpret_cast<long>(obj));
   });
   Singular.method("LIST_CMD_TRAVERSAL", &convert_nested_list);
   Singular.method("get_ring_content", &get_ring_content);
