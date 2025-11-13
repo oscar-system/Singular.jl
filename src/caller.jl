@@ -132,6 +132,11 @@ function create_casting_functions()
                 cast = libSingular.RESOLUTION_CMD_CASTER(vptr)
                 return R(cast, Val(:resolution))  # eh
             end
+        ,
+        mapping_types_reversed[:DEF_CMD] =>
+            function (vptr, R)
+                return nothing
+            end
         )
 end
 
