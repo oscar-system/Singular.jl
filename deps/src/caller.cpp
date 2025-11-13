@@ -39,7 +39,7 @@ static jl_value_t * get_type_mapper()
                      {MODUL_CMD, "MODUL_CMD"},
                      {VECTOR_CMD, "VECTOR_CMD"},
                      {INTVEC_CMD, "INTVEC_CMD"},
-		     {DEF_CMD,"DEF_CMD"}};
+                     {DEF_CMD,"DEF_CMD"}};
 
   jl_array_t * return_array =
       jl_alloc_array_1d(jl_array_any_type, sizeof(types) / sizeof(types[0]));
