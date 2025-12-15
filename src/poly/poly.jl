@@ -1612,22 +1612,11 @@ function polynomial_ring(R::Nemo.Ring, s::AbstractVector{<:VarName};
    return _PolynomialRing(R, s, ordering, ordering2, cached, degree_bound)
 end
 
-macro polynomial_ring(R, s, n, o)
-   S = gensym()
-   y = gensym()
-   v0 = [s*string(i) for i in 1:n]
-   exp1 = :(($S, $y) = polynomial_ring($R, $v0; ordering=$o))
-   v = [:($(Symbol(s, i)) = $y[$i]) for i in 1:n]
-   v1 = Expr(:block, exp1, v..., S)
-   return esc(v1)
-end
-
-macro polynomial_ring(R, s, n)
-   S = gensym()
-   y = gensym()
-   v0 = [s*string(i) for i in 1:n]
-   exp1 = :(($S, $y) = polynomial_ring($R, $v0))
-   v = [:($(Symbol(s, i)) = $y[$i]) for i in 1:n]
-   v1 = Expr(:block, exp1, v..., S)
-   return esc(v1)
+macro polynomial_ring(R, s::VarName, n::Integer, ordering = QuoteNode(:degrevlex))
+    xv = [Symbol(s, i) for i in 1:n]
+    xt = Expr(:tuple, esc.(xv)...)
+    quote
+        S, $xt = polynomial_ring($(esc(R)), $xv; ordering = $(esc(ordering)))
+        S
+    end
 end
