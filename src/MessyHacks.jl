@@ -107,10 +107,10 @@ let zero_parameter_types = [
    ],
 
    one_parameter_types = [
-      AbstractAlgebra.Generic.LaurentSeriesRing =>
-         AbstractAlgebra.Generic.LaurentSeriesRingElem,
-      AbstractAlgebra.Generic.FracField =>
-         AbstractAlgebra.Generic.FracFieldElem
+      (AbstractAlgebra.Generic.LaurentSeriesRing,
+         AbstractAlgebra.Generic.LaurentSeriesRingElem, RingElement),
+      (AbstractAlgebra.Generic.FracField,
+         AbstractAlgebra.Generic.FracFieldElem, RingElem),
    ]
 
    for (A, B) in zero_parameter_types
@@ -124,10 +124,10 @@ let zero_parameter_types = [
       end
    end
 
-   for (A, B) in one_parameter_types
+   for (A, B, C) in one_parameter_types
       nu = (A <: Nemo.Field) ? :(Singular.n_FieldElem) : :(Singular.n_RingElem)
       @eval begin
-         function (R::($A){T})(a::($nu){($B){T}}) where T <: RingElement
+         function (R::($A){T})(a::($nu){($B){T}}) where T <: $C
             GC.@preserve a begin
                return R(libSingular.julia(libSingular.cast_number_to_void(a.ptr)))
             end
