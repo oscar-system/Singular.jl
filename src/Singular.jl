@@ -87,6 +87,88 @@ const libflint = Nemo.libflint
 
 const mapping_types_reversed = Dict{Symbol, Int64}()
 
+const VERSION_NUMBER = Base.pkgversion(@__MODULE__)
+
+
+###############################################################################
+#
+#   Load Singular Rings/Fields/etc
+#     There is a slight circular dependency: in order to create a G-Algebra
+#     you need a PolyRing R and matrices over R, and in order to create a
+#     quotient ring you need the polynomial ring and an ideal.
+#     The matrix code requires some module code, which requires some ideal
+#     code, which requires some poly code. Therefore, we include all of the
+#     poly/matrix/module/ideal types before including the methods.
+#
+###############################################################################
+
+include("AbstractTypes.jl")
+
+include("LibSingular.jl")
+
+import .libSingular: call_interpreter
+
+include("Number.jl")
+
+global ZZ::Integers
+global QQ::Rationals
+
+include("poly/OrderingTypes.jl")
+
+include("poly/PolyTypes.jl")
+
+include("matrix/MatrixTypes.jl")
+
+include("poly/PluralTypes.jl")
+
+include("module/ModuleTypes.jl")
+
+include("poly/LPTypes.jl")
+
+# all "poly" types
+
+const PolyRingUnion{T} = Union{PolyRing{T}, PluralRing{T}, LPRing{T}} where T <: Nemo.RingElem
+
+const SPolyUnion{T} = Union{spoly{T}, spluralg{T}, slpalg{T}} where T <: Nemo.RingElem
+
+include("poly/orderings.jl")
+
+include("poly/poly.jl")
+
+include("poly/plural.jl")
+
+include("poly/weyl.jl")
+
+include("poly/lp.jl")
+
+include("ideal/IdealTypes.jl")
+
+include("matrix/matrix.jl")
+
+include("matrix/bigintmat.jl")
+
+include("ideal/quotient.jl")
+
+include("module/module.jl")
+
+include("ideal/ideal.jl")
+
+include("Vector.jl")
+
+include("Resolution.jl")
+
+include("caller.jl")
+
+include("Meta.jl")
+
+include("Map.jl")
+
+include("rand.jl")
+
+include("MessyHacks.jl")
+
+include("Aliases.jl")
+
 function __init__()
    if Sys.iswindows()
       windows_error()
@@ -182,84 +264,5 @@ FB Mathematik der Universitaet, D-67653 Kaiserslautern      \\
      """)
    end
 end
-
-const VERSION_NUMBER = Base.pkgversion(@__MODULE__)
-
-
-###############################################################################
-#
-#   Load Singular Rings/Fields/etc
-#     There is a slight circular dependency: in order to create a G-Algebra
-#     you need a PolyRing R and matrices over R, and in order to create a
-#     quotient ring you need the polynomial ring and an ideal.
-#     The matrix code requires some module code, which requires some ideal
-#     code, which requires some poly code. Therefore, we include all of the
-#     poly/matrix/module/ideal types before including the methods.
-#
-###############################################################################
-
-include("AbstractTypes.jl")
-
-include("LibSingular.jl")
-
-import .libSingular: call_interpreter
-
-include("Number.jl")
-
-include("poly/OrderingTypes.jl")
-
-include("poly/PolyTypes.jl")
-
-include("matrix/MatrixTypes.jl")
-
-include("poly/PluralTypes.jl")
-
-include("module/ModuleTypes.jl")
-
-include("poly/LPTypes.jl")
-
-# all "poly" types
-
-const PolyRingUnion{T} = Union{PolyRing{T}, PluralRing{T}, LPRing{T}} where T <: Nemo.RingElem
-
-const SPolyUnion{T} = Union{spoly{T}, spluralg{T}, slpalg{T}} where T <: Nemo.RingElem
-
-include("poly/orderings.jl")
-
-include("poly/poly.jl")
-
-include("poly/plural.jl")
-
-include("poly/weyl.jl")
-
-include("poly/lp.jl")
-
-include("ideal/IdealTypes.jl")
-
-include("matrix/matrix.jl")
-
-include("matrix/bigintmat.jl")
-
-include("ideal/quotient.jl")
-
-include("module/module.jl")
-
-include("ideal/ideal.jl")
-
-include("Vector.jl")
-
-include("Resolution.jl")
-
-include("caller.jl")
-
-include("Meta.jl")
-
-include("Map.jl")
-
-include("rand.jl")
-
-include("MessyHacks.jl")
-
-include("Aliases.jl")
 
 end # module
