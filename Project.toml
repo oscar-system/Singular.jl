@@ -19,7 +19,7 @@ libsingular_julia_jll = "ae4fbd8f-ecdb-54f8-bbce-35570499b30e"
 
 [compat]
 AbstractAlgebra = "0.43.1, 0.44, 0.45, 0.46, 0.47"
-BinaryWrappers = "~0.1.1"
+BinaryWrappers = "~0.1.1, ~0.2.0"
 CxxWrap = "~0.17"
 FileWatching = "1.10"
 Libdl = "1.6"
