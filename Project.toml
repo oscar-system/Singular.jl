@@ -1,6 +1,6 @@
 name = "Singular"
 uuid = "bcd08a7b-43d2-5ff7-b6d4-c458787f915c"
-version = "0.28.4"
+version = "0.28.5"
 
 [deps]
 AbstractAlgebra = "c3fe647b-3220-5bb0-a1ea-a7954cac585d"
@@ -19,7 +19,7 @@ libsingular_julia_jll = "ae4fbd8f-ecdb-54f8-bbce-35570499b30e"
 
 [compat]
 AbstractAlgebra = "0.43.1, 0.44, 0.45, 0.46, 0.47"
-BinaryWrappers = "~0.1.1"
+BinaryWrappers = "~0.1.1, ~0.2.0"
 CxxWrap = "~0.17"
 FileWatching = "1.10"
 Libdl = "1.6"
