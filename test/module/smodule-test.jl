@@ -333,10 +333,13 @@ end
    M = Singular.Module(R, v1, v2, v3, v4)
 
    G,T = prune_with_map(M)
+   H   = prune(M)
 
    @test ngens(G) == 1
+   @test ngens(H) == 1
 
    @test G[1] == vector(R, z)
+   @test H[1] == G[1]
    @test T[3,1] == R(1)
 
    R, (x, y, z) = polynomial_ring(ZZ, ["x", "y", "z"])
@@ -354,10 +357,13 @@ end
    M = Singular.Module(R, v1, v2, v3, v4)
 
    G,T = prune_with_map(M)
+   H   = prune(M)
 
    @test ngens(G) == 1
+   @test ngens(H) == 1
 
    @test G[1] == vector(R, z)
+   @test H[1] == G[1]
    @test T[3,1] == R(1)
 
    G,T,p = prune_with_map_projection(M)
