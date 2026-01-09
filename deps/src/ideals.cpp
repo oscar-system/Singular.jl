@@ -107,6 +107,16 @@ auto id_mres_map_helper(sip_sideal * I, int n, ring R)
   return std::make_tuple(s, TT);
 }
 
+auto id_prune_helper(sip_sideal * I, ring R)
+{
+  auto origin = currRing;
+  rChangeCurrRing(R);
+  ideal      T;
+  ideal s = idMinEmbedding(I, 0, NULL);
+  rChangeCurrRing(origin);
+  return s;
+}
+
 auto id_prune_map_helper(sip_sideal * I, ring R)
 {
   auto origin = currRing;
@@ -486,6 +496,7 @@ void singular_define_ideals(jlcxx::Module & Singular)
   Singular.method("id_res", &id_res_helper);
   Singular.method("id_lres", &id_lres_helper);
   Singular.method("id_mres_map", &id_mres_map_helper);
+  Singular.method("id_prune", &id_prune_helper);
   Singular.method("id_prune_map", &id_prune_map_helper);
   Singular.method("id_prune_map_v", &id_prune_map_v_helper);
 

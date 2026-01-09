@@ -1,5 +1,5 @@
 export jet, minimal_generating_set, ModuleClass, rank, smodule, slimgb,
-       eliminate, modulo, lift, dimension, division, divrem, prune_with_map,
+       eliminate, modulo, lift, dimension, division, divrem, prune, prune_with_map,
        prune_with_map_projection, quotient, contains, saturation, saturation2
 
 ###############################################################################
@@ -419,6 +419,18 @@ function mres_with_map(I::smodule{spoly{T}}, max_length::Int) where T <: Nemo.Fi
    end
    r, TT_ptr = GC.@preserve I R libSingular.id_mres_map(I.ptr, Cint(max_length + 1), R.ptr)
    return sresolution{spoly{T}}(R, r, true, false),smatrix{spoly{T}}(R,TT_ptr)
+end
+
+@doc raw"""
+    prune(id::smodule{spoly{T}}) where T <: Nemo.RingElem
+
+Returns the module R minimally embedded in a free module such that the
+corresponding factor modules are isomorphic.
+"""
+function prune(I::smodule{spoly{T}}) where T <: Nemo.RingElem
+   R = base_ring(I)
+   r = GC.@preserve I R libSingular.id_prune(I.ptr, R.ptr)
+   return smodule{spoly{T}}(R, r)
 end
 
 @doc raw"""
