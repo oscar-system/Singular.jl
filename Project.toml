@@ -1,6 +1,6 @@
 name = "Singular"
 uuid = "bcd08a7b-43d2-5ff7-b6d4-c458787f915c"
-version = "0.28.6"
+version = "0.28.7"
 
 [deps]
 AbstractAlgebra = "c3fe647b-3220-5bb0-a1ea-a7954cac585d"
@@ -18,13 +18,13 @@ lib4ti2_jll = "1493ae25-0f90-5c0e-a06c-8c5077d6d66f"
 libsingular_julia_jll = "ae4fbd8f-ecdb-54f8-bbce-35570499b30e"
 
 [compat]
-AbstractAlgebra = "0.43.1, 0.44, 0.45, 0.46, 0.47"
+AbstractAlgebra = "0.43.1, 0.44, 0.45, 0.46, 0.47, 0.48"
 BinaryWrappers = "~0.1.1, ~0.2.0"
 CxxWrap = "~0.17"
 FileWatching = "1.10"
 Libdl = "1.6"
 LinearAlgebra = "1.6"
-Nemo = "0.47, 0.48, 0.49, 0.50, 0.51, 0.52, 0.53"
+Nemo = "0.47, 0.48, 0.49, 0.50, 0.51, 0.52, 0.53, 0.54"
 Pkg = "1.6"
 Random = "1.6"
 RandomExtensions = "0.4.2"
