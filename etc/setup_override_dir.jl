@@ -1,6 +1,5 @@
 # This Julia script sets up a directory with Singular compiled from a local path,
-# then "installs" this GAP for use by the `run_with_override.jl` script
-
+# then "installs" this Singular for use by the `run_with_override.jl` script
 
 #
 # parse arguments
@@ -9,28 +8,44 @@ length(ARGS) >= 1 || error("must provide path of Singular source directory as fi
 length(ARGS) >= 2 || error("must provide path of destination directory as second argument")
 singular_prefix = popfirst!(ARGS)
 prefix = popfirst!(ARGS)
-if length(ARGS) > 0 && ARGS[1] == "--debug"
-  debugmode = true
-  popfirst!(ARGS)
+
+if length(ARGS) > 0 && !startswith(ARGS[1], "--")
+  build_dir = popfirst!(ARGS)
 else
-  debugmode = false
+  build_dir = mktempdir(; cleanup = true)
 end
 
-# TODO: should the user be allowed to provide a tmp_gap_build_dir ? that might
-# be handy for incremental updates
+run_configure = true
+# debugmode = false
+for arg in ARGS
+   if arg == "--no-configure"
+      global run_configure = false
+   # elseif arg == "--debug"
+   #    global debugmode = true
+   else
+      error("Unknown argument: $(arg)")
+   end
+end
 
 
 # validate arguments
-isdir(singular_prefix) || error("The given GAP prefix '$(singular_prefix)' is not a valid directory")
+isdir(singular_prefix) || error("The given Singular prefix '$(singular_prefix)' is not a valid directory")
 if ispath(prefix)
-    error("installation prefix '$(prefix)' already exists, please remove it before running this script")
-    # TODO: prompt the user for whether to delete the dir or abort
+   print("The given installation prefix '$(prefix)' already exists. Overwrite? [Y/n]")
+   answer = readline()
+   if lowercase(answer) in ["y", "yes", ""]
+      rm(prefix; force=true, recursive=true)
+   else
+      error("Aborting")
+   end
 end
 
 # convert into absolute paths
 mkpath(prefix)
 prefix = abspath(prefix)
 singular_prefix = abspath(singular_prefix)
+mkpath(build_dir)
+build_dir = abspath(build_dir)
 
 #
 # Install needed packages
@@ -64,7 +79,7 @@ function gmp_artifact_dir()
 end
 
 #
-# locate GMP headers and the Julia executable for use by the GAP build system
+# locate headers for use by the GAP build system
 #
 deps_and_dirs = Dict(
    GMP_jll => gmp_artifact_dir(),
@@ -73,71 +88,61 @@ deps_and_dirs = Dict(
    MPFR_jll => MPFR_jll.find_artifact_dir(),
 )
 
-#
-# create a temporary directory for the build
-#
-tmp_gap_build_dir = mktempdir(; cleanup = false)
-cd(tmp_gap_build_dir)
+cd(build_dir)
 
-#
-# configure and build Singular
-#
-@info "Configuring GAP in $(tmp_gap_build_dir) for $(prefix)"
+if run_configure
+   #
+   # configure and build Singular
+   #
+   @info "Configuring Singular in $(build_dir) for $(prefix)"
 
-extraargs = String[]
-cppflags = String[]
-ldflags = String[]
+   extraargs = String[]
+   cppflags = String[]
+   ldflags = String[]
 
-for (jll, dir) in deps_and_dirs
-    push!(cppflags, "-I$(dir)/include")
-    push!(ldflags, "-L$(dir)/lib")
+   for (jll, dir) in deps_and_dirs
+      push!(cppflags, "-I$(dir)/include")
+      push!(ldflags, "-L$(dir)/lib")
+   end
+
+   if !isempty(cppflags)
+      push!(extraargs, "CPPFLAGS=$(join(cppflags, " "))")
+   end
+   if !isempty(ldflags)
+      push!(extraargs, "LDFLAGS=$(join(ldflags, " "))")
+   end
+
+
+   # TODO: redirect the output of configure into a log file
+   @show run(`$(singular_prefix)/configure
+       --prefix=$(prefix)
+       --with-libparse
+       --enable-shared
+       --disable-static
+       --enable-p-procs-static
+       --disable-p-procs-dynamic
+       --enable-gfanlib
+       --without-readline
+       --without-ntl
+       --with-gmp=$(deps_and_dirs[GMP_jll])
+       --with-flint=$(deps_and_dirs[FLINT_jll])
+       --without-python
+       --with-builtinmodules=gfanlib,syzextra,customstd,interval,subsets,loctriv,gitfan,freealgebra
+       --disable-partialgb-module
+       --disable-polymake-module
+       --disable-pyobject-module
+       --disable-singmathic-module
+       --disable-systhreads-module
+       --disable-cohomo-module
+       --disable-machinelearning-module
+       --disable-sispasm-module
+       $(extraargs)
+       $(ARGS)
+       `)
 end
 
-if !isempty(cppflags)
-   push!(extraargs, "CPPFLAGS=$(join(cppflags, " "))")
-end
-if !isempty(ldflags)
-   push!(extraargs, "LDFLAGS=$(join(ldflags, " "))")
-end
 
-if debugmode
-    # compile GAP in debug mode (enables many additional assertions in the kernel)
-    # and disable optimizations, so that debugging the resulting binary with gdb or lldb
-    # gets easier
-    @info "Debug mode is enabled"
-    append!(extraargs, ["CFLAGS=-g", "CXXFLAGS=-g", "--enable-debug"])
-end
-
-
-# TODO: redirect the output of configure into a log file
-@show run(`$(singular_prefix)/configure
-    --prefix=$(prefix)
-    --with-libparse
-    --enable-shared
-    --disable-static
-    --enable-p-procs-static
-    --disable-p-procs-dynamic
-    --enable-gfanlib
-    --without-readline
-    --without-ntl
-    --with-gmp=$(deps_and_dirs[GMP_jll])
-    --with-flint=$(deps_and_dirs[FLINT_jll])
-    --without-python
-    --with-builtinmodules=gfanlib,syzextra,customstd,interval,subsets,loctriv,gitfan,freealgebra
-    --disable-partialgb-module
-    --disable-polymake-module
-    --disable-pyobject-module
-    --disable-singmathic-module
-    --disable-systhreads-module
-    --disable-cohomo-module
-    --disable-machinelearning-module
-    --disable-sispasm-module
-    $(extraargs)
-    $(ARGS)
-    `)
-
-
-@info "Building Singular in $(tmp_gap_build_dir)"
+@info "Building Singular in $(build_dir)"
 
 # complete the build
 run(`make -j$(Sys.CPU_THREADS)`)

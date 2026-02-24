@@ -1,11 +1,11 @@
 #
 # parse arguments
 #
-length(ARGS) >= 1 || error("must provide path of GAP override directory as first argument")
-gapoverride = popfirst!(ARGS)
+length(ARGS) >= 1 || error("must provide path of Singular override directory as first argument")
+singularoverride = popfirst!(ARGS)
 
-isdir(gapoverride) || error("The given override path '$(gapoverride)' is not a valid directory")
-gapoverride = abspath(gapoverride)
+isdir(singularoverride) || error("The given override path '$(singularoverride)' is not a valid directory")
+singularoverride = abspath(singularoverride)
 
 #
 #
@@ -39,7 +39,7 @@ tmpdepot = mktempdir(; cleanup=true)
 @info "Created temporary depot at $(tmpdepot)"
 
 # create override file for Singular_jll
-add_jll_override(tmpdepot, "Singular", gapoverride)
+add_jll_override(tmpdepot, "Singular", singularoverride)
 
 # prepend our temporary depot to the depot list...
 withenv("JULIA_DEPOT_PATH"=>tmpdepot*":"*join(DEPOT_PATH, ":")) do

@@ -13,19 +13,29 @@ For this to work, follow these instructions:
 
 2. Execute `./autoconf.sh` in the SINGULARROOT.
 
-3. Build Singular by executing the `etc/setup_override_dir.jl`
-   script. It takes as first argument the SINGULARROOT, and as second argument the places where
-   the result shall be installed. I recommend to execute this in a separate
-   environment, as it may need to install a few things.
+3. Build Singular by executing the `etc/setup_override_dir.jl` script in the `override` environment.
+   Arguments:
+    - first argument: the SINGULARROOT
+    - second argument: the directory where the override environment shall be installed, e.g. `/tmp/singular_jll_override`.
+    - third argument (optional): a temp build directory to make use of incremental make builds,
+      e.g. `/tmp/singular_jll_override_build`. if not given, a temporary directory will be created
+      and deleted after the build.
+    - `--no-configure` (optional): if given, the script will not execute `./configure` in the SINGULARROOT,
+      but assume that this has already been done. This can be useful if you want to save time by doing incremental builds,
+      or if you need to pass special arguments to `./configure` that the script does not know about.
 
-   To give a concrete example you could invoke
+    To give a concrete example you could invoke
 
-        julia --proj=override etc/setup_override_dir.jl $SINGULARROOT /tmp/singular_jll_override
+        julia --proj=override etc/setup_override_dir.jl $SINGULARROOT /tmp/singular_jll_override /tmp/singular_jll_override_build
+
+    for the first time, and then for subsequent builds (after making changes to the SINGULAR sources) you could invoke
+
+        julia --proj=override etc/setup_override_dir.jl $SINGULARROOT /tmp/singular_jll_override /tmp/singular_jll_override_build --no-configure
 
 4. Use the `etc/run_with_override.jl` script with the exact same Julia executable
    and the override environment we just prepared.
 
         julia --proj=override etc/run_with_override.jl /tmp/singular_jll_override
 
-5. This opens a Julia session with the override in effect. You can now e.g. load GAP.jl
-   via `using GAP`, or install other packages (such as Oscar) and test with them.
+5. This opens a Julia session with the override in effect. You can now e.g. load Singular.jl
+   via `using Singular`, or install other packages (such as Oscar) and test with them.
