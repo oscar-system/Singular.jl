@@ -84,6 +84,7 @@ end
 deps_and_dirs = Dict(
    GMP_jll => gmp_artifact_dir(),
    FLINT_jll => FLINT_jll.find_artifact_dir(),
+   FLINT_jll.OpenBLAS32_jll => FLINT_jll.OpenBLAS32_jll.find_artifact_dir(),
    cddlib_jll => cddlib_jll.find_artifact_dir(),
    MPFR_jll => MPFR_jll.find_artifact_dir(),
 )
@@ -105,6 +106,8 @@ if run_configure
       push!(ldflags, "-L$(dir)/lib")
    end
 
+   push!(ldflags, "-L"*joinpath(MPFR_jll.find_artifact_dir(), "lib", "julia"))
+
    if !isempty(cppflags)
       push!(extraargs, "CPPFLAGS=$(join(cppflags, " "))")
    end
@@ -112,6 +115,7 @@ if run_configure
       push!(extraargs, "LDFLAGS=$(join(ldflags, " "))")
    end
 
+   @show(extraargs)
 
    # TODO: redirect the output of configure into a log file
    @show run(`$(singular_prefix)/configure
@@ -145,7 +149,7 @@ end
 @info "Building Singular in $(build_dir)"
 
 # complete the build
-run(`make -j$(Sys.CPU_THREADS)`)
+run(`make -j$(Sys.CPU_THREADS) V=1`)
 
 @info "Installing Singular to $(prefix)"
 run(`make install`)
