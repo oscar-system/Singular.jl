@@ -89,7 +89,7 @@ Step 3, the commit SHA used to update the `libsingular_julia` build scripts
 contains all of the desired changes to `libsingular_julia`.
 
 
-## Building a custom `Singular_jjl` locally
+## Building a custom `Singular_jll` locally
 
 For testing purposes one may wish to try out `Singular_jll` changes locally before
 submitting them as a PR to Yggdrasil. This can be done as shown in the following
