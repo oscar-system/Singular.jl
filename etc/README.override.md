@@ -18,7 +18,7 @@ For this to work, follow these instructions:
     - first argument: the SINGULARROOT
     - second argument: the directory where the override environment shall be installed, e.g. `/tmp/singular_jll_override`.
     - third argument (optional): a temp build directory to make use of incremental make builds,
-      e.g. `/tmp/singular_jll_override_build`. if not given, a temporary directory will be created
+      e.g. `/tmp/singular_jll_override_build`. If not given, a temporary directory will be created
       and deleted after the build.
     - `--no-configure` (optional): if given, the script will not execute `./configure` in the SINGULARROOT,
       but assume that this has already been done. This can be useful if you want to save time by doing incremental builds,
