@@ -17,16 +17,21 @@ end
 
 run_configure = true
 overwrite_allow = false
+verbose = false
 # debugmode = false
-for arg in ARGS
+left_ARGS = String[]
+while !isempty(ARGS)
+   arg = popfirst!(ARGS)
    if arg == "--no-configure"
       global run_configure = false
    elseif arg == "--yes"
       global overwrite_allow = true
+   elseif arg == "--verbose"
+      global verbose = true
    # elseif arg == "--debug"
    #    global debugmode = true
    else
-      error("Unknown argument: $(arg)")
+      push!(left_ARGS, arg)
    end
 end
 
@@ -87,8 +92,7 @@ if run_configure
       push!(extraargs, "LDFLAGS=$(join(ldflags, " "))")
    end
 
-   # TODO: redirect the output of configure into a log file
-   @show run(`$(singular_prefix)/configure
+   configure_cmd = `$(singular_prefix)/configure
        --prefix=$(prefix)
        --with-libparse
        --enable-shared
@@ -111,13 +115,18 @@ if run_configure
        --disable-machinelearning-module
        --disable-sispasm-module
        $(extraargs)
-       $(ARGS)
-       `)
+       $(left_ARGS)
+       `
+
+   verbose && @show configure_cmd
+
+   # TODO: redirect the output of configure into a log file
+   @show run(configure_cmd)
 end
 
 
 @info "Building Singular in $(build_dir)"
-run(`make -j$(Sys.CPU_THREADS) V=1`)
+run(`make -j$(Sys.CPU_THREADS) $(verbose ? "V=1" : "")`)
 
 @info "Installing Singular to $(prefix)"
 run(`make install`)
