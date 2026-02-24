@@ -108,6 +108,9 @@ if run_configure
 
    push!(ldflags, "-L"*joinpath(MPFR_jll.find_artifact_dir(), "lib", "julia"))
 
+   push!(ldflags, "-lopenblas")
+   push!(ldflags, "-lgfortran")
+
    if !isempty(cppflags)
       push!(extraargs, "CPPFLAGS=$(join(cppflags, " "))")
    end
