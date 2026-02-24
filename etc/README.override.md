@@ -11,7 +11,7 @@ For this to work, follow these instructions:
 1. Obtain a copy of the SINGULAR sources, probably from a clone of the SINGULAR git repository.
    Let's say this is in directory `SINGULARROOT`.
 
-2. Execute `./autoconf.sh` in the SINGULARROOT.
+2. Execute `./autogen.sh` in the SINGULARROOT.
 
 3. Build Singular by executing the `etc/setup_override_dir.jl` script in the `override` environment.
    Arguments:
