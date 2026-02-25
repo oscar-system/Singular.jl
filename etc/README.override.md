@@ -17,12 +17,12 @@ For this to work, follow these instructions:
 
 3. Build Singular by executing the `etc/setup_override_dir.jl` script in the `override` environment.
    Arguments:
-    - first argument: the SINGULARROOT
+    - first argument: the `SINGULARROOT`
     - second argument: the directory where the override environment shall be installed, e.g. `/tmp/singular_jll_override`.
     - third argument (optional): a temp build directory to make use of incremental builds,
       e.g. `/tmp/singular_jll_override_build`. If not given, a temporary directory will be created
       and deleted after the build.
-    - `--no-configure` (optional): if given, the script will not execute `./configure` in the SINGULARROOT,
+    - `--no-configure` (optional): if given, the script will not execute `./configure` in the `SINGULARROOT`,
       but assume that this has already been done. This can be useful if you want to save time by doing incremental builds,
       or if you need to pass special arguments to `./configure` that the script does not know about.
     - `--yes` (optional): if given, the script will not ask for confirmation before deleting the override directory (if it already exists).
