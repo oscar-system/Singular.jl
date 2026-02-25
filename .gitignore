@@ -7,5 +7,6 @@
 /docs/build/
 /gh-pages/
 /local/*
+/override/
 /Manifest.toml
 /src/libraryfuncdictionary.jl
