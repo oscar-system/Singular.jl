@@ -40,9 +40,10 @@ tmpdepot = mktempdir(; cleanup=true)
 
 # create override file for Singular_jll
 add_jll_override(tmpdepot, "Singular", singularoverride)
+run(`touch $(Base.locate_package(Base.identify_package("Singular")))`)
 
 # prepend our temporary depot to the depot list...
-withenv("JULIA_DEPOT_PATH"=>tmpdepot*":"*join(DEPOT_PATH, ":")) do
+withenv("JULIA_DEPOT_PATH"=>tmpdepot*":"*join(DEPOT_PATH, ":"), "FORCE_LIBSINGULAR_JULIA_COMPILATION"=>"true") do
 
     # ... and start Julia, by default with the same project environment
     run(`$(Base.julia_cmd()) --project=$(Base.active_project()) $(ARGS)`)
