@@ -108,7 +108,7 @@ BASEPATH=$(pwd)
 export BINARYBUILDER_AUTOMATIC_APPLE=true
 
 # change into the directory containing the `build_tarballs.jl` we want to build
-cd S/Singular_jll
+cd S/Singular
 
 # Now `build_tarballs.jl` can be modified, e.g. to pull a different set of
 # sources, use different versions of dependencies, etc.

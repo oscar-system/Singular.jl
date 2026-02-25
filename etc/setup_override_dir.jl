@@ -78,19 +78,10 @@ if run_configure
    deps_path = mktempdir(; cleanup=false)
    deploy_artifact_paths(deps_path, artifact_paths)
 
-   extraargs = String[]
-   cppflags = String[]
-   ldflags = String[]
-
-   push!(cppflags, "-I$(joinpath(deps_path, "include"))")
-   push!(ldflags, "-L$(joinpath(deps_path, "lib"))")
-
-   if !isempty(cppflags)
-      push!(extraargs, "CPPFLAGS=$(join(cppflags, " "))")
-   end
-   if !isempty(ldflags)
-      push!(extraargs, "LDFLAGS=$(join(ldflags, " "))")
-   end
+   extraargs = [
+        "CPPFLAGS=-I$(joinpath(deps_path, "include"))",
+        "LDFLAGS=-L$(joinpath(deps_path, "lib"))",
+   ]
 
    configure_cmd = `$(singular_prefix)/configure
        --prefix=$(prefix)
