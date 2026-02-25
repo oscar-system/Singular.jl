@@ -18,7 +18,6 @@ end
 run_configure = true
 overwrite_allow = false
 verbose = false
-# debugmode = false
 left_ARGS = String[]
 while !isempty(ARGS)
    arg = popfirst!(ARGS)
@@ -28,8 +27,6 @@ while !isempty(ARGS)
       global overwrite_allow = true
    elseif arg == "--verbose"
       global verbose = true
-   # elseif arg == "--debug"
-   #    global debugmode = true
    else
       push!(left_ARGS, arg)
    end
@@ -76,7 +73,7 @@ if run_configure
    deps = ["GMP_jll", "FLINT_jll", "cddlib_jll", "MPFR_jll"]
    artifact_paths = collect_artifact_paths(deps)
    deps_path = mktempdir(; cleanup=false)
-   deploy_artifact_paths(deps_path, artifact_paths)
+   deploy_artifact_paths(deps_path, artifact_paths) # collect all (transitive) dependencies into one tree
 
    extraargs = [
         "CPPFLAGS=-I$(joinpath(deps_path, "include"))",
