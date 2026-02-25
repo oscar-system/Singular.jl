@@ -114,7 +114,7 @@ end
 
 
 @info "Building Singular in $(build_dir)"
-run(`make -j$(Sys.CPU_THREADS) $(verbose ? "V=1" : "")`)
+run(`make -j$(Sys.CPU_THREADS) $(verbose ? "V=1" : [])`)
 
 @info "Installing Singular to $(prefix)"
-run(`make install`)
+run(`make install $(verbose ? "V=1" : [])`)
