@@ -65,27 +65,45 @@ It is possible to act on polynomials and ideals via algebra homomorphisms.
 
 **Examples**
 
-```julia
-R, (x, y, z, w) = polynomial_ring(Nemo.ZZ, ["x", "y", "z", "w"];
-                             ordering=:negdegrevlex)
+```jldoctest
+julia> R, (x, y, z, w) = polynomial_ring(ZZ, ["x", "y", "z", "w"];
+                                    ordering=:negdegrevlex)
+(Singular polynomial ring (ZZ),(x,y,z,w),(ds(4),C), spoly{n_Z}[x, y, z, w])
 
-S, (a, b, c) = polynomial_ring(Nemo.ZZ, ["a", "b", "c"];
-                             ordering=:degrevlex)
+julia> S, (a, b, c) = polynomial_ring(ZZ, ["a", "b", "c"];
+                                    ordering=:degrevlex)
+(Singular polynomial ring (ZZ),(a,b,c),(dp(3),C), spoly{n_Z}[a, b, c])
 
-V = [a, a + b^2, b - c, c + b]
+julia> V = [a, a + b^2, b - c, c + b]
+4-element Vector{spoly{n_Z}}:
+ a
+ b^2 + a
+ b - c
+ b + c
 
-f = AlgebraHomomorphism(R, S, V)
+julia> f = AlgebraHomomorphism(R, S, V)
+Algebra homomorphism
+  from Singular polynomial ring (ZZ),(x,y,z,w),(ds(4),C)
+  to Singular polynomial ring (ZZ),(a,b,c),(dp(3),C)
+Defining equations: spoly{n_Z}[a, b^2 + a, b - c, b + c]
 
-id  = IdentityAlgebraHomomorphism(S)
+julia> id  = IdentityAlgebraHomomorphism(S)
+Identity algebra homomorphism
+  from Singular polynomial ring (ZZ),(a,b,c),(dp(3),C)
+  to Singular polynomial ring (ZZ),(a,b,c),(dp(3),C)
+Defining equations: spoly{n_Z}[a, b, c]
 
+julia> J = Ideal(R, [x, y^3])
+Singular ideal over Singular polynomial ring (ZZ),(x,y,z,w),(ds(4),C) with generators (x, y^3)
 
-J = Ideal(R, [x, y^3])
+julia> p = x + y^3 + z*w
+x + z*w + y^3
 
-p = x + y^3 + z*w
+julia> K = f(J)
+Singular ideal over Singular polynomial ring (ZZ),(a,b,c),(dp(3),C) with generators (a, b^6 + 3*a*b^4 + 3*a^2*b^2 + a^3)
 
-K = f(J)
-
-q = f(p)
+julia> q = f(p)
+b^6 + 3*a*b^4 + 3*a^2*b^2 + a^3 + b^2 - c^2 + a
 ```
 
 ### Composition

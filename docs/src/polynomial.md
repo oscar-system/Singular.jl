@@ -424,9 +424,9 @@ squarefree factorization is available.
 
 **Examples**
 
-```julia
+```jldoctest
 julia> R = @polynomial_ring(QQ, "x", 4)
-Singular Polynomial Ring (QQ),(x1,x2,x3,x4),(dp(4),C)
+Singular polynomial ring (QQ),(x1,x2,x3,x4),(dp(4),C)
 
 julia> f = 123*(57*x2^3 + x4^5)^3*(x1^2 + x1+1)^2*(x1 + x2*x3)^2;
 
@@ -439,14 +439,14 @@ multivariate factorization is available.
 
 **Examples**
 
-```julia
+```jldoctest
 julia> R = @polynomial_ring(ZZ, "x", 4)
-Singular Polynomial Ring (ZZ),(x1,x2,x3,x4),(dp(4),C)
+Singular polynomial ring (ZZ),(x1,x2,x3,x4),(dp(4),C)
 
 julia> f = 123*(57*x2^3 + x4^5)^3*(x1^2 + x1+1)^2*(x1 + x2*x3)^2;
 
 julia> Fac = factor(f)
-123 * (x2*x3 + x1)^2 * (x4^5 + 57*x2^3)^3 * (x1^2 + x1 + 1)^2
+123 * (x1^2 + x1 + 1)^2 * (x4^5 + 57*x2^3)^3 * (x2*x3 + x1)^2
 ```
 
 ### Change of coefficient rings
@@ -475,10 +475,13 @@ via `CoefficientRing`.
 
 **Examples**
 
-```julia
-R, (x, y) = polynomial_ring(ZZ, ["x", "y"])
+```jldoctest
+julia> R, (x, y) = polynomial_ring(ZZ, ["x", "y"])
+(Singular polynomial ring (ZZ),(x,y),(dp(2),C), spoly{n_Z}[x, y])
 
-p = x^5 + y^3+1
+julia> p = x^5 + y^3+1
+x^5 + y^3 + 1
 
-p2 change_base_ring(CoefficientRing(Nemo.QQ), p)
+julia> p2 = change_base_ring(CoefficientRing(Singular.Nemo.QQ), p)
+x^5 + y^3 + 1
 ```
