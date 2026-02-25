@@ -103,7 +103,8 @@ julia> K = f(J)
 Singular ideal over Singular polynomial ring (ZZ),(a,b,c),(dp(3),C) with generators (a, b^6 + 3*a*b^4 + 3*a^2*b^2 + a^3)
 
 julia> q = f(p)
-b^6 + 3*a*b^4 + 3*a^2*b^2 + a^3 + b^2 - c^2 + a```
+b^6 + 3*a*b^4 + 3*a^2*b^2 + a^3 + b^2 - c^2 + a
+```
 
 ### Composition
 
