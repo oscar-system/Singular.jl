@@ -85,8 +85,8 @@ function build_code(src_hash; cached::Bool=true)
       builddir = joinpath(depsdir, "build-$VERSION")
       installdir = joinpath(depsdir, "install-$VERSION")
    else
-      builddir = mktempdir(depsdir; prefix="build-")
-      installdir = mktempdir(depsdir; prefix="install-")
+      builddir = joinpath(depsdir, "build-forced-compile")
+      installdir = joinpath(depsdir, "install-forced-compile")
    end
 
    lib_path = joinpath(installdir, "lib", "libsingular_julia.$(Libdl.dlext)")
