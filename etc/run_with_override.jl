@@ -51,6 +51,7 @@ end
 withenv(
     "JULIA_DEPOT_PATH"=>tmpdepot*":"*join(DEPOT_PATH, ":"),
     "DYLD_FALLBACK_LIBRARY_PATH"=>dyld_fallback,
+    "FORCE_LIBSINGULAR_JULIA_COMPILATION"=>"true",
 ) do
 
     # ... and start Julia, by default with the same project environment
