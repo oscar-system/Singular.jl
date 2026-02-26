@@ -40,9 +40,17 @@ tmpdepot = mktempdir(; cleanup=true)
 
 # create override file for Singular_jll
 add_jll_override(tmpdepot, "Singular", singularoverride)
+singular_libdir = joinpath(singularoverride, "lib")
+
+dyld_fallback = let existing = get(ENV, "DYLD_FALLBACK_LIBRARY_PATH", "")
+    isempty(existing) ? singular_libdir : existing * ":" * singular_libdir
+end
 
 # prepend our temporary depot to the depot list...
-withenv("JULIA_DEPOT_PATH"=>tmpdepot*":"*join(DEPOT_PATH, ":")) do
+withenv(
+    "JULIA_DEPOT_PATH"=>tmpdepot*":"*join(DEPOT_PATH, ":"),
+    "DYLD_FALLBACK_LIBRARY_PATH"=>dyld_fallback,
+) do
 
     # ... and start Julia, by default with the same project environment
     run(`$(Base.julia_cmd()) --project=$(Base.active_project()) $(ARGS)`)
