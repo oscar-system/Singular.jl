@@ -71,32 +71,41 @@ function jll_artifact_dir(the_jll::Module)
     return the_jll.find_artifact_dir()
 end
 
-function build_code(src_hash)
-   @info "Bundled C++ sources don't match libsingular_julia_jll"
-
+# If `cached=true`, then we check if we already have a compiled version of the bundled C++ code
+# that matches the current sources (by comparing tree hashes). If so, we just use that.
+# If `cached=false`, then we skip the check and recompile the bundled C++ code unconditionally,
+# and put it in a directory where it won't be picked up by the check on subsequent runs.
+function build_code(src_hash; cached::Bool=true)
    depsdir = abspath(joinpath(@__DIR__, "..", "deps"))
    srcdir = joinpath(depsdir, "src")
 
-   # encode the Julia version into into the build & install paths
-   # as different Julia versions tend to not be ABI compatible
-   builddir = joinpath(depsdir, "build-$VERSION")
-   installdir = joinpath(depsdir, "install-$VERSION")
-
-   # check if we already built the code and if so, just use that
-   lib_path = joinpath(installdir, "lib", "libsingular_julia.$(Libdl.dlext)")
-   treehash_path = joinpath(installdir, "lib", "libsingular_julia.treehash")
-   try
-      bin_hash = read(treehash_path, String)
-      if bin_hash == src_hash
-         @info "Using already compiled bundled C++ code"
-         return lib_path
-      end
-   catch
+   if cached
+      # encode the Julia version into into the build & install paths
+      # as different Julia versions tend to not be ABI compatible
+      builddir = joinpath(depsdir, "build-$VERSION")
+      installdir = joinpath(depsdir, "install-$VERSION")
+   else
+      builddir = mktempdir(depsdir; prefix="build-")
+      installdir = mktempdir(depsdir; prefix="install-")
    end
 
-   # TODO: check if this is a dev version of Singular.jl; if so, continue. If
-   # not, i.e. if this is a regular version, then refuse to run
+   lib_path = joinpath(installdir, "lib", "libsingular_julia.$(Libdl.dlext)")
+   treehash_path = joinpath(installdir, "lib", "libsingular_julia.treehash")
 
+   if cached
+      # check if we already built the code and if so, just use that
+      try
+         bin_hash = read(treehash_path, String)
+         if bin_hash == src_hash
+            @info "Using already compiled bundled C++ code"
+            return lib_path
+         end
+      catch
+      end
+
+      # TODO: check if this is a dev version of Singular.jl; if so, continue. If
+      # not, i.e. if this is a regular version, then refuse to run
+   end
 
    @info "Compiling libsingular_julia ..."
 
@@ -156,12 +165,15 @@ function locate_libsingular()
    # the uuid is for Singular.jl
    pkginfo = get(Pkg.dependencies(), Base.PkgId(parentmodule(Setup)).uuid, nothing)
 
-   if jll_hash == src_hash || (pkginfo !== nothing && pkginfo.is_tracking_registry)
+   if get(ENV, "FORCE_LIBSINGULAR_JULIA_COMPILATION", "false") == "true"
+      @info "FORCE_LIBSINGULAR_JULIA_COMPILATION is set to true -> compiling bundled sources"
+      path = build_code(src_hash; cached=false)
+   elseif jll_hash == src_hash || (pkginfo !== nothing && pkginfo.is_tracking_registry)
        # if the tree hashes match then we use the JLL
        # also if we are using a released Singular.jl version
        path = libsingular_julia_jll.get_libsingular_julia_path()
    else
-      # tree hashes differ: we use the bundled sources.
+      @info "Bundled C++ sources don't match libsingular_julia_jll -> compiling bundled sources"
       path = build_code(src_hash)
    end
    @debug "Use libsingular_julia from $path"

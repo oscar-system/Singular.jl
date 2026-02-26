@@ -40,8 +40,9 @@ tmpdepot = mktempdir(; cleanup=true)
 
 # create override file for Singular_jll
 add_jll_override(tmpdepot, "Singular", singularoverride)
-singular_libdir = joinpath(singularoverride, "lib")
+run(`touch $(Base.locate_package(Base.identify_package("Singular")))`)
 
+singular_libdir = joinpath(singularoverride, "lib")
 dyld_fallback = let existing = get(ENV, "DYLD_FALLBACK_LIBRARY_PATH", "")
     isempty(existing) ? singular_libdir : existing * ":" * singular_libdir
 end
