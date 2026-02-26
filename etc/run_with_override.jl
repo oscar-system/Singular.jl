@@ -41,9 +41,30 @@ tmpdepot = mktempdir(; cleanup=true)
 # create override file for Singular_jll
 add_jll_override(tmpdepot, "Singular", singularoverride)
 
-# prepend our temporary depot to the depot list...
-withenv("JULIA_DEPOT_PATH"=>tmpdepot*":"*join(DEPOT_PATH, ":")) do
+# create a fresh marker file in deps/src so the tree hash changes
+libsingular_src_dir = joinpath(dirname(@__DIR__), "deps", "src")
+isdir(libsingular_src_dir) || error("Could not find $(libsingular_src_dir)")
 
-    # ... and start Julia, by default with the same project environment
-    run(`$(Base.julia_cmd()) --project=$(Base.active_project()) $(ARGS)`)
+marker_prefix = ".recompile-libsingular-julia-"
+for filename in readdir(libsingular_src_dir)
+    if startswith(filename, marker_prefix)
+        rm(joinpath(libsingular_src_dir, filename); force=true)
+    end
+end
+
+libsingular_src_marker = joinpath(
+    libsingular_src_dir,
+    marker_prefix * string(time_ns()) * ".txt",
+)
+write(libsingular_src_marker, "force recompilation marker\n")
+
+# prepend our temporary depot to the depot list...
+try
+    withenv("JULIA_DEPOT_PATH"=>tmpdepot*":"*join(DEPOT_PATH, ":")) do
+
+        # ... and start Julia, by default with the same project environment
+        run(`$(Base.julia_cmd()) --project=$(Base.active_project()) $(ARGS)`)
+    end
+finally
+    rm(libsingular_src_marker; force=true)
 end
