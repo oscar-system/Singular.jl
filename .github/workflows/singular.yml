@@ -49,7 +49,7 @@ jobs:
         id: setup-julia
         with:
           version: ${{ matrix.julia-version }}
-      - name: Checkout Singular
+      - name: "Checkout Singular"
         uses: actions/checkout@v6
         with:
           repository: 'Singular/Singular'
