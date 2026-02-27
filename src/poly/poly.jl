@@ -1103,7 +1103,7 @@ function factor_squarefree(x::spoly)
       push!(D, I[i] => Int64(a[i]))
     end
   end
-  return Fac(I[1], D)
+  return Fac(I[1], sort(collect(D)))
 end
 
 function factor(x::spoly)
@@ -1126,7 +1126,7 @@ function factor(x::spoly)
     for i in 2:n
       push!(D, I[i] => Int64(a[i]))
     end
-  return Fac(I[1], D)
+  return Fac(I[1], sort(collect(D)))
   end
 end
 
