@@ -431,7 +431,7 @@ Singular polynomial ring (QQ),(x1,x2,x3,x4),(dp(4),C)
 julia> f = 123*(57*x2^3 + x4^5)^3*(x1^2 + x1+1)^2*(x1 + x2*x3)^2;
 
 julia> Fac = factor(f)
-123 * (x4^5 + 57*x2^3)^3 * (x1^2 + x1 + 1)^2 * (x2*x3 + x1)^2
+123 * (x2*x3 + x1)^2 * (x1^2 + x1 + 1)^2 * (x4^5 + 57*x2^3)^3
 ```
 
 For the Singular base rings `QQ`, `ZZ` and `Fp` a function to compute the
@@ -446,7 +446,7 @@ Singular polynomial ring (ZZ),(x1,x2,x3,x4),(dp(4),C)
 julia> f = 123*(57*x2^3 + x4^5)^3*(x1^2 + x1+1)^2*(x1 + x2*x3)^2;
 
 julia> Fac = factor(f)
-123 * (x1^2 + x1 + 1)^2 * (x4^5 + 57*x2^3)^3 * (x2*x3 + x1)^2
+123 * (x2*x3 + x1)^2 * (x1^2 + x1 + 1)^2 * (x4^5 + 57*x2^3)^3
 ```
 
 ### Change of coefficient rings
