@@ -32,7 +32,7 @@ jobs:
           - 'spielwiese'
         julia-version:
           - '1'         # latest stable release
-          - '1.13-nightly'
+        #  - '1.13-nightly' # TODO: enable once julia 1.13.0-rc1 is released
           - 'nightly'
         os:
           - ubuntu-latest
