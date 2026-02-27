@@ -169,12 +169,17 @@ end
    R, x = FiniteField(5, 2, "x")
 
    @test (x + 1)^2 == x^20
-   @test_throws DomainError x^-rand(1:99)
 
    R, x = FiniteField(5, 1, "x")
    @test x^3 == x*x*x
    @test R(2)^2 == 2^2
    @test R(2)^3 == 2^3
+
+   y = R(2)
+   @test y^-1 == inv(y)
+   for i in 0:10
+     @test isone(y^i * y^(-i))
+   end
 end
 
 @testset "n_GF.exact_division" begin
