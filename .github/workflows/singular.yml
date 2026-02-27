@@ -1,0 +1,73 @@
+name: CI with Singular
+
+on:
+  push:
+    branches:
+      - 'master'
+      - 'release-*'
+    tags: '*'
+  pull_request:
+  schedule:
+      # Every day at 2:33 AM UTC
+      - cron: '33 2 * * *'
+  workflow_dispatch:
+
+concurrency:
+  # group by workflow and ref; the last slightly strange component ensures that for pull
+  # requests, we limit to 1 concurrent job, but for the default repository branch we don't
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.ref_name != github.event.repository.default_branch || github.run_number }}
+  # Cancel intermediate builds, but only if it is a pull request build.
+  cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
+
+jobs:
+  test:
+    name: Julia ${{ matrix.julia-version }} - Singular ${{ matrix.singular-version }} - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    continue-on-error: ${{ matrix.julia-version == 'nightly' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        singular-version:
+          - 'spielwiese'
+        julia-version:
+          - '1'         # latest stable release
+        #  - '1.13-nightly' # TODO: enable once julia 1.13.0-rc1 is released
+          - 'nightly'
+        os:
+          - ubuntu-latest
+        include:
+          # Add a few macOS jobs (the number we can run in parallel is limited)
+          - singular-version: 'spielwiese'
+            julia-version: '1'
+            os: macOS-latest
+
+    steps:
+      - uses: actions/checkout@v6
+      - name: "Set up Julia"
+        uses: julia-actions/setup-julia@v2
+        id: setup-julia
+        with:
+          version: ${{ matrix.julia-version }}
+      - name: "Checkout Singular"
+        uses: actions/checkout@v6
+        with:
+          repository: 'Singular/Singular'
+          ref: ${{ matrix.singular-version }}
+          path: 'SINGULARROOT'
+      - name: "Install dependencies (for macOS)"
+        if: runner.os == 'macOS'
+        run: |
+          brew install autoconf automake libtool
+      - name: "Run autogen.sh in SINGULARROOT"
+        run: |
+          mv SINGULARROOT /tmp/SINGULARROOT
+          cd /tmp/SINGULARROOT
+          ./autogen.sh
+      - name: "Override bundled Singular"
+        run: |
+          julia --proj=override etc/setup_override_dir.jl /tmp/SINGULARROOT /tmp/singular_jll_override
+      - name: "Run tests"
+        run: |
+           julia --proj=override etc/run_with_override.jl /tmp/singular_jll_override --depwarn=error -e "using Pkg; Pkg.test(\"Singular\")"
+
