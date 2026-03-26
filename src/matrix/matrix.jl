@@ -154,6 +154,7 @@ function *(i::Int, M::smatrix{T}) where T <: AbstractAlgebra.RingElem
 end
 
 function *(M::smatrix{T}, i::Int) where T <: AbstractAlgebra.RingElem
+   R = base_ring(M)
    return R(i) * M
 end
 ###############################################################################
