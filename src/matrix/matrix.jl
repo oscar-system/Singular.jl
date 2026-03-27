@@ -134,6 +134,7 @@ function *(M::smatrix{T}, N::smatrix{T}) where T <: AbstractAlgebra.RingElem
 end
 
 function *(p::spoly{T}, M::smatrix{spoly{T}}) where T <: AbstractAlgebra.RingElem
+   (ncols(M) == 0 || nrows(M) == 0) && return M
    R = base_ring(M)
    R != parent(p) && error("Base rings do not match.")
    GC.@preserve M p R begin
@@ -149,13 +150,13 @@ function *(M::smatrix{spoly{T}}, p::spoly{T}) where T <: AbstractAlgebra.RingEle
 end
 
 function *(i::Int, M::smatrix{T}) where T <: AbstractAlgebra.RingElem
+   (ncols(M) == 0 || nrows(M) == 0) && return M
    R = base_ring(M)
    return R(i) * M
 end
 
 function *(M::smatrix{T}, i::Int) where T <: AbstractAlgebra.RingElem
-   R = base_ring(M)
-   return R(i) * M
+   return i*M
 end
 ###############################################################################
 #
