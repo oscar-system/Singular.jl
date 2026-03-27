@@ -88,6 +88,14 @@ end
    @test (M1 + M2) - M2 == M1
    @test M3*(M1 + M2) == M3*M1 + M3*M2
    @test M2 * 3 == 3 * M2
+
+   # empty matrix stuff
+   E1 = zero_matrix(R, 0, 1)
+   E2 = zero_matrix(R, 1, 0)
+   @test E1 * E2 == zero_matrix(R,0,0)
+   @test E2 * E1 == zero_matrix(R,1,1)
+   @test 3 * E1 == E1
+   @test x * E1 == E1
 end
 
 @testset "smatrix.comparison" begin
