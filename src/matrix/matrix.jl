@@ -136,7 +136,7 @@ end
 function *(p::spoly{T}, M::smatrix{spoly{T}}) where T <: AbstractAlgebra.RingElem
    R = base_ring(M)
    R != parent(p) && error("Base rings do not match.")
-   GC.@preserve M R begin
+   GC.@preserve M p R begin
       x = libSingular.mp_Copy(M.ptr, R.ptr)
       y = libSingular.p_Copy(p.ptr, R.ptr)
       ptr = libSingular.mp_MultP(x, y, R.ptr)
