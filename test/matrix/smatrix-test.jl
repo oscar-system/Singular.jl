@@ -87,6 +87,7 @@ end
    @test M1 + M2 == M2 + M1
    @test (M1 + M2) - M2 == M1
    @test M3*(M1 + M2) == M3*M1 + M3*M2
+   @test M2 * 3 == 3 * M2
 end
 
 @testset "smatrix.comparison" begin
