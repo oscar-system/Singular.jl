@@ -1542,7 +1542,7 @@ function (R::PolyRing{T})(n::T) where T <: n_unknown
    return spoly{T}(R, n)
 end
 
-function (R::PolyRing)(f::T) where T <: Nemo.MPolyRingElem
+function (R::PolyRing)(f::Union{spoly, T}) where T <: Nemo.MPolyRingElem
   parent(f) == R && return f
   B = base_ring(R)
   g = MPolyBuildCtx(R)
@@ -1554,11 +1554,6 @@ end
 
 function (R::PolyRing{S})(n::T) where {S <: Nemo.RingElem, T <: Nemo.RingElem}
    return spoly{S}(R, base_ring(R)(n))
-end
-
-function (R::PolyRing)(p::spoly)
-   parent(p) != R && error("Unable to coerce polynomial")
-   return p
 end
 
 ###############################################################################
