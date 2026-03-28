@@ -238,7 +238,7 @@ end
     R, (x,y) = polynomial_ring(QQ, ["x", "y"])
     Q, (a,b) = QuotientRing(R, Ideal(R, x-y))
     @test iszero(a-b)
-    @test (a-b) == Q(0)
+    @test (a-b) == Q(0) == Q(x-y)
     @test a == b
 end
 
@@ -468,6 +468,24 @@ end
    f = x^2+y^3+z^5
 
    @test S(f) == a^2+b^3+c^5
+end
+
+@testset "poly.coerce_spoly_between_PolyRings" begin
+   R, (x, y) = polynomial_ring(ZZ, ["x", "y"])
+   S, (a, b) = polynomial_ring(QQ, ["x", "y"])
+
+   f = x^2 + 3*x*y + y^2
+   g = S(f)
+
+   @test g == a^2 + 3*a*b + b^2
+   @test parent(g) == S
+
+   @test S(g) === g
+   @test S(zero(R)) == zero(S)
+   @test S(R(5)) == S(5)
+
+   T, (u,) = polynomial_ring(QQ, ["u"])
+   @test_throws ErrorException T(f)
 end
 
 @testset "poly.test_spoly_differential" begin

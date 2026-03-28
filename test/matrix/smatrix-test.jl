@@ -45,7 +45,7 @@
    Rx, _ = polynomial_ring(QQ, ["x"])
    Z = zero_matrix(Rx, 2, 3)
    @test_throws ArgumentError S(Z)
-   @test_throws Exception S(Z[1, 1])
+   @test S(Z[1, 1]) isa smatrix
 end
 
 @testset "smatrix.manipulation" begin
