@@ -182,18 +182,25 @@ end
 ###############################################################################
 
 function ^(x::n_GF, y::Int)
-   y < 0 && throw(DomainError(y, "exponent must be non-negative"))
    if isone(x)
       return x
    elseif y == 0
       return one(parent(x))
    elseif y == 1
       return x
-   else
-      R = parent(x)
-      p = GC.@preserve x R libSingular.n_Power(x.ptr, y, R.ptr)
-      return R(p)
+   elseif y < 0
+      if y == typemin(Int)
+         # avoid infinite recursion due to typemin(Int) == -typemin(Int)
+         x ^= 2
+         y >>= 1
+      end
+      x = inv(x)
+      y = -y
    end
+
+   R = parent(x)
+   p = GC.@preserve x R libSingular.n_Power(x.ptr, y, R.ptr)
+   return R(p)
 end
 
 ###############################################################################
