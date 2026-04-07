@@ -96,6 +96,7 @@ end
 
    m = Singular.Module(R, v, vector(R, R(0), R(0), 2+x))
    n = lead(m)
+   @test n.isGB == true
    @test n[1] == vector(R, 2*x^10, R(0), R(0))
    @test n[2] == vector(R, R(0), R(0), R(2))
 end
