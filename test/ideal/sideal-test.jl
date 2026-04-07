@@ -299,6 +299,7 @@ end
    i1 = @inferred lead(Ideal(R, x^2 + x*y + 1, 2y^2 + 3, R(7)))
    i2 = @inferred Ideal(R, x^2, 2y^2, R(7))
    @test isequal(i1, i2) || equal(i1, i2)
+   @test i1.isGB == true
 
    R, (x, y) = FreeAlgebra(QQ, ["x", "y"], 10)
    i1 = @inferred lead(Ideal(R, x^2 + x*y + 1, 2y^2 + 3, R(7)))
