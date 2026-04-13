@@ -124,6 +124,7 @@ function lead(M::smodule)
    R = base_ring(M)
    ptr = GC.@preserve M R libSingular.id_Head(M.ptr, R.ptr)
    z = Module(R, ptr)
+   z.isGB = true
    return z
 end
 
