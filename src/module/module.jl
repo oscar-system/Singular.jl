@@ -633,7 +633,7 @@ end
 @doc raw"""
     lift_std_syz(M::smodule)
 
-Computes the Groebner base `G` of `M`, the transformation matrix `T` and the syzygies of M.
+Computes the Groebner basis `G` of `M`, the transformation matrix `T` and the syzygies of M.
 Returns a tuple `(G,T,S)` satisfying `(Matrix(G) = Matrix(M) * T, 0=Matrix(M)*Matrix(S))`.
 """
 function lift_std_syz(M::smodule; complete_reduction::Bool = false)
@@ -645,7 +645,7 @@ end
 @doc raw"""
     lift_std(M::smodule)
 
-Computes the Groebner base `G` of `M` and the transformation matrix `T` such that
+Computes the Groebner basis `G` of `M` and the transformation matrix `T` such that
 `(Matrix(G) = Matrix(M) * T)`.
 """
 function lift_std(M::smodule; complete_reduction::Bool = false)
@@ -654,6 +654,12 @@ function lift_std(M::smodule; complete_reduction::Bool = false)
    return Module(R, ptr), smatrix{elem_type(R)}(R, T_ptr)
 end
 
+
+@doc raw"""
+    lift_std_sparse_transformation_matrix(M::smodule)
+
+Computes the Groebner basis `G` of `M` and the transformation matrix`T` in sparse format.
+"""
 function lift_std_sparse_transformation_matrix(M::smodule; complete_reduction::Bool = false)
    R = base_ring(M)
    ptr,T_ptr = GC.@preserve M R libSingular.id_LiftStd(M.ptr, R.ptr, complete_reduction)
