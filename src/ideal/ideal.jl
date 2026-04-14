@@ -1048,7 +1048,7 @@ end
 @doc raw"""
     lift_std_syz(M::sideal{S}; complete_reduction::Bool = false) where S <: spoly
 
-Computes the Groebner base G of I, the transformation matrix T and the syzygies of M.
+Computes the Groebner basis G of I, the transformation matrix T and the syzygies of M.
 Returns G,T,S
 (Matrix(G) = Matrix(I) * T, 0=Matrix(M)*Matrix(S))
 """
@@ -1061,13 +1061,24 @@ end
 @doc raw"""
     lift_std(M::sideal{S}; complete_reduction::Bool = false) where S <: spoly
 
-Computes the Groebner base G of M and the transformation matrix T such that
+Computes the Groebner basis G of M and the transformation matrix T such that
 (Matrix(G) = Matrix(M) * T)
 """
 function lift_std(M::sideal{S}; complete_reduction::Bool = false) where S <: spoly
    R = base_ring(M)
    ptr,T_ptr = GC.@preserve M R libSingular.id_LiftStd(M.ptr, R.ptr, complete_reduction)
    return sideal{S}(R, ptr), smatrix{S}(R, T_ptr)
+end
+
+@doc raw"""
+    lift_std(M::sideal{S}; complete_reduction::Bool = false) where S <: spoly
+
+Computes the Groebner basis G of M and the transformation matrix T in sparse format.
+"""
+function lift_std_sparse_transformation_matrix(M::sideal{S}; complete_reduction::Bool = false) where S <: spoly
+   R = base_ring(M)
+   ptr,T_ptr = GC.@preserve M R libSingular.id_LiftStd(M.ptr, R.ptr, complete_reduction)
+   return sideal{S}(R, ptr), Module(smatrix{S}(R, T_ptr))
 end
 
 ###############################################################################
