@@ -1,5 +1,6 @@
 export jet, minimal_generating_set, ModuleClass, rank, smodule, slimgb,
-       eliminate, modulo, lift, dimension, division, divrem, prune, prune_with_map,
+       eliminate, modulo, lift, lift_std, lift_std_sparse_transformation_matrix,
+       dimension, division, divrem, prune, prune_with_map,
        prune_with_map_projection, quotient, contains, saturation, saturation2
 
 ###############################################################################
@@ -651,6 +652,12 @@ function lift_std(M::smodule; complete_reduction::Bool = false)
    R = base_ring(M)
    ptr,T_ptr = GC.@preserve M R libSingular.id_LiftStd(M.ptr, R.ptr, complete_reduction)
    return Module(R, ptr), smatrix{elem_type(R)}(R, T_ptr)
+end
+
+function lift_std_sparse_transformation_matrix(M::smodule; complete_reduction::Bool = false)
+   R = base_ring(M)
+   ptr,T_ptr = GC.@preserve M R libSingular.id_LiftStd(M.ptr, R.ptr, complete_reduction)
+   return Module(R, ptr), Module(smatrix{elem_type(R)}(R, T_ptr))
 end
 
 ###############################################################################
