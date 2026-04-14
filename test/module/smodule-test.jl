@@ -149,6 +149,16 @@ end =#
    G2 = std(M)
 
    @test G2.isGB == true
+
+   G, m = lift_std_sparse_transformation_matrix(M)
+
+   sm = Singular.Module(R,
+                        vector(R,-x,-y,R(1)),
+                        vector(R,R(1),R(0),R(0)),
+                        vector(R,R(0),R(1),R(0)))
+   @test m[1] == sm[1]
+   @test m[2] == sm[2]
+   @test m[3] == sm[3]
 end
 
 @testset "smodule.syz" begin
