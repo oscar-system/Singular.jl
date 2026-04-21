@@ -478,6 +478,7 @@ function lead(I::sideal{S}) where S <: SPolyUnion
    ptr = GC.@preserve I R libSingular.id_Head(I.ptr, R.ptr)
    L = sideal{S}(R, ptr)
    L.isGB = true
+   L.isTwoSided = true
    return L
 end
 
