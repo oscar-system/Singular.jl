@@ -476,7 +476,10 @@ Singular ideal over Singular polynomial ring (QQ),(x,y),(dp(2),C) with generator
 function lead(I::sideal{S}) where S <: SPolyUnion
    R = base_ring(I)
    ptr = GC.@preserve I R libSingular.id_Head(I.ptr, R.ptr)
-   return sideal{S}(R, ptr)
+   L = sideal{S}(R, ptr)
+   L.isGB = true
+   L.isTwoSided = true
+   return L
 end
 
 ###############################################################################
