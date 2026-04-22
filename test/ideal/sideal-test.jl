@@ -672,6 +672,12 @@ end
    @test T[2,1] == 1
    @test T[1,2] == 1
 
+   G, T = @inferred Singular.lift_std_sparse_transformation_matrix(I)
+   @test G[1] == y
+   @test G[2] == x
+   @test T[1] == vector(R, R(0), R(1))
+   @test T[2] == vector(R, R(1), R(0))
+
    G, T = @inferred Singular.lift_std(I, complete_reduction = true)
    @test G[1] == y
    @test G[2] == x
