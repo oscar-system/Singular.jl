@@ -1081,7 +1081,7 @@ Computes the Groebner basis G of M and the transformation matrix T in sparse for
 function lift_std_sparse_transformation_matrix(M::sideal{S}; complete_reduction::Bool = false) where S <: spoly
    R = base_ring(M)
    ptr,T_ptr = GC.@preserve M R libSingular.id_LiftStd(M.ptr, R.ptr, complete_reduction)
-   return sideal{S}(R, ptr), Module(smatrix{S}(R, T_ptr))
+   return sideal{S}(R, ptr), Module(transpose(smatrix{S}(R, T_ptr)))
 end
 
 ###############################################################################
