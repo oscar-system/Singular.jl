@@ -110,9 +110,6 @@ import .libSingular: call_interpreter
 
 include("Number.jl")
 
-global ZZ::Integers
-global QQ::Rationals
-
 include("poly/OrderingTypes.jl")
 
 include("poly/PolyTypes.jl")
