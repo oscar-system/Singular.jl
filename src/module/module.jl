@@ -436,6 +436,23 @@ function prune(I::smodule{spoly{T}}) where T <: Nemo.RingElem
 end
 
 @doc raw"""
+    prune_projection(id::smodule{spoly{T}}) where T <: Nemo.RingElem
+
+Return a module `R` and a projection map `p`
+satisfying the following properties: `R` is minimally embedded in a free
+module `parent(R)` such that the quotient `parent(R)/R` is isomorphic to
+`parent(id)/id`, with the projection given by the vector `p`
+describing this isomorphism.
+`p` maps `gen(parent(id),i)` to `gen(parent(R),p[i])`
+"""
+function prune_projection(I::smodule{spoly{T}}) where T <: Nemo.RingElem
+   R = base_ring(I)
+   a = Vector{Int32}()
+   r = GC.@preserve I R libSingular.id_prune_v(I.ptr, a, R.ptr)
+   return smodule{spoly{T}}(R, r),a
+end
+
+@doc raw"""
     prune_with_map(id::smodule{spoly{T}}) where T <: Nemo.RingElem
 
 Returns the module R minimally embedded in a free module such that the

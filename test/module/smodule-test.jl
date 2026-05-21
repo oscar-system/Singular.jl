@@ -342,6 +342,7 @@ end
    v4 = vector(R, R(0),R(0),R(1))
 
    M = Singular.Module(R, v1, v2, v3, v4)
+   G,p = Singular.prune_projection(M)
 
    G,T = prune_with_map(M)
    H   = prune(M)
@@ -365,6 +366,11 @@ end
    @test p[2] == 1
    @test p[3] == 2
 
+   G,p = prune_projection(M)
+   @test p[1] == 1
+   @test p[2] == 1
+   @test p[3] == 2
+
    M = Singular.Module(R, v1, v2, v3, v4)
 
    G,T = prune_with_map(M)
@@ -378,6 +384,11 @@ end
    @test T[3,1] == R(1)
 
    G,T,p = prune_with_map_projection(M)
+   @test p[1] == 1
+   @test p[2] == 1
+   @test p[3] == 2
+
+   G,p = prune_projection(M)
    @test p[1] == 1
    @test p[2] == 1
    @test p[3] == 2
