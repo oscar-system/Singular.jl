@@ -1,6 +1,6 @@
 export jet, minimal_generating_set, ModuleClass, rank, smodule, slimgb,
        eliminate, modulo, lift, lift_std, lift_std_sparse_transformation_matrix,
-       dimension, division, divrem, prune, prune_with_map,
+       dimension, division, divrem, prune, prune_projection, prune_with_map,
        prune_with_map_projection, quotient, contains, saturation, saturation2
 
 ###############################################################################
