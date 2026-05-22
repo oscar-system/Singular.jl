@@ -117,6 +117,20 @@ auto id_prune_helper(sip_sideal * I, ring R)
   return s;
 }
 
+auto id_prune_v_helper(sip_sideal * I, jlcxx::ArrayRef<int> a, ring R)
+{
+  auto origin = currRing;
+  rChangeCurrRing(R);
+  ideal      T;
+  int *v = (int *)omAlloc(I->rank*sizeof(int));
+  ideal s = idMinEmbedding_v(I, 0, NULL, v);
+  for (int j = 0; j < I->rank; j++)
+      a.push_back(v[j]);
+  omFreeSize(v,I->rank*sizeof(int));
+  rChangeCurrRing(origin);
+  return s;
+}
+
 auto id_prune_map_helper(sip_sideal * I, ring R)
 {
   auto origin = currRing;
@@ -497,6 +511,7 @@ void singular_define_ideals(jlcxx::Module & Singular)
   Singular.method("id_lres", &id_lres_helper);
   Singular.method("id_mres_map", &id_mres_map_helper);
   Singular.method("id_prune", &id_prune_helper);
+  Singular.method("id_prune_v", &id_prune_v_helper);
   Singular.method("id_prune_map", &id_prune_map_helper);
   Singular.method("id_prune_map_v", &id_prune_map_v_helper);
 
