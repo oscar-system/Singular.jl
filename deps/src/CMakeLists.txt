@@ -14,6 +14,17 @@ message(STATUS "Found JlCxx at ${JlCxx_location}")
 include(CheckCXXCompilerFlag)
 
 set(CMAKE_CXX_STANDARD 14)
+option(SINGULAR_JL_ENABLE_CPP_COVERAGE
+  "Build libsingular_julia with native coverage instrumentation" OFF)
+
+if(SINGULAR_JL_ENABLE_CPP_COVERAGE)
+  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
+    add_compile_options(--coverage)
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} --coverage")
+  else()
+    message(FATAL_ERROR "Native coverage is only supported with GCC- or Clang-like compilers")
+  endif()
+endif()
 
 # avoid gcc 9 internal compiler error,
 # see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=90998
