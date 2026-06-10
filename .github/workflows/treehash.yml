@@ -18,6 +18,8 @@ concurrency:
 jobs:
   treehash:
     runs-on: ubuntu-latest
+    env:
+      SINGULAR_JL_ENABLE_CPP_COVERAGE: "1"
     steps:
       - uses: actions/checkout@v6
       - name: "Set up Julia"
@@ -54,3 +56,5 @@ jobs:
       - name: "Upload coverage data to Codecov"
         continue-on-error: true
         uses: codecov/codecov-action@v6
+        with:
+          gcov_include: deps/src
