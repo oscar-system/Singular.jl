@@ -71,6 +71,13 @@ function jll_artifact_dir(the_jll::Module)
     return the_jll.find_artifact_dir()
 end
 
+function cmake_extra_args(env::AbstractDict{String, String}=ENV)
+   if get(env, "SINGULAR_JL_ENABLE_CPP_COVERAGE", "") == "1"
+      return ["-DSINGULAR_JL_ENABLE_CPP_COVERAGE=ON"]
+   end
+   return String[]
+end
+
 function build_code(src_hash)
    @info "Bundled C++ sources don't match libsingular_julia_jll"
 
@@ -111,6 +118,7 @@ function build_code(src_hash)
 
    gmp_prefix = jll_artifact_dir(Singular_jll.GMP_jll)
    singular_prefix = jll_artifact_dir(Singular_jll)
+   extra_args = cmake_extra_args()
 
    Pidfile.mkpidlock("$installdir.lock"; stale_age=60) do
       # delete any previous build or install artifacts
@@ -125,6 +133,7 @@ function build_code(src_hash)
              -DSingular_PREFIX=$(singular_prefix)
              -DCMAKE_INSTALL_PREFIX=$(installdir)
              -DCMAKE_BUILD_TYPE=Release
+             $(extra_args)
              -S $srcdir
              -B $builddir
             `)
