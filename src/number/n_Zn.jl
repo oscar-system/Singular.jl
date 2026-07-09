@@ -15,7 +15,7 @@ base_ring(a::N_ZnRing) = ZZ
 base_ring_type(::Type{N_ZnRing}) = Integers
 
 function characteristic(R::N_ZnRing)
-   return ZZ(libSingular.n_GetChar(R.ptr))
+   return ZZ(R.modulus)
 end
 
 function deepcopy_internal(a::n_Zn, dict::IdDict)
