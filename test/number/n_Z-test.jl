@@ -178,6 +178,29 @@ end
    end
 end
 
+@testset "n_Z.conversion memory ownership" begin
+   if !Sys.iswindows()
+      values = [ZZ(0), ZZ(17), ZZ(-(BigInt(1) << 256) + 1)]
+      foreach(n -> finalize(BigInt(n)), values) # warm up before tracing
+      GC.gc(true)
+
+      nactive = -1
+      Nemo.trace_memory(true)
+      empty!(Nemo.active_mem)
+      try
+         for _ in 1:10, n in values
+            finalize(BigInt(n))
+         end
+         nactive = length(Nemo.active_mem)
+      finally
+         Nemo.trace_memory(false)
+         empty!(Nemo.active_mem)
+      end
+
+      @test nactive == 0
+   end
+end
+
 @testset "n_Z.rand" begin
    @test rand(ZZ, 1:9) isa n_Z
    Random.seed!(rng, 0)

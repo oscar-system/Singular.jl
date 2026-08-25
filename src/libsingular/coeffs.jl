@@ -1,3 +1,5 @@
+import Nemo
+
 # initialise a number from an mpz
 function n_InitMPZ(b::BigInt, cf::coeffs_ptr)
    GC.@preserve b begin
@@ -8,10 +10,11 @@ end
 
 # get an mpz from a number
 function n_GetMPZ(s::number_ptr, r::coeffs_ptr)
-   res = BigInt(1)
+   res = Nemo.@new_struct(BigInt)
    GC.@preserve res begin
       resp = pointer_from_objref(res)
       n_GetMPZ_internal(resp, s, r)
+      finalizer(cglobal((:__gmpz_clear, Base.GMP.libgmp)), res)
    end
    return res
 end
@@ -56,8 +59,6 @@ end
 #   Conversion between numbers that wrap jl_value_t's and julia values
 #
 ###############################################################################
-
-import Nemo
 
 mutable struct live_cache
    num::Int

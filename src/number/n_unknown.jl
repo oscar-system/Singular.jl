@@ -161,8 +161,8 @@ function gcdx(x::n_unknown, y::n_unknown)
    check_parent(x, y)
    R = parent(x)
    GC.@preserve x y R begin
-      s = Ref(libSingular.n_Init(0, R.ptr))
-      t = Ref(libSingular.n_Init(0, R.ptr))
+      s = Ref(libSingular.number_ptr(C_NULL))
+      t = Ref(libSingular.number_ptr(C_NULL))
       g = libSingular.n_ExtGcd(x.ptr, y.ptr, s, t, R.ptr)
       return R(g), R(s[]), R(t[])
    end

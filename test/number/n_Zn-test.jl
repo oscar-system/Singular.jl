@@ -136,6 +136,29 @@ end
    @test g == R(1)*s + R(5)*t
 end
 
+@testset "n_Zn.extended_gcd output memory ownership" begin
+   if !Sys.iswindows()
+      R, = residue_ring(ZZ, 6)
+      a = R(2)
+      b = R(4)
+      foreach(finalize, gcdx(a, b)) # warm up before allocation tracing
+      GC.gc(true)
+
+      nactive = -1
+      Nemo.trace_memory(true)
+      empty!(Nemo.active_mem)
+      try
+         foreach(finalize, gcdx(a, b))
+         nactive = length(Nemo.active_mem)
+      finally
+         Nemo.trace_memory(false)
+         empty!(Nemo.active_mem)
+      end
+
+      @test nactive == 0
+   end
+end
+
 @testset "n_Zn.Polynomials" begin
    R, = residue_ring(ZZ, 5)
    S, x = Nemo.polynomial_ring(R, "x")

@@ -274,8 +274,8 @@ end
 function gcdx(x::n_Z, y::n_Z)
    c = parent(x)
    GC.@preserve x y c begin
-      s = Ref(libSingular.n_Init(0, c.ptr))
-      t = Ref(libSingular.n_Init(0, c.ptr))
+      s = Ref(libSingular.number_ptr(C_NULL))
+      t = Ref(libSingular.number_ptr(C_NULL))
       g = libSingular.n_ExtGcd(x.ptr, y.ptr, s, t, c.ptr)
       return c(g), c(s[]), c(t[])
    end

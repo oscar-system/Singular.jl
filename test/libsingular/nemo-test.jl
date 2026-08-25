@@ -88,6 +88,9 @@ end
 
    @test gcd(f1c[1], f1c[2]) == Nemo.ZZ(1)
 
+   g, s, t = gcdx(f1c[1], f1c[2])
+   @test g == f1c[1]*s + f1c[2]*t
+
    @test divexact(f1c[2], f1c[1]) == Nemo.ZZ(3)
 
    @test f1c[2] - f1c[1] == Nemo.ZZ(2)
