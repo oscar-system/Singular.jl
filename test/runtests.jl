@@ -11,6 +11,7 @@ import Singular.Nemo
 using Test
 
 include("Aqua.jl")
+include("ClosureBoxes.jl")
 
 include("number-test.jl")
 include("poly-test.jl")
