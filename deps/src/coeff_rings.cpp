@@ -33,6 +33,7 @@ typedef struct __singular_coeff_ring_struct {
   void *  cfGreaterZero;
   void *  cfWriteLong;
   void *  cfCoeffWrite;
+  void *  cfFactorize;
 } singular_coeff_ring_struct;
 
 static BOOLEAN nCoeffIsEqual(const coeffs r, n_coeffType n, void *d)
@@ -82,6 +83,32 @@ void fill_coeffs_with_function_data(jl_value_t * coeff_struct, void * cf_void)
   cf->cfGreaterZero = (BOOLEAN(*)(number, const coeffs))cf_input->cfGreaterZero;
   cf->cfWriteLong = (void (*)(number, const coeffs))cf_input->cfWriteLong;
   cf->cfCoeffWrite = (void (*)(const coeffs, BOOLEAN))cf_input->cfCoeffWrite;
+  cf->cfFactorize = (nFactorizeFunc)cf_input->cfFactorize;
+}
+
+ideal copy_factorization_result(ideal factors, jlcxx::ArrayRef<int> exponents,
+                                void * v_void, int with_exps,
+                                ring source, void * target_void)
+{
+  ring target = reinterpret_cast<ring>(target_void);
+  ideal result = idrCopyR(factors, source, target);
+
+  if (with_exps != 1)
+  {
+    intvec ** v = reinterpret_cast<intvec **>(v_void);
+    if (v != NULL)
+    {
+      const int n = si_max(1, IDELEMS(result));
+      (*v) = new intvec(n);
+      int * content = (*v)->ivGetVec();
+      for (int i = 0; i < n; i++)
+      {
+        content[i] = (i < exponents.size()) ? exponents[i] : 1;
+      }
+    }
+  }
+
+  return result;
 }
 
 
@@ -103,6 +130,19 @@ void singular_define_coeff_rings(jlcxx::Module & singular)
   singular.method("cast_void_to_number", [](void * n) {
     return reinterpret_cast<number>(n);
   });
+  singular.method("factorization_callback_ring_copy", [](void * r) {
+    return rCopy(reinterpret_cast<ring>(r));
+  });
+  singular.method("factorization_callback_poly_copy", [](void * p, void * r) {
+    return p_Copy(reinterpret_cast<poly>(p), reinterpret_cast<ring>(r));
+  });
+  singular.method("factorization_callback_poly_copy_to_ring", [](void * p, void * source, ring target) {
+    return prCopyR(reinterpret_cast<poly>(p), reinterpret_cast<ring>(source), target);
+  });
+  singular.method("factorization_callback_coeff_data", [](void * r) {
+    return reinterpret_cast<ring>(r)->cf->data;
+  });
+  singular.method("copy_factorization_result", copy_factorization_result);
   singular.method("get_coeffs_BIGINT", []() {
     return coeffs_BIGINT;
   });

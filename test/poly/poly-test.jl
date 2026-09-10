@@ -582,6 +582,27 @@ end
 
    @test_throws Exception factor(f)
    @test_throws Exception factor_squarefree(f)
+
+   Fq_large, a = Nemo.Native.finite_field(Nemo.next_prime(Nemo.ZZ(10)^50), 2, "a")
+   R, (x,) = polynomial_ring(Fq_large, ["x"])
+   f = (x + a)*(x + 1)^2
+
+   F = factor(f)
+   @test f == F.unit*prod(p^e for (p, e) in F)
+
+   F = factor_squarefree(f)
+   @test f == F.unit*prod(p^e for (p, e) in F)
+
+   R, (x, y) = polynomial_ring(Fq_large, ["x", "y"])
+   f = (x + a)*(y + 1)
+   err = try
+      factor(f)
+      nothing
+   catch e
+      e
+   end
+   @test err isa ErrorException
+   @test occursin("coefficient factorization callback is not implemented", sprint(showerror, err))
 end
 
 @testset "poly.hash" begin

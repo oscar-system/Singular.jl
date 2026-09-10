@@ -200,6 +200,89 @@ end
 
 ###############################################################################
 #
+#   Factorization
+#
+###############################################################################
+
+function _unwrap_nemo_field_elem(a)
+   if isdefined(Singular, :FieldElemWrapper) && a isa Singular.FieldElemWrapper
+      return a.data
+   end
+   return a
+end
+
+function _nemo_field_for_factorization(R)
+   K = Singular.base_ring(R).base_ring
+   if isdefined(Singular, :FieldWrapper) && K isa Singular.FieldWrapper
+      return K.data
+   end
+   return K
+end
+
+function _singular_univariate_to_julia(R, f)
+   K = _nemo_field_for_factorization(R)
+   U, x = AbstractAlgebra.polynomial_ring(K, string(R.S[1]))
+   g = zero(U)
+   for (c, v) in zip(Singular.coefficients(f), Singular.exponent_vectors(f))
+      cc = GC.@preserve c julia(cast_number_to_void(c.ptr))
+      g += _unwrap_nemo_field_elem(cc)*x^v[1]
+   end
+   return g
+end
+
+function _julia_univariate_to_singular(R, f)
+   S = Singular.base_ring(R)
+   B = Singular.MPolyBuildCtx(R)
+   for i in 0:Nemo.degree(f)
+      c = Nemo.coeff(f, i)
+      if !Nemo.iszero(c)
+         Singular.push_term!(B, S(c), [i])
+      end
+   end
+   return Singular.finish(B)
+end
+
+function _factorization_callback_ring(r_ptr::Ptr{Cvoid})
+   r = factorization_callback_ring_copy(r_ptr)
+   K = unsafe_pointer_to_objref(factorization_callback_coeff_data(r_ptr))
+   S = Singular.CoefficientRing(K)
+   T = Singular.elem_type(S)
+   return Singular.PolyRing{T}(r, S, Singular.singular_symbols(r))
+end
+
+function nemoFieldFactorize(f_ptr::Ptr{Cvoid}, v_ptr::Ptr{Ptr{Cvoid}},
+                            with_exps::Cint, r_ptr::Ptr{Cvoid})
+   try
+      R = _factorization_callback_ring(r_ptr)
+      if Singular.nvars(R) != 1
+         return C_NULL
+      end
+
+      f = R(factorization_callback_poly_copy_to_ring(f_ptr, r_ptr, R.ptr))
+      F = AbstractAlgebra.factor(_singular_univariate_to_julia(R, f))
+
+      factors = typeof(f)[]
+      exponents = Int32[]
+      if with_exps == 0 || with_exps == 3
+         push!(factors, _julia_univariate_to_singular(R, AbstractAlgebra.unit(F)))
+         push!(exponents, Int32(1))
+      end
+      for (g, e) in F
+         push!(factors, _julia_univariate_to_singular(R, g))
+         push!(exponents, Int32(e))
+      end
+
+      I = Singular.Ideal(R, factors)
+      res = GC.@preserve R f I copy_factorization_result(I.ptr, exponents,
+         reinterpret(Ptr{Cvoid}, v_ptr), Int(with_exps), R.ptr, r_ptr)
+      return reinterpret(Ptr{Cvoid}, res.cpp_object)
+   catch
+      return C_NULL
+   end
+end
+
+###############################################################################
+#
 #   InitChar
 #
 ###############################################################################
@@ -238,6 +321,7 @@ function nemoFieldInitChar(cf::Ptr{Cvoid}, p::Ptr{Cvoid})
     ring_struct.cfGreaterZero = @cfunction(nemoFieldGreaterZero, Cint, (Ptr{Cvoid}, Ptr{Cvoid}))
     ring_struct.cfWriteLong = @cfunction(nemoFieldWrite, Cvoid, (Ptr{Cvoid}, Ptr{Cvoid}))
     ring_struct.cfCoeffWrite = @cfunction(nemoFieldCoeffWrite, Cvoid, (Ptr{Cvoid}, Cint))
+    ring_struct.cfFactorize = @cfunction(nemoFieldFactorize, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Ptr{Cvoid}}, Cint, Ptr{Cvoid}))
 
     fill_coeffs_with_function_data(ring_struct,cf)
 
