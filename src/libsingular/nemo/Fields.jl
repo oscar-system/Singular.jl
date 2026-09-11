@@ -200,9 +200,13 @@ end
 
 ###############################################################################
 #
-#   Factorization
+#   Nemo-backed field factorization callback
 #
 ###############################################################################
+
+# Concrete implementation of the generic cfFactorize API for Nemo-backed fields.
+# This intentionally handles only univariate polynomials; other coefficient
+# domains or multivariate algorithms must provide their own implementation.
 
 function _unwrap_nemo_field_elem(a)
    if isdefined(Singular, :FieldElemWrapper) && a isa Singular.FieldElemWrapper
@@ -245,7 +249,7 @@ end
 function _factorization_callback_ring(r_ptr::Ptr{Cvoid})
    r = factorization_callback_ring_copy(r_ptr)
    K = unsafe_pointer_to_objref(factorization_callback_coeff_data(r_ptr))
-   S = Singular.CoefficientRing(K)
+   S = Singular._wrapped_coefficient_ring(K)
    T = Singular.elem_type(S)
    return Singular.PolyRing{T}(r, S, Singular.singular_symbols(r))
 end
@@ -255,6 +259,8 @@ function nemoFieldFactorize(f_ptr::Ptr{Cvoid}, v_ptr::Ptr{Ptr{Cvoid}},
    try
       R = _factorization_callback_ring(r_ptr)
       if Singular.nvars(R) != 1
+         # Not a generic fallback: this concrete Nemo implementation is
+         # univariate only, so Singular should report the missing case.
          return C_NULL
       end
 

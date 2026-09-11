@@ -33,6 +33,8 @@ typedef struct __singular_coeff_ring_struct {
   void *  cfGreaterZero;
   void *  cfWriteLong;
   void *  cfCoeffWrite;
+  // Generic callback API: coefficient domains may provide polynomial
+  // factorization when Singular's native/Factory paths cannot handle them.
   void *  cfFactorize;
 } singular_coeff_ring_struct;
 
@@ -130,6 +132,8 @@ void singular_define_coeff_rings(jlcxx::Module & singular)
   singular.method("cast_void_to_number", [](void * n) {
     return reinterpret_cast<number>(n);
   });
+  // Generic callback bridge helpers. Concrete callbacks, such as the
+  // Nemo-field one, use these to copy inputs/results across the C/Julia API.
   singular.method("factorization_callback_ring_copy", [](void * r) {
     return rCopy(reinterpret_cast<ring>(r));
   });

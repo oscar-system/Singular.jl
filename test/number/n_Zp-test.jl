@@ -9,6 +9,20 @@
    @test F == F1
    @test F != F2
    @test F1 != F2
+
+   @test Fp(Nemo.ZZ(7)) === F
+
+   p_machine = Nemo.next_prime(Nemo.ZZ(2)^29)
+   F_machine = Fp(p_machine)
+   @test F_machine isa N_ZpField
+   @test characteristic(F_machine) == p_machine
+
+   p_large = Nemo.next_prime(Nemo.ZZ(2)^70)
+   F_large = Fp(p_large)
+   @test F_large isa N_ZnRing
+   @test characteristic(F_large) == p_large
+
+   @test_throws DomainError Fp(15)
 end
 
 @testset "n_Zp.printing" begin

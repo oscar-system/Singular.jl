@@ -271,6 +271,8 @@ promote_rule(C::Type{n_Zn}, ::Type{Nemo.ZZRingElem}) = n_Zn
 
 promote_rule(C::Type{n_Zn}, ::Type{n_Z}) = n_Zn
 
+promote_rule(::Type{n_Zn}, ::Type{T}) where {T <: AbstractAlgebra.FinFieldElem} = n_Zn
+
 ###############################################################################
 #
 #   Parent call functions
@@ -288,9 +290,38 @@ promote_rule(C::Type{n_Zn}, ::Type{n_Z}) = n_Zn
 
 (R::N_ZnRing)(n::Nemo.ZZModRingElem) = n_Zn(R, lift(n))
 
+function _lift_prime_field_element(a::AbstractAlgebra.FinFieldElem)
+   K = parent(a)
+   Nemo.order(K) == Nemo.characteristic(K) ||
+      throw(ArgumentError("finite field element must belong to a prime field"))
+   if applicable(Nemo.lift, Nemo.ZZ, a)
+      return Nemo.lift(Nemo.ZZ, a)
+   end
+   if applicable(Nemo.lift, a)
+      return Nemo.lift(a)
+   end
+   if applicable(Nemo.coeff, a, 0)
+      return Nemo.ZZ(Nemo.coeff(a, 0))
+   end
+   throw(ArgumentError("finite field element cannot be lifted to an integer"))
+end
+
+function (R::N_ZnRing)(a::T) where {T <: AbstractAlgebra.FinFieldElem}
+   K = parent(a)
+   characteristic(R) == Nemo.characteristic(K) ||
+      throw(ArgumentError("characteristic does not match"))
+   return R(_lift_prime_field_element(a))
+end
+
 (R::Nemo.zzModRing)(n::n_Zn) = R(BigInt(n))
 
 (R::Nemo.ZZModRing)(n::n_Zn) = R(BigInt(n))
+
+function (F::AbstractAlgebra.FinField)(a::n_Zn)
+   Nemo.characteristic(F) == characteristic(parent(a)) ||
+      throw(ArgumentError("characteristic does not match"))
+   return F(Nemo.ZZ(BigInt(a)))
+end
 
 lift(n::n_Zn) = ZZ(BigInt(n))
 

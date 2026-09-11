@@ -583,8 +583,39 @@ end
    @test_throws Exception factor(f)
    @test_throws Exception factor_squarefree(f)
 
+   p_machine = Nemo.next_prime(Nemo.ZZ(2)^29)
+   Fp_machine = Nemo.Native.GF(p_machine)
+   R, (x, y) = polynomial_ring(Fp_machine, ["x", "y"])
+   @test base_ring(R) isa N_ZpField
+   f = (x + 2*y + 3)*(x*y + 5)
+   F = factor(f)
+   @test f == F.unit*prod(q^e for (q, e) in F)
+
+   p_large = Nemo.next_prime(Nemo.ZZ(2)^70)
+   prime_fields = (Nemo.Native.GF(p_large),
+                   first(Nemo.Native.finite_field(p_large, 1, "a")))
+   for Fp_large in prime_fields
+      R, (x, y) = polynomial_ring(Fp_large, ["x", "y"])
+      @test base_ring(R) isa N_ZnRing
+      @test characteristic(base_ring(R)) == p_large
+
+      a = Fp_large(Nemo.ZZ(2)^69 + 123)
+      @test Fp_large(base_ring(R)(a)) == a
+
+      f = (x + a*y + 1)*(x^2 + y + 3)
+      F = factor(f)
+      @test f == F.unit*prod(q^e for (q, e) in F)
+   end
+
+   composite_ring, = residue_ring(ZZ, 3*p_large)
+   R, (x,) = polynomial_ring(composite_ring, ["x"])
+   @test_throws Exception factor((x + 1)*(x + 2))
+
+   # Example/regression for one concrete callback implementation: univariate
+   # factorization over a large-prime Nemo-backed finite field.
    Fq_large, a = Nemo.Native.finite_field(Nemo.next_prime(Nemo.ZZ(10)^50), 2, "a")
    R, (x,) = polynomial_ring(Fq_large, ["x"])
+   @test base_ring(R) isa Singular.N_Field
    f = (x + a)*(x + 1)^2
 
    F = factor(f)
@@ -593,6 +624,8 @@ end
    F = factor_squarefree(f)
    @test f == F.unit*prod(p^e for (p, e) in F)
 
+   # Negative example: the generic API is present, but this concrete Nemo
+   # callback does not implement multivariate factorization.
    R, (x, y) = polynomial_ring(Fq_large, ["x", "y"])
    f = (x + a)*(y + 1)
    err = try
