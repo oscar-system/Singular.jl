@@ -58,14 +58,8 @@ is_unit(n::n_Q) = !iszero(n)
 Return in `ZZ` the numerator of $x$.
 """
 function numerator(x::n_Q)
-   c = parent(x)
-   GC.@preserve x c QQ ZZ begin
-      xref = Ref(x.ptr)
-      p = libSingular.n_GetNumerator(xref, c.ptr)
-      x.ptr = xref[]
-      pp = libSingular.nApplyMapFunc(n_Q_2_n_Z, p, QQ.ptr, ZZ.ptr)
-      libSingular.n_Delete(p, QQ.ptr)
-      return ZZ(pp)
+   GC.@preserve x begin
+     return ZZ(libSingular.n_GetMPZ(x.ptr, parent(x).ptr))
    end
 end
 
