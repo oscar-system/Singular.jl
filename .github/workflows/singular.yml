@@ -21,7 +21,7 @@ concurrency:
 
 jobs:
   test:
-    name: Julia ${{ matrix.julia-version }} - Singular ${{ matrix.singular-version }} - ${{ matrix.os }}
+    name: Julia ${{ matrix.julia-version }} - Singular ${{ matrix.singular-version }} - ${{ matrix.os }} - ${{ matrix.omalloc-config }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
     continue-on-error: ${{ matrix.julia-version == 'nightly' }}
@@ -36,11 +36,19 @@ jobs:
           - 'nightly'
         os:
           - ubuntu-latest
+        omalloc-config:
+          - 'host-pagesize'
         include:
-          # Add a few macOS jobs (the number we can run in parallel is limited)
+          # Match the current macOS ARM JLL ABI.
           - singular-version: 'spielwiese'
             julia-version: '1'
             os: macOS-latest
+            omalloc-config: 'jll-4k'
+          # Also exercise a fully native macOS ARM stack.
+          - singular-version: 'spielwiese'
+            julia-version: '1'
+            os: macOS-latest
+            omalloc-config: 'native-16k'
 
     steps:
       - uses: actions/checkout@v7
@@ -59,6 +67,18 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           brew install autoconf automake libtool
+      - name: "Select omalloc page size"
+        if: matrix.omalloc-config != 'host-pagesize'
+        run: |
+          if [[ "${{ matrix.omalloc-config }}" == "jll-4k" ]]; then
+            echo "ac_cv_pagesize=4096" >> "$GITHUB_ENV"
+          else
+            if [[ "$(getconf PAGESIZE)" != "16384" ]]; then
+              echo "native-16k requires a host with 16 KiB pages" >&2
+              exit 1
+            fi
+            echo "ac_cv_pagesize=16384" >> "$GITHUB_ENV"
+          fi
       - name: "Run autogen.sh in SINGULARROOT"
         run: |
           mv SINGULARROOT /tmp/SINGULARROOT
@@ -67,6 +87,15 @@ jobs:
       - name: "Override bundled Singular"
         run: |
           julia --proj=override etc/setup_override_dir.jl /tmp/SINGULARROOT /tmp/singular_jll_override
+      - name: "Verify omalloc page size"
+        if: matrix.omalloc-config != 'host-pagesize'
+        run: |
+          if [[ "${{ matrix.omalloc-config }}" == "jll-4k" ]]; then
+            expected=4096
+          else
+            expected=16384
+          fi
+          grep -F "#define SIZEOF_SYSTEM_PAGE $expected" /tmp/singular_jll_override/include/omalloc/omConfig.h
       - name: "Run tests"
         run: |
            julia --proj=override etc/run_with_override.jl /tmp/singular_jll_override --depwarn=error -e "using Pkg; Pkg.test(\"Singular\")"
