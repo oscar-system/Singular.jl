@@ -21,7 +21,7 @@ concurrency:
 
 jobs:
   test:
-    name: Julia ${{ matrix.julia-version }} - Singular ${{ matrix.singular-version }} - ${{ matrix.os }} - ${{ matrix.omalloc-config }}
+    name: Julia ${{ matrix.julia-version }} - Singular ${{ matrix.singular-version }} - ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
     continue-on-error: ${{ matrix.julia-version == 'nightly' }}
