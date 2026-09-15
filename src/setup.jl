@@ -13,6 +13,8 @@ import Pkg.Artifacts
 
 const lib4ti2_binpath = BinaryWrappers.@generate_wrappers(lib4ti2_jll)
 
+Base.include_dependency(joinpath(@__DIR__, "..", "deps", "src"))
+
 # make sure Singular can find the wrappers
 function __init__()
     ENV["PATH"] = lib4ti2_binpath * ":" * ENV["PATH"]
