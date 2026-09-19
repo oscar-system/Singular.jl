@@ -41,7 +41,8 @@ tmpdepot = mktempdir(; cleanup=true)
 # create override file for Singular_jll
 add_jll_override(tmpdepot, "Singular", singularoverride)
 
-# create a fresh marker file in deps/src so the tree hash changes
+# Create a fresh marker in the tracked deps/src directory, invalidating both
+# the Singular.jl package image and the bundled C++ source hash.
 libsingular_src_dir = joinpath(dirname(@__DIR__), "deps", "src")
 isdir(libsingular_src_dir) || error("Could not find $(libsingular_src_dir)")
 
