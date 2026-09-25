@@ -8,7 +8,7 @@ export sideal, IdealSet, syz, lead, normalize!, is_constant, is_zerodim, fglm,
        saturation, saturation2, satstd, slimgb, std, std_with_HC,
        vdim, interreduce, degree, mult,
        hilbert_series, hilbert_series_data, std_hilbert,
-       is_homogeneous, division, divrem, divrem2, mstd, syz_slimgb
+       is_homogeneous, division, divrem, divrem2, mstd, syz_slimgb, simplify
 
 
 ###############################################################################
@@ -724,6 +724,44 @@ function interreduce(I::sideal{S}) where {T <: Nemo.RingElem,
    R = base_ring(I)
    ptr = GC.@preserve I R libSingular.id_InterRed(I.ptr, R.ptr)
    libSingular.idSkipZeroes(ptr)
+   return sideal{S}(R, ptr, false, I.isTwoSided)
+end
+
+@doc raw"""
+    simplify(I::sideal{S}; normalize::Bool=false, remove_zeros::Bool=false,
+                  erase_duplicates::Bool=false, erase_scalar_multiples::Bool=false,
+                  erase_same_leading_monomials::Bool=false,
+                  erase_multiple_leading_monomials::Bool=false) where {T <: Nemo.RingElem,
+                                          S <: Union{spoly{T}, spluralg{T}}}
+
+Return a simplification of the elements of I depending on the given options.
+"""
+function simplify(I::sideal{S}; normalize::Bool=false, remove_zeros::Bool=false,
+                  erase_duplicates::Bool=false, erase_scalar_multiples::Bool=false,
+                  erase_same_leading_monomials::Bool=false,
+                  erase_multiple_leading_monomials::Bool=false) where {T <: Nemo.RingElem,
+                                          S <: Union{spoly{T}, spluralg{T}}}
+   R = base_ring(I)
+   ptr = GC.@preserve I R libSingular.id_Copy(I.ptr, R.ptr)
+   if erase_multiple_leading_monomials
+      libSingular.id_DelDiv(ptr, R.ptr)
+   end
+   if erase_same_leading_monomials
+      libSingular.id_DelLmEquals(ptr, R.ptr)
+   end
+   if erase_scalar_multiples
+      libSingular.id_DelMultiples(ptr, R.ptr)
+   end
+   if erase_duplicates
+      libSingular.id_DelEquals(ptr, R.ptr)
+   end
+   if remove_zeros
+      libSingular.idSkipZeroes(ptr)
+   end
+   if normalize
+      libSingular.id_Norm(ptr, R.ptr)
+      libSingular.id_Normalize(ptr, R.ptr)
+   end
    return sideal{S}(R, ptr, false, I.isTwoSided)
 end
 
