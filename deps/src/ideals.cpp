@@ -226,8 +226,10 @@ auto id_InterRed_helper(ideal a, ring b, bool complete_reduction = false)
   {
     const ring origin = currRing;
     rChangeCurrRing(b);
+    si_opt_1 |= crbit;
     id = kInterRed(a, b->qideal);
     rChangeCurrRing(origin);
+    si_opt_1 = save_opt;
   }
   else
     id = idInit(0, a->rank);
@@ -282,8 +284,10 @@ auto id_StdHC_helper(ideal a, poly HC, ring b, bool complete_reduction = false)
     p_IncrExp(NN,b->N,b);
     p_Setm(NN,b);
     b->ppNoether=NN;
+    si_opt_1 |= crbit;
     id = kStd(a, b->qideal, h, &n);
     rChangeCurrRing(origin);
+    si_opt_1 = save_opt;
     if (n != NULL)
       delete n;
     p_Delete(&(b->ppNoether),b);
