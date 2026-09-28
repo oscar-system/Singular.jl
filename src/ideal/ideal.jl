@@ -767,7 +767,7 @@ function fglm(I::sideal{spoly{T}}, ordering::Symbol; complete_reduction::Bool=fa
    ptr = GC.@preserve Isrc Rsrc Rdest libSingular.fglmzero(Isrc.ptr, Rsrc.ptr, Rdest.ptr)
    resI = sideal{spoly{T}}(Rdest, ptr, true)
    if (complete_reduction)
-      resI = interreduce(resI)
+      resI = interreduce(resI, complete_reduction=complete_reduction)
    end
    return resI
 end
