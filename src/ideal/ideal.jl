@@ -751,7 +751,7 @@ end
 Compute a Groebner basis for the zero - dimensional ideal $I$ in the ring $R$ using the FGLM
 algorithm. All involved orderings have to be global.
 """
-function fglm(I::sideal{spoly{T}}, ordering::Symbol) where T <: Nemo.RingElem
+function fglm(I::sideal{spoly{T}}, ordering::Symbol; complete_reduction::Bool=false) where T <: Nemo.RingElem
    Rdest = base_ring(I)
    !has_global_ordering(Rdest) && error("Algorithm works only for global orderings")
    n = nvars(Rdest)
@@ -765,7 +765,11 @@ function fglm(I::sideal{spoly{T}}, ordering::Symbol) where T <: Nemo.RingElem
    !is_zerodim(Isrc) && error("Ideal needs to be zero-dimensional")
 
    ptr = GC.@preserve Isrc Rsrc Rdest libSingular.fglmzero(Isrc.ptr, Rsrc.ptr, Rdest.ptr)
-   return sideal{spoly{T}}(Rdest, ptr, true)
+   resI = sideal{spoly{T}}(Rdest, ptr, true)
+   if (complete_reduction)
+      resI = interreduce(resI)
+   end
+   return resI
 end
 
 ###############################################################################
