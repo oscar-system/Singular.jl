@@ -213,8 +213,14 @@ auto id_Slimgb_helper(ideal a, ring b, bool complete_reduction = false)
   return id;
 }
 
-auto id_InterRed_helper(ideal a, ring b)
+auto id_InterRed_helper(ideal a, ring b, bool complete_reduction = false)
 {
+  //  bool complete_reduction= false;
+  unsigned int crbit;
+  if (complete_reduction)
+    crbit = Sy_bit(OPT_REDSB);
+  else
+    crbit = 0;
   ideal id = NULL;
   if (!idIs0(a))
   {
@@ -256,8 +262,14 @@ auto id_Std_helper(ideal a, ring b, bool complete_reduction = false)
   return id;
 }
 
-auto id_StdHC_helper(ideal a, poly HC, ring b)
+auto id_StdHC_helper(ideal a, poly HC, ring b, bool complete_reduction = false)
 {
+  // bool complete_reduction= false;
+  unsigned int crbit;
+  if (complete_reduction)
+    crbit = Sy_bit(OPT_REDSB);
+  else
+    crbit = 0;
   ideal id = NULL;
   if (!idIs0(a))
   {
