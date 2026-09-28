@@ -225,6 +225,7 @@ auto id_InterRed_helper(ideal a, ring b, bool complete_reduction = false)
   if (!idIs0(a))
   {
     const ring origin = currRing;
+    unsigned int save_opt = si_opt_1;
     rChangeCurrRing(b);
     si_opt_1 |= crbit;
     id = kInterRed(a, b->qideal);
@@ -278,6 +279,7 @@ auto id_StdHC_helper(ideal a, poly HC, ring b, bool complete_reduction = false)
     intvec *     n = NULL;
     tHomog       h = testHomog;
     const ring   origin = currRing;
+    unsigned int save_opt = si_opt_1;
     rChangeCurrRing(b);
     p_Delete(&(b->ppNoether),b);
     poly NN=p_Copy(HC,b);
