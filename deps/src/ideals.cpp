@@ -213,15 +213,24 @@ auto id_Slimgb_helper(ideal a, ring b, bool complete_reduction = false)
   return id;
 }
 
-auto id_InterRed_helper(ideal a, ring b)
+auto id_InterRed_helper(ideal a, ring b, bool complete_reduction = false)
 {
+  //  bool complete_reduction= false;
+  unsigned int crbit;
+  if (complete_reduction)
+    crbit = Sy_bit(OPT_REDSB);
+  else
+    crbit = 0;
   ideal id = NULL;
   if (!idIs0(a))
   {
     const ring origin = currRing;
+    unsigned int save_opt = si_opt_1;
     rChangeCurrRing(b);
+    si_opt_1 |= crbit;
     id = kInterRed(a, b->qideal);
     rChangeCurrRing(origin);
+    si_opt_1 = save_opt;
   }
   else
     id = idInit(0, a->rank);
@@ -256,22 +265,31 @@ auto id_Std_helper(ideal a, ring b, bool complete_reduction = false)
   return id;
 }
 
-auto id_StdHC_helper(ideal a, poly HC, ring b)
+auto id_StdHC_helper(ideal a, poly HC, ring b, bool complete_reduction = false)
 {
+  // bool complete_reduction= false;
+  unsigned int crbit;
+  if (complete_reduction)
+    crbit = Sy_bit(OPT_REDSB);
+  else
+    crbit = 0;
   ideal id = NULL;
   if (!idIs0(a))
   {
     intvec *     n = NULL;
     tHomog       h = testHomog;
     const ring   origin = currRing;
+    unsigned int save_opt = si_opt_1;
     rChangeCurrRing(b);
     p_Delete(&(b->ppNoether),b);
     poly NN=p_Copy(HC,b);
     p_IncrExp(NN,b->N,b);
     p_Setm(NN,b);
     b->ppNoether=NN;
+    si_opt_1 |= crbit;
     id = kStd(a, b->qideal, h, &n);
     rChangeCurrRing(origin);
+    si_opt_1 = save_opt;
     if (n != NULL)
       delete n;
     p_Delete(&(b->ppNoether),b);
