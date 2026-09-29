@@ -416,6 +416,16 @@ void singular_define_ideals(jlcxx::Module & Singular)
 
   Singular.method("idIs0", &idIs0);
 
+  Singular.method("id_DelDiv", &id_DelDiv);
+
+  Singular.method("id_DelLmEquals", &id_DelLmEquals);
+
+  Singular.method("id_DelEquals", &id_DelEquals);
+
+  Singular.method("id_Norm", &id_Norm);
+
+  Singular.method("id_DelMultiples", &id_DelMultiples);
+
   Singular.method("id_IsConstant", &id_IsConstant);
 
   Singular.method("id_IsZeroDim", &id_IsZeroDim);

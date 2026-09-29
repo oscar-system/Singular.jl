@@ -455,6 +455,23 @@ end
    @test equal(A, I)
 end
 
+@testset "sideal.simplify" begin
+   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
+
+   I = @inferred Ideal(R, x, x^2, y, x+y)
+   A = @inferred Ideal(R, x, x^2, y, R(0))
+   @test equal(A, simplify(I, erase_same_leading_monomials=true))
+   A = @inferred Ideal(R, x, R(0), y, R(0))
+   @test equal(A, simplify(I, erase_multiple_leading_monomials=true))
+   A = @inferred Ideal(R, x, y)
+   @test equal(A, simplify(I, erase_multiple_leading_monomials=true, remove_zeros=true))
+   I = @inferred Ideal(R, 3*x+3*y, x+y)
+   A = @inferred Ideal(R, 3*x+3*y, R(0))
+   @test equal(A, simplify(I, erase_scalar_multiples=true))
+   A = @inferred Ideal(R, x+y, x+y)
+   @test equal(A, simplify(I, normalize=true))
+end
+
 @testset "sideal.fglm" begin
    R, (x, y, z) = polynomial_ring(QQ, ["x", "y", "z"], ordering = :lex)
    I = Ideal(R, y^3+x^2, x^2*y+x^2, x^3-x^2, z^4-x^2-y)
