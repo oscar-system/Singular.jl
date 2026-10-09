@@ -43,7 +43,7 @@ julia> R, (x, y, z, w) = polynomial_ring(L[1], ["x", "y", "z", "w"];
 
 julia> S, (a, b, c) = polynomial_ring(L[1], ["a", "b", "c"];
                                     ordering=:degrevlex)
-(Singular polynomial ring (9,a),(a@1,b,c),(dp(3),C), spoly{n_GF}[a, b, c])
+(Singular polynomial ring (9,a),(a,b,c),(dp(3),C), spoly{n_GF}[a, b, c])
 
 julia> V = [a, a + b^2, b - c, c + b]
 4-element Vector{spoly{n_GF}}:
@@ -55,7 +55,7 @@ julia> V = [a, a + b^2, b - c, c + b]
 julia> f = AlgebraHomomorphism(R, S, V)
 Algebra homomorphism
   from Singular polynomial ring (9,a),(x,y,z,w),(ds(4),C)
-  to Singular polynomial ring (9,a),(a@1,b,c),(dp(3),C)
+  to Singular polynomial ring (9,a),(a,b,c),(dp(3),C)
 Defining equations: spoly{n_GF}[a, b^2 + a, b + a^4*c, b + c]
 ```
 
