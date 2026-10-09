@@ -132,6 +132,10 @@ auto set_option_helper2(std::string opt, bool value) {
 
 JLCXX_MODULE define_julia_module(jlcxx::Module & Singular)
 {
+  Singular.method("omalloc_page_size", []() {
+    return static_cast<int64_t>(SIZEOF_SYSTEM_PAGE);
+  });
+
   Singular.add_type<n_Procs_s>("coeffs");
   Singular.add_bits<n_coeffType>("n_coeffType");
   Singular.set_const("n_Z", n_Z);
