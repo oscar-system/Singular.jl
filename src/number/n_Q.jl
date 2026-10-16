@@ -22,11 +22,42 @@ function deepcopy_internal(a::n_Q, dict::IdDict)
    GC.@preserve a c return c(libSingular.n_Copy(a.ptr, c.ptr))
 end
 
+# An n_Q is either an immediate integer or a pointer to Singular's
+# snumber { mpz_t z; mpz_t n; int s }; see src/libsingular/rawnumbers.jl. Views
+# into the latter borrow Singular's limbs, so every use must sit inside a
+# GC.@preserve of the n_Q.
+#
+# Singular may leave a rational unnormalized (s == 0), in which case z and n
+# need not be coprime. Normalizing can replace the snumber, so this returns the
+# pointer to use from here on.
+@inline function _normalized(x::n_Q)
+   p = x.ptr
+   if !libSingular.rational_is_imm(p) &&
+         libSingular.rational_state(p) == libSingular.RAT_UNNORMALIZED
+      c = parent(x)
+      p = GC.@preserve x c libSingular.n_Normalize(p, c.ptr)
+      x.ptr = p
+   end
+   return p
+end
+
+@inline _is_fraction(p::libSingular.number_ptr) =
+   !libSingular.rational_is_imm(p) &&
+      libSingular.rational_state(p) != libSingular.RAT_INTEGER
+
 function hash(a::n_Q, h::UInt)
-   n = numerator(a)
-   d = denominator(a)
-   nhash = hash(n, h)
-   dhash = hash(d, h)
+   GC.@preserve a begin
+      p = _normalized(a)
+      if libSingular.rational_is_imm(p)
+         nhash = hash(libSingular.rational_imm(p), h)
+         dhash = hash(1, h)
+      else
+         nhash = libSingular.mpz_hash(libSingular.rational_num_mpz(p), h)
+         dhash = _is_fraction(p) ?
+                 libSingular.mpz_hash(libSingular.rational_den_mpz(p), h) :
+                 hash(1, h)
+      end
+   end
    return xor(xor(nhash, dhash), 0xf348b78c190e8fc1%UInt)
 end
 
@@ -40,15 +71,13 @@ one(::Rationals) = QQ(1)
 
 zero(::Rationals) = QQ(0)
 
-function isone(n::n_Q)
-   c = parent(n)
-   GC.@preserve n c return libSingular.n_IsOne(n.ptr, c.ptr)
-end
+# Singular shortens every representable integer to an immediate, so 0 and 1
+# only ever occur in that form
+isone(n::n_Q) = libSingular.rational_is_imm(n.ptr) &&
+                isone(libSingular.rational_imm(n.ptr))
 
-function iszero(n::n_Q)
-   c = parent(n)
-   GC.@preserve n c return libSingular.n_IsZero(n.ptr, c.ptr)
-end
+iszero(n::n_Q) = libSingular.rational_is_imm(n.ptr) &&
+                 iszero(libSingular.rational_imm(n.ptr))
 
 is_unit(n::n_Q) = !iszero(n)
 
@@ -58,14 +87,10 @@ is_unit(n::n_Q) = !iszero(n)
 Return in `ZZ` the numerator of $x$.
 """
 function numerator(x::n_Q)
-   c = parent(x)
-   GC.@preserve x c QQ ZZ begin
-      xref = Ref(x.ptr)
-      p = libSingular.n_GetNumerator(xref, c.ptr)
-      x.ptr = xref[]
-      pp = libSingular.nApplyMapFunc(n_Q_2_n_Z, p, QQ.ptr, ZZ.ptr)
-      libSingular.n_Delete(p, QQ.ptr)
-      return ZZ(pp)
+   GC.@preserve x begin
+      p = _normalized(x)
+      libSingular.rational_is_imm(p) && return ZZ(libSingular.rational_imm(p))
+      return ZZ(libSingular.n_InitMPZ(libSingular.rational_num_mpz(p), ZZ.ptr))
    end
 end
 
@@ -75,27 +100,23 @@ end
 Return in `ZZ` the denominator of $x$.
 """
 function denominator(x::n_Q)
-   c = parent(x)
-   GC.@preserve x c QQ ZZ begin
-      xref = Ref(x.ptr)
-      p = libSingular.n_GetDenom(xref, c.ptr)
-      x.ptr = xref[]
-      pp = libSingular.nApplyMapFunc(n_Q_2_n_Z, p, QQ.ptr, ZZ.ptr)
-      libSingular.n_Delete(p, QQ.ptr)
-      return ZZ(pp)
+   GC.@preserve x begin
+      p = _normalized(x)
+      _is_fraction(p) || return one(ZZ)
+      return ZZ(libSingular.n_InitMPZ(libSingular.rational_den_mpz(p), ZZ.ptr))
    end
 end
 
-function abs(n::n_Q)
-   c = parent(n)
-   GC.@preserve n c begin
-      if libSingular.n_GreaterZero(n.ptr, c.ptr) || iszero(n)
-         return deepcopy(n)
-      else
-         return -n
-      end
+function is_negative(x::n_Q)
+   GC.@preserve x begin
+      p = x.ptr
+      libSingular.rational_is_imm(p) && return libSingular.rational_imm(p) < 0
+      return libSingular.mpz_sign(
+                libSingular.mpz_view(libSingular.rational_num_mpz(p))) < 0
    end
 end
+
+abs(n::n_Q) = is_negative(n) ? -n : deepcopy(n)
 
 ###############################################################################
 #
@@ -188,13 +209,51 @@ end
 #
 ###############################################################################
 
-==(x::n_Q, y::Integer) = (x ==  parent(x)(y))
+# Sign of x - y, or `nothing` when x is a proper fraction, where deciding the
+# comparison needs more than a look at the numerator.
+@inline function _cmp_machine_int(x::n_Q, y::Int)
+   GC.@preserve x begin
+      p = _normalized(x)
+      libSingular.rational_is_imm(p) &&
+         return cmp(libSingular.rational_imm(p), y)
+      _is_fraction(p) && return nothing
+      return libSingular.mpz_cmp_int(
+                libSingular.mpz_view(libSingular.rational_num_mpz(p)), y)
+   end
+end
 
-==(x::Integer, y::n_Q) = (parent(y)(x) == y)
+function _cmp(x::n_Q, y::n_Q)
+   c = parent(x)
+   GC.@preserve x y c begin
+      libSingular.n_Equal(x.ptr, y.ptr, c.ptr) && return 0
+      return libSingular.n_Greater(x.ptr, y.ptr, c.ptr) ? 1 : -1
+   end
+end
 
-isless(x::n_Q, y::Integer) = isless(x, parent(x)(y))
+function _cmp(x::n_Q, y::Integer)
+   yy = libSingular.machine_int(y)
+   if yy !== nothing
+      c = _cmp_machine_int(x, yy)
+      c !== nothing && return c
+   end
+   return _cmp(x, QQ(y))
+end
 
-isless(x::Integer, y::n_Q) = isless(parent(y)(x), y)
+_cmp(x::n_Q, y::Nemo.ZZRingElem) =
+   libSingular.fmpz_is_small(y) ? _cmp(x, y.d) : _cmp(x, QQ(y))
+
+_cmp(x::n_Q, y::Union{Rational, Nemo.QQFieldElem}) = _cmp(x, QQ(y))
+
+const RationalLikeTypes = Union{Integer, Rational, Nemo.ZZRingElem,
+                                Nemo.QQFieldElem}
+
+==(x::n_Q, y::RationalLikeTypes) = _cmp(x, y) == 0
+
+==(x::RationalLikeTypes, y::n_Q) = _cmp(y, x) == 0
+
+isless(x::n_Q, y::RationalLikeTypes) = _cmp(x, y) < 0
+
+isless(x::RationalLikeTypes, y::n_Q) = _cmp(y, x) > 0
 
 ###############################################################################
 #
@@ -342,12 +401,41 @@ promote_rule(C::Type{n_Q}, ::Type{Nemo.ZZRingElem}) = n_Q
 
 promote_rule(C::Type{n_Q}, ::Type{n_Z}) = n_Q
 
-Rational{T}(x::n_Q) where {T} = convert(T, numerator(x)) // convert(T, denominator(x))
-Rational(x::n_Q) = Integer(numerator(x)) // Integer(denominator(x))
+function Rational{T}(x::n_Q) where {T <: Integer}
+   GC.@preserve x begin
+      p = _normalized(x)
+      libSingular.rational_is_imm(p) &&
+         return Rational{T}(libSingular.rational_imm(p))
+      n = libSingular.mpz_to(T, libSingular.rational_num_mpz(p))
+      d = _is_fraction(p) ?
+          libSingular.mpz_to(T, libSingular.rational_den_mpz(p)) : one(T)
+      # Singular keeps z/n in lowest terms with n > 0
+      return Base.unsafe_rational(n, d)
+   end
+end
+
+Rational(x::n_Q) = Rational{BigInt}(x)
 
 convert(::Type{T}, x::n_Q) where {T <: Rational} = T(x)
 
-Nemo.QQFieldElem(x::n_Q) = QQFieldElem(ZZRingElem(numerator(x)), ZZRingElem(denominator(x)))
+function Nemo.QQFieldElem(x::n_Q)
+   GC.@preserve x begin
+      p = _normalized(x)
+      libSingular.rational_is_imm(p) &&
+         return QQFieldElem(libSingular.rational_imm(p))
+      # Singular keeps z/n in lowest terms with n > 0, which is exactly FLINT's
+      # canonical form, so both halves can be filled in directly
+      z = QQFieldElem()
+      GC.@preserve z begin
+         libSingular.fmpz_set!(libSingular.fmpq_num_ptr(z),
+                               libSingular.rational_num_mpz(p))
+         _is_fraction(p) && libSingular.fmpz_set!(libSingular.fmpq_den_ptr(z),
+                                                  libSingular.rational_den_mpz(p))
+      end
+      return z
+   end
+end
+
 convert(::Type{QQFieldElem}, x::n_Q) = QQFieldElem(x)
 (::QQField)(x::n_Q) = QQFieldElem(x)
 
@@ -396,8 +484,6 @@ rand(R::Rationals, n) = rand(Random.GLOBAL_RNG, R, n)
 
 # from rationals
 
-(::Rationals)(x::Rational{Int}) = n_Q(numerator(x)) // n_Q(denominator(x))
-
-(R::Rationals)(x::Union{Rational,QQFieldElem}) = R(numerator(x)) // R(denominator(x))
+(::Rationals)(x::Union{Rational, QQFieldElem}) = n_Q(x)
 
 (::Rationals)(n::n_Q) = n

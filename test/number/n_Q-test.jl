@@ -166,3 +166,80 @@ end
    Random.seed!(rng, 0)
    @test M == rand(rng, make(QQ, 1:9), 2, 3)
 end
+
+@testset "n_Q.immediate_boundaries" begin
+   # Singular stores an integer of up to 29 bits in the number word itself
+   for v in (0, 1, -1, 2^28 - 1, 2^28, -2^28, -2^28 - 1, 2^40,
+             typemax(Int), typemin(Int), big(2)^100, -big(2)^100)
+      a = QQ(v)
+
+      @test a == v && a == Nemo.ZZRingElem(v)
+      @test Rational{BigInt}(a) == v
+      @test Nemo.QQFieldElem(a) == v
+      @test numerator(a) == v && isone(denominator(a))
+      @test a + QQ(1) == big(v) + 1
+      @test a * QQ(2) == 2 * big(v)
+
+      @test iszero(a) == iszero(v)
+      @test isone(a) == isone(v)
+      @test is_unit(a) == !iszero(v)
+      @test Singular.is_negative(a) == (v < 0)
+      @test abs(a) == abs(big(v))
+      @test hash(a) == hash(QQ(v))
+   end
+end
+
+@testset "n_Q.nemo_conversions" begin
+   for (n, d) in ((3, 7), (-3, 7), (1, 1), (2^30, 7), (7, 2^30),
+                  (big(2)^100, 7), (7, big(2)^100), (-big(2)^100, big(3)^50))
+      q = Nemo.QQFieldElem(Nemo.ZZRingElem(n), Nemo.ZZRingElem(d))
+      a = QQ(q)
+
+      @test a == q
+      @test Nemo.QQFieldElem(a) == q
+      @test Rational{BigInt}(a) == Rational{BigInt}(big(n), big(d))
+      @test numerator(a) == numerator(q)
+      @test denominator(a) == denominator(q)
+      @test QQ(Rational{BigInt}(q)) == a
+      @test hash(a) == hash(QQ(q))
+   end
+end
+
+@testset "n_Q.nemo_comparison" begin
+   @test QQ(5) == Nemo.ZZ(5)
+   @test Nemo.ZZ(5) == QQ(5)
+   @test QQ(5) == Nemo.QQ(5)
+   @test Nemo.QQ(5) == QQ(5)
+   @test QQ(3)//QQ(7) == Nemo.QQ(3, 7)
+   @test QQ(3)//QQ(7) != Nemo.QQ(3, 8)
+   @test QQ(3)//QQ(7) < Nemo.QQ(1, 2)
+   @test Nemo.QQ(1, 2) > QQ(3)//QQ(7)
+   @test QQ(3)//QQ(7) < Nemo.ZZ(1)
+   @test QQ(3)//QQ(7) == 3//7
+   @test 3//7 == QQ(3)//QQ(7)
+
+   # a proper fraction is never an integer, however it is stored
+   @test QQ(3)//QQ(7) != 1
+   @test QQ(3)//QQ(7) != 0
+   @test 0 < QQ(3)//QQ(7) < 1
+end
+
+@testset "n_Q.unnormalized_coefficients" begin
+   # polynomial arithmetic leaves coefficients unnormalized, i.e. with a
+   # numerator and denominator that still share a factor
+   R, (x,) = polynomial_ring(QQ, ["x"])
+   r = QQ(3)//QQ(7)
+   expected = [Nemo.QQ(27, 343), Nemo.QQ(81, 343),
+               Nemo.QQ(81, 343), Nemo.QQ(27, 343)]
+
+   for (c, e) in zip(coefficients((r*x + r)^3), expected)
+      @test c == e
+      @test numerator(c) == numerator(e)
+      @test denominator(c) == denominator(e)
+      # normalizing replaces the number in place, so repeat every conversion
+      @test Nemo.QQFieldElem(c) == e
+      @test Nemo.QQFieldElem(c) == e
+      @test Rational{BigInt}(c) == Rational{BigInt}(e)
+      @test hash(c) == hash(QQ(e))
+   end
+end
