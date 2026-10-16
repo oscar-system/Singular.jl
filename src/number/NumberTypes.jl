@@ -96,9 +96,44 @@ mutable struct n_Q <: Nemo.FieldElem
 end
 
 n_Q(n::n_Q) = n
-n_Q(n::Integer = 0) = n_Q(libSingular.number_ptr(n, QQ.ptr))
-n_Q(n::Nemo.ZZRingElem) = n_Q(libSingular.number_ptr(n, QQ.ptr))
-n_Q(n::n_Z) = n_Q(libSingular.nApplyMapFunc(n_Z_2_n_Q, n.ptr, ZZ.ptr, QQ.ptr))
+
+# A small enough integer is its own n_Q, so we can build the number without
+# calling into Singular at all; see src/libsingular/rawnumbers.jl.
+function n_Q(n::Integer = 0)
+   v = libSingular.machine_int(n)
+   v !== nothing && libSingular.rational_imm_fits(v) &&
+      return n_Q(libSingular.rational_from_imm(v))
+   return n_Q(libSingular.number_ptr(n, QQ.ptr))
+end
+
+n_Q(n::Nemo.ZZRingElem) =
+   GC.@preserve n QQ n_Q(libSingular.rational_ptr_from_fmpz(n.d, QQ.ptr))
+
+# Both halves of a QQFieldElem are coprime with a positive denominator, which
+# is also what Singular wants, so one division is enough to build the number.
+function n_Q(x::Nemo.QQFieldElem)
+   c = QQ
+   GC.@preserve x c begin
+      num = libSingular.rational_ptr_from_fmpz(x.num, c.ptr)
+      x.den == 1 && return n_Q(num)
+      den = libSingular.rational_ptr_from_fmpz(x.den, c.ptr)
+      p = libSingular.n_Div(num, den, c.ptr)
+      libSingular.n_Delete(num, c.ptr)
+      libSingular.n_Delete(den, c.ptr)
+      return n_Q(p)
+   end
+end
+
+n_Q(x::Rational) = n_Q(numerator(x)) // n_Q(denominator(x))
+
+function n_Q(n::n_Z)
+   GC.@preserve n begin
+      m = libSingular.integer_mpz(n.ptr)
+      v = libSingular.mpz_view(m)
+      libSingular.mpz_fits_int(v) && return n_Q(libSingular.mpz_to_int(v))
+      return n_Q(libSingular.n_InitMPZ(m, QQ.ptr))
+   end
+end
 
 
 ###############################################################################

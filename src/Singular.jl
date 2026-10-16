@@ -203,10 +203,6 @@ function __init__()
    global ZZ = Integers()
    global QQ = Rationals()
 
-   # done in __init__ since headers must be included first
-
-   global n_Z_2_n_Q = libSingular.n_SetMap(ZZ.ptr, QQ.ptr)
-   global n_Q_2_n_Z = libSingular.n_SetMap(QQ.ptr, ZZ.ptr)
    ZZ.refcount += 1
    QQ.refcount += 1
 
