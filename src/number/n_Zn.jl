@@ -80,7 +80,7 @@ end
 function BigInt(n::n_Zn)
    z = BigInt()
    GC.@preserve n begin
-      ccall((:__gmpz_set, :libgmp), Cvoid,
+      ccall((:__gmpz_set, Base.GMP.libgmp), Cvoid,
             (Ref{BigInt}, Ptr{Any}),
             z, n.ptr.cpp_object)
    end
