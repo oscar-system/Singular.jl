@@ -29,10 +29,6 @@ function add_jll_override(depot, pkgname, newdir)
         $(pkgname) = "$(newdir)"
         """)
     end
-
-    # we need to make sure that precompilation is run again with the override in place
-    # (just running Pkg.precompile() does not seem to suffice)
-    run(`touch $(Base.locate_package(pkgid))`)
 end
 
 tmpdepot = mktempdir(; cleanup=true)
@@ -41,38 +37,25 @@ tmpdepot = mktempdir(; cleanup=true)
 # create override file for Singular_jll
 add_jll_override(tmpdepot, "Singular", singularoverride)
 
-# create a fresh marker file in deps/src so the tree hash changes
-libsingular_src_dir = joinpath(dirname(@__DIR__), "deps", "src")
-isdir(libsingular_src_dir) || error("Could not find $(libsingular_src_dir)")
-
-marker_prefix = ".recompile-libsingular-julia-"
-for filename in readdir(libsingular_src_dir)
-    if startswith(filename, marker_prefix)
-        rm(joinpath(libsingular_src_dir, filename); force=true)
-    end
-end
-
-libsingular_src_marker = joinpath(
-    libsingular_src_dir,
-    marker_prefix * string(time_ns()) * ".txt",
-)
-write(libsingular_src_marker, "force recompilation marker\n")
-
 singular_libdir = joinpath(singularoverride, "lib")
 dyld_fallback = let existing = get(ENV, "DYLD_FALLBACK_LIBRARY_PATH", "")
     isempty(existing) ? singular_libdir : existing * ":" * singular_libdir
 end
 
-# prepend our temporary depot to the depot list...
-try
-    withenv(
-        "JULIA_DEPOT_PATH"=>tmpdepot*":"*join(DEPOT_PATH, ":"),
-        "DYLD_FALLBACK_LIBRARY_PATH"=>dyld_fallback,
-    ) do
+# Use the temporary depot alone: a trailing separator appends only the system
+# depots, not ~/.julia. Nothing precompiled against the unoverridden Singular_jll
+# is visible, so everything below is built with the override in place. This
+# matters because an artifact override by itself does not invalidate a package
+# image, and Singular.jl bakes plenty into one: the libsingular_julia path, the
+# Singular binary path, the library function dictionary, and the CxxWrap
+# wrappers generated from libsingular_julia.
+withenv(
+    "JULIA_DEPOT_PATH"=>tmpdepot*":",
+    "DYLD_FALLBACK_LIBRARY_PATH"=>dyld_fallback,
+) do
 
-        # ... and start Julia, by default with the same project environment
-        run(`$(Base.julia_cmd()) --project=$(Base.active_project()) $(ARGS)`)
-    end
-finally
-    rm(libsingular_src_marker; force=true)
+    # ... make sure all dependencies are installed ...
+    run(`$(Base.julia_cmd()) --project=$(Base.active_project()) -e "using Pkg; Pkg.instantiate()"`)
+    # ... and start Julia, by default with the same project environment
+    run(`$(Base.julia_cmd()) --project=$(Base.active_project()) $(ARGS)`)
 end

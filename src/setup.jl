@@ -71,9 +71,14 @@ function jll_artifact_dir(the_jll::Module)
     return the_jll.find_artifact_dir()
 end
 
-function build_code(src_hash)
-   @info "Bundled C++ sources don't match libsingular_julia_jll"
+# What a cached build in `deps/install-*` must match to be reusable: the bundled
+# sources, and the Singular it was compiled against. An overridden Singular_jll
+# keeps the same path when it is rebuilt, hence the mtime.
+function build_stamp(src_hash::AbstractString, singular_prefix::AbstractString)
+   return string(src_hash, "\n", singular_prefix, "\n", mtime(Singular_jll.Singular_path), "\n")
+end
 
+function build_code(src_hash)
    depsdir = abspath(joinpath(@__DIR__, "..", "deps"))
    srcdir = joinpath(depsdir, "src")
 
@@ -82,12 +87,15 @@ function build_code(src_hash)
    builddir = joinpath(depsdir, "build-$VERSION")
    installdir = joinpath(depsdir, "install-$VERSION")
 
+   gmp_prefix = jll_artifact_dir(Singular_jll.GMP_jll)
+   singular_prefix = jll_artifact_dir(Singular_jll)
+   stamp = build_stamp(src_hash, singular_prefix)
+
    # check if we already built the code and if so, just use that
    lib_path = joinpath(installdir, "lib", "libsingular_julia.$(Libdl.dlext)")
-   treehash_path = joinpath(installdir, "lib", "libsingular_julia.treehash")
+   stamp_path = joinpath(installdir, "lib", "libsingular_julia.treehash")
    try
-      bin_hash = read(treehash_path, String)
-      if bin_hash == src_hash
+      if read(stamp_path, String) == stamp
          @info "Using already compiled bundled C++ code"
          return lib_path
       end
@@ -108,9 +116,6 @@ function build_code(src_hash)
 
    JlCxx_DIR = joinpath(CxxWrap.prefix_path(), "lib", "cmake", "JlCxx")
    julia_exec = joinpath(Sys.BINDIR, Base.julia_exename())
-
-   gmp_prefix = jll_artifact_dir(Singular_jll.GMP_jll)
-   singular_prefix = jll_artifact_dir(Singular_jll)
 
    Pidfile.mkpidlock("$installdir.lock"; stale_age=60) do
       # delete any previous build or install artifacts
@@ -138,11 +143,29 @@ function build_code(src_hash)
             `)
       end
 
-      write(treehash_path, String(src_hash))
+      write(stamp_path, stamp)
    end
 
    return lib_path
 
+end
+
+"""
+    singular_jll_is_overridden()
+
+Return whether Singular_jll resolves to something other than its own artifact,
+either via an `Overrides.toml` or via a dev'ed Singular_jll carrying an
+`override` directory.
+"""
+function singular_jll_is_overridden()
+   pkgid = Base.PkgId(Singular_jll)
+
+   Pkg.Artifacts.query_override(pkgid.uuid, "Singular") === nothing || return true
+
+   # JLLWrappers resolves a dev'ed JLL to `<package dir>/override` if present
+   src = Base.locate_package(pkgid)
+   src === nothing && return false
+   return isdir(joinpath(dirname(dirname(src)), "override"))
 end
 
 function locate_libsingular()
@@ -156,12 +179,19 @@ function locate_libsingular()
    # the uuid is for Singular.jl
    pkginfo = get(Pkg.dependencies(), Base.PkgId(parentmodule(Setup)).uuid, nothing)
 
-   if jll_hash == src_hash || (pkginfo !== nothing && pkginfo.is_tracking_registry)
+   if singular_jll_is_overridden()
+      # The libsingular_julia in the JLL was compiled against the Singular in
+      # Singular_jll. An overridden Singular_jll may differ in ABI -- notably in
+      # the omalloc page size -- and a mismatch is not diagnosed, it crashes at
+      # runtime. So build against the Singular actually in use.
+      @info "Singular_jll is overridden"
+      path = build_code(src_hash)
+   elseif jll_hash == src_hash || (pkginfo !== nothing && pkginfo.is_tracking_registry)
        # if the tree hashes match then we use the JLL
        # also if we are using a released Singular.jl version
        path = libsingular_julia_jll.get_libsingular_julia_path()
    else
-      # tree hashes differ: we use the bundled sources.
+      @info "Bundled C++ sources don't match libsingular_julia_jll"
       path = build_code(src_hash)
    end
    @debug "Use libsingular_julia from $path"
