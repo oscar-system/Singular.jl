@@ -75,7 +75,7 @@ end
 # sources, and the Singular it was compiled against. An overridden Singular_jll
 # keeps the same path when it is rebuilt, hence the mtime.
 function build_stamp(src_hash::AbstractString, singular_prefix::AbstractString)
-   return string(src_hash, "\n", singular_prefix, "\n", mtime(Singular_jll.Singular_path), "\n")
+   return string(src_hash, "\n", singular_prefix, "\n", mtime(Singular_jll.libsingular_path), "\n")
 end
 
 function build_code(src_hash)
@@ -93,7 +93,7 @@ function build_code(src_hash)
 
    # check if we already built the code and if so, just use that
    lib_path = joinpath(installdir, "lib", "libsingular_julia.$(Libdl.dlext)")
-   stamp_path = joinpath(installdir, "lib", "libsingular_julia.treehash")
+   stamp_path = joinpath(installdir, "lib", "libsingular_julia.stamp")
    try
       if read(stamp_path, String) == stamp
          @info "Using already compiled bundled C++ code"
