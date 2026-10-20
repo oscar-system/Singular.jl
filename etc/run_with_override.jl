@@ -43,14 +43,11 @@ dyld_fallback = let existing = get(ENV, "DYLD_FALLBACK_LIBRARY_PATH", "")
 end
 
 # Use the temporary depot alone: a trailing separator appends only the system
-# depots, not ~/.julia. Nothing precompiled against the unoverridden Singular_jll
-# is visible, so everything below is built with the override in place. This
-# matters because an artifact override by itself does not invalidate a package
-# image, and Singular.jl bakes plenty into one: the libsingular_julia path, the
-# Singular binary path, the library function dictionary, and the CxxWrap
-# wrappers generated from libsingular_julia.
+# depots, not ~/.julia, so no package image precompiled without the override is
+# reused. An artifact override by itself does not invalidate a package image.
 withenv(
     "JULIA_DEPOT_PATH"=>tmpdepot*":",
+    "FORCE_LIBSINGULAR_JULIA_COMPILATION"=>"true",
     "DYLD_FALLBACK_LIBRARY_PATH"=>dyld_fallback,
 ) do
 

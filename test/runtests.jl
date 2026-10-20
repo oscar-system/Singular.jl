@@ -12,7 +12,6 @@ using Test
 
 include("Aqua.jl")
 include("ClosureBoxes.jl")
-include("setup-test.jl")
 
 include("number-test.jl")
 include("poly-test.jl")

@@ -150,24 +150,6 @@ function build_code(src_hash)
 
 end
 
-"""
-    singular_jll_is_overridden()
-
-Return whether Singular_jll resolves to something other than its own artifact,
-either via an `Overrides.toml` or via a dev'ed Singular_jll carrying an
-`override` directory.
-"""
-function singular_jll_is_overridden()
-   pkgid = Base.PkgId(Singular_jll)
-
-   Pkg.Artifacts.query_override(pkgid.uuid, "Singular") === nothing || return true
-
-   # JLLWrappers resolves a dev'ed JLL to `<package dir>/override` if present
-   src = Base.locate_package(pkgid)
-   src === nothing && return false
-   return isdir(joinpath(dirname(dirname(src)), "override"))
-end
-
 function locate_libsingular()
    jll_path = joinpath(libsingular_julia_jll.find_artifact_dir(), "lib", "libsingular_julia.treehash")
    jll_hash = chomp(read(jll_path, String))
@@ -179,12 +161,12 @@ function locate_libsingular()
    # the uuid is for Singular.jl
    pkginfo = get(Pkg.dependencies(), Base.PkgId(parentmodule(Setup)).uuid, nothing)
 
-   if singular_jll_is_overridden()
-      # The libsingular_julia in the JLL was compiled against the Singular in
-      # Singular_jll. An overridden Singular_jll may differ in ABI -- notably in
-      # the omalloc page size -- and a mismatch is not diagnosed, it crashes at
-      # runtime. So build against the Singular actually in use.
-      @info "Singular_jll is overridden"
+   if haskey(ENV, "FORCE_LIBSINGULAR_JULIA_COMPILATION")
+      # e.g. set by etc/run_with_override.jl: the JLL's libsingular_julia was
+      # compiled against the Singular in Singular_jll, and an ABI mismatch with
+      # a custom Singular -- such as a different omalloc page size -- is not
+      # diagnosed, it crashes at runtime
+      @info "FORCE_LIBSINGULAR_JULIA_COMPILATION is set"
       path = build_code(src_hash)
    elseif jll_hash == src_hash || (pkginfo !== nothing && pkginfo.is_tracking_registry)
        # if the tree hashes match then we use the JLL
