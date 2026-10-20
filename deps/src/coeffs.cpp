@@ -195,7 +195,7 @@ void singular_define_coeffs(jlcxx::Module & Singular)
     {
       // naCopyTrans2AlgExt has a bug with zero input
       if (a == NULL || NUM((fraction)a) == NULL)
-        return reinterpret_cast<number>(NULL);
+        return static_cast<number>(nullptr);
 
       nMapFunc nMap = n_SetMap(F, K);
       return nMap(a, F, K);
