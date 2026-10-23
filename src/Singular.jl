@@ -113,6 +113,10 @@ include("Number.jl")
 global ZZ::Integers
 global QQ::Rationals
 
+# n_Q(::n_Z) reads this on every conversion, so it needs a type for the same
+# reason ZZ and QQ do
+global n_Z_2_n_Q::Ptr{Nothing}
+
 include("poly/OrderingTypes.jl")
 
 include("poly/PolyTypes.jl")
@@ -209,6 +213,8 @@ function __init__()
    global n_Q_2_n_Z = libSingular.n_SetMap(QQ.ptr, ZZ.ptr)
    ZZ.refcount += 1
    QQ.refcount += 1
+
+   libSingular.check_number_layout(ZZ.ptr, QQ.ptr)
 
    global ringorder_no = libSingular.ringorder_no
    global ringorder_lp = libSingular.ringorder_lp

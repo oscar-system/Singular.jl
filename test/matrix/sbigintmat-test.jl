@@ -19,3 +19,14 @@ end
    @test a == R(Singular.sbigintmat(a))
    @test a*b == R(Singular.sbigintmat(a*b))
 end
+
+@testset "sbigintmat.large_entries" begin
+   # Singular stores a bigint either in the number word itself or on the heap
+   for v in (0, 1, -1, 2^28 - 1, 2^28, -2^28 - 1, big(2)^100, -big(2)^100)
+      m = Singular.sbigintmat(1, 1)
+      m[1, 1] = v
+      @test m[1, 1] == v
+      @test m[1, 1] isa BigInt
+      @test Nemo.matrix(Nemo.ZZ, m)[1, 1] == v
+   end
+end

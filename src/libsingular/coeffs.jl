@@ -191,10 +191,5 @@ function number_ptr(n::Integer, c::coeffs_ptr)
    end
 end
 
-function number_ptr(x::Nemo.ZZRingElem, c::coeffs_ptr)
-   if Nemo._fmpz_is_small(x)
-      n_Init(x.d, c)
-   else
-      GC.@preserve x n_InitMPZ(Nemo._as_bigint(x), c)
-   end
-end
+number_ptr(x::Nemo.ZZRingElem, c::coeffs_ptr) =
+   GC.@preserve x number_ptr_from_fmpz(x.d, c)

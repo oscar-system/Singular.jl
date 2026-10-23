@@ -15,6 +15,8 @@ include("libsingular/LibSingularTypes.jl")
 
 include("libsingular/errors.jl")
 
+include("libsingular/rawnumbers.jl")
+
 include("libsingular/coeffs.jl")
 
 include("libsingular/rings.jl")

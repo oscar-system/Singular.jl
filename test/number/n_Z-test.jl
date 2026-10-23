@@ -224,3 +224,49 @@ end
    l = Singular.LibRing.addvarsTo(r, r, Any["a", "b"], 0)
    @test l[1] isa Singular.PolyRing{n_Z}
 end
+
+@testset "n_Z.machine_integer_boundaries" begin
+   for v in (0, 1, -1, 2^28, typemax(Int), typemin(Int),
+             big(typemax(Int)) + 1, big(typemin(Int)) - 1,
+             big(2)^100, -big(2)^100)
+      a = ZZ(v)
+
+      @test BigInt(a) == v
+      @test Nemo.ZZRingElem(a) == v
+      @test a == v && a == Nemo.ZZRingElem(v)
+      @test !(a < v) && !(v < a)
+      @test a < big(v) + 1 && big(v) - 1 < a
+      @test a < Nemo.ZZRingElem(v) + 1
+
+      @test iszero(a) == iszero(v)
+      @test isone(a) == isone(v)
+      @test is_unit(a) == (abs(big(v)) == 1)
+      @test Singular.is_negative(a) == (v < 0)
+      @test abs(a) == abs(big(v))
+      @test a + ZZ(1) == big(v) + 1
+
+      # the hash of an n_Z has always been that of its BigInt value, salted
+      @test hash(a) == xor(hash(BigInt(v)), 0x8ab976d24b6a0cca % UInt)
+      @test hash(a, UInt(7)) == xor(hash(BigInt(v), UInt(7)),
+                                    0x8ab976d24b6a0cca % UInt)
+   end
+
+   @test Int(ZZ(typemin(Int))) == typemin(Int)
+   @test Int(ZZ(typemax(Int))) == typemax(Int)
+   @test Int8(ZZ(-128)) == -128
+   @test UInt(ZZ(5)) === UInt(5)
+   @test_throws InexactError Int(ZZ(big(typemax(Int)) + 1))
+   @test_throws InexactError Int8(ZZ(300))
+end
+
+@testset "n_Z.nemo_comparison" begin
+   @test ZZ(5) == Nemo.ZZ(5)
+   @test Nemo.ZZ(5) == ZZ(5)
+   @test ZZ(5) != Nemo.ZZ(7)
+   @test ZZ(5) < Nemo.ZZ(7)
+   @test Nemo.ZZ(3) < ZZ(5)
+   @test ZZ(2)^100 == Nemo.ZZ(2)^100
+   @test ZZ(2)^100 > Nemo.ZZ(2)^99
+   @test ZZ(2)^100 < Nemo.ZZ(2)^101
+   @test -ZZ(2)^100 < Nemo.ZZ(0)
+end
