@@ -128,6 +128,39 @@ end
 
 ###############################################################################
 #
+#   Divisibility
+#
+###############################################################################
+
+# return values of cfDivComp, as in Singular's kutil.cc
+const pDivComp_EQUAL = Cint(2)
+const pDivComp_LESS = Cint(1)
+const pDivComp_GREATER = Cint(-1)
+const pDivComp_INCOMP = Cint(0)
+
+function nemoRingDivComp(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
+   n1 = julia(a)
+   n2 = julia(b)
+   b_divides_a = Nemo.divides(n1, n2)[1]
+   a_divides_b = Nemo.divides(n2, n1)[1]
+   b_divides_a && a_divides_b && return pDivComp_EQUAL
+   b_divides_a && return pDivComp_GREATER
+   a_divides_b && return pDivComp_LESS
+   return pDivComp_INCOMP
+end
+
+function nemoRingIsUnit(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
+   n = julia(a)
+   return Cint(Nemo.is_unit(n))
+end
+
+function nemoRingGetUnit(a::Ptr{Cvoid}, cf::Ptr{Cvoid})
+   n = julia(a)
+   return number(Nemo.canonical_unit(n))
+end
+
+###############################################################################
+#
 #   Comparison
 #
 ###############################################################################
@@ -186,6 +219,12 @@ function nemoRingGcd(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
    n1 = julia(a)
    n2 = julia(b)
    return number(Nemo.gcd(n1, n2))
+end
+
+function nemoRingLcm(a::Ptr{Cvoid}, b::Ptr{Cvoid}, cf::Ptr{Cvoid})
+   n1 = julia(a)
+   n2 = julia(b)
+   return number(Nemo.lcm(n1, n2))
 end
 
 ###############################################################################
@@ -261,6 +300,10 @@ function nemoRingInitChar(cf::Ptr{Cvoid}, p::Ptr{Cvoid})
     ring_struct.cfGreaterZero = @cfunction(nemoRingGreaterZero, Cint, (Ptr{Cvoid}, Ptr{Cvoid}))
     ring_struct.cfWriteLong = @cfunction(nemoRingWrite, Cvoid, (Ptr{Cvoid}, Ptr{Cvoid}))
     ring_struct.cfCoeffWrite = @cfunction(nemoRingCoeffWrite, Cvoid, (Ptr{Cvoid}, Cint))
+    ring_struct.cfLcm = @cfunction(nemoRingLcm, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfDivComp = @cfunction(nemoRingDivComp, Cint, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfIsUnit = @cfunction(nemoRingIsUnit, Cint, (Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfGetUnit = @cfunction(nemoRingGetUnit, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}))
 
     fill_coeffs_with_function_data(ring_struct,cf)
 
@@ -302,6 +345,10 @@ function nemoDomainInitChar(cf::Ptr{Cvoid}, p::Ptr{Cvoid})
     ring_struct.cfGreaterZero = @cfunction(nemoRingGreaterZero, Cint, (Ptr{Cvoid}, Ptr{Cvoid}))
     ring_struct.cfWriteLong = @cfunction(nemoRingWrite, Cvoid, (Ptr{Cvoid}, Ptr{Cvoid}))
     ring_struct.cfCoeffWrite = @cfunction(nemoRingCoeffWrite, Cvoid, (Ptr{Cvoid}, Cint))
+    ring_struct.cfLcm = @cfunction(nemoRingLcm, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfDivComp = @cfunction(nemoRingDivComp, Cint, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfIsUnit = @cfunction(nemoRingIsUnit, Cint, (Ptr{Cvoid}, Ptr{Cvoid}))
+    ring_struct.cfGetUnit = @cfunction(nemoRingGetUnit, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}))
 
     fill_coeffs_with_function_data(ring_struct,cf)
 

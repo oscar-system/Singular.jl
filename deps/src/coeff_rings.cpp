@@ -33,6 +33,10 @@ typedef struct __singular_coeff_ring_struct {
   void *  cfGreaterZero;
   void *  cfWriteLong;
   void *  cfCoeffWrite;
+  void *  cfLcm;
+  void *  cfDivComp;
+  void *  cfIsUnit;
+  void *  cfGetUnit;
 } singular_coeff_ring_struct;
 
 static BOOLEAN nCoeffIsEqual(const coeffs r, n_coeffType n, void *d)
@@ -82,6 +86,16 @@ void fill_coeffs_with_function_data(jl_value_t * coeff_struct, void * cf_void)
   cf->cfGreaterZero = (BOOLEAN(*)(number, const coeffs))cf_input->cfGreaterZero;
   cf->cfWriteLong = (void (*)(number, const coeffs))cf_input->cfWriteLong;
   cf->cfCoeffWrite = (void (*)(const coeffs, BOOLEAN))cf_input->cfCoeffWrite;
+
+  // optional: if NULL, keep the defaults set by nInitChar
+  if (cf_input->cfLcm != NULL)
+    cf->cfLcm = (numberfunc)cf_input->cfLcm;
+  if (cf_input->cfDivComp != NULL)
+    cf->cfDivComp = (int (*)(number, number, const coeffs))cf_input->cfDivComp;
+  if (cf_input->cfIsUnit != NULL)
+    cf->cfIsUnit = (BOOLEAN(*)(number, const coeffs))cf_input->cfIsUnit;
+  if (cf_input->cfGetUnit != NULL)
+    cf->cfGetUnit = (number(*)(number, const coeffs))cf_input->cfGetUnit;
 }
 
 
