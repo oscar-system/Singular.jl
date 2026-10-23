@@ -216,6 +216,7 @@ function fqInitChar(cf::Ptr{Cvoid}, p::Ptr{Cvoid})
     ring_struct.cfGreaterZero = @cfunction(fqGreaterZero, Cint, (Ptr{Cvoid}, Ptr{Cvoid}))
     ring_struct.cfWriteLong = @cfunction(fqWrite, Cvoid, (Ptr{Cvoid}, Ptr{Cvoid}))
     ring_struct.cfCoeffWrite = @cfunction(fqCoeffWrite, Cvoid, (Ptr{Cvoid}, Cint))
+    ring_struct.cfFactorize = @cfunction(nemoFieldFactorize, Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Ptr{Cvoid}}, Cint, Ptr{Cvoid}))
 
     fill_coeffs_with_function_data(ring_struct, cf)
 

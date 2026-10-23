@@ -1,5 +1,29 @@
 #include "rings.h"
 
+#include <vector>
+
+extern int inerror;
+extern std::vector<std::string> singular_error_log;
+
+static void jl_error_from_singular_log_or(const char * fallback)
+{
+  if (singular_error_log.empty())
+  {
+    jl_error(fallback);
+  }
+
+  std::string msg;
+  for (auto & si : singular_error_log)
+  {
+    if (!msg.empty()) msg += "\n";
+    msg += si;
+  }
+  singular_error_log.clear();
+  errorreported = 0;
+  inerror = 0;
+  jl_error(msg.c_str());
+}
+
 auto rDefault_helper(coeffs cf, jlcxx::ArrayRef<std::string> vars, rRingOrder_t ord)
 {
   auto    len = vars.size();
@@ -516,6 +540,11 @@ void singular_define_rings(jlcxx::Module & Singular)
     rChangeCurrRing(r);
     intvec * v = NULL;
     ideal    I = singclap_sqrfree(pCopy(p), &v, 0, currRing);
+    if (I == NULL || v == NULL)
+    {
+      rChangeCurrRing(origin);
+      jl_error_from_singular_log_or("Singular squarefree factorization failed");
+    }
     int *    content = v->ivGetVec();
     for (int i = 0; i < v->length(); i++)
     {
@@ -531,6 +560,11 @@ void singular_define_rings(jlcxx::Module & Singular)
     rChangeCurrRing(r);
     intvec * v = NULL;
     ideal    I = singclap_factorize(p_Copy(p, r), &v, 0, r);
+    if (I == NULL || v == NULL)
+    {
+      rChangeCurrRing(origin);
+      jl_error_from_singular_log_or("Singular factorization failed");
+    }
     int *    content = v->ivGetVec();
     for (int i = 0; i < v->length(); i++)
     {
