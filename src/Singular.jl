@@ -80,8 +80,10 @@ include("setup.jl")
 
 const binSingular = Singular_jll.Singular_path
 
-const _libsingular_julia = Ref(Setup.locate_libsingular())
-libsingular_julia() = _libsingular_julia[]
+# fixed at precompile time: CxxWrap wraps this library then, and reopens it in
+# `libSingular.__init__`, which runs before our `__init__`
+const _libsingular_julia = Setup.locate_libsingular()
+libsingular_julia() = _libsingular_julia
 
 const libflint = Nemo.libflint
 
@@ -173,8 +175,6 @@ function __init__()
    if Sys.iswindows()
       windows_error()
    end
-
-   _libsingular_julia[] = Setup.locate_libsingular()
 
    # Initialise Singular
    ENV["SINGULAR_EXECUTABLE"] = binSingular
