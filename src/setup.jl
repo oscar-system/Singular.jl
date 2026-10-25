@@ -154,9 +154,15 @@ function locate_libsingular()
    jll_path = joinpath(libsingular_julia_jll.find_artifact_dir(), "lib", "libsingular_julia.treehash")
    jll_hash = chomp(read(jll_path, String))
 
+   # recompile when the bundled sources change, so that this runs again
+   srcdir = joinpath(@__DIR__, "..", "deps", "src")
+   for (root, _, files) in walkdir(srcdir), file in files
+      include_dependency(joinpath(root, file))
+   end
+
    # compare the sources used to build libsingular_julia_jll with bundled copies
    # by comparing tree hashes
-   src_hash = bytes2hex(Pkg.GitTools.tree_hash(joinpath(@__DIR__, "..", "deps", "src")))
+   src_hash = bytes2hex(Pkg.GitTools.tree_hash(srcdir))
 
    # the uuid is for Singular.jl
    pkginfo = get(Pkg.dependencies(), Base.PkgId(parentmodule(Setup)).uuid, nothing)
