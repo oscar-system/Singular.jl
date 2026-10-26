@@ -269,4 +269,9 @@ end
    @test ZZ(2)^100 > Nemo.ZZ(2)^99
    @test ZZ(2)^100 < Nemo.ZZ(2)^101
    @test -ZZ(2)^100 < Nemo.ZZ(0)
+
+   @test cmp(ZZ(5), 7) == -1 && cmp(7, ZZ(5)) == 1
+   @test cmp(ZZ(5), Nemo.ZZ(5)) == 0
+   @test cmp(ZZ(2)^100, Nemo.ZZ(2)^99) == 1 && cmp(Nemo.ZZ(2)^99, ZZ(2)^100) == -1
+   @test cmp(ZZ(2)^100, big(2)^100) == 0
 end

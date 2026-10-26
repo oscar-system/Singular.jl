@@ -2,40 +2,55 @@
 #
 #   Decoding n_Z and n_Q coefficients in place
 #
-#   A coefficient is one machine word, either a pointer or a value carrying a
-#   tag in its low bits.
+#   Singular hands each coefficient around as a single machine word: either a
+#   pointer, or a small value stored in the word itself and marked by a tag in
+#   its lowest bits. Which of the two depends on the coefficient domain.
 #
-#     n_Z   always a pointer to a GMP mpz_t. SI_INTEGER_VARIANT 3 would tag
-#           small values the way n_Q does, but Singular is built with variant
-#           2, which has no immediate form at all.
+#     n_Z   always a pointer to a GMP integer (mpz_t, see `mpz_view` below).
+#           SI_INTEGER_VARIANT 3 would store small values in the word as n_Q
+#           does, but Singular is built with variant 2, which never does.
 #
-#     n_Q   (SI_BIGINT_VARIANT 1, longrat.cc) an immediate *integer*, or a
-#           pointer to an snumber. A fraction is always an snumber.
+#     n_Q   (SI_BIGINT_VARIANT 1, implemented in Singular's longrat.cc) either
+#           an integer stored in the word itself, or a pointer to an snumber.
+#           A fraction is always an snumber.
 #
-#   An immediate n_Q, by bit:
+#   An n_Q integer stored in the word looks like this, bit 63 on the left:
 #
 #      63                              2   1   0
 #     +---------------------------------+---+---+
 #     |             value               | 0 | 1 |
 #     +---------------------------------+---+---+
 #
-#   Only -2^28 .. 2^28-1 ever turns up there, because longrat.cc computes with
-#   the decoded value as a C int (MAX_NUM_SIZE 28; its 64-bit branch is
-#   compiled out).
+#   Bit 0 marks it; a pointer never has it set. The value is the word shifted
+#   right by two, arithmetically, so a negative value comes back sign-extended.
+#   longrat.cc only ever stores values in -2^28 .. 2^28-1 this way, because
+#   its arithmetic adds and subtracts these words as C ints (MAX_NUM_SIZE 28;
+#   its 64-bit variant is compiled out): a wider value stored here would
+#   overflow and silently give wrong results. We decode any width but only
+#   ever create values in that range.
 #
-#   An snumber, by byte:
+#   longrat.cc also turns every integer result in that range into this form,
+#   so 0 and 1 never occur as an snumber. iszero and isone below rely on that,
+#   as Singular's own nlIsZero and nlIsOne do.
+#
+#   An snumber has the following layout, the labels now giving byte offsets:
 #
 #      0         16         32  36
 #     +----------+----------+---+
 #     | mpz_t z  | mpz_t n  | s |
 #     +----------+----------+---+
 #
-#   z/n is the value and s says how to read it: 3 for an integer, where n is
-#   undefined, 1 for a fraction in lowest terms, 0 for one still to be reduced.
+#   Each mpz_t takes 16 bytes and s, a C int, 4. z is the numerator (German
+#   "Zähler") and n the denominator ("Nenner"); s says how to read them:
 #
-#   Every call into Singular costs a ccall through CxxWrap, and one that hands
-#   back a number costs a Julia allocation on top; for small coefficients that
-#   is the bulk of the work. Decoding the word here costs a few loads instead.
+#     3   an integer: the value is z, and n is undefined
+#     1   the fraction z/n in lowest terms, with n > 1
+#     0   the fraction z/n, possibly not in lowest terms, with n > 1
+#
+#   longrat.cc never sets s to 2; it tests s < 2 for "has a denominator".
+#
+#   The functions in this file read these words directly instead of calling
+#   into Singular for each coefficient.
 #
 ###############################################################################
 
@@ -50,9 +65,14 @@ const Limb = Base.GMP.Limb
 ###############################################################################
 
 """
-Non-owning view of the header of a GMP `mpz_t` that belongs to Singular. The
-limbs live behind `d`, so a view is only valid while the Singular object
-holding the `mpz_t` is reachable: every use needs a `GC.@preserve`.
+    mpz_view
+
+Copy of the header of a GMP integer (`mpz_t`, see
+https://gmplib.org/manual/Integer-Internals): `size` is the number of limbs
+in use, negated for a negative value, and `d` points to the limbs, least
+significant first. The limbs are not copied, so a view is only valid while
+the Singular object it came from is alive: every use needs a `GC.@preserve`
+of that object.
 """
 struct mpz_view
    alloc::Cint
@@ -64,94 +84,82 @@ const mpz_view_ptr = Ptr{mpz_view}
 
 @inline mpz_view(p::mpz_view_ptr) = unsafe_load(p)
 
-@inline mpz_is_zero(m::mpz_view) = m.size == 0
+@inline Base.iszero(m::mpz_view) = m.size == 0
 
-@inline mpz_sign(m::mpz_view) = m.size > 0 ? 1 : (m.size < 0 ? -1 : 0)
+@inline Base.isone(m::mpz_view) = m.size == 1 && unsafe_load(m.d) == 1
 
-@inline mpz_is_abs_one(m::mpz_view) = abs(m.size) == 1 && unsafe_load(m.d) == 1
+@inline AbstractAlgebra.is_unit(m::mpz_view) =
+   abs(m.size) == 1 && unsafe_load(m.d) == 1
 
-@inline mpz_is_one(m::mpz_view) = m.size == 1 && unsafe_load(m.d) == 1
+@inline Base.sign(m::mpz_view) = Int(sign(m.size))
 
 # The magnitude of a one-limb mpz_t is representable as an Int unless it is
 # larger than typemax(Int); -2^63 is the one negative value that still fits.
-@inline function mpz_fits_int(m::mpz_view)
+@inline function Nemo.fits(::Type{Int}, m::mpz_view)
    m.size == 0 && return true
    abs(m.size) == 1 || return false
    limb = unsafe_load(m.d)
    return limb <= (m.size > 0 ? Limb(typemax(Int)) : Limb(typemin(Int) % UInt))
 end
 
-@inline function mpz_to_int(m::mpz_view)
+# the value of `m`, which the caller has checked fits an Int
+@inline function _int(m::mpz_view)
    m.size == 0 && return 0
    limb = unsafe_load(m.d) % Int
    return m.size > 0 ? limb : -limb
 end
 
-"""
-    mpz_cmp_int(m::mpz_view, y::Int)
+@inline (::Type{T})(m::mpz_view) where {T <: Integer} =
+   Nemo.fits(Int, m) ? T(_int(m)) : T(Nemo.set!(BigInt(), m))
 
-Sign of `m - y`.
-"""
-@inline function mpz_cmp_int(m::mpz_view, y::Int)
+@inline Nemo.ZZRingElem(m::mpz_view) =
+   Nemo.fits(Int, m) ? Nemo.ZZRingElem(_int(m)) : Nemo.set!(Nemo.ZZRingElem(), m)
+
+@inline function Base.cmp(m::mpz_view, y::Int)
    # anything too large for an Int has a bigger magnitude than y
-   mpz_fits_int(m) || return mpz_sign(m)
-   return cmp(mpz_to_int(m), y)
+   Nemo.fits(Int, m) || return sign(m)
+   return cmp(_int(m), y)
 end
 
-"""
-    mpz_cmp(a::mpz_view_ptr, b::mpz_view_ptr)
+@inline Base.cmp(a::mpz_view, b::mpz_view) =
+   Int(@ccall Base.GMP.libgmp.__gmpz_cmp(Ref(a)::Ref{mpz_view},
+                                          Ref(b)::Ref{mpz_view})::Cint)
 
-Sign of `a - b`.
-"""
-@inline mpz_cmp(a::mpz_view_ptr, b::mpz_view_ptr) =
-   Int(@ccall Base.GMP.libgmp.__gmpz_cmp(a::mpz_view_ptr, b::mpz_view_ptr)::Cint)
+# Base hashes a one-limb BigInt as the corresponding Int, so this agrees with
+# hashing the BigInt without copying it where possible
+Base.hash(m::mpz_view, h::UInt) =
+   Nemo.fits(Int, m) ? hash(_int(m), h) : hash(BigInt(m), h)
 
-"""
-    bigint_set!(z::BigInt, m::mpz_view_ptr)
-
-Copy the integer at `m` into `z`.
-"""
-@inline function bigint_set!(z::BigInt, m::mpz_view_ptr)
-   @ccall Base.GMP.libgmp.__gmpz_set(z::Ref{BigInt}, m::mpz_view_ptr)::Nothing
+@inline function Nemo.set!(z::BigInt, m::mpz_view)
+   @ccall Base.GMP.libgmp.__gmpz_set(z::Ref{BigInt}, Ref(m)::Ref{mpz_view})::Nothing
    return z
 end
 
-"""
-    mpz_to(T::Type{<:Integer}, m::mpz_view_ptr)
-
-The integer at `m` as a `T`.
-"""
-function mpz_to(::Type{T}, m::mpz_view_ptr) where {T <: Integer}
-   v = mpz_view(m)
-   mpz_fits_int(v) && return T(mpz_to_int(v))
-   return T(bigint_set!(BigInt(), m))
-end
-
-"""
-    mpz_hash(m::mpz_view_ptr, h::UInt)
-
-`hash(x, h)` for the integer `x` at `m`, without copying it where possible.
-"""
-function mpz_hash(m::mpz_view_ptr, h::UInt)
-   v = mpz_view(m)
-   # Base hashes a one-limb BigInt as the corresponding Int
-   mpz_fits_int(v) && return hash(mpz_to_int(v), h)
-   return hash(bigint_set!(BigInt(), m), h)
-end
-
-"""
-    fmpz_set!(z, m::mpz_view_ptr)
-
-Copy the integer at `m` into the `ZZRingElem` `z`, which may also be given as a
-pointer into a larger FLINT object.
-"""
-@inline function fmpz_set!(z::Nemo.ZZRingElem, m::mpz_view_ptr)
-   @ccall libflint.fmpz_set_mpz(z::Ref{Nemo.ZZRingElem}, m::mpz_view_ptr)::Nothing
+# `z` may also point into a larger FLINT object, such as half of a QQFieldElem
+@inline function Nemo.set!(z::Nemo.ZZRingElem, m::mpz_view)
+   @ccall libflint.fmpz_set_mpz(z::Ref{Nemo.ZZRingElem}, Ref(m)::Ref{mpz_view})::Nothing
    return z
 end
 
-@inline function fmpz_set!(z::Ptr{Nemo.ZZRingElem}, m::mpz_view_ptr)
-   @ccall libflint.fmpz_set_mpz(z::Ptr{Nemo.ZZRingElem}, m::mpz_view_ptr)::Nothing
+@inline function Nemo.set!(z::Ptr{Nemo.ZZRingElem}, m::mpz_view)
+   @ccall libflint.fmpz_set_mpz(z::Ptr{Nemo.ZZRingElem}, Ref(m)::Ref{mpz_view})::Nothing
+   return z
+end
+
+# Overwrite the mpz_t at `z`, which must belong to a Singular number no one
+# else holds yet.
+@inline function Nemo.set!(z::mpz_view_ptr, x::Int)
+   @ccall Base.GMP.libgmp.__gmpz_set_si(z::mpz_view_ptr, x::Clong)::Nothing
+   return z
+end
+
+@inline function Nemo.set!(z::mpz_view_ptr, x::BigInt)
+   @ccall Base.GMP.libgmp.__gmpz_set(z::mpz_view_ptr, x::Ref{BigInt})::Nothing
+   return z
+end
+
+@inline function Nemo.set!(z::mpz_view_ptr, m::mpz_view)
+   @ccall Base.GMP.libgmp.__gmpz_set(z::mpz_view_ptr, Ref(m)::Ref{mpz_view})::Nothing
    return z
 end
 
@@ -181,10 +189,10 @@ paying for it.
 #
 ###############################################################################
 
-# values of snumber.s
-const RAT_UNNORMALIZED = Cint(0)   # z/n, gcd(z, n) not necessarily 1
-const RAT_NORMALIZED   = Cint(1)   # z/n in lowest terms, n > 1
-const RAT_INTEGER      = Cint(3)   # z, n undefined
+# values of snumber.s, see the top of this file
+const RAT_UNNORMALIZED = Cint(0)
+const RAT_NORMALIZED   = Cint(1)
+const RAT_INTEGER      = Cint(3)
 
 const _SR_INT = 1
 const _SNUMBER_N_OFFSET = sizeof(mpz_view)
@@ -192,8 +200,7 @@ const _SNUMBER_N_OFFSET = sizeof(mpz_view)
 # a Singular built without SING_NDEBUG puts an extra `debug` field before `s`
 const _SNUMBER_S_OFFSET = 2 * sizeof(mpz_view)
 
-# Singular computes with immediate values as C ints (MAX_NUM_SIZE 28 in
-# longrat.cc), so a wider immediate would silently overflow its arithmetic.
+# the range longrat.cc stores in the word, see the top of this file
 const _SR_MAX = (1 << 28) - 1
 const _SR_MIN = -(1 << 28)
 
@@ -222,7 +229,7 @@ also safe on a number that Singular owns.
 """
 function rational_to_bigint(p::number_ptr)
    rational_is_imm(p) && return BigInt(rational_imm(p))
-   return bigint_set!(BigInt(), rational_num_mpz(p))
+   return BigInt(mpz_view(rational_num_mpz(p)))
 end
 
 ###############################################################################
@@ -282,4 +289,32 @@ immediate value where possible. The caller keeps the fmpz alive.
 function rational_ptr_from_fmpz(d::Int, qq::coeffs_ptr)
    fmpz_is_small(d) && rational_imm_fits(d) && return rational_from_imm(d)
    return number_ptr_from_fmpz(d, qq)
+end
+
+"""
+    rational_ptr(y::Integer, qq::coeffs_ptr)
+
+An `n_Q` in `qq` equal to `y`, stored in the word itself where possible.
+"""
+function rational_ptr(y::Integer, qq::coeffs_ptr)
+   v = machine_int(y)
+   v !== nothing && rational_imm_fits(v) && return rational_from_imm(v)
+   return number_ptr(y, qq)
+end
+
+"""
+    rational_fraction(num, den::number_ptr, qq::coeffs_ptr)
+
+The `n_Q` `num/den`, for an `n_Q` integer `den > 1` coprime to `num`, which
+is an `Int`, a `BigInt` or an `mpz_view`. Takes ownership of `den`.
+
+Dividing would store num/den unreduced and then spend a gcd finding nothing
+to cancel. Inverting `den` gives the snumber {1, den, s = 1} without one
+(nlInvers in longrat.cc), and only its numerator is left to overwrite.
+"""
+function rational_fraction(num, den::number_ptr, qq::coeffs_ptr)
+   p = n_Invers(den, qq)
+   rational_is_imm(den) || n_Delete(den, qq)
+   Nemo.set!(rational_num_mpz(p), num)
+   return p
 end

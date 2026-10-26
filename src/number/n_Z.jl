@@ -21,20 +21,12 @@ function deepcopy_internal(a::n_Z, dict::IdDict)
 end
 
 # An n_Z is a pointer to a GMP integer, which we read in place rather than
-# calling into Singular; see src/libsingular/rawnumbers.jl. The views below
-# borrow Singular's limbs, so every use must sit inside a GC.@preserve of `x`.
-@inline _mpz(x::n_Z) = libSingular.integer_mpz(x.ptr)
-
-@inline _view(x::n_Z) = libSingular.mpz_view(_mpz(x))
+# calling into Singular; see src/libsingular/rawnumbers.jl. The view borrows
+# Singular's limbs, so every use must sit inside a GC.@preserve of `x`.
+@inline _view(x::n_Z) = libSingular.mpz_view(libSingular.integer_mpz(x.ptr))
 
 function hash(a::n_Z, h::UInt)
-   hh = GC.@preserve a begin
-      m = _view(a)
-      # hash as an Int where possible; Base hashes a one-limb BigInt the same
-      # way, so this does not change any hash value
-      libSingular.mpz_fits_int(m) ? hash(libSingular.mpz_to_int(m), h) :
-                                    hash(BigInt(a), h)
-   end
+   hh = GC.@preserve a hash(_view(a), h)
    return xor(hh, 0x8ab976d24b6a0cca%UInt)
 end
 
@@ -48,11 +40,11 @@ one(::Integers) = ZZ(1)
 
 zero(::Integers) = ZZ(0)
 
-isone(n::n_Z) = GC.@preserve n libSingular.mpz_is_one(_view(n))
+isone(n::n_Z) = GC.@preserve n isone(_view(n))
 
-iszero(n::n_Z) = GC.@preserve n libSingular.mpz_is_zero(_view(n))
+iszero(n::n_Z) = GC.@preserve n iszero(_view(n))
 
-is_unit(n::n_Z) = GC.@preserve n libSingular.mpz_is_abs_one(_view(n))
+is_unit(n::n_Z) = GC.@preserve n is_unit(_view(n))
 
 @doc raw"""
     numerator(n::n_Z)
@@ -105,7 +97,7 @@ function show(io::IO, n::n_Z)
    print(io, libSingular.StringEndS())
 end
 
-is_negative(x::n_Z) = GC.@preserve x libSingular.mpz_sign(_view(x)) < 0
+is_negative(x::n_Z) = GC.@preserve x sign(_view(x)) < 0
 
 ###############################################################################
 #
@@ -165,18 +157,18 @@ end
 #
 ###############################################################################
 
-function _cmp(x::n_Z, y::Integer)
+function cmp(x::n_Z, y::Integer)
    yy = libSingular.machine_int(y)
-   yy === nothing && return _cmp(x, ZZ(y))
-   return GC.@preserve x libSingular.mpz_cmp_int(_view(x), yy)
+   yy === nothing && return cmp(x, ZZ(y))
+   return GC.@preserve x cmp(_view(x), yy)
 end
 
-function _cmp(x::n_Z, y::Nemo.ZZRingElem)
-   libSingular.fmpz_is_small(y) && return _cmp(x, y.d)
-   return GC.@preserve x y libSingular.mpz_cmp(_mpz(x), libSingular.fmpz_mpz(y))
+function cmp(x::n_Z, y::Nemo.ZZRingElem)
+   libSingular.fmpz_is_small(y) && return cmp(x, y.d)
+   return GC.@preserve x y cmp(_view(x), libSingular.mpz_view(libSingular.fmpz_mpz(y)))
 end
 
-function _cmp(x::n_Z, y::n_Z)
+function cmp(x::n_Z, y::n_Z)
    c = parent(x)
    GC.@preserve x y c begin
       libSingular.n_Equal(x.ptr, y.ptr, c.ptr) && return 0
@@ -186,13 +178,15 @@ end
 
 const IntegerOrZZRingElem = Union{Integer, Nemo.ZZRingElem}
 
-==(x::n_Z, y::IntegerOrZZRingElem) = _cmp(x, y) == 0
+cmp(x::IntegerOrZZRingElem, y::n_Z) = -cmp(y, x)
 
-==(x::IntegerOrZZRingElem, y::n_Z) = _cmp(y, x) == 0
+==(x::n_Z, y::IntegerOrZZRingElem) = cmp(x, y) == 0
 
-isless(x::n_Z, y::IntegerOrZZRingElem) = _cmp(x, y) < 0
+==(x::IntegerOrZZRingElem, y::n_Z) = cmp(x, y) == 0
 
-isless(x::IntegerOrZZRingElem, y::n_Z) = _cmp(y, x) > 0
+isless(x::n_Z, y::IntegerOrZZRingElem) = cmp(x, y) < 0
+
+isless(x::IntegerOrZZRingElem, y::n_Z) = cmp(x, y) < 0
 
 ###############################################################################
 #
@@ -375,27 +369,15 @@ promote_rule(C::Type{n_Z}, ::Type{T}) where {T <: Integer} = n_Z
 
 promote_rule(C::Type{n_Z}, ::Type{Nemo.ZZRingElem}) = n_Z
 
-BigInt(n::n_Z) = GC.@preserve n libSingular.bigint_set!(BigInt(), _mpz(n))
+BigInt(n::n_Z) = GC.@preserve n BigInt(_view(n))
 Integer(n::n_Z) = BigInt(n)
 
-function (::Type{T})(n::n_Z) where {T <: Integer}
-   GC.@preserve n begin
-      m = _view(n)
-      libSingular.mpz_fits_int(m) && return T(libSingular.mpz_to_int(m))
-   end
-   return T(BigInt(n))
-end
+(::Type{T})(n::n_Z) where {T <: Integer} = GC.@preserve n T(_view(n))
 
 convert(::Type{T}, n::n_Z) where {T <: Integer} = T(n)
 
 # ZZRingElem
-function Nemo.ZZRingElem(n::n_Z)
-   GC.@preserve n begin
-      m = _view(n)
-      libSingular.mpz_fits_int(m) && return Nemo.ZZRingElem(libSingular.mpz_to_int(m))
-      return libSingular.fmpz_set!(Nemo.ZZRingElem(), _mpz(n))
-   end
-end
+Nemo.ZZRingElem(n::n_Z) = GC.@preserve n Nemo.ZZRingElem(_view(n))
 convert(::Type{Nemo.ZZRingElem}, n::n_Z) = Nemo.ZZRingElem(n)
 (::ZZRing)(n::n_Z) = Nemo.ZZRingElem(n)
 

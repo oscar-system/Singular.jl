@@ -103,39 +103,38 @@ end
 
 n_Q(n::n_Q) = n
 
-# A small enough integer is its own n_Q, so we can build the number without
-# calling into Singular at all; see src/libsingular/rawnumbers.jl.
-function n_Q(n::Integer = 0)
-   v = libSingular.machine_int(n)
-   v !== nothing && libSingular.rational_imm_fits(v) &&
-      return n_Q(libSingular.rational_from_imm(v))
-   return n_Q(libSingular.number_ptr(n, QQ.ptr))
-end
+n_Q(n::Integer = 0) = n_Q(libSingular.rational_ptr(n, QQ.ptr))
 
 n_Q(n::Nemo.ZZRingElem) =
    GC.@preserve n QQ n_Q(libSingular.rational_ptr_from_fmpz(n.d, QQ.ptr))
 
-# Both halves of a QQFieldElem are coprime with a positive denominator, which
-# is also what Singular wants, so one division is enough to build the number.
+# A QQFieldElem and a Rational are both in lowest terms with a positive
+# denominator, so rational_fraction can skip the gcd a division would cost.
 function n_Q(x::Nemo.QQFieldElem)
    c = QQ
    GC.@preserve x c begin
-      num = libSingular.rational_ptr_from_fmpz(x.num, c.ptr)
-      x.den == 1 && return n_Q(num)
+      x.den == 1 && return n_Q(libSingular.rational_ptr_from_fmpz(x.num, c.ptr))
       den = libSingular.rational_ptr_from_fmpz(x.den, c.ptr)
-      p = libSingular.n_Div(num, den, c.ptr)
-      libSingular.n_Delete(num, c.ptr)
-      libSingular.n_Delete(den, c.ptr)
-      return n_Q(p)
+      num = libSingular.fmpz_is_small(x.num) ? x.num :
+            libSingular.mpz_view(libSingular.fmpz_mpz(x.num))
+      return n_Q(libSingular.rational_fraction(num, den, c.ptr))
    end
 end
 
-n_Q(x::Rational) = n_Q(numerator(x)) // n_Q(denominator(x))
+function n_Q(x::Rational)
+   n, d = numerator(x), denominator(x)
+   isone(d) && return n_Q(n)
+   v = libSingular.machine_int(n)
+   num = v === nothing ? BigInt(n) : v
+   c = QQ
+   den = libSingular.rational_ptr(d, c.ptr)
+   return GC.@preserve c num n_Q(libSingular.rational_fraction(num, den, c.ptr))
+end
 
 function n_Q(n::n_Z)
    GC.@preserve n begin
-      v = libSingular.mpz_view(libSingular.integer_mpz(n.ptr))
-      libSingular.mpz_fits_int(v) && return n_Q(libSingular.mpz_to_int(v))
+      v = _view(n)
+      fits(Int, v) && return n_Q(Int(v))
    end
    return n_Q(libSingular.number_ptr(n, QQ.ptr))
 end

@@ -211,6 +211,29 @@ end
    end
 end
 
+@testset "n_Q.fraction_construction" begin
+   # QQ(::QQFieldElem) and QQ(::Rational) build the snumber without a gcd,
+   # relying on both inputs being in lowest terms with a positive denominator
+   for (n, d) in ((3, 7), (-3, 7), (2^28 - 1, 2^28), (-2^28, 2^28 - 1),
+                  (typemax(Int), 2), (typemin(Int) + 1, 3),
+                  (big(2)^100 + 1, 7), (7, big(3)^50),
+                  (-big(2)^100 - 1, big(3)^50))
+      ref = QQ(n) // QQ(d)
+      for a in (QQ(Nemo.QQ(n, d)), QQ(Rational{BigInt}(n, d)))
+         @test a == ref
+         @test numerator(a) == n && denominator(a) == d
+         @test a * QQ(d) == n
+         @test hash(a) == hash(ref)
+         @test Singular.libSingular.rational_state(a.ptr) ==
+               Singular.libSingular.RAT_NORMALIZED
+      end
+   end
+
+   @test QQ(3//7) == QQ(3)//QQ(7)
+   @test QQ(-3//7) == QQ(-3)//QQ(7)
+   @test QQ(5//1) == 5 && QQ(Nemo.QQ(5)) == 5
+end
+
 @testset "n_Q.nemo_comparison" begin
    @test QQ(5) == Nemo.ZZ(5)
    @test Nemo.ZZ(5) == QQ(5)
@@ -228,6 +251,11 @@ end
    @test QQ(3)//QQ(7) != 1
    @test QQ(3)//QQ(7) != 0
    @test 0 < QQ(3)//QQ(7) < 1
+
+   @test cmp(QQ(3)//QQ(7), 1) == -1 && cmp(1, QQ(3)//QQ(7)) == 1
+   @test cmp(QQ(3)//QQ(7), 3//7) == 0
+   @test cmp(QQ(5), Nemo.ZZ(5)) == 0
+   @test cmp(Nemo.QQ(1, 2), QQ(3)//QQ(7)) == 1
 end
 
 @testset "n_Q.unnormalized_coefficients" begin

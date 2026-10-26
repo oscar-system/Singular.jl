@@ -27,7 +27,7 @@ using lib4ti2_jll
 using Singular_jll
 
 import Base: BigInt, Integer, Matrix, Rational,
-             abs, checkbounds, convert, deepcopy, deepcopy_internal,
+             abs, checkbounds, cmp, convert, deepcopy, deepcopy_internal,
              denominator, div, divrem, exponent,
              gcd, gcdx, getindex, hash, inv, isequal, isless, lcm,
              length, mod, numerator, one, reduce, rem, setindex!, show,
