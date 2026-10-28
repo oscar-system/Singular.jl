@@ -540,8 +540,15 @@ end
 #
 ###############################################################################
 
-function show(io::IO, R::PolyRing)
+function _fixed_singular_poly_ring_string(R::PolyRing)
    s = libSingular.rString(R.ptr)
+   sp = split(s, "),(")
+   vnames = join([string(v) for v in R.S], ",")
+   return sp[1]*"),("*vnames*"),("*sp[3]
+end
+
+function show(io::IO, R::PolyRing)
+   s = _fixed_singular_poly_ring_string(R)
    io = pretty(io)
    if libSingular.rIsQuotientRing(R.ptr)
       print(io, LowercaseOff(), "Singular polynomial quotient ring ", s)
@@ -551,7 +558,7 @@ function show(io::IO, R::PolyRing)
 end
 
 function show(io::IO, ::MIME"text/plain", R::PolyRing)
-   s = libSingular.rString(R.ptr)
+   s = _fixed_singular_poly_ring_string(R)
    io = pretty(io)
    if libSingular.rIsQuotientRing(R.ptr)
       print(io, LowercaseOff(), "Singular polynomial quotient ring ", s)
