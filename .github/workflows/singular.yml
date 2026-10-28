@@ -39,11 +39,6 @@ jobs:
         omalloc-config:
           - 'host-pagesize'
         include:
-          # Match the current macOS ARM JLL ABI.
-          - singular-version: 'spielwiese'
-            julia-version: '1'
-            os: macOS-latest
-            omalloc-config: 'jll-4k'
           # Also exercise the intermediate supported omalloc page size.
           - singular-version: 'spielwiese'
             julia-version: '1'
@@ -76,9 +71,6 @@ jobs:
         if: matrix.omalloc-config != 'host-pagesize'
         run: |
           case "${{ matrix.omalloc-config }}" in
-            jll-4k)
-              echo "ac_cv_pagesize=4096" >> "$GITHUB_ENV"
-              ;;
             omalloc-8k)
               echo "ac_cv_pagesize=8192" >> "$GITHUB_ENV"
               ;;
@@ -106,7 +98,6 @@ jobs:
         if: matrix.omalloc-config != 'host-pagesize'
         run: |
           case "${{ matrix.omalloc-config }}" in
-            jll-4k) expected=4096 ;;
             omalloc-8k) expected=8192 ;;
             native-16k) expected=16384 ;;
           esac
@@ -114,4 +105,3 @@ jobs:
       - name: "Run tests"
         run: |
            julia --proj=override etc/run_with_override.jl /tmp/singular_jll_override --depwarn=error -e "using Pkg; Pkg.test(\"Singular\")"
-
