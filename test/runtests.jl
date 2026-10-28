@@ -10,6 +10,7 @@ import Singular.Nemo
 
 using Test
 
+include("setup-test.jl")
 include("Aqua.jl")
 include("ClosureBoxes.jl")
 
