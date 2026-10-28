@@ -25,9 +25,9 @@ end
 function Base.getindex(m::sbigintmat, i::Int, j::Int)
    (0 < i <= nrows(m) && 0 < j <= ncols(m)) || error("index out of range")
    GC.@preserve m begin
-      # not our own ptr
+      # not our own ptr, so it must not be normalized in passing
       ptr = libSingular.bigintmat_viewindex(m.ptr, Cint(i), Cint(j))
-      return libSingular.n_GetMPZ(ptr, libSingular.get_coeffs_BIGINT())
+      return libSingular.rational_to_bigint(ptr)
    end
 end
 

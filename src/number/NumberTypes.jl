@@ -57,6 +57,12 @@ n_Z(n::n_Z) = n
 n_Z(n::Integer = 0) = n_Z(libSingular.number_ptr(n, ZZ.ptr))
 n_Z(n::Nemo.ZZRingElem) = n_Z(libSingular.number_ptr(n, ZZ.ptr))
 
+# An n_Z is an mpz_t, which every coefficient domain takes through InitMPZ.
+# That reduces before calling the domain's Init, which matters for GF: its
+# nfInit reduces a long by repeated subtraction, so n_Init(2^62) hangs.
+libSingular.number_ptr(n::n_Z, c::libSingular.coeffs_ptr) =
+   GC.@preserve n libSingular.n_InitMPZ(libSingular.integer_mpz(n.ptr), c)
+
 
 const IntegerLikeTypes = Union{Integer, n_Z, Nemo.ZZRingElem}
 
@@ -96,9 +102,42 @@ mutable struct n_Q <: Nemo.FieldElem
 end
 
 n_Q(n::n_Q) = n
-n_Q(n::Integer = 0) = n_Q(libSingular.number_ptr(n, QQ.ptr))
-n_Q(n::Nemo.ZZRingElem) = n_Q(libSingular.number_ptr(n, QQ.ptr))
-n_Q(n::n_Z) = n_Q(libSingular.nApplyMapFunc(n_Z_2_n_Q, n.ptr, ZZ.ptr, QQ.ptr))
+
+n_Q(n::Integer = 0) = n_Q(libSingular.rational_ptr(n, QQ.ptr))
+
+n_Q(n::Nemo.ZZRingElem) =
+   GC.@preserve n QQ n_Q(libSingular.rational_ptr_from_fmpz(n.d, QQ.ptr))
+
+# A QQFieldElem and a Rational are both in lowest terms with a positive
+# denominator, so rational_fraction can skip the gcd a division would cost.
+function n_Q(x::Nemo.QQFieldElem)
+   c = QQ
+   GC.@preserve x c begin
+      x.den == 1 && return n_Q(libSingular.rational_ptr_from_fmpz(x.num, c.ptr))
+      den = libSingular.rational_ptr_from_fmpz(x.den, c.ptr)
+      num = libSingular.fmpz_is_small(x.num) ? x.num :
+            libSingular.mpz_view(libSingular.fmpz_mpz(x.num))
+      return n_Q(libSingular.rational_fraction(num, den, c.ptr))
+   end
+end
+
+function n_Q(x::Rational)
+   n, d = numerator(x), denominator(x)
+   isone(d) && return n_Q(n)
+   v = libSingular.machine_int(n)
+   num = v === nothing ? BigInt(n) : v
+   c = QQ
+   den = libSingular.rational_ptr(d, c.ptr)
+   return GC.@preserve c num n_Q(libSingular.rational_fraction(num, den, c.ptr))
+end
+
+function n_Q(n::n_Z)
+   GC.@preserve n begin
+      v = _view(n)
+      fits(Int, v) && return n_Q(Int(v))
+   end
+   return n_Q(libSingular.number_ptr(n, QQ.ptr))
+end
 
 
 ###############################################################################
@@ -116,8 +155,6 @@ const N_ZnRingID = Dict{BigInt, Ring}()
 
 mutable struct N_ZnRing <: Ring
    ptr::libSingular.coeffs_ptr
-   from_n_Z::Ptr{Nothing}
-   to_n_Z::Ptr{Nothing}
    refcount::Int
 
    function N_ZnRing(n::BigInt, cached::Bool = true)
@@ -126,7 +163,7 @@ mutable struct N_ZnRing <: Ring
          info = ZnmInfo(n, UInt(1))
          GC.@preserve info begin
             ptr = libSingular.nInitChar(libSingular.n_Zn, pointer_from_objref(info))
-            d = new(ptr, libSingular.n_SetMap(ZZ.ptr, ptr), libSingular.n_SetMap(ptr, ZZ.ptr), 1)
+            d = new(ptr, 1)
          end
          finalizer(_Ring_finalizer, d)
          return d
@@ -150,7 +187,7 @@ end
 
 n_Zn(c::N_ZnRing, n::Integer = 0) = n_Zn(c, libSingular.number_ptr(n, c.ptr))
 n_Zn(c::N_ZnRing, n::Nemo.ZZRingElem) = n_Zn(c, libSingular.number_ptr(n, c.ptr))
-n_Zn(c::N_ZnRing, n::n_Z) = n_Zn(c, libSingular.nApplyMapFunc(c.from_n_Z, n.ptr, ZZ.ptr, c.ptr))
+n_Zn(c::N_ZnRing, n::n_Z) = n_Zn(c, libSingular.number_ptr(n, c.ptr))
 
 
 ###############################################################################
@@ -163,15 +200,12 @@ const N_ZpFieldID = Dict{Int, Field}()
 
 mutable struct N_ZpField <: Field
    ptr::libSingular.coeffs_ptr
-   from_n_Z::Ptr{Nothing}
-   to_n_Z::Ptr{Nothing}
    refcount::Int
 
    function N_ZpField(n::Int, cached::Bool = true)
       return AbstractAlgebra.get_cached!(N_ZpFieldID, n, cached) do
          ptr = libSingular.nInitChar(libSingular.n_Zp, Ptr{Nothing}(n))
-         d = new(ptr, libSingular.n_SetMap(ZZ.ptr, ptr),
-              libSingular.n_SetMap(ptr, ZZ.ptr), 1)
+         d = new(ptr, 1)
          finalizer(_Ring_finalizer, d)
          return d
       end::N_ZpField
@@ -191,17 +225,9 @@ mutable struct n_Zp <: Nemo.FieldElem
    end
 end
 
-# FIXME: in Singular 4.2.0 the n_Zp constructors are broken for big integer
-# arguments, where they return incorrect results for e.g. big(3)^80); as a
-# workaround, we convert first to n_Z. This will be fixed in a future Singular
-# release.
-#n_Zp(c::N_ZpField, n::Integer = 0) = n_Zp(c, libSingular.number_ptr(n, c.ptr))
-#n_Zp(c::N_ZpField, n::Nemo.ZZRingElem) = n_Zp(c, libSingular.number_ptr(n, c.ptr))
-n_Zp(c::N_ZpField, n::Int = 0) = n_Zp(c, libSingular.number_ptr(n, c.ptr))
-n_Zp(c::N_ZpField, n::Integer) = n_Zp(c, n_Z(n))
-n_Zp(c::N_ZpField, n::Nemo.ZZRingElem) = n_Zp(c, n_Z(n))
-
-n_Zp(c::N_ZpField, n::n_Z) = n_Zp(c, libSingular.nApplyMapFunc(c.from_n_Z, n.ptr, ZZ.ptr, c.ptr))
+n_Zp(c::N_ZpField, n::Integer = 0) = n_Zp(c, libSingular.number_ptr(n, c.ptr))
+n_Zp(c::N_ZpField, n::Nemo.ZZRingElem) = n_Zp(c, libSingular.number_ptr(n, c.ptr))
+n_Zp(c::N_ZpField, n::n_Z) = n_Zp(c, libSingular.number_ptr(n, c.ptr))
 
 
 ###############################################################################
@@ -221,8 +247,6 @@ const N_GFieldID = Dict{Tuple{Int, Int, Symbol}, Field}()
 mutable struct N_GField <: Field
    ptr::libSingular.coeffs_ptr
    deg::Int
-   from_n_Z::Ptr{Nothing}
-   to_n_Z::Ptr{Nothing}
    refcount::Int
    S::Symbol
 
@@ -251,8 +275,7 @@ mutable struct N_GField <: Field
                ptr = GC.@preserve gfinfo libSingular.nInitChar(libSingular.n_GF, pointer_from_objref(gfinfo))
             end
          end
-         d = new(ptr, n, libSingular.n_SetMap(ZZ.ptr, ptr),
-                         libSingular.n_SetMap(ptr, ZZ.ptr), 1, S)
+         d = new(ptr, n, 1, S)
          finalizer(_Ring_finalizer, d)
          return d
       end::N_GField
@@ -274,14 +297,7 @@ end
 
 n_GF(c::N_GField, n::Integer = 0) = n_GF(c, libSingular.number_ptr(n, c.ptr))
 n_GF(c::N_GField, n::Nemo.ZZRingElem) = n_GF(c, libSingular.number_ptr(n, c.ptr))
-function n_GF(c::N_GField, n::n_Z)
-   # FIXME: the following is broken because Singular 4.2.0 does not implement
-   # a map from n_Z to n_GF, hence from_n_Z is NULL. This is corrected in the
-   # development version of Singular, but for now, just perform the conversion
-   # by first converting to BigInt
-   #return n_GF(c, libSingular.nApplyMapFunc(c.from_n_Z, n.ptr, ZZ.ptr, c.ptr))
-   return n_GF(c, BigInt(n))
-end
+n_GF(c::N_GField, n::n_Z) = n_GF(c, libSingular.number_ptr(n, c.ptr))
 
 
 ###############################################################################
@@ -336,7 +352,7 @@ end
 n_transExt(c::N_FField{T}, n::libSingular.number_ptr) where {T <: Field} = n_transExt{T}(c, n)
 n_transExt(c::N_FField, n::Integer = 0) = n_transExt(c, libSingular.number_ptr(n, c.ptr))
 n_transExt(c::N_FField, n::Nemo.ZZRingElem) = n_transExt(c, libSingular.number_ptr(n, c.ptr))
-n_transExt(c::N_FField, n::n_Z) = n_transExt(c, BigInt(n))
+n_transExt(c::N_FField, n::n_Z) = n_transExt(c, libSingular.number_ptr(n, c.ptr))
 
 
 ###############################################################################
@@ -403,7 +419,7 @@ end
 n_algExt(c::N_AlgExtField{T}, n::libSingular.number_ptr) where {T <: Field} = n_algExt{T}(c, n)
 n_algExt(c::N_AlgExtField, n::Integer = 0) = n_algExt(c, libSingular.number_ptr(n, c.ptr))
 n_algExt(c::N_AlgExtField, n::Nemo.ZZRingElem) = n_algExt(c, libSingular.number_ptr(n, c.ptr))
-n_algExt(c::N_AlgExtField, n::n_Z) = n_algExt(c, BigInt(n))
+n_algExt(c::N_AlgExtField, n::n_Z) = n_algExt(c, libSingular.number_ptr(n, c.ptr))
 
 
 ###############################################################################

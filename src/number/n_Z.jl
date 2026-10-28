@@ -20,8 +20,14 @@ function deepcopy_internal(a::n_Z, dict::IdDict)
    GC.@preserve a c return c(libSingular.n_Copy(a.ptr, c.ptr))
 end
 
+# An n_Z is a pointer to a GMP integer, which we read in place rather than
+# calling into Singular; see src/libsingular/rawnumbers.jl. The view borrows
+# Singular's limbs, so every use must sit inside a GC.@preserve of `x`.
+@inline _view(x::n_Z) = libSingular.mpz_view(libSingular.integer_mpz(x.ptr))
+
 function hash(a::n_Z, h::UInt)
-   return xor(hash(convert(BigInt, a), h), 0x8ab976d24b6a0cca%UInt)
+   hh = GC.@preserve a hash(_view(a), h)
+   return xor(hh, 0x8ab976d24b6a0cca%UInt)
 end
 
 ###############################################################################
@@ -34,17 +40,11 @@ one(::Integers) = ZZ(1)
 
 zero(::Integers) = ZZ(0)
 
-function isone(n::n_Z)
-   c = parent(n)
-   GC.@preserve n c return libSingular.n_IsOne(n.ptr, c.ptr)
-end
+isone(n::n_Z) = GC.@preserve n isone(_view(n))
 
-function iszero(n::n_Z)
-   c = parent(n)
-   GC.@preserve n c return libSingular.n_IsZero(n.ptr, c.ptr)
-end
+iszero(n::n_Z) = GC.@preserve n iszero(_view(n))
 
-is_unit(n::n_Z) = n == 1 || n == -1
+is_unit(n::n_Z) = GC.@preserve n is_unit(_view(n))
 
 @doc raw"""
     numerator(n::n_Z)
@@ -66,16 +66,7 @@ function denominator(n::n_Z)
    return one(parent(n))
 end
 
-function abs(n::n_Z)
-   c = parent(n)
-   GC.@preserve n c begin
-      if libSingular.n_GreaterZero(n.ptr, parent(n).ptr) || iszero(n)
-         return deepcopy(n)
-      else
-         return -n
-      end
-   end
-end
+abs(n::n_Z) = is_negative(n) ? -n : deepcopy(n)
 
 ###############################################################################
 #
@@ -106,8 +97,7 @@ function show(io::IO, n::n_Z)
    print(io, libSingular.StringEndS())
 end
 
-is_negative(x::n_Z) = !libSingular.n_GreaterZero(x.ptr, parent(x).ptr) &&
-                      !iszero(x)
+is_negative(x::n_Z) = GC.@preserve x sign(_view(x)) < 0
 
 ###############################################################################
 #
@@ -167,16 +157,36 @@ end
 #
 ###############################################################################
 
-==(x::n_Z, y::Integer) = (x ==  parent(x)(y))
+function cmp(x::n_Z, y::Integer)
+   yy = libSingular.machine_int(y)
+   yy === nothing && return cmp(x, ZZ(y))
+   return GC.@preserve x cmp(_view(x), yy)
+end
 
-==(x::Integer, y::n_Z) = (parent(y)(x) == y)
+function cmp(x::n_Z, y::Nemo.ZZRingElem)
+   libSingular.fmpz_is_small(y) && return cmp(x, y.d)
+   return GC.@preserve x y cmp(_view(x), libSingular.mpz_view(libSingular.fmpz_mpz(y)))
+end
 
-==(x::n_Z, y::Nemo.ZZRingElem) = Nemo.ZZRingElem(convert(BigInt, x)) == y
-==(x::Nemo.ZZRingElem, y::n_Z) = y == x
+function cmp(x::n_Z, y::n_Z)
+   c = parent(x)
+   GC.@preserve x y c begin
+      libSingular.n_Equal(x.ptr, y.ptr, c.ptr) && return 0
+      return libSingular.n_Greater(x.ptr, y.ptr, c.ptr) ? 1 : -1
+   end
+end
 
-isless(x::n_Z, y::Integer) = isless(x, parent(x)(y))
+const IntegerOrZZRingElem = Union{Integer, Nemo.ZZRingElem}
 
-isless(x::Integer, y::n_Z) = isless(parent(y)(x), y)
+cmp(x::IntegerOrZZRingElem, y::n_Z) = -cmp(y, x)
+
+==(x::n_Z, y::IntegerOrZZRingElem) = cmp(x, y) == 0
+
+==(x::IntegerOrZZRingElem, y::n_Z) = cmp(x, y) == 0
+
+isless(x::n_Z, y::IntegerOrZZRingElem) = cmp(x, y) < 0
+
+isless(x::IntegerOrZZRingElem, y::n_Z) = cmp(x, y) < 0
 
 ###############################################################################
 #
@@ -359,14 +369,15 @@ promote_rule(C::Type{n_Z}, ::Type{T}) where {T <: Integer} = n_Z
 
 promote_rule(C::Type{n_Z}, ::Type{Nemo.ZZRingElem}) = n_Z
 
-BigInt(n::n_Z) = libSingular.n_GetMPZ(n.ptr, parent(n).ptr)
+BigInt(n::n_Z) = GC.@preserve n BigInt(_view(n))
 Integer(n::n_Z) = BigInt(n)
-(::Type{T})(n::n_Z) where {T <: Integer} = T(BigInt(n))
+
+(::Type{T})(n::n_Z) where {T <: Integer} = GC.@preserve n T(_view(n))
 
 convert(::Type{T}, n::n_Z) where {T <: Integer} = T(n)
 
 # ZZRingElem
-Nemo.ZZRingElem(n::n_Z) = Nemo.ZZRingElem(BigInt(n))
+Nemo.ZZRingElem(n::n_Z) = GC.@preserve n Nemo.ZZRingElem(_view(n))
 convert(::Type{Nemo.ZZRingElem}, n::n_Z) = Nemo.ZZRingElem(n)
 (::ZZRing)(n::n_Z) = Nemo.ZZRingElem(n)
 
