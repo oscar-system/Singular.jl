@@ -40,8 +40,9 @@
 #     | mpz_t z  | mpz_t n  | s |
 #     +----------+----------+---+
 #
-#   Each mpz_t takes 16 bytes and s, a C int, 4. z is the numerator (German
-#   "Zähler") and n the denominator ("Nenner"); s says how to read them:
+#   Each mpz_t takes 16 bytes and s, a BOOLEAN, 4. On 32-bit systems an mpz_t
+#   takes 12 and BOOLEAN is a short. z is the numerator (German "Zähler") and
+#   n the denominator ("Nenner"); s says how to read them:
 #
 #     3   an integer: the value is z, and n is undefined
 #     1   the fraction z/n in lowest terms, with n > 1
@@ -189,10 +190,13 @@ paying for it.
 #
 ###############################################################################
 
+# Singular's BOOLEAN, see misc/auxiliary.h
+const _BOOLEAN = sizeof(Clong) == 8 ? Cint : Cshort
+
 # values of snumber.s, see the top of this file
-const RAT_UNNORMALIZED = Cint(0)
-const RAT_NORMALIZED   = Cint(1)
-const RAT_INTEGER      = Cint(3)
+const RAT_UNNORMALIZED = _BOOLEAN(0)
+const RAT_NORMALIZED   = _BOOLEAN(1)
+const RAT_INTEGER      = _BOOLEAN(3)
 
 const _SR_INT = 1
 const _SNUMBER_N_OFFSET = sizeof(mpz_view)
@@ -213,7 +217,7 @@ const _SR_MIN = -(1 << 28)
 @inline rational_from_imm(y::Int) = number_ptr(Ptr{number}((y << 2) + _SR_INT))
 
 @inline rational_state(p::number_ptr) =
-   unsafe_load(Ptr{Cint}(raw(p) + _SNUMBER_S_OFFSET))
+   unsafe_load(Ptr{_BOOLEAN}(raw(p) + _SNUMBER_S_OFFSET))
 
 @inline rational_num_mpz(p::number_ptr) = mpz_view_ptr(raw(p))
 
@@ -242,22 +246,10 @@ end
 #
 ###############################################################################
 
-@inline fmpz_is_small(d::Int) = unsigned(d) >> (Sys.WORD_SIZE - 2) != 1
-
-@inline fmpz_is_small(a::Nemo.ZZRingElem) = fmpz_is_small(a.d)
-
 # pointer to the mpz_t backing an fmpz that is not an immediate value
 @inline fmpz_mpz(d::Int) = mpz_view_ptr(d << 2)
 
 @inline fmpz_mpz(a::Nemo.ZZRingElem) = fmpz_mpz(a.d)
-
-# The two halves of a QQFieldElem can be written in place; only valid under
-# GC.@preserve of `a`.
-@inline fmpq_num_ptr(a::Nemo.QQFieldElem) =
-   Ptr{Nemo.ZZRingElem}(pointer_from_objref(a))
-
-@inline fmpq_den_ptr(a::Nemo.QQFieldElem) =
-   fmpq_num_ptr(a) + sizeof(Nemo.ZZRingElem)
 
 ###############################################################################
 #
@@ -276,7 +268,7 @@ A number in `cf` equal to the integer stored in the fmpz word `d`. The caller
 keeps the fmpz alive.
 """
 function number_ptr_from_fmpz(d::Int, cf::coeffs_ptr)
-   fmpz_is_small(d) && return n_Init(d, cf)
+   Nemo.__fmpz_is_small(d) && return n_Init(d, cf)
    return n_InitMPZ(fmpz_mpz(d), cf)
 end
 
@@ -287,7 +279,8 @@ An `n_Q` in `qq` equal to the integer stored in the fmpz word `d`, as an
 immediate value where possible. The caller keeps the fmpz alive.
 """
 function rational_ptr_from_fmpz(d::Int, qq::coeffs_ptr)
-   fmpz_is_small(d) && rational_imm_fits(d) && return rational_from_imm(d)
+   Nemo.__fmpz_is_small(d) && rational_imm_fits(d) &&
+      return rational_from_imm(d)
    return number_ptr_from_fmpz(d, qq)
 end
 

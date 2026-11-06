@@ -115,7 +115,7 @@ function n_Q(x::Nemo.QQFieldElem)
    GC.@preserve x c begin
       x.den == 1 && return n_Q(libSingular.rational_ptr_from_fmpz(x.num, c.ptr))
       den = libSingular.rational_ptr_from_fmpz(x.den, c.ptr)
-      num = libSingular.fmpz_is_small(x.num) ? x.num :
+      num = Nemo.__fmpz_is_small(x.num) ? x.num :
             libSingular.mpz_view(libSingular.fmpz_mpz(x.num))
       return n_Q(libSingular.rational_fraction(num, den, c.ptr))
    end
@@ -124,6 +124,8 @@ end
 function n_Q(x::Rational)
    n, d = numerator(x), denominator(x)
    isone(d) && return n_Q(n)
+   # ±1//0 is a valid Rational; the division raises Singular's error for it
+   iszero(d) && return n_Q(n) // n_Q(d)
    v = libSingular.machine_int(n)
    num = v === nothing ? BigInt(n) : v
    c = QQ

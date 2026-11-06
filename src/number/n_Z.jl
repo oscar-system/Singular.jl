@@ -164,7 +164,7 @@ function cmp(x::n_Z, y::Integer)
 end
 
 function cmp(x::n_Z, y::Nemo.ZZRingElem)
-   libSingular.fmpz_is_small(y) && return cmp(x, y.d)
+   Nemo._fmpz_is_small(y) && return cmp(x, y.d)
    return GC.@preserve x y cmp(_view(x), libSingular.mpz_view(libSingular.fmpz_mpz(y)))
 end
 

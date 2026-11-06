@@ -236,7 +236,7 @@ function cmp(x::n_Q, y::Integer)
 end
 
 cmp(x::n_Q, y::Nemo.ZZRingElem) =
-   libSingular.fmpz_is_small(y) ? cmp(x, y.d) : cmp(x, QQ(y))
+   Nemo._fmpz_is_small(y) ? cmp(x, y.d) : cmp(x, QQ(y))
 
 cmp(x::n_Q, y::Union{Rational, Nemo.QQFieldElem}) = cmp(x, QQ(y))
 
@@ -424,8 +424,8 @@ function Nemo.QQFieldElem(x::n_Q)
       # canonical form, so both halves can be filled in directly
       z = QQFieldElem()
       GC.@preserve z begin
-         Nemo.set!(libSingular.fmpq_num_ptr(z), _num(p))
-         _is_fraction(p) && Nemo.set!(libSingular.fmpq_den_ptr(z), _den(p))
+         Nemo.set!(Nemo._num_ptr(z), _num(p))
+         _is_fraction(p) && Nemo.set!(Nemo._den_ptr(z), _den(p))
       end
       return z
    end

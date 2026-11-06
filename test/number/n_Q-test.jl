@@ -232,6 +232,10 @@ end
    @test QQ(3//7) == QQ(3)//QQ(7)
    @test QQ(-3//7) == QQ(-3)//QQ(7)
    @test QQ(5//1) == 5 && QQ(Nemo.QQ(5)) == 5
+
+   @test_throws ErrorException QQ(1//0)
+   @test_throws ErrorException QQ(-1//0)
+   @test_throws ErrorException QQ(big(1)//0)
 end
 
 @testset "n_Q.nemo_comparison" begin
