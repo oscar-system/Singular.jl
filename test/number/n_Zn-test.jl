@@ -169,3 +169,19 @@ end
 
    @test g == -x^4+2*x^3-x+1
 end
+
+@testset "n_Zn.conversion_boundaries" begin
+   for m in (6, big(2)^64 + 13)
+      F, = residue_ring(ZZ, m)
+      for v in (0, 1, -1, m - 1, m, -m, m + 1, 7m, typemax(Int), typemin(Int),
+                big(2)^64, -big(3)^80)
+         # build the reference from a machine integer where the residue fits
+         res = mod(big(v), m)
+         r = res <= typemax(Int) ? F(Int(res)) : F(res)
+         @test F(v) == r
+         @test F(Nemo.ZZ(v)) == r
+         @test F(ZZ(v)) == r
+         @test iszero(F(v)) == iszero(res)
+      end
+   end
+end

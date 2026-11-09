@@ -107,7 +107,7 @@ function create_casting_functions()
         mapping_types_reversed[:BIGINT_CMD] =>
             function (vptr, R)
                 cast = libSingular.NUMBER_CMD_CASTER(vptr)
-                return libSingular.n_GetMPZ(cast, libSingular.get_coeffs_BIGINT())
+                return libSingular.rational_to_bigint(cast)
             end
         ,
         mapping_types_reversed[:BIGINTMAT_CMD] =>
