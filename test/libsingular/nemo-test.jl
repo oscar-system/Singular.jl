@@ -555,3 +555,23 @@ end
 
    @test deepcopy(f1c[1]) == f1c[1]
 end
+
+@testset "Nemo.NemoRing.intersection" begin
+   # ring with zero divisors
+   U = Nemo.residue_ring(Nemo.ZZ, Nemo.ZZRingElem(4))[1]
+   R, (x, y) = polynomial_ring(U, ["x", "y"])
+   I = Ideal(R, 2x + y, 2y^2)
+   J = Ideal(R, x^2*y + 3y)
+   K = intersection(I, J)
+   @test equal(K, Ideal(R, 2x^2*y + 2y, x^2*y^2 + 3y^2))
+   @test contains(K, I*J)
+
+   # domain
+   U, t = Nemo.polynomial_ring(Nemo.QQ, "t")
+   R, (x, y) = polynomial_ring(U, ["x", "y"])
+   I = Ideal(R, 2x*y - t*x, (2t - 1)*x*y)
+   J = Ideal(R, t*x*y - t*x)
+   K = intersection(I, J)
+   @test equal(K, Ideal(R, 4t*x*y^2 - 5t*x*y + t*x, 2t^2*x*y - 2t^2*x - t*x*y + t*x))
+   @test contains(K, I*J)
+end
