@@ -263,10 +263,14 @@ function prepare_argument(x::svector)
                              R)
 end
 
+# A third entry `1` in the argument states that it is a standard basis, which
+# sets the flag `isSB` of the interpreter, so that library procedures that check
+# `attrib(I, "isSB")` do not compute a standard basis again.
 function prepare_argument(x::sideal)
     R = parent(x).base_ring
     GC.@preserve x R return (Any[mapping_types_reversed[:IDEAL_CMD],
-                                 libSingular.copy_idealptr_to_void(x.ptr, R.ptr)],
+                                 libSingular.copy_idealptr_to_void(x.ptr, R.ptr),
+                                 Int(x.isGB)],
                              R)
 end
 
@@ -304,7 +308,8 @@ end
 function prepare_argument(x::smodule)
     R = parent(x).base_ring
     GC.@preserve x R return (Any[mapping_types_reversed[:MODUL_CMD],
-                                 libSingular.copy_idealptr_to_void(x.ptr, R.ptr)],
+                                 libSingular.copy_idealptr_to_void(x.ptr, R.ptr),
+                                 Int(x.isGB)],
                              R)
 end
 

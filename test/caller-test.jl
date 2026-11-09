@@ -256,3 +256,18 @@ end
     S = Singular.create_ring_from_singular_ring(Singular.libSingular.rCopy(R.ptr))
     @test base_ring(R) == base_ring(S)
 end
+
+@testset "caller.isGB" begin
+    # `hilbPoly` computes a standard basis unless the argument is known to be one
+    R, (x, y, z) = polynomial_ring(Singular.QQ, ["x", "y", "z"])
+    # the generators are not a standard basis, their leading ideal is (x^2, x*y)
+    I = Ideal(R, x^2 - y*z, x*y)
+    L = Ideal(R, x^2, x*y)
+    @test !I.isGB
+    hp = Singular.LibPolylib.hilbPoly(R, I)
+    @test hp == Singular.LibPolylib.hilbPoly(R, std(I))
+    @test hp != Singular.LibPolylib.hilbPoly(R, std(L))
+    I.isGB = true
+    @test Singular.LibPolylib.hilbPoly(R, I) == Singular.LibPolylib.hilbPoly(R, std(L))
+end
+
