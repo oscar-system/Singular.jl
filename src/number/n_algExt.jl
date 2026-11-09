@@ -317,9 +317,18 @@ end
 
 function (F::N_FField)(a::n_algExt)
    K = parent(a)
-   F == parent(modulus(K)) || error("Parents must coincide")
-   ptr = GC.@preserve a K F libSingular.algExt_to_transExt(a.ptr, K.ptr, F.ptr)
-   return F(ptr)
+   if F == parent(modulus(K))
+      ptr = GC.@preserve a K F libSingular.algExt_to_transExt(a.ptr, K.ptr, F.ptr)
+      return F(ptr)
+   end
+   if base_ring(F) == K
+      ptr = GC.@preserve a K F begin
+         map_ptr = libSingular.n_SetMap(K.ptr, F.ptr)
+         libSingular.nApplyMapFunc(map_ptr, a.ptr, K.ptr, F.ptr)
+      end
+      return F(ptr)
+   end
+   error("Parents must coincide")
 end
 
 ###############################################################################

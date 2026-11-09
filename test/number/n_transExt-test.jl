@@ -21,6 +21,15 @@
 
    @test K1 === K2
    @test K1 !== K3
+
+   F, (a,) = FunctionField(QQ, ["a"])
+   K, a = AlgebraicExtensionField(F, a^2 + a + 1)
+   Kt, (t,) = FunctionField(K, ["t"])
+
+   @test Kt isa Singular.N_FField
+   @test base_ring(Kt) === K
+   @test Kt(a)^2 + Kt(a) + 1 == 0
+   @test (t + Kt(a)) - t == Kt(a)
 end
 
 @testset "n_transExt.printing" begin

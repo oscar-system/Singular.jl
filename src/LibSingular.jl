@@ -4,6 +4,8 @@ using CxxWrap
 
 import ..Singular: libflint, libsingular_julia, AbstractAlgebra
 
+const Singular = parentmodule(@__MODULE__)
+
 @wrapmodule(libsingular_julia)
 
 function __init__()

@@ -22,9 +22,17 @@
    @test F isa Singular.Ring
    @test F1 isa Singular.Ring
    @test F2 isa Singular.Ring
+   @test characteristic(F) == BigInt(10)^50
    @test F == F1
    @test F != F2
    @test F1 != F2
+
+   p = parse(BigInt, "917088912668245284804231646110917")
+   Fp, = residue_ring(ZZ, p)
+   @test characteristic(Fp) == p
+   @test occursin(string(p), sprint(show, Fp))
+   @test iszero(Fp(p))
+   @test !iszero(Fp(p % BigInt(2)^30))
 
    @test_throws DomainError residue_ring(ZZ, -rand(1:99))
 

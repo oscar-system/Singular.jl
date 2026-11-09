@@ -279,6 +279,8 @@ promote_rule(C::Type{n_Zp}, ::Type{Nemo.ZZRingElem}) = n_Zp
 
 promote_rule(C::Type{n_Zp}, ::Type{n_Z}) = n_Zp
 
+promote_rule(::Type{n_Zp}, ::Type{T}) where {T <: AbstractAlgebra.FinFieldElem} = n_Zp
+
 ###############################################################################
 #
 #   Parent call functions
@@ -302,12 +304,22 @@ function (F::N_ZpField)(a::Nemo.zzModRingElem)
    return F(lift(a))
 end
 
+function (F::N_ZpField)(a::T) where {T <: AbstractAlgebra.FinFieldElem}
+   characteristic(F) == characteristic(parent(a)) || error("characteristic does not match")
+   return F(_lift_prime_field_element(a))
+end
+
 function (F::Nemo.fpField)(a::n_Zp)
    characteristic(F) == characteristic(parent(a)) || error("characteristic does not match")
    return F(Int(a))
 end
 
 function (F::Nemo.zzModRing)(a::n_Zp)
+   characteristic(F) == characteristic(parent(a)) || error("characteristic does not match")
+   return F(Int(a))
+end
+
+function (F::AbstractAlgebra.FinField)(a::n_Zp)
    characteristic(F) == characteristic(parent(a)) || error("characteristic does not match")
    return F(Int(a))
 end
@@ -319,12 +331,15 @@ end
 #
 ###############################################################################
 
-function Fp(a::Int; cached=true)
-   a <= 0 && throw(DomainError(a, "prime must be positive"))
-   a > 2^29 && throw(DomainError(a, "prime must be <= 2^29"))
-   !Nemo.is_prime(Nemo.ZZRingElem(a)) && throw(DomainError(a, "characteristic must be prime"))
+function Fp(a::IntegerLikeTypes; cached=true)
+   p = BigInt(a)
+   p <= 0 && throw(DomainError(a, "prime must be positive"))
+   !Nemo.is_prime(Nemo.ZZRingElem(p)) && throw(DomainError(a, "characteristic must be prime"))
 
-   return N_ZpField(a, cached)
+   if p <= typemax(Cint)
+      return N_ZpField(Int(p), cached)
+   end
+   return N_ZnRing(p, cached)
 end
 
 function Base.Int(a::n_Zp)

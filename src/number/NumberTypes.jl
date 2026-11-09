@@ -118,6 +118,7 @@ mutable struct N_ZnRing <: Ring
    ptr::libSingular.coeffs_ptr
    from_n_Z::Ptr{Nothing}
    to_n_Z::Ptr{Nothing}
+   modulus::BigInt
    refcount::Int
 
    function N_ZnRing(n::BigInt, cached::Bool = true)
@@ -126,7 +127,8 @@ mutable struct N_ZnRing <: Ring
          info = ZnmInfo(n, UInt(1))
          GC.@preserve info begin
             ptr = libSingular.nInitChar(libSingular.n_Zn, pointer_from_objref(info))
-            d = new(ptr, libSingular.n_SetMap(ZZ.ptr, ptr), libSingular.n_SetMap(ptr, ZZ.ptr), 1)
+            d = new(ptr, libSingular.n_SetMap(ZZ.ptr, ptr),
+                    libSingular.n_SetMap(ptr, ZZ.ptr), BigInt(n), 1)
          end
          finalizer(_Ring_finalizer, d)
          return d
@@ -495,4 +497,3 @@ mutable struct n_unknownsingularcoefficient <: Nemo.RingElem
       return a
    end
 end
-
