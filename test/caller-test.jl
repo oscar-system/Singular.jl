@@ -291,3 +291,15 @@ end
     @test Singular.LibPolylib.hilbPoly(R, J) == Singular.LibPolylib.hilbPoly(R, std(J))
     @test Singular.map_ideal(Singular.AlgebraHomomorphism(R, R, [x, y]), I).isGB
 end
+
+@testset "caller.isGB.module" begin
+    # `GKdim` computes a standard basis of a module unless it is known to be one
+    R, (x, y, z) = polynomial_ring(Singular.QQ, ["x", "y", "z"])
+    M = Singular.Module(R, vector(R, x^2 - y*z), vector(R, x*y))
+    L = Singular.Module(R, vector(R, x^2), vector(R, x*y))
+    @test !M.isGB
+    @test Singular.LibGkdim.GKdim(R, M) == Singular.LibGkdim.GKdim(R, std(M))
+    @test Singular.LibGkdim.GKdim(R, M) != Singular.LibGkdim.GKdim(R, std(L))
+    M.isGB = true
+    @test Singular.LibGkdim.GKdim(R, M) == Singular.LibGkdim.GKdim(R, std(L))
+end
