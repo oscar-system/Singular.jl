@@ -270,4 +270,3 @@ end
     I.isGB = true
     @test Singular.LibPolylib.hilbPoly(R, I) == Singular.LibPolylib.hilbPoly(R, std(L))
 end
-
