@@ -301,7 +301,6 @@ static leftv call_lib_proc_with_flags(const char * n, void ** args, int * arg_ty
     tmp.Init();
     tmp.data = args[0];
     tmp.rtyp = arg_types[0];
-    tmp.flag = 0;
     if (arg_flags[0] & 1)
       setFlag(&tmp, FLAG_STD);
     while (arg_types[i] != 0)
