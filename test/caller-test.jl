@@ -270,3 +270,13 @@ end
     I.isGB = true
     @test Singular.LibPolylib.hilbPoly(R, I) == Singular.LibPolylib.hilbPoly(R, std(L))
 end
+
+@testset "caller.isGB.setindex" begin
+    # replacing a generator of a standard basis gives an ideal that is not known to
+    # be a standard basis, so that library procedures compute one
+    R, (x, y) = polynomial_ring(Singular.QQ, ["x", "y"])
+    K = std(Ideal(R, x^2, y^2))
+    K[findfirst(==(y^2), gens(K))] = x*y + y^2
+    @test !K.isGB
+    @test Singular.LibPolylib.hilbPoly(R, K) == Singular.LibPolylib.hilbPoly(R, std(K))
+end
