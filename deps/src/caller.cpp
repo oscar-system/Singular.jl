@@ -6,6 +6,9 @@
 #include <Singular/lists.h>
 #include <misc/intvec.h>
 #include <Singular/cntrlc.h>
+#include <Singular/ipid.h>
+#include <Singular/attrib.h>
+#include <Singular/subexpr.h>
 
 
 using jlcxx::jlcxx_array_data;
@@ -208,14 +211,121 @@ static void * copy_string_to_void(std::string s)
   return reinterpret_cast<void *>(omStrDup(s.c_str()));
 }
 
-bool translate_singular_type(jl_value_t * obj, void ** args, int * argtypes, int i)
+// An argument is passed as `[type, pointer]` or as `[type, pointer, flags]`, where
+// bit 0 of `flags` states that the argument is a standard basis (the attribute
+// "isSB", `FLAG_STD`, of the Singular interpreter).
+bool translate_singular_type(jl_value_t * obj, void ** args, int * argtypes, int * argflags, int i)
 {
   jl_array_t * array = reinterpret_cast<jl_array_t *>(obj);
   int          cmd = static_cast<int>(jl_unbox_int64(jl_array_ptr_ref(array, 0)));
   void *       arg = jl_unbox_voidpointer(jl_array_ptr_ref(array, 1));
   args[i] = arg;
   argtypes[i] = cmd;
+  argflags[i] = (jl_array_len(array) > 2)
+                  ? static_cast<int>(jl_unbox_int64(jl_array_ptr_ref(array, 2)))
+                  : 0;
   return true;
+}
+
+// The two helpers below are copies of the static functions `iiCallLibProcBegin`
+// and `iiCallLibProcEnd` of Singular/iplib.cc, which are needed to call a library
+// procedure with arguments that carry flags.
+static void call_lib_proc_begin()
+{
+  idhdl tmp_ring = NULL;
+  if (currRing != NULL)
+  {
+    if ((currRingHdl != NULL) && (IDRING(currRingHdl) != currRing))
+    {
+      // clean up things depending on currRingHdl:
+      sLastPrinted.CleanUp(IDRING(currRingHdl));
+      sLastPrinted.Init();
+    }
+    // need to define a ring-hdl for currRingHdl
+    tmp_ring = enterid(" tmpRing", myynest, RING_CMD, &IDROOT, FALSE);
+    IDRING(tmp_ring) = rIncRefCnt(currRing);
+    rSetHdl(tmp_ring);
+  }
+}
+
+static void call_lib_proc_end(idhdl save_ringhdl, ring save_ring)
+{
+  if ((currRing != NULL) && (currRing != save_ring))
+  {
+    idhdl hh = IDROOT;
+    idhdl prev = NULL;
+    while ((hh != currRingHdl) && (hh != NULL))
+    {
+      prev = hh;
+      hh = hh->next;
+    }
+    if ((hh != NULL) && (strcmp(IDID(hh), " tmpRing") == 0))
+    {
+      rDecRefCnt(currRing);
+      if (prev == NULL)
+        IDROOT = hh->next;
+      else
+        prev->next = hh->next;
+      omFree((ADDRESS)IDID(hh));
+      omFreeBin((ADDRESS)hh, idrec_bin);
+    }
+  }
+  currRingHdl = save_ringhdl;
+  currRing = save_ring;
+}
+
+// Same as `ii_CallLibProcM` of Singular/iplib.cc, but `arg_flags[i]` is set as the
+// flag `FLAG_STD` of the i-th argument if bit 0 of `arg_flags[i]` is set, such that
+// the interpreter knows that an ideal or module is a standard basis. This is the
+// only difference.
+static leftv call_lib_proc_with_flags(const char * n, void ** args, int * arg_types,
+                                      int * arg_flags, const ring R, BOOLEAN & err)
+{
+  idhdl h = ggetid(n);
+  if ((h == NULL) || (IDTYP(h) != PROC_CMD))
+  {
+    err = 2;
+    return NULL;
+  }
+  // ring handling
+  idhdl save_ringhdl = currRingHdl;
+  ring  save_ring = currRing;
+  rChangeCurrRing(R);
+  call_lib_proc_begin();
+  // arguments
+  if (arg_types[0] != 0)
+  {
+    sleftv tmp;
+    leftv  tt = &tmp;
+    int    i = 1;
+    tmp.Init();
+    tmp.data = args[0];
+    tmp.rtyp = arg_types[0];
+    if (arg_flags[0] & 1)
+      setFlag(&tmp, FLAG_STD);
+    while (arg_types[i] != 0)
+    {
+      tt->next = (leftv)omAlloc0Bin(sleftv_bin);
+      tt = tt->next;
+      tt->rtyp = arg_types[i];
+      tt->data = args[i];
+      if (arg_flags[i] & 1)
+        setFlag(tt, FLAG_STD);
+      i++;
+    }
+    err = iiMake_proc(h, currPack, &tmp);
+  }
+  else
+    err = iiMake_proc(h, currPack, NULL);
+  call_lib_proc_end(save_ringhdl, save_ring);
+  if (err == FALSE)
+  {
+    leftv res = (leftv)omAllocBin(sleftv_bin);
+    memcpy(res, &iiRETURNEXPR, sizeof(sleftv));
+    iiRETURNEXPR.Init();
+    return res;
+  }
+  return NULL;
 }
 
 jl_value_t * get_julia_type_from_sleftv(leftv ret)
@@ -276,19 +386,27 @@ jl_value_t * call_singular_library_procedure(std::string                   s,
   int    len = arguments.size();
   void * args[len];
   int    argtypes[len + 1];
+  int    argflags[len + 1];
   argtypes[len] = 0;
+  argflags[len] = 0;
+  bool   have_flags = false;
   for (int i = 0; i < len; i++)
   {
-    bool result = translate_singular_type(arguments[i], args, argtypes, i);
+    bool result = translate_singular_type(arguments[i], args, argtypes, argflags, i);
     if (!result)
     {
       jl_error("Could not convert argument");
     }
+    if (argflags[i] != 0)
+      have_flags = true;
   }
   BOOLEAN      err;
   jl_value_t * retObj;
   si_set_signals();
-  leftv        ret = ii_CallLibProcM(s.c_str(), args, argtypes, r, err);
+  // calls without flagged arguments use the library function of Singular
+  leftv        ret = have_flags
+                       ? call_lib_proc_with_flags(s.c_str(), args, argtypes, argflags, r, err)
+                       : ii_CallLibProcM(s.c_str(), args, argtypes, r, err);
   si_reset_signals();
   if (err)
   {

@@ -256,3 +256,50 @@ end
     S = Singular.create_ring_from_singular_ring(Singular.libSingular.rCopy(R.ptr))
     @test base_ring(R) == base_ring(S)
 end
+
+@testset "caller.isGB" begin
+    # `hilbPoly` computes a standard basis unless the argument is known to be one
+    R, (x, y, z) = polynomial_ring(Singular.QQ, ["x", "y", "z"])
+    # the generators are not a standard basis, their leading ideal is (x^2, x*y)
+    I = Ideal(R, x^2 - y*z, x*y)
+    L = Ideal(R, x^2, x*y)
+    @test !I.isGB
+    hp = Singular.LibPolylib.hilbPoly(R, I)
+    @test hp == Singular.LibPolylib.hilbPoly(R, std(I))
+    @test hp != Singular.LibPolylib.hilbPoly(R, std(L))
+    I.isGB = true
+    @test Singular.LibPolylib.hilbPoly(R, I) == Singular.LibPolylib.hilbPoly(R, std(L))
+end
+
+@testset "caller.isGB.setindex" begin
+    # replacing a generator of a standard basis gives an ideal that is not known to
+    # be a standard basis, so that library procedures compute one
+    R, (x, y) = polynomial_ring(Singular.QQ, ["x", "y"])
+    K = std(Ideal(R, x^2, y^2))
+    K[findfirst(==(y^2), gens(K))] = x*y + y^2
+    @test !K.isGB
+    @test Singular.LibPolylib.hilbPoly(R, K) == Singular.LibPolylib.hilbPoly(R, std(K))
+end
+
+@testset "caller.isGB.map_ideal" begin
+    # the image of a standard basis is not a standard basis in general, but it is
+    # for a map that fixes the variables
+    R, (x, y) = polynomial_ring(Singular.QQ, ["x", "y"])
+    I = std(Ideal(R, x^2, y^2))
+    J = Singular.map_ideal(Singular.AlgebraHomomorphism(R, R, [x, x + y]), I)
+    @test !J.isGB
+    @test Singular.LibPolylib.hilbPoly(R, J) == Singular.LibPolylib.hilbPoly(R, std(J))
+    @test Singular.map_ideal(Singular.AlgebraHomomorphism(R, R, [x, y]), I).isGB
+end
+
+@testset "caller.isGB.module" begin
+    # `GKdim` computes a standard basis of a module unless it is known to be one
+    R, (x, y, z) = polynomial_ring(Singular.QQ, ["x", "y", "z"])
+    M = Singular.Module(R, vector(R, x^2 - y*z), vector(R, x*y))
+    L = Singular.Module(R, vector(R, x^2), vector(R, x*y))
+    @test !M.isGB
+    @test Singular.LibGkdim.GKdim(R, M) == Singular.LibGkdim.GKdim(R, std(M))
+    @test Singular.LibGkdim.GKdim(R, M) != Singular.LibGkdim.GKdim(R, std(L))
+    M.isGB = true
+    @test Singular.LibGkdim.GKdim(R, M) == Singular.LibGkdim.GKdim(R, std(L))
+end
