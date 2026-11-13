@@ -280,3 +280,14 @@ end
     @test !K.isGB
     @test Singular.LibPolylib.hilbPoly(R, K) == Singular.LibPolylib.hilbPoly(R, std(K))
 end
+
+@testset "caller.isGB.map_ideal" begin
+    # the image of a standard basis is not a standard basis in general, but it is
+    # for a map that fixes the variables
+    R, (x, y) = polynomial_ring(Singular.QQ, ["x", "y"])
+    I = std(Ideal(R, x^2, y^2))
+    J = Singular.map_ideal(Singular.AlgebraHomomorphism(R, R, [x, x + y]), I)
+    @test !J.isGB
+    @test Singular.LibPolylib.hilbPoly(R, J) == Singular.LibPolylib.hilbPoly(R, std(J))
+    @test Singular.map_ideal(Singular.AlgebraHomomorphism(R, R, [x, y]), I).isGB
+end
