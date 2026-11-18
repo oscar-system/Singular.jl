@@ -273,6 +273,11 @@ jl_value_t * call_singular_library_procedure(std::string                   s,
                                              ring                          r,
                                              jlcxx::ArrayRef<jl_value_t *> arguments)
 {
+  const BITSET saved_options = si_opt_1;
+  const BITSET saved_verbose_options = si_opt_2;
+  const ring saved_ring = currRing;
+  const BITSET saved_ring_options = saved_ring == nullptr ? 0 : saved_ring->options;
+  const BITSET saved_call_ring_options = r == nullptr ? 0 : r->options;
   int    len = arguments.size();
   void * args[len];
   int    argtypes[len + 1];
@@ -285,25 +290,55 @@ jl_value_t * call_singular_library_procedure(std::string                   s,
       jl_error("Could not convert argument");
     }
   }
-  BOOLEAN      err;
+  BOOLEAN      err = FALSE;
   jl_value_t * retObj;
+  jl_value_t * exception = nullptr;
+  leftv        ret = nullptr;
+  JL_GC_PUSH1(&exception);
   si_set_signals();
-  leftv        ret = ii_CallLibProcM(s.c_str(), args, argtypes, r, err);
-  si_reset_signals();
-  if (err)
+  JL_TRY
   {
+    ret = ii_CallLibProcM(s.c_str(), args, argtypes, r, err);
+  }
+  JL_CATCH
+  {
+#if JULIA_VERSION_MAJOR > 1 || JULIA_VERSION_MINOR >= 11
+    exception = jl_current_exception(jl_current_task);
+#else
+    exception = jl_current_exception();
+#endif
+  }
+  si_reset_signals();
+  if (err || exception != nullptr)
+  {
+    SI_RESTORE_OPT(saved_options, saved_verbose_options);
+    if (saved_ring != nullptr)
+      saved_ring->options = saved_ring_options;
+    if (r != nullptr)
+      r->options = saved_call_ring_options;
     inerror = 0;
     errorreported = 0;
-    if (err==2) jl_error("Could not call function");
+    if (exception != nullptr)
+    {
+      JL_GC_POP();
+      jl_throw(exception);
+    }
+    if (err==2)
+    {
+      JL_GC_POP();
+      jl_error("Could not call function");
+    }
     else if(err==1)
     {
       std::stringstream ss;
       for (auto & si : singular_error_log)
         ss << si << std::endl;
       singular_error_log.clear();
+      JL_GC_POP();
       jl_error(ss.str().c_str());
     }
   }
+  JL_GC_POP();
   if (ret->next != NULL)
   {
     int          len = ret->listLength();
