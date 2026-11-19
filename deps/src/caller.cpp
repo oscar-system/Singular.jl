@@ -6,6 +6,9 @@
 #include <Singular/lists.h>
 #include <misc/intvec.h>
 #include <Singular/cntrlc.h>
+#include <Singular/ipid.h>
+#include <Singular/attrib.h>
+#include <Singular/subexpr.h>
 
 
 using jlcxx::jlcxx_array_data;
@@ -208,13 +211,19 @@ static void * copy_string_to_void(std::string s)
   return reinterpret_cast<void *>(omStrDup(s.c_str()));
 }
 
-bool translate_singular_type(jl_value_t * obj, void ** args, int * argtypes, int i)
+// An argument is passed as `[type, pointer]` or as `[type, pointer, flags]`, where
+// bit 0 of `flags` states that the argument is a standard basis (the attribute
+// "isSB", `FLAG_STD`, of the Singular interpreter).
+bool translate_singular_type(jl_value_t * obj, void ** args, int * argtypes, int * argflags, int i)
 {
   jl_array_t * array = reinterpret_cast<jl_array_t *>(obj);
   int          cmd = static_cast<int>(jl_unbox_int64(jl_array_ptr_ref(array, 0)));
   void *       arg = jl_unbox_voidpointer(jl_array_ptr_ref(array, 1));
   args[i] = arg;
   argtypes[i] = cmd;
+  argflags[i] = (jl_array_len(array) > 2)
+                  ? static_cast<int>(jl_unbox_int64(jl_array_ptr_ref(array, 2)))
+                  : 0;
   return true;
 }
 
@@ -276,10 +285,12 @@ jl_value_t * call_singular_library_procedure(std::string                   s,
   int    len = arguments.size();
   void * args[len];
   int    argtypes[len + 1];
+  int    argflags[len + 1];
   argtypes[len] = 0;
+  argflags[len] = 0;
   for (int i = 0; i < len; i++)
   {
-    bool result = translate_singular_type(arguments[i], args, argtypes, i);
+    bool result = translate_singular_type(arguments[i], args, argtypes, argflags, i);
     if (!result)
     {
       jl_error("Could not convert argument");
@@ -288,7 +299,7 @@ jl_value_t * call_singular_library_procedure(std::string                   s,
   BOOLEAN      err;
   jl_value_t * retObj;
   si_set_signals();
-  leftv        ret = ii_CallLibProcM(s.c_str(), args, argtypes, r, err);
+  leftv        ret = ii_CallLibProcMFlags(s.c_str(), args, argtypes, argflags, r, err);
   si_reset_signals();
   if (err)
   {
