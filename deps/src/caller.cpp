@@ -273,6 +273,11 @@ jl_value_t * call_singular_library_procedure(std::string                   s,
                                              ring                          r,
                                              jlcxx::ArrayRef<jl_value_t *> arguments)
 {
+  const BITSET saved_options = si_opt_1;
+  const BITSET saved_verbose_options = si_opt_2;
+  const ring saved_ring = currRing;
+  const BITSET saved_ring_options = saved_ring == nullptr ? 0 : saved_ring->options;
+  const BITSET saved_call_ring_options = r == nullptr ? 0 : r->options;
   int    len = arguments.size();
   void * args[len];
   int    argtypes[len + 1];
@@ -285,16 +290,38 @@ jl_value_t * call_singular_library_procedure(std::string                   s,
       jl_error("Could not convert argument");
     }
   }
-  BOOLEAN      err;
+  BOOLEAN      err = FALSE;
   jl_value_t * retObj;
+  leftv        ret = nullptr;
   si_set_signals();
-  leftv        ret = ii_CallLibProcM(s.c_str(), args, argtypes, r, err);
+  JL_TRY
+  {
+    ret = ii_CallLibProcM(s.c_str(), args, argtypes, r, err);
+  }
+  JL_CATCH
+  {
+    si_reset_signals();
+    SI_RESTORE_OPT(saved_options, saved_verbose_options);
+    if (saved_ring != nullptr)
+      saved_ring->options = saved_ring_options;
+    if (r != nullptr)
+      r->options = saved_call_ring_options;
+    inerror = 0;
+    errorreported = 0;
+    jl_rethrow();
+  }
   si_reset_signals();
   if (err)
   {
+    SI_RESTORE_OPT(saved_options, saved_verbose_options);
+    if (saved_ring != nullptr)
+      saved_ring->options = saved_ring_options;
+    if (r != nullptr)
+      r->options = saved_call_ring_options;
     inerror = 0;
     errorreported = 0;
-    if (err==2) jl_error("Could not call function");
+    if (err==2)
+      jl_error("Could not call function");
     else if(err==1)
     {
       std::stringstream ss;
