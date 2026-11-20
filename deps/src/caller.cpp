@@ -292,9 +292,7 @@ jl_value_t * call_singular_library_procedure(std::string                   s,
   }
   BOOLEAN      err = FALSE;
   jl_value_t * retObj;
-  jl_value_t * exception = nullptr;
   leftv        ret = nullptr;
-  JL_GC_PUSH1(&exception);
   si_set_signals();
   JL_TRY
   {
@@ -302,14 +300,18 @@ jl_value_t * call_singular_library_procedure(std::string                   s,
   }
   JL_CATCH
   {
-#if JULIA_VERSION_MAJOR > 1 || JULIA_VERSION_MINOR >= 11
-    exception = jl_current_exception(jl_current_task);
-#else
-    exception = jl_current_exception();
-#endif
+    si_reset_signals();
+    SI_RESTORE_OPT(saved_options, saved_verbose_options);
+    if (saved_ring != nullptr)
+      saved_ring->options = saved_ring_options;
+    if (r != nullptr)
+      r->options = saved_call_ring_options;
+    inerror = 0;
+    errorreported = 0;
+    jl_rethrow();
   }
   si_reset_signals();
-  if (err || exception != nullptr)
+  if (err)
   {
     SI_RESTORE_OPT(saved_options, saved_verbose_options);
     if (saved_ring != nullptr)
@@ -318,27 +320,17 @@ jl_value_t * call_singular_library_procedure(std::string                   s,
       r->options = saved_call_ring_options;
     inerror = 0;
     errorreported = 0;
-    if (exception != nullptr)
-    {
-      JL_GC_POP();
-      jl_throw(exception);
-    }
     if (err==2)
-    {
-      JL_GC_POP();
       jl_error("Could not call function");
-    }
     else if(err==1)
     {
       std::stringstream ss;
       for (auto & si : singular_error_log)
         ss << si << std::endl;
       singular_error_log.clear();
-      JL_GC_POP();
       jl_error(ss.str().c_str());
     }
   }
-  JL_GC_POP();
   if (ret->next != NULL)
   {
     int          len = ret->listLength();
