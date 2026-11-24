@@ -98,6 +98,29 @@ end
         options_after = Singular.libSingular.call_interpreter("option();")[2]
         @test options_after == options_before
 
+        @test_throws ErrorException Singular.low_level_caller("issue6421_error", Any[])
+        options_after = Singular.libSingular.call_interpreter("option();")[2]
+        @test options_after == options_before
+
+        @test_throws ErrorException Singular.low_level_caller_ring("issue6421_missing", R, Any[])
+        options_after = Singular.libSingular.call_interpreter("option();")[2]
+        @test options_after == options_before
+
+        current_ring_setup = Singular.libSingular.call_interpreter("""
+            ring issue6421_current_ring=0,(y),dp;
+            option(noredSB); option(noredTail); option(noredThrough); option(nointStrategy);
+            """)
+        @test !current_ring_setup[1]
+        try
+            current_ring_options_before = Singular.libSingular.call_interpreter("option();")[2]
+            @test_throws ErrorException Singular.low_level_caller("issue6421_error", Any[])
+            current_ring_options_after = Singular.libSingular.call_interpreter("option();")[2]
+            @test current_ring_options_after == current_ring_options_before
+        finally
+            current_ring_cleanup = Singular.libSingular.call_interpreter("kill issue6421_current_ring;")
+            @test !current_ring_cleanup[1]
+        end
+
         @test Singular.low_level_caller_ring("issue6421_success", R, Any[]) == 1
         options_after_success = Singular.libSingular.call_interpreter("option();")[2]
         @test occursin("redSB", options_after_success)

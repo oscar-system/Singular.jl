@@ -13,6 +13,23 @@ using jlcxx::jlcxx_array_data;
 // Internal singular interpreter variable
 extern int inerror;
 
+static void restore_singular_state_after_error(
+    const BITSET saved_options,
+    const BITSET saved_verbose_options,
+    const ring   saved_ring,
+    const BITSET saved_ring_options,
+    const ring   call_ring,
+    const BITSET saved_call_ring_options)
+{
+  SI_RESTORE_OPT(saved_options, saved_verbose_options);
+  if (saved_ring != nullptr)
+    saved_ring->options = saved_ring_options;
+  if (call_ring != nullptr)
+    call_ring->options = saved_call_ring_options;
+  inerror = 0;
+  errorreported = 0;
+}
+
 static jl_value_t * jl_int64_vector_type;
 static jl_value_t * jl_int64_matrix_type;
 
@@ -301,25 +318,23 @@ jl_value_t * call_singular_library_procedure(std::string                   s,
   JL_CATCH
   {
     si_reset_signals();
-    SI_RESTORE_OPT(saved_options, saved_verbose_options);
-    if (saved_ring != nullptr)
-      saved_ring->options = saved_ring_options;
-    if (r != nullptr)
-      r->options = saved_call_ring_options;
-    inerror = 0;
-    errorreported = 0;
+    restore_singular_state_after_error(saved_options,
+                                       saved_verbose_options,
+                                       saved_ring,
+                                       saved_ring_options,
+                                       r,
+                                       saved_call_ring_options);
     jl_rethrow();
   }
   si_reset_signals();
   if (err)
   {
-    SI_RESTORE_OPT(saved_options, saved_verbose_options);
-    if (saved_ring != nullptr)
-      saved_ring->options = saved_ring_options;
-    if (r != nullptr)
-      r->options = saved_call_ring_options;
-    inerror = 0;
-    errorreported = 0;
+    restore_singular_state_after_error(saved_options,
+                                       saved_verbose_options,
+                                       saved_ring,
+                                       saved_ring_options,
+                                       r,
+                                       saved_call_ring_options);
     if (err==2)
       jl_error("Could not call function");
     else if(err==1)
