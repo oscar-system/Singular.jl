@@ -61,6 +61,8 @@ function setindex!(I::sideal{S}, p::S, i::Int) where S <: SPolyUnion
       end
       p1 = libSingular.p_Copy(p.ptr, R.ptr)
       libSingular.setindex_internal(I.ptr, p1, Cint(i - 1))
+      # the new generators are not necessarily a standard basis anymore
+      I.isGB = false
       nothing
    end
 end

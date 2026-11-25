@@ -51,7 +51,9 @@ function map_ideal(f::Map(SAlgHom), I::sideal)
        break
      end
    end
-   if equal_ordering
+   # the image of a standard basis is only known to be one if the variables are
+   # mapped to the variables
+   if equal_ordering && f.image == gens(f.codomain)
      J.isGB = I.isGB
    end
    return J
