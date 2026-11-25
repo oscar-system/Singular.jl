@@ -432,7 +432,7 @@ for (rw, rew) in [(:RingWrapper, :RingElemWrapper),
 end
 
 # one input, one non-wrapped output
-for op in (:iszero, :isone, :(AbstractAlgebra.is_zero_divisor))
+for op in (:iszero, :isone, :is_unit, :(AbstractAlgebra.is_zero_divisor))
    @eval begin
       function ($op)(a::($rew){S, T}) where {S, T}
          return ($op)(a.data)
@@ -459,7 +459,7 @@ for op in (:(==), )
 end
 
 # two inputs, one wrapped output
-for op in (:+, :-, :*, :div, :gcd)
+for op in (:+, :-, :*, :div, :gcd, :lcm)
    @eval begin
       function ($op)(a::($rew){S, T}, b::($rew){S, T}) where {S, T}
          return ($rew){S, T}(($op)(a.data, b.data), a.parent)
