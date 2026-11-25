@@ -78,6 +78,21 @@ function build_stamp(src_hash::AbstractString, singular_prefix::AbstractString)
    return string(src_hash, "\n", singular_prefix, "\n", mtime(Singular_jll.libsingular_path), "\n")
 end
 
+function omalloc_page_size(config_path::AbstractString=joinpath(
+    jll_artifact_dir(Singular_jll), "include", "omalloc", "omConfig.h"))
+    isfile(config_path) || error("Could not find omalloc configuration at $(config_path)")
+
+    for line in eachline(config_path)
+        match_result = match(
+            r"^#\s*define\s+SIZEOF_SYSTEM_PAGE\s+([0-9]+)(?:\s|$)",
+            strip(line),
+        )
+        match_result === nothing || return parse(Int, match_result.captures[1])
+    end
+
+    error("Could not determine omalloc page size from $(config_path)")
+end
+
 function build_code(src_hash)
    depsdir = abspath(joinpath(@__DIR__, "..", "deps"))
    srcdir = joinpath(depsdir, "src")
