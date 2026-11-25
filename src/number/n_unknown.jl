@@ -547,7 +547,7 @@ CoefficientRingID = Dict{Nemo.Ring, Any}()
   return :($S)
 end
 
-function CoefficientRing(R::T, cached::Bool = true) where {T <: Nemo.Ring}
+function _wrapped_coefficient_ring(R::T, cached::Bool = true) where {T <: Nemo.Ring}
   U = elem_type(T)
   wrappertype = mutable_field_or_ring_type_wrapper(T, U)
   wrapperelemtype = elem_type(wrappertype)
@@ -562,4 +562,16 @@ function CoefficientRing(R::T, cached::Bool = true) where {T <: Nemo.Ring}
     end
     return rettype(newring)
   end::rettype
+end
+
+function CoefficientRing(R::T, cached::Bool = true) where {T <: AbstractAlgebra.FinField}
+  p = Nemo.characteristic(R)
+  if Nemo.order(R) == p && p > 2^29
+    return Fp(p; cached=cached)
+  end
+  return _wrapped_coefficient_ring(R, cached)
+end
+
+function CoefficientRing(R::T, cached::Bool = true) where {T <: Nemo.Ring}
+  return _wrapped_coefficient_ring(R, cached)
 end

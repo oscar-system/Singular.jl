@@ -7,8 +7,9 @@ end
 
 # Integers mod p
 
-Integers mod a prime $p$ are implemented via the Singular `n_Zp` type for any positive
-prime modulus less than $2^{29}$.
+Integers mod a prime $p$ are implemented via Singular's machine-integer `n_Zp`
+representation when the modulus fits and via its GMP-backed modular representation
+otherwise.
 
 The associated field of integers mod $p$ is represented by a parent object which can
 be constructed by a call to the `Fp` constructor.
@@ -19,9 +20,10 @@ $p$ are given in the following table according to the library providing them.
  Library        | Element type  | Parent type
 ----------------|---------------|--------------------
 Singular        | `n_Zp`        | `Singular.N_ZpField`
+Singular (GMP)  | `n_Zn`        | `Singular.N_ZnRing`
 
-All integer mod $p$ element types belong directly to the abstract type `FieldElem` and
-all the parent object types belong to the abstract type `Field`.
+The GMP-backed representation is shared with general residue rings. Singular marks
+its coefficient domain as a field when the modulus is prime.
 
 ## Integer mod $p$ functionality
 
@@ -41,13 +43,14 @@ The following constructors are available to create the field of integers modulo 
 prime $p$.
 
 ```julia
-Fp(p::Int; cached=true)
+Fp(p::Integer; cached=true)
 ```
 
-Construct the field of integers modulo $p$. By default, the field is cached, so that
-all fields of integers modulo $p$ have the same parent object. If this is not the
-desired behaviour, the `cached` parameter can be set to `false`. If $p$ is not a prime
-or $p$ is not in the range $(0, 2^{29})$, an exception is raised.
+Construct the field of integers modulo $p$. Singular chooses the coefficient
+representation according to the size of $p$. By default, the result is cached, so
+that repeated constructions use the same parent object. If this is not desired, the
+`cached` parameter can be set to `false`. If $p$ is not positive and prime, an
+exception is raised.
 
 Given a field $R$ of integers modulo $p$, we also have the following coercions in
 addition to the standard ones expected.
@@ -98,4 +101,3 @@ julia> a = R(5)
 julia> b = Int(a)
 5
 ```
-

@@ -99,8 +99,9 @@ mutable struct singular_coeff_ring_struct
     cfGreaterZero::Ptr{Cvoid}
     cfWriteLong::Ptr{Cvoid}
     cfCoeffWrite::Ptr{Cvoid}
+    cfFactorize::Ptr{Cvoid}
 end
 
 function singular_coeff_ring_struct()
-    singular_coeff_ring_struct(Tuple(cat([0 for i in 1:5], [Ptr{Cvoid}(0) for i in 1:27], dims = 1))...)
+    singular_coeff_ring_struct(Tuple(cat([0 for i in 1:5], [Ptr{Cvoid}(0) for i in 1:28], dims = 1))...)
 end

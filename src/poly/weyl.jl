@@ -49,7 +49,7 @@ function WeylAlgebra(R::Nemo.Ring, s::AbstractVector{<:VarName};
                      ordering = :degrevlex, ordering2::Symbol = :comp1min,
                      cached::Bool = true, degree_bound::Int = 0)
    s = vcat(map(Symbol, s), [Symbol('d', sym) for sym in s])
-   RR = CoefficientRing(R)
+   RR = _wrapped_coefficient_ring(R)
    return _WeylAlgebra(RR, map(Symbol, s), ordering, ordering2, cached, degree_bound)
 end
 
@@ -58,7 +58,7 @@ function WeylAlgebra(R::Nemo.Ring, s::AbstractMatrix{<:VarName};
                      cached::Bool = true, degree_bound::Int = 0)
    size(s)[1] == 2 || throw(ArgumentError("s must be either a vector or a matrix with two rows"))
    s = vcat(view(s, 1, :), view(s, 2, :))
-   RR = CoefficientRing(R)
+   RR = _wrapped_coefficient_ring(R)
    return _WeylAlgebra(RR, map(Symbol, s), ordering, ordering2, cached, degree_bound)
 end
 
@@ -81,4 +81,3 @@ macro WeylAlgebra(R, s, n)
    v1 = Expr(:block, exp1, v..., S)
    return esc(v1)
 end
-

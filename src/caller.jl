@@ -195,7 +195,7 @@ function create_ring_from_singular_ring(r::libSingular.ring_ptr)
       cf = libSingular.nCopyCoeff(c)
       data_ptr = libSingular.nGetCoeffData(cf)
       R = unsafe_pointer_to_objref(data_ptr)
-      basering = CoefficientRing(R)  # FIXME: should we set cache=false ?
+      basering = _wrapped_coefficient_ring(R)  # FIXME: should we set cache=false ?
    else
       basering = N_UnknownSingularCoefficientRing(libSingular.nCopyCoeff(c))
    end

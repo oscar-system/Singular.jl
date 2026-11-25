@@ -383,8 +383,8 @@ Return a tuple $K, a$ consisting of a function field $K$ over the field $F$
 with transcendence basis stored in the array $S$.
 """
 function FunctionField(F::Singular.Field, S::AbstractVector{<:VarName}; cached::Bool=true)
-   isa(F, Rationals) || isa(F, N_ZpField) ||
-             error("Only transcendental extensions of Q and Fp are supported.")
+   isa(F, Rationals) || isa(F, N_ZpField) || isa(F, N_AlgExtField) ||
+             error("Only transcendental extensions of Q, Fp, and algebraic extensions are supported.")
    isempty(S) && throw(ArgumentError("array must be non-empty"))
    R = N_FField(F, S, cached)
    return tuple(R, transcendence_basis(R))
