@@ -4,3 +4,6 @@ Singular = "bcd08a7b-43d2-5ff7-b6d4-c458787f915c"
 
 [compat]
 Documenter = "1"
+
+[sources]
+Singular = {path = ".."}
