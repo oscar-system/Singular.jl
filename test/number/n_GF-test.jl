@@ -250,3 +250,18 @@ end
    @test s2 == rand(rng, R, 2)
    @test s3 == rand(rng, R, 2, 3)
 end
+
+@testset "n_GF.conversion_boundaries" begin
+   # large values only as BigInt: nfInit reduces a machine integer by repeated
+   # subtraction, so F(2^62) would take years
+   for (p, d) in ((2, 4), (7, 3), (101, 2))
+      F, = FiniteField(p, d, "a")
+      for v in (0, 1, -1, p - 1, p, -p, p + 1, 7p,
+                big(typemax(Int)), big(2)^64, -big(3)^80)
+         r = F(Int(mod(v, p)))
+         @test F(v) == r
+         @test F(Nemo.ZZ(v)) == r
+         @test F(ZZ(v)) == r
+      end
+   end
+end

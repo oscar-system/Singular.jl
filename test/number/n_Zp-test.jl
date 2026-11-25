@@ -125,3 +125,17 @@ end
    Random.seed!(rng, seed)
    @test x == rand(rng, m)
 end
+
+@testset "n_Zp.conversion_boundaries" begin
+   # 536870909 is the largest prime Fp accepts
+   for p in (2, 7, 536870909)
+      F = Fp(p)
+      for v in (0, 1, -1, p - 1, p, -p, p + 1, 7p, typemax(Int), typemin(Int),
+                big(2)^64, -big(3)^80)
+         r = F(Int(mod(v, p)))
+         @test F(v) == r
+         @test F(Nemo.ZZ(v)) == r
+         @test F(ZZ(v)) == r
+      end
+   end
+end
