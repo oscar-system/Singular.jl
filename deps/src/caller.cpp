@@ -16,6 +16,23 @@ using jlcxx::jlcxx_array_data;
 // Internal singular interpreter variable
 extern int inerror;
 
+static void restore_singular_state_after_error(
+    const BITSET saved_options,
+    const BITSET saved_verbose_options,
+    const ring   saved_ring,
+    const BITSET saved_ring_options,
+    const ring   call_ring,
+    const BITSET saved_call_ring_options)
+{
+  SI_RESTORE_OPT(saved_options, saved_verbose_options);
+  if (saved_ring != nullptr)
+    saved_ring->options = saved_ring_options;
+  if (call_ring != nullptr)
+    call_ring->options = saved_call_ring_options;
+  inerror = 0;
+  errorreported = 0;
+}
+
 static jl_value_t * jl_int64_vector_type;
 static jl_value_t * jl_int64_matrix_type;
 
@@ -282,6 +299,11 @@ jl_value_t * call_singular_library_procedure(std::string                   s,
                                              ring                          r,
                                              jlcxx::ArrayRef<jl_value_t *> arguments)
 {
+  const BITSET saved_options = si_opt_1;
+  const BITSET saved_verbose_options = si_opt_2;
+  const ring saved_ring = currRing;
+  const BITSET saved_ring_options = saved_ring == nullptr ? 0 : saved_ring->options;
+  const BITSET saved_call_ring_options = r == nullptr ? 0 : r->options;
   int    len = arguments.size();
   void * args[len];
   int    argtypes[len + 1];
@@ -296,16 +318,36 @@ jl_value_t * call_singular_library_procedure(std::string                   s,
       jl_error("Could not convert argument");
     }
   }
-  BOOLEAN      err;
+  BOOLEAN      err = FALSE;
   jl_value_t * retObj;
+  leftv        ret = nullptr;
   si_set_signals();
-  leftv        ret = ii_CallLibProcMFlags(s.c_str(), args, argtypes, argflags, r, err);
+  JL_TRY
+  {
+    ret = ii_CallLibProcMFlags(s.c_str(), args, argtypes, argflags, r, err);
+  }
+  JL_CATCH
+  {
+    si_reset_signals();
+    restore_singular_state_after_error(saved_options,
+                                       saved_verbose_options,
+                                       saved_ring,
+                                       saved_ring_options,
+                                       r,
+                                       saved_call_ring_options);
+    jl_rethrow();
+  }
   si_reset_signals();
   if (err)
   {
-    inerror = 0;
-    errorreported = 0;
-    if (err==2) jl_error("Could not call function");
+    restore_singular_state_after_error(saved_options,
+                                       saved_verbose_options,
+                                       saved_ring,
+                                       saved_ring_options,
+                                       r,
+                                       saved_call_ring_options);
+    if (err==2)
+      jl_error("Could not call function");
     else if(err==1)
     {
       std::stringstream ss;

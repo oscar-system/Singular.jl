@@ -78,6 +78,62 @@
     @test 0 == reduce(x1*x2*x3*x4*x5*x6*x7*x8*x9 - 1, id)
 end
 
+@testset "caller restores options after errors" begin
+    R, _ = polynomial_ring(Singular.QQ, ["x"])
+    setup = Singular.libSingular.call_interpreter("""
+        intvec issue6421_saved_options=option(get);
+        option(noredSB); option(noredTail); option(noredThrough); option(nointStrategy);
+        proc issue6421_error()
+        {
+          option(redSB); option(redTail); option(redThrough); option(intStrategy);
+          ERROR(\"expected test error\");
+        }
+        proc issue6421_success() { option(redSB); return(1); }
+        """)
+    @test !setup[1]
+
+    try
+        options_before = Singular.libSingular.call_interpreter("option();")[2]
+        @test_throws ErrorException Singular.low_level_caller_ring("issue6421_error", R, Any[])
+        options_after = Singular.libSingular.call_interpreter("option();")[2]
+        @test options_after == options_before
+
+        @test_throws ErrorException Singular.low_level_caller("issue6421_error", Any[])
+        options_after = Singular.libSingular.call_interpreter("option();")[2]
+        @test options_after == options_before
+
+        @test_throws ErrorException Singular.low_level_caller_ring("issue6421_missing", R, Any[])
+        options_after = Singular.libSingular.call_interpreter("option();")[2]
+        @test options_after == options_before
+
+        current_ring_setup = Singular.libSingular.call_interpreter("""
+            ring issue6421_current_ring=0,(y),dp;
+            option(noredSB); option(noredTail); option(noredThrough); option(nointStrategy);
+            """)
+        @test !current_ring_setup[1]
+        try
+            current_ring_options_before = Singular.libSingular.call_interpreter("option();")[2]
+            @test_throws ErrorException Singular.low_level_caller("issue6421_error", Any[])
+            current_ring_options_after = Singular.libSingular.call_interpreter("option();")[2]
+            @test current_ring_options_after == current_ring_options_before
+        finally
+            current_ring_cleanup = Singular.libSingular.call_interpreter("kill issue6421_current_ring;")
+            @test !current_ring_cleanup[1]
+        end
+
+        @test Singular.low_level_caller_ring("issue6421_success", R, Any[]) == 1
+        options_after_success = Singular.libSingular.call_interpreter("option();")[2]
+        @test occursin("redSB", options_after_success)
+    finally
+        Singular.libSingular.call_interpreter("""
+            option(set, issue6421_saved_options);
+            kill issue6421_saved_options;
+            kill issue6421_error;
+            kill issue6421_success;
+            """)
+    end
+end
+
 @testset "caller.LibFinvar" begin
    Qw, (w,) = FunctionField(QQ, ["w"])
    K, w = AlgebraicExtensionField(Qw, w^2+w+1)
